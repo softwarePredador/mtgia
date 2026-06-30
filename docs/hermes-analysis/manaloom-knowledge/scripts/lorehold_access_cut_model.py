@@ -827,7 +827,7 @@ def build_model(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Access Cut Model - 2026-06-28",
+        "# Lorehold Access Cut Model - 2026-06-30",
         "",
         f"- generated_at: `{payload['generated_at']}`",
         f"- source_db: `{payload['source_db']}`",

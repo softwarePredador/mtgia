@@ -1,128 +1,73 @@
 {
   "action_queue": [
     {
-      "action_key": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
+      "action_key": "create_new_seed_safe_cut_hypothesis",
       "blockers": [
-        "seed 7 and seed 20260625 still lose 0-9 in the candidate-only access diagnostics",
-        "Squee and Land Tax are not naturally accessible in the weak seeds even though seed 42 wins when access appears early",
-        "prior exact tutor-over-Land-Tax benchmarks are negative, so the next package must preserve protected engine pieces unless a same-lane cut model proves otherwise"
+        "current focus-access package queue has zero gate-ready packages",
+        "access, tutor, and hand-filter cut models are exhausted for the current evidence",
+        "new package must preserve protected engine pieces and seed-42 telemetry"
       ],
-      "candidate_cards": [
-        "Land Tax",
-        "Library of Leng",
-        "Lorehold, the Historian",
-        "Scroll Rack",
-        "Sensei's Divining Top",
-        "Squee, Goblin Nabob",
-        "The Mind Stone",
-        "Urza's Saga"
-      ],
+      "candidate_cards": [],
       "cut_cards": [],
       "evidence": {
-        "candidate_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
-        "hypothesis_assessments": [
+        "exhausted_work": [
           {
-            "current_limitations": [
-              "per-game event counts available for seeds: 7",
-              "focus access seed 7: Urza's Saga:opening={'hand': 2, 'library': 7};early={'battlefield': 9, 'hand': 23, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | Library of Leng:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=6 | Sensei's Divining Top:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=27 | Scroll Rack:opening={'library': 9};early={'library': 144};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):1', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Squee, Goblin Nabob:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=4"
+            "blocked_package_count": 2,
+            "evidence_inputs": [
+              "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
             ],
-            "focus_cards": [
-              "Urza's Saga",
-              "Library of Leng",
-              "Sensei's Divining Top",
-              "Scroll Rack",
-              "Squee, Goblin Nabob"
-            ],
-            "hypothesis_key": "trace_seed7_engine_access_sequence",
-            "next_action": "review weak-seed access sequence and decide whether tutor/draw density or runtime sequencing is the blocker",
-            "target_seeds": [
-              "7"
-            ],
-            "trace_status": "focus_access_trace_available_review_sequence"
+            "failure_mode": "seed7_missing_engine_access",
+            "work_key": "contextual_tutor_cut_model"
           },
           {
-            "current_limitations": [
-              "per-game event counts available for seeds: 20260625",
-              "focus access seed 20260625: Library of Leng:opening={'hand': 1, 'library': 8};early={'battlefield': 19, 'hand': 10, 'library': 115};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 6, 'phase': 'turn_start', 'zone': 'hand'};min_library_position=1 | Sensei's Divining Top:opening={'hand': 1, 'library': 8};early={'battlefield': 12, 'hand': 4, 'library': 128};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Vivi Ornitier #99 (real):0', 'turn': 10, 'phase': 'after_precombat_main', 'zone': 'battlefield'};min_library_position=2 | Scroll Rack:opening={'hand': 2, 'library': 7};early={'battlefield': 14, 'hand': 18, 'library': 112};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):0', 'turn': 0, 'phase': 'opening_keep', 'zone': 'hand'};min_library_position=1 | The Mind Stone:opening={'hand': 1, 'library': 8};early={'hand': 19, 'library': 125};first_hand_or_battlefield={'game_id': 'candidate_607_squee_hashseed0_isolated_cached_timeout_v3:Sisay, Weatherlight Captain #61 (real):1', 'turn': 3, 'phase': 'after_draw_step', 'zone': 'hand'};min_library_position=1 | Land Tax:opening={'library': 9};early={'library': 144};first_hand_or_battlefield=-;min_library_position=19"
+            "blocked_package_count": 23,
+            "evidence_inputs": [
+              "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
             ],
-            "focus_cards": [
-              "Library of Leng",
-              "Sensei's Divining Top",
-              "Scroll Rack",
-              "The Mind Stone",
-              "Land Tax"
-            ],
-            "hypothesis_key": "trace_seed20260625_conversion_window",
-            "next_action": "review conversion-window access trace before changing The Mind Stone, Land Tax, or discard-to-top package",
-            "target_seeds": [
-              "20260625"
-            ],
-            "trace_status": "focus_access_trace_available_review_conversion"
+            "failure_mode": "seed20260625_conversion_under_pressure",
+            "work_key": "hand_filter_non_core_cut_search"
           },
           {
-            "current_limitations": [
-              "per-game event counts available for seeds: 7, 20260625, 42",
-              "Saga focus trace includes target_type, candidate_names, legal_target_names, and selected_reason"
+            "blocked_package_count": 0,
+            "evidence_inputs": [
+              "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_goal_learning_squee_access_density.json",
+              "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v2.json"
             ],
-            "focus_cards": [
-              "Urza's Saga",
-              "Sensei's Divining Top",
-              "Library of Leng"
-            ],
-            "hypothesis_key": "audit_urzas_saga_artifact_tutor_scope",
-            "next_action": "review Saga target scope against trace payload before changing cards",
-            "target_seeds": [
-              "7",
-              "20260625",
-              "42"
-            ],
-            "trace_status": "runtime_trace_payload_available_review_model_scope"
-          },
-          {
-            "current_limitations": [
-              "per-game event counts available for seeds: 7, 20260625, 42"
-            ],
-            "focus_cards": [
-              "Squee, Goblin Nabob",
-              "Library of Leng",
-              "Lorehold, the Historian"
-            ],
-            "hypothesis_key": "audit_squee_graveyard_entry_route",
-            "next_action": "add sequencing/runtime probe for Squee graveyard entry before testing another card swap",
-            "target_seeds": [
-              "7",
-              "20260625",
-              "42"
-            ],
-            "trace_status": "trace_evidence_supports_sequencing_gap"
+            "failure_mode": "squee_graveyard_entry_route",
+            "work_key": "squee_access_density_model"
           }
         ],
-        "trace_summary": {
-          "focus_card_count": 8,
-          "hypothesis_count": 4,
-          "primary_trace_level_counts": {
-            "per_game_event_counts": 3
+        "focus_access_summary": {
+          "access_model_status": "squee_route_modeled_access_density_needed",
+          "active_operational_work_count": 0,
+          "focus_failure_mode_count": 4,
+          "gate_ready_package_count": 0,
+          "operational_work_count": 3,
+          "package_candidate_count": 52,
+          "package_status_counts": {
+            "blocked_no_safe_cut": 30,
+            "blocked_no_target_failure_mode": 15,
+            "blocked_prior_negative_exact": 3,
+            "blocked_protected_cut": 2,
+            "trace_or_runtime_probe_required": 2
           },
-          "recommended_next_action": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
-          "seed_count": 3,
-          "seed_source_count": 6,
-          "trace_status_counts": {
-            "focus_access_trace_available_review_conversion": 1,
-            "focus_access_trace_available_review_sequence": 1,
-            "runtime_trace_payload_available_review_model_scope": 1,
-            "trace_evidence_supports_sequencing_gap": 1
-          }
+          "prior_rejected_package_count": 59,
+          "protected_card_count": 8,
+          "recommended_next_action": "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis",
+          "seed_42_anchor_available": true,
+          "squee_probe_status": "squee_route_modeled_but_access_gap_remains",
+          "top_operational_work_key": ""
         }
       },
       "lane": "strategy_learning",
       "next_steps": [
-        "Build a small access package that increases early Top/Rack/Library/Squee reach without repeating rejected Land Tax cuts.",
-        "Prefer cards already in local oracle/rule scope, then gate only the package that preserves seed-42 miracle/topdeck telemetry.",
-        "If the package cannot be evaluated because a card lacks runtime behavior, route that card to XMage/runtime implementation before battle."
+        "Expand cut-safety evidence or produce a lane-specific exposure model for non-protected cuts.",
+        "Prefer non-Squee recursion packages or tutor packages only after a seed-safe cut exists.",
+        "Do not run battle gates until the new package has explicit add/cut evidence and card-use criteria."
       ],
-      "priority": -2,
-      "status": "focus_access_trace_ready_for_package_design",
-      "why_now": "The latest failure-targeted audit has per-game access snapshots for the weak seeds. The blocker moved from missing telemetry to deciding whether access density, conversion timing, or runtime sequencing should be tested next."
+      "priority": -3,
+      "status": "focus_access_cut_models_exhausted_new_seed_safe_cut_required",
+      "why_now": "The focus-access generator consumed the weak-seed trace, current access model, tutor cut model, and hand-filter model and found zero gate-ready packages or active modeling work. The next step is not another battle gate; it is a fresh seed-safe cut hypothesis."
     },
     {
       "action_key": "build_failure_targeted_synergy_hypotheses",
@@ -295,729 +240,6 @@
       "priority": -1,
       "status": "hypothesis_queue_exhausted_requires_new_synthesis",
       "why_now": "The current hypothesis queue has 0 gate-ready packages and 13 tested negatives. The next move must explain the failed seeds and existing-engine sequencing before another card swap."
-    },
-    {
-      "action_key": "record_profiled_same_lane_benchmarks_exhausted",
-      "blockers": [
-        "same-lane candidate queue is exhausted for the currently profiled cuts",
-        "all evaluated same-lane packages either regressed strong seed 42 or are blocked by prior evidence"
-      ],
-      "candidate_cards": [],
-      "cut_cards": [
-        "Creative Technique",
-        "Bender's Waterskin",
-        "Generous Gift",
-        "Monument to Endurance"
-      ],
-      "cut_evidence_summary": {
-        "deck_card_count": 94,
-        "lorehold_variant_deck_ids": [
-          607,
-          608,
-          609,
-          610,
-          611,
-          612,
-          613,
-          614,
-          615,
-          616
-        ],
-        "manual_same_lane_only_count": 2,
-        "model_cut_exposure_count": 0,
-        "recommended_action_counts": {
-          "blocked": 61,
-          "commander": 1,
-          "mana_base": 28,
-          "manual_same_lane_only": 2,
-          "requires_same_lane_gate": 2
-        },
-        "status_counts": {
-          "blocked_by_cut_safety": 8,
-          "blocked_by_prior_rejection": 24,
-          "measured_cut_exposure_needs_same_lane_benchmark": 2,
-          "measured_high_cut_exposure": 5,
-          "never_cut": 29,
-          "same_lane_only": 2,
-          "structural_dependency": 24
-        }
-      },
-      "lane": "cut_modeling",
-      "next_steps": [
-        "Do not keep rerunning the profiled cut benchmark generator until the shell, corpus, or runtime rules change.",
-        "Move to focus-access trace review and failure-targeted package synthesis.",
-        "Reopen these cuts only if new variant cards become runtime-ready or the cut model changes."
-      ],
-      "priority": 3,
-      "profiled_cut_benchmark_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json",
-      "profiled_cut_benchmark_summary": {
-        "blocker_counts": {
-          "candidate_conditional_discard_payoff_not_early_mana_replacement": 4,
-          "candidate_much_higher_cmc": 125,
-          "candidate_narrow_color_hate": 1,
-          "candidate_policy_blocked_no_premium_mox": 8,
-          "candidate_role_mismatch:big_spell_value": 42,
-          "candidate_role_mismatch:discard_ramp_value": 15,
-          "candidate_role_mismatch:ramp": 114,
-          "candidate_role_mismatch:spot_removal": 57,
-          "candidate_role_mismatch:unknown": 776,
-          "candidate_scope_not_same_lane": 1030,
-          "candidate_too_low_curve_for_big_spell_slot": 152,
-          "candidate_unmodeled_discard_hand_cost": 4,
-          "candidate_unmodeled_life_payment_mana_cost": 12,
-          "prior_exact_reject": 31
-        },
-        "candidate_pool_count": 270,
-        "filtered_out_cut_count": 0,
-        "pair_evaluation_count": 1080,
-        "preflight_ready_pair_count": 0,
-        "profiled_cut_count": 4,
-        "recommended_next_action": "no_profiled_cut_benchmark_package_ready",
-        "selected_package_count": 0,
-        "status_counts": {
-          "blocked": 1080
-        },
-        "supported_cut_count": 4,
-        "unfiltered_profiled_cut_count": 4
-      },
-      "protected_high_exposure_cut_slots": [
-        {
-          "card_name": "Path to Exile",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 102,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "spot_removal",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "miracle_hit",
-              "paid_cast_exposure",
-              "spot_removal"
-            ],
-            "summary_metric_count": 43,
-            "unique_exposure_count": 145
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Path to Exile",
-            "deck_count": 4,
-            "deck_ids": [
-              607,
-              609,
-              613,
-              616
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 145 deduplicated exposures for this cut slot.",
-            "Measured role is spot_removal.",
-            "Exposure signals: miracle_hit, paid_cast_exposure, spot_removal."
-          ],
-          "recommended_action": "blocked",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Path to Exile",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_high_cut_exposure",
-          "strategy_decision": {
-            "decision": "core_support",
-            "effective_role": "removal",
-            "package_lane": "interaction",
-            "status": "core_support",
-            "tags": [
-              "instant_sorcery",
-              "removal"
-            ]
-          }
-        },
-        {
-          "card_name": "Swords to Plowshares",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 203,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "spot_removal",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "miracle_hit",
-              "paid_cast_exposure",
-              "spot_removal"
-            ],
-            "summary_metric_count": 31,
-            "unique_exposure_count": 234
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Swords to Plowshares",
-            "deck_count": 5,
-            "deck_ids": [
-              607,
-              608,
-              609,
-              610,
-              615
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 234 deduplicated exposures for this cut slot.",
-            "Measured role is spot_removal.",
-            "Exposure signals: miracle_hit, paid_cast_exposure, spot_removal."
-          ],
-          "recommended_action": "blocked",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Swords to Plowshares",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_high_cut_exposure",
-          "strategy_decision": {
-            "decision": "core_support",
-            "effective_role": "removal",
-            "package_lane": "interaction",
-            "status": "core_support",
-            "tags": [
-              "instant_sorcery",
-              "removal"
-            ]
-          }
-        },
-        {
-          "card_name": "Esper Sentinel",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 386,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "draw_filter_value",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "draw_filter_value",
-              "paid_cast_exposure",
-              "tutor_target"
-            ],
-            "summary_metric_count": 70,
-            "unique_exposure_count": 456
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Esper Sentinel",
-            "deck_count": 6,
-            "deck_ids": [
-              607,
-              609,
-              611,
-              613,
-              614,
-              615
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 456 deduplicated exposures for this cut slot.",
-            "Measured role is draw_filter_value.",
-            "Exposure signals: draw_filter_value, paid_cast_exposure, tutor_target."
-          ],
-          "recommended_action": "blocked",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Esper Sentinel",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_high_cut_exposure",
-          "strategy_decision": {
-            "decision": "core_engine_or_probation",
-            "effective_role": "draw",
-            "package_lane": "hand_filter",
-            "status": "core_or_flex_engine",
-            "tags": [
-              "draw",
-              "hand_filter"
-            ]
-          }
-        },
-        {
-          "card_name": "Smothering Tithe",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 801,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "ramp_engine",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "discard_or_rummage_context",
-              "paid_cast_exposure",
-              "ramp_engine"
-            ],
-            "summary_metric_count": 53,
-            "unique_exposure_count": 854
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Smothering Tithe",
-            "deck_count": 8,
-            "deck_ids": [
-              607,
-              608,
-              611,
-              612,
-              613,
-              614,
-              615,
-              616
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 854 deduplicated exposures for this cut slot.",
-            "Measured role is ramp_engine.",
-            "Exposure signals: discard_or_rummage_context, paid_cast_exposure, ramp_engine."
-          ],
-          "recommended_action": "blocked",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Smothering Tithe",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_high_cut_exposure",
-          "strategy_decision": {
-            "decision": "core_engine_or_probation",
-            "effective_role": "ramp",
-            "package_lane": "hand_filter",
-            "status": "core_support",
-            "tags": [
-              "hand_filter",
-              "mana_engine",
-              "ramp"
-            ]
-          }
-        },
-        {
-          "card_name": "Sensei's Divining Top",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 2726,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "runtime_ready_unexposed",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "rule_only",
-            "role_signals": [
-              "paid_cast_exposure"
-            ],
-            "summary_metric_count": 246,
-            "unique_exposure_count": 2972
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Sensei's Divining Top",
-            "deck_count": 10,
-            "deck_ids": [
-              607,
-              608,
-              609,
-              610,
-              611,
-              612,
-              613,
-              614,
-              615,
-              616
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 2972 deduplicated exposures for this cut slot.",
-            "Measured role is runtime_ready_unexposed.",
-            "Exposure signals: paid_cast_exposure."
-          ],
-          "recommended_action": "blocked",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2,
-              "protected_cut": 2
-            },
-            "card_name": "Sensei's Divining Top",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_high_cut_exposure",
-          "strategy_decision": {
-            "decision": "core_engine_or_probation",
-            "effective_role": "draw",
-            "package_lane": "hand_filter",
-            "status": "core_or_flex_engine",
-            "tags": [
-              "draw",
-              "hand_filter"
-            ]
-          }
-        }
-      ],
-      "status": "profiled_same_lane_benchmark_queue_exhausted",
-      "top_same_lane_cut_candidates": [
-        {
-          "card_name": "Creative Technique",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 34,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "runtime_ready_unexposed",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "rule_only",
-            "role_signals": [
-              "discard_or_rummage_context",
-              "paid_cast_exposure"
-            ],
-            "summary_metric_count": 4,
-            "unique_exposure_count": 38
-          },
-          "cut_safety": {
-            "best_delta_pp": 3.7,
-            "card_name": "Creative Technique",
-            "current_decision": "manual_review",
-            "current_lane": "finisher_or_big_spell",
-            "effective_role": "big_spell_value",
-            "observation_count": 1,
-            "observations": [
-              {
-                "adds": [
-                  "Gamble"
-                ],
-                "baseline": "8-19",
-                "candidate": "9-18",
-                "candidate_losses": 18,
-                "candidate_wins": 9,
-                "decision": "probation_deeper_gate_only",
-                "delta_pp": 3.7,
-                "family": "tutor_access",
-                "package_key": "gamble_approach_access_cut_creative",
-                "strong_seed_delta_pp": -44.45
-              }
-            ],
-            "reason": "aggregate upside exists, but it broke the known strong seed",
-            "status": "risky_cut_only_same_lane",
-            "worst_delta_pp": 3.7,
-            "worst_strong_seed_delta_pp": -44.45
-          },
-          "lorehold_variant_presence": {
-            "card_name": "Creative Technique",
-            "deck_count": 2,
-            "deck_ids": [
-              607,
-              614
-            ]
-          },
-          "reasons": [
-            "Cut-safety permits only a same-lane win after prior strong-seed regression."
-          ],
-          "recommended_action": "requires_same_lane_gate",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_is_miracle_core_big_spell": 2,
-              "incompatible_lane": 2,
-              "prior_rejected_cut": 2,
-              "protected_cut": 2
-            },
-            "card_name": "Creative Technique",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "same_lane_only",
-          "strategy_decision": {
-            "decision": "manual_review",
-            "effective_role": "big_spell_value",
-            "package_lane": "finisher_or_big_spell",
-            "status": "flex_or_contextual",
-            "tags": [
-              "draw",
-              "instant_sorcery",
-              "spell_copy"
-            ]
-          }
-        },
-        {
-          "card_name": "Bender's Waterskin",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 216,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "ramp_engine",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "paid_cast_exposure",
-              "ramp_engine"
-            ],
-            "summary_metric_count": 50,
-            "unique_exposure_count": 266
-          },
-          "cut_safety": {
-            "best_delta_pp": 3.7,
-            "card_name": "Bender's Waterskin",
-            "current_decision": "flex_but_cut_risky",
-            "current_lane": "early_mana",
-            "effective_role": "ramp",
-            "observation_count": 3,
-            "observations": [
-              {
-                "adds": [
-                  "Primal Amulet // Primal Wellspring"
-                ],
-                "baseline": "8-19",
-                "candidate": "7-20",
-                "candidate_losses": 20,
-                "candidate_wins": 7,
-                "decision": "reject_or_rework",
-                "delta_pp": -3.7,
-                "family": "cost_reduce_copy",
-                "package_key": "primal_amulet_spell_engine",
-                "strong_seed_delta_pp": -44.45
-              },
-              {
-                "adds": [
-                  "Galvanoth"
-                ],
-                "baseline": "8-19",
-                "candidate": "9-18",
-                "candidate_losses": 18,
-                "candidate_wins": 9,
-                "decision": "probation_deeper_gate_only",
-                "delta_pp": 3.7,
-                "family": "topdeck_freecast",
-                "package_key": "galvanoth_topdeck_freecast",
-                "strong_seed_delta_pp": -44.45
-              },
-              {
-                "adds": [
-                  "Brainstone"
-                ],
-                "baseline": "8-19",
-                "candidate": "6-21",
-                "candidate_losses": 21,
-                "candidate_wins": 6,
-                "decision": "reject_or_rework",
-                "delta_pp": -7.41,
-                "family": "topdeck_setup",
-                "package_key": "brainstone_topdeck_miracle",
-                "strong_seed_delta_pp": -33.33
-              }
-            ],
-            "reason": "aggregate upside exists, but it broke the known strong seed",
-            "status": "risky_cut_only_same_lane",
-            "worst_delta_pp": -7.41,
-            "worst_strong_seed_delta_pp": -44.45
-          },
-          "lorehold_variant_presence": {
-            "card_name": "Bender's Waterskin",
-            "deck_count": 7,
-            "deck_ids": [
-              607,
-              608,
-              609,
-              610,
-              611,
-              613,
-              614
-            ]
-          },
-          "reasons": [
-            "Cut-safety permits only a same-lane win after prior strong-seed regression."
-          ],
-          "recommended_action": "requires_same_lane_gate",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_is_early_mana_floor_support": 2,
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "prior_rejected_cut": 2,
-              "protected_cut": 2,
-              "same_as_blocked_source_cut": 1
-            },
-            "card_name": "Bender's Waterskin",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "same_lane_only",
-          "strategy_decision": {
-            "decision": "flex_but_cut_risky",
-            "effective_role": "ramp",
-            "package_lane": "early_mana",
-            "status": "core_support",
-            "tags": [
-              "mana_engine",
-              "ramp"
-            ]
-          }
-        },
-        {
-          "card_name": "Generous Gift",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 11,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "spot_removal",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "miracle_hit",
-              "paid_cast_exposure",
-              "spot_removal"
-            ],
-            "summary_metric_count": 31,
-            "unique_exposure_count": 42
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Generous Gift",
-            "deck_count": 4,
-            "deck_ids": [
-              607,
-              610,
-              614,
-              616
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 42 deduplicated exposures, so this is not a blind low-use cut.",
-            "Measured role is spot_removal.",
-            "Exposure signals: miracle_hit, paid_cast_exposure, spot_removal."
-          ],
-          "recommended_action": "manual_same_lane_only",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Generous Gift",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_cut_exposure_needs_same_lane_benchmark",
-          "strategy_decision": {
-            "decision": "core_support",
-            "effective_role": "removal",
-            "package_lane": "interaction",
-            "status": "core_support",
-            "tags": [
-              "instant_sorcery",
-              "removal"
-            ]
-          }
-        },
-        {
-          "card_name": "Monument to Endurance",
-          "cut_exposure": {
-            "decision_status": "review_required",
-            "direct_event_count": 7,
-            "exposure_profile": "docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
-            "inferred_role": "discard_ramp_value",
-            "next_action": "connect role to an explicit package hypothesis",
-            "role_confidence": "direct_event_or_rule",
-            "role_signals": [
-              "discard_payoff",
-              "paid_cast_exposure",
-              "ramp_engine"
-            ],
-            "summary_metric_count": 49,
-            "unique_exposure_count": 56
-          },
-          "cut_safety": {},
-          "lorehold_variant_presence": {
-            "card_name": "Monument to Endurance",
-            "deck_count": 7,
-            "deck_ids": [
-              607,
-              608,
-              609,
-              611,
-              613,
-              614,
-              615
-            ]
-          },
-          "reasons": [
-            "Replay profile measured 56 deduplicated exposures, so this is not a blind low-use cut.",
-            "Measured role is discard_ramp_value.",
-            "Exposure signals: discard_payoff, paid_cast_exposure, ramp_engine."
-          ],
-          "recommended_action": "manual_same_lane_only",
-          "safe_cut_replanner_evidence": {
-            "blocker_counts": {
-              "cut_not_flex_decision": 2,
-              "incompatible_lane": 1,
-              "missing_cut_safety_row": 2
-            },
-            "card_name": "Monument to Endurance",
-            "followup_count": 2,
-            "source_packages": {
-              "gods_willing_commander_shield_cut_promise": 1,
-              "past_in_flames_recast": 1
-            }
-          },
-          "status": "measured_cut_exposure_needs_same_lane_benchmark",
-          "strategy_decision": {
-            "decision": "core_engine_or_probation",
-            "effective_role": "ramp",
-            "package_lane": "hand_filter",
-            "status": "core_support",
-            "tags": [
-              "hand_filter",
-              "mana_engine",
-              "passive",
-              "ramp",
-              "unknown"
-            ]
-          }
-        }
-      ],
-      "why_now": "The profiled same-lane benchmark generator found no remaining preflight-ready packages after loading prior negative evidence."
     },
     {
       "action_key": "batch_xmage_runtime_rule_gaps",
@@ -7486,7 +6708,7 @@
       ],
       "priority": 90,
       "status": "tutor_land_tax_benchmarks_rejected",
-      "tutor_cut_model_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json",
+      "tutor_cut_model_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json",
       "why_now": "The tutor cut model found no direct seed-safe swap, and the highest same-access Land Tax benchmarks already lost the equal gate."
     }
   ],
@@ -7495,7 +6717,8 @@
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_cut_exposure_profile_20260628_v1.json"
   ],
-  "generated_at": "2026-06-30T21:52:02Z",
+  "focus_access_package_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
+  "generated_at": "2026-06-30T22:18:11Z",
   "guardrails": [
     {
       "guardrail_key": "no_automatic_gate_without_safe_cut",
@@ -7619,7 +6842,7 @@
   "mana_base_validator_reports": [
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
   ],
-  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json",
+  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json",
   "method_notes": [
     "This planner is a decision layer, not a promotion engine.",
     "A runtime-ready card is not gate-ready unless a safe cut model exists.",
@@ -7665,15 +6888,14 @@
   "source_db_mutated": false,
   "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
   "summary": {
-    "action_count": 9,
+    "action_count": 8,
     "action_status_counts": {
       "diagnostic_low_exposure_recorded_no_strategy_block": 1,
-      "focus_access_trace_ready_for_package_design": 1,
+      "focus_access_cut_models_exhausted_new_seed_safe_cut_required": 1,
       "hypothesis_queue_exhausted_requires_new_synthesis": 1,
       "no_hand_filter_benchmark_ready": 1,
       "no_mana_base_preflight_ready": 1,
       "no_recursion_benchmark_ready": 1,
-      "profiled_same_lane_benchmark_queue_exhausted": 1,
       "runtime_required_before_strategy_gate": 1,
       "tutor_land_tax_benchmarks_rejected": 1
     },
@@ -7772,7 +6994,7 @@
       "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
       "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon"
     ],
-    "recommended_next_action": "review_focus_access_trace_then_define_next_deck_or_runtime_package",
+    "recommended_next_action": "create_new_seed_safe_cut_hypothesis",
     "trace_audit_status_counts": {
       "focus_access_trace_available_review_conversion": 1,
       "focus_access_trace_available_review_sequence": 1,
@@ -7782,6 +7004,6 @@
   },
   "trace_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json",
   "tutor_cut_model_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
   ]
 }

@@ -7,6 +7,13 @@ import lorehold_tutor_cut_model as model
 def test_defaults_use_current_runtime_package_inputs():
     assert model.DEFAULT_STRATEGY_AUDIT.name == "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
     assert model.DEFAULT_MINER_REPORT.name == "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
+    assert model.DEFAULT_EXPOSURE_PROFILES[0].name == "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json"
+    assert "lorehold_tutor_cut_candidate_exposure_profile_20260627_v1.json" in {
+        path.name for path in model.DEFAULT_EXPOSURE_PROFILES
+    }
+    assert "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json" in {
+        path.name for path in model.DEFAULT_PRIOR_PACKAGE_REPORTS
+    }
     assert model.DEFAULT_BASELINE_DECK_ID == 607
 
 
@@ -219,3 +226,45 @@ def test_tutor_cut_model_blocks_prior_bad_cuts_and_requires_benchmark():
     candidates = {row["card_name"]: row for row in payload["candidates"]}
     assert candidates["Gamble"]["active_rule_count"] == 1
     assert len(candidates["Gamble"]["prior_tutor_evidence"]) == 2
+
+
+def test_prior_package_reports_block_failed_same_access_cut():
+    prior_package_reports = [
+        (
+            model.REPORT_DIR / "synthetic_prior.json",
+            {
+                "packages": [
+                    {
+                        "package_key": "gamble_access_benchmark_cut_land_tax",
+                        "family": "tutor_access_benchmark",
+                        "adds": ["Gamble"],
+                        "cuts": ["Land Tax"],
+                        "gate_summary": {
+                            "baseline": {"wins": 2, "losses": 1},
+                            "candidate": {"wins": 0, "losses": 3},
+                            "delta_pp": -66.67,
+                        },
+                    }
+                ]
+            },
+        )
+    ]
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            strategy_audit=strategy_audit(),
+            miner_report=miner_report(),
+            exposure_profiles=exposure_profiles(),
+            prior_package_reports=prior_package_reports,
+        )
+
+    by_pair = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["cut_pair_evaluations"]
+    }
+    pair = by_pair[("Gamble", "Land Tax")]
+    assert pair["status"] == "blocked"
+    assert "prior_strong_seed_regression:Land Tax" in pair["blockers"]
+    assert payload["prior_package_reports"] == [str(model.REPORT_DIR / "synthetic_prior.json")]
+    candidates = {row["card_name"]: row for row in payload["candidates"]}
+    assert len(candidates["Gamble"]["prior_tutor_evidence"]) == 3

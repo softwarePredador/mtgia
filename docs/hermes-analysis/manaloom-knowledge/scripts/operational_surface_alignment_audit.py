@@ -282,7 +282,7 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"],
+            ["lorehold_access_cut_model_20260630_goal_learning_squee_access_density.json"],
             "scripts.lorehold_focus_generator_uses_corrected_access_model",
         ),
         check_contains(
@@ -305,12 +305,13 @@ def build_checks() -> list[Check]:
             [
                 "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
                 "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json",
-                "lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json",
+                "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
+                "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json",
                 "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json",
                 "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
                 "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
                 "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
-                "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json",
+                "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json",
                 "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json",
                 "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json",
             ],

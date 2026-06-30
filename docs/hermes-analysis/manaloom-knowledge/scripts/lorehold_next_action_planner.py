@@ -26,7 +26,7 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
@@ -42,7 +42,12 @@ DEFAULT_HYPOTHESIS_QUEUE = (
 DEFAULT_TRACE_AUDIT = (
     REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
 )
-DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"]
+DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT = (
+    REPORT_DIR / "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
+)
+DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
+    REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
+]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
 ]
@@ -1361,6 +1366,59 @@ def build_focus_access_trace_action(trace_audit: dict[str, Any] | None) -> dict[
     }
 
 
+def build_focus_access_package_result_action(
+    focus_access_report: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not focus_access_report:
+        return None
+    summary = focus_access_report.get("summary") or {}
+    if (
+        summary.get("recommended_next_action")
+        != "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis"
+    ):
+        return None
+    if int(summary.get("active_operational_work_count") or 0) != 0:
+        return None
+    exhausted_work = [
+        {
+            "work_key": row.get("work_key"),
+            "failure_mode": row.get("failure_mode"),
+            "blocked_package_count": row.get("blocked_package_count"),
+            "evidence_inputs": row.get("evidence_inputs") or [],
+        }
+        for row in focus_access_report.get("operational_work_queue") or []
+        if row.get("status") == "model_exhausted_do_not_repeat_without_new_evidence"
+    ]
+    return {
+        "priority": -3,
+        "action_key": "create_new_seed_safe_cut_hypothesis",
+        "status": "focus_access_cut_models_exhausted_new_seed_safe_cut_required",
+        "lane": "strategy_learning",
+        "candidate_cards": [],
+        "cut_cards": [],
+        "why_now": (
+            "The focus-access generator consumed the weak-seed trace, current access model, "
+            "tutor cut model, and hand-filter model and found zero gate-ready packages or "
+            "active modeling work. The next step is not another battle gate; it is a fresh "
+            "seed-safe cut hypothesis."
+        ),
+        "blockers": [
+            "current focus-access package queue has zero gate-ready packages",
+            "access, tutor, and hand-filter cut models are exhausted for the current evidence",
+            "new package must preserve protected engine pieces and seed-42 telemetry",
+        ],
+        "next_steps": [
+            "Expand cut-safety evidence or produce a lane-specific exposure model for non-protected cuts.",
+            "Prefer non-Squee recursion packages or tutor packages only after a seed-safe cut exists.",
+            "Do not run battle gates until the new package has explicit add/cut evidence and card-use criteria.",
+        ],
+        "evidence": {
+            "focus_access_summary": summary,
+            "exhausted_work": exhausted_work,
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1467,11 +1525,13 @@ def build_plan(
     strategy_audit: dict[str, Any] | None = None,
     hypothesis_queue: dict[str, Any] | None = None,
     trace_audit: dict[str, Any] | None = None,
+    focus_access_package_report: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
     trace_audit_path: Path = DEFAULT_TRACE_AUDIT,
+    focus_access_package_path: Path = DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1487,9 +1547,15 @@ def build_plan(
     inconclusive_action = build_inconclusive_exposure_action(inconclusive_packages)
     if inconclusive_action:
         actions.append(inconclusive_action)
-    trace_action = build_focus_access_trace_action(trace_audit)
-    if trace_action:
-        actions.append(trace_action)
+    focus_access_result_action = build_focus_access_package_result_action(
+        focus_access_package_report
+    )
+    if focus_access_result_action:
+        actions.append(focus_access_result_action)
+    else:
+        trace_action = build_focus_access_trace_action(trace_audit)
+        if trace_action:
+            actions.append(trace_action)
     strategy_action = build_strategy_synthesis_action(strategy_audit, hypothesis_queue)
     if strategy_action:
         actions.append(strategy_action)
@@ -1552,6 +1618,9 @@ def build_plan(
         "strategy_audit": str(strategy_path) if strategy_audit else "",
         "hypothesis_queue": str(hypothesis_queue_path) if hypothesis_queue else "",
         "trace_audit": str(trace_audit_path) if trace_audit else "",
+        "focus_access_package_report": (
+            str(focus_access_package_path) if focus_access_package_report else ""
+        ),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
@@ -1627,6 +1696,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Strategy audit: `{payload.get('strategy_audit') or '-'}`",
         f"- Hypothesis queue: `{payload.get('hypothesis_queue') or '-'}`",
         f"- Trace audit: `{payload.get('trace_audit') or '-'}`",
+        f"- Focus-access package report: `{payload.get('focus_access_package_report') or '-'}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
@@ -1710,6 +1780,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
+    parser.add_argument("--focus-access-package-report", type=Path, default=DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
@@ -1728,6 +1799,11 @@ def main() -> int:
     strategy_audit = read_json(args.strategy_audit) if args.strategy_audit.exists() else None
     hypothesis_queue = read_json(args.hypothesis_queue) if args.hypothesis_queue.exists() else None
     trace_audit = read_json(args.trace_audit) if args.trace_audit.exists() else None
+    focus_access_package_report = (
+        read_json(args.focus_access_package_report)
+        if args.focus_access_package_report.exists()
+        else None
+    )
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
     tutor_cut_model_reports = read_existing_json(
@@ -1761,11 +1837,13 @@ def main() -> int:
         strategy_audit=strategy_audit,
         hypothesis_queue=hypothesis_queue,
         trace_audit=trace_audit,
+        focus_access_package_report=focus_access_package_report,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
         hypothesis_queue_path=args.hypothesis_queue,
         trace_audit_path=args.trace_audit,
+        focus_access_package_path=args.focus_access_package_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

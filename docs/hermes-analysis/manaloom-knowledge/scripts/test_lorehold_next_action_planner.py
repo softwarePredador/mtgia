@@ -4,10 +4,11 @@ import lorehold_next_action_planner as planner
 
 
 def test_defaults_use_current_cut_models():
-    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json"
+    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json"
     assert planner.DEFAULT_HYPOTHESIS_QUEUE.name == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
     assert planner.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
-    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"
+    assert planner.DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT.name == "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
+    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
     assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
     assert planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0].name == "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
 
@@ -1245,6 +1246,40 @@ def test_next_action_planner_prioritizes_focus_access_trace_review():
     assert action["status"] == "focus_access_trace_ready_for_package_design"
     assert "Squee, Goblin Nabob" in action["candidate_cards"]
     assert "The Mind Stone" in action["candidate_cards"]
+
+
+def test_next_action_planner_uses_focus_package_result_after_cut_models_exhausted():
+    focus_report = {
+        "summary": {
+            "recommended_next_action": "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis",
+            "active_operational_work_count": 0,
+            "gate_ready_package_count": 0,
+        },
+        "operational_work_queue": [
+            {
+                "work_key": "contextual_tutor_cut_model",
+                "status": "model_exhausted_do_not_repeat_without_new_evidence",
+                "failure_mode": "seed7_missing_engine_access",
+                "blocked_package_count": 2,
+                "evidence_inputs": ["tutor.json"],
+            }
+        ],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        trace_audit=trace_audit_report(),
+        focus_access_package_report=focus_report,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "create_new_seed_safe_cut_hypothesis"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    assert "review_focus_access_trace_then_define_next_deck_or_runtime_package" not in actions
+    action = actions["create_new_seed_safe_cut_hypothesis"]
+    assert action["status"] == "focus_access_cut_models_exhausted_new_seed_safe_cut_required"
+    assert action["evidence"]["exhausted_work"][0]["work_key"] == "contextual_tutor_cut_model"
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

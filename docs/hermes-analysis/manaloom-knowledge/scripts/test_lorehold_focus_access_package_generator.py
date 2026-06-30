@@ -5,10 +5,17 @@ def test_default_planner_uses_current_rejection_integrated_report():
     assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"
 
 
-def test_default_access_model_uses_post_pg276_assemble_access_density_report():
+def test_default_access_model_uses_goal_learning_access_density_report():
     assert (
         gen.DEFAULT_ACCESS_MODEL.name
-        == "lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"
+        == "lorehold_access_cut_model_20260630_goal_learning_squee_access_density.json"
+    )
+
+
+def test_default_tutor_cut_model_uses_goal_learning_contextual_report():
+    assert (
+        gen.DEFAULT_TUTOR_CUT_MODEL.name
+        == "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
     )
 
 
@@ -454,3 +461,64 @@ def test_completed_hand_filter_model_is_not_reprioritized_as_next_work():
     assert hand_filter["impact_score"] == -1
     assert hand_filter["next_command"] == "do_not_repeat_without_new_cut_or_runtime_evidence"
     assert report["summary"]["top_operational_work_key"] == "runtime_rule_gap_batch"
+
+
+def test_all_current_cut_models_exhausted_routes_to_new_seed_safe_cut_hypothesis():
+    pairing = {
+        "candidate": "Gamble",
+        "candidate_status": "high_frequency_runtime_ready_unexplored",
+        "candidate_score": 74,
+        "lane": "contextual",
+        "cut_options": [],
+    }
+    exhausted_hand_filter_model = {
+        "summary": {
+            "recommended_next_action": "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence",
+            "preflight_benchmark_ready_count": 0,
+            "expanded_preflight_benchmark_ready_count": 0,
+        }
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner_with_pairing(pairing),
+        squee_probe={
+            "summary": {
+                "status": "squee_route_modeled_but_access_gap_remains",
+                "modeled_when_accessed": True,
+                "weak_material_missing_squee_seeds": ["7", "20260625"],
+            }
+        },
+        access_model={
+            "summary": {
+                "access_density_status": "squee_route_modeled_access_density_needed",
+                "preflight_access_candidate_ready_count": 0,
+                "recommended_next_action": "no_access_swap_ready; build_new_seed_safe_cut",
+            }
+        },
+        tutor_cut_model={
+            "summary": {
+                "direct_gate_ready_count": 0,
+                "recommended_next_action": (
+                    "do_not_gate_direct_tutor_swap; benchmark same-access cuts or build additive package"
+                ),
+            }
+        },
+        hand_filter_cut_model=exhausted_hand_filter_model,
+        runtime_gap_queue={"summary": {"blocked_runtime_rule_gap_count": 0}},
+    )
+
+    assert report["summary"]["active_operational_work_count"] == 0
+    assert report["summary"]["top_operational_work_key"] == ""
+    assert report["summary"]["recommended_next_action"] == (
+        "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis"
+    )
+    assert report["instrumentation_route"]["status"] == (
+        "current_cut_models_exhausted_new_cut_required"
+    )
+    assert report["instrumentation_route"]["next_action"] == "create_new_seed_safe_cut_hypothesis"
+    statuses = {row["work_key"]: row["status"] for row in report["operational_work_queue"]}
+    assert statuses["squee_access_density_model"] == "model_exhausted_do_not_repeat_without_new_evidence"
+    assert statuses["contextual_tutor_cut_model"] == "model_exhausted_do_not_repeat_without_new_evidence"
+    assert statuses["hand_filter_non_core_cut_search"] == "model_exhausted_do_not_repeat_without_new_evidence"
