@@ -1,0 +1,105 @@
+{
+  "blocker_chain": [
+    {
+      "blocker": "no_gate_ready_package",
+      "evidence": "focus queue gate_ready_package_count=0",
+      "resolution": "rerun focus package generation only after runtime/safe-cut blockers change"
+    },
+    {
+      "blocker": "no_safe_access_cut",
+      "evidence": "access model preflight_access_candidate_ready_count=0",
+      "resolution": "find a seed-safe cut for the access/topdeck lane before battle gating"
+    },
+    {
+      "blocker": "hidden_retreat_product_truth_confirmed",
+      "evidence": "PG271 status=applied_synced",
+      "resolution": "no PostgreSQL action; continue cut/gate work"
+    },
+    {
+      "blocker": "card_level_evidence_required",
+      "evidence": "outcome audit deeper_gate_candidate_count=0, rejected_current_pair_count=11, inconclusive_no_used_sample_count=8",
+      "resolution": "promote only packages where the added card has observed used-game support"
+    }
+  ],
+  "env_status": {
+    "database_url_available_from_env_file": true,
+    "database_url_available_in_process": false,
+    "env_candidates_checked": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/.env",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server/.env",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/backend/.env"
+    ],
+    "env_probe": {
+      "attempted": true,
+      "database_url_present": true,
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_classification": "database_url_present"
+    },
+    "existing_env_files": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server/.env"
+    ],
+    "precheck_environment_ready": true,
+    "psql_path": "/opt/homebrew/bin/psql",
+    "selected_env_file": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/server/.env"
+  },
+  "generated_at": "2026-06-30T11:08:08Z",
+  "guardrails": [
+    "Do not run blind three-game swaps when the package queue has zero gate-ready candidates.",
+    "Do not treat aggregate battle record as card-level proof.",
+    "Do not repeat exact rejected pairs without a new failure target or cut rationale.",
+    "Do not rerun PG271 SQL when Hidden Retreat is already applied/synced.",
+    "Hermes/runtime overlay is laboratory evidence unless PostgreSQL apply and sync are complete."
+  ],
+  "inputs": {
+    "access_model": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_corrected.json",
+    "focus_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg276_lane_corrected.json",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+    "outcome_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_v1.json"
+  },
+  "manifest_extract": {
+    "deploy_id": "pg271",
+    "files": {
+      "apply": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_apply.sql",
+      "manifest": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+      "package": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md",
+      "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_postcheck.sql",
+      "precheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_precheck.sql",
+      "rollback": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_rollback.sql"
+    },
+    "mutations_performed": [],
+    "selected_card_names": [
+      "Hidden Retreat"
+    ],
+    "status": "applied_synced"
+  },
+  "postgres_precheck": {
+    "attempts": [
+      {
+        "attempted": false,
+        "classification": "not_requested",
+        "reason": "precheck execution is opt-in and read-only"
+      }
+    ],
+    "run_requested": false
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "summary": {
+    "access_model_recommended_next_action": "no_access_swap_ready; build_new_seed_safe_cut",
+    "deeper_gate_candidate_count": 0,
+    "focus_recommended_next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
+    "gate_ready_package_count": 0,
+    "hidden_retreat_package_status": "applied_synced",
+    "hidden_retreat_runtime_model_status": "local_db_active",
+    "inconclusive_no_used_sample_count": 8,
+    "missing_per_card_outcome_data_count": 44,
+    "outcome_audit_recommended_next_action": "avoid_repeating_rejected_pairs_and_generate_new_trace_targeted_package",
+    "pg271_apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+    "preflight_access_candidate_ready_count": 0,
+    "readiness_status": "hidden_retreat_synced_no_gate_ready_package",
+    "recommended_next_action": "continue_trace_targeted_cut_model_or_runtime_gap_work_before_more_battles",
+    "rejected_current_pair_count": 11,
+    "safe_to_run_battle_gate_now": false
+  }
+}

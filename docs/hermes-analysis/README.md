@@ -73,11 +73,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Resultado atual: manter `607` como baseline protegido; `615` e fonte para
     teste estreito de pacote, nao troca direta de deck.
   - Modelos ativos de corte/acesso Lorehold devem usar `607` como baseline
-    default. Evidencia corrente pos-PG276:
-    `master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_assemble_the_players_squee_access_density.md`.
+    default. Evidencia corrente pos-PG276 com correcao de lane por Oracle:
+    `master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_corrected.md`.
     Brainstone, Chaos Wand e Assemble the Players agora estao `verified/auto`
     com escopos executaveis, mas ainda nao ha pacote gate-ready porque falta
-    corte seguro.
+    corte seguro; a correcao bloqueia falsos cortes de interacao como
+    `Redirect Lightning` tratados como draw.
   - Fila runtime atual:
     `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`.
     `Codex Shredder`, `Perpetual Timepiece`, `Chaos Wand` e

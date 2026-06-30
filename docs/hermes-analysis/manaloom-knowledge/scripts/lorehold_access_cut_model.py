@@ -107,6 +107,24 @@ def json_list(value: object) -> list[Any]:
     return decoded if isinstance(decoded, list) else []
 
 
+def oracle_lane_override(row: dict[str, Any]) -> str | None:
+    oracle_text = str(row.get("oracle_text") or "").lower()
+    if "change the target of target spell or ability" in oracle_text:
+        return "protection"
+    if "counter target spell" in oracle_text or "counter target activated" in oracle_text:
+        return "protection"
+    if "prevent" in oracle_text and "damage" in oracle_text:
+        return "protection"
+    if (
+        "destroy target" in oracle_text
+        or "exile target" in oracle_text
+        or "deals damage to any target" in oracle_text
+        or ("deals " in oracle_text and " damage to target" in oracle_text)
+    ):
+        return "removal"
+    return None
+
+
 def load_deck_cards(conn: sqlite3.Connection, deck_id: int) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
@@ -146,6 +164,9 @@ def lane_for_card(row: dict[str, Any]) -> str:
         return "access_tutor"
     if tag == "ramp":
         return "early_mana"
+    oracle_override = oracle_lane_override(row)
+    if oracle_override:
+        return oracle_override
     if tag == "protection" or "protection" in oracle_tags:
         return "protection"
     if tag == "board_wipe" or "board_wipe" in oracle_tags:

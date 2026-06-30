@@ -8,7 +8,7 @@ def test_default_planner_uses_current_rejection_integrated_report():
 def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     assert (
         gen.DEFAULT_ACCESS_MODEL.name
-        == "lorehold_access_cut_model_20260630_post_pg276_assemble_the_players_squee_access_density.json"
+        == "lorehold_access_cut_model_20260630_post_pg276_lane_corrected.json"
     )
 
 

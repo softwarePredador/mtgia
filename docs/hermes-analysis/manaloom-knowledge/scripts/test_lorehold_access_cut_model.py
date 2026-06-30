@@ -51,6 +51,18 @@ def memory_db():
             (607, "Sensei's Divining Top", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
             (607, "Promise of Loyalty", 1, "draw", '["draw"]', "Sorcery", "", 5, 0),
             (607, "Low Exposure Topdeck Flex", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
+            (
+                607,
+                "Redirect Lightning",
+                1,
+                "draw",
+                '["draw"]',
+                "Instant - Lesson",
+                "As an additional cost to cast this spell, pay 5 life or pay {2}.\n"
+                "Change the target of target spell or ability with a single target.",
+                1,
+                0,
+            ),
             (607, "Boros Signet", 1, "ramp", '["ramp"]', "Artifact", "", 2, 0),
             (609, "Penance", 1, "draw", '["draw"]', "Enchantment", "", 3, 0),
             (609, "Hidden Retreat", 1, "draw", '["draw"]', "Enchantment", "", 3, 0),
@@ -291,6 +303,26 @@ def test_access_model_can_surface_same_lane_preflight_candidate():
     assert ready[("Brainstone", "Low Exposure Topdeck Flex")]["status"] == (
         "preflight_access_candidate_ready"
     )
+
+
+def test_access_model_uses_oracle_to_correct_misleading_draw_tag():
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            strategy_report=strategy_report(),
+            seed_matrix_report=seed_matrix_report(),
+            candidates=["Brainstone"],
+        )
+
+    pairs = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["pair_evaluations"]
+    }
+    redirect = pairs[("Brainstone", "Redirect Lightning")]
+    assert redirect["cut_lane"] == "protection"
+    assert redirect["status"] == "blocked_cut_or_prior_evidence"
+    assert "cut_cross_lane:protection" in redirect["blockers"]
+    assert "cut_is_protection_shell" in redirect["blockers"]
 
 
 def test_access_model_records_squee_access_density_context():
