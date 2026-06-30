@@ -1134,6 +1134,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
             default_names,
         )
         self.assertIn(
+            "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
+            default_names,
+        )
+        self.assertIn(
             "lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
             default_names,
         )

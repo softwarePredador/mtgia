@@ -4,7 +4,7 @@ import lorehold_next_action_planner as planner
 
 
 def test_defaults_use_current_cut_models():
-    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json"
+    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json"
     assert planner.DEFAULT_HYPOTHESIS_QUEUE.name == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
     assert planner.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
     assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"
@@ -963,12 +963,22 @@ def test_next_action_planner_default_prior_reports_include_strategy_audit():
 
 def test_next_action_planner_defaults_include_exposure_contract_report():
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
+    exposure_names = {path.name for path in planner.DEFAULT_EXPOSURE_PROFILES}
+    profiled_names = {path.name for path in planner.DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS}
 
+    assert "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json" in exposure_names
+    assert (
+        "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json"
+        in profiled_names
+    )
     assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
     assert "lorehold_exposure_outcome_audit_20260628_actionability_v1.json" in default_names
     assert "lorehold_forced_exposure_probe_decision_20260630.json" in default_names
     assert "lorehold_forced_signal_natural_confirm_decision_20260630.json" in default_names
     assert "lorehold_profiled_cut_benchmark_gate_decision_20260630.json" in default_names
+    assert "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json" in default_names
+    assert "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json" in default_names
+    assert "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json" in default_names
 
 
 def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_rejections():
@@ -998,6 +1008,17 @@ def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_reje
                         "delta_pp": 0.0,
                     },
                 },
+                {
+                    "package_key": "chaos_warp_same_lane_benchmark_cut_generous_gift",
+                    "adds": ["Chaos Warp"],
+                    "cuts": ["Generous Gift"],
+                    "decision": "reject_regresses_critical_matchup",
+                    "gate_summary": {
+                        "baseline": {"wins": 27, "losses": 44, "stalls": 1},
+                        "candidate": {"wins": 30, "losses": 42, "stalls": 0},
+                        "delta_pp": 3.64,
+                    },
+                },
             ]
         },
     )
@@ -1005,9 +1026,13 @@ def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_reje
     rejected = planner.rejected_package_evidence([prior])
 
     assert sorted(rejected) == [
+        "chaos_warp_same_lane_benchmark_cut_generous_gift",
         "enlightened_access_benchmark_cut_land_tax",
         "gamble_access_benchmark_cut_land_tax",
     ]
+    assert rejected["chaos_warp_same_lane_benchmark_cut_generous_gift"]["decision"] == (
+        "reject_regresses_critical_matchup"
+    )
     assert rejected["enlightened_access_benchmark_cut_land_tax"]["decision"] == (
         "tie_watch_strategy_regression"
     )

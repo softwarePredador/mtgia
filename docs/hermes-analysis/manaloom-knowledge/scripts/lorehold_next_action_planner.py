@@ -26,9 +26,10 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260630_goal_learning_deck607_exposure_current.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
+    REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
     REPORT_DIR / "lorehold_cut_exposure_profile_20260628_v1.json",
 ]
@@ -52,7 +53,7 @@ DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
 ]
 DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS = [
-    REPORT_DIR / "lorehold_profiled_cut_benchmark_generator_20260630_post_cloud_key_reject.json"
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json"
 ]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
@@ -76,6 +77,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_forced_exposure_probe_decision_20260630.json",
     REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
     REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
+    REPORT_DIR / "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
 ]
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
@@ -89,6 +93,8 @@ INCONCLUSIVE_EXPOSURE_DECISIONS = {
 }
 REJECTED_PRIOR_DECISIONS = {
     "reject_or_rework",
+    "reject_regresses_critical_matchup",
+    "invalid_or_incomplete",
     "forced_access_no_lift_reject_or_rework",
     "tie_watch_strategy_regression",
 }
@@ -282,6 +288,8 @@ def infer_package_decision(result: dict[str, Any]) -> str:
             return decision
         if exposure_decision:
             return exposure_decision
+        if decision in REJECTED_PRIOR_DECISIONS:
+            return decision
         return "reject_or_rework" if decision.startswith("reject") else decision
     aggregate = result.get("aggregate") or {}
     aggregate_decision = str(aggregate.get("decision") or "")

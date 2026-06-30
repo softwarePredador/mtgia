@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-30T20:55:27Z",
+  "source": "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "baseline_deck_id": 607,
+  "packages": [
+    {
+      "package_key": "chaos_warp_same_lane_benchmark_cut_generous_gift",
+      "family": "interaction_removal_benchmark",
+      "adds": ["Chaos Warp"],
+      "cuts": ["Generous Gift"],
+      "decision": "reject_regresses_critical_matchup",
+      "delta_pp": 3.64,
+      "baseline_wins": 27,
+      "baseline_losses": 44,
+      "candidate_wins": 30,
+      "candidate_losses": 42,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 4, "losses": 5, "stalls": 0, "games": 9},
+          "candidate": {"wins": 3, "losses": 6, "stalls": 0, "games": 9}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Chaos Warp",
+        "recorded_use_count": 31,
+        "accessed_games": 10,
+        "smoke_used_games_record": "8W/1L/0S"
+      },
+      "evidence_reports": [
+        "docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_gate_20260630_goal_learning_smoke_20260630_205058.md",
+        "docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_seed_matrix_20260630_goal_learning_confirm_20260630_205527.md",
+        "docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.md"
+      ]
+    }
+  ]
+}

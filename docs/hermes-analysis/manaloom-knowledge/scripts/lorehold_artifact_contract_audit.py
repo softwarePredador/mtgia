@@ -237,6 +237,34 @@ def summarize_profiled_cut_package_manifest(payload: Mapping[str, Any]) -> dict[
     }
 
 
+def summarize_prior_package_decision(payload: Mapping[str, Any]) -> dict[str, Any]:
+    packages = payload.get("packages") or []
+    packages = packages if isinstance(packages, list) else []
+    valid_rows = [
+        row
+        for row in packages
+        if isinstance(row, Mapping)
+        and row.get("package_key")
+        and isinstance(row.get("adds"), list)
+        and isinstance(row.get("cuts"), list)
+        and row.get("decision")
+    ]
+    decision_counts: dict[str, int] = {}
+    for row in valid_rows:
+        decision = str(row.get("decision"))
+        decision_counts[decision] = decision_counts.get(decision, 0) + 1
+    return {
+        "source": payload.get("source"),
+        "baseline_deck_id": payload.get("baseline_deck_id"),
+        "package_count": len(packages),
+        "valid_package_row_count": len(valid_rows),
+        "decision_counts": decision_counts,
+        "source_db_mutated": payload.get("source_db_mutated", False),
+        "postgres_writes": payload.get("postgres_writes", False),
+        "package_keys": [str(row.get("package_key")) for row in valid_rows],
+    }
+
+
 def summarize_exposure_aware_gate_queue(payload: Mapping[str, Any]) -> dict[str, Any]:
     packages = payload.get("packages") or []
     ready_queue = payload.get("ready_queue") or []
@@ -317,6 +345,23 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             schema_version="package_gate_v1",
             status="pass",
             detail="package gate; not an equal deck battle gate",
+            canonical_summary=summary,
+        )
+
+    if (
+        "packages" in keys
+        and "baseline_deck_id" in keys
+        and "source" in keys
+        and "postgres_writes" in keys
+        and "source_db_mutated" in keys
+    ):
+        summary = summarize_prior_package_decision(payload)
+        return ArtifactClassification(
+            **base,
+            artifact_kind="prior_package_decision",
+            schema_version="prior_package_decision_compact_v1",
+            status="pass" if summary["package_count"] == summary["valid_package_row_count"] else "warn",
+            detail="compact prior package decision rows for package-reject memory",
             canonical_summary=summary,
         )
 

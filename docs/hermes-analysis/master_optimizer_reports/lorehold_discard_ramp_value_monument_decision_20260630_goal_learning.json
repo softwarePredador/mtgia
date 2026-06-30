@@ -1,0 +1,129 @@
+{
+  "generated_at": "2026-06-30T21:30:21Z",
+  "source": "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "baseline_deck_id": 607,
+  "packages": [
+    {
+      "package_key": "cool_but_rude_same_lane_benchmark_cut_monument_to_endurance",
+      "family": "discard_ramp_value_benchmark",
+      "adds": ["Cool but Rude"],
+      "cuts": ["Monument to Endurance"],
+      "decision": "reject_or_rework",
+      "delta_pp": -8.33,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 9,
+      "candidate_losses": 15,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 0, "losses": 3, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Cool but Rude",
+        "recorded_use_count": 20,
+        "accessed_games": 4
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_gate_20260630_goal_learning_smoke_20260630_210849.md"
+    },
+    {
+      "package_key": "currency_converter_same_lane_benchmark_cut_monument_to_endurance",
+      "family": "discard_ramp_value_benchmark",
+      "adds": ["Currency Converter"],
+      "cuts": ["Monument to Endurance"],
+      "decision": "reject_regresses_critical_matchup",
+      "delta_pp": 0.0,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 11,
+      "candidate_losses": 13,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 1, "losses": 2, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Currency Converter",
+        "recorded_use_count": 41,
+        "accessed_games": 8
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_212135.md"
+    },
+    {
+      "package_key": "glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance",
+      "family": "discard_ramp_value_benchmark",
+      "adds": ["Glint-Horn Buccaneer"],
+      "cuts": ["Monument to Endurance"],
+      "decision": "reject_regresses_critical_matchup",
+      "delta_pp": -4.16,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 10,
+      "candidate_losses": 14,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 0, "losses": 3, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Glint-Horn Buccaneer",
+        "recorded_use_count": 13,
+        "accessed_games": 7
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_remaining_gate_20260630_goal_learning_smoke_20260630_213021.md"
+    },
+    {
+      "package_key": "magmakin_artillerist_same_lane_benchmark_cut_monument_to_endurance",
+      "family": "discard_ramp_value_benchmark",
+      "adds": ["Magmakin Artillerist"],
+      "cuts": ["Monument to Endurance"],
+      "decision": "reject_regresses_critical_matchup",
+      "delta_pp": -16.66,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 7,
+      "candidate_losses": 17,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 1, "losses": 2, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Magmakin Artillerist",
+        "recorded_use_count": 16,
+        "accessed_games": 11
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_remaining_gate_20260630_goal_learning_smoke_20260630_213021.md"
+    },
+    {
+      "package_key": "surly_badgersaur_same_lane_benchmark_cut_monument_to_endurance",
+      "family": "discard_ramp_value_benchmark",
+      "adds": ["Surly Badgersaur"],
+      "cuts": ["Monument to Endurance"],
+      "decision": "reject_regresses_critical_matchup",
+      "delta_pp": -4.16,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 10,
+      "candidate_losses": 14,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 0, "losses": 3, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Surly Badgersaur",
+        "recorded_use_count": 6,
+        "accessed_games": 7
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_remaining_gate_20260630_goal_learning_smoke_20260630_213021.md"
+    }
+  ]
+}

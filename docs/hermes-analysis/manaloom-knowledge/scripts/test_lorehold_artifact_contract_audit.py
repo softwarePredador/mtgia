@@ -132,6 +132,37 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
 
+    def test_prior_package_decision_compact_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-06-30T00:00:00Z",
+            "source": "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "baseline_deck_id": 607,
+            "packages": [
+                {
+                    "package_key": "glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance",
+                    "family": "discard_ramp_value_benchmark",
+                    "adds": ["Glint-Horn Buccaneer"],
+                    "cuts": ["Monument to Endurance"],
+                    "decision": "reject_regresses_critical_matchup",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prior_package_decision.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "prior_package_decision")
+        self.assertEqual(classification.schema_version, "prior_package_decision_compact_v1")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
+        self.assertEqual(
+            classification.canonical_summary["decision_counts"],
+            {"reject_regresses_critical_matchup": 1},
+        )
+
     def test_from_scratch_challenger_artifacts_are_recognized(self) -> None:
         summary_payload = {
             "candidates": [{"candidate_key": "challenger_lorehold_access_density_control_v1"}],

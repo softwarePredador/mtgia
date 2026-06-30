@@ -77,6 +77,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
     REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
     REPORT_DIR / "lorehold_cloud_key_waterskin_gate_20260630_all_lanes_20260630_082705.json",
+    REPORT_DIR / "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
 )
 
 

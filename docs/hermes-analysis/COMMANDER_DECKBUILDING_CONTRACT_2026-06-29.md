@@ -487,7 +487,19 @@ and miracle cadence. Also do not promote
 `cool_but_rude_same_lane_benchmark_cut_monument_to_endurance` or
 `currency_converter_same_lane_benchmark_cut_monument_to_endurance`; both were
 same-lane discard-ramp-value tests over `Monument to Endurance`, and neither
-passed the protected fast-pressure gate. The protected baseline remains `607`.
+passed the protected fast-pressure gate. Also do not promote
+`glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance`,
+`magmakin_artillerist_same_lane_benchmark_cut_monument_to_endurance`, or
+`surly_badgersaur_same_lane_benchmark_cut_monument_to_endurance`; the remaining
+same-lane discard-ramp-value candidates also lost the protected gate and
+regressed Winota. Also do not promote
+`possibility_storm_same_lane_benchmark_cut_creative_technique`; it was the
+remaining all-lanes package after prior filtering, but it lost the smoke gate
+and regressed Winota while collecting too little used-game outcome sample for a
+positive card-level claim. The current profiled same-lane one-for-one queue is
+closed: the latest all-lanes pass evaluated `1080` candidate/cut pairs, found
+`0` preflight-ready packages, and blocked `31` exact prior rejects. The
+protected baseline remains `607`.
 
 Package-gate correction generated on 2026-06-30:
 
@@ -623,8 +635,11 @@ Chaos Warp/Generous Gift profiled-removal decision generated on 2026-06-30:
 Discard-ramp-value / Monument decision generated on 2026-06-30:
 
 - Candidates:
-  `cool_but_rude_same_lane_benchmark_cut_monument_to_endurance` and
-  `currency_converter_same_lane_benchmark_cut_monument_to_endurance`.
+  `cool_but_rude_same_lane_benchmark_cut_monument_to_endurance`,
+  `currency_converter_same_lane_benchmark_cut_monument_to_endurance`,
+  `glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance`,
+  `magmakin_artillerist_same_lane_benchmark_cut_monument_to_endurance`, and
+  `surly_badgersaur_same_lane_benchmark_cut_monument_to_endurance`.
 - Why they were tested: `Monument to Endurance` is not generic ramp in the
   current shell; it is a discard-trigger value/ramp payoff tied to hand
   filtering, treasure, and opponent life-loss pressure. The profiled-cut
@@ -638,19 +653,78 @@ Discard-ramp-value / Monument decision generated on 2026-06-30:
   `11W/13L/0S` versus `607` `11W/12L/1S`, but Winota regressed from
   `2W/1L/0S` to `1W/2L/0S`. The card was used `41` times and accessed in
   `8` games.
+- Residual same-lane smoke results after prior-reject filtering:
+  `Glint-Horn Buccaneer` lost `10W/14L/0S` and Winota `0W/3L/0S`;
+  `Magmakin Artillerist` lost `7W/17L/0S` and Winota `1W/2L/0S`; and
+  `Surly Badgersaur` lost `10W/14L/0S` and Winota `0W/3L/0S`.
+- Direct card-use evidence exists for the residual candidates:
+  `Glint-Horn Buccaneer` use `13` / access `7`, `Magmakin Artillerist` use
+  `16` / access `11`, and `Surly Badgersaur` use `6` / access `7`.
 - Tooling decision: package gates now return
   `reject_regresses_critical_matchup` when a critical matchup record drops,
   even if aggregate win rate ties or improves.
-- Decision: keep `Monument to Endurance` protected in deck `607`. `Currency
-  Converter` remains a coherent card, but this exact cut is rejected; revisit
-  it only with a safer cut or a package-level hypothesis that preserves the
-  fast-pressure matchup.
+- Decision: keep `Monument to Endurance` protected in deck `607`. The current
+  discard-ramp-value one-for-one replacement pool over `Monument to Endurance`
+  is exhausted and rejected; revisit these cards only with a safer cut or a
+  package-level hypothesis that preserves the fast-pressure matchup.
 - Evidence reports:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_discard_ramp_value_monument.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_discard_ramp_value_monument_remaining.md`,
   `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_gate_20260630_goal_learning_smoke_20260630_210849.md`,
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_211343.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_212135.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_remaining_gate_20260630_goal_learning_smoke_20260630_213021.md`,
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.md`.
+
+Possibility Storm / Creative Technique decision generated on 2026-06-30:
+
+- Candidate:
+  `possibility_storm_same_lane_benchmark_cut_creative_technique`.
+- Why it was tested: after prior-exact blockers for `Chaos Warp / Generous
+  Gift` and the five current `Monument to Endurance` discard-ramp-value
+  replacements, the profiled all-lanes queue had one remaining
+  preflight-ready same-lane package. `Creative Technique` is protected, but the
+  registry allows a same-function `big_spell_value` benchmark.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `3W/21L/0S` versus `607` `11W/12L/1S`.
+- Critical matchup failure: Winota fell from `2W/1L/0S` on baseline `607` to
+  `0W/3L/0S` on the candidate.
+- Direct card-use evidence: `Possibility Storm` was accessed in `6` games and
+  recorded `3` use events, but produced only one used-game outcome sample; the
+  gate decision is therefore `insufficient_card_outcome_sample`, not a
+  promotion signal.
+- Decision: reject this exact natural package and keep `Creative Technique`
+  protected. Revisit `Possibility Storm` only through a forced-access
+  diagnostic or a materially different package hypothesis.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_after_monument_closure.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_big_spell_value_creative_technique_gate_20260630_goal_learning_smoke_20260630_213730.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.md`.
+
+Profiled cut queue closure generated on 2026-06-30:
+
+- Scope: current same-lane one-for-one package queue over protected deck `607`,
+  with variant decks `608` through `616` used as candidate context.
+- Latest all-lanes generator result:
+  `candidate_pool_count=270`, `pair_evaluation_count=1080`,
+  `preflight_ready_pair_count=0`, and `selected_package_count=0`.
+- The prior-reject registry now blocks the current rejected package signatures
+  for `Chaos Warp / Generous Gift`, all five current `Monument to Endurance`
+  discard-ramp-value replacements, and `Possibility Storm / Creative
+  Technique`.
+- Decision: stop this one-for-one queue. The next Lorehold learning cycle must
+  either introduce a new strategic safe-cut model, a multi-card package
+  hypothesis that preserves the Winota/fast-pressure guard, or a forced-access
+  diagnostic used only for card-understanding evidence.
+- Updated planner result:
+  `gate_ready_now_count=0`, `prior_rejected_package_count=59`, and
+  recommended next action
+  `review_focus_access_trace_then_define_next_deck_or_runtime_package`.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_queue_closed_decision_20260630_goal_learning.md`.
+- Next-action report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_queue_closed.md`.
 
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 

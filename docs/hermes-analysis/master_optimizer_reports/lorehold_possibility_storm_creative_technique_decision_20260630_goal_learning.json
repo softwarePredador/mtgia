@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-06-30T21:37:30Z",
+  "source": "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning",
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "baseline_deck_id": 607,
+  "packages": [
+    {
+      "package_key": "possibility_storm_same_lane_benchmark_cut_creative_technique",
+      "family": "big_spell_value_benchmark",
+      "adds": ["Possibility Storm"],
+      "cuts": ["Creative Technique"],
+      "decision": "insufficient_card_outcome_sample",
+      "delta_pp": -33.33,
+      "baseline_wins": 11,
+      "baseline_losses": 12,
+      "candidate_wins": 3,
+      "candidate_losses": 21,
+      "critical_matchup_records": {
+        "Winota": {
+          "baseline": {"wins": 2, "losses": 1, "stalls": 0, "games": 3},
+          "candidate": {"wins": 0, "losses": 3, "stalls": 0, "games": 3}
+        }
+      },
+      "card_use_evidence": {
+        "added_card": "Possibility Storm",
+        "recorded_use_count": 3,
+        "accessed_games": 6,
+        "used_game_outcome_sample": "1W/0L/0S"
+      },
+      "evidence_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_big_spell_value_creative_technique_gate_20260630_goal_learning_smoke_20260630_213730.md"
+    }
+  ]
+}

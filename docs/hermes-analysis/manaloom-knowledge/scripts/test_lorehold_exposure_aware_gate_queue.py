@@ -257,5 +257,5 @@ irrelevant package output
     assert status["markdown"] == "/tmp/report.md"
 
 
-def test_default_planner_uses_minimum_used_sample_contract():
-    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260628_min_used_sample_v2.json"
+def test_default_planner_uses_current_queue_closed_contract():
+    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"

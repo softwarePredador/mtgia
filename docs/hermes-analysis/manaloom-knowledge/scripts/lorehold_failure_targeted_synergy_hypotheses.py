@@ -30,7 +30,7 @@ DEFAULT_HYPOTHESIS_QUEUE = (
     REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 )
 DEFAULT_NEXT_ACTION_PLANNER = (
-    REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
+    REPORT_DIR / "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"
 )
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
