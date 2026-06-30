@@ -321,6 +321,41 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["applies_to_spell_colors"], ["W"])
         self.assertEqual(primary["cost_reduction_applies_to"], "spells_you_cast")
 
+    def test_cloud_key_maps_to_chosen_card_type_cost_reduction(self) -> None:
+        entry = {
+            "xmage_class_name": "CloudKey",
+            "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            "effect_classes": [
+                "ChooseCardTypeEffect",
+                "SpellsCostReductionAllOfChosenCardTypeEffect",
+            ],
+            "ability_classes": ["AsEntersBattlefieldAbility", "SimpleStaticAbility"],
+            "target_classes": [],
+            "cost_classes": [],
+            "filter_classes": ["FilterCard"],
+        }
+
+        result = hints.build_effect_hints(
+            entry,
+            (
+                "As Cloud Key enters the battlefield, choose artifact, creature, "
+                "enchantment, instant, or sorcery. Spells you cast of the chosen "
+                "type cost {1} less to cast."
+            ),
+        )
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "static_cost_reduction")
+        self.assertEqual(primary["battle_model_scope"], "chosen_card_type_cost_reduction_v1")
+        self.assertTrue(primary["choose_card_type_on_enter"])
+        self.assertEqual(
+            primary["chosen_card_type_options"],
+            ["artifact", "creature", "enchantment", "instant", "sorcery"],
+        )
+        self.assertEqual(primary["cost_reduction_applies_to"], "spells_you_cast_of_chosen_card_type")
+        self.assertTrue(primary["cost_reduction_uses_chosen_card_type"])
+        self.assertEqual(primary["cost_reduction_generic"], 1)
+
     def test_custom_power_based_cost_reduction_extracts_scarlet_witch_filters(self) -> None:
         result = hints.build_effect_hints(
             {

@@ -33,7 +33,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md`.
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:

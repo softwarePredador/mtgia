@@ -1818,6 +1818,38 @@ def _build_exact_runtime_variant_fields(
     normalized = _normalized_rules_text(rules_text)
 
     if (
+        xmage_class_name == "CloudKey"
+        and card_types == {"ARTIFACT"}
+        and ability_classes == {"AsEntersBattlefieldAbility", "SimpleStaticAbility"}
+        and effect_classes == {"ChooseCardTypeEffect", "SpellsCostReductionAllOfChosenCardTypeEffect"}
+        and not target_classes
+        and not cost_classes
+    ):
+        return {
+            "effect": "static_cost_reduction",
+            "scope": "chosen_card_type_cost_reduction_v1",
+            "fields": {
+                "permanent_type": "artifact",
+                "choose_card_type_on_enter": True,
+                "chosen_card_type_options": ["artifact", "creature", "enchantment", "instant", "sorcery"],
+                "preferred_card_type_order": ["instant", "sorcery", "artifact", "creature", "enchantment"],
+                "cost_reduction_applies_to": "spells_you_cast_of_chosen_card_type",
+                "cost_reduction_uses_chosen_card_type": True,
+                "cost_reduction_generic": 1,
+                "applies_to_controller": "source_controller",
+            },
+            "reason": (
+                "XMage structure matches Cloud Key's as-enters card-type choice plus a static "
+                "cost reduction for spells of the chosen type."
+            ),
+            "signals": [
+                "CloudKey",
+                "ChooseCardTypeEffect",
+                "SpellsCostReductionAllOfChosenCardTypeEffect",
+            ],
+        }
+
+    if (
         xmage_class_name == "DevotedDruid"
         and card_types == {"CREATURE"}
         and ability_classes == {"GreenManaAbility", "SimpleActivatedAbility"}

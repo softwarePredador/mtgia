@@ -5754,15 +5754,36 @@
     "battle_rule_oracle_hash": "d5300831d3df4276f01145ddeca85521"
   },
   "Cloud Key": {
-    "cmc": 3.0,
-    "effect": "ramp_permanent",
-    "mana_produced": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
+    "ability_kind": "static",
+    "applies_to_controller": "source_controller",
+    "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+    "choose_card_type_on_enter": true,
+    "chosen_card_type_options": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "instant",
+      "sorcery"
+    ],
+    "cost_reduction_applies_to": "spells_you_cast_of_chosen_card_type",
+    "cost_reduction_generic": 1,
+    "cost_reduction_uses_chosen_card_type": true,
+    "effect": "static_cost_reduction",
+    "permanent_type": "artifact",
+    "preferred_card_type_order": [
+      "instant",
+      "sorcery",
+      "artifact",
+      "creature",
+      "enchantment"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:797349f2d8c0cc961e0c0c1611b9beb6",
+    "battle_rule_oracle_hash": "19792b44d184aed6b5b075cfa5c0cbe4"
   },
   "Cloud of Faeries": {
     "ability_kind": "triggered",

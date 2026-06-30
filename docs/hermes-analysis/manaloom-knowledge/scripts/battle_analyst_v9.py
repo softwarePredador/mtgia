@@ -1103,6 +1103,7 @@ def alternative_cost_for_effect(player, card, effect_data):
 
 STATIC_COST_REDUCTION_EFFECTS = {"static_cost_reduction", "cost_reduction"}
 STATIC_COST_REDUCTION_SCOPE = "static_cost_reduction_for_matching_spells_v1"
+CHOSEN_CARD_TYPE_COST_REDUCTION_APPLIES_TO = "spells_you_cast_of_chosen_card_type"
 POWER_BASED_INSTANT_SORCERY_COST_REDUCTION_SCOPE = (
     "static_power_based_cost_reduction_for_instant_sorcery_mv4_plus_v1"
 )
@@ -1330,6 +1331,80 @@ def source_imprinted_card_types(source):
     return []
 
 
+def chosen_card_type_options(effect_data):
+    options = [
+        str(value).lower()
+        for value in _as_list((effect_data or {}).get("chosen_card_type_options"))
+        if str(value or "").lower() in MTG_SHARED_CARD_TYPES
+    ]
+    if options:
+        return options
+    return ["artifact", "creature", "enchantment", "instant", "sorcery"]
+
+
+def _card_type_choice_score(player, card_type, amount):
+    total_reduction = 0
+    matching_spell_count = 0
+    highest_mana_value = 0
+    for hand_card in getattr(player, "hand", []) or []:
+        if not isinstance(hand_card, dict):
+            continue
+        if not _card_type_matches(hand_card, [card_type]):
+            continue
+        cost = card_mana_cost(hand_card)
+        try:
+            generic_cost = max(0, int(cost.get("generic", 0) or 0))
+        except (TypeError, ValueError):
+            generic_cost = 0
+        applied_amount = min(generic_cost, max(0, int(amount or 0)))
+        if applied_amount <= 0:
+            continue
+        total_reduction += applied_amount
+        matching_spell_count += 1
+        highest_mana_value = max(highest_mana_value, int(card_mana_value(hand_card) or 0))
+    return total_reduction, matching_spell_count, highest_mana_value
+
+
+def choose_card_type_for_cost_reducer(player, permanent, effect_data):
+    options = chosen_card_type_options(effect_data)
+    preferred = [
+        str(value).lower()
+        for value in _as_list((effect_data or {}).get("preferred_card_type_order"))
+        if str(value or "").lower() in options
+    ]
+    preferred.extend(option for option in options if option not in preferred)
+    preference_rank = {card_type: len(preferred) - index for index, card_type in enumerate(preferred)}
+    amount = _static_cost_reduction_amount(permanent, effect_data, controller=player)
+    scored = []
+    for card_type in options:
+        total, count, highest = _card_type_choice_score(player, card_type, amount)
+        scored.append((total, count, highest, preference_rank.get(card_type, 0), card_type))
+    best_total, best_count, _highest, _rank, chosen = max(scored)
+    reason = "hand_maximize_reduction" if best_total > 0 and best_count > 0 else "preferred_default"
+    return chosen, reason, {
+        "estimated_reduction": best_total,
+        "matching_spell_count": best_count,
+    }
+
+
+def resolve_chosen_card_type_cost_reducer(player, permanent, effect_data, turn=None):
+    chosen, reason, score = choose_card_type_for_cost_reducer(player, permanent, effect_data)
+    permanent["chosen_card_type"] = chosen
+    permanent["chosen_card_type_reason"] = reason
+    permanent["chosen_card_type_options"] = chosen_card_type_options(effect_data)
+    emit_replay_event(
+        "chosen_card_type_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        chosen_card_type=chosen,
+        reason=reason,
+        estimated_reduction=score.get("estimated_reduction", 0),
+        matching_spell_count=score.get("matching_spell_count", 0),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
 def _static_cost_reduction_min_mana_value(effect_data):
     for key in (
         "minimum_mana_value",
@@ -1430,13 +1505,23 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
     shared_types = []
     imprinted_types = []
     spell_types = []
+    chosen_card_type = None
     if applies_to == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO:
         imprinted_types = source_imprinted_card_types(source)
         spell_types = shared_card_types(card)
         shared_types = sorted(set(imprinted_types) & set(spell_types))
         if not shared_types:
             return None
-    card_types = _static_cost_reduction_card_types(effect_data)
+    if (
+        applies_to == CHOSEN_CARD_TYPE_COST_REDUCTION_APPLIES_TO
+        or effect_data.get("cost_reduction_uses_chosen_card_type")
+    ):
+        chosen_card_type = str(
+            source.get("chosen_card_type") or effect_data.get("chosen_card_type") or ""
+        ).strip().lower()
+        if chosen_card_type not in chosen_card_type_options(effect_data):
+            return None
+    card_types = [chosen_card_type] if chosen_card_type else _static_cost_reduction_card_types(effect_data)
     if not shared_types and not _card_type_matches(card, card_types):
         return None
     min_mana_value = _static_cost_reduction_min_mana_value(effect_data)
@@ -1456,6 +1541,7 @@ def _static_cost_reduction_matches_spell(source, effect_data, card, *, controlle
         "imprinted_card_types": imprinted_types,
         "spell_card_types": spell_types,
         "shared_card_types": shared_types,
+        "chosen_card_type": chosen_card_type,
     }
 
 
@@ -39054,6 +39140,12 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "static_cost_reduction"
             player.battlefield.append(permanent)
+            if (
+                effect_data.get("choose_card_type_on_enter")
+                or str(effect_data.get("cost_reduction_applies_to") or "").strip().lower()
+                == CHOSEN_CARD_TYPE_COST_REDUCTION_APPLIES_TO
+            ):
+                resolve_chosen_card_type_cost_reducer(player, permanent, effect_data, turn=turn)
             if (
                 effect_data.get("requires_imprint_nonland_card")
                 or str(effect_data.get("cost_reduction_applies_to") or "").strip().lower()

@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
@@ -286,6 +286,7 @@ def audit_script_surface() -> list[Check]:
             [
                 "test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token",
                 "test_neheb_routes_to_exact_postcombat_life_lost_mana_engine",
+                "test_cloud_key_maps_to_chosen_card_type_cost_reduction",
                 "test_dynamic_mana_spell_routes_to_ritual_family",
                 "test_generic_blink_effect_routes_to_targeted_zone_transition_family",
                 "test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope",
@@ -309,6 +310,16 @@ def audit_script_surface() -> list[Check]:
                 "phase_trigger_resolved",
             ],
             check_name="tests.runtime_neheb_coverage_present",
+        ),
+        contains_all(
+            scripts / "test_cloud_key_runtime.py",
+            [
+                "test_cloud_key_chooses_best_hand_type_and_reduces_only_that_type",
+                "chosen_card_type_cost_reduction_v1",
+                "chosen_card_type_resolved",
+                "spells_you_cast_of_chosen_card_type",
+            ],
+            check_name="tests.runtime_cloud_key_coverage_present",
         ),
     ]
 
@@ -345,14 +356,14 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
     expected_counts = {
         "Validity status counts": {
             "ready_for_structured_xmage_pull_review_required": 70,
-            "xmage_source_valid_mapper_required": 62,
+            "xmage_source_valid_mapper_required": 61,
         },
         "Proposal status counts": {
             "split_family_scope_review_required": 70,
-            "mapper_metadata_or_test_scenario_required": 62,
+            "mapper_metadata_or_test_scenario_required": 61,
         },
         "Family counts": {
-            "manual_model": 62,
+            "manual_model": 61,
             "ramp_permanent": 5,
             "targeted_interaction": 12,
             "recursion": 11,

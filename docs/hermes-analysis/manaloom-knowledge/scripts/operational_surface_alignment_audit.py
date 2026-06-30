@@ -39,7 +39,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -135,10 +135,10 @@ def build_checks() -> list[Check]:
             XMAGE_FLOW,
             [
                 "Status: `current_operating_standard`",
-                "PG267 Neheb postcombat mana checkpoint",
+                "PG267/PG268 runtime-rule checkpoint",
                 CURRENT_XMAGE_MANIFEST,
                 "ready_for_structured_xmage_pull_review_required=70",
-                "xmage_source_valid_mapper_required=62",
+                "xmage_source_valid_mapper_required=61",
                 "runtime_family_required_count=0",
             ],
             "docs.xmage_flow_points_to_current_manifest",
@@ -181,8 +181,8 @@ def build_checks() -> list[Check]:
             [
                 CURRENT_XMAGE_MANIFEST,
                 '"ready_for_structured_xmage_pull_review_required": 70',
-                '"xmage_source_valid_mapper_required": 62',
-                '"mapper_metadata_or_test_scenario_required": 62',
+                '"xmage_source_valid_mapper_required": 61',
+                '"mapper_metadata_or_test_scenario_required": 61',
                 '"split_family_scope_review_required": 70',
             ],
             "scripts.xmage_strategy_audit_uses_current_manifest",

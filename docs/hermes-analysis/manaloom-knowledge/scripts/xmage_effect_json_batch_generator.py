@@ -222,6 +222,13 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "postcombat_life_lost_mana_trigger",
             "timing": "beginning_postcombat_main",
         }
+    if effect_json.get("battle_model_scope") == "chosen_card_type_cost_reduction_v1":
+        return {
+            "category": "support",
+            "effect": "static_cost_reduction",
+            "subtype": "chosen_card_type_cost_reducer",
+            "timing": "static_after_as_enters_choice",
+        }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             return {

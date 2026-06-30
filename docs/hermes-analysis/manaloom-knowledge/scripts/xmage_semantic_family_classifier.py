@@ -849,6 +849,26 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("artifact_enters_untap_source_status") == "annotation_only"
         )
 
+    if effect == "static_cost_reduction" and scope == "chosen_card_type_cost_reduction_v1":
+        return (
+            str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")
+            == "CloudKey"
+            and types == {"ARTIFACT"}
+            and ability_classes == {"AsEntersBattlefieldAbility", "SimpleStaticAbility"}
+            and effect_classes == {"ChooseCardTypeEffect", "SpellsCostReductionAllOfChosenCardTypeEffect"}
+            and not target_classes
+            and not cost_classes
+            and bool(effect_json.get("choose_card_type_on_enter"))
+            and effect_json.get("chosen_card_type_options")
+            == ["artifact", "creature", "enchantment", "instant", "sorcery"]
+            and effect_json.get("preferred_card_type_order")
+            == ["instant", "sorcery", "artifact", "creature", "enchantment"]
+            and effect_json.get("cost_reduction_applies_to") == "spells_you_cast_of_chosen_card_type"
+            and bool(effect_json.get("cost_reduction_uses_chosen_card_type"))
+            and int(effect_json.get("cost_reduction_generic") or 0) == 1
+            and effect_json.get("applies_to_controller") == "source_controller"
+        )
+
     if effect == "modal_spell" and scope == "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1":
         return (
             types == {"INSTANT"}

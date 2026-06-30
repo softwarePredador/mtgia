@@ -6852,6 +6852,80 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "postcombat_life_lost_mana_trigger",
         )
 
+    def test_classifier_and_generator_mark_cloud_key_chosen_type_reducer_batch_safe(self) -> None:
+        batch = {
+            "cards": [
+                {
+                    "card_name": "Cloud Key",
+                    "severity": "medium",
+                    "oracle_hash": "cloudkeyhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "CloudKey",
+                        "path": "/xmage/CloudKey.java",
+                        "types": ["ARTIFACT"],
+                        "effect_classes": [
+                            "ChooseCardTypeEffect",
+                            "SpellsCostReductionAllOfChosenCardTypeEffect",
+                        ],
+                        "ability_classes": ["AsEntersBattlefieldAbility", "SimpleStaticAbility"],
+                        "cost_classes": [],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "effect": "static_cost_reduction",
+                            "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+                            "permanent_type": "artifact",
+                            "choose_card_type_on_enter": True,
+                            "chosen_card_type_options": [
+                                "artifact",
+                                "creature",
+                                "enchantment",
+                                "instant",
+                                "sorcery",
+                            ],
+                            "preferred_card_type_order": [
+                                "instant",
+                                "sorcery",
+                                "artifact",
+                                "creature",
+                                "enchantment",
+                            ],
+                            "cost_reduction_applies_to": "spells_you_cast_of_chosen_card_type",
+                            "cost_reduction_uses_chosen_card_type": True,
+                            "cost_reduction_generic": 1,
+                            "applies_to_controller": "source_controller",
+                        },
+                    },
+                }
+            ]
+        }
+        family_report = classifier.build_family_report(batch)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "static_cost_reducer")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit=batch,
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Cloud Key",
+                        "candidate_rule": {"oracle_hash": "cloudkeyhash"},
+                        "external_references": {"scryfall": {"mana_cost": "{3}"}},
+                    }
+                ]
+            },
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "support")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "chosen_card_type_cost_reducer")
+        self.assertEqual(proposal["effect_json"]["battle_model_scope"], "chosen_card_type_cost_reduction_v1")
+
     def test_classifier_marks_birds_of_paradise_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

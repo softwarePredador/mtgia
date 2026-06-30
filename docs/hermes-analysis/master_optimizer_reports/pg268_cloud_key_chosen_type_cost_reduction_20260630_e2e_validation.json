@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T06:48:26.366769+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg268_cloud_key_chosen_type_cost_reduction_20260630_manifest.json",
+  "package_id": "pg268_cloud_key_chosen_type_cost_reduction_20260630_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+          "card_name": "Cloud Key",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:797349f2d8c0cc961e0c0c1611b9beb6",
+          "oracle_hash": "19792b44d184aed6b5b075cfa5c0cbe4",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+          "card_name": "Cloud Key",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:797349f2d8c0cc961e0c0c1611b9beb6",
+          "oracle_hash": "19792b44d184aed6b5b075cfa5c0cbe4",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cloud Key",
+          "logical_rule_key": "battle_rule_v1:797349f2d8c0cc961e0c0c1611b9beb6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Cloud Key",
+          "component_keys": [],
+          "effect": "static_cost_reduction",
+          "logical_rule_key": "battle_rule_v1:797349f2d8c0cc961e0c0c1611b9beb6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
