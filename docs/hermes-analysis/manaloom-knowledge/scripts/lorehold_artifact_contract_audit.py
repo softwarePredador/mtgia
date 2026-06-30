@@ -492,6 +492,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             "from-scratch shell failure synthesis",
         ),
         (
+            "closing_window_trace_miner",
+            {"closing_window_comparisons", "hypothesis_queue", "protected_baseline"},
+            "closing-window trace miner",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",

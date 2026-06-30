@@ -21,6 +21,9 @@ def test_defaults_use_current_cut_models():
     assert planner.DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT.name == (
         "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
     )
+    assert planner.DEFAULT_CLOSING_WINDOW_TRACE_REPORT.name == (
+        "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
+    )
     assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
         "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
     )
@@ -1473,6 +1476,48 @@ def test_next_action_planner_prioritizes_from_scratch_failure_synthesis():
     action = payload["action_queue"][0]
     assert action["status"] == "from_scratch_shell_learning_requires_trace_mining"
     assert action["candidate_cards"] == ["challenger_lorehold_access_density_control_v1"]
+
+
+def test_next_action_planner_prioritizes_closing_window_trace_over_failure_synthesis():
+    closing_window = {
+        "summary": {
+            "recommended_next_action": "build_trace_targeted_micro_package_from_closing_window",
+            "comparison_count": 3,
+            "next_steps": ["build a trace-targeted micro-package"],
+        },
+        "hypothesis_queue": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "ready_for_micro_package_model",
+            }
+        ],
+        "closing_window_comparisons": [{"candidate_key": "challenger_shell"}],
+    }
+    failure_synthesis = {
+        "summary": {
+            "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+            "can_run_next_battle_gate": False,
+            "blockers": ["all current shells are below protected 607"],
+        },
+        "shell_gate_rows": [{"candidate_key": "challenger_shell"}],
+        "learning_constraints": [],
+        "next_hypothesis_requirements": {},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_failure_synthesis=failure_synthesis,
+        closing_window_trace=closing_window,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_trace_targeted_micro_package_from_closing_window"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "closing_window_trace_targets_ready_for_micro_package_model"
+    assert action["candidate_count"] == 1
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

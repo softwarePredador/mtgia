@@ -343,6 +343,18 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "summary": {},
                 },
             ),
+            (
+                "closing_window_trace_miner",
+                {
+                    "closing_window_comparisons": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "hypothesis_queue": [],
+                    "postgres_writes": False,
+                    "protected_baseline": "deck_607",
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
         ]
 
         with tempfile.TemporaryDirectory() as tmp:

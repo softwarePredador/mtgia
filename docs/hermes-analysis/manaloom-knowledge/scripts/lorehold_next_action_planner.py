@@ -69,6 +69,9 @@ DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
 DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT = (
     REPORT_DIR / "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
 )
+DEFAULT_CLOSING_WINDOW_TRACE_REPORT = (
+    REPORT_DIR / "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -1763,6 +1766,44 @@ def build_from_scratch_failure_synthesis_action(
     return None
 
 
+def build_closing_window_trace_action(
+    closing_window_trace: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not closing_window_trace:
+        return None
+    summary = closing_window_trace.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    if recommended != "build_trace_targeted_micro_package_from_closing_window":
+        return None
+    hypotheses = list(closing_window_trace.get("hypothesis_queue") or [])
+    return {
+        "priority": -7,
+        "action_key": "build_trace_targeted_micro_package_from_closing_window",
+        "status": "closing_window_trace_targets_ready_for_micro_package_model",
+        "lane": "strategy_learning",
+        "candidate_cards": [],
+        "candidate_count": len(hypotheses),
+        "cut_cards": [],
+        "why_now": (
+            "Closing-window mining compared exact same-opponent slots where protected 607 "
+            "won and rejected shells lost. The dominant gaps are miracle/topdeck/spell-volume "
+            "deficits, so the next deck work must be a trace-targeted micro-package with "
+            "protected 607 anchors, not another broad shell."
+        ),
+        "blockers": [
+            "no package is ready until a micro-package names its add/cut lane",
+            "do not cut 607 anchors surfaced by the closing-window trace",
+            "do not battle-gate a package that has not predeclared miracle/topdeck/spell-volume targets",
+        ],
+        "next_steps": list(summary.get("next_steps") or []),
+        "evidence": {
+            "closing_window_summary": summary,
+            "hypothesis_queue": hypotheses,
+            "top_comparisons": list(closing_window_trace.get("closing_window_comparisons") or [])[:8],
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1874,6 +1915,7 @@ def build_plan(
     from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     from_scratch_failure_synthesis: dict[str, Any] | None = None,
+    closing_window_trace: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
@@ -1882,6 +1924,7 @@ def build_plan(
     focus_access_package_path: Path = DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT,
     seed_safe_cut_hypothesis_path: Path = DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT,
     from_scratch_failure_synthesis_path: Path = DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
+    closing_window_trace_path: Path = DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1911,6 +1954,9 @@ def build_plan(
     )
     if from_scratch_failure_action:
         actions.append(from_scratch_failure_action)
+    closing_window_action = build_closing_window_trace_action(closing_window_trace)
+    if closing_window_action:
+        actions.append(closing_window_action)
     focus_access_result_action = build_focus_access_package_result_action(
         focus_access_package_report
     )
@@ -2012,6 +2058,9 @@ def build_plan(
         "from_scratch_failure_synthesis_report": str(from_scratch_failure_synthesis_path)
         if from_scratch_failure_synthesis
         else None,
+        "closing_window_trace_report": str(closing_window_trace_path)
+        if closing_window_trace
+        else None,
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -2044,6 +2093,9 @@ def build_plan(
             "from_scratch_failure_synthesis": (
                 (from_scratch_failure_synthesis or {}).get("summary") or {}
             ),
+            "closing_window_trace_summary": (
+                (closing_window_trace or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -2064,6 +2116,7 @@ def build_plan(
             "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
             "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
             "A rejected from-scratch shell synthesis blocks another broad shell gate until a closing-window trace target is declared.",
+            "A completed closing-window trace routes to micro-package modeling; do not run another broad shell before the micro-package exists.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -2092,6 +2145,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- From-scratch reports: `{', '.join(payload.get('from_scratch_reports') or []) or '-'}`",
         f"- From-scratch gate reports: `{', '.join(payload.get('from_scratch_gate_reports') or []) or '-'}`",
         f"- From-scratch failure synthesis: `{payload.get('from_scratch_failure_synthesis_report') or '-'}`",
+        f"- Closing-window trace report: `{payload.get('closing_window_trace_report') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -2184,6 +2238,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
     )
+    parser.add_argument(
+        "--closing-window-trace-report",
+        type=Path,
+        default=DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
+    )
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
@@ -2236,6 +2295,11 @@ def main() -> int:
         if args.from_scratch_failure_synthesis_report.exists()
         else None
     )
+    closing_window_trace = (
+        read_json(args.closing_window_trace_report)
+        if args.closing_window_trace_report.exists()
+        else None
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -2254,6 +2318,7 @@ def main() -> int:
         from_scratch_reports=from_scratch_reports,
         from_scratch_gate_reports=from_scratch_gate_reports,
         from_scratch_failure_synthesis=from_scratch_failure_synthesis,
+        closing_window_trace=closing_window_trace,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
@@ -2262,6 +2327,7 @@ def main() -> int:
         focus_access_package_path=args.focus_access_package_report,
         seed_safe_cut_hypothesis_path=args.seed_safe_cut_hypothesis_report,
         from_scratch_failure_synthesis_path=args.from_scratch_failure_synthesis_report,
+        closing_window_trace_path=args.closing_window_trace_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

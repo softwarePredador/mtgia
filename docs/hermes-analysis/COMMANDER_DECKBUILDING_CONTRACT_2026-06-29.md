@@ -871,6 +871,29 @@ From-scratch shell failure synthesis generated on 2026-06-30:
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_shell_failure_synthesis.md`.
 
+Closing-window trace mining generated on 2026-06-30:
+
+- Scope: exact same-opponent slots where protected `607` won and a rejected
+  from-scratch shell lost, across the current recursion/discard, pressure
+  repair, and access-density gates.
+- Result: `13` direct comparisons; every compared challenger loss died before
+  the 607 closing window. Average 607 turn advantage was `10.15` turns.
+- Dominant strategic deficits were `lorehold_cost_paid=153`,
+  `lorehold_spell_cast=134`, `miracle_cast=71`,
+  `lorehold_upkeep_rummage=63`, `topdeck_manipulation_activated=41`, and
+  `static_cost_reduction_total=37`.
+- Dominant anchor deficits were `Sensei's Divining Top`, `Scroll Rack`,
+  `Approach of the Second Sun`, `Victory Chimes`, `Mizzix's Mastery`,
+  `Bender's Waterskin`, and `Jeska's Will`.
+- Decision: the next deck-learning step is
+  `build_trace_targeted_micro_package_from_closing_window`. Build only a
+  micro-package that preserves those 607 anchors, predeclares miracle/topdeck
+  and spell-volume targets, and repairs pressure/closing-window execution.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_closing_window_trace.md`.
+
 Electro ramp-benchmark decision generated on 2026-06-30:
 
 - Candidate:

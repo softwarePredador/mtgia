@@ -1,0 +1,968 @@
+{
+  "artifact_type": "closing_window_trace_miner",
+  "closing_window_comparisons": [
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Lorehold, the Historian": 2,
+        "cost_paid:Scroll Rack": 1,
+        "cost_paid:Surge to Victory": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Big Score": 1,
+        "miracle_cast:Jeska's Will": 1,
+        "spell_cast:Bender's Waterskin": 1,
+        "spell_cast:Scroll Rack": 1,
+        "spell_cast:Surge to Victory": 1,
+        "spell_cast:Victory Chimes": 1,
+        "topdeck_manipulation_activated:Scroll Rack": 3
+      },
+      "baseline_game_id": "deck_607:Sisay, Weatherlight Captain #61 (real):0",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 15,
+      "candidate_game_id": "challenger_lorehold_access_density_control_v1:Sisay, Weatherlight Captain #61 (real):0",
+      "candidate_key": "challenger_lorehold_access_density_control_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 6,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Sisay, Weatherlight Captain #61 (real)",
+      "opponent_archetype": "control",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 21,
+        "lorehold_spell_cast": 18,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 8,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 3
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_fixed607_gate.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 21,
+        "lorehold_spell_cast": 18,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 8,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 3
+      },
+      "turn_delta_607_minus_candidate": 9
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Scroll Rack": 1,
+        "cost_paid:Surge to Victory": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Big Score": 1,
+        "miracle_cast:Jeska's Will": 1,
+        "spell_cast:Bender's Waterskin": 1,
+        "spell_cast:Scroll Rack": 1,
+        "spell_cast:Surge to Victory": 1,
+        "spell_cast:Victory Chimes": 1,
+        "topdeck_manipulation_activated:Scroll Rack": 3
+      },
+      "baseline_game_id": "deck_607:Sisay, Weatherlight Captain #61 (real):0",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 15,
+      "candidate_game_id": "challenger_lorehold_access_density_control_v1:Sisay, Weatherlight Captain #61 (real):0",
+      "candidate_key": "challenger_lorehold_access_density_control_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 10,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Sisay, Weatherlight Captain #61 (real)",
+      "opponent_archetype": "control",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 12,
+        "lorehold_spell_cast": 10,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 7,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 1
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 12,
+        "lorehold_spell_cast": 10,
+        "lorehold_upkeep_rummage": 2,
+        "miracle_cast": 7,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 1
+      },
+      "turn_delta_607_minus_candidate": 5
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Approach of the Second Sun": 1,
+        "cost_paid:Mizzix's Mastery": 1,
+        "cost_paid:Sensei's Divining Top": 2,
+        "miracle_cast:Approach of the Second Sun": 1,
+        "spell_cast:Approach of the Second Sun": 1,
+        "spell_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 2,
+        "spell_resolved:Approach of the Second Sun": 2,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 2,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 3
+      },
+      "baseline_game_id": "deck_607:Aang, at the Crossroads #106 (real):1",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 15,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Aang, at the Crossroads #106 (real):1",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 8,
+      "game_index": 1,
+      "gap_tags": [
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "opponent": "Aang, at the Crossroads #106 (real)",
+      "opponent_archetype": "ramp_value",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 4,
+        "lorehold_spell_cast": 5,
+        "miracle_cast": 4,
+        "topdeck_manipulation_activated": 3
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 4,
+        "lorehold_spell_cast": 5,
+        "lorehold_upkeep_rummage": -3,
+        "miracle_cast": 4,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 3
+      },
+      "turn_delta_607_minus_candidate": 7
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Approach of the Second Sun": 1,
+        "cost_paid:Mizzix's Mastery": 1,
+        "cost_paid:Sensei's Divining Top": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Approach of the Second Sun": 1,
+        "spell_cast:Approach of the Second Sun": 1,
+        "spell_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_cast:Victory Chimes": 1,
+        "spell_resolved:Approach of the Second Sun": 2,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 1
+      },
+      "baseline_game_id": "deck_607:Aang, at the Crossroads #106 (real):2",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 12,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Aang, at the Crossroads #106 (real):2",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 9,
+      "game_index": 2,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "opponent": "Aang, at the Crossroads #106 (real)",
+      "opponent_archetype": "ramp_value",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 5,
+        "lorehold_spell_cast": 6,
+        "miracle_cast": 2
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 5,
+        "lorehold_spell_cast": 6,
+        "lorehold_upkeep_rummage": -3,
+        "miracle_cast": 2,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": -1
+      },
+      "turn_delta_607_minus_candidate": 3
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Jeska's Will": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Sensei's Divining Top": 2,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Approach of the Second Sun": 1,
+        "miracle_cast:Creative Technique": 1,
+        "spell_cast:Jeska's Will": 1,
+        "spell_cast:Sensei's Divining Top": 2,
+        "spell_cast:Victory Chimes": 1,
+        "spell_resolved:Approach of the Second Sun": 1,
+        "spell_resolved:Sensei's Divining Top": 2,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 2
+      },
+      "baseline_game_id": "deck_607:Rograkh, Son of Rohgahh #62 (real):0",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 11,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Rograkh, Son of Rohgahh #62 (real):0",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 7,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Rograkh, Son of Rohgahh #62 (real)",
+      "opponent_archetype": "combo",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 14,
+        "lorehold_spell_cast": 15,
+        "lorehold_upkeep_rummage": 6,
+        "miracle_cast": 7,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 2
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 14,
+        "lorehold_spell_cast": 15,
+        "lorehold_upkeep_rummage": 6,
+        "miracle_cast": 7,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 2
+      },
+      "turn_delta_607_minus_candidate": 4
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Approach of the Second Sun": 2,
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Lorehold, the Historian": 2,
+        "cost_paid:Molecule Man": 1,
+        "cost_paid:The Scarlet Witch": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Creative Technique": 1,
+        "miracle_cast:Jeska's Will": 1,
+        "miracle_cast:Surge to Victory": 1,
+        "spell_cast:Approach of the Second Sun": 2,
+        "spell_cast:Bender's Waterskin": 1,
+        "spell_resolved:Approach of the Second Sun": 2
+      },
+      "baseline_game_id": "deck_607:Vivi Ornitier #99 (real):0",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 34,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Vivi Ornitier #99 (real):0",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 6,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Vivi Ornitier #99 (real)",
+      "opponent_archetype": "combo",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 20,
+        "lorehold_spell_cast": 16,
+        "lorehold_upkeep_rummage": 6,
+        "miracle_cast": 11,
+        "static_cost_reduction_total": 8
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 20,
+        "lorehold_spell_cast": 16,
+        "lorehold_upkeep_rummage": 6,
+        "miracle_cast": 11,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 0
+      },
+      "turn_delta_607_minus_candidate": 28
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Lorehold, the Historian": 3,
+        "cost_paid:Scroll Rack": 1,
+        "cost_paid:Sensei's Divining Top": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Storm Herd": 1,
+        "spell_cast:Scroll Rack": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_cast:Victory Chimes": 1,
+        "spell_resolved:Scroll Rack": 1,
+        "spell_resolved:Sensei's Divining Top": 1,
+        "spell_resolved:Storm Herd": 1,
+        "topdeck_manipulation_activated:Scroll Rack": 4
+      },
+      "baseline_game_id": "deck_607:Winota, Joiner of Forces #39 (real):0",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 19,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Winota, Joiner of Forces #39 (real):0",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 7,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Winota, Joiner of Forces #39 (real)",
+      "opponent_archetype": "tribal",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 18,
+        "lorehold_spell_cast": 12,
+        "lorehold_upkeep_rummage": 17,
+        "miracle_cast": 4,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 4
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 18,
+        "lorehold_spell_cast": 12,
+        "lorehold_upkeep_rummage": 17,
+        "miracle_cast": 4,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 4
+      },
+      "turn_delta_607_minus_candidate": 12
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Sensei's Divining Top": 2,
+        "miracle_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 2,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 2,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 8
+      },
+      "baseline_game_id": "deck_607:Winota, Joiner of Forces #39 (real):1",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 18,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_engine_v1:Winota, Joiner of Forces #39 (real):1",
+      "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 12,
+      "game_index": 1,
+      "gap_tags": [
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "opponent": "Winota, Joiner of Forces #39 (real)",
+      "opponent_archetype": "tribal",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 9,
+        "lorehold_spell_cast": 8,
+        "miracle_cast": 2,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 8
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 9,
+        "lorehold_spell_cast": 8,
+        "lorehold_upkeep_rummage": -1,
+        "miracle_cast": 2,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 8
+      },
+      "turn_delta_607_minus_candidate": 6
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Approach of the Second Sun": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Mizzix's Mastery": 1,
+        "cost_paid:Sensei's Divining Top": 4,
+        "miracle_cast:Approach of the Second Sun": 1,
+        "spell_cast:Approach of the Second Sun": 1,
+        "spell_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 4,
+        "spell_resolved:Approach of the Second Sun": 2,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 4,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 8
+      },
+      "baseline_game_id": "deck_607:Aang, at the Crossroads #106 (real):1",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 15,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_pressure_repair_v1:Aang, at the Crossroads #106 (real):1",
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 9,
+      "game_index": 1,
+      "gap_tags": [
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ],
+      "opponent": "Aang, at the Crossroads #106 (real)",
+      "opponent_archetype": "ramp_value",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 7,
+        "lorehold_spell_cast": 8,
+        "miracle_cast": 5,
+        "topdeck_manipulation_activated": 8
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 7,
+        "lorehold_spell_cast": 8,
+        "lorehold_upkeep_rummage": 0,
+        "miracle_cast": 5,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 0,
+        "topdeck_manipulation_activated": 8
+      },
+      "turn_delta_607_minus_candidate": 6
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Mizzix's Mastery": 1,
+        "cost_paid:Sensei's Divining Top": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Approach of the Second Sun": 1,
+        "spell_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_cast:Victory Chimes": 1,
+        "spell_resolved:Approach of the Second Sun": 2,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 1
+      },
+      "baseline_game_id": "deck_607:Aang, at the Crossroads #106 (real):2",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 12,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_pressure_repair_v1:Aang, at the Crossroads #106 (real):2",
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 6,
+      "game_index": 2,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Aang, at the Crossroads #106 (real)",
+      "opponent_archetype": "ramp_value",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 2,
+        "lorehold_spell_cast": 4,
+        "lorehold_upkeep_rummage": 3,
+        "miracle_cast": 3
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 2,
+        "lorehold_spell_cast": 4,
+        "lorehold_upkeep_rummage": 3,
+        "miracle_cast": 3,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": -2,
+        "topdeck_manipulation_activated": 0
+      },
+      "turn_delta_607_minus_candidate": 6
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Approach of the Second Sun": 2,
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Molecule Man": 1,
+        "cost_paid:The Scarlet Witch": 1,
+        "miracle_cast:Creative Technique": 1,
+        "miracle_cast:Jeska's Will": 1,
+        "miracle_cast:Surge to Victory": 1,
+        "spell_cast:Approach of the Second Sun": 2,
+        "spell_cast:Bender's Waterskin": 1,
+        "spell_cast:Molecule Man": 1,
+        "spell_resolved:Approach of the Second Sun": 2
+      },
+      "baseline_game_id": "deck_607:Vivi Ornitier #99 (real):0",
+      "baseline_reason": "approach",
+      "baseline_result": "win",
+      "baseline_turns": 34,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_pressure_repair_v1:Vivi Ornitier #99 (real):0",
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 8,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "approach_conversion_missing",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Vivi Ornitier #99 (real)",
+      "opponent_archetype": "combo",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 15,
+        "lorehold_spell_cast": 12,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 10,
+        "static_cost_reduction_total": 8
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 15,
+        "lorehold_spell_cast": 12,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 10,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 8,
+        "topdeck_manipulation_activated": 0
+      },
+      "turn_delta_607_minus_candidate": 26
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Lorehold, the Historian": 3,
+        "cost_paid:Scroll Rack": 1,
+        "cost_paid:Sensei's Divining Top": 1,
+        "cost_paid:Victory Chimes": 1,
+        "miracle_cast:Storm Herd": 1,
+        "spell_cast:Scroll Rack": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_cast:Victory Chimes": 1,
+        "spell_resolved:Scroll Rack": 1,
+        "spell_resolved:Sensei's Divining Top": 1,
+        "spell_resolved:Storm Herd": 1,
+        "topdeck_manipulation_activated:Scroll Rack": 4
+      },
+      "baseline_game_id": "deck_607:Winota, Joiner of Forces #39 (real):0",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 19,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_pressure_repair_v1:Winota, Joiner of Forces #39 (real):0",
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 8,
+      "game_index": 0,
+      "gap_tags": [
+        "607_mana_timing_anchor_deficit",
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Winota, Joiner of Forces #39 (real)",
+      "opponent_archetype": "tribal",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 16,
+        "lorehold_spell_cast": 13,
+        "lorehold_upkeep_rummage": 17,
+        "miracle_cast": 4,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 4
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": 0,
+        "lorehold_cost_paid": 16,
+        "lorehold_spell_cast": 13,
+        "lorehold_upkeep_rummage": 17,
+        "miracle_cast": 4,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 4
+      },
+      "turn_delta_607_minus_candidate": 11
+    },
+    {
+      "anchor_card_event_delta_607_minus_candidate": {
+        "cost_paid:Lorehold, the Historian": 2,
+        "cost_paid:Sensei's Divining Top": 1,
+        "miracle_cast:Mizzix's Mastery": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_resolved:Mizzix's Mastery": 1,
+        "spell_resolved:Sensei's Divining Top": 1,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 8
+      },
+      "baseline_game_id": "deck_607:Winota, Joiner of Forces #39 (real):1",
+      "baseline_reason": "elimination",
+      "baseline_result": "win",
+      "baseline_turns": 18,
+      "candidate_game_id": "challenger_lorehold_recursion_discard_pressure_repair_v1:Winota, Joiner of Forces #39 (real):1",
+      "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+      "candidate_reason": "life_zero|found=False|countered=0",
+      "candidate_result": "loss",
+      "candidate_turns": 9,
+      "game_index": 1,
+      "gap_tags": [
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish",
+        "lorehold_spell_volume_deficit",
+        "miracle_cast_deficit",
+        "static_cost_reduction_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit",
+        "upkeep_rummage_deficit"
+      ],
+      "opponent": "Winota, Joiner of Forces #39 (real)",
+      "opponent_archetype": "tribal",
+      "positive_strategic_deltas": {
+        "lorehold_cost_paid": 10,
+        "lorehold_spell_cast": 7,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 4,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 8
+      },
+      "source_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+      "strategic_event_delta_607_minus_candidate": {
+        "birgi_spell_cast_mana": -2,
+        "lorehold_cost_paid": 10,
+        "lorehold_spell_cast": 7,
+        "lorehold_upkeep_rummage": 5,
+        "miracle_cast": 4,
+        "squee_upkeep_return": 0,
+        "static_cost_reduction_total": 1,
+        "topdeck_manipulation_activated": 8
+      },
+      "turn_delta_607_minus_candidate": 9
+    }
+  ],
+  "gate_reports": [
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_fixed607_gate.json",
+    "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json"
+  ],
+  "generated_at": "2026-06-30T23:24:28Z",
+  "hypothesis_queue": [
+    {
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "requirements": [
+        "do not cut Sensei's Divining Top, Scroll Rack, Bender's Waterskin, or Victory Chimes",
+        "predeclare miracle_cast and topdeck_manipulation_activated targets before gate",
+        "candidate must not overfill hand_filter plus graveyard_recursion plus conversion lanes together"
+      ],
+      "status": "ready_for_micro_package_model",
+      "target_gap_tags": [
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ]
+    },
+    {
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "pressure_survival_without_engine_cuts",
+      "requirements": [
+        "repair early pressure only with cards that preserve the 607 topdeck/miracle floor",
+        "Winota/Sisay/Vivi losses must be evaluated by same opponent slot before confirmation"
+      ],
+      "status": "ready_for_micro_package_model",
+      "target_gap_tags": [
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish"
+      ]
+    },
+    {
+      "evidence_cards": [
+        "topdeck_manipulation_activated:Sensei's Divining Top",
+        "cost_paid:Lorehold, the Historian",
+        "cost_paid:Sensei's Divining Top",
+        "spell_cast:Sensei's Divining Top",
+        "spell_resolved:Sensei's Divining Top",
+        "topdeck_manipulation_activated:Scroll Rack",
+        "spell_resolved:Approach of the Second Sun",
+        "cost_paid:Victory Chimes"
+      ],
+      "evidence_events": [
+        "lorehold_cost_paid",
+        "lorehold_spell_cast",
+        "miracle_cast",
+        "lorehold_upkeep_rummage",
+        "topdeck_manipulation_activated",
+        "static_cost_reduction_total"
+      ],
+      "hypothesis_key": "approach_big_spell_conversion_preservation",
+      "requirements": [
+        "protect Approach of the Second Sun, Mizzix's Mastery, and high-impact spell volume",
+        "do not treat tutor access as sufficient unless it restores spell volume and finish conversion"
+      ],
+      "status": "ready_for_micro_package_model",
+      "target_gap_tags": [
+        "approach_conversion_missing",
+        "lorehold_spell_volume_deficit"
+      ]
+    }
+  ],
+  "postgres_writes": false,
+  "protected_baseline": "deck_607",
+  "source_db_mutated": false,
+  "summary": {
+    "avg_607_turn_advantage": 10.15,
+    "candidate_counts": {
+      "challenger_lorehold_access_density_control_v1": 2,
+      "challenger_lorehold_recursion_discard_engine_v1": 6,
+      "challenger_lorehold_recursion_discard_pressure_repair_v1": 5
+    },
+    "comparison_count": 13,
+    "gap_counts": {
+      "607_mana_timing_anchor_deficit": 9,
+      "approach_conversion_missing": 7,
+      "candidate_died_before_closing_window": 13,
+      "candidate_lost_multiple_turns_before_607_finish": 13,
+      "lorehold_spell_volume_deficit": 13,
+      "miracle_cast_deficit": 13,
+      "static_cost_reduction_deficit": 9,
+      "topdeck_activation_deficit": 9,
+      "topdeck_engine_card_deficit": 11,
+      "upkeep_rummage_deficit": 9
+    },
+    "next_steps": [
+      "Use the hypothesis queue to build only a micro-package, not another broad shell.",
+      "Protect 607 anchors observed in winning close windows.",
+      "Predeclare target metrics before any battle gate.",
+      "Reject any package that improves access but loses miracle/topdeck/spell-volume deltas."
+    ],
+    "opponent_counts": {
+      "Aang, at the Crossroads #106 (real)": 4,
+      "Rograkh, Son of Rohgahh #62 (real)": 1,
+      "Sisay, Weatherlight Captain #61 (real)": 2,
+      "Vivi Ornitier #99 (real)": 2,
+      "Winota, Joiner of Forces #39 (real)": 4
+    },
+    "ready_micro_package_hypothesis_count": 3,
+    "recommended_next_action": "build_trace_targeted_micro_package_from_closing_window",
+    "top_anchor_card_deficits": [
+      {
+        "delta_total": 29,
+        "event": "topdeck_manipulation_activated:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 17,
+        "event": "cost_paid:Lorehold, the Historian"
+      },
+      {
+        "delta_total": 15,
+        "event": "cost_paid:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_cast:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_resolved:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 14,
+        "event": "topdeck_manipulation_activated:Scroll Rack"
+      },
+      {
+        "delta_total": 13,
+        "event": "spell_resolved:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 8,
+        "event": "cost_paid:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "cost_paid:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 6,
+        "event": "spell_resolved:Mizzix's Mastery"
+      },
+      {
+        "delta_total": 5,
+        "event": "miracle_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Bender's Waterskin"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Scroll Rack"
+      },
+      {
+        "delta_total": 4,
+        "event": "miracle_cast:Jeska's Will"
+      }
+    ],
+    "top_strategic_deficits": [
+      {
+        "delta_total": 153,
+        "event": "lorehold_cost_paid"
+      },
+      {
+        "delta_total": 134,
+        "event": "lorehold_spell_cast"
+      },
+      {
+        "delta_total": 71,
+        "event": "miracle_cast"
+      },
+      {
+        "delta_total": 63,
+        "event": "lorehold_upkeep_rummage"
+      },
+      {
+        "delta_total": 41,
+        "event": "topdeck_manipulation_activated"
+      },
+      {
+        "delta_total": 37,
+        "event": "static_cost_reduction_total"
+      }
+    ]
+  }
+}
