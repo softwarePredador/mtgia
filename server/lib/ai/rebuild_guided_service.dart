@@ -113,6 +113,13 @@ class RebuildResult {
   }
 }
 
+int rebuildGuidedEdhrecTopCardWeight(EdhrecCard card, int index) {
+  return 170 -
+      index +
+      (card.synergy * 40).round() +
+      (card.inclusionRate * 20).round();
+}
+
 class RebuildGuidedService {
   RebuildGuidedService(this._pool, {EdhrecService? edhrecService})
       : _edhrecService = edhrecService ?? EdhrecService();
@@ -594,11 +601,7 @@ class RebuildGuidedService {
     if (commanderData != null) {
       for (var i = 0; i < commanderData.topCards.length; i++) {
         final card = commanderData.topCards[i];
-        final weight = 170 -
-            i +
-            (card.synergy * 40).round() +
-            (card.inclusion * 20).round();
-        addWeight(card.name, weight);
+        addWeight(card.name, rebuildGuidedEdhrecTopCardWeight(card, i));
       }
     }
 

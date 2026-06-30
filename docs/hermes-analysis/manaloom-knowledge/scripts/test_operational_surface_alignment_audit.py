@@ -16,6 +16,11 @@ class OperationalSurfaceAlignmentAuditTests(unittest.TestCase):
         self.assertEqual(report["summary"]["status_counts"].get("fail", 0), 0)
         self.assertGreaterEqual(report["inventory"]["script_files"], 300)
         self.assertGreaterEqual(report["inventory"]["top_level_docs"], 100)
+        check_names = {check["name"] for check in report["checks"]}
+        self.assertIn(
+            "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
+            check_names,
+        )
 
     def test_forbidden_stale_snippet_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:

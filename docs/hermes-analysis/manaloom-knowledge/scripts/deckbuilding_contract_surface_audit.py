@@ -17,6 +17,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 CONTRACT_DOC = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_deckbuilding_contract_support.dart"
 STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.dart"
+REBUILD_GUIDED_SERVICE = REPO_ROOT / "server/lib/ai/rebuild_guided_service.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
@@ -131,6 +132,15 @@ def build_audit() -> dict[str, Any]:
                 "inclusionRate",
                 "structural_foundation",
                 "generic_or_low_context_signal",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            REBUILD_GUIDED_SERVICE,
+            [
+                "rebuildGuidedEdhrecTopCardWeight",
+                "card.inclusionRate * 20",
             ],
         )
     )

@@ -30,6 +30,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 STALE_SIBLING_DB = SCRIPT_DIR.parent / "knowledge.db"
+CURRENT_TARGET_DECK_ID = "607"
+LEGACY_TARGET_DECK_ID = "6"
 
 SQLITE_REQUIRED_COLUMNS: dict[str, set[str]] = {
     "battle_card_rules": {
@@ -381,13 +383,13 @@ def sqlite_cache_integrity_checks(conn: sqlite3.Connection) -> list[Check]:
             target_missing = sqlite_count(
                 conn,
                 "deck_cards",
-                "deck_id = 6 AND COALESCE(card_id, '') = ''",
+                f"deck_id = {CURRENT_TARGET_DECK_ID} AND COALESCE(card_id, '') = ''",
             )
             checks.append(
                 Check(
                     "sqlite_integrity.deck_cards_target_card_id",
                     "pass" if target_missing == 0 else "fail",
-                    f"deck_id_6_missing_card_id={target_missing}",
+                    f"deck_id_{CURRENT_TARGET_DECK_ID}_missing_card_id={target_missing}",
                 )
             )
             checks.append(
@@ -657,17 +659,24 @@ def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[
         )
 
     if table_exists(conn, "decks") and table_exists(conn, "deck_cards"):
-        deck = conn.execute(
-            "SELECT id, deck_name, notes FROM decks WHERE id=6 LIMIT 1"
-        ).fetchone()
-        if deck:
+        for deck_id, label in (
+            (CURRENT_TARGET_DECK_ID, "protected_deck_607"),
+            (LEGACY_TARGET_DECK_ID, "legacy_deck_6"),
+        ):
+            deck = conn.execute(
+                "SELECT id, deck_name, notes FROM decks WHERE id=? LIMIT 1",
+                (deck_id,),
+            ).fetchone()
+            if not deck:
+                continue
             match = re.search(r"pg_deck_id=([0-9a-fA-F-]{36})", str(deck[2] or ""))
             if match:
                 pg_deck_id = match.group(1)
-                sqlite_qty = sqlite_count(conn, "deck_cards", "deck_id=6")
+                sqlite_qty = sqlite_count(conn, "deck_cards", f"deck_id={deck_id}")
                 sqlite_total_qty = int(
                     conn.execute(
-                        "SELECT COALESCE(SUM(quantity), 0) FROM deck_cards WHERE deck_id=6"
+                        "SELECT COALESCE(SUM(quantity), 0) FROM deck_cards WHERE deck_id=?",
+                        (deck_id,),
                     ).fetchone()[0]
                     or 0
                 )
@@ -685,17 +694,17 @@ def pg_sqlite_parity_checks(conn: sqlite3.Connection, *, skip_pg: bool) -> list[
                 status = "pass" if int(pg_rows) == sqlite_qty and int(pg_qty) == sqlite_total_qty else "fail"
                 checks.append(
                     Check(
-                        "pg_sqlite_parity.deck_id_6_pg_snapshot",
+                        f"pg_sqlite_parity.{label}_pg_snapshot",
                         status,
-                        f"pg_deck_id={pg_deck_id} sqlite_rows={sqlite_qty} pg_rows={int(pg_rows)} sqlite_qty={sqlite_total_qty} pg_qty={int(pg_qty)}",
+                        f"deck_id={deck_id} pg_deck_id={pg_deck_id} sqlite_rows={sqlite_qty} pg_rows={int(pg_rows)} sqlite_qty={sqlite_total_qty} pg_qty={int(pg_qty)}",
                     )
                 )
             else:
                 checks.append(
                     Check(
-                        "pg_sqlite_parity.deck_id_6_pg_snapshot",
+                        f"pg_sqlite_parity.{label}_pg_snapshot",
                         "warn",
-                        "deck_id_6_has_no_pg_deck_id_note",
+                        f"deck_id_{deck_id}_has_no_pg_deck_id_note",
                     )
                 )
     return checks
@@ -714,11 +723,14 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
         )
     else:
         checks.append(Check("sqlite_db.active", "pass", str(sqlite_db)))
-        with sqlite3.connect(sqlite_db) as conn:
+        conn = sqlite3.connect(sqlite_db)
+        try:
             conn.row_factory = sqlite3.Row
             checks.extend(sqlite_schema_checks(conn))
             checks.extend(sqlite_cache_integrity_checks(conn))
             checks.extend(pg_sqlite_parity_checks(conn, skip_pg=skip_pg))
+        finally:
+            conn.close()
 
     if STALE_SIBLING_DB.exists() and STALE_SIBLING_DB.stat().st_size == 0:
         checks.append(

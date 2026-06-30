@@ -114,7 +114,32 @@ class LoreholdLossFailureClassifierTest(unittest.TestCase):
         self.assertEqual(len(rows), 3)
         self.assertEqual(
             sorted(row["package_key"] for row in rows),
-            ["a", "b", "baseline_squee_champion"],
+            ["a", "b", "legacy_baseline_deck_6"],
+        )
+
+    def test_collect_loss_rows_labels_current_607_baseline_as_protected(self):
+        payload = {
+            "simulation_seed": 7,
+            "results": [
+                {
+                    "deck_key": "deck_607",
+                    "game_results": [game(game_id="deck_607:Opponent:0")],
+                },
+                {
+                    "deck_key": "synergy_a",
+                    "game_results": [game(game_id="synergy_a:Opponent:0")],
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "gate.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+
+            rows = classifier.collect_loss_rows([path])
+
+        self.assertEqual(
+            sorted(row["package_key"] for row in rows),
+            ["a", "protected_baseline_607"],
         )
 
     def test_default_gate_paths_include_versioned_topfreecast_details_only(self):

@@ -37,7 +37,7 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
                 tmp / "lorehold_squee_gate_20260627_v1.json",
                 {
                     "results": [
-                        {"deck_key": "deck_6", "status": "pass", "games": 9, "wins": 5, "losses": 4, "stalls": 0, "win_rate": 55.56},
+                        {"deck_key": "deck_607", "status": "pass", "games": 9, "wins": 5, "losses": 4, "stalls": 0, "win_rate": 55.56},
                         {
                             "deck_key": "candidate_607_squee_hashseed0_isolated_cached_timeout_v3",
                             "archetype": "strategy-first-squee",
@@ -97,6 +97,36 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
             self.assertIn("lorehold_squee_gate_20260627_v1.json", champion["sources"])
             self.assertEqual(hidden["classification"], "latest_rejected")
             self.assertEqual(hidden["latest_candidate"]["damage_prevention_shield_created"], 0)
+
+    def test_deck_6_result_report_is_historical_observation_only(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            registry = tmp / "registry.json"
+            write_json(registry, {"current_leader": "candidate_607_squee_v1"})
+            write_json(
+                tmp / "lorehold_legacy_gate.json",
+                {
+                    "results": [
+                        {"deck_key": "deck_6", "status": "pass", "games": 9, "wins": 3, "losses": 6, "stalls": 0, "win_rate": 33.33},
+                        {
+                            "deck_key": "candidate_607_legacy_positive_v1",
+                            "status": "pass",
+                            "games": 9,
+                            "wins": 6,
+                            "losses": 3,
+                            "stalls": 0,
+                            "win_rate": 66.67,
+                        },
+                    ]
+                },
+            )
+
+            payload = ledger.build_ledger(tmp, registry)
+
+            group = next(row for row in payload["package_groups"] if row["package_key"] == "candidate_607_legacy_positive_v1")
+            self.assertEqual(group["classification"], "legacy_baseline_observation_only")
+            self.assertEqual(group["legacy_baseline_count"], 1)
+            self.assertNotIn(group, payload["actionable_confirmation_queue"])
 
     def test_conflicting_positive_and_negative_requires_confirmation(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -222,7 +252,7 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
                 {
                     "results": [
                         {
-                            "deck_key": "deck_6",
+                            "deck_key": "deck_607",
                             "wins": 1,
                             "losses": 3,
                             "stalls": 0,

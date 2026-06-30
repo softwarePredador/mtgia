@@ -16,7 +16,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from master_optimizer_common import battle_gate_cli_lines, battle_gate_report_lines
+from master_optimizer_common import (
+    battle_gate_cli_lines,
+    battle_gate_report_lines,
+    resolve_default_knowledge_db,
+)
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -24,7 +28,7 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 DOCS_DIR = REPO_ROOT / "docs" / "hermes-analysis"
 REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v9.py"
 DEFAULT_BATTLE_TEST = SCRIPT_DIR / "test_battle_analyst_v10_3.py"
 DEFAULT_SLOT_OPTIMIZER = SCRIPT_DIR / "slot_optimizer.py"

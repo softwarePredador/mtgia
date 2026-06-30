@@ -22,6 +22,10 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_OUTPUT_STEM = "lorehold_loss_failure_classifier_20260627_conversion_pressure_v8"
+CURRENT_BASELINE_KEY = "deck_607"
+LEGACY_BASELINE_KEY = "deck_6"
+CURRENT_BASELINE_PACKAGE_KEY = "protected_baseline_607"
+LEGACY_BASELINE_PACKAGE_KEY = "legacy_baseline_deck_6"
 
 
 CAUSE_LABELS = {
@@ -63,11 +67,17 @@ def default_gate_paths() -> list[Path]:
 
 
 def package_key_for_result(deck_key: str) -> str:
-    if deck_key == "deck_6":
-        return "baseline_squee_champion"
+    if deck_key == CURRENT_BASELINE_KEY:
+        return CURRENT_BASELINE_PACKAGE_KEY
+    if deck_key == LEGACY_BASELINE_KEY:
+        return LEGACY_BASELINE_PACKAGE_KEY
     if deck_key.startswith("synergy_"):
         return deck_key.removeprefix("synergy_")
     return deck_key
+
+
+def is_baseline_deck_key(deck_key: str) -> bool:
+    return deck_key in {CURRENT_BASELINE_KEY, LEGACY_BASELINE_KEY}
 
 
 def int_value(mapping: dict[str, Any], key: str) -> int:
@@ -198,7 +208,7 @@ def sort_seed(value: Any) -> tuple[int, str]:
 
 def collect_loss_rows(paths: list[Path]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    seen_baseline_games: set[tuple[Any, str]] = set()
+    seen_baseline_games: set[tuple[Any, str, str]] = set()
     for path in sorted(paths):
         payload = read_json(path)
         seed = payload.get("simulation_seed")
@@ -209,8 +219,8 @@ def collect_loss_rows(paths: list[Path]) -> list[dict[str, Any]]:
                 if game.get("result") != "loss":
                     continue
                 game_id = str(game.get("game_id") or "")
-                if deck_key == "deck_6":
-                    dedupe_key = (seed, game_id)
+                if is_baseline_deck_key(deck_key):
+                    dedupe_key = (seed, deck_key, game_id)
                     if dedupe_key in seen_baseline_games:
                         continue
                     seen_baseline_games.add(dedupe_key)

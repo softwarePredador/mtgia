@@ -52,6 +52,10 @@ ACTIVE_FILES = [
     SCRIPT_DIR / "lorehold_canonical_deck_snapshot.py",
     SCRIPT_DIR / "validate_deck_legalities.py",
     SCRIPT_DIR / "pg_hermes_sqlite_contract_audit.py",
+    SCRIPT_DIR / "xmage_current_replay_batch_pipeline.py",
+    SCRIPT_DIR / "battle_package_end_to_end_validation.py",
+    SCRIPT_DIR / "pgc060_end_to_end_validation.py",
+    SCRIPT_DIR / "master_optimizer_loop.py",
     REPO_ROOT / "server" / "bin" / "sync_hermes_learned_deck.sh",
     REPO_ROOT / "server" / "bin" / "pull_learning_events.py",
     REPO_ROOT / "server" / "bin" / "register_commanders.py",
@@ -92,6 +96,10 @@ PATH_CONTRACT_SNIPPETS = {
     "sync_hermes_learned_deck.sh": ["MANALOOM_REPO", "MANALOOM_KNOWLEDGE_DB", "MANALOOM_HERMES_SCRIPT_DIR"],
     "pull_learning_events.py": ["MANALOOM_KNOWLEDGE_DB", "PGHOST", "PGDATABASE"],
     "register_commanders.py": ["MANALOOM_KNOWLEDGE_DB", "DEFAULT_KNOWLEDGE_DB"],
+    "xmage_current_replay_batch_pipeline.py": ["resolve_default_knowledge_db", "--sqlite-db"],
+    "battle_package_end_to_end_validation.py": ["resolve_default_knowledge_db", "--sqlite-db"],
+    "pgc060_end_to_end_validation.py": ["resolve_default_knowledge_db", "--sqlite-db"],
+    "master_optimizer_loop.py": ["resolve_default_knowledge_db", "--db"],
 }
 
 CRON_SEQUENCE_SNIPPETS = {

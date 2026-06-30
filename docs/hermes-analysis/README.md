@@ -19,6 +19,15 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Use para evitar criar runner, tabela, campo, artefato ou fluxo redundante
     antes de verificar a superficie existente.
 
+- `MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md`
+  - Status: `current_failure_mode_gate`.
+  - Checklist transversal antes de declarar alinhamento entre battle, regras de
+    carta, deckbuilding, Hermes/SQLite e PostgreSQL.
+  - Cobre os bugs antigos que nao podem voltar: fanout por join cru, baseline
+    `deck_6` como shell atual, artefato legado sem normalizador, EDHREC por
+    `inclusion` absoluto, PostgreSQL/Hermes fora de ordem e conclusao por
+    batalha sem carta comprada/usada.
+
 ## Contrato de dados / aliases
 
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`

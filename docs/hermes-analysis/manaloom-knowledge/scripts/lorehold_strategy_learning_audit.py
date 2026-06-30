@@ -105,6 +105,11 @@ DEFAULT_LIBRARY_LENG_TELEMETRY_GATES = [
 DEFAULT_LOSS_FAILURE_CLASSIFIER = (
     REPORT_DIR / "lorehold_loss_failure_classifier_20260627_conversion_pressure_v8.json"
 )
+BASELINE_LOSS_PACKAGE_KEYS = {
+    "protected_baseline_607",
+    "legacy_baseline_deck_6",
+    "baseline_squee_champion",
+}
 DEFAULT_SAFE_PACKAGE_GATES = [
     REPORT_DIR / "lorehold_synergy_package_gate_20260627_v3_safe_queue_smoke2.json",
 ]
@@ -1027,7 +1032,7 @@ def build_strategy_dependency_map(
     baseline_loss_rows = [
         row
         for row in loss_rows
-        if row.get("package_key") == "baseline_squee_champion"
+        if row.get("package_key") in BASELINE_LOSS_PACKAGE_KEYS
     ]
     cut_rows = cut_safety_manifest.get("cuts") or []
     locked_cuts = [
@@ -1488,7 +1493,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             (
                 row
                 for row in loss_summary_rows
-                if row.get("seed") == 7 and row.get("package_key") == "baseline_squee_champion"
+                if row.get("seed") == 7 and row.get("package_key") in BASELINE_LOSS_PACKAGE_KEYS
             ),
             None,
         )
@@ -1496,7 +1501,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             (
                 row
                 for row in loss_summary_rows
-                if row.get("seed") == 20260625 and row.get("package_key") == "baseline_squee_champion"
+                if row.get("seed") == 20260625 and row.get("package_key") in BASELINE_LOSS_PACKAGE_KEYS
             ),
             None,
         )

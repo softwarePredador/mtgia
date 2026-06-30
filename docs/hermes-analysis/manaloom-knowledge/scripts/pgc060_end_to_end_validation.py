@@ -20,10 +20,11 @@ from pathlib import Path
 from typing import Any
 
 import db_helper
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 DEFAULT_SNAPSHOT = SCRIPT_DIR / "known_cards_canonical_snapshot.json"
 DEFAULT_BATTLE = SCRIPT_DIR / "battle_analyst_v9.py"
 

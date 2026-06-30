@@ -17,10 +17,11 @@ import xmage_effect_json_batch_generator as proposal_generator
 import xmage_local_rule_indexer as local_indexer
 import xmage_pattern_registry_builder as pattern_registry_builder
 import xmage_semantic_family_classifier as family_classifier
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_REPORT_DIR = SCRIPT_DIR.parent.parent / "master_optimizer_reports"
 DEFAULT_BATTLE_ARTIFACT_DIR = Path(
     "/Users/desenvolvimentomobile/.manaloom-agents/artifacts/battle-strategy-audit/latest"

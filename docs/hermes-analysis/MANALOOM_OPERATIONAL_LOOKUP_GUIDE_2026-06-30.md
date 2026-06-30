@@ -109,7 +109,13 @@ operational work queue and the planner trace review, not from a promotion gate.
 
 ## Validation Commands
 
-Before claiming the project is aligned:
+Before claiming the project is aligned, read
+`MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md` and run the matching
+gate set for the claim. The matrix is the cross-surface checklist for old bugs
+such as raw fanout joins, historical baseline `deck_6`, legacy artifacts,
+absolute EDHREC `inclusion` scoring, and PostgreSQL -> Hermes/SQLite drift.
+
+Default alignment set:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \

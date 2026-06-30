@@ -16,6 +16,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 CRITICAL_MATCHUP_TERMS = ("Winota", "Vivi", "Sisay")
+CURRENT_BASELINE_KEY = "deck_607"
+LEGACY_BASELINE_KEY = "deck_6"
 
 
 def utc_now() -> str:
@@ -191,11 +193,28 @@ def critical_terms_for_opponent(opponent: str) -> list[str]:
     return [term for term in CRITICAL_MATCHUP_TERMS if term.lower() in opponent.lower()]
 
 
+def resolve_baseline_result(results: Iterable[Any]) -> tuple[dict[str, Any] | None, str, bool]:
+    rows = [row for row in results if isinstance(row, dict)]
+    current = next((row for row in rows if row.get("deck_key") == CURRENT_BASELINE_KEY), None)
+    if isinstance(current, dict):
+        return current, CURRENT_BASELINE_KEY, False
+    legacy = next((row for row in rows if row.get("deck_key") == LEGACY_BASELINE_KEY), None)
+    if isinstance(legacy, dict):
+        return legacy, LEGACY_BASELINE_KEY, True
+    return None, "", False
+
+
+def result_gate_decision(delta_pp: float, baseline: Mapping[str, Any], candidate: Mapping[str, Any], *, legacy_baseline: bool) -> str:
+    if legacy_baseline:
+        return "legacy_baseline_observation_only"
+    return gate_decision(delta_pp, baseline, candidate)
+
+
 def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     results = payload.get("results") or []
     if not isinstance(results, list):
         return []
-    baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
+    baseline, baseline_key, baseline_is_legacy = resolve_baseline_result(results)
     if not isinstance(baseline, dict):
         return []
     observations: list[dict[str, Any]] = []
@@ -203,7 +222,7 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
         if not isinstance(row, dict):
             continue
         deck_key = str(row.get("deck_key") or "")
-        if deck_key == "deck_6" or not deck_key.startswith("candidate_"):
+        if deck_key == baseline_key or not deck_key.startswith("candidate_"):
             continue
         delta_pp = numeric(row.get("win_rate")) - numeric(baseline.get("win_rate"))
         observations.append(
@@ -218,10 +237,17 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
                 "adds": [],
                 "cuts": [],
                 "status": row.get("status"),
+                "baseline_key": baseline_key,
+                "baseline_is_legacy": baseline_is_legacy,
                 "baseline": compact_result(baseline),
                 "candidate": compact_result(row),
                 "delta_pp": round(delta_pp, 2),
-                "decision": gate_decision(delta_pp, baseline, row),
+                "decision": result_gate_decision(
+                    delta_pp,
+                    baseline,
+                    row,
+                    legacy_baseline=baseline_is_legacy,
+                ),
                 "games_per_opponent": payload.get("games_per_opponent"),
                 "opponent_limit": len(payload.get("opponents") or []),
                 "opponent_seed": payload.get("opponent_seed"),
@@ -265,8 +291,10 @@ def collect_synergy_critical_matchups(reports_dir: Path) -> dict[str, list[dict[
         results = payload.get("results") or []
         if not isinstance(results, list):
             continue
-        baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
+        baseline, baseline_key, baseline_is_legacy = resolve_baseline_result(results)
         if not isinstance(baseline, dict):
+            continue
+        if baseline_is_legacy:
             continue
         baseline_opponents = {
             str(row.get("opponent") or ""): row
@@ -366,6 +394,7 @@ def summarize_group(
     positive = [row for row in delta_rows if numeric(row.get("delta_pp")) > 0]
     negative = [row for row in delta_rows if numeric(row.get("delta_pp")) < 0]
     ties = [row for row in delta_rows if numeric(row.get("delta_pp")) == 0]
+    legacy_baseline_count = sum(1 for row in observations if row.get("baseline_is_legacy"))
     critical_improvements = [row for row in critical_matchups if row.get("result") == "improved"]
     critical_regressions = [row for row in critical_matchups if row.get("result") == "regressed"]
     critical_ties = [row for row in critical_matchups if row.get("result") == "tied"]
@@ -399,6 +428,7 @@ def summarize_group(
         "positive_count": len(positive),
         "negative_count": len(negative),
         "tie_count": len(ties),
+        "legacy_baseline_count": legacy_baseline_count,
         "critical_matchup_count": len(critical_matchups),
         "critical_improvement_count": len(critical_improvements),
         "critical_regression_count": len(critical_regressions),
@@ -442,6 +472,8 @@ def classify_group(
         return "blocked_prior_evidence"
     if latest_decision == "candidate_apply_error":
         return "candidate_apply_error"
+    if latest_decision == "legacy_baseline_observation_only":
+        return "legacy_baseline_observation_only"
     if latest_decision in {"preflight_ready", "apply_ready"}:
         if positive_count:
             return "preflight_ready_needs_gate"

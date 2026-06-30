@@ -23,6 +23,7 @@ REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 README = DOCS_DIR / "README.md"
 SCRIPTS_README = SCRIPT_DIR / "README.md"
 OPERATIONAL_LOOKUP_GUIDE = DOCS_DIR / "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md"
+FAILURE_MODE_MATRIX = DOCS_DIR / "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md"
 XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
@@ -42,10 +43,12 @@ LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
 LOREHOLD_REGISTRY_CANDIDATE_RUNNER = SCRIPT_DIR / "lorehold_registry_candidate_runner.py"
+LOREHOLD_LOSS_FAILURE_CLASSIFIER = SCRIPT_DIR / "lorehold_loss_failure_classifier.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
+REBUILD_GUIDED_SERVICE = REPO_ROOT / "server" / "lib" / "ai" / "rebuild_guided_service.dart"
 
 CURRENT_XMAGE_MANIFEST = (
     "xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md"
@@ -136,6 +139,7 @@ def build_checks() -> list[Check]:
                 "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
+                "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
                 CURRENT_XMAGE_MANIFEST,
                 "build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos",
             ],
@@ -149,10 +153,23 @@ def build_checks() -> list[Check]:
                 "lorehold_failure_targeted_synergy_hypotheses.py",
                 "--allow-legacy-registry-runner",
                 "--candidate-deck-id 607",
+                "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
                 "xmage_strategy_consistency_audit.py",
                 "--output-prefix",
             ],
             "docs.operational_lookup_guide_covers_lookup_params_and_legacy_blocks",
+        ),
+        check_contains(
+            FAILURE_MODE_MATRIX,
+            [
+                "Status: `current_failure_mode_gate`",
+                "raw multi-row intelligence joins",
+                "protected baseline `607`",
+                "inclusionRate",
+                "legacy baseline `deck_6`",
+                "PostgreSQL -> Hermes/SQLite",
+            ],
+            "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
         ),
         check_contains(
             XMAGE_FLOW,
@@ -313,6 +330,16 @@ def build_checks() -> list[Check]:
             "scripts.lorehold_registry_runner_blocked_by_default",
         ),
         check_contains(
+            LOREHOLD_LOSS_FAILURE_CLASSIFIER,
+            [
+                'CURRENT_BASELINE_KEY = "deck_607"',
+                'LEGACY_BASELINE_KEY = "deck_6"',
+                'CURRENT_BASELINE_PACKAGE_KEY = "protected_baseline_607"',
+                'LEGACY_BASELINE_PACKAGE_KEY = "legacy_baseline_deck_6"',
+            ],
+            "scripts.lorehold_loss_classifier_labels_current_and_legacy_baselines",
+        ),
+        check_contains(
             IDEAL_MATRIX,
             [
                 "historical Lorehold rule-first candidate matrix",
@@ -355,6 +382,14 @@ def build_checks() -> list[Check]:
                 "ready_for_battle_gate",
             ],
             "server.deckbuilding_contract_support_exists",
+        ),
+        check_contains(
+            REBUILD_GUIDED_SERVICE,
+            [
+                "rebuildGuidedEdhrecTopCardWeight",
+                "card.inclusionRate * 20",
+            ],
+            "server.rebuild_guided_scores_edhrec_by_inclusion_rate",
         ),
     ]
 
