@@ -338,6 +338,70 @@ RESEARCH_PLANS = {
             "This does not test The One Ring against a miracle-engine or ramp-timing card.",
         ],
     },
+    "enlightened_tutor_insurrection_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_enlightened_tutor_insurrection_v1",
+        "candidate_name": "Lorehold 607 + Enlightened Tutor over Insurrection v1",
+        "candidate_archetype": "607-enlightened-tutor-insurrection",
+        "added": [{"card_name": "Enlightened Tutor", "source_deck_id": 615}],
+        "removed": ["Insurrection"],
+        "intent": (
+            "Test the current contract's tutor/selection lane by adding a "
+            "one-mana instant tutor that puts Scroll Rack, Sensei's Divining "
+            "Top, Land Tax, Library of Leng, Bender's Waterskin, Victory "
+            "Chimes, or protection/value enchantments on top. The cut is the "
+            "highest-cost nonprotected finisher, preserving pressure, miracle "
+            "timing, cost reduction, and ramp anchors."
+        ),
+        "external_signals": [
+            "Enlightened Tutor appears in local Lorehold variants 608, 611, 612, 613, 614, and 615.",
+            "Local battle_card_rules has an active auto PG063 rule for artifact/enchantment tutor to library top.",
+            "The contract marks tutor/selection as the next useful lane after rejecting generic ramp/value swaps.",
+            "Insurrection is a high-cost wincon with verified runtime, so this test must prove consistency beats the lost finisher ceiling.",
+        ],
+    },
+    "enlightened_tutor_creative_technique_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_enlightened_tutor_creative_technique_v1",
+        "candidate_name": "Lorehold 607 + Enlightened Tutor over Creative Technique v1",
+        "candidate_archetype": "607-enlightened-tutor-creative-technique",
+        "added": [{"card_name": "Enlightened Tutor", "source_deck_id": 615}],
+        "removed": ["Creative Technique"],
+        "intent": (
+            "Test Enlightened Tutor against an expensive one-shot free-cast "
+            "value spell. This asks whether deterministic selection for the "
+            "artifact/enchantment topdeck engine improves the 607 plan more "
+            "than Creative Technique's demonstrated top-nonland free cast."
+        ),
+        "external_signals": [
+            "Enlightened Tutor directly supports topdeck setup by placing a selected artifact or enchantment on top.",
+            "Creative Technique is a spell-chain/free-cast value card, so this is a closer selection-versus-value comparison than cutting a pressure card.",
+            "Previous The One Ring over Creative Technique testing showed Creative Technique matters, so this candidate requires battle proof rather than structural promotion.",
+        ],
+    },
+    "gamble_storm_herd_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_gamble_storm_herd_v1",
+        "candidate_name": "Lorehold 607 + Gamble over Storm Herd v1",
+        "candidate_archetype": "607-gamble-storm-herd",
+        "added": [{"card_name": "Gamble", "source_deck_id": 615}],
+        "removed": ["Storm Herd"],
+        "intent": (
+            "Test a universal one-mana tutor against a high-cost finisher, not "
+            "against a pressure or miracle-timing anchor. Gamble can find any "
+            "needed card but carries random-discard risk, so this candidate "
+            "must prove that flexible access beats Storm Herd's miracle-token "
+            "finisher ceiling."
+        ),
+        "external_signals": [
+            "Gamble appears in local Lorehold variants 609, 612, 613, 614, and 615.",
+            "Local battle_card_rules has a verified/auto PG070 rule for any-card tutor to hand followed by random discard.",
+            "Storm Herd is a used high-cost finisher in the 607 shell, so this is a smoke candidate only until equal battle evidence proves the access upgrade.",
+        ],
+    },
 }
 
 

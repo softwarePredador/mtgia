@@ -130,6 +130,45 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
                 self.assertEqual(plan["removed"], [cut_card])
                 self.assertFalse(protected_cards.intersection(plan["removed"]))
 
+    def test_enlightened_tutor_plans_cut_only_nonprotected_nonpressure_slots(self):
+        expectations = {
+            "enlightened_tutor_insurrection_v1": "Insurrection",
+            "enlightened_tutor_creative_technique_v1": "Creative Technique",
+        }
+        protected_cards = {
+            "Bender's Waterskin",
+            "Victory Chimes",
+            "Molecule Man",
+            "The Scarlet Witch",
+            "The Mind Stone",
+            "Promise of Loyalty",
+            "Avatar's Wrath",
+            "Flawless Maneuver",
+            "Teferi's Protection",
+        }
+        for plan_key, cut_card in expectations.items():
+            with self.subTest(plan_key=plan_key):
+                plan = research.RESEARCH_PLANS[plan_key]
+                self.assertEqual(plan["added"], [{"card_name": "Enlightened Tutor", "source_deck_id": 615}])
+                self.assertEqual(plan["removed"], [cut_card])
+                self.assertFalse(protected_cards.intersection(plan["removed"]))
+
+    def test_gamble_plan_cuts_only_high_cost_finisher_not_protected_anchor(self):
+        plan = research.RESEARCH_PLANS["gamble_storm_herd_v1"]
+        self.assertEqual(plan["added"], [{"card_name": "Gamble", "source_deck_id": 615}])
+        self.assertEqual(plan["removed"], ["Storm Herd"])
+        self.assertFalse(
+            {
+                "Bender's Waterskin",
+                "Victory Chimes",
+                "Molecule Man",
+                "The Scarlet Witch",
+                "The Mind Stone",
+                "Insurrection",
+                "Promise of Loyalty",
+            }.intersection(plan["removed"])
+        )
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

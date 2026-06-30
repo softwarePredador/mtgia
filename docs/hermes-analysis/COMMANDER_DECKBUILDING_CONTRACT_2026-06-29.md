@@ -312,6 +312,38 @@ The One Ring cut decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_one_ring_cut_decision_20260630.md`.
 
+Tutor/selection decision generated on 2026-06-30:
+
+- Scope: test true tutor/selection improvements after rejecting generic ramp
+  and value swaps.
+- Protected cards intentionally preserved:
+  `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`, `The Scarlet Witch`,
+  `The Mind Stone`, and the core pressure/protection package.
+- Candidates:
+  `candidate_607_enlightened_tutor_insurrection_v1`,
+  `candidate_607_enlightened_tutor_creative_technique_v1`, and
+  `candidate_607_gamble_storm_herd_v1`.
+- Local source support: `Enlightened Tutor` appears in variants `608`, `611`,
+  `612`, `613`, `614`, and `615`; `Gamble` appears in `609`, `612`, `613`,
+  `614`, and `615`.
+- Runtime support: `Enlightened Tutor` has active PG063
+  `artifact_enchantment_tutor_to_library_top_v1`; `Gamble` has verified PG070
+  `any_card_to_hand_then_random_discard_v1`.
+- Structural result: all three candidates kept intent `100.0` and scored above
+  `607`, but structure alone was not promotion evidence.
+- Battle result: `Enlightened Tutor` over `Creative Technique` lost smoke
+  `7/24` versus `607` `11/24`; `Enlightened Tutor` over `Insurrection` lost
+  confirmed aggregate `25/72` versus `607` `30/72`; `Gamble` over `Storm Herd`
+  lost smoke `9/24` versus `607` `11/24`.
+- Direct card-use evidence: `Enlightened Tutor` over `Insurrection` accessed
+  tutor `15` games, spell-cast `18`, resolved `19`; `Gamble` accessed `7`
+  games, spell-cast `7`, resolved `7`.
+- Decision: reject the tested tutor/selection swaps. The tested tutors are
+  coherent cards, but the current 607 high-impact finisher/value package still
+  converts better.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_selection_decision_20260630.md`.
+
 ## General Deckbuilding Gate
 
 Every generated or optimized Commander deck must pass:
@@ -430,22 +462,23 @@ happen:
 ## Next Product Step
 
 For Lorehold, do not promote `614`, `615`, `candidate_607_v615_mana_engine_v1`,
-`candidate_607_v615_mana_vault_method_repair_v1`, or any 2026-06-30
-`The One Ring` candidate as the final ideal deck from the current evidence.
-The repaired Mana Vault and The One Ring tests exercised their cards but lost
-to `607`, so the protected baseline remains `607`.
+`candidate_607_v615_mana_vault_method_repair_v1`, any 2026-06-30
+`The One Ring` candidate, or any 2026-06-30 tested tutor/selection candidate as
+the final ideal deck from the current evidence. The tested cards were exercised
+in battle but lost to `607`, so the protected baseline remains `607`.
 
-The next real product step is to stop testing generic value/ramp upgrades into
-protected miracle slots. Keep the `607` miracle/topdeck/ramp shell intact and
-look only for:
+The next real product step is to stop cutting already-used finishers or value
+spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell
+intact and look only for:
 
-- true same-lane tutor/selection improvements that help find the topdeck or
-  miracle pieces without cutting pressure cards; or
-- pressure-matchup improvements that do not reduce miracle/topdeck frequency.
+- pressure-matchup improvements that do not reduce miracle/topdeck frequency;
+  or
+- tutor/selection packages that add access while removing a demonstrably low-use
+  nonpressure slot.
 
 Keep `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`, `The Scarlet
-Witch`, and `The Mind Stone` protected until a direct same-lane challenger beats
-`607`.
+Witch`, `The Mind Stone`, `Insurrection`, `Storm Herd`, and `Creative
+Technique` protected until a direct same-lane challenger beats `607`.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.
