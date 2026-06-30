@@ -4076,6 +4076,34 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
 
     if (
         effect == "free_cast"
+        and scope == "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "KaylasMusicBoxExileEffect",
+                "KaylasMusicBoxLookEffect",
+                "KaylasMusicBoxPlayFromExileEffect",
+            }.issubset(effect_classes)
+            and ability_classes == {"SimpleActivatedAbility"}
+            and "TapSourceCost" in xmage_cost_classes(card)
+            and bool(effect_json.get("legendary"))
+            and bool(effect_json.get("activated_exile_top_card_face_down"))
+            and effect_json.get("activation_cost_mana") == "{W}"
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("exiled_card_look_permission_controller_only"))
+            and bool(effect_json.get("activated_play_owned_cards_exiled_with_source_until_eot"))
+            and bool(effect_json.get("play_from_exile_requires_tap"))
+            and effect_json.get("play_from_exile_duration") == "until_end_of_turn"
+            and effect_json.get("play_from_exile_owner_scope")
+            == "controller_owned_cards_exiled_with_source"
+            and bool(effect_json.get("play_lands_from_exile"))
+            and bool(effect_json.get("alternate_zone_permission"))
+            and not bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
+    if (
+        effect == "free_cast"
         and scope == "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1"
     ):
         return (

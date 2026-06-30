@@ -7664,7 +7664,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "free_cast",
-                "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+                "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
             ),
             (
                 "LanternOfInsight",
@@ -7759,12 +7759,43 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["effect"], expected_effect)
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
-                if class_name in {"GhoulcallersBell", "LanternOfInsight", "PossibilityStorm"}:
+                if class_name in {
+                    "GhoulcallersBell",
+                    "KaylasMusicBox",
+                    "LanternOfInsight",
+                    "PossibilityStorm",
+                }:
                     self.assertFalse(expected_scope.startswith("xmage_"))
                     self.assertFalse(expected_scope.endswith("_review_v1"))
                 else:
                     self.assertTrue(expected_scope.startswith("xmage_"))
-                    self.assertTrue(expected_scope.endswith("_review_v1"))
+                if class_name == "KaylasMusicBox":
+                    self.assertTrue(primary["activated_exile_top_card_face_down"])
+                    self.assertEqual(primary["activation_cost_mana"], "{W}")
+                    self.assertTrue(primary["activation_requires_tap"])
+                    self.assertTrue(primary["activated_play_owned_cards_exiled_with_source_until_eot"])
+                    self.assertTrue(primary["play_from_exile_requires_tap"])
+                    self.assertEqual(primary["play_from_exile_duration"], "until_end_of_turn")
+                    self.assertEqual(
+                        primary["play_from_exile_owner_scope"],
+                        "controller_owned_cards_exiled_with_source",
+                    )
+                    self.assertTrue(primary["play_lands_from_exile"])
+                    self.assertFalse(primary["may_cast_without_paying_mana_cost"])
+                    card = {
+                        "card_name": "Kayla's Music Box",
+                        "ready_for_structured_pull": True,
+                        "status": "xmage_source_valid_mapper_required",
+                        "xmage": {
+                            "types": ["ARTIFACT"],
+                            "ability_classes": entry.get("ability_classes", []),
+                            "effect_classes": entry.get("effect_classes", []),
+                            "cost_classes": entry.get("cost_classes", []),
+                            "target_classes": entry.get("target_classes", []),
+                            "primary_effect": primary,
+                        },
+                    }
+                    self.assertTrue(classifier.exact_scope_batch_safe(card))
 
 
 if __name__ == "__main__":

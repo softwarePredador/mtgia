@@ -8,14 +8,14 @@ def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     )
 
 
-def test_default_runtime_queue_uses_post_pg279_possibility_storm_report():
+def test_default_runtime_queue_uses_post_pg280_kayla_music_box_report():
     assert (
         readiness.DEFAULT_RUNTIME_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg279_possibility_storm.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
     )
 
 
-def test_default_manifests_include_current_pg271_through_pg279_packages():
+def test_default_manifests_include_current_pg271_through_pg280_packages():
     assert [path.name for path in readiness.DEFAULT_MANIFESTS] == [
         "pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
         "pg272_brainstone_executable_topdeck_20260630_manifest.json",
@@ -26,6 +26,7 @@ def test_default_manifests_include_current_pg271_through_pg279_packages():
         "pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
         "pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
         "pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+        "pg280_kayla_music_box_exile_play_20260630_manifest.json",
     ]
     assert readiness.DEFAULT_PRECHECK_BLOCKERS == []
 

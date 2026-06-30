@@ -808,24 +808,29 @@ Runtime enablement checkpoint generated on 2026-06-30:
   remaining cards randomly. Runtime marks the original spell as replaced so it
   cannot resolve later from the stack. This is a high-impact `free_cast`
   runtime unlock, not deck-promotion evidence by itself.
+- PG280 promoted and synced `Kayla's Music Box` with exact activated artifact
+  runtime: `{W}, {T}` exiles the controller's top library card face down with
+  controller-only look permission, and `{T}` lets the controller play owned
+  cards exiled with that source until end of turn by paying normal costs. This
+  removes one `free_cast` split item but is not deck-promotion evidence by
+  itself.
 - The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg279_possibility_storm.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`.
   The PG276 follow-up mapper wave reduced the Lorehold runtime manual mapper
-  backlog from `12` to `0`; PG277 through PG279 then reduced the structured
-  split-scope residual from `16` to `13` cards across eight families, so the
+  backlog from `12` to `0`; PG277 through PG280 then reduced the structured
+  split-scope residual from `16` to `12` cards across eight families, so the
   next deck-quality blocker remains exact runtime/scope work rather than
   card-by-card identification.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg279_possibility_storm.md`.
-- The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg279_possibility_storm.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.md`.
+- The current readiness handoff is
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
-  back to PG apply, while `Codex Shredder` and `Perpetual Timepiece` are
-  already filtered from runtime-gap work as current active rules; `Chaos Wand`
-  and `Assemble the Players` are also filtered out after PG276; `Ghoulcaller's
-  Bell` is filtered out after PG277; `Lantern of Insight` is filtered out after
-  PG278; `Possibility Storm` is filtered out after PG279.
+  back to PG apply. The paired post-PG280 runtime-gap queue filters `Codex
+  Shredder`, `Perpetual Timepiece`, `Chaos Wand`, `Assemble the Players`,
+  `Ghoulcaller's Bell`, `Lantern of Insight`, `Possibility Storm`, and
+  `Kayla's Music Box` as current active rules.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

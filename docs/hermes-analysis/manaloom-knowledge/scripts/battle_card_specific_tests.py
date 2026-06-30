@@ -19766,6 +19766,112 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg280_kaylas_music_box_exiles_top_card_and_casts_owned_exiled_card():
+        box = {
+            "name": "Kayla's Music Box",
+            "effect": "free_cast",
+            "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
+            "type_line": "Legendary Artifact",
+            "permanent_type": "artifact",
+            "legendary": True,
+            "activated_exile_top_card_face_down": True,
+            "activation_cost_mana": "{W}",
+            "activation_requires_tap": True,
+            "exiled_card_look_permission_controller_only": True,
+            "activated_play_owned_cards_exiled_with_source_until_eot": True,
+            "play_from_exile_requires_tap": True,
+            "play_from_exile_duration": "until_end_of_turn",
+            "play_from_exile_owner_scope": "controller_owned_cards_exiled_with_source",
+            "play_lands_from_exile": True,
+            "alternate_zone_permission": True,
+            "may_cast_without_paying_mana_cost": False,
+            "_rule_logical_key": "battle_rule_v1:68e589311ca78d53076e317ab21a4151",
+            "_rule_oracle_hash": "348760fb8766d6a7185f9a09df78abd9",
+        }
+        exiled_spell = {
+            "name": "Kayla Stored Draw",
+            "type_line": "Sorcery",
+            "cmc": 1,
+            "effect": "draw",
+        }
+        drawn_a = {"name": "Drawn Followup A", "type_line": "Instant", "cmc": 2}
+        drawn_b = {"name": "Drawn Followup B", "type_line": "Instant", "cmc": 3}
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Kayla Controller")
+            opponent = player("Opponent")
+            active.battlefield = [box]
+            active.library = [exiled_spell, drawn_a, drawn_b]
+            active.mana_pool.add("white", 1)
+
+            exiled = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=7,
+                rng=random.Random(2801),
+                phase="precombat_main",
+            )
+            box["tapped"] = False
+            box["utility_artifact_used_this_turn"] = False
+            active.mana_pool.add("generic", 1)
+            cast_from_exile = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=8,
+                rng=random.Random(2802),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert exiled == 1
+        assert cast_from_exile == 1
+        assert exiled_spell not in active.exile
+        assert exiled_spell in active.graveyard
+        assert [card.get("name") for card in active.hand] == ["Drawn Followup A", "Drawn Followup B"]
+        assert box["kaylas_music_box_exiled_cards"] == []
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Kayla's Music Box"
+            and data.get("activation_kind") == "kayla_exile_top_card_face_down"
+            and data.get("exiled_card") == "Kayla Stored Draw"
+            and data.get("face_down") is True
+            and data.get("look_permission_controller") == "Kayla Controller"
+            and data.get("rule_logical_key") == "battle_rule_v1:68e589311ca78d53076e317ab21a4151"
+            and data.get("rule_oracle_hash") == "348760fb8766d6a7185f9a09df78abd9"
+            for event, data in events
+        )
+        assert any(
+            event == "kaylas_music_box_play_from_exile"
+            and data.get("cast_card") == "Kayla Stored Draw"
+            and data.get("source_zone") == "exile"
+            and data.get("cast_without_paying_mana_cost") is False
+            and data.get("locked_cost", {}).get("generic") == 1
+            for event, data in events
+        )
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("activation_kind") == "kayla_play_owned_exiled_card_until_eot"
+            and data.get("selected_card") == "Kayla Stored Draw"
+            and data.get("cast_without_paying_mana_cost") is False
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action") == "play_owned_exiled_card_until_eot"
+            and "alternate_zone_permission" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player():
         def codex_shredder():
             return {
@@ -21834,6 +21940,7 @@ def register_tests(battle, player):
         test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw,
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
+        test_pg280_kaylas_music_box_exiles_top_card_and_casts_owned_exiled_card,
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
         test_pg277_ghoulcallers_bell_mills_each_player,
         test_pg278_lantern_of_insight_reveals_top_cards_and_shuffles_target_player,

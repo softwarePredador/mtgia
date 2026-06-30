@@ -1,0 +1,71 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg280_kayla_music_box_exile_play_20260630_123818",
+  "deploy_id": "PG280",
+  "expected_rules": [
+    {
+      "card_name": "Kayla's Music Box",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68e589311ca78d53076e317ab21a4151",
+      "min_rule_version": 2,
+      "normalized_name": "kayla's music box",
+      "oracle_hash": "348760fb8766d6a7185f9a09df78abd9",
+      "required_effect_fields": {
+        "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
+        "effect": "free_cast"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "free_cast": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_rollback.sql"
+  },
+  "generated_at": "2026-06-30T12:39:16+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Kayla's Music Box"
+      },
+      "card_name": "Kayla's Music Box",
+      "effect": "free_cast",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68e589311ca78d53076e317ab21a4151",
+      "normalized_name": "kayla's music box",
+      "required_effect_fields": {
+        "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
+        "effect": "free_cast"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Kayla's Music Box"
+  ],
+  "selected_count": 1,
+  "slug": "kayla_music_box_exile_play",
+  "snapshot_checks": [
+    {
+      "card_name": "Kayla's Music Box",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68e589311ca78d53076e317ab21a4151",
+      "min_rule_version": 2,
+      "normalized_name": "kayla's music box",
+      "oracle_hash": "348760fb8766d6a7185f9a09df78abd9",
+      "required_effect_fields": {
+        "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

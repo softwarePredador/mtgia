@@ -283,7 +283,7 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_runtime_gap_family_queue_20260630_post_pg279_possibility_storm.json"],
+            ["lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
         ),
         check_contains(

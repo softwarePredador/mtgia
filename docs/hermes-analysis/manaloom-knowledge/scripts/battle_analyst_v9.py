@@ -13527,6 +13527,9 @@ SURGE_TO_VICTORY_SCOPE = (
 CURRENCY_CONVERTER_SCOPE = (
     "currency_converter_discard_exile_draw_discard_token_v1"
 )
+KAYLAS_MUSIC_BOX_SCOPE = (
+    "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1"
+)
 
 
 def _available_discard_modal_modes(permanent):
@@ -14082,6 +14085,441 @@ def _choose_currency_converter_exiled_card(permanent):
             card.get("name", "?"),
         ),
     )
+
+
+def _kaylas_music_box_exiled_cards(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    cards = permanent.setdefault("kaylas_music_box_exiled_cards", [])
+    if not isinstance(cards, list):
+        cards = []
+        permanent["kaylas_music_box_exiled_cards"] = cards
+    return cards
+
+
+def _is_kaylas_music_box(permanent):
+    return (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == KAYLAS_MUSIC_BOX_SCOPE
+        and bool(permanent.get("activated_exile_top_card_face_down"))
+        and bool(permanent.get("activated_play_owned_cards_exiled_with_source_until_eot"))
+    )
+
+
+def _kaylas_music_box_exiled_with_source(card, permanent, player):
+    if not isinstance(card, dict) or not isinstance(permanent, dict):
+        return False
+    source_name = permanent.get("name", "Kayla's Music Box")
+    if card.get("_exiled_with_source_runtime_id") == id(permanent):
+        return True
+    if card.get("_exiled_with") != source_name:
+        return False
+    owner = card.get("_owned_by")
+    return owner in (None, getattr(player, "name", None))
+
+
+def _kaylas_music_box_playable_cards(player, permanent, phase):
+    source_cards = list(_kaylas_music_box_exiled_cards(permanent))
+    exile_cards = [
+        card
+        for card in getattr(player, "exile", []) or []
+        if _kaylas_music_box_exiled_with_source(card, permanent, player)
+    ]
+    seen = set()
+    merged = []
+    for card in source_cards + exile_cards:
+        if not isinstance(card, dict):
+            continue
+        marker = id(card)
+        if marker in seen:
+            continue
+        seen.add(marker)
+        if card not in getattr(player, "exile", []) or []:
+            continue
+        merged.append(card)
+
+    options = []
+    for card in merged:
+        if is_effective_land(card):
+            if (
+                permanent.get("play_lands_from_exile")
+                and phase in MAIN_PHASES
+                and player.lands_played_this_turn < player.max_lands_per_turn
+            ):
+                options.append(
+                    {
+                        "card": card,
+                        "effect_data": {"effect": "land"},
+                        "kind": "land",
+                        "score": 3,
+                        "locked_cost": None,
+                    }
+                )
+            continue
+
+        effect_data = copy.deepcopy(get_card_effect(card))
+        if effect_data.get("effect") in {"unknown", "land", "counter"}:
+            continue
+        if not can_cast_in_phase(card, effect_data, phase, controller=player):
+            continue
+        cast_plan = runtime_cast_plan_for_card(player, card, effect_data)
+        if cast_plan is None:
+            continue
+        options.append(
+            {
+                "card": card,
+                "effect_data": effect_data,
+                "kind": "spell",
+                "score": threat_score(
+                    effect_data.get("effect", "unknown"),
+                    card.get("name", "?"),
+                    player,
+                    [player],
+                    CURRENT_REPLAY_TURN if CURRENT_REPLAY_TURN is not None else 0,
+                )
+                + int(card_mana_value(card) or 0),
+                "locked_cost": copy.deepcopy(cast_plan.get("locked_cost") or {}),
+            }
+        )
+    options.sort(
+        key=lambda option: (
+            float(option.get("score") or 0),
+            int(card_mana_value(option["card"]) or 0),
+            option["card"].get("name", "?"),
+        ),
+        reverse=True,
+    )
+    return options
+
+
+def _kaylas_music_box_exile_top_card(player, permanent, turn, *, phase):
+    if permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "kaylas_music_box_already_tapped",
+            phase=phase,
+        )
+        return False
+    if not getattr(player, "library", None):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "kaylas_music_box_no_library_card_to_exile",
+            phase=phase,
+        )
+        return False
+    activation_cost = permanent.get("activation_cost_mana") or "{W}"
+    if not player.can_pay(activation_cost) or not player.spend_mana(activation_cost):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "kaylas_music_box_failed_to_pay_exile_activation",
+            phase=phase,
+        )
+        return False
+
+    top_card = player.library.pop(0)
+    if isinstance(top_card, dict):
+        top_card["_exiled_with"] = permanent.get("name", "Kayla's Music Box")
+        top_card["_exiled_with_source_runtime_id"] = id(permanent)
+        top_card["_owned_by"] = player.name
+        top_card["_look_permission_controller"] = player.name
+        top_card["_kaylas_music_box_face_down"] = True
+    move_to_exile(
+        player,
+        top_card,
+        face_down=True,
+        public=False,
+        reason="kaylas_music_box_exile_top_face_down",
+        turn=turn,
+    )
+    _kaylas_music_box_exiled_cards(permanent).append(top_card)
+    permanent["utility_artifact_used_this_turn"] = True
+    if permanent.get("activation_requires_tap", True):
+        permanent["tapped"] = True
+
+    emit_decision_trace(
+        decision_type="utility_artifact_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                top_card if isinstance(top_card, dict) else {"name": str(top_card)},
+                {"effect": "free_cast"},
+                score=1,
+                action="exile_top_card_face_down",
+            )
+        ],
+        chosen_option=decision_card_option(
+            top_card if isinstance(top_card, dict) else {"name": str(top_card)},
+            {"effect": "free_cast"},
+            score=1,
+            action="exile_top_card_face_down",
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost_mana": activation_cost,
+            "exiled_card": top_card.get("name", "?") if isinstance(top_card, dict) else str(top_card),
+            "exiled_count": len(_kaylas_music_box_exiled_cards(permanent)),
+        },
+        rule_source=permanent.get("_rule_source", "kaylas_music_box_runtime_v1"),
+        rule_status=permanent.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=1,
+        actual_outcome="exiled_top_card_face_down",
+        reason="bank_top_library_card_for_later_normal-cost_play_from_exile",
+        strategic_principle="convert spare white mana and tap into a future alternate-zone card option",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={"mana": activation_cost, "cards_exiled": 1, "tapped": 1},
+        risk_flags=["tap_artifact", "face_down_exile", "alternate_zone_permission"],
+    )
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="kayla_exile_top_card_face_down",
+        mana_paid=activation_cost,
+        exiled_card=top_card.get("name", "?") if isinstance(top_card, dict) else str(top_card),
+        face_down=True,
+        public=False,
+        look_permission_controller=player.name,
+        exiled_count=len(_kaylas_music_box_exiled_cards(permanent)),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
+def _kaylas_music_box_play_card_from_exile(
+    player,
+    permanent,
+    opponents,
+    all_players,
+    option,
+    turn,
+    rng,
+    *,
+    phase,
+):
+    card = option["card"]
+    if option.get("kind") == "land":
+        candidate = {
+            "card": card,
+            "source_zone": "exile",
+            "topdeck_permission": None,
+        }
+        played = play_land_candidate(player, opponents, all_players, turn, None, candidate)
+        if not played:
+            return False, "land_play_failed"
+        _remove_matching_zone_card(_kaylas_music_box_exiled_cards(permanent), card)
+        emit_replay_event(
+            "kaylas_music_box_play_from_exile",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            played_card=card.get("name", "?"),
+            played_kind="land",
+            source_zone="exile",
+            cast_without_paying_mana_cost=False,
+            result="land_played_from_exile",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        return True, "land_played_from_exile"
+
+    effect_data = copy.deepcopy(option.get("effect_data") or get_card_effect(card))
+    cast_ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="kaylas_music_box_play_from_exile",
+        modes=["alternate_zone_permission", "pay_normal_cost"],
+        source_zone="exile",
+        locked_cost_override=copy.deepcopy(option.get("locked_cost") or None),
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False, "cast_payment_or_timing_failed"
+    removed = _remove_matching_zone_card(getattr(player, "exile", []), card)
+    _remove_matching_zone_card(_kaylas_music_box_exiled_cards(permanent), card)
+    if removed is None:
+        return False, "not_in_exile"
+    emit_replay_event(
+        "kaylas_music_box_play_from_exile",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        cast_card=card.get("name", "?"),
+        cast_effect=effect_data.get("effect", "unknown"),
+        source_zone="exile",
+        cast_without_paying_mana_cost=False,
+        result="cast_with_normal_cost",
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(permanent),
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=card.get("type_line", ""),
+        cmc=card.get("cmc", 0),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    mark_cast_ledger_emitted(effect_data)
+    players = all_players or [player, *list(opponents or [])]
+    trigger_spell_cast_engines(
+        player,
+        players,
+        card,
+        turn,
+        phase,
+        stack=None,
+        active_player=player,
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        card,
+        turn,
+        phase,
+        rng,
+        stack=None,
+        active_player=player,
+        all_players=players,
+    )
+    apply_effect_immediate(
+        player,
+        opponents,
+        card,
+        turn,
+        rng,
+        effect_data_override=effect_data,
+        stack=None,
+        phase=phase,
+    )
+    return True, "cast_with_normal_cost"
+
+
+def activate_kaylas_music_box(player, permanent, opponents, all_players, turn, rng, *, phase):
+    if not _is_kaylas_music_box(permanent) or permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "kaylas_music_box_already_tapped",
+            phase=phase,
+        )
+        return False
+
+    play_options = _kaylas_music_box_playable_cards(player, permanent, phase)
+    if play_options:
+        if permanent.get("play_from_exile_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        chosen = play_options[0]
+        success, result = _kaylas_music_box_play_card_from_exile(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            chosen,
+            turn,
+            rng,
+            phase=phase,
+        )
+        if not success:
+            permanent["utility_artifact_used_this_turn"] = False
+            permanent["tapped"] = False
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                f"kaylas_music_box_{result}",
+                phase=phase,
+            )
+            return False
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    option["card"],
+                    option["effect_data"],
+                    score=option["score"],
+                    action="play_owned_exiled_card_until_eot",
+                )
+                for option in play_options[:8]
+            ],
+            chosen_option=decision_card_option(
+                chosen["card"],
+                chosen["effect_data"],
+                score=chosen["score"],
+                action="play_owned_exiled_card_until_eot",
+            ),
+            rejected_options=[
+                decision_card_option(
+                    option["card"],
+                    option["effect_data"],
+                    score=option["score"],
+                    action="defer_owned_exiled_card",
+                )
+                for option in play_options[1:8]
+            ],
+            score_components={
+                "selected_card": chosen["card"].get("name", "?"),
+                "selected_kind": chosen.get("kind"),
+                "playable_count": len(play_options),
+                "result": result,
+            },
+            rule_source=permanent.get("_rule_source", "kaylas_music_box_runtime_v1"),
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=chosen.get("score", 0),
+            actual_outcome=result,
+            reason="tap_artifact_to_use_a_card_previously_exiled_with_this_source",
+            strategic_principle="spend tap window on the highest-value owned card available from source exile",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "tapped": 1,
+                "cards_from_exile": 1,
+                "cast_without_paying_mana": 0,
+            },
+            risk_flags=["tap_artifact", "alternate_zone_permission"],
+            rejected_reason="lower_exiled_card_score",
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="kayla_play_owned_exiled_card_until_eot",
+            selected_card=chosen["card"].get("name", "?"),
+            selected_kind=chosen.get("kind"),
+            source_zone="exile",
+            cast_without_paying_mana_cost=False,
+            result=result,
+            exiled_remaining=len(_kaylas_music_box_exiled_cards(permanent)),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return True
+
+    return _kaylas_music_box_exile_top_card(player, permanent, turn, phase=phase)
 
 
 def activate_currency_converter(player, permanent, opponents, all_players, turn, rng, *, phase):
@@ -18314,9 +18752,15 @@ def play_land_candidate(player, opponents, all_players, turn, stack, candidate):
         else:
             return False
     else:
-        if land not in player.hand:
+        if source_zone == "exile":
+            if land in getattr(player, "exile", []) or []:
+                player.exile.remove(land)
+            else:
+                return False
+        elif land not in player.hand:
             return False
-        player.hand.remove(land)
+        else:
+            player.hand.remove(land)
 
     eff = get_card_effect(land)
     mdfc_land_face = mdfc_land_face_for_card(land, eff)
@@ -24852,6 +25296,18 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
 
     for permanent in list(getattr(player, "battlefield", []) or []):
         if activate_currency_converter(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_kaylas_music_box(
             player,
             permanent,
             opponents,

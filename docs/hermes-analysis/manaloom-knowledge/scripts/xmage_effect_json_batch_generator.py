@@ -249,6 +249,16 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "discard_exile_token_conversion",
             "timing": "triggered_and_activated",
         }
+    if (
+        effect_json.get("battle_model_scope")
+        == "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1"
+    ):
+        return {
+            "category": "combo_value",
+            "effect": "free_cast",
+            "subtype": "play_from_exile_normal_cost",
+            "timing": "activated_alternate_zone_permission",
+        }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             return {

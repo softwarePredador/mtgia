@@ -7578,11 +7578,11 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="free_cast",
-                scope="xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+                scope="artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
                 reason=(
                     "XMage structure matches Kayla's Music Box: an activated ability looks at and exiles "
                     "the top library card face down, and a second tap ability allows playing owned cards "
-                    "exiled with it until end of turn."
+                    "exiled with it until end of turn by paying normal costs."
                 ),
                 ability_kind="activated",
                 requires_runtime_executor=True,
@@ -7590,8 +7590,14 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "permanent_type": "artifact",
                     "legendary": True,
                     "activated_exile_top_card_face_down": True,
+                    "activation_cost_mana": "{W}",
+                    "activation_requires_tap": True,
                     "exiled_card_look_permission_controller_only": True,
                     "activated_play_owned_cards_exiled_with_source_until_eot": True,
+                    "play_from_exile_requires_tap": True,
+                    "play_from_exile_duration": "until_end_of_turn",
+                    "play_from_exile_owner_scope": "controller_owned_cards_exiled_with_source",
+                    "play_lands_from_exile": True,
                     "alternate_zone_permission": True,
                     "may_cast_without_paying_mana_cost": False,
                 },
