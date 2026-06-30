@@ -1,0 +1,55 @@
+name: ManaLoom Guardrails
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/manaloom-guardrails.yml"
+      - "docs/hermes-analysis/**"
+      - "server/bin/**"
+      - "server/lib/**"
+      - "server/routes/**"
+      - "server/test/**"
+  push:
+    branches:
+      - master
+      - "codex/**"
+    paths:
+      - ".github/workflows/manaloom-guardrails.yml"
+      - "docs/hermes-analysis/**"
+      - "server/bin/**"
+      - "server/lib/**"
+      - "server/routes/**"
+      - "server/test/**"
+
+jobs:
+  manaloom-guardrails:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile guardrail scripts
+        run: |
+          python3 -m py_compile \
+            docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+            docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py
+
+      - name: Run focused guardrail tests
+        working-directory: docs/hermes-analysis/manaloom-knowledge/scripts
+        run: |
+          python3 -m unittest \
+            test_legacy_contamination_audit.py \
+            test_operational_surface_alignment_audit.py
+
+      - name: Audit legacy contamination baseline
+        run: |
+          python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+            --out-prefix /tmp/manaloom_legacy_contamination_ci
+
+      - name: Audit operational surface alignment
+        run: |
+          python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
+            --out-prefix /tmp/manaloom_operational_surface_ci
