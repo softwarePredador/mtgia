@@ -31,7 +31,7 @@ DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
 DEFAULT_RUNTIME_GAP_QUEUE = (
-    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json"
+    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.json"
 )
 DEFAULT_HAND_FILTER_CUT_MODEL = (
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
@@ -436,11 +436,10 @@ def squee_work_item(
             if hidden_runtime_status == "runtime_proposal_overlay_active" and ready_count == 0:
                 reason = (
                     "Squee discard/return is modeled when accessed; Hidden Retreat is modeled "
-                    "through a read-only runtime proposal, but access model found 0 preflight-ready "
-                    "access swaps. Remaining blockers are approved PG apply/sync for product truth "
-                    "and a seed-safe cut model."
+                    "and PG271-synced, but access model found 0 preflight-ready access swaps. "
+                    "Remaining blocker is a seed-safe cut model."
                 )
-                if hidden_package_status:
+                if hidden_package_status and hidden_package_status != "prepared_read_only_pending_apply_approval":
                     reason += f" Hidden Retreat package status: {hidden_package_status}."
             else:
                 reason = (
@@ -603,7 +602,7 @@ def next_command_for_work(work_key: str) -> str:
         "runtime_rule_gap_batch": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
             "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
-            "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync"
+            "lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat"
         ),
     }
     return commands.get(work_key, "")
@@ -614,7 +613,7 @@ def promotion_criteria_for_work(work_key: str) -> list[str]:
         "squee_access_density_model": [
             "Find a non-protected access package that improves Squee/Top/Rack/Library reach.",
             "Preserve seed-42 Squee, miracle, and topdeck telemetry before broader gates.",
-            "If Hidden Retreat is used, promote only after approved PostgreSQL apply/sync.",
+            "Use Hidden Retreat as PG271-synced if selected; do not rerun its PostgreSQL apply.",
         ],
         "contextual_tutor_cut_model": [
             "Find a tutor package that does not cut Land Tax, Thor, Creative Technique, or protected topdeck engines.",

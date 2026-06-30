@@ -758,15 +758,18 @@ Runtime enablement checkpoint generated on 2026-06-30:
 - PG264 promoted and synced `Gisela, Blade of Goldnight` with the exact
   static-damage scope
   `opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1`.
-- PG265-PG270 subsequently promoted and synced `Lens of Clarity`,
+- PG265-PG271 subsequently promoted and synced `Lens of Clarity`,
   `Eight-and-a-Half-Tails`, `Neheb, the Eternal`, `Cloud Key`,
-  `Alhammarret's Archive`, and `Currency Converter`; the focus-access generator
-  now defaults to the post-PG270 runtime-gap queue.
+  `Alhammarret's Archive`, `Currency Converter`, and `Hidden Retreat`; the
+  focus-access generator now defaults to the post-PG271 runtime-gap queue.
 - The current runtime-gap queue after PG264 is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg270_currency_converter_apply_sync.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat.md`.
+- The current readiness output is
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat.md`;
+  `Hidden Retreat` is applied/synced and must not be routed back to PG apply.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

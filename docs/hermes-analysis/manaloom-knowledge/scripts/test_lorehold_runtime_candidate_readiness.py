@@ -124,6 +124,108 @@ def test_pg_precheck_blocked_is_not_global_card_reject(tmp_path):
     assert report["summary"]["pg_precheck_blocked_count"] == 1
 
 
+def test_missing_pg_package_files_blocks_apply_before_precheck(tmp_path):
+    manifest_path = tmp_path / "pg244_manifest.json"
+    manifests = [
+        (
+            manifest_path,
+            {
+                "deploy_id": "PG244",
+                "status": "prepared_read_only_pending_apply_approval",
+                "selected_card_names": ["Hidden Retreat"],
+                "files": {
+                    "precheck": "missing_precheck.sql",
+                    "apply": "missing_apply.sql",
+                    "postcheck": "missing_postcheck.sql",
+                    "rollback": "missing_rollback.sql",
+                },
+            },
+        )
+    ]
+
+    report = readiness.build_report(
+        runtime_queue={"family_queue": []},
+        access_model=access_model(),
+        hypothesis_queue={"queue": []},
+        manifests=manifests,
+        precheck_blockers=[],
+    )
+
+    hidden = {row["card_name"]: row for row in report["cards"]}["Hidden Retreat"]
+    assert hidden["status"] == "pg_package_files_missing"
+    assert hidden["pg_packages"][0]["missing_files"] == ["apply", "postcheck", "precheck", "rollback"]
+    assert report["summary"]["pg_package_files_missing_count"] == 1
+    assert report["summary"]["recommended_next_action"].startswith("regenerate_missing_pg_package_files")
+
+
+def test_applied_synced_pg_package_is_not_reported_pending():
+    manifests = [
+        (
+            readiness.REPORT_DIR / "pg271_manifest.json",
+            {
+                "deploy_id": "PG271",
+                "status": "prepared_read_only_pending_apply_approval",
+                "selected_card_names": ["Hidden Retreat"],
+                "files": {
+                    "precheck": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_candidate_readiness.py",
+                    "apply": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_candidate_readiness.py",
+                    "postcheck": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_candidate_readiness.py",
+                    "rollback": "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_candidate_readiness.py",
+                },
+                "expected_rules": [
+                    {
+                        "card_name": "Hidden Retreat",
+                        "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                        "required_effect_fields": {
+                            "effect": "damage_prevention_shield",
+                            "battle_model_scope": (
+                                "activated_put_card_from_hand_on_top_library_"
+                                "prevent_damage_from_target_instant_or_sorcery_spell_v1"
+                            ),
+                        },
+                    }
+                ],
+            },
+        )
+    ]
+    active_rule_index = {
+        "hidden retreat": [
+            {
+                "card_name": "Hidden Retreat",
+                "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "source": "curated",
+                "effect_json": {
+                    "effect": "damage_prevention_shield",
+                    "battle_model_scope": (
+                        "activated_put_card_from_hand_on_top_library_"
+                        "prevent_damage_from_target_instant_or_sorcery_spell_v1"
+                    ),
+                },
+            }
+        ]
+    }
+
+    report = readiness.build_report(
+        runtime_queue={"family_queue": []},
+        access_model=access_model(),
+        hypothesis_queue={"queue": []},
+        manifests=manifests,
+        precheck_blockers=[],
+        active_rule_index=active_rule_index,
+    )
+
+    hidden = {row["card_name"]: row for row in report["cards"]}["Hidden Retreat"]
+    assert hidden["status"] == "pg_package_applied_synced"
+    assert hidden["active_rules"][0]["source"] == "curated"
+    assert report["summary"]["pg_package_applied_synced_count"] == 1
+    assert report["summary"]["pg_package_prepared_pending_apply_approval_count"] == 0
+    assert not report["summary"]["recommended_next_action"].startswith("run_approved_precheck_apply")
+
+
 def test_split_scope_and_access_runtime_blockers_get_separate_statuses():
     report = readiness.build_report(
         runtime_queue=runtime_queue(),

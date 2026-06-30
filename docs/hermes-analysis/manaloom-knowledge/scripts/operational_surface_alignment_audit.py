@@ -46,7 +46,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260630_post_pg270_currency_converter_apply_sync_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_post_pg271_hidden_retreat_apply_sync_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -142,7 +142,7 @@ def build_checks() -> list[Check]:
             XMAGE_FLOW,
             [
                 "Status: `current_operating_standard`",
-                "PG267/PG270 runtime-rule checkpoint",
+                "PG267/PG271 runtime-rule checkpoint",
                 CURRENT_XMAGE_MANIFEST,
                 "ready_for_structured_xmage_pull_review_required=68",
                 "xmage_source_valid_mapper_required=61",

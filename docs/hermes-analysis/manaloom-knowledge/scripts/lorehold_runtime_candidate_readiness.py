@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,9 +22,10 @@ from typing import Any, Iterable
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
+DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
 
-DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json"
-DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v2.json"
+DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
 DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_MANIFESTS = [
     REPORT_DIR / "pg245_lorehold_topdeck_damage_runtime_20260628_manifest.json",
@@ -44,6 +46,75 @@ def read_json(path: Path) -> dict[str, Any]:
 
 def read_existing(paths: Iterable[Path]) -> list[tuple[Path, dict[str, Any]]]:
     return [(path, read_json(path)) for path in paths if path.exists()]
+
+
+def resolve_report_path(value: str) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return REPO_ROOT / path
+
+
+def normalize_card_name(name: str) -> str:
+    return " ".join(str(name or "").strip().lower().replace("’", "'").split())
+
+
+def load_active_sqlite_rules(sqlite_db: Path) -> dict[str, list[dict[str, Any]]]:
+    if not sqlite_db.exists():
+        return {}
+    with sqlite3.connect(sqlite_db) as conn:
+        conn.row_factory = sqlite3.Row
+        columns = {
+            row[1]
+            for row in conn.execute("pragma table_info(battle_card_rules)").fetchall()
+        }
+        required = {
+            "card_name",
+            "normalized_name",
+            "logical_rule_key",
+            "effect_json",
+            "source",
+            "review_status",
+            "execution_status",
+        }
+        if not required.issubset(columns):
+            return {}
+        disabled_clause = "and disabled_at is null" if "disabled_at" in columns else ""
+        rows = conn.execute(
+            f"""
+            select card_name, normalized_name, logical_rule_key, effect_json,
+                   source, review_status, execution_status
+            from battle_card_rules
+            where review_status = 'verified'
+              and execution_status in ('auto', 'trusted')
+              {disabled_clause}
+            """
+        ).fetchall()
+    index: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        try:
+            effect_json = json.loads(row["effect_json"] or "{}")
+        except json.JSONDecodeError:
+            effect_json = {}
+        entry = {
+            "card_name": row["card_name"],
+            "normalized_name": row["normalized_name"],
+            "logical_rule_key": row["logical_rule_key"],
+            "source": row["source"],
+            "review_status": row["review_status"],
+            "execution_status": row["execution_status"],
+            "effect": effect_json.get("effect"),
+            "battle_model_scope": effect_json.get("battle_model_scope"),
+            "effect_json": effect_json,
+        }
+        keys = {
+            normalize_card_name(str(row["card_name"] or "")),
+            normalize_card_name(str(row["normalized_name"] or "")),
+        }
+        for key in keys:
+            if key:
+                index[key].append(entry)
+    return dict(index)
 
 
 def card_rows_from_runtime_queue(runtime_queue: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -105,18 +176,65 @@ def access_model_rows(access_model: dict[str, Any]) -> dict[str, dict[str, Any]]
 def package_index(manifests: list[tuple[Path, dict[str, Any]]]) -> dict[str, list[dict[str, Any]]]:
     index: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for path, manifest in manifests:
+        files = manifest.get("files") or {}
+        missing_files = [
+            key
+            for key, value in sorted(files.items())
+            if key in {"precheck", "apply", "postcheck", "rollback"}
+            and value
+            and not resolve_report_path(str(value)).exists()
+        ]
+        expected_rules = manifest.get("expected_rules") or []
         for card in manifest.get("selected_card_names") or []:
+            normalized_card = normalize_card_name(str(card))
+            card_expected_rules = [
+                rule
+                for rule in expected_rules
+                if normalize_card_name(str(rule.get("card_name") or rule.get("normalized_name") or ""))
+                == normalized_card
+            ]
             index[str(card)].append(
                 {
                     "deploy_id": manifest.get("deploy_id"),
                     "status": manifest.get("status"),
                     "manifest": str(path),
                     "apply_gate": manifest.get("apply_gate"),
-                    "files": manifest.get("files") or {},
+                    "files": files,
+                    "missing_files": missing_files,
                     "family_counts": manifest.get("family_counts") or {},
+                    "expected_rules": card_expected_rules,
                 }
             )
     return dict(index)
+
+
+def active_rule_matches_package(
+    active_rules: list[dict[str, Any]],
+    packages: list[dict[str, Any]],
+) -> bool:
+    if not active_rules or not packages:
+        return False
+    for package in packages:
+        expected_rules = package.get("expected_rules") or []
+        if not expected_rules:
+            return True
+        for expected in expected_rules:
+            required_fields = expected.get("required_effect_fields") or {}
+            for active in active_rules:
+                if expected.get("logical_rule_key") and active.get("logical_rule_key") != expected.get(
+                    "logical_rule_key"
+                ):
+                    continue
+                if expected.get("review_status") and active.get("review_status") != expected.get("review_status"):
+                    continue
+                if expected.get("execution_status") and active.get("execution_status") != expected.get(
+                    "execution_status"
+                ):
+                    continue
+                effect_json = active.get("effect_json") or {}
+                if all(effect_json.get(key) == value for key, value in required_fields.items()):
+                    return True
+    return False
 
 
 def precheck_index(blockers: list[tuple[Path, dict[str, Any]]]) -> dict[str, list[dict[str, Any]]]:
@@ -162,13 +280,24 @@ def card_readiness_status(
     packages: list[dict[str, Any]],
     blockers: list[dict[str, Any]],
     hypotheses: list[dict[str, Any]],
+    active_rules: list[dict[str, Any]],
 ) -> tuple[str, str]:
+    if active_rule_matches_package(active_rules, packages):
+        return (
+            "pg_package_applied_synced",
+            "Use the synced verified rule and rebuild the queue before any deck gate; do not rerun this package.",
+        )
     if blockers:
         return (
             "pg_precheck_blocked",
             "Rerun PostgreSQL precheck; do not apply package until every selected card has a matched card row.",
         )
     if packages:
+        if any(package.get("missing_files") for package in packages):
+            return (
+                "pg_package_files_missing",
+                "Regenerate or restore the missing precheck/apply/postcheck package files before any PostgreSQL apply.",
+            )
         return (
             "pg_package_prepared_pending_apply_approval",
             "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
@@ -206,6 +335,8 @@ def build_report(
     runtime_queue_path: Path = DEFAULT_RUNTIME_QUEUE,
     access_model_path: Path = DEFAULT_ACCESS_MODEL,
     hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
+    active_rule_index: dict[str, list[dict[str, Any]]] | None = None,
+    active_rule_source: Path | None = DEFAULT_SQLITE_DB,
 ) -> dict[str, Any]:
     cards = card_rows_from_runtime_queue(runtime_queue)
     for name, row in access_model_rows(access_model).items():
@@ -214,6 +345,7 @@ def build_report(
     packages_by_card = package_index(manifests)
     blockers_by_card = precheck_index(precheck_blockers)
     hypotheses_by_card = hypothesis_rows(hypothesis_queue)
+    active_rule_index = active_rule_index or {}
 
     rows: list[dict[str, Any]] = []
     for name in sorted(cards):
@@ -221,11 +353,13 @@ def build_report(
         packages = packages_by_card.get(name, [])
         blockers = blockers_by_card.get(name, [])
         hypotheses = hypotheses_by_card.get(name, [])
+        active_rules = active_rule_index.get(normalize_card_name(name), [])
         status, next_action = card_readiness_status(
             card=card,
             packages=packages,
             blockers=blockers,
             hypotheses=hypotheses,
+            active_rules=active_rules,
         )
         cut_specific_rejects = [
             row
@@ -239,6 +373,7 @@ def build_report(
                 "next_action": next_action,
                 "pg_packages": packages,
                 "pg_precheck_blockers": blockers,
+                "active_rules": active_rules,
                 "cut_specific_negative_count": len(cut_specific_rejects),
                 "cut_specific_negatives": cut_specific_rejects,
                 "card_global_reject": False,
@@ -249,12 +384,14 @@ def build_report(
     promotion_counts = Counter(row.get("promotion_lane") or "" for row in rows)
     priority_order = {
         "pg_precheck_blocked": 0,
+        "pg_package_files_missing": 1,
         "pg_package_prepared_pending_apply_approval": 1,
         "split_scope_review_required": 2,
         "manual_mapper_required": 3,
         "runtime_model_blocked": 4,
         "swap_negative_not_card_global_reject": 5,
-        "review_required": 6,
+        "pg_package_applied_synced": 6,
+        "review_required": 7,
     }
     rows.sort(
         key=lambda row: (
@@ -263,6 +400,14 @@ def build_report(
             row["card_name"],
         )
     )
+    if status_counts.get("pg_package_files_missing", 0):
+        recommended_next_action = "regenerate_missing_pg_package_files_or_continue_split_scope_runtime_families"
+    elif status_counts.get("pg_precheck_blocked", 0):
+        recommended_next_action = "rerun_pg_precheck_before_apply"
+    elif status_counts.get("pg_package_prepared_pending_apply_approval", 0):
+        recommended_next_action = "run_approved_precheck_apply_postcheck_sync_or_split_scope_runtime_families"
+    else:
+        recommended_next_action = "split_scope_runtime_families_or_continue_cut_modeling"
     return {
         "generated_at": utc_now(),
         "postgres_writes": False,
@@ -270,6 +415,7 @@ def build_report(
         "runtime_queue": str(runtime_queue_path),
         "access_model": str(access_model_path),
         "hypothesis_queue": str(hypothesis_queue_path),
+        "active_rule_source": str(active_rule_source) if active_rule_source else None,
         "manifests": [str(path) for path, _payload in manifests],
         "precheck_blockers": [str(path) for path, _payload in precheck_blockers],
         "summary": {
@@ -277,13 +423,15 @@ def build_report(
             "status_counts": dict(sorted(status_counts.items())),
             "promotion_lane_counts": dict(sorted(promotion_counts.items())),
             "pg_precheck_blocked_count": status_counts.get("pg_precheck_blocked", 0),
+            "pg_package_files_missing_count": status_counts.get("pg_package_files_missing", 0),
             "pg_package_prepared_pending_apply_approval_count": status_counts.get(
                 "pg_package_prepared_pending_apply_approval", 0
             ),
+            "pg_package_applied_synced_count": status_counts.get("pg_package_applied_synced", 0),
             "split_scope_review_required_count": status_counts.get("split_scope_review_required", 0),
             "manual_mapper_required_count": status_counts.get("manual_mapper_required", 0),
             "cut_specific_negative_count": sum(int(row.get("cut_specific_negative_count") or 0) for row in rows),
-            "recommended_next_action": "rerun_pg245_precheck_then_sync_or_split_scope_runtime_families",
+            "recommended_next_action": recommended_next_action,
         },
         "cards": rows,
     }
@@ -298,6 +446,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Runtime queue: `{report['runtime_queue']}`",
         f"- Access model: `{report['access_model']}`",
         f"- Hypothesis queue: `{report['hypothesis_queue']}`",
+        f"- Active rule source: `{report.get('active_rule_source') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -337,6 +486,11 @@ def render_markdown(report: dict[str, Any]) -> str:
             lines.append(
                 f"- PG package `{package.get('deploy_id')}` status `{package.get('status')}`; apply `{files.get('apply') or '-'}`"
             )
+            if package.get("missing_files"):
+                lines.append(
+                    "- Missing package files: "
+                    + ", ".join(f"`{name}`" for name in package.get("missing_files") or [])
+                )
         for blocker in row.get("pg_precheck_blockers") or []:
             lines.append(
                 f"- Precheck blocker `{blocker.get('status')}` at `{blocker.get('blocked_step')}`: {blocker.get('sanitized_error')}"
@@ -358,6 +512,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--manifest", type=Path, action="append")
     parser.add_argument("--precheck-blocker", type=Path, action="append")
+    parser.add_argument("--sqlite-db", type=Path, default=DEFAULT_SQLITE_DB)
     parser.add_argument("--stem", default="lorehold_runtime_candidate_readiness_20260628_v1")
     return parser.parse_args()
 
@@ -375,6 +530,8 @@ def main() -> int:
         runtime_queue_path=args.runtime_queue,
         access_model_path=args.access_model,
         hypothesis_queue_path=args.hypothesis_queue,
+        active_rule_index=load_active_sqlite_rules(args.sqlite_db),
+        active_rule_source=args.sqlite_db,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

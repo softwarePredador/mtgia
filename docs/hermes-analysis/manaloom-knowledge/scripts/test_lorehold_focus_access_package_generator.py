@@ -12,7 +12,7 @@ def test_default_access_model_uses_runtime_overlay_report():
 def test_default_runtime_gap_queue_uses_current_miner_report():
     assert (
         gen.DEFAULT_RUNTIME_GAP_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.json"
     )
 
 
@@ -217,8 +217,8 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert report["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
     assert report["summary"]["access_model_status"] == "squee_route_modeled_access_density_needed"
     assert required[0]["preflight_access_candidate_ready_count"] == 0
-    assert "read-only runtime proposal" in required[0]["reason"]
-    assert "approved PG apply/sync" in required[0]["reason"]
+    assert "PG271-synced" in required[0]["reason"]
+    assert "seed-safe cut model" in required[0]["reason"]
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
 
 

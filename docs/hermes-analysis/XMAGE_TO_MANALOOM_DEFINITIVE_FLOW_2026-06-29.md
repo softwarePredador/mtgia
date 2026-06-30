@@ -327,7 +327,7 @@ PG263/PG264 Lorehold runtime-gap checkpoint:
   `split_family_scope_review_required=13`,
   `safe_for_batch_pg_package_count=0`.
 
-PG267/PG270 runtime-rule checkpoint:
+PG267/PG271 runtime-rule checkpoint:
 
 - PG265 was applied and synced for `Lens of Clarity` with exact visibility-only
   topdeck scope `look_top_library_any_time_and_opponent_face_down_creatures_v1`.
@@ -344,6 +344,9 @@ PG267/PG270 runtime-rule checkpoint:
 - PG270 was applied and synced for `Currency Converter` with exact draw-engine
   bookkeeping for discarding, exiling the discarded card from graveyard, moving
   it back to graveyard, and creating Treasure.
+- PG271 was applied and synced for `Hidden Retreat` with exact targeted
+  instant/sorcery damage-prevention scope
+  `activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1`.
 - PG267 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
 - PG268 package evidence:
@@ -352,8 +355,10 @@ PG267/PG270 runtime-rule checkpoint:
   `docs/hermes-analysis/master_optimizer_reports/pg269_alhammarret_archive_replacements_20260630_package.md`.
 - PG270 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg270_currency_converter_draw_engine_20260630_package.md`.
-- Current queue after PG270:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg270_currency_converter_apply_sync_manifest.md`.
+- PG271 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md`.
+- Current queue after PG271:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg271_hidden_retreat_apply_sync_manifest.md`.
 - Current combined severity counts:
   `{"high": 102, "medium": 42, "pass": 647}`.
 - Current unresolved routing:
@@ -366,10 +371,13 @@ PG267/PG270 runtime-rule checkpoint:
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.md`;
   blocked runtime gaps are `20`, with
   `mapper_metadata_or_test_scenario_required=12` and
   `split_family_scope_review_required=8`.
+- Current Lorehold runtime readiness after PG271:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat.md`;
+  `Hidden Retreat` is `pg_package_applied_synced`, not apply-pending.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

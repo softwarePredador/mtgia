@@ -1,0 +1,71 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg271_hidden_retreat_damage_prevention_20260630_20260630",
+  "deploy_id": "pg271",
+  "expected_rules": [
+    {
+      "card_name": "Hidden Retreat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+      "min_rule_version": 2,
+      "normalized_name": "hidden retreat",
+      "oracle_hash": "816f631d821b5a48e187fafe519845d7",
+      "required_effect_fields": {
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+        "effect": "damage_prevention_shield"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "damage_prevention_shield": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_rollback.sql"
+  },
+  "generated_at": "2026-06-30T08:55:10+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Hidden Retreat"
+      },
+      "card_name": "Hidden Retreat",
+      "effect": "damage_prevention_shield",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+      "normalized_name": "hidden retreat",
+      "required_effect_fields": {
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+        "effect": "damage_prevention_shield"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Hidden Retreat"
+  ],
+  "selected_count": 1,
+  "slug": "hidden_retreat_damage_prevention_20260630",
+  "snapshot_checks": [
+    {
+      "card_name": "Hidden Retreat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+      "min_rule_version": 2,
+      "normalized_name": "hidden retreat",
+      "oracle_hash": "816f631d821b5a48e187fafe519845d7",
+      "required_effect_fields": {
+        "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
