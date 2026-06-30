@@ -7630,7 +7630,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "mill_engine",
-                "xmage_artifact_tap_each_player_mill_one_review_v1",
+                "artifact_tap_each_player_mill_one_v1",
             ),
             (
                 "KarnTheGreatCreator",
@@ -7759,8 +7759,12 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["effect"], expected_effect)
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
-                self.assertTrue(expected_scope.startswith("xmage_"))
-                self.assertTrue(expected_scope.endswith("_review_v1"))
+                if class_name == "GhoulcallersBell":
+                    self.assertFalse(expected_scope.startswith("xmage_"))
+                    self.assertFalse(expected_scope.endswith("_review_v1"))
+                else:
+                    self.assertTrue(expected_scope.startswith("xmage_"))
+                    self.assertTrue(expected_scope.endswith("_review_v1"))
 
 
 if __name__ == "__main__":

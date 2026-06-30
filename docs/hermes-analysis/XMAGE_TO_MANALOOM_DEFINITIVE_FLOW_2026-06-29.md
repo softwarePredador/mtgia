@@ -390,6 +390,10 @@ PG267/PG271 runtime-rule checkpoint:
   `docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_package.md`.
 - PG276 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_package.md`.
+- PG277 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_package.md`.
+- PG277 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_e2e_validation.md`.
 - Current queue after PG276:
   `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
 - Current combined severity counts:
@@ -404,19 +408,22 @@ PG267/PG271 runtime-rule checkpoint:
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.md`;
-  blocked runtime gaps are still `16`, but the manual mapper backlog is now
-  `0`; all `16` remaining cards are routed to `split_family_scope_review_required`.
-  The split families are `free_cast=3`, `passive=2`, `recursion=2`,
-  `board_wipe_choice=2`, `token_maker=2`, `topdeck_play=2`,
-  `draw_engine=1`, `mill_spell=1`, and `tutor=1`.
-- Current Lorehold runtime readiness after PG276:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_manual_mapper_wave.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg277_ghoulcaller.md`;
+  blocked runtime gaps are now `15`, manual mapper backlog remains `0`, and all
+  `15` remaining cards are routed to `split_family_scope_review_required`.
+  `Ghoulcaller's Bell` is filtered out as a current verified/auto rule after
+  PG277. The remaining split families are `free_cast=3`, `passive=2`,
+  `recursion=2`, `board_wipe_choice=2`, `token_maker=2`, `topdeck_play=2`,
+  `draw_engine=1`, and `tutor=1`.
+- Current Lorehold runtime readiness after PG277:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg277_ghoulcaller.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
   apply-pending; `Codex Shredder` and `Perpetual Timepiece` are filtered out of
   the runtime-gap queue as current verified/auto active rules; `Chaos Wand` is
   also filtered out as a current verified/auto active rule; `Assemble the
-  Players` is filtered out after PG276 as a current verified/auto active rule.
+  Players` is filtered out after PG276 as a current verified/auto active rule;
+  `Ghoulcaller's Bell` is filtered out after PG277 as a current verified/auto
+  active rule.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

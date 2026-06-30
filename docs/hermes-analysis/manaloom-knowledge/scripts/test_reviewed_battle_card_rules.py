@@ -506,6 +506,17 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "xmage_graveyard_return_variant_review_v1",
             by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
         )
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["source"], "curated")
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["review_status"], "verified")
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["execution_status"], "auto")
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["effect_json"]["effect"], "mill_engine")
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["effect_json"]["mill_count"], 1)
+        self.assertEqual(by_name["Ghoulcaller's Bell"]["effect_json"]["mill_scope"], "each_player")
+        self.assertTrue(by_name["Ghoulcaller's Bell"]["effect_json"]["activation_requires_tap"])
+        self.assertEqual(
+            by_name["Ghoulcaller's Bell"]["effect_json"]["battle_model_scope"],
+            "artifact_tap_each_player_mill_one_v1",
+        )
         self.assertEqual(by_name["Chaos Wand"]["source"], "curated")
         self.assertEqual(by_name["Chaos Wand"]["review_status"], "verified")
         self.assertEqual(by_name["Chaos Wand"]["execution_status"], "auto")

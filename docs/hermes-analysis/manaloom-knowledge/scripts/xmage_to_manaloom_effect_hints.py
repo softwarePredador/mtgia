@@ -7505,7 +7505,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="mill_engine",
-                scope="xmage_artifact_tap_each_player_mill_one_review_v1",
+                scope="artifact_tap_each_player_mill_one_v1",
                 reason=(
                     "XMage structure matches Ghoulcaller's Bell: activated tap ability mills one "
                     "card from each player's library."
@@ -7514,6 +7514,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                 requires_runtime_executor=True,
                 extra_effect_fields={
                     "permanent_type": "artifact",
+                    "artifact": True,
                     "activation_requires_tap": True,
                     "mill_count": 1,
                     "mill_scope": "each_player",

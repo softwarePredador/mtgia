@@ -24047,6 +24047,121 @@ def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="p
                 phase=phase,
             )
             continue
+        mill_count = int(permanent.get("mill_count") or 0)
+        if str(permanent.get("mill_scope") or "").lower() == "each_player":
+            if mill_count <= 0:
+                continue
+            players = [
+                candidate
+                for candidate in (all_players or [player, *list(opponents or [])])
+                if getattr(candidate, "is_alive", lambda: True)()
+            ]
+            mill_results = []
+            total_milled = 0
+            for target in players:
+                library_before = len(getattr(target, "library", []) or [])
+                graveyard_before = len(getattr(target, "graveyard", []) or [])
+                milled = []
+                for _ in range(min(mill_count, len(getattr(target, "library", []) or []))):
+                    milled_card = target.library.pop(0)
+                    target.graveyard.append(milled_card)
+                    milled.append(milled_card)
+                    resolve_land_cards_enter_graveyard_triggers(
+                        target,
+                        [milled_card],
+                        turn=turn,
+                        source_event="each_player_mill_artifact",
+                    )
+                total_milled += len(milled)
+                mill_results.append(
+                    {
+                        "player": target.name,
+                        "requested_mill": mill_count,
+                        "milled_count": len(milled),
+                        "milled": [
+                            milled_card.get("name", "?")
+                            for milled_card in milled
+                            if isinstance(milled_card, dict)
+                        ],
+                        "library_before": library_before,
+                        "library_after": len(getattr(target, "library", []) or []),
+                        "graveyard_before": graveyard_before,
+                        "graveyard_after": len(getattr(target, "graveyard", []) or []),
+                    }
+                )
+            if total_milled <= 0:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_cards_for_each_player_mill",
+                    phase=phase,
+                )
+                continue
+            if permanent.get("activation_requires_tap", True):
+                permanent["tapped"] = True
+            permanent["utility_artifact_used_this_turn"] = True
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="tap_each_player_mill",
+                        effect=permanent.get("effect", "mill_engine"),
+                        score=8 + total_milled,
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="tap_each_player_mill",
+                    effect=permanent.get("effect", "mill_engine"),
+                    score=8 + total_milled,
+                ),
+                score_components={
+                    "mill_count_per_player": mill_count,
+                    "affected_players": len(players),
+                    "total_milled": total_milled,
+                },
+                rule_source=permanent.get("_rule_source", "utility_artifact_activation_v1"),
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=8 + total_milled,
+                reason="use_idle_artifact_to_mill_each_player",
+                strategic_principle="use symmetrical mill only when the exact artifact rule is present",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={"total_library": -total_milled, "total_graveyard": total_milled},
+                risk_flags=["tap_artifact", "symmetrical_mill"],
+            )
+            emit_replay_event(
+                "mill_engine_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="tap_each_player_mill",
+                requested_mill_per_player=mill_count,
+                affected_players=len(players),
+                total_milled=total_milled,
+                mill_results=mill_results,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="tap_each_player_mill",
+                requested_mill_per_player=mill_count,
+                affected_players=len(players),
+                total_milled=total_milled,
+                mill_results=mill_results,
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            return 1
         sacrifice_type = str(permanent.get("activation_sacrifice_target_type") or "artifact").lower()
         sacrifice_candidates = [
             candidate
@@ -24076,7 +24191,6 @@ def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="p
             )
         )
         sacrificed = sacrifice_candidates[0]
-        mill_count = int(permanent.get("mill_count") or 0)
         if mill_count <= 0:
             continue
         target = choose_mill_target(player, opponents, mill_count)

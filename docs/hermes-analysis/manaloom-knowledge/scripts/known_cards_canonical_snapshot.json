@@ -13204,6 +13204,24 @@
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a",
     "battle_rule_oracle_hash": "5725b39ca4bb7c5e8e4bebf0d246be13"
   },
+  "Ghoulcaller's Bell": {
+    "ability_kind": "activated",
+    "activation_requires_tap": true,
+    "artifact": true,
+    "battle_model_scope": "artifact_tap_each_player_mill_one_v1",
+    "effect": "mill_engine",
+    "mill_count": 1,
+    "mill_scope": "each_player",
+    "permanent_type": "artifact",
+    "target": "each_player",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f5a40566d057c8e235241cfa88fd35d4",
+    "battle_rule_oracle_hash": "be79f523c3a5cd11de81a0dfdf0d1c2c"
+  },
   "Giada, Font of Hope": {
     "cmc": 2.0,
     "effect": "ramp_permanent",

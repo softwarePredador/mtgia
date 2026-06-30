@@ -848,6 +848,17 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("artifact_enters_untap_source"))
             and effect_json.get("artifact_enters_untap_source_status") == "annotation_only"
         )
+    if effect == "mill_engine" and scope == "artifact_tap_each_player_mill_one_v1":
+        return (
+            types == {"ARTIFACT"}
+            and "MillCardsEachPlayerEffect" in effect_classes
+            and "SimpleActivatedAbility" in ability_classes
+            and "TapSourceCost" in cost_classes
+            and bool(effect_json.get("activation_requires_tap"))
+            and int(effect_json.get("mill_count") or 0) == 1
+            and effect_json.get("mill_scope") == "each_player"
+            and effect_json.get("target") == "each_player"
+        )
 
     if effect == "static_cost_reduction" and scope == "chosen_card_type_cost_reduction_v1":
         return (

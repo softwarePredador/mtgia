@@ -19879,6 +19879,79 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg277_ghoulcallers_bell_mills_each_player():
+        bell = {
+            "name": "Ghoulcaller's Bell",
+            "effect": "mill_engine",
+            "type_line": "Artifact",
+            "artifact": True,
+            "battle_model_scope": "artifact_tap_each_player_mill_one_v1",
+            "activation_requires_tap": True,
+            "mill_count": 1,
+            "mill_scope": "each_player",
+            "target": "each_player",
+            "_rule_logical_key": "battle_rule_v1:f5a40566d057c8e235241cfa88fd35d4",
+            "_rule_oracle_hash": "be79f523c3a5cd11de81a0dfdf0d1c2c",
+        }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Bell Controller")
+            opponent_one = player("Opponent One")
+            opponent_two = player("Opponent Two")
+            active.battlefield = [bell]
+            active.library = [
+                {"name": "Controller Top", "type_line": "Instant", "cmc": 1},
+                {"name": "Controller Second", "type_line": "Land", "cmc": 0},
+            ]
+            opponent_one.library = [
+                {"name": "Opponent One Top", "type_line": "Creature", "cmc": 2},
+                {"name": "Opponent One Second", "type_line": "Land", "cmc": 0},
+            ]
+            opponent_two.library = [
+                {"name": "Opponent Two Top", "type_line": "Sorcery", "cmc": 3},
+                {"name": "Opponent Two Second", "type_line": "Land", "cmc": 0},
+            ]
+
+            activated = battle.activate_utility_artifacts(
+                active,
+                [opponent_one, opponent_two],
+                [active, opponent_one, opponent_two],
+                turn=4,
+                rng=random.Random(2771),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert activated == 1
+        assert bell["tapped"] is True
+        assert [card.get("name") for card in active.graveyard] == ["Controller Top"]
+        assert [card.get("name") for card in opponent_one.graveyard] == ["Opponent One Top"]
+        assert [card.get("name") for card in opponent_two.graveyard] == ["Opponent Two Top"]
+        assert [card.get("name") for card in active.library] == ["Controller Second"]
+        assert any(
+            event == "mill_engine_activated"
+            and data.get("card") == "Ghoulcaller's Bell"
+            and data.get("activation_kind") == "tap_each_player_mill"
+            and data.get("affected_players") == 3
+            and data.get("total_milled") == 3
+            and data.get("rule_logical_key") == "battle_rule_v1:f5a40566d057c8e235241cfa88fd35d4"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action") == "tap_each_player_mill"
+            and "symmetrical_mill" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard():
         def perpetual_timepiece():
             return {
@@ -21557,6 +21630,7 @@ def register_tests(battle, player):
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
+        test_pg277_ghoulcallers_bell_mills_each_player,
         test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard,
         test_pg275_chaos_wand_exiles_opponent_library_until_free_cast_hit,
         test_pg276_assemble_the_players_casts_small_top_creature_once_with_paid_cost,
