@@ -81,6 +81,13 @@
       "learning": "Grand Abolisher protects a decisive own turn in theory, but this exact non-instant replacement reduced the smoke gate immediately. It should not be confirmed from this slot unless a future runtime or opponent model materially changes."
     },
     {
+      "key": "candidate_607_deflecting_palm_redirect_lightning_v1",
+      "swap_or_scope": "+Deflecting Palm; -Redirect Lightning",
+      "status": "rejected_smoke",
+      "result": "smoke tied 11W/13L/0S vs deck_607 11W/12L/1S over 24 games; Deflecting Palm was exercised in 8 games, spell-cast 6, miracle-cast 1, resolved 8; Winota 1W/2L vs deck_607 2W/1L",
+      "learning": "Deflecting Palm is battle-ready and did produce real card events, but this same-lane pressure probe did not beat deck_607 and regressed the fast-pressure Winota slice plus miracle/discard-to-top cadence. Do not promote this exact swap in the current 607 shell."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",

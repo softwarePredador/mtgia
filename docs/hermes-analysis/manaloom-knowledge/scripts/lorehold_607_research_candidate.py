@@ -467,6 +467,28 @@ RESEARCH_PLANS = {
             "The registry protects Tibalt's Trickery until a same-function replacement wins; Grand Abolisher is included only as a same-function protection benchmark.",
         ],
     },
+    "deflecting_palm_redirect_lightning_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_deflecting_palm_redirect_lightning_v1",
+        "candidate_name": "Lorehold 607 + Deflecting Palm over Redirect Lightning v1",
+        "candidate_archetype": "607-deflecting-palm-redirect-lightning",
+        "added": [{"card_name": "Deflecting Palm", "source_deck_id": 615}],
+        "removed": ["Redirect Lightning"],
+        "intent": (
+            "Test a pressure-matchup protection sidegrade without touching the "
+            "miracle/topdeck shell, ramp anchors, board wipes, or finishers. "
+            "Redirect Lightning is the current cheap single-target redirection "
+            "lesson; Deflecting Palm stays in the same instant-speed protection "
+            "lane while converting one large combat or damage event into reach."
+        ),
+        "external_signals": [
+            "Deflecting Palm appears in local Lorehold variants 614, 615, and 616.",
+            "Local battle_card_rules has a verified auto damage-prevention/reflection rule for Deflecting Palm.",
+            "The frozen contract says the next useful lane is pressure-matchup improvement that does not reduce topdeck or miracle frequency.",
+            "Redirect Lightning is not a protected anchor, but prior The One Ring over Redirect Lightning failed because it was a cross-lane higher-curve value swap; this candidate keeps the cheap instant/protection lane.",
+        ],
+    },
 }
 
 

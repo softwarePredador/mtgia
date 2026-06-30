@@ -200,6 +200,28 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
                 self.assertEqual(plan["removed"], ["Tibalt's Trickery"])
                 self.assertFalse(protected_cards.intersection(plan["removed"]))
 
+    def test_deflecting_palm_plan_is_same_lane_pressure_protection_probe(self):
+        plan = research.RESEARCH_PLANS["deflecting_palm_redirect_lightning_v1"]
+        self.assertEqual(plan["base_deck_id"], 607)
+        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_key"], "candidate_607_deflecting_palm_redirect_lightning_v1")
+        self.assertEqual(plan["added"], [{"card_name": "Deflecting Palm", "source_deck_id": 615}])
+        self.assertEqual(plan["removed"], ["Redirect Lightning"])
+        self.assertIn("pressure-matchup", plan["intent"])
+        self.assertFalse(
+            {
+                "Bender's Waterskin",
+                "Victory Chimes",
+                "Molecule Man",
+                "The Scarlet Witch",
+                "The Mind Stone",
+                "Insurrection",
+                "Storm Herd",
+                "Creative Technique",
+                "Tibalt's Trickery",
+            }.intersection(plan["removed"])
+        )
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

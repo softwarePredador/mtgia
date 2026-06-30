@@ -465,8 +465,11 @@ For Lorehold, do not promote `614`, `615`, `candidate_607_v615_mana_engine_v1`,
 `candidate_607_v615_mana_vault_method_repair_v1`, any 2026-06-30
 `The One Ring` candidate, any 2026-06-30 tested tutor/selection candidate, or
 any 2026-06-30 tested `Tibalt's Trickery` replacement as the final ideal deck
-from the current evidence. The tested cards were exercised in battle but lost
-to `607`, so the protected baseline remains `607`.
+from the current evidence. Also do not promote
+`candidate_607_deflecting_palm_redirect_lightning_v1`; it tied total wins in
+the smoke gate but regressed Winota and miracle/discard-to-top cadence. The
+tested cards were exercised in battle but did not pass the promotion contract,
+so the protected baseline remains `607`.
 
 Tibalt replacement decision generated on 2026-06-30:
 
@@ -491,6 +494,25 @@ Tibalt replacement decision generated on 2026-06-30:
   enough to cut it when exercised same-lane replacements lose confirmed gates.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_tibalt_replacement_decision_20260630.md`.
+
+Deflecting Palm pressure-probe decision generated on 2026-06-30:
+
+- Candidate:
+  `candidate_607_deflecting_palm_redirect_lightning_v1`.
+- Structural result: rank `1`, score `141.058`, intent `100.0`, lands `34`,
+  rule-ready `97.9%`.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `11/24` versus `607` `11/24`.
+- Direct card-use evidence: `Deflecting Palm` had card events in `8/24`
+  games, spell-cast `6`, miracle-cast `1`, and resolved `8`.
+- Promotion failure: Winota regressed to `1/3` versus `607` `2/3`; miracle
+  casts fell from `48` to `37`; discard-to-top replacements fell from `14` to
+  `6`.
+- Decision: reject this exact `+Deflecting Palm; -Redirect Lightning` swap.
+  The card is battle-ready, but this replacement does not improve the current
+  `607` shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_deflecting_palm_redirect_lightning_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell
