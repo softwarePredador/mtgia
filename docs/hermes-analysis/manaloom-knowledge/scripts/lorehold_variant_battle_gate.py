@@ -348,14 +348,73 @@ def deck_specs(
     return specs
 
 
-def load_opponents(db: Path, *, opponent_limit: int, opponent_seed: int) -> tuple[str, list[dict[str, Any]]]:
+def parse_fixed_opponent_deck_ids(raw: str | None) -> list[int]:
+    if not raw:
+        return []
+    return [int(part.strip()) for part in str(raw).split(",") if part.strip()]
+
+
+def fixed_opponent_profile_from_deck(db: Path, deck_id: int) -> dict[str, Any]:
+    previous_db = Path(str(getattr(battle, "DB", DEFAULT_DB)))
     set_battle_db(db)
-    os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(opponent_limit)
+    try:
+        commander, deck, construction_report = battle.load_deck_with_construction_report(deck_id)
+    finally:
+        set_battle_db(previous_db)
+    if commander is None:
+        raise RuntimeError(f"fixed opponent deck {deck_id} has no commander")
+    name = f"Fixed Lorehold deck {deck_id}"
+    commander_card = dict(commander)
+    commander_card["owner"] = name
+    return {
+        "name": name,
+        "archetype": f"fixed_deck_{deck_id}",
+        "source": "fixed_deck",
+        "fixed_opponent_deck_id": deck_id,
+        "source_card_count": len(deck) + 1,
+        "battle_card_count": len(deck),
+        "built_deck": [dict(card) for card in deck],
+        "commander_name": commander.get("name", f"Deck {deck_id} Commander"),
+        "commander_card": commander_card,
+        "commander_cmc": commander.get("cmc", 4),
+        "commander_metadata_source": "deck_cards",
+        "strategy": "spells",
+        "life": 40,
+        "lands": sum(1 for card in deck if battle.card_has_functional_tag(card, "land") or "Land" in card.get("type_line", "")),
+        "ramp": sum(1 for card in deck if battle.card_has_functional_tag(card, "ramp", "ritual")),
+        "removal": sum(1 for card in deck if battle.card_has_functional_tag(card, "removal", "board_wipe")),
+        "counters": sum(1 for card in deck if battle.card_has_functional_tag(card, "counter", "protection")),
+        "creatures": sum(1 for card in deck if "Creature" in card.get("type_line", "")),
+        "avg_cmc": sum(float(card.get("cmc") or 0) for card in deck) / max(1, len(deck)),
+        "is_real": True,
+        "is_fixed_opponent": True,
+        "construction_report": construction_report,
+    }
+
+
+def load_opponents(
+    db: Path,
+    *,
+    opponent_limit: int,
+    opponent_seed: int,
+    fixed_opponent_deck_ids: list[int] | None = None,
+) -> tuple[str, list[dict[str, Any]]]:
+    fixed_ids = list(fixed_opponent_deck_ids or [])
+    fixed_profiles = [fixed_opponent_profile_from_deck(db, deck_id) for deck_id in fixed_ids]
+    dynamic_limit = max(0, int(opponent_limit) - len(fixed_profiles))
+    set_battle_db(db)
+    os.environ["MANALOOM_BATTLE_REAL_OPPONENT_LIMIT"] = str(max(1, dynamic_limit))
     os.environ["MANALOOM_BATTLE_REAL_OPPONENT_SEED"] = str(opponent_seed)
-    opponents = battle.load_learned_opponents()
+    opponents = battle.load_learned_opponents() if dynamic_limit else []
     if opponents:
-        return "real", opponents[:opponent_limit]
-    return "generic", list(battle.OPPONENT_ARCHETYPES[:opponent_limit])
+        kind = "real"
+        selected = opponents[:dynamic_limit]
+    else:
+        kind = "generic"
+        selected = list(battle.OPPONENT_ARCHETYPES[:dynamic_limit])
+    if fixed_profiles:
+        kind = f"{kind}+fixed_deck"
+    return kind, fixed_profiles + selected
 
 
 def _raise_game_timeout(signum: int, frame: Any) -> None:
@@ -1412,6 +1471,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- games_per_opponent: `{report['games_per_opponent']}`",
         f"- opponent_kind: `{report['opponent_kind']}`",
         f"- opponent_seed: `{report['opponent_seed']}`",
+        f"- fixed_opponent_deck_ids: `{', '.join(str(item) for item in report.get('fixed_opponent_deck_ids') or []) or 'none'}`",
         f"- simulation_seed: `{report['simulation_seed']}`",
         f"- python_hash_seed: `{report.get('python_hash_seed', 'unset')}`",
         f"- deck_process_isolation: `{report.get('deck_process_isolation', False)}`",
@@ -1587,6 +1647,14 @@ def main() -> int:
     parser.add_argument("--games", type=int, default=1)
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--opponent-seed", type=int, default=20260626)
+    parser.add_argument(
+        "--fixed-opponent-deck-ids",
+        default=None,
+        help=(
+            "Comma-separated local deck ids to inject as fixed real opponents. "
+            "Use 607 when testing from-scratch Lorehold challengers against the protected baseline."
+        ),
+    )
     parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--game-timeout-seconds", type=float, default=0.0)
     parser.add_argument(
@@ -1617,6 +1685,7 @@ def main() -> int:
     args = parser.parse_args()
 
     deck_ids = parse_deck_ids(args.deck_ids)
+    fixed_opponent_deck_ids = parse_fixed_opponent_deck_ids(args.fixed_opponent_deck_ids)
     specs = deck_specs(
         db=args.db,
         deck_ids=deck_ids,
@@ -1631,6 +1700,7 @@ def main() -> int:
         args.db,
         opponent_limit=args.opponent_limit,
         opponent_seed=args.opponent_seed,
+        fixed_opponent_deck_ids=fixed_opponent_deck_ids,
     )
     matrix_scores = load_matrix_scores(args.matrix)
 
@@ -1656,6 +1726,7 @@ def main() -> int:
             "games_per_opponent": max(1, args.games),
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
+            "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
             "simulation_seed": args.simulation_seed,
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "game_timeout_seconds": float(args.game_timeout_seconds or 0),
@@ -1715,6 +1786,7 @@ def main() -> int:
             "games_per_opponent": max(1, args.games),
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
+            "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
             "simulation_seed": args.simulation_seed,
             "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
             "deck_process_isolation": bool(args.isolate_deck_process),
@@ -1736,6 +1808,7 @@ def main() -> int:
         "games_per_opponent": max(1, args.games),
         "opponent_kind": opponent_kind,
         "opponent_seed": args.opponent_seed,
+        "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
         "simulation_seed": args.simulation_seed,
         "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
         "deck_process_isolation": bool(args.isolate_deck_process),
@@ -1759,6 +1832,7 @@ def main() -> int:
                 "games_per_opponent": max(1, args.games),
                 "opponent_kind": opponent_kind,
                 "opponent_seed": args.opponent_seed,
+                "fixed_opponent_deck_ids": fixed_opponent_deck_ids,
                 "simulation_seed": args.simulation_seed,
                 "python_hash_seed": os.environ.get("PYTHONHASHSEED", "unset"),
                 "deck_process_isolation": bool(args.isolate_deck_process),
