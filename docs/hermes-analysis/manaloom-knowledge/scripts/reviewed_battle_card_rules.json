@@ -267,9 +267,12 @@
       "activation_cost_generic": 2,
       "hand_to_top_exchange": true,
       "requires_sacrifice_artifact": true,
+      "activation_requires_tap": true,
+      "activation_requires_sacrifice": true,
       "draw_count": 3,
       "put_from_hand_on_top_count": 2,
-      "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1"
+      "can_setup_lorehold_miracle_draw": true,
+      "battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1"
     },
     "deck_role_json": {
       "category": "draw",
@@ -277,9 +280,10 @@
       "subtype": "activated_draw_topdeck_filter"
     },
     "source": "curated",
-    "confidence": 0.88,
-    "review_status": "active",
-    "notes": "Oracle-reviewed on 2026-06-19 against Scryfall API: {2}, {T}, Sacrifice this artifact: Draw three cards, then put two cards from your hand on top of your library in any order. Runtime must keep Brainstone as an activated topdeck/filter artifact, not as free draw on spell resolution; full sacrifice/draw/put-back activation executor remains pending."
+    "confidence": 0.92,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "notes": "Oracle-reviewed on 2026-06-19 against Scryfall API and rechecked on 2026-06-30 against local XMage Brainstone.java: {2}, {T}, Sacrifice this artifact: Draw three cards, then put two cards from your hand on top of your library in any order. ManaLoom runtime covers the Lorehold first-draw miracle setup slice with sacrifice, draw-three, put-two-back, replay, and decision-trace assertions."
   },
   "Breena, the Demagogue": {
     "effect_json": {

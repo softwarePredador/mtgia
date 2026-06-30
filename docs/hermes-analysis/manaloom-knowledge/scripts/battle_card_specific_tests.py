@@ -11618,6 +11618,12 @@ def register_tests(battle, player):
                 **brainstone_card,
                 **battle.get_card_effect(brainstone_card),
             }
+            assert brainstone_permanent["battle_model_scope"] == (
+                "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1"
+            )
+            assert "unexecuted" not in brainstone_permanent["battle_model_scope"]
+            assert brainstone_permanent["put_from_hand_on_top_count"] == 2
+            assert brainstone_permanent["requires_sacrifice_artifact"] is True
             lorehold.battlefield = [
                 {
                     "name": "Lorehold, the Historian",

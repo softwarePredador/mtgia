@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260630_post_pg271_hidden_retreat_apply_sync_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260630_post_pg272_brainstone_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"

@@ -46,7 +46,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260630_post_pg271_hidden_retreat_apply_sync_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_post_pg272_brainstone_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -278,7 +278,7 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"],
+            ["lorehold_access_cut_model_20260630_post_pg272_brainstone.json"],
             "scripts.lorehold_focus_generator_uses_corrected_access_model",
         ),
         check_contains(

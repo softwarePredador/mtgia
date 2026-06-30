@@ -708,17 +708,20 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
                     "effect": "topdeck_manipulation",
                     "activation_cost_generic": 2,
                     "requires_sacrifice_artifact": True,
+                    "activation_requires_tap": True,
+                    "activation_requires_sacrifice": True,
                     "draw_count": 3,
                     "put_from_hand_on_top_count": 2,
-                    "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+                    "can_setup_lorehold_miracle_draw": True,
+                    "battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
                 },
                 "deck_role_json": {
                     "category": "draw",
                     "effect": "topdeck_manipulation",
                 },
                 "source": "curated",
-                "confidence": 0.88,
-                "review_status": "active",
+                "confidence": 0.92,
+                "review_status": "verified",
                 "execution_status": "auto",
                 "notes": "reviewed runtime row",
             }
@@ -767,11 +770,16 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
 
         self.assertGreaterEqual(changed, 2)
         self.assertEqual(exported, 1)
-        self.assertIn(("curated", "active", "auto", json.dumps(reviewed_rows[0]["effect_json"], sort_keys=True)), rows)
+        self.assertIn(("curated", "verified", "auto", json.dumps(reviewed_rows[0]["effect_json"], sort_keys=True)), rows)
         self.assertEqual(payload["Brainstone"]["effect"], "topdeck_manipulation")
         self.assertEqual(payload["Brainstone"]["battle_rule_source"], "curated")
-        self.assertEqual(payload["Brainstone"]["battle_rule_review_status"], "active")
+        self.assertEqual(payload["Brainstone"]["battle_rule_review_status"], "verified")
         self.assertEqual(payload["Brainstone"]["battle_rule_execution_status"], "auto")
+        self.assertEqual(
+            payload["Brainstone"]["battle_model_scope"],
+            "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
+        )
+        self.assertNotIn("unexecuted", payload["Brainstone"]["battle_model_scope"])
 
     def test_merge_pg_rows_restores_reviewed_hash_for_same_runtime_key(self) -> None:
         pg_rows = [

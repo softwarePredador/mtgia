@@ -1,8 +1,8 @@
 import lorehold_runtime_candidate_readiness as readiness
 
 
-def test_default_access_model_uses_post_pg271_hidden_retreat_report():
-    assert readiness.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"
+def test_default_access_model_uses_post_pg272_brainstone_report():
+    assert readiness.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
 
 
 def runtime_queue():

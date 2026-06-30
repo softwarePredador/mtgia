@@ -548,7 +548,7 @@ def classify_pair(
     elif hard_blockers:
         status = "blocked_cut_or_prior_evidence"
     elif not compatible:
-        status = "manual_same_lane_cut_required"
+        status = "manual_cross_lane_cut_review_required"
     elif score >= 75:
         status = "preflight_access_candidate_ready"
     else:
@@ -658,7 +658,16 @@ def build_model(
 
     status_counts = Counter(row["status"] for row in pair_rows)
     preflight_rows = [row for row in pair_rows if row["status"] == "preflight_access_candidate_ready"]
-    manual_rows = [row for row in pair_rows if row["status"] in {"manual_same_lane_cut_required", "manual_review_required"}]
+    manual_rows = [
+        row
+        for row in pair_rows
+        if row["status"]
+        in {
+            "manual_cross_lane_cut_review_required",
+            "manual_review_required",
+            "manual_same_lane_cut_required",
+        }
+    ]
     hidden_retreat_local_rule = local_rules.get(normalize_key("Hidden Retreat")) or {}
     hidden_retreat_overlay_rule = overlay_rules.get(normalize_key("Hidden Retreat")) or {}
     hidden_retreat_local_active = int(hidden_retreat_local_rule.get("active_rule_count") or 0)

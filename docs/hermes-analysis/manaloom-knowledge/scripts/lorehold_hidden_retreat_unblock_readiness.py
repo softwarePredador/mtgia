@@ -26,8 +26,8 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_MANIFEST = REPORT_DIR / "pg271_hidden_retreat_damage_prevention_20260630_manifest.json"
-DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.json"
-DEFAULT_FOCUS_QUEUE = REPORT_DIR / "lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat_v2.json"
+DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
+DEFAULT_FOCUS_QUEUE = REPORT_DIR / "lorehold_focus_access_package_generator_20260630_post_pg272_brainstone_v2.json"
 DEFAULT_OUTCOME_AUDIT = REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_v1.json"
 
 

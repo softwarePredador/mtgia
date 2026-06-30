@@ -347,6 +347,11 @@ PG267/PG271 runtime-rule checkpoint:
 - PG271 was applied and synced for `Hidden Retreat` with exact targeted
   instant/sorcery damage-prevention scope
   `activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1`.
+- PG272 was applied and synced for `Brainstone` with exact executable
+  Lorehold first-draw setup scope
+  `brainstone_draw_three_put_two_back_for_first_draw_miracle_v1`, replacing
+  the stale `unexecuted` scope label while preserving the activated
+  tap/sacrifice, draw-three, put-two-back model.
 - PG267 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
 - PG268 package evidence:
@@ -357,8 +362,10 @@ PG267/PG271 runtime-rule checkpoint:
   `docs/hermes-analysis/master_optimizer_reports/pg270_currency_converter_draw_engine_20260630_package.md`.
 - PG271 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md`.
-- Current queue after PG271:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg271_hidden_retreat_apply_sync_manifest.md`.
+- PG272 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_package.md`.
+- Current queue after PG272:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg272_brainstone_manifest.md`.
 - Current combined severity counts:
   `{"high": 102, "medium": 42, "pass": 647}`.
 - Current unresolved routing:
@@ -371,13 +378,14 @@ PG267/PG271 runtime-rule checkpoint:
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg272_brainstone.md`;
   blocked runtime gaps are `20`, with
   `mapper_metadata_or_test_scenario_required=12` and
   `split_family_scope_review_required=8`.
-- Current Lorehold runtime readiness after PG271:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat_v2.md`;
-  `Hidden Retreat` is `pg_package_applied_synced`, not apply-pending.
+- Current Lorehold runtime readiness after PG272:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg272_brainstone_v2.md`;
+  `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
+  apply-pending.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

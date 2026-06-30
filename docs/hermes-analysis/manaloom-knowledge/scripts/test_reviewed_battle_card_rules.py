@@ -433,12 +433,24 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Arcane Endeavor"]["effect_json"]["effect"], "draw_cards")
         self.assertTrue(by_name["Arcane Endeavor"]["effect_json"]["roll_two_d8_choose_draw_count"])
         self.assertEqual(by_name["Brainstone"]["source"], "curated")
-        self.assertEqual(by_name["Brainstone"]["review_status"], "active")
+        self.assertEqual(by_name["Brainstone"]["review_status"], "verified")
+        self.assertEqual(by_name["Brainstone"]["execution_status"], "auto")
         self.assertEqual(by_name["Brainstone"]["effect_json"]["effect"], "topdeck_manipulation")
         self.assertEqual(by_name["Brainstone"]["effect_json"]["activation_cost_generic"], 2)
         self.assertEqual(by_name["Brainstone"]["effect_json"]["draw_count"], 3)
         self.assertTrue(by_name["Brainstone"]["effect_json"]["hand_to_top_exchange"])
         self.assertTrue(by_name["Brainstone"]["effect_json"]["requires_sacrifice_artifact"])
+        self.assertTrue(by_name["Brainstone"]["effect_json"]["activation_requires_tap"])
+        self.assertTrue(by_name["Brainstone"]["effect_json"]["activation_requires_sacrifice"])
+        self.assertTrue(by_name["Brainstone"]["effect_json"]["can_setup_lorehold_miracle_draw"])
+        self.assertEqual(
+            by_name["Brainstone"]["effect_json"]["battle_model_scope"],
+            "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
+        )
+        self.assertNotIn(
+            "unexecuted",
+            by_name["Brainstone"]["effect_json"]["battle_model_scope"],
+        )
         self.assertEqual(by_name["Breena, the Demagogue"]["source"], "curated")
         self.assertEqual(by_name["Breena, the Demagogue"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Breena, the Demagogue"]["effect_json"]["political_attack_draw_trigger"])

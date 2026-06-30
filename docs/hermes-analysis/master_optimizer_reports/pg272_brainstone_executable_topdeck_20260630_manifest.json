@@ -1,0 +1,55 @@
+{
+  "package_id": "pg272_brainstone_executable_topdeck_20260630",
+  "status": "applied_synced",
+  "generated_at": "2026-06-30T09:30:35Z",
+  "selected_cards": [
+    "Brainstone"
+  ],
+  "families": {
+    "topdeck_manipulation": 1
+  },
+  "source_references": [
+    "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/Brainstone.java",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py"
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Brainstone",
+      "normalized_name": "brainstone",
+      "oracle_hash": "3c13a2b77d527812c94eae8a9c6f9615",
+      "logical_rule_key": "battle_rule_v1:6aab083c9a25b2af50c2069683da5131",
+      "battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
+      "effect": "topdeck_manipulation",
+      "review_status": "verified",
+      "execution_status": "auto"
+    }
+  ],
+  "files": {
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_precheck.sql",
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_apply.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_rollback.sql",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_postcheck.sql",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_package.md"
+  },
+  "apply_result": {
+    "backup_rows": 3,
+    "deprecated_shadow_rows": 3,
+    "upserted_rows": 1
+  },
+  "postcheck_result": {
+    "promoted_rule_rows": 1,
+    "promoted_verified_auto_rows": 1,
+    "promoted_oracle_hash_rows": 1,
+    "promoted_expected_scope_rows": 1,
+    "active_runtime_rows_after": 1,
+    "active_unexecuted_rows_after": 0,
+    "deprecated_disabled_rows_after": 3
+  },
+  "sync_result": {
+    "pg_rows_loaded": 4,
+    "sqlite_inserted_or_updated": 3,
+    "canonical_snapshot_rows_exported": 3284
+  },
+  "postgres_writes": true,
+  "source_db_mutated": true
+}

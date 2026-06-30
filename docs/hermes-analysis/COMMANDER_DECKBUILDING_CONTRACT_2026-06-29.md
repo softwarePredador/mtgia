@@ -501,10 +501,13 @@ Cut-model baseline correction generated on 2026-06-30:
   `lorehold_safe_cut_replanner.py`, and `lorehold_manual_cut_review.py` now
   default to protected baseline deck `607`, not historical deck `6`.
 - The corrected access model is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg271_hidden_retreat.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg272_brainstone.md`.
   It evaluated deck `607` directly (`94` deck rows), found `0` preflight-ready
-  access swaps, and removed the invalid `Penance` over `Brainstone` path
-  because `Brainstone` exists in deck `6`, not in protected deck `607`.
+  access swaps, removed the invalid `Penance` over `Brainstone` path because
+  `Brainstone` exists in deck `6`, not in protected deck `607`, and then
+  rechecked Brainstone after PG272. Brainstone is now runtime-ready with no
+  `unexecuted` scope blocker, but the model still requires a safe cut before
+  any battle gate.
 - The corrected hand-filter, tutor, and recursion models also produced `0`
   gate-ready direct swaps from deck `607`:
   `lorehold_hand_filter_cut_model_20260630_after_pg269_alhammarret.md`,
@@ -761,15 +764,21 @@ Runtime enablement checkpoint generated on 2026-06-30:
 - PG265-PG271 subsequently promoted and synced `Lens of Clarity`,
   `Eight-and-a-Half-Tails`, `Neheb, the Eternal`, `Cloud Key`,
   `Alhammarret's Archive`, `Currency Converter`, and `Hidden Retreat`; the
-  focus-access generator now defaults to the post-PG271 runtime-gap queue.
-- The current runtime-gap queue after PG264 is
+  focus-access generator then advanced through PG272 Brainstone.
+- PG272 promoted and synced `Brainstone` from stale
+  `brainstone_draw_three_put_two_back_unexecuted_v1` naming to exact executable
+  scope `brainstone_draw_three_put_two_back_for_first_draw_miracle_v1`, with
+  PostgreSQL postcheck proving `active_unexecuted_rows_after=0` and the focused
+  Brainstone runtime test passing.
+- The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg271_hidden_retreat.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg272_brainstone.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg271_hidden_retreat_v2.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg272_brainstone_v2.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg271_hidden_retreat_v2.md`;
-  `Hidden Retreat` is applied/synced and must not be routed back to PG apply.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg272_brainstone_v2.md`;
+  `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
+  back to PG apply.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

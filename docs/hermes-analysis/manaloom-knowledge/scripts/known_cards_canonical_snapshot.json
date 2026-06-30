@@ -3914,8 +3914,12 @@
     "battle_rule_oracle_hash": "ae7c7b244cb9842dde5c406ae7773fca"
   },
   "Brainstone": {
+    "ability_kind": "activated",
     "activation_cost_generic": 2,
-    "battle_model_scope": "brainstone_draw_three_put_two_back_unexecuted_v1",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
+    "can_setup_lorehold_miracle_draw": true,
     "cmc": 1.0,
     "draw_count": 3,
     "effect": "topdeck_manipulation",
@@ -3925,10 +3929,10 @@
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 0.88,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:03bed5506a427743723cd7676c6a67d9",
-    "battle_rule_oracle_hash": "58ead991d38c00ac4b790f7e3aa09578"
+    "battle_rule_confidence": 0.92,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6aab083c9a25b2af50c2069683da5131",
+    "battle_rule_oracle_hash": "3c13a2b77d527812c94eae8a9c6f9615"
   },
   "Brainstorm": {
     "count": 1,
