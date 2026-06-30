@@ -139,6 +139,46 @@ def test_leyline_dowser_mills_instant_to_hand_and_can_untap_with_legendary_creat
     )
 
 
+def test_leyline_dowser_mills_non_spell_to_graveyard_without_overclaiming_recursion():
+    battle = load_battle()
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(battle, "Lorehold")
+        opponent = player(battle, "Opponent")
+        dowser = leyline_dowser()
+        milled_land = {
+            "name": "Plains",
+            "type_line": "Basic Land - Plains",
+            "effect": "land",
+        }
+        active.battlefield = [dowser]
+        active.library = [milled_land]
+        active.mana_pool.add_generic(1)
+
+        activated = battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=3,
+            rng=random.Random(611),
+            phase="precombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    assert activated == 1
+    assert milled_land not in active.hand
+    assert milled_land in active.graveyard
+    assert any(
+        event == "utility_artifact_activated"
+        and data.get("activation_kind") == "leyline_dowser_mill_one_maybe_spell_to_hand"
+        and data.get("destination") == "graveyard"
+        and data.get("recovered_to_hand") is False
+        for event, data in events
+    )
+
+
 def test_orcish_spy_taps_to_look_at_target_players_top_three_without_moving_cards():
     battle = load_battle()
     events = []
@@ -176,6 +216,46 @@ def test_orcish_spy_taps_to_look_at_target_players_top_three_without_moving_card
         and data.get("seen_cards") == ["Mountain", "Lightning Bolt", "Island"]
         for event, data in events
     )
+
+
+def test_orcish_spy_does_not_activate_while_summoning_sick():
+    battle = load_battle()
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(battle, "Lorehold")
+        opponent = player(battle, "Opponent")
+        spy = orcish_spy()
+        spy["summoning_sick"] = True
+        cards = [
+            {"name": "Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+            {"name": "Lightning Bolt", "type_line": "Instant", "effect": "direct_damage"},
+            {"name": "Island", "type_line": "Basic Land - Island", "effect": "land"},
+        ]
+        active.battlefield = [spy]
+        opponent.library = list(cards)
+
+        activated = battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=2,
+            rng=random.Random(612),
+            phase="precombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    assert activated == 0
+    assert spy.get("tapped") is not True
+    assert opponent.library == cards
+    assert any(
+        event == "activated_ability_skipped"
+        and data.get("card") == "Orcish Spy"
+        and data.get("strategic_guardrail_reason") == "top_library_look_source_summoning_sick"
+        for event, data in events
+    )
+    assert not any(event == "top_library_looked" for event, _data in events)
 
 
 def test_prototype_portal_imprints_artifact_on_enter_and_creates_token_copy_for_x():
@@ -232,6 +312,68 @@ def test_prototype_portal_imprints_artifact_on_enter_and_creates_token_copy_for_
         event == "token_created"
         and data.get("activation_kind") == "prototype_portal_create_token_copy"
         and data.get("token_copy_of") == "Chromatic Star"
+        for event, data in events
+    )
+
+
+def test_prototype_portal_without_artifact_imprint_does_not_create_token():
+    battle = load_battle()
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(battle, "Lorehold")
+        opponent = player(battle, "Opponent")
+        card = {"name": "Prototype Portal", "type_line": "Artifact", "cmc": 4}
+        effect = prototype_portal()
+        active.hand = [
+            {
+                "name": "Lightning Bolt",
+                "type_line": "Instant",
+                "effect": "direct_damage",
+                "cmc": 1,
+            }
+        ]
+
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=4,
+            rng=random.Random(613),
+            effect_data_override=effect,
+            stack=battle.Stack(),
+            phase="precombat_main",
+        )
+        portal = next(permanent for permanent in active.battlefield if permanent.get("name") == "Prototype Portal")
+        active.mana_pool.add_generic(4)
+        activated = battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            rng=random.Random(613),
+            phase="precombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    assert "imprinted_card" not in portal
+    assert activated == 0
+    assert not any(
+        permanent.get("token_copy_of")
+        for permanent in active.battlefield
+        if isinstance(permanent, dict)
+    )
+    assert any(
+        event == "imprint_failed"
+        and data.get("card") == "Prototype Portal"
+        and data.get("reason") == "no_artifact_card_in_hand"
+        for event, data in events
+    )
+    assert any(
+        event == "activated_ability_skipped"
+        and data.get("card") == "Prototype Portal"
+        and data.get("strategic_guardrail_reason") == "prototype_portal_no_imprinted_artifact"
         for event, data in events
     )
 
@@ -297,9 +439,72 @@ def test_pyxis_exiles_each_players_top_card_then_sacrifices_to_put_permanents_on
     )
 
 
+def test_pyxis_without_final_mana_continues_banking_face_down_cards():
+    battle = load_battle()
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        active = player(battle, "Lorehold")
+        opponent = player(battle, "Opponent")
+        source = pyxis()
+        active_first = {"name": "Mana Rock", "type_line": "Artifact", "effect": "ramp_permanent"}
+        active_second = {"name": "Plains", "type_line": "Basic Land - Plains", "effect": "land"}
+        opponent_first = {"name": "Ponder", "type_line": "Sorcery", "effect": "draw_cards"}
+        opponent_second = {"name": "Island", "type_line": "Basic Land - Island", "effect": "land"}
+        active.battlefield = [source]
+        active.library = [active_first, active_second]
+        opponent.library = [opponent_first, opponent_second]
+
+        first = battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=4,
+            rng=random.Random(614),
+            phase="precombat_main",
+        )
+        source["tapped"] = False
+        source["utility_artifact_used_this_turn"] = False
+        second = battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            rng=random.Random(615),
+            phase="postcombat_main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    assert first == 1
+    assert second == 1
+    assert source in active.battlefield
+    assert source not in active.graveyard
+    assert active_first in active.exile
+    assert active_second in active.exile
+    assert opponent_first in opponent.exile
+    assert opponent_second in opponent.exile
+    assert all(card.get("_pyxis_face_down") is True for card in [active_first, active_second])
+    assert sum(
+        1
+        for event, data in events
+        if event == "utility_artifact_activated"
+        and data.get("activation_kind") == "pyxis_each_player_exile_top_face_down"
+    ) == 2
+    assert not any(
+        event == "utility_artifact_activated"
+        and data.get("activation_kind") == "pyxis_reveal_exiled_put_permanents_onto_battlefield"
+        for event, data in events
+    )
+
+
 if __name__ == "__main__":
     test_leyline_dowser_mills_instant_to_hand_and_can_untap_with_legendary_creature()
+    test_leyline_dowser_mills_non_spell_to_graveyard_without_overclaiming_recursion()
     test_orcish_spy_taps_to_look_at_target_players_top_three_without_moving_cards()
+    test_orcish_spy_does_not_activate_while_summoning_sick()
     test_prototype_portal_imprints_artifact_on_enter_and_creates_token_copy_for_x()
+    test_prototype_portal_without_artifact_imprint_does_not_create_token()
     test_pyxis_exiles_each_players_top_card_then_sacrifices_to_put_permanents_onto_battlefield()
+    test_pyxis_without_final_mana_continues_banking_face_down_cards()
     print("PASS test_artifact_topdeck_runtime")
