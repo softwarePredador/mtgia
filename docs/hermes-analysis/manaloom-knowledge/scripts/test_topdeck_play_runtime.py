@@ -56,6 +56,21 @@ def verge_rangers():
     }
 
 
+def lens_of_clarity():
+    return {
+        "name": "Lens of Clarity",
+        "effect": "topdeck_play",
+        "battle_model_scope": "look_top_library_any_time_and_opponent_face_down_creatures_v1",
+        "look_top_library_any_time": True,
+        "look_opponent_face_down_creatures_any_time": True,
+        "play_lands_from_top_library": False,
+        "alternate_zone_permission": False,
+        "may_cast_without_paying_mana_cost": False,
+        "type_line": "Artifact",
+        "cmc": 1,
+    }
+
+
 def player(battle, name, deck=None):
     return battle.Player(name, None, deck or [], strategy="midrange")
 
@@ -115,3 +130,42 @@ def test_verge_rangers_does_not_play_top_library_land_without_land_deficit():
         event == "land_played" and data.get("source_zone") == "library"
         for event, data in events
     )
+
+
+def test_lens_of_clarity_enters_as_visibility_only_topdeck_play_permanent():
+    battle = load_battle()
+    active = player(battle, "Lorehold", [dead_spell(), basic_land()])
+    opponent = player(battle, "Opponent")
+    events = []
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        effect = lens_of_clarity()
+        battle.apply_effect_immediate(
+            active,
+            [opponent],
+            effect,
+            turn=1,
+            rng=random.Random(607),
+            effect_data_override=effect,
+            stack=battle.Stack(),
+            phase="main",
+        )
+    finally:
+        battle.REPLAY_EVENT_HANDLER = None
+
+    permanent = next(card for card in active.battlefield if card.get("name") == "Lens of Clarity")
+    assert permanent["effect"] == "topdeck_play"
+    assert permanent["look_top_library_any_time"] is True
+    assert permanent["look_opponent_face_down_creatures_any_time"] is True
+    assert permanent["play_lands_from_top_library"] is False
+    assert permanent["may_cast_without_paying_mana_cost"] is False
+
+    permission_events = [
+        data for event, data in events if event == "topdeck_play_static_permission_entered"
+    ]
+    assert permission_events
+    assert permission_events[0]["card"] == "Lens of Clarity"
+    assert permission_events[0]["look_top_library_any_time"] is True
+    assert permission_events[0]["look_opponent_face_down_creatures_any_time"] is True
+    assert permission_events[0]["play_lands_from_top_library"] is False
+    assert permission_events[0]["may_cast_without_paying_mana_cost"] is False

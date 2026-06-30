@@ -3601,6 +3601,38 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                         },
                     },
                     {
+                        "card_name": "Lens of Clarity",
+                        "severity": "high",
+                        "oracle_hash": "lenshash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "LensOfClarity",
+                            "path": "/xmage/LensOfClarity.java",
+                            "types": ["ARTIFACT"],
+                            "effect_classes": [
+                                "LookAtTopCardOfLibraryAnyTimeEffect",
+                                "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+                            ],
+                            "ability_classes": ["SimpleStaticAbility"],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "topdeck_play",
+                                "battle_model_scope": (
+                                    "look_top_library_any_time_and_opponent_face_down_creatures_v1"
+                                ),
+                                "look_top_library_any_time": True,
+                                "look_opponent_face_down_creatures_any_time": True,
+                                "play_lands_from_top_library": False,
+                                "alternate_zone_permission": False,
+                                "may_cast_without_paying_mana_cost": False,
+                            },
+                        },
+                    },
+                    {
                         "card_name": "Gisela, Blade of Goldnight",
                         "severity": "high",
                         "oracle_hash": "giselahash",
@@ -3649,6 +3681,11 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_card["Verge Rangers"]["family_id"], "topdeck_play")
         self.assertEqual(
             by_card["Verge Rangers"]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+        self.assertEqual(by_card["Lens of Clarity"]["family_id"], "topdeck_play")
+        self.assertEqual(
+            by_card["Lens of Clarity"]["promotion_lane"],
             "batch_metadata_candidate_requires_pg_precheck",
         )
         self.assertEqual(by_card["Twinflame Tyrant"]["family_id"], "static_damage_modifier")
@@ -10348,6 +10385,39 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                         },
                     },
                 },
+                {
+                    "card_name": "Lens of Clarity",
+                    "severity": "high",
+                    "oracle_hash": None,
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["review_only_or_needs_review_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "LensOfClarity",
+                        "path": "/xmage/LensOfClarity.java",
+                        "types": ["ARTIFACT"],
+                        "effect_classes": [
+                            "LookAtTopCardOfLibraryAnyTimeEffect",
+                            "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+                        ],
+                        "ability_classes": ["SimpleStaticAbility"],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "ability_kind": "static",
+                            "battle_model_scope": (
+                                "look_top_library_any_time_and_opponent_face_down_creatures_v1"
+                            ),
+                            "effect": "topdeck_play",
+                            "look_top_library_any_time": True,
+                            "look_opponent_face_down_creatures_any_time": True,
+                            "play_lands_from_top_library": False,
+                            "alternate_zone_permission": False,
+                            "may_cast_without_paying_mana_cost": False,
+                        },
+                    },
+                },
             ],
         }
         external_harvest = {
@@ -10355,6 +10425,7 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
             "cards": [
                 {"card_name": "Twinflame Tyrant", "candidate_rule": {"oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6"}},
                 {"card_name": "Verge Rangers", "candidate_rule": {"oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f"}},
+                {"card_name": "Lens of Clarity", "candidate_rule": {"oracle_hash": "2ecfad3e651e40d4bc94925c3acc62ae"}},
             ],
         }
 
@@ -10374,6 +10445,13 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(verge["deck_role_json"]["category"], "ramp")
         self.assertEqual(verge["deck_role_json"]["effect"], "topdeck_play")
         self.assertEqual(verge["deck_role_json"]["subtype"], "play_lands_from_library")
+
+        lens = by_name["Lens of Clarity"]
+        self.assertTrue(lens["safe_for_batch_pg_package"])
+        self.assertEqual(lens["family_id"], "topdeck_play")
+        self.assertEqual(lens["deck_role_json"]["category"], "draw")
+        self.assertEqual(lens["deck_role_json"]["effect"], "topdeck_play")
+        self.assertEqual(lens["deck_role_json"]["subtype"], "topdeck_visibility")
 
 
 if __name__ == "__main__":

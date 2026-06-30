@@ -797,6 +797,33 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["play_lands_from_top_library"])
         self.assertEqual(primary["play_from_top_condition"], "opponent_controls_more_lands")
 
+    def test_lens_of_clarity_maps_to_visibility_only_topdeck_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "LensOfClarity",
+                "effect_classes": [
+                    "LookAtTopCardOfLibraryAnyTimeEffect",
+                    "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+                ],
+                "ability_classes": ["SimpleStaticAbility"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            },
+            "You may look at the top card of your library and at face-down creatures you don't control any time.",
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "topdeck_play")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "look_top_library_any_time_and_opponent_face_down_creatures_v1",
+        )
+        self.assertTrue(primary["look_top_library_any_time"])
+        self.assertTrue(primary["look_opponent_face_down_creatures_any_time"])
+        self.assertFalse(primary["play_lands_from_top_library"])
+        self.assertFalse(primary["alternate_zone_permission"])
+        self.assertFalse(primary["may_cast_without_paying_mana_cost"])
+
     def test_vanquish_the_horde_maps_to_exact_cost_reduced_board_wipe_scope(self) -> None:
         result = hints.build_effect_hints(
             {

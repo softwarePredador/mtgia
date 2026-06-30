@@ -283,6 +283,13 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     if effect == "creature" and effect_json.get("is_mana_source"):
         category = "ramp"
         subtype = "mana_dork"
+    elif effect == "topdeck_play":
+        if effect_json.get("play_lands_from_top_library"):
+            category = "ramp"
+            subtype = "play_lands_from_library"
+        elif effect_json.get("look_top_library_any_time"):
+            category = "draw"
+            subtype = "topdeck_visibility"
     role = {
         "category": category,
         "effect": effect,

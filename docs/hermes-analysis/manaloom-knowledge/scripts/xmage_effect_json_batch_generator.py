@@ -205,6 +205,21 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     if effect:
         role.setdefault("effect", effect)
     effect_json = dict(card.get("effect_json") or {})
+    if effect == "topdeck_play":
+        if effect_json.get("play_lands_from_top_library"):
+            return {
+                "category": "ramp",
+                "effect": "topdeck_play",
+                "subtype": "play_lands_from_library",
+                "timing": "static",
+            }
+        if effect_json.get("look_top_library_any_time"):
+            return {
+                "category": "draw",
+                "effect": "topdeck_play",
+                "subtype": "topdeck_visibility",
+                "timing": "static",
+            }
     if effect_json.get("battle_model_scope") == "creature_damage_controller_reflect_global_v1":
         return {
             "category": "burn_engine",

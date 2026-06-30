@@ -18147,14 +18147,21 @@
     "battle_rule_logical_key": "battle_rule_v1:a6cead2efc176db343e9420c47d02310"
   },
   "Lens of Clarity": {
-    "cmc": 1.0,
-    "effect": "topdeck_manipulation",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b4b5ef932bcf415cb9f5cf8f764cd946"
+    "ability_kind": "static",
+    "alternate_zone_permission": false,
+    "battle_model_scope": "look_top_library_any_time_and_opponent_face_down_creatures_v1",
+    "effect": "topdeck_play",
+    "look_opponent_face_down_creatures_any_time": true,
+    "look_top_library_any_time": true,
+    "may_cast_without_paying_mana_cost": false,
+    "play_lands_from_top_library": false,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:45a79bbae76496a55723659b63dc4001",
+    "battle_rule_oracle_hash": "2ecfad3e651e40d4bc94925c3acc62ae"
   },
   "Let the Galaxy Burn": {
     "cmc": 6.0,

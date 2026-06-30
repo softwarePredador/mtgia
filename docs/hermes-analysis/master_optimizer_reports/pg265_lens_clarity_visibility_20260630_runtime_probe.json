@@ -1,0 +1,31 @@
+{
+  "battlefield_effect": "topdeck_play",
+  "card_name": "Lens of Clarity",
+  "look_opponent_face_down_creatures_any_time": true,
+  "look_top_library_any_time": true,
+  "may_cast_without_paying_mana_cost": false,
+  "permission_events": [
+    {
+      "card": "Lens of Clarity",
+      "event": "topdeck_play_static_permission_entered",
+      "look_opponent_face_down_creatures_any_time": true,
+      "look_top_library_any_time": true,
+      "may_cast_without_paying_mana_cost": false,
+      "play_lands_from_top_library": false,
+      "player": "Lorehold",
+      "rule_alternative_count": 1,
+      "rule_confidence": 0.94,
+      "rule_execution_status": "auto",
+      "rule_logical_key": "battle_rule_v1:45a79bbae76496a55723659b63dc4001",
+      "rule_oracle_hash": "2ecfad3e651e40d4bc94925c3acc62ae",
+      "rule_review_status": "verified",
+      "rule_runtime_selection_mode": "single_selected",
+      "rule_source": "curated",
+      "rule_version": 2,
+      "turn": 1
+    }
+  ],
+  "play_lands_from_top_library": false,
+  "scope": "look_top_library_any_time_and_opponent_face_down_creatures_v1",
+  "status": "pass"
+}

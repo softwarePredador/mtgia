@@ -1130,6 +1130,24 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
         )
 
     if (
+        effect == "topdeck_play"
+        and scope == "look_top_library_any_time_and_opponent_face_down_creatures_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "LookAtTopCardOfLibraryAnyTimeEffect",
+                "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+            }.issubset(effect_classes)
+            and "SimpleStaticAbility" in ability_classes
+            and bool(effect_json.get("look_top_library_any_time"))
+            and bool(effect_json.get("look_opponent_face_down_creatures_any_time"))
+            and not bool(effect_json.get("play_lands_from_top_library"))
+            and not bool(effect_json.get("alternate_zone_permission"))
+            and not bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
+    if (
         effect == "damage_modifier"
         and scope == "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
     ):

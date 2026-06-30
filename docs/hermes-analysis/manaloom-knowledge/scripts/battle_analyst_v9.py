@@ -38938,6 +38938,48 @@ def apply_effect_immediate(
                 == SHARED_CARD_TYPE_COST_REDUCTION_APPLIES_TO
             ):
                 resolve_semblance_anvil_imprint(player, permanent, card, turn=turn)
+    elif effect == "topdeck_play":
+        if is_instant(card) or is_sorcery(card):
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        else:
+            permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
+            permanent["effect"] = "topdeck_play"
+            player.battlefield.append(permanent)
+            if is_battlefield_creature(permanent):
+                process_controlled_creature_enters_triggers(
+                    player,
+                    opponents,
+                    permanent,
+                    turn,
+                    source_event="topdeck_play_permanent_resolved",
+                    stack=stack,
+                    active_player=player,
+                    all_players=[player, *(opponents or [])],
+                )
+                process_opponent_controlled_creature_enters_triggers(
+                    player,
+                    permanent,
+                    turn,
+                    source_event="topdeck_play_permanent_resolved",
+                    stack=stack,
+                    active_player=player,
+                    all_players=[player, *(opponents or [])],
+                )
+            emit_replay_event(
+                "topdeck_play_static_permission_entered",
+                player=player.name,
+                card=card.get("name", "?"),
+                look_top_library_any_time=bool(permanent.get("look_top_library_any_time")),
+                look_opponent_face_down_creatures_any_time=bool(
+                    permanent.get("look_opponent_face_down_creatures_any_time")
+                ),
+                play_lands_from_top_library=bool(permanent.get("play_lands_from_top_library")),
+                may_cast_without_paying_mana_cost=bool(
+                    permanent.get("may_cast_without_paying_mana_cost")
+                ),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
     elif effect == "flash_permission":
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         permanent["effect"] = "flash_permission"

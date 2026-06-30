@@ -7188,6 +7188,40 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if (
+        xmage_class_name == "LensOfClarity"
+        and card_types == {"ARTIFACT"}
+        and {
+            "LookAtTopCardOfLibraryAnyTimeEffect",
+            "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+        }.issubset(effect_classes)
+        and "SimpleStaticAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="topdeck_play",
+                scope="look_top_library_any_time_and_opponent_face_down_creatures_v1",
+                reason=(
+                    "XMage structure matches Lens of Clarity: controller may look at the top card of "
+                    "their library and opponent face-down creatures, without gaining cast or play permission."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "look_top_library_any_time": True,
+                    "look_opponent_face_down_creatures_any_time": True,
+                    "play_lands_from_top_library": False,
+                    "alternate_zone_permission": False,
+                    "may_cast_without_paying_mana_cost": False,
+                },
+                matched_signals=[
+                    "LookAtTopCardOfLibraryAnyTimeEffect",
+                    "LookAtOpponentFaceDownCreaturesAnyTimeEffect",
+                    "SimpleStaticAbility",
+                ],
+            )
+        )
+
+    if (
         card_types == {"ENCHANTMENT"}
         and effect_classes == {"DamageTargetEffect"}
         and "DealtDamageAnyTriggeredAbility" in ability_classes
