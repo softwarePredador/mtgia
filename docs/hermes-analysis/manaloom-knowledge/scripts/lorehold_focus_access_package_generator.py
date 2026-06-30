@@ -33,6 +33,9 @@ DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg
 DEFAULT_RUNTIME_GAP_QUEUE = (
     REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json"
 )
+DEFAULT_HAND_FILTER_CUT_MODEL = (
+    REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
+)
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -637,6 +640,8 @@ def evidence_inputs_for_work(
     work_item: dict[str, Any],
     runtime_gap_path: Path | None,
     runtime_gap_summary: dict[str, Any],
+    hand_filter_cut_model_path: Path | None,
+    hand_filter_cut_model: dict[str, Any] | None,
 ) -> list[str]:
     inputs = [
         str(value)
@@ -649,7 +654,21 @@ def evidence_inputs_for_work(
     work_key = str(work_item.get("work_key") or "")
     if work_key == "runtime_rule_gap_batch" and runtime_gap_summary and runtime_gap_path:
         inputs.append(str(runtime_gap_path))
+    if work_key == "hand_filter_non_core_cut_search" and hand_filter_cut_model and hand_filter_cut_model_path:
+        inputs.append(str(hand_filter_cut_model_path))
     return sorted(set(inputs))
+
+
+def hand_filter_model_exhausted(hand_filter_cut_model: dict[str, Any] | None) -> bool:
+    if not hand_filter_cut_model:
+        return False
+    summary = hand_filter_cut_model.get("summary") or {}
+    return (
+        summary.get("recommended_next_action")
+        == "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+        and int(summary.get("preflight_benchmark_ready_count") or 0) == 0
+        and int(summary.get("expanded_preflight_benchmark_ready_count") or 0) == 0
+    )
 
 
 def build_operational_work_queue(
@@ -659,6 +678,8 @@ def build_operational_work_queue(
     planner_payload: dict[str, Any],
     runtime_gap_queue: dict[str, Any] | None = None,
     runtime_gap_path: Path | None = DEFAULT_RUNTIME_GAP_QUEUE,
+    hand_filter_cut_model: dict[str, Any] | None = None,
+    hand_filter_cut_model_path: Path | None = DEFAULT_HAND_FILTER_CUT_MODEL,
 ) -> list[dict[str, Any]]:
     runtime_action = planner_runtime_action(planner_payload) or {}
     runtime_context = runtime_gap_context(runtime_gap_queue)
@@ -680,11 +701,14 @@ def build_operational_work_queue(
             work_key == "squee_access_density_model"
             and "approved PG apply/sync" in str(work_item.get("reason") or "")
         )
+        hand_filter_exhausted = work_key == "hand_filter_non_core_cut_search" and hand_filter_model_exhausted(
+            hand_filter_cut_model
+        )
         impact_score = len(blocked_rows) * 2
         if work_key == "runtime_rule_gap_batch":
             impact_score += runtime_card_count + runtime_ready_count * 5
         elif work_key == "hand_filter_non_core_cut_search":
-            impact_score += 20
+            impact_score += 0 if hand_filter_exhausted else 20
         elif work_key == "contextual_tutor_cut_model":
             impact_score += 35
         elif work_key == "squee_access_density_model":
@@ -713,18 +737,28 @@ def build_operational_work_queue(
                 "runtime_gap_context": runtime_context if work_key == "runtime_rule_gap_batch" else {},
                 "postgres_write_required_to_run": False,
                 "postgres_write_required_to_promote": requires_pg_to_promote,
-                "next_command": next_command_for_work(work_key),
+                "next_command": (
+                    "do_not_repeat_without_new_cut_or_runtime_evidence"
+                    if hand_filter_exhausted
+                    else next_command_for_work(work_key)
+                ),
                 "evidence_inputs": evidence_inputs_for_work(
                     work_item=work_item,
                     runtime_gap_path=runtime_gap_path,
                     runtime_gap_summary=runtime_context,
+                    hand_filter_cut_model_path=hand_filter_cut_model_path,
+                    hand_filter_cut_model=hand_filter_cut_model,
                 ),
                 "promotion_criteria": promotion_criteria_for_work(work_key),
-                "impact_score": impact_score,
+                "impact_score": -1 if hand_filter_exhausted else impact_score,
                 "status": (
-                    "read_only_modeling_ready_pg_promotion_blocked"
-                    if requires_pg_to_promote
-                    else "actionable_modeling_required"
+                    "model_exhausted_do_not_repeat_without_new_evidence"
+                    if hand_filter_exhausted
+                    else (
+                        "read_only_modeling_ready_pg_promotion_blocked"
+                        if requires_pg_to_promote
+                        else "actionable_modeling_required"
+                    )
                 ),
             }
         )
@@ -747,6 +781,7 @@ def build_report(
     squee_probe: dict[str, Any] | None = None,
     access_model: dict[str, Any] | None = None,
     runtime_gap_queue: dict[str, Any] | None = None,
+    hand_filter_cut_model: dict[str, Any] | None = None,
     planner_path: Path = DEFAULT_PLANNER,
     trace_path: Path = DEFAULT_TRACE_AUDIT,
     miner_path: Path = DEFAULT_MINER_REPORT,
@@ -754,6 +789,7 @@ def build_report(
     squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
     access_model_path: Path = DEFAULT_ACCESS_MODEL,
     runtime_gap_path: Path = DEFAULT_RUNTIME_GAP_QUEUE,
+    hand_filter_cut_model_path: Path = DEFAULT_HAND_FILTER_CUT_MODEL,
 ) -> dict[str, Any]:
     modes = focus_failure_modes(trace_audit)
     package_candidates = evaluate_pairings(
@@ -780,6 +816,8 @@ def build_report(
         planner_payload=planner_payload,
         runtime_gap_queue=runtime_gap_queue,
         runtime_gap_path=runtime_gap_path,
+        hand_filter_cut_model=hand_filter_cut_model,
+        hand_filter_cut_model_path=hand_filter_cut_model_path,
     )
     return {
         "generated_at": utc_now(),
@@ -790,6 +828,7 @@ def build_report(
         "squee_probe": str(squee_probe_path) if squee_probe else "",
         "access_model": str(access_model_path) if access_model else "",
         "runtime_gap_queue": str(runtime_gap_path) if runtime_gap_queue else "",
+        "hand_filter_cut_model": str(hand_filter_cut_model_path) if hand_filter_cut_model else "",
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -847,6 +886,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Squee probe: `{payload['squee_probe'] or '-'}`",
         f"- Access model: `{payload['access_model'] or '-'}`",
         f"- Runtime gap queue: `{payload['runtime_gap_queue'] or '-'}`",
+        f"- Hand-filter cut model: `{payload['hand_filter_cut_model'] or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -971,6 +1011,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
     parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
     parser.add_argument("--runtime-gap-queue", type=Path, default=DEFAULT_RUNTIME_GAP_QUEUE)
+    parser.add_argument("--hand-filter-cut-model", type=Path, default=DEFAULT_HAND_FILTER_CUT_MODEL)
     parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v3")
     return parser.parse_args()
 
@@ -984,6 +1025,9 @@ def main() -> int:
         squee_probe=read_json(args.squee_probe) if args.squee_probe.exists() else None,
         access_model=read_json(args.access_model) if args.access_model.exists() else None,
         runtime_gap_queue=read_json(args.runtime_gap_queue) if args.runtime_gap_queue.exists() else None,
+        hand_filter_cut_model=(
+            read_json(args.hand_filter_cut_model) if args.hand_filter_cut_model.exists() else None
+        ),
         planner_path=args.planner,
         trace_path=args.trace_audit,
         miner_path=args.miner_report,
@@ -991,6 +1035,7 @@ def main() -> int:
         squee_probe_path=args.squee_probe,
         access_model_path=args.access_model,
         runtime_gap_path=args.runtime_gap_queue,
+        hand_filter_cut_model_path=args.hand_filter_cut_model,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

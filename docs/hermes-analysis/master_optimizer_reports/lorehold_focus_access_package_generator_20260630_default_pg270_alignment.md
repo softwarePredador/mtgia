@@ -1,6 +1,6 @@
 # Lorehold Focus-Access Package Generator - 2026-06-30
 
-- Generated at: `2026-06-30T08:37:37Z`
+- Generated at: `2026-06-30T08:50:35Z`
 - Planner: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_after_profiled_gate.json`
 - Trace audit: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json`
 - Miner report: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json`
@@ -8,6 +8,7 @@
 - Squee probe: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_graveyard_entry_probe_20260628_v1.json`
 - Access model: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.json`
 - Runtime gap queue: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json`
+- Hand-filter cut model: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 
@@ -21,7 +22,7 @@
 - Squee probe status: `squee_route_modeled_but_access_gap_remains`
 - Access model status: `squee_route_modeled_access_density_needed`
 - Operational work items: `4`
-- Top operational work: `hand_filter_non_core_cut_search`
+- Top operational work: `runtime_rule_gap_batch`
 
 ## Gate-Ready Packages
 
@@ -86,21 +87,12 @@
 
 | Rank | Work | Impact | Blocks | Runtime Gaps | PG To Promote | Next Command |
 | ---: | --- | ---: | ---: | ---: | --- | --- |
-| 1 | `hand_filter_non_core_cut_search` | 66 | 23 | 0 | `false` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_hand_filter_cut_model.py --stem lorehold_hand_filter_cut_model_20260630_after_profiled_gate` |
-| 2 | `runtime_rule_gap_batch` | 60 | 0 | 20 | `false` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py --output-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync` |
-| 3 | `contextual_tutor_cut_model` | 39 | 2 | 0 | `false` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_tutor_cut_model.py --stem lorehold_tutor_cut_model_20260630_after_profiled_gate` |
-| 4 | `squee_access_density_model` | 35 | 9 | 0 | `true` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_access_cut_model.py --stem lorehold_access_cut_model_20260630_after_profiled_gate` |
+| 1 | `runtime_rule_gap_batch` | 60 | 0 | 20 | `false` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py --output-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync` |
+| 2 | `contextual_tutor_cut_model` | 39 | 2 | 0 | `false` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_tutor_cut_model.py --stem lorehold_tutor_cut_model_20260630_after_profiled_gate` |
+| 3 | `squee_access_density_model` | 35 | 9 | 0 | `true` | `python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_access_cut_model.py --stem lorehold_access_cut_model_20260630_after_profiled_gate` |
+| 4 | `hand_filter_non_core_cut_search` | -1 | 23 | 0 | `false` | `do_not_repeat_without_new_cut_or_runtime_evidence` |
 
-### 1. hand_filter_non_core_cut_search
-
-- Failure mode: `seed20260625_conversion_under_pressure`
-- Target seeds: `20260625`
-- Reason: Hand-filter candidates only pair with protected same-lane support cuts.
-- Evidence inputs: `-`
-- Blocked package statuses: `{"blocked_no_safe_cut": 23}`
-- Promotion criteria: Find a non-core hand-filter cut outside protected support slots.; Reject Big Score, Esper Sentinel, Monument, Rise, and Artist's Talent cuts unless a same-lane benchmark proves safety.; Target the seed-20260625 conversion-under-pressure failure explicitly.
-
-### 2. runtime_rule_gap_batch
+### 1. runtime_rule_gap_batch
 
 - Failure mode: `blocked_runtime_rule_gap`
 - Target seeds: `-`
@@ -115,7 +107,7 @@
   - `draw_engine`: 1 cards, support `runtime_family_partially_supported_review_required`, samples `Naktamun Lorespinner // Wheel of Fortune`
   - `tutor`: 1 cards, support `runtime_family_partially_supported_review_required`, samples `Deathbellow War Cry`
 
-### 3. contextual_tutor_cut_model
+### 2. contextual_tutor_cut_model
 
 - Failure mode: `seed7_missing_engine_access`
 - Target seeds: `7`
@@ -124,7 +116,7 @@
 - Blocked package statuses: `{"trace_or_runtime_probe_required": 2}`
 - Promotion criteria: Find a tutor package that does not cut Land Tax, Thor, Creative Technique, or protected topdeck engines.; Pass seed-7 access sequence review before any broader battle gate.; Reject exact pairs with prior strong-seed regression.
 
-### 4. squee_access_density_model
+### 3. squee_access_density_model
 
 - Failure mode: `squee_graveyard_entry_route`
 - Target seeds: `7, 20260625`
@@ -132,6 +124,15 @@
 - Evidence inputs: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.json, /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_squee_graveyard_entry_probe_20260628_v1.json`
 - Blocked package statuses: `{"blocked_no_safe_cut": 7, "blocked_protected_cut": 2}`
 - Promotion criteria: Find a non-protected access package that improves Squee/Top/Rack/Library reach.; Preserve seed-42 Squee, miracle, and topdeck telemetry before broader gates.; If Hidden Retreat is used, promote only after approved PostgreSQL apply/sync.
+
+### 4. hand_filter_non_core_cut_search
+
+- Failure mode: `seed20260625_conversion_under_pressure`
+- Target seeds: `20260625`
+- Reason: Hand-filter candidates only pair with protected same-lane support cuts.
+- Evidence inputs: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json`
+- Blocked package statuses: `{"blocked_no_safe_cut": 23}`
+- Promotion criteria: Find a non-core hand-filter cut outside protected support slots.; Reject Big Score, Esper Sentinel, Monument, Rise, and Artist's Talent cuts unless a same-lane benchmark proves safety.; Target the seed-20260625 conversion-under-pressure failure explicitly.
 
 ## Guardrails
 

@@ -16,6 +16,13 @@ def test_default_runtime_gap_queue_uses_current_miner_report():
     )
 
 
+def test_default_hand_filter_cut_model_uses_expanded_pg270_search():
+    assert (
+        gen.DEFAULT_HAND_FILTER_CUT_MODEL.name
+        == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
+    )
+
+
 def planner_payload(prior_keys=None):
     return {
         "summary": {
@@ -298,3 +305,53 @@ def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batc
     assert by_work["hand_filter_non_core_cut_search"]["blocked_package_count"] == 1
     assert by_work["contextual_tutor_cut_model"]["blocked_package_count"] == 1
     assert by_work["squee_access_density_model"]["postgres_write_required_to_run"] is False
+
+
+def test_completed_hand_filter_model_is_not_reprioritized_as_next_work():
+    miner = {
+        "pairing_hypotheses": [
+            {
+                "candidate": "Apex of Power",
+                "candidate_status": "high_frequency_runtime_ready_unexplored",
+                "candidate_score": 92,
+                "lane": "hand_filter",
+                "cut_options": [
+                    {
+                        "card_name": "Loose Spell",
+                        "status": "manual_review_needed",
+                        "gate_readiness": "manual_review_needed",
+                    }
+                ],
+            }
+        ],
+    }
+    runtime_gap_queue = {
+        "summary": {
+            "blocked_runtime_rule_gap_count": 20,
+            "family_count": 2,
+            "validity_summary": {"ready_for_structured_pull_count": 8},
+        },
+        "family_queue": [],
+    }
+    exhausted_hand_filter_model = {
+        "summary": {
+            "recommended_next_action": "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence",
+            "preflight_benchmark_ready_count": 0,
+            "expanded_preflight_benchmark_ready_count": 0,
+        }
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner,
+        runtime_gap_queue=runtime_gap_queue,
+        hand_filter_cut_model=exhausted_hand_filter_model,
+    )
+
+    by_work = {row["work_key"]: row for row in report["operational_work_queue"]}
+    hand_filter = by_work["hand_filter_non_core_cut_search"]
+    assert hand_filter["status"] == "model_exhausted_do_not_repeat_without_new_evidence"
+    assert hand_filter["impact_score"] == -1
+    assert hand_filter["next_command"] == "do_not_repeat_without_new_cut_or_runtime_evidence"
+    assert report["summary"]["top_operational_work_key"] == "runtime_rule_gap_batch"
