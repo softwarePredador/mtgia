@@ -1,6 +1,6 @@
 # PG Hermes SQLite Contract Audit
 
-- Generated at: `2026-06-30T17:53:47.650304+00:00`
+- Generated at: `2026-06-30T17:56:55.874048+00:00`
 - Status: `pass`
 - PostgreSQL target: `skipped`
 - SQLite DB: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`

@@ -218,6 +218,42 @@ class PgHermesSqliteContractAuditTests(unittest.TestCase):
         )
         self.assertEqual(report["status"], "pass")
 
+    def test_missing_pg_connection_reports_fail_without_traceback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            conn = sqlite3.connect(db_path)
+            try:
+                for table in audit.SQLITE_REQUIRED_COLUMNS:
+                    create_contract_table(conn, table)
+                    insert_contract_row(conn, table)
+                insert_contract_row(
+                    conn,
+                    "card_legalities",
+                    card_name="Mana Crypt",
+                    status="banned",
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            original_connect = audit.connect
+
+            def failing_connect():
+                raise RuntimeError("DATABASE_URL is not set")
+
+            audit.connect = failing_connect
+            try:
+                report = audit.build_report(db_path, skip_pg=False)
+            finally:
+                audit.connect = original_connect
+
+        checks = {check["name"]: check for check in report["checks"]}
+        self.assertEqual(report["status"], "fail")
+        self.assertIn("pg_connection", checks)
+        self.assertIn("pg_sqlite_parity", checks)
+        self.assertTrue(checks["pg_connection"]["detail"].startswith("connection_error:RuntimeError"))
+        self.assertTrue(checks["pg_sqlite_parity"]["detail"].startswith("pg_connection_error:RuntimeError"))
+
 
 if __name__ == "__main__":
     unittest.main()

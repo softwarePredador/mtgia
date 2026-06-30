@@ -545,6 +545,10 @@ def slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
 
 
+def compact_error(exc: Exception) -> str:
+    return f"{type(exc).__name__}:{str(exc)[:240]}"
+
+
 def pg_columns_and_counts() -> tuple[dict[str, set[str]], dict[str, int], str]:
     columns: dict[str, set[str]] = {}
     counts: dict[str, int] = {}
@@ -728,7 +732,16 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
             conn.row_factory = sqlite3.Row
             checks.extend(sqlite_schema_checks(conn))
             checks.extend(sqlite_cache_integrity_checks(conn))
-            checks.extend(pg_sqlite_parity_checks(conn, skip_pg=skip_pg))
+            try:
+                checks.extend(pg_sqlite_parity_checks(conn, skip_pg=skip_pg))
+            except Exception as exc:
+                checks.append(
+                    Check(
+                        "pg_sqlite_parity",
+                        "fail",
+                        f"pg_connection_error:{compact_error(exc)}",
+                    )
+                )
         finally:
             conn.close()
 
@@ -745,9 +758,19 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
     if skip_pg:
         checks.append(Check("pg_connection", "warn", "skipped_pg"))
     else:
-        pg_columns, pg_counts, pg_target = pg_columns_and_counts()
-        checks.append(Check("pg_connection", "pass", pg_target))
-        checks.extend(pg_schema_checks(pg_columns, pg_counts))
+        try:
+            pg_columns, pg_counts, pg_target = pg_columns_and_counts()
+        except Exception as exc:
+            checks.append(
+                Check(
+                    "pg_connection",
+                    "fail",
+                    f"connection_error:{compact_error(exc)}",
+                )
+            )
+        else:
+            checks.append(Check("pg_connection", "pass", pg_target))
+            checks.extend(pg_schema_checks(pg_columns, pg_counts))
 
     status_counts: dict[str, int] = {}
     for check in checks:

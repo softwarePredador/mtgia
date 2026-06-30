@@ -1,8 +1,8 @@
 # Lorehold Artifact Contract Audit
 
-- Generated at: `2026-06-30T17:54:00.459174+00:00`
+- Generated at: `2026-06-30T17:57:13.821849+00:00`
 - Status: `pass`
-- Artifact count: `441`
+- Artifact count: `442`
 - Unknown/invalid artifacts: `0`
 - Artifact contract: `pass`
 - Deck universe: `pass`
@@ -41,7 +41,7 @@
 | --- | ---: |
 | `access_cut_model` | 9 |
 | `action_critic` | 1 |
-| `artifact_contract_audit` | 2 |
+| `artifact_contract_audit` | 3 |
 | `battle_forensic` | 3 |
 | `candidate_matrix` | 41 |
 | `canonical_snapshot` | 2 |
