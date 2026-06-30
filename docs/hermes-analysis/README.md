@@ -9,6 +9,16 @@ Updated: 2026-06-30
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
+## Indice operacional rapido
+
+- `MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md`
+  - Status: `current_lookup_index`.
+  - Primeira consulta pratica antes de executar ManaLoom/Hermes/XMage/Lorehold:
+    onde consultar, como consultar, quais parametros usar, quais scripts sao
+    legados/bloqueados e quais auditorias provaram alinhamento.
+  - Use para evitar criar runner, tabela, campo, artefato ou fluxo redundante
+    antes de verificar a superficie existente.
+
 ## Contrato de dados / aliases
 
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`

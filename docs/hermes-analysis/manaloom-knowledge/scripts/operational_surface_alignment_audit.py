@@ -22,6 +22,7 @@ REPORT_DIR = DOCS_DIR / "master_optimizer_reports"
 
 README = DOCS_DIR / "README.md"
 SCRIPTS_README = SCRIPT_DIR / "README.md"
+OPERATIONAL_LOOKUP_GUIDE = DOCS_DIR / "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md"
 XMAGE_FLOW = DOCS_DIR / "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md"
 BATTLE_RULES_CONTRACT = DOCS_DIR / "BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md"
 DECKBUILDING_CONTRACT = DOCS_DIR / "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
@@ -134,10 +135,24 @@ def build_checks() -> list[Check]:
                 "Status atual: canonico",
                 "XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md",
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
+                "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
                 CURRENT_XMAGE_MANIFEST,
                 "build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos",
             ],
             "docs.root_readme_routes_current_contracts",
+        ),
+        check_contains(
+            OPERATIONAL_LOOKUP_GUIDE,
+            [
+                "Status: `current_lookup_index`",
+                "resolve_default_knowledge_db()",
+                "lorehold_failure_targeted_synergy_hypotheses.py",
+                "--allow-legacy-registry-runner",
+                "--candidate-deck-id 607",
+                "xmage_strategy_consistency_audit.py",
+                "--output-prefix",
+            ],
+            "docs.operational_lookup_guide_covers_lookup_params_and_legacy_blocks",
         ),
         check_contains(
             XMAGE_FLOW,

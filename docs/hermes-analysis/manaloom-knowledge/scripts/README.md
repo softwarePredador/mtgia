@@ -56,6 +56,12 @@ The default harness also resolves to v9.
 
 ## Lorehold Deckbuilder Handoff
 
+Before running Lorehold/deckbuilder scripts, read:
+
+```text
+docs/hermes-analysis/MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md
+```
+
 The active Lorehold deckbuilder continuation is the trace/focus/exposure chain:
 
 ```bash
