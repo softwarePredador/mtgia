@@ -5,18 +5,19 @@ def test_default_access_model_uses_post_pg272_brainstone_report():
     assert readiness.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
 
 
-def test_default_runtime_queue_uses_post_pg273_codex_report():
+def test_default_runtime_queue_uses_post_pg274_perpetual_timepiece_report():
     assert (
         readiness.DEFAULT_RUNTIME_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.json"
     )
 
 
-def test_default_manifests_include_current_pg271_pg272_pg273_packages():
+def test_default_manifests_include_current_pg271_through_pg274_packages():
     assert [path.name for path in readiness.DEFAULT_MANIFESTS] == [
         "pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
         "pg272_brainstone_executable_topdeck_20260630_manifest.json",
         "pg273_codex_shredder_mill_recursion_20260630_manifest.json",
+        "pg274_perpetual_timepiece_graveyard_shuffle_20260630_manifest.json",
     ]
     assert readiness.DEFAULT_PRECHECK_BLOCKERS == []
 

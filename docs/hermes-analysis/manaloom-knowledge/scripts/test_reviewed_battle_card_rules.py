@@ -454,12 +454,27 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertEqual(by_name["Codex Shredder"]["source"], "curated")
         self.assertEqual(by_name["Codex Shredder"]["review_status"], "verified")
         self.assertEqual(by_name["Codex Shredder"]["execution_status"], "auto")
-        self.assertEqual(by_name["Codex Shredder"]["logical_rule_key"], "battle_rule_v1:3417000adca740f0c5036e7232221df4")
+        self.assertEqual(
+            by_name["Codex Shredder"]["logical_rule_key"],
+            "battle_rule_v1:3417000adca740f0c5036e7232221df4",
+        )
         self.assertEqual(by_name["Codex Shredder"]["effect_json"]["effect"], "passive")
-        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["activated_target_player_mill_count"], 1)
-        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_cost_generic"], 5)
-        self.assertTrue(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_requires_tap"])
-        self.assertTrue(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_requires_sacrifice"])
+        self.assertEqual(
+            by_name["Codex Shredder"]["effect_json"]["activated_target_player_mill_count"],
+            1,
+        )
+        self.assertEqual(
+            by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_cost_generic"],
+            5,
+        )
+        self.assertTrue(
+            by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_requires_tap"]
+        )
+        self.assertTrue(
+            by_name["Codex Shredder"]["effect_json"][
+                "graveyard_to_hand_activation_requires_sacrifice"
+            ]
+        )
         self.assertEqual(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_target"], "any_card")
         self.assertEqual(
             by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
@@ -468,6 +483,31 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertNotIn(
             "xmage_graveyard_return_variant_review_v1",
             by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
+        )
+        self.assertEqual(by_name["Perpetual Timepiece"]["source"], "curated")
+        self.assertEqual(by_name["Perpetual Timepiece"]["review_status"], "verified")
+        self.assertEqual(by_name["Perpetual Timepiece"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Perpetual Timepiece"]["logical_rule_key"],
+            "battle_rule_v1:26cffda59616c27dd2e137e165dc2d5d",
+        )
+        self.assertEqual(by_name["Perpetual Timepiece"]["effect_json"]["effect"], "passive")
+        self.assertEqual(by_name["Perpetual Timepiece"]["effect_json"]["activated_self_mill_count"], 2)
+        self.assertEqual(
+            by_name["Perpetual Timepiece"]["effect_json"]["graveyard_shuffle_activation_cost_generic"],
+            2,
+        )
+        self.assertFalse(
+            by_name["Perpetual Timepiece"]["effect_json"]["graveyard_shuffle_activation_requires_tap"]
+        )
+        self.assertTrue(by_name["Perpetual Timepiece"]["effect_json"]["graveyard_shuffle_exiles_self"])
+        self.assertEqual(
+            by_name["Perpetual Timepiece"]["effect_json"]["battle_model_scope"],
+            "tap_self_mill_two_or_exile_self_shuffle_any_number_graveyard_cards_into_library_v1",
+        )
+        self.assertNotIn(
+            "xmage_graveyard_return_variant_review_v1",
+            by_name["Perpetual Timepiece"]["effect_json"]["battle_model_scope"],
         )
         self.assertEqual(by_name["Breena, the Demagogue"]["source"], "curated")
         self.assertEqual(by_name["Breena, the Demagogue"]["effect_json"]["effect"], "creature")

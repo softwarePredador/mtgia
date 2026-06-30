@@ -19879,6 +19879,125 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard():
+        def perpetual_timepiece():
+            return {
+                "name": "Perpetual Timepiece",
+                "effect": "passive",
+                "type_line": "Artifact",
+                "artifact": True,
+                "battle_model_scope": (
+                    "tap_self_mill_two_or_exile_self_shuffle_any_number_graveyard_cards_into_library_v1"
+                ),
+                "activated_self_mill_count": 2,
+                "self_mill_activation_requires_tap": True,
+                "self_mill_min_library_after": 2,
+                "graveyard_shuffle_activation_cost_generic": 2,
+                "graveyard_shuffle_activation_requires_tap": False,
+                "graveyard_shuffle_exiles_self": True,
+                "graveyard_shuffle_target_count": 99,
+                "graveyard_shuffle_min_targets": 1,
+                "graveyard_shuffle_low_library_threshold": 8,
+                "graveyard_shuffle_target_controller": "self",
+                "graveyard_shuffle_destination": "library",
+                "_rule_logical_key": "battle_rule_v1:pg274_perpetual_timepiece_test",
+                "_rule_oracle_hash": "pg274-perpetual-timepiece-test-hash",
+            }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            mill_player = player("Timepiece Miller")
+            mill_opponent = player("Opponent")
+            mill_timepiece = perpetual_timepiece()
+            mill_player.battlefield = [mill_timepiece]
+            mill_player.library = [
+                {"name": "Top Spell", "type_line": "Sorcery", "cmc": 4},
+                {"name": "Second Spell", "type_line": "Instant", "cmc": 2},
+                {"name": "Third Card", "type_line": "Creature", "cmc": 3},
+                {"name": "Fourth Card", "type_line": "Land", "cmc": 0},
+                {"name": "Fifth Card", "type_line": "Land", "cmc": 0},
+            ]
+
+            milled = battle.activate_utility_artifacts(
+                mill_player,
+                [mill_opponent],
+                [mill_player, mill_opponent],
+                turn=2,
+                rng=random.Random(2741),
+                phase="precombat_main",
+            )
+
+            shuffle_player = player("Timepiece Recycler")
+            shuffle_opponent = player("Opponent")
+            shuffle_timepiece = perpetual_timepiece()
+            high_value = {"name": "Mizzix's Mastery", "type_line": "Sorcery", "cmc": 4}
+            medium_value = {"name": "Big Score", "type_line": "Instant", "cmc": 4}
+            low_value = {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0}
+            shuffle_player.battlefield = [shuffle_timepiece]
+            shuffle_player.library = [{"name": "Library Card", "type_line": "Sorcery", "cmc": 3}]
+            shuffle_player.graveyard = [low_value, high_value, medium_value]
+            shuffle_player.mana_pool.add("generic", 2)
+
+            shuffled = battle.activate_utility_artifacts(
+                shuffle_player,
+                [shuffle_opponent],
+                [shuffle_player, shuffle_opponent],
+                turn=6,
+                rng=random.Random(2742),
+                phase="postcombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert milled == 1
+        assert mill_timepiece["tapped"] is True
+        assert [card.get("name") for card in mill_player.graveyard] == ["Top Spell", "Second Spell"]
+        assert [card.get("name") for card in mill_player.library] == [
+            "Third Card",
+            "Fourth Card",
+            "Fifth Card",
+        ]
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Perpetual Timepiece"
+            and data.get("activation_kind") == "tap_self_mill"
+            and data.get("milled") == ["Top Spell", "Second Spell"]
+            for event, data in events
+        )
+
+        assert shuffled == 1
+        assert shuffle_player.mana_pool.total() == 0
+        assert shuffle_timepiece in shuffle_player.exile
+        assert shuffle_timepiece not in shuffle_player.battlefield
+        assert not any(card in shuffle_player.graveyard for card in [high_value, medium_value, low_value])
+        assert {card.get("name") for card in shuffle_player.library} == {
+            "Library Card",
+            "Mizzix's Mastery",
+            "Big Score",
+            "Mountain",
+        }
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Perpetual Timepiece"
+            and data.get("activation_kind") == "self_exile_shuffle_graveyard_to_library"
+            and set(data.get("moved_cards") or []) == {"Mizzix's Mastery", "Big Score", "Mountain"}
+            and data.get("exiled_self") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:pg274_perpetual_timepiece_test"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action") == "self_exile_shuffle_graveyard_to_library"
+            and "shuffle_graveyard_into_library" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg215_green_goblin_discard_nonland_counter_and_land_treasure():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -21205,6 +21324,7 @@ def register_tests(battle, player):
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
+        test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard,
         test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
         test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
         test_pg216_black_market_connections_precombat_modal_resources,

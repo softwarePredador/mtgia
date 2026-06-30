@@ -46,7 +46,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260630_post_pg273_codex_shredder_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_post_pg274_perpetual_timepiece_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -144,7 +144,7 @@ def build_checks() -> list[Check]:
                 "Status: `current_operating_standard`",
                 "PG267/PG271 runtime-rule checkpoint",
                 CURRENT_XMAGE_MANIFEST,
-                "ready_for_structured_xmage_pull_review_required=67",
+                "ready_for_structured_xmage_pull_review_required=66",
                 "xmage_source_valid_mapper_required=61",
                 "runtime_family_required_count=0",
             ],
@@ -187,10 +187,10 @@ def build_checks() -> list[Check]:
             XMAGE_AUDIT,
             [
                 CURRENT_XMAGE_MANIFEST,
-                '"ready_for_structured_xmage_pull_review_required": 67',
+                '"ready_for_structured_xmage_pull_review_required": 66',
                 '"xmage_source_valid_mapper_required": 61',
                 '"mapper_metadata_or_test_scenario_required": 61',
-                '"split_family_scope_review_required": 67',
+                '"split_family_scope_review_required": 66',
             ],
             "scripts.xmage_strategy_audit_uses_current_manifest",
         ),
@@ -283,7 +283,7 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.json"],
+            ["lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
         ),
         check_contains(

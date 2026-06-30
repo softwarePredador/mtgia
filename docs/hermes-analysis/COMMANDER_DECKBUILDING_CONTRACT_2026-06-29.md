@@ -774,16 +774,20 @@ Runtime enablement checkpoint generated on 2026-06-30:
   runtime for target-player mill one and five-mana tap/sacrifice graveyard-card
   recursion to hand. This removes one recursion split item from the runtime
   gap queue but is not deck-promotion evidence by itself.
+- PG274 promoted and synced `Perpetual Timepiece` with exact activated artifact
+  runtime for self-mill two and two-mana exile/shuffle of selected graveyard
+  cards into library. This removes one more recursion split item from the
+  runtime-gap queue but is also not deck-promotion evidence by itself.
 - The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg273_codex_shredder.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg274_perpetual_timepiece.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg273_codex_shredder.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg274_perpetual_timepiece.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
-  back to PG apply, while `Codex Shredder` is already filtered from runtime-gap
-  work as a current active rule.
+  back to PG apply, while `Codex Shredder` and `Perpetual Timepiece` are
+  already filtered from runtime-gap work as current active rules.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and
