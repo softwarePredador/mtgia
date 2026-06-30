@@ -550,6 +550,10 @@ def runtime_gap_context(runtime_gap_queue: dict[str, Any] | None) -> dict[str, A
             }
         )
     return {
+        "raw_blocked_runtime_rule_gap_count": int(summary.get("raw_blocked_runtime_rule_gap_count") or 0),
+        "filtered_current_verified_auto_rule_count": int(
+            summary.get("filtered_current_verified_auto_rule_count") or 0
+        ),
         "blocked_runtime_rule_gap_count": int(summary.get("blocked_runtime_rule_gap_count") or 0),
         "ready_for_structured_pull_count": int(validity.get("ready_for_structured_pull_count") or 0),
         "exact_xmage_found_count": int(validity.get("exact_xmage_found_count") or 0),
@@ -583,6 +587,19 @@ def blocked_rows_for_work(work_key: str, package_candidates: list[dict[str, Any]
             and row.get("status") in {"blocked_no_safe_cut", "blocked_protected_cut"}
         ]
     return []
+
+
+def runtime_gap_reason(runtime_context: dict[str, Any], fallback: str) -> str:
+    current_count = int(runtime_context.get("blocked_runtime_rule_gap_count") or 0)
+    raw_count = int(runtime_context.get("raw_blocked_runtime_rule_gap_count") or 0)
+    filtered_count = int(runtime_context.get("filtered_current_verified_auto_rule_count") or 0)
+    if current_count and raw_count:
+        return (
+            f"{current_count} variant-only cards still lack active runtime rules "
+            f"after filtering {filtered_count} current verified/auto rules from "
+            f"{raw_count} raw runtime gaps."
+        )
+    return fallback
 
 
 def next_command_for_work(work_key: str) -> str:
@@ -719,7 +736,11 @@ def build_operational_work_queue(
                 "work_key": work_key,
                 "failure_mode": work_item.get("failure_mode"),
                 "target_seeds": work_item.get("target_seeds") or [],
-                "reason": work_item.get("reason") or "",
+                "reason": (
+                    runtime_gap_reason(runtime_context, str(work_item.get("reason") or ""))
+                    if work_key == "runtime_rule_gap_batch"
+                    else work_item.get("reason") or ""
+                ),
                 "blocked_package_count": len(blocked_rows),
                 "blocked_package_status_counts": dict(sorted(status_counts.items())),
                 "blocked_package_samples": [

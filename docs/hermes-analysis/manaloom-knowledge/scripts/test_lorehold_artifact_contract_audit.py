@@ -262,7 +262,9 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
             "summary": {
                 "natural_gate_ready_count": 0,
                 "forced_exposure_probe_ready_count": 11,
-                "recommended_next_action": "run_forced_exposure_probe_before_natural_gate",
+                "recommended_next_action": (
+                    "forced_exposure_diagnostic_only_review_focus_runtime_before_gate"
+                ),
                 "status_counts": {"forced_exposure_ready": 11},
             },
             "packages": [{"package_key": "probe"}],

@@ -1,31 +1,29 @@
 # Lorehold Runtime Gap Family Queue
 
-- Generated at: `2026-06-30T12:41:25Z`
+- Generated at: `2026-06-30T15:22:43Z`
 - XMage root: `/Users/desenvolvimentomobile/Downloads/mage-master`
 - SQLite current-rule filter: `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`
 - PostgreSQL writes: `false`
 - SQLite source mutated: `false`
 - Raw blocked runtime cards: `61`
-- Filtered current verified/auto rules: `49`
-- Blocked runtime cards: `12`
-- Candidate lanes: `{"contextual": 9, "finisher_or_big_spell": 1, "hand_filter": 2}`
-- Promotion lanes: `{"split_family_scope_review_required": 12}`
+- Filtered current verified/auto rules: `53`
+- Blocked runtime cards: `8`
+- Candidate lanes: `{"contextual": 5, "finisher_or_big_spell": 1, "hand_filter": 2}`
+- Promotion lanes: `{"batch_metadata_candidate_requires_pg_precheck": 1, "split_family_scope_review_required": 7}`
 - Targeted interaction subfamilies: `{}`
 - Targeted interaction subfamily statuses: `{}`
-- Family count: `8`
+- Family count: `6`
 
 ## Family Queue
 
 | Rank | Family | Cards | Support | Batch strategy | Candidate lanes | Promotion lanes | Implementation unit |
 | ---: | --- | ---: | --- | --- | --- | --- | --- |
 | 1 | `passive` | 2 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1, "hand_filter": 1}` | `{"split_family_scope_review_required": 2}` | static battlefield annotation and passive support execution |
-| 2 | `recursion` | 2 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 2}` | `{"split_family_scope_review_required": 2}` | graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations |
-| 3 | `board_wipe_choice` | 2 | `runtime_family_required` | `implement_family_before_metadata_batch` | `{"contextual": 1, "hand_filter": 1}` | `{"split_family_scope_review_required": 2}` | multi-player choice/wipe/sacrifice resolution |
-| 4 | `token_maker` | 2 | `runtime_family_required` | `implement_family_before_metadata_batch` | `{"contextual": 1, "finisher_or_big_spell": 1}` | `{"split_family_scope_review_required": 2}` | token creation with stats, abilities, duration, and zone cleanup |
-| 5 | `draw_engine` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | static and activated draw-engine bookkeeping with delayed card movement |
-| 6 | `free_cast` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping |
-| 7 | `tutor` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield |
-| 8 | `topdeck_play` | 1 | `runtime_supported_family` | `metadata_batch_after_pg_precheck` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | top-of-library visibility and permission to play cards from library under board-state conditions |
+| 2 | `board_wipe_choice` | 2 | `runtime_family_required` | `implement_family_before_metadata_batch` | `{"contextual": 1, "hand_filter": 1}` | `{"split_family_scope_review_required": 2}` | multi-player choice/wipe/sacrifice resolution |
+| 3 | `draw_engine` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | static and activated draw-engine bookkeeping with delayed card movement |
+| 4 | `recursion` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"split_family_scope_review_required": 1}` | graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations |
+| 5 | `tutor` | 1 | `runtime_family_partially_supported_review_required` | `split_by_scope_before_metadata_batch` | `{"contextual": 1}` | `{"batch_metadata_candidate_requires_pg_precheck": 1}` | library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield |
+| 6 | `token_maker` | 1 | `runtime_family_required` | `implement_family_before_metadata_batch` | `{"finisher_or_big_spell": 1}` | `{"split_family_scope_review_required": 1}` | token creation with stats, abilities, duration, and zone cleanup |
 
 ## Cards By Family
 
@@ -47,24 +45,6 @@ Signal groups:
 | `Blood Moon` | -10 | `616` | `hand_filter` | `split_family_scope_review_required` | `` |  | `passive` | `xmage_nonbasic_lands_are_mountains_static_review_v1` | `BloodMoon` |
 | `Karn, the Great Creator` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `passive` | `xmage_artifact_activation_lock_planeswalker_wish_review_v1` | `KarnTheGreatCreator` |
 
-### recursion
-
-- Support: `runtime_family_partially_supported_review_required`
-- Batch strategy: `split_by_scope_before_metadata_batch`
-- Family tests: `["test_profound_journey_rebounds_and_returns_permanents_to_battlefield", "test_pg202_redress_fate_returns_all_artifact_enchantment_cards"]`
-- Targeted interaction subfamilies: `{}`
-- Targeted interaction subfamily statuses: `{}`
-
-Signal groups:
-
-- `targeting;mill;activated_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Leyline Dowser`
-- `triggered_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Charmbreaker Devils`
-
-| Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |
-| --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `Charmbreaker Devils` | -10 | `612` | `contextual` | `split_family_scope_review_required` | `` |  | `recursion` | `xmage_graveyard_return_variant_review_v1` | `CharmbreakerDevils` |
-| `Leyline Dowser` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `recursion` | `xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1` | `LeylineDowser` |
-
 ### board_wipe_choice
 
 - Support: `runtime_family_required`
@@ -83,24 +63,6 @@ Signal groups:
 | `Chandra's Ignition` | -10 | `613` | `hand_filter` | `split_family_scope_review_required` | `` |  | `sweeper_damage` | `xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1` | `ChandrasIgnition` |
 | `Karn's Sylex` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `board_wipe` | `xmage_mass_removal_or_sacrifice_variant_review_v1` | `KarnsSylex` |
 
-### token_maker
-
-- Support: `runtime_family_required`
-- Batch strategy: `implement_family_before_metadata_batch`
-- Family tests: `[]`
-- Targeted interaction subfamilies: `{}`
-- Targeted interaction subfamily statuses: `{}`
-
-Signal groups:
-
-- `targeting;token;triggered_ability;activated_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Prototype Portal`
-- `triggered_ability`: 1 cards; lanes `{"finisher_or_big_spell": 1}`; samples `Ancient Gold Dragon`
-
-| Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |
-| --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `Ancient Gold Dragon` | -10 | `612` | `finisher_or_big_spell` | `split_family_scope_review_required` | `` |  | `token_maker` | `xmage_combat_damage_d20_faerie_dragon_token_review_v1` | `AncientGoldDragon` |
-| `Prototype Portal` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `token_maker` | `xmage_imprint_artifact_create_copy_token_x_cost_review_v1` | `PrototypePortal` |
-
 ### draw_engine
 
 - Support: `runtime_family_partially_supported_review_required`
@@ -117,21 +79,21 @@ Signal groups:
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
 | `Naktamun Lorespinner // Wheel of Fortune` | -10 | `608` | `contextual` | `split_family_scope_review_required` | `` |  | `draw_engine` | `xmage_draw_card_variant_review_v1` | `NaktamunLorespinner` |
 
-### free_cast
+### recursion
 
 - Support: `runtime_family_partially_supported_review_required`
 - Batch strategy: `split_by_scope_before_metadata_batch`
-- Family tests: `["test_pg102_creative_technique_demonstrates_top_nonland_free_casts", "test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them", "test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit"]`
+- Family tests: `["test_profound_journey_rebounds_and_returns_permanents_to_battlefield", "test_pg202_redress_fate_returns_all_artifact_enchantment_cards"]`
 - Targeted interaction subfamilies: `{}`
 - Targeted interaction subfamily statuses: `{}`
 
 Signal groups:
 
-- `activated_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Pyxis of Pandemonium`
+- `triggered_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Charmbreaker Devils`
 
 | Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `Pyxis of Pandemonium` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `free_cast` | `xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1` | `PyxisOfPandemonium` |
+| `Charmbreaker Devils` | -10 | `612` | `contextual` | `split_family_scope_review_required` | `` |  | `recursion` | `xmage_graveyard_return_variant_review_v1` | `CharmbreakerDevils` |
 
 ### tutor
 
@@ -147,20 +109,20 @@ Signal groups:
 
 | Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `Deathbellow War Cry` | -10 | `616` | `contextual` | `split_family_scope_review_required` | `` |  | `tutor` | `xmage_library_search_variant_review_v1` | `DeathbellowWarCry` |
+| `Deathbellow War Cry` | -10 | `616` | `contextual` | `batch_metadata_candidate_requires_pg_precheck` | `` |  | `tutor` | `up_to_four_different_name_minotaur_creatures_to_battlefield_v1` | `DeathbellowWarCry` |
 
-### topdeck_play
+### token_maker
 
-- Support: `runtime_supported_family`
-- Batch strategy: `metadata_batch_after_pg_precheck`
-- Family tests: `["test_verge_rangers_plays_top_library_land_when_opponent_has_more_lands"]`
+- Support: `runtime_family_required`
+- Batch strategy: `implement_family_before_metadata_batch`
+- Family tests: `[]`
 - Targeted interaction subfamilies: `{}`
 - Targeted interaction subfamily statuses: `{}`
 
 Signal groups:
 
-- `targeting;activated_ability`: 1 cards; lanes `{"contextual": 1}`; samples `Orcish Spy`
+- `triggered_ability`: 1 cards; lanes `{"finisher_or_big_spell": 1}`; samples `Ancient Gold Dragon`
 
 | Card | Score | Variant decks | Lane | Promotion | Subfamily | Next step | Effect | Scope | XMage class |
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `Orcish Spy` | -10 | `610` | `contextual` | `split_family_scope_review_required` | `` |  | `topdeck_play` | `xmage_tap_look_top_three_target_player_library_review_v1` | `OrcishSpy` |
+| `Ancient Gold Dragon` | -10 | `612` | `finisher_or_big_spell` | `split_family_scope_review_required` | `` |  | `token_maker` | `xmage_combat_damage_d20_faerie_dragon_token_review_v1` | `AncientGoldDragon` |

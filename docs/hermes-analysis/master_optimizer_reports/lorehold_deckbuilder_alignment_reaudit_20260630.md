@@ -16,8 +16,8 @@
 | Planner | `lorehold_next_action_planner_20260630_after_profiled_gate.json` | recommended action: `review_focus_access_trace_then_define_next_deck_or_runtime_package` |
 | Failure-targeted synthesis | `lorehold_failure_targeted_synergy_hypotheses_20260630_after_profiled_gate.json` | `4` hypotheses; next action `run_failure_targeted_trace_audit` |
 | Failure-targeted trace audit | `lorehold_failure_targeted_trace_audit_20260630_after_profiled_gate.json` | focus access/conversion trace is available; review sequence before package |
-| Focus-access generator | `lorehold_focus_access_package_generator_20260630_after_profiled_gate.json` | `52` package candidates, `0` gate-ready, top work `runtime_rule_gap_batch` |
-| Exposure-aware queue | `lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate.json` | `7` forced-exposure diagnostics ready, `0` natural gate-ready |
+| Focus-access generator | `lorehold_focus_access_package_generator_20260630_after_profiled_gate.json` | `52` package candidates, `0` gate-ready, top work `runtime_rule_gap_batch`; `8` filtered runtime gaps remain |
+| Exposure-aware queue | `lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate.json` | `11` forced-exposure diagnostics ready, `0` natural gate-ready |
 
 ## Interpretation
 
@@ -29,7 +29,8 @@
    - seed `20260625`: engine appears but does not convert;
    - `Urza's Saga`: active scope is partial and needs utilization review;
    - `Squee, Goblin Nabob`: graveyard-entry route needs sequencing review.
-5. The exposure-aware queue can run forced diagnostics for `7` low/inconclusive packages, but this is diagnostic only. It is not a natural benchmark and cannot promote the deck.
+5. The exposure-aware queue can run forced diagnostics for `11` low/inconclusive packages, but this is diagnostic only. It is not a natural benchmark and cannot promote the deck.
+6. The current runtime queue filters `53` verified/auto rules out of `61` raw runtime gaps; the remaining `8` cards are the real runtime/scope work before deck gates can trust those candidates.
 
 ## Aligned Default Flow
 
@@ -67,5 +68,5 @@ Only run `lorehold_synergy_package_gate.py` after the previous reports produce e
 Do not attempt to mount/promote a new deck list from this state. The correct next work is to inspect the available focus traces and decide whether the next implementation is:
 
 - runtime/sequencing correction for an existing engine; or
-- a diagnostic forced-exposure probe for one of the `7` ready diagnostic packages; or
+- a diagnostic forced-exposure probe for one of the `11` ready diagnostic packages, only after the focus/runtime review is intentionally choosing diagnostic sampling; or
 - a new failure-targeted package only after trace evidence identifies a missing route and preserves seed-42 miracle/topdeck telemetry.

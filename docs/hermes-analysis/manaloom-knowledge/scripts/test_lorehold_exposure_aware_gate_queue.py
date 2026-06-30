@@ -119,7 +119,7 @@ def test_low_exposure_package_becomes_forced_exposure_diagnostic():
     assert mana_vault["forced_access_mode"] == "opening_hand"
     assert "--forced-access-mode" in mana_vault["command"]
     assert report["summary"]["recommended_next_action"] == (
-        "run_forced_exposure_probe_before_natural_gate"
+        "forced_exposure_diagnostic_only_review_focus_runtime_before_gate"
     )
 
 

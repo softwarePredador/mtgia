@@ -185,32 +185,6 @@
     },
     {
       "active_rule_count": 0,
-      "card_name": "Leyline Dowser",
-      "findings": [
-        {
-          "code": "no_active_battle_rule",
-          "detail": "Lorehold variant candidate is blocked_runtime_rule_gap in the variant gap miner."
-        }
-      ],
-      "functional_tags": {
-        "unknown": 2
-      },
-      "impact_rank": 8,
-      "lane": "contextual",
-      "oracle_hash": null,
-      "priority_score": -10,
-      "review_only_rule_count": 0,
-      "severity": "medium",
-      "trusted_executable_rule_count": 0,
-      "type_line": "Artifact",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "variant_total_quantity": 1
-    },
-    {
-      "active_rule_count": 0,
       "card_name": "Naktamun Lorespinner // Wheel of Fortune",
       "findings": [
         {
@@ -221,7 +195,7 @@
       "functional_tags": {
         "creature": 2
       },
-      "impact_rank": 9,
+      "impact_rank": 8,
       "lane": "contextual",
       "oracle_hash": null,
       "priority_score": -10,
@@ -234,91 +208,13 @@
         608
       ],
       "variant_total_quantity": 1
-    },
-    {
-      "active_rule_count": 0,
-      "card_name": "Orcish Spy",
-      "findings": [
-        {
-          "code": "no_active_battle_rule",
-          "detail": "Lorehold variant candidate is blocked_runtime_rule_gap in the variant gap miner."
-        }
-      ],
-      "functional_tags": {
-        "creature": 2
-      },
-      "impact_rank": 10,
-      "lane": "contextual",
-      "oracle_hash": null,
-      "priority_score": -10,
-      "review_only_rule_count": 0,
-      "severity": "medium",
-      "trusted_executable_rule_count": 0,
-      "type_line": "Creature \u2014 Orc Rogue",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "variant_total_quantity": 1
-    },
-    {
-      "active_rule_count": 0,
-      "card_name": "Prototype Portal",
-      "findings": [
-        {
-          "code": "no_active_battle_rule",
-          "detail": "Lorehold variant candidate is blocked_runtime_rule_gap in the variant gap miner."
-        }
-      ],
-      "functional_tags": {
-        "unknown": 2
-      },
-      "impact_rank": 11,
-      "lane": "contextual",
-      "oracle_hash": null,
-      "priority_score": -10,
-      "review_only_rule_count": 0,
-      "severity": "medium",
-      "trusted_executable_rule_count": 0,
-      "type_line": "Artifact",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "variant_total_quantity": 1
-    },
-    {
-      "active_rule_count": 0,
-      "card_name": "Pyxis of Pandemonium",
-      "findings": [
-        {
-          "code": "no_active_battle_rule",
-          "detail": "Lorehold variant candidate is blocked_runtime_rule_gap in the variant gap miner."
-        }
-      ],
-      "functional_tags": {
-        "unknown": 2
-      },
-      "impact_rank": 12,
-      "lane": "contextual",
-      "oracle_hash": null,
-      "priority_score": -10,
-      "review_only_rule_count": 0,
-      "severity": "medium",
-      "trusted_executable_rule_count": 0,
-      "type_line": "Artifact",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "variant_total_quantity": 1
     }
   ],
   "deck_id": 6,
-  "generated_at": "2026-06-30T12:41:25Z",
+  "generated_at": "2026-06-30T15:22:43Z",
   "scope": "lorehold_variant_only_cards_blocked_by_runtime_rule_gap",
   "severity_counts": {
-    "medium": 12
+    "medium": 8
   },
   "source": "lorehold_variant_gap_miner",
   "source_deck_ids": [
@@ -364,5 +260,5 @@
     "tested_negative_cut_count": 13,
     "variant_only_card_count": 270
   },
-  "total_cards": 12
+  "total_cards": 8
 }

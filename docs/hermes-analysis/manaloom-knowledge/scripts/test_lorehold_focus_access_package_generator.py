@@ -256,6 +256,8 @@ def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batc
     }
     runtime_gap_queue = {
         "summary": {
+            "raw_blocked_runtime_rule_gap_count": 61,
+            "filtered_current_verified_auto_rule_count": 53,
             "blocked_runtime_rule_gap_count": 61,
             "family_count": 2,
             "validity_summary": {
@@ -305,6 +307,7 @@ def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batc
     assert queue[0]["work_key"] == "runtime_rule_gap_batch"
     assert queue[0]["blocked_runtime_rule_gap_count"] == 61
     assert queue[0]["runtime_ready_for_structured_pull_count"] == 9
+    assert "after filtering 53 current verified/auto rules from 61 raw runtime gaps" in queue[0]["reason"]
     assert queue[0]["runtime_gap_context"]["top_families"][0]["family_id"] == "manual_model"
     assert "lorehold_runtime_gap_family_queue.py" in queue[0]["next_command"]
 

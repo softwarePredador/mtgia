@@ -1,5 +1,5 @@
 {
-  "access_model": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json",
+  "access_model": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json",
   "active_rule_source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
   "cards": [
     {
@@ -108,32 +108,6 @@
     },
     {
       "active_rules": [],
-      "batch_strategy": "split_by_scope_before_metadata_batch",
-      "battle_model_scope": "xmage_library_search_variant_review_v1",
-      "candidate_lane": "contextual",
-      "candidate_score": -10,
-      "card_global_reject": false,
-      "card_name": "Deathbellow War Cry",
-      "cut_specific_negative_count": 0,
-      "cut_specific_negatives": [],
-      "effect": "tutor",
-      "family_id": "tutor",
-      "family_support_status": "runtime_family_partially_supported_review_required",
-      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
-      "pg_packages": [],
-      "pg_precheck_blockers": [],
-      "promotion_lane": "split_family_scope_review_required",
-      "ready_for_structured_pull": true,
-      "source": "runtime_gap_family_queue",
-      "status": "split_scope_review_required",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        616
-      ],
-      "xmage_class": "DeathbellowWarCry"
-    },
-    {
-      "active_rules": [],
       "batch_strategy": "implement_family_before_metadata_batch",
       "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
       "candidate_lane": "contextual",
@@ -187,32 +161,6 @@
     {
       "active_rules": [],
       "batch_strategy": "split_by_scope_before_metadata_batch",
-      "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-      "candidate_lane": "contextual",
-      "candidate_score": -10,
-      "card_global_reject": false,
-      "card_name": "Leyline Dowser",
-      "cut_specific_negative_count": 0,
-      "cut_specific_negatives": [],
-      "effect": "recursion",
-      "family_id": "recursion",
-      "family_support_status": "runtime_family_partially_supported_review_required",
-      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
-      "pg_packages": [],
-      "pg_precheck_blockers": [],
-      "promotion_lane": "split_family_scope_review_required",
-      "ready_for_structured_pull": true,
-      "source": "runtime_gap_family_queue",
-      "status": "split_scope_review_required",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "xmage_class": "LeylineDowser"
-    },
-    {
-      "active_rules": [],
-      "batch_strategy": "split_by_scope_before_metadata_batch",
       "battle_model_scope": "xmage_draw_card_variant_review_v1",
       "candidate_lane": "contextual",
       "candidate_score": -10,
@@ -235,84 +183,6 @@
         608
       ],
       "xmage_class": "NaktamunLorespinner"
-    },
-    {
-      "active_rules": [],
-      "batch_strategy": "metadata_batch_after_pg_precheck",
-      "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-      "candidate_lane": "contextual",
-      "candidate_score": -10,
-      "card_global_reject": false,
-      "card_name": "Orcish Spy",
-      "cut_specific_negative_count": 0,
-      "cut_specific_negatives": [],
-      "effect": "topdeck_play",
-      "family_id": "topdeck_play",
-      "family_support_status": "runtime_supported_family",
-      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
-      "pg_packages": [],
-      "pg_precheck_blockers": [],
-      "promotion_lane": "split_family_scope_review_required",
-      "ready_for_structured_pull": true,
-      "source": "runtime_gap_family_queue",
-      "status": "split_scope_review_required",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "xmage_class": "OrcishSpy"
-    },
-    {
-      "active_rules": [],
-      "batch_strategy": "implement_family_before_metadata_batch",
-      "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-      "candidate_lane": "contextual",
-      "candidate_score": -10,
-      "card_global_reject": false,
-      "card_name": "Prototype Portal",
-      "cut_specific_negative_count": 0,
-      "cut_specific_negatives": [],
-      "effect": "token_maker",
-      "family_id": "token_maker",
-      "family_support_status": "runtime_family_required",
-      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
-      "pg_packages": [],
-      "pg_precheck_blockers": [],
-      "promotion_lane": "split_family_scope_review_required",
-      "ready_for_structured_pull": true,
-      "source": "runtime_gap_family_queue",
-      "status": "split_scope_review_required",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "xmage_class": "PrototypePortal"
-    },
-    {
-      "active_rules": [],
-      "batch_strategy": "split_by_scope_before_metadata_batch",
-      "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-      "candidate_lane": "contextual",
-      "candidate_score": -10,
-      "card_global_reject": false,
-      "card_name": "Pyxis of Pandemonium",
-      "cut_specific_negative_count": 0,
-      "cut_specific_negatives": [],
-      "effect": "free_cast",
-      "family_id": "free_cast",
-      "family_support_status": "runtime_family_partially_supported_review_required",
-      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
-      "pg_packages": [],
-      "pg_precheck_blockers": [],
-      "promotion_lane": "split_family_scope_review_required",
-      "ready_for_structured_pull": true,
-      "source": "runtime_gap_family_queue",
-      "status": "split_scope_review_required",
-      "variant_deck_count": 1,
-      "variant_decks": [
-        610
-      ],
-      "xmage_class": "PyxisOfPandemonium"
     },
     {
       "access_targets": [
@@ -383,7 +253,7 @@
             "precheck": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_precheck.sql",
             "rollback": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_rollback.sql"
           },
-          "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
           "missing_files": [],
           "status": "applied_synced"
         }
@@ -481,7 +351,7 @@
             "precheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_precheck.sql",
             "rollback": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_rollback.sql"
           },
-          "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
           "missing_files": [],
           "status": "applied_synced"
         }
@@ -661,28 +531,54 @@
         614
       ],
       "xmage_class": ""
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Deathbellow War Cry",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "tutor",
+      "family_id": "tutor",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "DeathbellowWarCry"
     }
   ],
-  "generated_at": "2026-06-30T12:44:25Z",
-  "hypothesis_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+  "generated_at": "2026-06-30T15:22:55Z",
+  "hypothesis_queue": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
   "manifests": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json"
   ],
   "postgres_writes": false,
   "precheck_blockers": [],
-  "runtime_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
+  "runtime_queue": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
   "source_db_mutated": false,
   "summary": {
-    "card_count": 17,
+    "card_count": 13,
     "cut_specific_negative_count": 0,
     "manual_mapper_required_count": 0,
     "pg_package_applied_synced_count": 2,
@@ -691,14 +587,15 @@
     "pg_precheck_blocked_count": 0,
     "promotion_lane_counts": {
       "access_density_candidate": 5,
-      "split_family_scope_review_required": 12
+      "batch_metadata_candidate_requires_pg_precheck": 1,
+      "split_family_scope_review_required": 7
     },
     "recommended_next_action": "split_scope_runtime_families_or_continue_cut_modeling",
-    "split_scope_review_required_count": 12,
+    "split_scope_review_required_count": 7,
     "status_counts": {
       "pg_package_applied_synced": 2,
-      "review_required": 3,
-      "split_scope_review_required": 12
+      "review_required": 4,
+      "split_scope_review_required": 7
     }
   }
 }

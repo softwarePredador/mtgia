@@ -297,6 +297,46 @@
       "why_now": "The current hypothesis queue has 0 gate-ready packages and 13 tested negatives. The next move must explain the failed seeds and existing-engine sequencing before another card swap."
     },
     {
+      "action_key": "run_tutor_land_tax_benchmark_gate",
+      "blockers": [
+        "no direct gate-ready tutor pair exists",
+        "Land Tax is protected support until the same-access benchmark resolves"
+      ],
+      "candidate_cards": [
+        "Enlightened Tutor",
+        "Gamble"
+      ],
+      "candidate_exposure": {
+        "Enlightened Tutor": {
+          "decision_status": "runtime_ready_cut_sensitive",
+          "exposure_profile": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
+          "inferred_role": "tutor_access",
+          "next_action": "retest only with seed-safe cut model",
+          "unique_exposure_count": 202
+        },
+        "Gamble": {
+          "decision_status": "runtime_ready_cut_sensitive",
+          "exposure_profile": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
+          "inferred_role": "tutor_access",
+          "next_action": "retest only with seed-safe cut model",
+          "unique_exposure_count": 228
+        }
+      },
+      "cut_cards": [
+        "Land Tax"
+      ],
+      "lane": "tutor_access",
+      "next_steps": [
+        "Run the explicit Gamble/Enlightened Tutor over Land Tax benchmark packages.",
+        "Promote only if the package beats baseline without seed regression.",
+        "If rejected, mark exact packages as prior-negative and move to additive access modeling."
+      ],
+      "priority": 1,
+      "status": "same_access_benchmark_required_before_next_tutor_attempt",
+      "tutor_cut_model_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v2_current_miner.json",
+      "why_now": "The tutor cut model is built and ranks Land Tax as the highest same-access benchmark, but that benchmark has not been resolved in prior package evidence."
+    },
+    {
       "action_key": "record_profiled_same_lane_benchmarks_exhausted",
       "blockers": [
         "same-lane candidate queue is exhausted for the currently profiled cuts",
@@ -349,7 +389,7 @@
         "Reopen these cuts only if new variant cards become runtime-ready or the cut model changes."
       ],
       "priority": 3,
-      "profiled_cut_benchmark_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json",
+      "profiled_cut_benchmark_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json",
       "profiled_cut_benchmark_summary": {
         "blocker_counts": {
           "candidate_conditional_discard_payoff_not_early_mana_replacement": 4,
@@ -1155,23 +1195,27 @@
         "Akroma's Will",
         "Austere Command",
         "Boros Charm",
+        "Enlightened Tutor",
+        "Gamble",
         "Grand Abolisher",
         "Hidden Retreat",
         "Perch Protection",
-        "Planetarium of Wan Shi Tong",
         "Plateau",
         "Seething Song",
         "Silence",
+        "Storm-Kiln Artist",
         "Twinflame Tyrant",
+        "Valakut Awakening // Valakut Stoneforge",
         "Volcanic Vision",
         "Wheel of Fortune"
       ],
       "cut_cards": [
+        "Arcane Signet",
         "Avatar's Wrath",
         "Big Score",
-        "Creative Technique",
         "Emeria's Call // Emeria, Shattered Skyclave",
         "Fellwar Stone",
+        "Land Tax",
         "Mother of Runes",
         "Pinnacle Monk // Mystic Peak",
         "Promise of Loyalty",
@@ -1179,7 +1223,7 @@
         "Thor, God of Thunder",
         "Turbulent Steppe"
       ],
-      "diagnostic_or_contract_inconclusive_count": 14,
+      "diagnostic_or_contract_inconclusive_count": 17,
       "lane": "battle_gate_evidence_quality",
       "next_steps": [
         "For strategy-gate rows, rerun with a larger natural sample or a forced-access diagnostic followed by natural confirmation.",
@@ -1203,7 +1247,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "akromas_will_cut_avatar_wrath",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1222,7 +1266,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "austere_command_wipe_over_emeria_tradeoff",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1241,7 +1285,45 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "boros_charm_pressure_cut_avatar_wrath",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_section": "package_rollups"
+        },
+        {
+          "adds": [
+            "Enlightened Tutor"
+          ],
+          "baseline": {},
+          "candidate": {},
+          "candidate_added_card_statuses": [],
+          "cuts": [
+            "Land Tax"
+          ],
+          "decision": "insufficient_card_outcome_used_sample",
+          "delta_pp": -66.67,
+          "evidence_scope": "diagnostic_or_contract",
+          "exposure_next_step": null,
+          "exposure_status": null,
+          "package_key": "enlightened_access_benchmark_cut_land_tax",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_section": "package_rollups"
+        },
+        {
+          "adds": [
+            "Gamble"
+          ],
+          "baseline": {},
+          "candidate": {},
+          "candidate_added_card_statuses": [],
+          "cuts": [
+            "Land Tax"
+          ],
+          "decision": "insufficient_card_outcome_used_sample",
+          "delta_pp": -66.67,
+          "evidence_scope": "diagnostic_or_contract",
+          "exposure_next_step": null,
+          "exposure_status": null,
+          "package_key": "gamble_access_benchmark_cut_land_tax",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1260,7 +1342,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "grand_abolisher_cut_mother_of_runes",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1279,7 +1361,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "hidden_retreat_stack_damage_topdeck_cut_promise",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1298,7 +1380,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "perch_protection_cut_avatar_wrath",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1317,35 +1399,8 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "pg245_twinflame_damage_payoff_cut_thor",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
-        },
-        {
-          "adds": [
-            "Planetarium of Wan Shi Tong"
-          ],
-          "baseline": {
-            "losses": 12,
-            "stalls": 1,
-            "wins": 11
-          },
-          "candidate": {
-            "losses": 16,
-            "stalls": 0,
-            "wins": 8
-          },
-          "candidate_added_card_statuses": [],
-          "cuts": [
-            "Creative Technique"
-          ],
-          "decision": "insufficient_card_outcome_sample",
-          "delta_pp": -12.5,
-          "evidence_scope": "diagnostic_or_contract",
-          "exposure_next_step": null,
-          "exposure_status": null,
-          "package_key": "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
-          "source_section": null
         },
         {
           "adds": [
@@ -1363,7 +1418,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "plateau_timing_upgrade_cut_radiant_summit",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1382,7 +1437,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "plateau_timing_upgrade_cut_turbulent_steppe",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         },
         {
@@ -1401,26 +1456,7 @@
           "exposure_next_step": null,
           "exposure_status": null,
           "package_key": "seething_song_cut_fellwar_stone",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
-          "source_section": "package_rollups"
-        },
-        {
-          "adds": [
-            "Silence"
-          ],
-          "baseline": {},
-          "candidate": {},
-          "candidate_added_card_statuses": [],
-          "cuts": [
-            "Avatar's Wrath"
-          ],
-          "decision": "inconclusive_low_exposure",
-          "delta_pp": -66.67,
-          "evidence_scope": "diagnostic_or_contract",
-          "exposure_next_step": null,
-          "exposure_status": null,
-          "package_key": "silence_cut_avatar_wrath",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+          "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
           "source_section": "package_rollups"
         }
       ],
@@ -5401,7 +5437,7 @@
       ],
       "candidate_cards": [],
       "cut_cards": [],
-      "hand_filter_cut_model_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260628_v4_current_miner.json",
+      "hand_filter_cut_model_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260628_v4_current_miner.json",
       "lane": "hand_filter",
       "next_steps": [
         "Search for a different non-core cut or a multi-card package before another hand-filter gate."
@@ -5429,7 +5465,7 @@
         "Command Beacon"
       ],
       "lane": "mana_base",
-      "mana_base_validator_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json",
+      "mana_base_validator_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json",
       "next_steps": [
         "Move to runtime/XMage rule-gap batching before another land test.",
         "Reopen mana base only with a new candidate or a cut that the validator marks preflight-ready."
@@ -7476,107 +7512,16 @@
         "Return to this lane only with a different cut or a multi-card package that preserves the current engine."
       ],
       "priority": 90,
-      "recursion_cut_model_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json",
+      "recursion_cut_model_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json",
       "status": "no_recursion_benchmark_ready",
       "why_now": "The recursion cut model found no safe non-Squee benchmark after protected cuts and prior rejects."
-    },
-    {
-      "action_key": "avoid_rejected_tutor_land_tax_swaps",
-      "blockers": [
-        "Gamble over Land Tax was rejected by prior gate evidence",
-        "Enlightened Tutor over Land Tax was rejected by prior gate evidence",
-        "Thor and Creative Technique tutor cuts already have prior regression evidence"
-      ],
-      "candidate_cards": [
-        "Enlightened Tutor",
-        "Gamble"
-      ],
-      "candidate_exposure": {
-        "Enlightened Tutor": {
-          "decision_status": "runtime_ready_cut_sensitive",
-          "exposure_profile": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
-          "inferred_role": "tutor_access",
-          "next_action": "retest only with seed-safe cut model",
-          "unique_exposure_count": 202
-        },
-        "Gamble": {
-          "decision_status": "runtime_ready_cut_sensitive",
-          "exposure_profile": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
-          "inferred_role": "tutor_access",
-          "next_action": "retest only with seed-safe cut model",
-          "unique_exposure_count": 228
-        }
-      },
-      "cut_cards": [
-        "Land Tax"
-      ],
-      "land_tax_benchmark_rejections": {
-        "enlightened_access_benchmark_cut_land_tax": {
-          "adds": [
-            "Enlightened Tutor"
-          ],
-          "aggregate": {},
-          "baseline": {
-            "losses": 12,
-            "stalls": 1,
-            "wins": 11
-          },
-          "candidate": {
-            "losses": 13,
-            "stalls": 0,
-            "wins": 11
-          },
-          "cuts": [
-            "Land Tax"
-          ],
-          "decision": "tie_watch_strategy_regression",
-          "delta_pp": 0.0,
-          "package_key": "enlightened_access_benchmark_cut_land_tax",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.json",
-          "source_section": null
-        },
-        "gamble_access_benchmark_cut_land_tax": {
-          "adds": [
-            "Gamble"
-          ],
-          "aggregate": {},
-          "baseline": {
-            "losses": 15,
-            "stalls": 0,
-            "wins": 9
-          },
-          "candidate": {
-            "losses": 17,
-            "stalls": 0,
-            "wins": 7
-          },
-          "cuts": [
-            "Land Tax"
-          ],
-          "decision": "forced_access_no_lift_reject_or_rework",
-          "delta_pp": -8.33,
-          "package_key": "gamble_access_benchmark_cut_land_tax",
-          "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_exposure_probe_decision_20260630.json",
-          "source_section": null
-        }
-      },
-      "lane": "tutor_access",
-      "next_steps": [
-        "Do not rerun exact tutor-over-Land-Tax packages without a changed shell or explicit override.",
-        "Search for an additive tutor/access package or a different low-exposure non-access cut.",
-        "Rerun the tutor cut model after any new shell change before another tutor gate."
-      ],
-      "priority": 90,
-      "status": "tutor_land_tax_benchmarks_rejected",
-      "tutor_cut_model_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v2_current_miner.json",
-      "why_now": "The tutor cut model found no direct seed-safe swap, and the highest same-access Land Tax benchmarks already lost the equal gate."
     }
   ],
   "exposure_profiles": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_cut_exposure_profile_20260628_v1.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_card_exposure_profile_20260627_v2_role_fix.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_cut_exposure_profile_20260628_v1.json"
   ],
-  "generated_at": "2026-06-30T05:16:17Z",
+  "generated_at": "2026-06-30T15:21:55Z",
   "guardrails": [
     {
       "guardrail_key": "no_automatic_gate_without_safe_cut",
@@ -7590,7 +7535,7 @@
     {
       "guardrail_key": "prior_package_reports_have_rejections",
       "reason": "Loaded prior package reports include explicit rejected package evidence; the planner must not recommend those exact add/cut packages as fresh gates.",
-      "rejected_package_count": 53,
+      "rejected_package_count": 47,
       "rejected_package_keys": [
         "angel_grace_life_floor_cut_dawn",
         "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
@@ -7608,15 +7553,12 @@
         "crackle_with_power_same_lane_benchmark_cut_winds_of_abandon",
         "desperate_ritual_same_lane_benchmark_cut_bender_s_waterskin",
         "electro_assaulting_battery_same_lane_benchmark_cut_winds_of_abandon",
-        "enlightened_access_benchmark_cut_land_tax",
         "enlightened_engine_access_cut_thor",
-        "ephemerate_same_lane_benchmark_cut_winds_of_abandon",
         "erode_same_lane_benchmark_cut_winds_of_abandon",
         "faithless_looting_squee_enabler",
         "galvanoth_topdeck_freecast_cut_chimes",
         "galvanoth_topdeck_freecast_cut_squelcher",
         "galvanoth_topdeck_freecast_cut_thor",
-        "gamble_access_benchmark_cut_land_tax",
         "gamble_access_cut_thor",
         "ghostly_prison_pressure_cut_squelcher",
         "invoke_calamity_same_lane_benchmark_cut_creative_technique",
@@ -7637,32 +7579,32 @@
         "razorgrass_ambush_razorgrass_field_same_lane_benchmark_cut_winds_of_abandon",
         "runaway_steamkin_cut_talisman",
         "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
-        "storm_kiln_artist_cut_arcane_signet",
         "surly_badgersaur_same_lane_benchmark_cut_bender_s_waterskin",
         "tablet_of_discovery_same_lane_benchmark_cut_bender_s_waterskin",
-        "the_warring_triad_same_lane_benchmark_cut_bender_s_waterskin",
         "treasonous_ogre_same_lane_benchmark_cut_bender_s_waterskin",
-        "valakut_hand_filter_cut_big_score",
         "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
         "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon"
       ]
     },
     {
       "guardrail_key": "inconclusive_low_exposure_is_not_card_proof",
-      "inconclusive_package_count": 14,
+      "inconclusive_package_count": 17,
       "inconclusive_package_keys": [
         "akromas_will_cut_avatar_wrath",
         "austere_command_wipe_over_emeria_tradeoff",
         "boros_charm_pressure_cut_avatar_wrath",
+        "enlightened_access_benchmark_cut_land_tax",
+        "gamble_access_benchmark_cut_land_tax",
         "grand_abolisher_cut_mother_of_runes",
         "hidden_retreat_stack_damage_topdeck_cut_promise",
         "perch_protection_cut_avatar_wrath",
         "pg245_twinflame_damage_payoff_cut_thor",
-        "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
         "plateau_timing_upgrade_cut_radiant_summit",
         "plateau_timing_upgrade_cut_turbulent_steppe",
         "seething_song_cut_fellwar_stone",
         "silence_cut_avatar_wrath",
+        "storm_kiln_artist_cut_arcane_signet",
+        "valakut_hand_filter_cut_big_score",
         "volcanic_recursion_cut_pinnacle",
         "wheel_hand_filter_cut_big_score"
       ],
@@ -7671,7 +7613,7 @@
     {
       "guardrail_key": "profiled_same_lane_benchmark_queue_exhausted",
       "reason": "The latest profiled cut benchmark generator has no remaining preflight-ready same-lane package, so the planner must advance to trace or runtime work.",
-      "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
+      "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
     },
     {
       "guardrail_key": "austere_emeria_tradeoff_rejected",
@@ -7687,13 +7629,13 @@
     }
   ],
   "hand_filter_cut_model_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
   ],
-  "hypothesis_queue": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+  "hypothesis_queue": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
   "mana_base_validator_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
   ],
-  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+  "manual_review": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
   "method_notes": [
     "This planner is a decision layer, not a promotion engine.",
     "A runtime-ready card is not gate-ready unless a safe cut model exists.",
@@ -7703,38 +7645,35 @@
     "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
     "PostgreSQL and SQLite are not mutated by this script."
   ],
-  "miner_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json",
+  "miner_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json",
   "postgres_writes": false,
   "prior_package_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_exposure_probe_decision_20260630.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_recurring_seed_window_20260628_v1_run.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_exposure_outcome_audit_20260628_actionability_v1.json"
   ],
   "profiled_cut_benchmark_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
   ],
   "recursion_cut_model_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
   ],
   "source_db_mutated": false,
-  "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "strategy_audit": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
   "summary": {
     "action_count": 9,
     "action_status_counts": {
@@ -7746,7 +7685,7 @@
       "no_recursion_benchmark_ready": 1,
       "profiled_same_lane_benchmark_queue_exhausted": 1,
       "runtime_required_before_strategy_gate": 1,
-      "tutor_land_tax_benchmarks_rejected": 1
+      "same_access_benchmark_required_before_next_tutor_attempt": 1
     },
     "gate_ready_now_count": 0,
     "hypothesis_queue_status_counts": {
@@ -7763,24 +7702,27 @@
       "manual_cut_review_required": 2,
       "needs_lane_model_before_gate": 2
     },
-    "prior_inconclusive_low_exposure_count": 14,
+    "prior_inconclusive_low_exposure_count": 17,
     "prior_inconclusive_low_exposure_keys": [
       "akromas_will_cut_avatar_wrath",
       "austere_command_wipe_over_emeria_tradeoff",
       "boros_charm_pressure_cut_avatar_wrath",
+      "enlightened_access_benchmark_cut_land_tax",
+      "gamble_access_benchmark_cut_land_tax",
       "grand_abolisher_cut_mother_of_runes",
       "hidden_retreat_stack_damage_topdeck_cut_promise",
       "perch_protection_cut_avatar_wrath",
       "pg245_twinflame_damage_payoff_cut_thor",
-      "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
       "plateau_timing_upgrade_cut_radiant_summit",
       "plateau_timing_upgrade_cut_turbulent_steppe",
       "seething_song_cut_fellwar_stone",
       "silence_cut_avatar_wrath",
+      "storm_kiln_artist_cut_arcane_signet",
+      "valakut_hand_filter_cut_big_score",
       "volcanic_recursion_cut_pinnacle",
       "wheel_hand_filter_cut_big_score"
     ],
-    "prior_rejected_package_count": 53,
+    "prior_rejected_package_count": 47,
     "prior_rejected_package_keys": [
       "angel_grace_life_floor_cut_dawn",
       "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
@@ -7798,15 +7740,12 @@
       "crackle_with_power_same_lane_benchmark_cut_winds_of_abandon",
       "desperate_ritual_same_lane_benchmark_cut_bender_s_waterskin",
       "electro_assaulting_battery_same_lane_benchmark_cut_winds_of_abandon",
-      "enlightened_access_benchmark_cut_land_tax",
       "enlightened_engine_access_cut_thor",
-      "ephemerate_same_lane_benchmark_cut_winds_of_abandon",
       "erode_same_lane_benchmark_cut_winds_of_abandon",
       "faithless_looting_squee_enabler",
       "galvanoth_topdeck_freecast_cut_chimes",
       "galvanoth_topdeck_freecast_cut_squelcher",
       "galvanoth_topdeck_freecast_cut_thor",
-      "gamble_access_benchmark_cut_land_tax",
       "gamble_access_cut_thor",
       "ghostly_prison_pressure_cut_squelcher",
       "invoke_calamity_same_lane_benchmark_cut_creative_technique",
@@ -7827,12 +7766,9 @@
       "razorgrass_ambush_razorgrass_field_same_lane_benchmark_cut_winds_of_abandon",
       "runaway_steamkin_cut_talisman",
       "seething_song_same_lane_benchmark_cut_bender_s_waterskin",
-      "storm_kiln_artist_cut_arcane_signet",
       "surly_badgersaur_same_lane_benchmark_cut_bender_s_waterskin",
       "tablet_of_discovery_same_lane_benchmark_cut_bender_s_waterskin",
-      "the_warring_triad_same_lane_benchmark_cut_bender_s_waterskin",
       "treasonous_ogre_same_lane_benchmark_cut_bender_s_waterskin",
-      "valakut_hand_filter_cut_big_score",
       "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
       "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon"
     ],
@@ -7844,8 +7780,8 @@
       "trace_evidence_supports_sequencing_gap": 1
     }
   },
-  "trace_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json",
+  "trace_audit": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json",
   "tutor_cut_model_reports": [
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v2_current_miner.json"
+    "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_cut_model_20260628_v2_current_miner.json"
   ]
 }

@@ -620,58 +620,68 @@
       "candidate_effect_hints": {
         "candidates": [
           {
-            "confidence_reason": "XMage exposes library-search behavior; ManaLoom can batch this as a tutor/search family and derive exact target/destination constraints during focused review.",
+            "confidence_reason": "XMage structure matches Deathbellow War Cry tutoring up to four Minotaur creature cards with different names directly onto the battlefield.",
             "effect_json": {
               "ability_kind": "one_shot",
-              "battle_model_scope": "xmage_library_search_variant_review_v1",
+              "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
               "effect": "tutor",
               "instant": false,
-              "sorcery": true,
-              "target": "library_card",
-              "target_constraints": {
-                "card_types": [
-                  "creature"
-                ]
-              },
+              "max_targets": 4,
+              "min_targets": 0,
+              "requires_different_names": true,
+              "target": "minotaur_creatures_to_battlefield",
+              "target_card_types": [
+                "creature"
+              ],
+              "target_subtypes": [
+                "minotaur"
+              ],
               "tutor_destination": "battlefield"
             },
             "matched_signals": [
-              "Search",
-              "library"
+              "SearchLibraryPutInPlayEffect",
+              "TargetCardWithDifferentNameInLibrary",
+              "FilterCreatureCard",
+              "SubType.MINOTAUR"
             ],
             "requires_manual_review": true,
             "requires_runtime_executor": true,
             "status": "review_candidate",
-            "suggested_battle_model_scope": "xmage_library_search_variant_review_v1",
+            "suggested_battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
             "suggested_tests": [
               "focused behavior scenario for tutor"
             ]
           }
         ],
         "primary_candidate": {
-          "confidence_reason": "XMage exposes library-search behavior; ManaLoom can batch this as a tutor/search family and derive exact target/destination constraints during focused review.",
+          "confidence_reason": "XMage structure matches Deathbellow War Cry tutoring up to four Minotaur creature cards with different names directly onto the battlefield.",
           "effect_json": {
             "ability_kind": "one_shot",
-            "battle_model_scope": "xmage_library_search_variant_review_v1",
+            "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
             "effect": "tutor",
             "instant": false,
-            "sorcery": true,
-            "target": "library_card",
-            "target_constraints": {
-              "card_types": [
-                "creature"
-              ]
-            },
+            "max_targets": 4,
+            "min_targets": 0,
+            "requires_different_names": true,
+            "target": "minotaur_creatures_to_battlefield",
+            "target_card_types": [
+              "creature"
+            ],
+            "target_subtypes": [
+              "minotaur"
+            ],
             "tutor_destination": "battlefield"
           },
           "matched_signals": [
-            "Search",
-            "library"
+            "SearchLibraryPutInPlayEffect",
+            "TargetCardWithDifferentNameInLibrary",
+            "FilterCreatureCard",
+            "SubType.MINOTAUR"
           ],
           "requires_manual_review": true,
           "requires_runtime_executor": true,
           "status": "review_candidate",
-          "suggested_battle_model_scope": "xmage_library_search_variant_review_v1",
+          "suggested_battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
           "suggested_tests": [
             "focused behavior scenario for tutor"
           ]
@@ -1101,183 +1111,6 @@
     },
     {
       "ability_classes": [
-        "SimpleActivatedAbility"
-      ],
-      "candidate_class_names": [
-        "LeylineDowser"
-      ],
-      "candidate_effect_hints": {
-        "candidates": [
-          {
-            "confidence_reason": "XMage structure matches Leyline Dowser: pay and tap to mill one card and optionally put an instant or sorcery milled this way into hand, plus tap a legendary creature to untap the artifact.",
-            "effect_json": {
-              "ability_kind": "activated",
-              "activation_cost_generic": 1,
-              "activation_requires_tap": true,
-              "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-              "effect": "recursion",
-              "mill_count": 1,
-              "milled_card_types_to_hand": [
-                "instant",
-                "sorcery"
-              ],
-              "permanent_type": "artifact",
-              "secondary_untap_source_by_tapping_legendary_creature": true,
-              "target_constraints": {
-                "card_types": [
-                  "creature"
-                ],
-                "controller_scope": "source_controller"
-              }
-            },
-            "matched_signals": [
-              "MillThenPutInHandEffect",
-              "UntapSourceEffect",
-              "TapTargetCost",
-              "FilterControlledCreaturePermanent"
-            ],
-            "requires_manual_review": true,
-            "requires_runtime_executor": true,
-            "status": "review_candidate",
-            "suggested_battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-            "suggested_tests": [
-              "focused behavior scenario for recursion"
-            ]
-          }
-        ],
-        "primary_candidate": {
-          "confidence_reason": "XMage structure matches Leyline Dowser: pay and tap to mill one card and optionally put an instant or sorcery milled this way into hand, plus tap a legendary creature to untap the artifact.",
-          "effect_json": {
-            "ability_kind": "activated",
-            "activation_cost_generic": 1,
-            "activation_requires_tap": true,
-            "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-            "effect": "recursion",
-            "mill_count": 1,
-            "milled_card_types_to_hand": [
-              "instant",
-              "sorcery"
-            ],
-            "permanent_type": "artifact",
-            "secondary_untap_source_by_tapping_legendary_creature": true,
-            "target_constraints": {
-              "card_types": [
-                "creature"
-              ],
-              "controller_scope": "source_controller"
-            }
-          },
-          "matched_signals": [
-            "MillThenPutInHandEffect",
-            "UntapSourceEffect",
-            "TapTargetCost",
-            "FilterControlledCreaturePermanent"
-          ],
-          "requires_manual_review": true,
-          "requires_runtime_executor": true,
-          "status": "review_candidate",
-          "suggested_battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-          "suggested_tests": [
-            "focused behavior scenario for recursion"
-          ]
-        },
-        "review_policy": "candidate_only_never_promote_without_oracle_and_tests",
-        "status": "ready"
-      },
-      "card_name": "Leyline Dowser",
-      "card_superclass": "CardImpl",
-      "class_declarations": [
-        {
-          "class_name": "LeylineDowser",
-          "extends": "CardImpl"
-        }
-      ],
-      "condition_classes": [],
-      "constructor_metadata": {
-        "back_face_name": null,
-        "back_mana_cost": null,
-        "card_types": [
-          "ARTIFACT"
-        ],
-        "constructor_mana_cost_literals": [
-          "{2}"
-        ],
-        "constructor_named_literals": [],
-        "constructor_string_literals": [
-          "{2}"
-        ],
-        "front_mana_cost": "{2}",
-        "mana_cost": "{2}",
-        "rarity": null,
-        "subtypes": [],
-        "super_call": "super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{2}\");",
-        "xmage_card_name": "Leyline Dowser"
-      },
-      "cost_classes": [
-        "GenericManaCost",
-        "TapSourceCost",
-        "TapTargetCost"
-      ],
-      "counter_types": [],
-      "custom_inner_classes": [],
-      "dynamic_value_classes": [],
-      "effect_classes": [
-        "MillThenPutInHandEffect",
-        "UntapSourceEffect"
-      ],
-      "filter_classes": [
-        "FilterControlledCreaturePermanent",
-        "FilterControlledPermanent"
-      ],
-      "imports": [
-        "java.util.UUID",
-        "mage.abilities.Ability",
-        "mage.abilities.common.SimpleActivatedAbility",
-        "mage.abilities.costs.common.TapSourceCost",
-        "mage.abilities.costs.common.TapTargetCost",
-        "mage.abilities.costs.mana.GenericManaCost",
-        "mage.abilities.effects.common.MillThenPutInHandEffect",
-        "mage.abilities.effects.common.UntapSourceEffect",
-        "mage.cards.CardImpl",
-        "mage.cards.CardSetInfo",
-        "mage.constants.CardType",
-        "mage.constants.SuperType",
-        "mage.filter.StaticFilters",
-        "mage.filter.common.FilterControlledCreaturePermanent",
-        "mage.filter.common.FilterControlledPermanent",
-        "mage.filter.predicate.permanent.TappedPredicate",
-        "mage.target.common.TargetControlledPermanent"
-      ],
-      "mutations_performed": [],
-      "raw_excerpt": "/**\n * @author TheElk801\n */\npublic final class LeylineDowser extends CardImpl {\n    private static final FilterControlledPermanent filter = new FilterControlledCreaturePermanent(\"an untapped legendary creature you control\");\n    static {\n        filter.add(TappedPredicate.UNTAPPED);\n        filter.add(SuperType.LEGENDARY.getPredicate());\n    }\n    public LeylineDowser(UUID ownerId, CardSetInfo setInfo) {\n        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{2}\");\n        Ability ability = new SimpleActivatedAbility(\n                new MillThenPutInHandEffect(1, StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY), new GenericManaCost(1)\n        );\n        ability.addCost(new TapSourceCost());\n        this.addAbility(ability);\n        this.addAbility(new SimpleActivatedAbility(\n                new UntapSourceEffect(), new TapTargetCost(new TargetControlledPermanent(filter))\n        ));\n    }\n    private LeylineDowser(final LeylineDowser card) {\n        super(card);\n    }\n    @Override\n    public LeylineDowser copy() {\n        return new LeylineDowser(this);\n    }\n}",
-      "resolution": "direct_bucket_candidate",
-      "signals": [
-        "targeting",
-        "activated_ability"
-      ],
-      "status": "found",
-      "suggested_test_scenarios": [
-        {
-          "actions": "cast or activate Leyline Dowser through the relevant supported phase",
-          "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-          "card_name": "Leyline Dowser",
-          "effect": "recursion",
-          "id": "leyline_dowser_1",
-          "setup": "minimal deterministic board state with legal targets and enough mana",
-          "status": "draft_requires_manual_review",
-          "title": "focused behavior scenario for recursion"
-        }
-      ],
-      "target_classes": [
-        "TargetControlledPermanent"
-      ],
-      "xmage_class_name": "LeylineDowser",
-      "xmage_package": "mage.cards.l",
-      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java",
-      "zones": []
-    },
-    {
-      "ability_classes": [
         "BeginningOfUpkeepTriggeredAbility"
       ],
       "candidate_class_names": [
@@ -1424,538 +1257,9 @@
       "xmage_package": "mage.cards.n",
       "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java",
       "zones": []
-    },
-    {
-      "ability_classes": [
-        "SimpleActivatedAbility"
-      ],
-      "candidate_class_names": [
-        "OrcishSpy"
-      ],
-      "candidate_effect_hints": {
-        "candidates": [
-          {
-            "confidence_reason": "XMage structure matches Orcish Spy: activated tap ability looks at the top three cards of target player's library.",
-            "effect_json": {
-              "ability_kind": "activated",
-              "activation_requires_tap": true,
-              "alternate_zone_permission": false,
-              "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-              "effect": "topdeck_play",
-              "look_target_player_library_top_count": 3,
-              "may_cast_without_paying_mana_cost": false,
-              "play_lands_from_top_library": false,
-              "power": 1,
-              "target_constraints": {
-                "target": "player"
-              },
-              "toughness": 1
-            },
-            "matched_signals": [
-              "LookLibraryTopCardTargetPlayerEffect",
-              "TargetPlayer",
-              "TapSourceCost"
-            ],
-            "requires_manual_review": true,
-            "requires_runtime_executor": true,
-            "status": "review_candidate",
-            "suggested_battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-            "suggested_tests": [
-              "focused behavior scenario for topdeck_play"
-            ]
-          }
-        ],
-        "primary_candidate": {
-          "confidence_reason": "XMage structure matches Orcish Spy: activated tap ability looks at the top three cards of target player's library.",
-          "effect_json": {
-            "ability_kind": "activated",
-            "activation_requires_tap": true,
-            "alternate_zone_permission": false,
-            "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-            "effect": "topdeck_play",
-            "look_target_player_library_top_count": 3,
-            "may_cast_without_paying_mana_cost": false,
-            "play_lands_from_top_library": false,
-            "power": 1,
-            "target_constraints": {
-              "target": "player"
-            },
-            "toughness": 1
-          },
-          "matched_signals": [
-            "LookLibraryTopCardTargetPlayerEffect",
-            "TargetPlayer",
-            "TapSourceCost"
-          ],
-          "requires_manual_review": true,
-          "requires_runtime_executor": true,
-          "status": "review_candidate",
-          "suggested_battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-          "suggested_tests": [
-            "focused behavior scenario for topdeck_play"
-          ]
-        },
-        "review_policy": "candidate_only_never_promote_without_oracle_and_tests",
-        "status": "ready"
-      },
-      "card_name": "Orcish Spy",
-      "card_superclass": "CardImpl",
-      "class_declarations": [
-        {
-          "class_name": "OrcishSpy",
-          "extends": "CardImpl"
-        }
-      ],
-      "condition_classes": [],
-      "constructor_metadata": {
-        "back_face_name": null,
-        "back_mana_cost": null,
-        "card_types": [
-          "CREATURE"
-        ],
-        "constructor_mana_cost_literals": [
-          "{R}"
-        ],
-        "constructor_named_literals": [],
-        "constructor_string_literals": [
-          "{R}"
-        ],
-        "front_mana_cost": "{R}",
-        "mana_cost": "{R}",
-        "rarity": null,
-        "subtypes": [
-          "ORC",
-          "ROGUE"
-        ],
-        "super_call": "super(ownerId,setInfo,new CardType[]{CardType.CREATURE},\"{R}\");",
-        "xmage_card_name": "Orcish Spy"
-      },
-      "cost_classes": [
-        "TapSourceCost"
-      ],
-      "counter_types": [],
-      "custom_inner_classes": [],
-      "dynamic_value_classes": [],
-      "effect_classes": [
-        "LookLibraryTopCardTargetPlayerEffect"
-      ],
-      "filter_classes": [],
-      "imports": [
-        "java.util.UUID",
-        "mage.MageInt",
-        "mage.abilities.Ability",
-        "mage.abilities.common.SimpleActivatedAbility",
-        "mage.abilities.costs.common.TapSourceCost",
-        "mage.abilities.effects.common.LookLibraryTopCardTargetPlayerEffect",
-        "mage.cards.CardImpl",
-        "mage.cards.CardSetInfo",
-        "mage.constants.CardType",
-        "mage.constants.SubType",
-        "mage.constants.Zone",
-        "mage.target.TargetPlayer"
-      ],
-      "mutations_performed": [],
-      "raw_excerpt": "/**\n *\n * @author anonymous\n */\npublic final class OrcishSpy extends CardImpl {\n    public OrcishSpy(UUID ownerId, CardSetInfo setInfo) {\n        super(ownerId,setInfo,new CardType[]{CardType.CREATURE},\"{R}\");\n        this.subtype.add(SubType.ORC);\n        this.subtype.add(SubType.ROGUE);\n        this.power = new MageInt(1);\n        this.toughness = new MageInt(1);\n        Ability ability = new SimpleActivatedAbility(new LookLibraryTopCardTargetPlayerEffect(3), new TapSourceCost());\n        ability.addTarget(new TargetPlayer());\n        this.addAbility(ability);\n    }\n    private OrcishSpy(final OrcishSpy card) {\n        super(card);\n    }\n    @Override\n    public OrcishSpy copy() {\n        return new OrcishSpy(this);\n    }\n}",
-      "resolution": "direct_bucket_candidate",
-      "signals": [
-        "targeting",
-        "activated_ability"
-      ],
-      "status": "found",
-      "suggested_test_scenarios": [
-        {
-          "actions": "cast or activate Orcish Spy through the relevant supported phase",
-          "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-          "card_name": "Orcish Spy",
-          "effect": "topdeck_play",
-          "id": "orcish_spy_1",
-          "setup": "minimal deterministic board state with legal targets and enough mana",
-          "status": "draft_requires_manual_review",
-          "title": "focused behavior scenario for topdeck_play"
-        }
-      ],
-      "target_classes": [
-        "TargetPlayer"
-      ],
-      "xmage_class_name": "OrcishSpy",
-      "xmage_package": "mage.cards.o",
-      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java",
-      "zones": []
-    },
-    {
-      "ability_classes": [
-        "EntersBattlefieldTriggeredAbility",
-        "SimpleActivatedAbility"
-      ],
-      "candidate_class_names": [
-        "PrototypePortal"
-      ],
-      "candidate_effect_hints": {
-        "candidates": [
-          {
-            "confidence_reason": "XMage structure matches Prototype Portal: imprint an artifact card from hand on ETB, then pay X and tap to create a token copy where X is the imprinted card's mana value.",
-            "effect_json": {
-              "ability_kind": "triggered_and_activated",
-              "activated_create_token_copy_of_imprinted_card": true,
-              "activation_requires_tap": true,
-              "activation_x_cost_source": "imprinted_card_mana_value",
-              "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-              "effect": "token_maker",
-              "imprint_artifact_card_from_hand_on_enter": true,
-              "permanent_type": "artifact",
-              "token_copy_source": "imprinted_card"
-            },
-            "matched_signals": [
-              "PrototypePortalEffect",
-              "PrototypePortalCreateTokenEffect",
-              "ImprintedManaValueXCostAdjuster"
-            ],
-            "requires_manual_review": true,
-            "requires_runtime_executor": true,
-            "status": "review_candidate",
-            "suggested_battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-            "suggested_tests": [
-              "create expected token count and stats",
-              "apply duration-limited protection or indestructible effect"
-            ]
-          }
-        ],
-        "primary_candidate": {
-          "confidence_reason": "XMage structure matches Prototype Portal: imprint an artifact card from hand on ETB, then pay X and tap to create a token copy where X is the imprinted card's mana value.",
-          "effect_json": {
-            "ability_kind": "triggered_and_activated",
-            "activated_create_token_copy_of_imprinted_card": true,
-            "activation_requires_tap": true,
-            "activation_x_cost_source": "imprinted_card_mana_value",
-            "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-            "effect": "token_maker",
-            "imprint_artifact_card_from_hand_on_enter": true,
-            "permanent_type": "artifact",
-            "token_copy_source": "imprinted_card"
-          },
-          "matched_signals": [
-            "PrototypePortalEffect",
-            "PrototypePortalCreateTokenEffect",
-            "ImprintedManaValueXCostAdjuster"
-          ],
-          "requires_manual_review": true,
-          "requires_runtime_executor": true,
-          "status": "review_candidate",
-          "suggested_battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-          "suggested_tests": [
-            "create expected token count and stats",
-            "apply duration-limited protection or indestructible effect"
-          ]
-        },
-        "review_policy": "candidate_only_never_promote_without_oracle_and_tests",
-        "status": "ready"
-      },
-      "card_name": "Prototype Portal",
-      "card_superclass": "CardImpl",
-      "class_declarations": [
-        {
-          "class_name": "PrototypePortal",
-          "extends": "CardImpl"
-        },
-        {
-          "class_name": "PrototypePortalEffect",
-          "extends": "OneShotEffect"
-        },
-        {
-          "class_name": "PrototypePortalCreateTokenEffect",
-          "extends": "OneShotEffect"
-        }
-      ],
-      "condition_classes": [],
-      "constructor_metadata": {
-        "back_face_name": null,
-        "back_mana_cost": null,
-        "card_types": [
-          "ARTIFACT"
-        ],
-        "constructor_mana_cost_literals": [
-          "{4}"
-        ],
-        "constructor_named_literals": [],
-        "constructor_string_literals": [
-          "{4}"
-        ],
-        "front_mana_cost": "{4}",
-        "mana_cost": "{4}",
-        "rarity": null,
-        "subtypes": [],
-        "super_call": "super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{4}\");",
-        "xmage_card_name": "Prototype Portal"
-      },
-      "cost_classes": [
-        "TapSourceCost"
-      ],
-      "counter_types": [],
-      "custom_inner_classes": [
-        {
-          "class_name": "PrototypePortalEffect",
-          "extends": "OneShotEffect"
-        },
-        {
-          "class_name": "PrototypePortalCreateTokenEffect",
-          "extends": "OneShotEffect"
-        }
-      ],
-      "dynamic_value_classes": [],
-      "effect_classes": [
-        "OneShotEffect",
-        "PrototypePortalCreateTokenEffect",
-        "PrototypePortalEffect"
-      ],
-      "filter_classes": [],
-      "imports": [
-        "java.util.UUID",
-        "mage.MageObject",
-        "mage.abilities.Ability",
-        "mage.abilities.common.EntersBattlefieldTriggeredAbility",
-        "mage.abilities.common.SimpleActivatedAbility",
-        "mage.abilities.costs.common.TapSourceCost",
-        "mage.abilities.costs.costadjusters.ImprintedManaValueXCostAdjuster",
-        "mage.abilities.costs.mana.ManaCostsImpl",
-        "mage.abilities.effects.OneShotEffect",
-        "mage.cards.Card",
-        "mage.cards.CardImpl",
-        "mage.cards.CardSetInfo",
-        "mage.constants.AbilityWord",
-        "mage.constants.CardType",
-        "mage.constants.Outcome",
-        "mage.constants.Zone",
-        "mage.filter.StaticFilters",
-        "mage.game.Game",
-        "mage.game.permanent.Permanent",
-        "mage.game.permanent.token.Token",
-        "mage.players.Player",
-        "mage.target.TargetCard",
-        "mage.util.functions.CopyTokenFunction"
-      ],
-      "mutations_performed": [],
-      "raw_excerpt": "/**\n * @author nantuko\n */\npublic final class PrototypePortal extends CardImpl {\n    public PrototypePortal(UUID ownerId, CardSetInfo setInfo) {\n        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{4}\");\n        this.addAbility(new EntersBattlefieldTriggeredAbility(\n                new PrototypePortalEffect(), true)\n                .setAbilityWord(AbilityWord.IMPRINT)\n        );\n        Ability ability = new SimpleActivatedAbility(new PrototypePortalCreateTokenEffect(), new ManaCostsImpl<>(\"{X}\"));\n        ability.addCost(new TapSourceCost());\n        ability.setCostAdjuster(ImprintedManaValueXCostAdjuster.instance);\n        this.addAbility(ability);\n    }\n    private PrototypePortal(final PrototypePortal card) {\n        super(card);\n    }\n    @Override\n    public PrototypePortal copy() {\n        return new PrototypePortal(this);\n    }\n}\nclass PrototypePortalEffect extends OneShotEffect {\n    PrototypePortalEffect() {\n        super(Outcome.Benefit);\n        staticText = \"exile an artifact card from your hand\";\n    }\n    private PrototypePortalEffect(PrototypePortalEffect effect) {\n        super(effect);\n    }\n    @Override\n    public boolean apply(Game game, Ability source) {\n        Player controller = game.getPlayer(source.getControllerId());\n        MageObject sourceObject = game.getObject(source);\n        if (controller != null && sourceObject != null) {\n            if (!controller.getHand().isEmpty()) {\n                TargetCard target = new TargetCard(Zone.HAND, StaticFilters.FILTER_CARD_ARTIFACT);\n                controller.choose(Outcome.Benefit, controller.getHand(), target, source, game);\n                Card card = controller.getHand().get(target.getFirstTarget(), game);\n                if (card != null) {\n                    controller.moveCardsToExile(card, source, game, true, source.getSourceId(), sourceObject.getIdName() + \" (Imprint)\");",
-      "resolution": "direct_bucket_candidate",
-      "signals": [
-        "targeting",
-        "triggered_ability",
-        "activated_ability"
-      ],
-      "status": "found",
-      "suggested_test_scenarios": [
-        {
-          "actions": "cast or resolve Prototype Portal",
-          "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
-          "card_name": "Prototype Portal",
-          "effect": "token_maker",
-          "id": "prototype_portal_1",
-          "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
-          "status": "draft_requires_manual_review",
-          "title": "create expected token count and stats"
-        },
-        {
-          "actions": "cast or resolve Prototype Portal",
-          "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
-          "card_name": "Prototype Portal",
-          "effect": "token_maker",
-          "id": "prototype_portal_2",
-          "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
-          "status": "draft_requires_manual_review",
-          "title": "apply duration-limited protection or indestructible effect"
-        }
-      ],
-      "target_classes": [
-        "TargetCard"
-      ],
-      "xmage_class_name": "PrototypePortal",
-      "xmage_package": "mage.cards.p",
-      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java",
-      "zones": [
-        "HAND"
-      ]
-    },
-    {
-      "ability_classes": [
-        "SimpleActivatedAbility"
-      ],
-      "candidate_class_names": [
-        "PyxisOfPandemonium"
-      ],
-      "candidate_effect_hints": {
-        "candidates": [
-          {
-            "confidence_reason": "XMage structure matches Pyxis of Pandemonium: tap to exile each player's top card face down, then pay seven, tap, and sacrifice to reveal those cards and put all permanent cards among them onto the battlefield.",
-            "effect_json": {
-              "ability_kind": "activated",
-              "activated_each_player_exile_top_face_down": true,
-              "activated_put_exiled_permanents_onto_battlefield": true,
-              "activation_requires_tap": true,
-              "alternate_zone_permission": true,
-              "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-              "effect": "free_cast",
-              "final_activation_cost_generic": 7,
-              "final_activation_requires_sacrifice": true,
-              "may_cast_without_paying_mana_cost": false,
-              "permanent_type": "artifact",
-              "put_permanent_cards_from_exile_onto_battlefield": true
-            },
-            "matched_signals": [
-              "PyxisOfPandemoniumExileEffect",
-              "PyxisOfPandemoniumPutOntoBattlefieldEffect",
-              "SacrificeSourceCost",
-              "GenericManaCost(7)"
-            ],
-            "requires_manual_review": true,
-            "requires_runtime_executor": true,
-            "status": "review_candidate",
-            "suggested_battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-            "suggested_tests": [
-              "focused behavior scenario for free_cast"
-            ]
-          }
-        ],
-        "primary_candidate": {
-          "confidence_reason": "XMage structure matches Pyxis of Pandemonium: tap to exile each player's top card face down, then pay seven, tap, and sacrifice to reveal those cards and put all permanent cards among them onto the battlefield.",
-          "effect_json": {
-            "ability_kind": "activated",
-            "activated_each_player_exile_top_face_down": true,
-            "activated_put_exiled_permanents_onto_battlefield": true,
-            "activation_requires_tap": true,
-            "alternate_zone_permission": true,
-            "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-            "effect": "free_cast",
-            "final_activation_cost_generic": 7,
-            "final_activation_requires_sacrifice": true,
-            "may_cast_without_paying_mana_cost": false,
-            "permanent_type": "artifact",
-            "put_permanent_cards_from_exile_onto_battlefield": true
-          },
-          "matched_signals": [
-            "PyxisOfPandemoniumExileEffect",
-            "PyxisOfPandemoniumPutOntoBattlefieldEffect",
-            "SacrificeSourceCost",
-            "GenericManaCost(7)"
-          ],
-          "requires_manual_review": true,
-          "requires_runtime_executor": true,
-          "status": "review_candidate",
-          "suggested_battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-          "suggested_tests": [
-            "focused behavior scenario for free_cast"
-          ]
-        },
-        "review_policy": "candidate_only_never_promote_without_oracle_and_tests",
-        "status": "ready"
-      },
-      "card_name": "Pyxis of Pandemonium",
-      "card_superclass": "CardImpl",
-      "class_declarations": [
-        {
-          "class_name": "PyxisOfPandemonium",
-          "extends": "CardImpl"
-        },
-        {
-          "class_name": "PyxisOfPandemoniumExileEffect",
-          "extends": "OneShotEffect"
-        },
-        {
-          "class_name": "PyxisOfPandemoniumPutOntoBattlefieldEffect",
-          "extends": "OneShotEffect"
-        }
-      ],
-      "condition_classes": [],
-      "constructor_metadata": {
-        "back_face_name": null,
-        "back_mana_cost": null,
-        "card_types": [
-          "ARTIFACT"
-        ],
-        "constructor_mana_cost_literals": [
-          "{1}"
-        ],
-        "constructor_named_literals": [],
-        "constructor_string_literals": [
-          "{1}"
-        ],
-        "front_mana_cost": "{1}",
-        "mana_cost": "{1}",
-        "rarity": null,
-        "subtypes": [],
-        "super_call": "super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{1}\");",
-        "xmage_card_name": "Pyxis of Pandemonium"
-      },
-      "cost_classes": [
-        "GenericManaCost",
-        "SacrificeSourceCost",
-        "TapSourceCost"
-      ],
-      "counter_types": [],
-      "custom_inner_classes": [
-        {
-          "class_name": "PyxisOfPandemoniumExileEffect",
-          "extends": "OneShotEffect"
-        },
-        {
-          "class_name": "PyxisOfPandemoniumPutOntoBattlefieldEffect",
-          "extends": "OneShotEffect"
-        }
-      ],
-      "dynamic_value_classes": [],
-      "effect_classes": [
-        "OneShotEffect",
-        "PyxisOfPandemoniumExileEffect",
-        "PyxisOfPandemoniumPutOntoBattlefieldEffect"
-      ],
-      "filter_classes": [],
-      "imports": [
-        "java.util.HashMap",
-        "java.util.Map",
-        "java.util.UUID",
-        "mage.abilities.Ability",
-        "mage.abilities.common.SimpleActivatedAbility",
-        "mage.abilities.costs.common.SacrificeSourceCost",
-        "mage.abilities.costs.common.TapSourceCost",
-        "mage.abilities.costs.mana.GenericManaCost",
-        "mage.abilities.effects.OneShotEffect",
-        "mage.cards.*",
-        "mage.constants.CardType",
-        "mage.constants.Outcome",
-        "mage.constants.Zone",
-        "mage.game.ExileZone",
-        "mage.game.Game",
-        "mage.game.permanent.Permanent",
-        "mage.players.Player",
-        "mage.util.CardUtil"
-      ],
-      "mutations_performed": [],
-      "raw_excerpt": "/**\n *\n * @author LevelX2\n */\npublic final class PyxisOfPandemonium extends CardImpl {\n    public PyxisOfPandemonium(UUID ownerId, CardSetInfo setInfo) {\n        super(ownerId, setInfo, new CardType[]{CardType.ARTIFACT}, \"{1}\");\n        this.addAbility(new SimpleActivatedAbility(\n                new PyxisOfPandemoniumExileEffect(),\n                new TapSourceCost()));\n        Ability ability = new SimpleActivatedAbility(\n                new PyxisOfPandemoniumPutOntoBattlefieldEffect(),\n                new GenericManaCost(7));\n        ability.addCost(new TapSourceCost());\n        ability.addCost(new SacrificeSourceCost());\n        this.addAbility(ability);\n    }\n    private PyxisOfPandemonium(final PyxisOfPandemonium card) {\n        super(card);\n    }\n    @Override\n    public PyxisOfPandemonium copy() {\n        return new PyxisOfPandemonium(this);\n    }\n}\nclass PyxisOfPandemoniumExileEffect extends OneShotEffect {\n    PyxisOfPandemoniumExileEffect() {\n        super(Outcome.Detriment);\n        this.staticText = \"Each player exiles the top card of their library face down\";\n    }\n    private PyxisOfPandemoniumExileEffect(final PyxisOfPandemoniumExileEffect effect) {\n        super(effect);\n    }\n    @Override\n    public PyxisOfPandemoniumExileEffect copy() {\n        return new PyxisOfPandemoniumExileEffect(this);\n    }\n    @Override\n    public boolean apply(Game game, Ability source) {\n        Player controller = game.getPlayer(source.getControllerId());\n        Permanent pyxis = game.getPermanentOrLKIBattlefield(source.getSourceId());\n        if (pyxis != null",
-      "resolution": "direct_bucket_candidate",
-      "signals": [
-        "activated_ability"
-      ],
-      "status": "found",
-      "suggested_test_scenarios": [
-        {
-          "actions": "cast or activate Pyxis of Pandemonium through the relevant supported phase",
-          "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-          "card_name": "Pyxis of Pandemonium",
-          "effect": "free_cast",
-          "id": "pyxis_of_pandemonium_1",
-          "setup": "minimal deterministic board state with legal targets and enough mana",
-          "status": "draft_requires_manual_review",
-          "title": "focused behavior scenario for free_cast"
-        }
-      ],
-      "target_classes": [],
-      "xmage_class_name": "PyxisOfPandemonium",
-      "xmage_package": "mage.cards.p",
-      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java",
-      "zones": [
-        "BATTLEFIELD"
-      ]
     }
   ],
-  "generated_at": "2026-06-30T12:41:25+00:00",
+  "generated_at": "2026-06-30T15:22:43+00:00",
   "mutations_performed": [],
   "source": {
     "kind": "lorehold_runtime_gap_family_queue",
@@ -1994,8 +1298,8 @@
   "status": "ready",
   "summary": {
     "not_found_count": 0,
-    "requested_card_count": 12,
-    "resolved_count": 12,
+    "requested_card_count": 8,
+    "resolved_count": 8,
     "xmage_class_index_size": 31747
   },
   "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"

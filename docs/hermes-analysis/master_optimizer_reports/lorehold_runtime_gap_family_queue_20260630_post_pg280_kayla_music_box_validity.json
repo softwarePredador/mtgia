@@ -37,6 +37,7 @@
           "AncientGoldDragonEffect",
           "OneShotEffect"
         ],
+        "filter_classes": [],
         "mana_cost": "{5}{W}{W}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientGoldDragon.java",
         "primary_effect": {
@@ -131,6 +132,7 @@
         "effect_classes": [
           "NonbasicLandsAreMountainsEffect"
         ],
+        "filter_classes": [],
         "mana_cost": "{2}{R}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodMoon.java",
         "primary_effect": {
@@ -201,6 +203,7 @@
           "ChandrasIgnitionEffect",
           "OneShotEffect"
         ],
+        "filter_classes": [],
         "mana_cost": "{3}{R}{R}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChandrasIgnition.java",
         "primary_effect": {
@@ -283,6 +286,7 @@
           "BoostSourceEffect",
           "ReturnFromGraveyardAtRandomEffect"
         ],
+        "filter_classes": [],
         "mana_cost": "{5}{R}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CharmbreakerDevils.java",
         "primary_effect": {
@@ -349,20 +353,27 @@
         "effect_classes": [
           "SearchLibraryPutInPlayEffect"
         ],
+        "filter_classes": [
+          "FilterCard",
+          "FilterCreatureCard"
+        ],
         "mana_cost": "{5}{R}{R}{R}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathbellowWarCry.java",
         "primary_effect": {
           "ability_kind": "one_shot",
-          "battle_model_scope": "xmage_library_search_variant_review_v1",
+          "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
           "effect": "tutor",
           "instant": false,
-          "sorcery": true,
-          "target": "library_card",
-          "target_constraints": {
-            "card_types": [
-              "creature"
-            ]
-          },
+          "max_targets": 4,
+          "min_targets": 0,
+          "requires_different_names": true,
+          "target": "minotaur_creatures_to_battlefield",
+          "target_card_types": [
+            "creature"
+          ],
+          "target_subtypes": [
+            "minotaur"
+          ],
           "tutor_destination": "battlefield"
         },
         "resolution": "direct_bucket_candidate",
@@ -431,6 +442,9 @@
         "effect_classes": [
           "KarnsSylexDestroyEffect",
           "OneShotEffect"
+        ],
+        "filter_classes": [
+          "FilterNonlandPermanent"
         ],
         "mana_cost": "{3}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnsSylex.java",
@@ -505,6 +519,10 @@
           "RestrictionEffect",
           "WishEffect"
         ],
+        "filter_classes": [
+          "FilterArtifactPermanent",
+          "FilterPermanent"
+        ],
         "mana_cost": "{4}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnTheGreatCreator.java",
         "primary_effect": {
@@ -552,95 +570,6 @@
       }
     },
     {
-      "card_name": "Leyline Dowser",
-      "checks": {
-        "focused_test_scenario_count": 1,
-        "focused_test_scenarios_present": true,
-        "mana_cost_match": null,
-        "specific_effect_candidate": true,
-        "type_match": true
-      },
-      "coherence_findings": [
-        "no_active_battle_rule"
-      ],
-      "expected": {
-        "mana_cost": null,
-        "type_line": "Artifact",
-        "types": [
-          "ARTIFACT"
-        ]
-      },
-      "oracle_hash": null,
-      "ready_for_structured_pull": true,
-      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
-      "severity": "medium",
-      "status": "ready_for_structured_xmage_pull_review_required",
-      "valid_xmage_source": true,
-      "xmage": {
-        "ability_classes": [
-          "SimpleActivatedAbility"
-        ],
-        "class_name": "LeylineDowser",
-        "condition_classes": [],
-        "cost_classes": [
-          "GenericManaCost",
-          "TapSourceCost",
-          "TapTargetCost"
-        ],
-        "effect_classes": [
-          "MillThenPutInHandEffect",
-          "UntapSourceEffect"
-        ],
-        "mana_cost": "{2}",
-        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java",
-        "primary_effect": {
-          "ability_kind": "activated",
-          "activation_cost_generic": 1,
-          "activation_requires_tap": true,
-          "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
-          "effect": "recursion",
-          "mill_count": 1,
-          "milled_card_types_to_hand": [
-            "instant",
-            "sorcery"
-          ],
-          "permanent_type": "artifact",
-          "secondary_untap_source_by_tapping_legendary_creature": true,
-          "target_constraints": {
-            "card_types": [
-              "creature"
-            ],
-            "controller_scope": "source_controller"
-          }
-        },
-        "resolution": "direct_bucket_candidate",
-        "signals": [
-          "targeting",
-          "activated_ability"
-        ],
-        "status": "found",
-        "subtypes": [],
-        "suggested_test_scenarios": [
-          {
-            "actions": "cast or activate Leyline Dowser through the relevant supported phase",
-            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-            "card_name": "Leyline Dowser",
-            "effect": "recursion",
-            "id": "leyline_dowser_1",
-            "setup": "minimal deterministic board state with legal targets and enough mana",
-            "status": "draft_requires_manual_review",
-            "title": "focused behavior scenario for recursion"
-          }
-        ],
-        "target_classes": [
-          "TargetControlledPermanent"
-        ],
-        "types": [
-          "ARTIFACT"
-        ]
-      }
-    },
-    {
       "card_name": "Naktamun Lorespinner // Wheel of Fortune",
       "checks": {
         "focused_test_scenario_count": 1,
@@ -679,6 +608,7 @@
           "DiscardHandAllEffect",
           "DrawCardAllEffect"
         ],
+        "filter_classes": [],
         "mana_cost": "{2}{R}",
         "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java",
         "primary_effect": {
@@ -717,294 +647,38 @@
           "SORCERY"
         ]
       }
-    },
-    {
-      "card_name": "Orcish Spy",
-      "checks": {
-        "focused_test_scenario_count": 1,
-        "focused_test_scenarios_present": true,
-        "mana_cost_match": null,
-        "specific_effect_candidate": true,
-        "type_match": true
-      },
-      "coherence_findings": [
-        "no_active_battle_rule"
-      ],
-      "expected": {
-        "mana_cost": null,
-        "type_line": "Creature \u2014 Orc Rogue",
-        "types": [
-          "CREATURE"
-        ]
-      },
-      "oracle_hash": null,
-      "ready_for_structured_pull": true,
-      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
-      "severity": "medium",
-      "status": "ready_for_structured_xmage_pull_review_required",
-      "valid_xmage_source": true,
-      "xmage": {
-        "ability_classes": [
-          "SimpleActivatedAbility"
-        ],
-        "class_name": "OrcishSpy",
-        "condition_classes": [],
-        "cost_classes": [
-          "TapSourceCost"
-        ],
-        "effect_classes": [
-          "LookLibraryTopCardTargetPlayerEffect"
-        ],
-        "mana_cost": "{R}",
-        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java",
-        "primary_effect": {
-          "ability_kind": "activated",
-          "activation_requires_tap": true,
-          "alternate_zone_permission": false,
-          "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
-          "effect": "topdeck_play",
-          "look_target_player_library_top_count": 3,
-          "may_cast_without_paying_mana_cost": false,
-          "play_lands_from_top_library": false,
-          "power": 1,
-          "target_constraints": {
-            "target": "player"
-          },
-          "toughness": 1
-        },
-        "resolution": "direct_bucket_candidate",
-        "signals": [
-          "targeting",
-          "activated_ability"
-        ],
-        "status": "found",
-        "subtypes": [
-          "ORC",
-          "ROGUE"
-        ],
-        "suggested_test_scenarios": [
-          {
-            "actions": "cast or activate Orcish Spy through the relevant supported phase",
-            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-            "card_name": "Orcish Spy",
-            "effect": "topdeck_play",
-            "id": "orcish_spy_1",
-            "setup": "minimal deterministic board state with legal targets and enough mana",
-            "status": "draft_requires_manual_review",
-            "title": "focused behavior scenario for topdeck_play"
-          }
-        ],
-        "target_classes": [
-          "TargetPlayer"
-        ],
-        "types": [
-          "CREATURE"
-        ]
-      }
-    },
-    {
-      "card_name": "Prototype Portal",
-      "checks": {
-        "focused_test_scenario_count": 2,
-        "focused_test_scenarios_present": true,
-        "mana_cost_match": null,
-        "specific_effect_candidate": true,
-        "type_match": true
-      },
-      "coherence_findings": [
-        "no_active_battle_rule"
-      ],
-      "expected": {
-        "mana_cost": null,
-        "type_line": "Artifact",
-        "types": [
-          "ARTIFACT"
-        ]
-      },
-      "oracle_hash": null,
-      "ready_for_structured_pull": true,
-      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
-      "severity": "medium",
-      "status": "ready_for_structured_xmage_pull_review_required",
-      "valid_xmage_source": true,
-      "xmage": {
-        "ability_classes": [
-          "EntersBattlefieldTriggeredAbility",
-          "SimpleActivatedAbility"
-        ],
-        "class_name": "PrototypePortal",
-        "condition_classes": [],
-        "cost_classes": [
-          "TapSourceCost"
-        ],
-        "effect_classes": [
-          "OneShotEffect",
-          "PrototypePortalCreateTokenEffect",
-          "PrototypePortalEffect"
-        ],
-        "mana_cost": "{4}",
-        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java",
-        "primary_effect": {
-          "ability_kind": "triggered_and_activated",
-          "activated_create_token_copy_of_imprinted_card": true,
-          "activation_requires_tap": true,
-          "activation_x_cost_source": "imprinted_card_mana_value",
-          "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
-          "effect": "token_maker",
-          "imprint_artifact_card_from_hand_on_enter": true,
-          "permanent_type": "artifact",
-          "token_copy_source": "imprinted_card"
-        },
-        "resolution": "direct_bucket_candidate",
-        "signals": [
-          "targeting",
-          "triggered_ability",
-          "activated_ability"
-        ],
-        "status": "found",
-        "subtypes": [],
-        "suggested_test_scenarios": [
-          {
-            "actions": "cast or resolve Prototype Portal",
-            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
-            "card_name": "Prototype Portal",
-            "effect": "token_maker",
-            "id": "prototype_portal_1",
-            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
-            "status": "draft_requires_manual_review",
-            "title": "create expected token count and stats"
-          },
-          {
-            "actions": "cast or resolve Prototype Portal",
-            "assertions": "expected tokens, stats, abilities and duration-limited effects match the model",
-            "card_name": "Prototype Portal",
-            "effect": "token_maker",
-            "id": "prototype_portal_2",
-            "setup": "source controller can cast the card; battlefield has representative affected/non-affected creatures if needed",
-            "status": "draft_requires_manual_review",
-            "title": "apply duration-limited protection or indestructible effect"
-          }
-        ],
-        "target_classes": [
-          "TargetCard"
-        ],
-        "types": [
-          "ARTIFACT"
-        ]
-      }
-    },
-    {
-      "card_name": "Pyxis of Pandemonium",
-      "checks": {
-        "focused_test_scenario_count": 1,
-        "focused_test_scenarios_present": true,
-        "mana_cost_match": null,
-        "specific_effect_candidate": true,
-        "type_match": true
-      },
-      "coherence_findings": [
-        "no_active_battle_rule"
-      ],
-      "expected": {
-        "mana_cost": null,
-        "type_line": "Artifact",
-        "types": [
-          "ARTIFACT"
-        ]
-      },
-      "oracle_hash": null,
-      "ready_for_structured_pull": true,
-      "reason": "Exact XMage class, compatible metadata, a specific structured effect candidate, and focused test scenarios were found; still requires implemented ManaLoom tests/review before PG promotion.",
-      "severity": "medium",
-      "status": "ready_for_structured_xmage_pull_review_required",
-      "valid_xmage_source": true,
-      "xmage": {
-        "ability_classes": [
-          "SimpleActivatedAbility"
-        ],
-        "class_name": "PyxisOfPandemonium",
-        "condition_classes": [],
-        "cost_classes": [
-          "GenericManaCost",
-          "SacrificeSourceCost",
-          "TapSourceCost"
-        ],
-        "effect_classes": [
-          "OneShotEffect",
-          "PyxisOfPandemoniumExileEffect",
-          "PyxisOfPandemoniumPutOntoBattlefieldEffect"
-        ],
-        "mana_cost": "{1}",
-        "path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java",
-        "primary_effect": {
-          "ability_kind": "activated",
-          "activated_each_player_exile_top_face_down": true,
-          "activated_put_exiled_permanents_onto_battlefield": true,
-          "activation_requires_tap": true,
-          "alternate_zone_permission": true,
-          "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
-          "effect": "free_cast",
-          "final_activation_cost_generic": 7,
-          "final_activation_requires_sacrifice": true,
-          "may_cast_without_paying_mana_cost": false,
-          "permanent_type": "artifact",
-          "put_permanent_cards_from_exile_onto_battlefield": true
-        },
-        "resolution": "direct_bucket_candidate",
-        "signals": [
-          "activated_ability"
-        ],
-        "status": "found",
-        "subtypes": [],
-        "suggested_test_scenarios": [
-          {
-            "actions": "cast or activate Pyxis of Pandemonium through the relevant supported phase",
-            "assertions": "final zones, counters, life totals, targets and event log match Oracle-backed expectation",
-            "card_name": "Pyxis of Pandemonium",
-            "effect": "free_cast",
-            "id": "pyxis_of_pandemonium_1",
-            "setup": "minimal deterministic board state with legal targets and enough mana",
-            "status": "draft_requires_manual_review",
-            "title": "focused behavior scenario for free_cast"
-          }
-        ],
-        "target_classes": [],
-        "types": [
-          "ARTIFACT"
-        ]
-      }
     }
   ],
-  "generated_at": "2026-06-30T12:41:25+00:00",
+  "generated_at": "2026-06-30T15:22:43+00:00",
   "mutations_performed": [],
   "source": {
-    "coherence_generated_at": "2026-06-30T12:41:25Z",
+    "coherence_generated_at": "2026-06-30T15:22:43Z",
     "coherence_severity_counts": {
-      "medium": 12
+      "medium": 8
     },
     "deck_id": 6,
     "external_harvest_status": null,
     "xmage_index_summary": {
       "not_found_count": 0,
-      "requested_card_count": 12,
-      "resolved_count": 12,
+      "requested_card_count": 8,
+      "resolved_count": 8,
       "xmage_class_index_size": 31747
     },
     "xmage_root": "/Users/desenvolvimentomobile/Downloads/mage-master"
   },
   "status": "ready",
   "summary": {
-    "audited_card_count": 12,
-    "exact_xmage_found_count": 12,
-    "focused_test_scenario_ready_count": 12,
+    "audited_card_count": 8,
+    "exact_xmage_found_count": 8,
+    "focused_test_scenario_ready_count": 8,
     "missing_xmage_class_count": 0,
-    "ready_for_structured_pull_count": 12,
+    "ready_for_structured_pull_count": 8,
     "severity_counts": {
-      "medium": 12
+      "medium": 8
     },
     "status_counts": {
-      "ready_for_structured_xmage_pull_review_required": 12
+      "ready_for_structured_xmage_pull_review_required": 8
     },
-    "valid_xmage_source_count": 12
+    "valid_xmage_source_count": 8
   }
 }

@@ -818,10 +818,12 @@ Runtime enablement checkpoint generated on 2026-06-30:
   superseded by
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`.
   The PG276 follow-up mapper wave reduced the Lorehold runtime manual mapper
-  backlog from `12` to `0`; PG277 through PG280 then reduced the structured
-  split-scope residual from `16` to `12` cards across eight families, so the
-  next deck-quality blocker remains exact runtime/scope work rather than
-  card-by-card identification.
+  backlog from `12` to `0`; PG277 through PG280 plus the current SQLite
+  verified/auto filter reduce the structured residual to `8` cards across six
+  families. `7` cards remain split-scope runtime work and `Deathbellow War Cry`
+  is a `batch_metadata_candidate_requires_pg_precheck` item, so the next
+  deck-quality blocker remains exact runtime/scope work rather than card-by-card
+  identification.
 - The current focus generator output is
   `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.md`.
 - The current readiness handoff is
@@ -830,7 +832,9 @@ Runtime enablement checkpoint generated on 2026-06-30:
   back to PG apply. The paired post-PG280 runtime-gap queue filters `Codex
   Shredder`, `Perpetual Timepiece`, `Chaos Wand`, `Assemble the Players`,
   `Ghoulcaller's Bell`, `Lantern of Insight`, `Possibility Storm`, and
-  `Kayla's Music Box` as current active rules.
+  `Kayla's Music Box` as current active rules; the current SQLite filter also
+  removes `Leyline Dowser`, `Orcish Spy`, `Prototype Portal`, and
+  `Pyxis of Pandemonium` as verified/auto active rules.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

@@ -421,15 +421,19 @@ PG267/PG271 runtime-rule checkpoint:
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`;
-  blocked runtime gaps are now `12`, manual mapper backlog remains `0`, and all
-  `12` remaining cards are routed to `split_family_scope_review_required`.
+  blocked runtime gaps are now `8` after current SQLite verified/auto filtering,
+  manual mapper backlog remains `0`, `7` cards remain routed to
+  `split_family_scope_review_required`, and `Deathbellow War Cry` is now a
+  `batch_metadata_candidate_requires_pg_precheck` review item.
   `Ghoulcaller's Bell` is filtered out as a current verified/auto rule after
   PG277, and `Lantern of Insight` is filtered out as a current verified/auto
   rule after PG278; `Possibility Storm` is filtered out as a current
   verified/auto rule after PG279; `Kayla's Music Box` is filtered out as a
-  current verified/auto rule after PG280. The remaining split families are `free_cast=1`,
-  `passive=2`, `recursion=2`, `board_wipe_choice=2`, `token_maker=2`,
-  `topdeck_play=1`, `draw_engine=1`, and `tutor=1`.
+  current verified/auto rule after PG280. The current filter also removes
+  `Leyline Dowser`, `Orcish Spy`, `Prototype Portal`, and `Pyxis of Pandemonium`
+  as verified/auto active rules. The remaining family counts are
+  `passive=2`, `board_wipe_choice=2`, `draw_engine=1`, `recursion=1`,
+  `token_maker=1`, and `tutor=1`.
 - Current Lorehold runtime readiness handoff after PG280:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not

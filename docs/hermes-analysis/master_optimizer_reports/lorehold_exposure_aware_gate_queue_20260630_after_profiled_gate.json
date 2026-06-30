@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-30T15:07:20Z",
-  "package_count": 22,
+  "generated_at": "2026-06-30T15:24:13Z",
+  "package_count": 25,
   "package_definition_files": [],
   "packages": [
     {
@@ -254,6 +254,252 @@
               "squee_to_graveyard": 2,
               "squee_upkeep_return": 3,
               "topdeck_manipulation_activated": 6,
+              "tutor_resolved": -1
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Enlightened Tutor"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "enlightened_access_benchmark_cut_land_tax",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages enlightened_access_benchmark_cut_land_tax --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "enlightened_access_benchmark_cut_land_tax",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Enlightened Tutor"
+            ],
+            "adds_signature": [
+              "enlightened tutor"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 18.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 9,
+                "lorehold_cost_paid": 32,
+                "lorehold_rummage_discard_to_top": 9,
+                "lorehold_spell_cast": 27,
+                "lorehold_upkeep_rummage": 18,
+                "miracle_cast": 14,
+                "topdeck_manipulation_activated": 9
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Land Tax"
+            ],
+            "cuts_signature": [
+              "land tax"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "tutor_access_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_enlightened_access_benchmark_cut_land_tax.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_enlightened_access_benchmark_cut_land_tax.md",
+            "gate_returncode": 0,
+            "package_key": "enlightened_access_benchmark_cut_land_tax",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 9,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -29,
+              "lorehold_rummage_discard_to_top": 9,
+              "lorehold_spell_cast": -24,
+              "lorehold_spell_rummage": -12,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": 0,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Gamble"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "gamble_access_benchmark_cut_land_tax",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages gamble_access_benchmark_cut_land_tax --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "gamble_access_benchmark_cut_land_tax",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "adds_signature": [
+              "gamble"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 16.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 36,
+                "lorehold_spell_cast": 30,
+                "lorehold_spell_rummage": 8,
+                "lorehold_upkeep_rummage": 4,
+                "miracle_cast": 4
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Land Tax"
+            ],
+            "cuts_signature": [
+              "land tax"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "tutor_access_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.md",
+            "gate_returncode": 0,
+            "package_key": "gamble_access_benchmark_cut_land_tax",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -25,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -21,
+              "lorehold_spell_rummage": -4,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -10,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -12,
               "tutor_resolved": -1
             }
           }
@@ -649,6 +895,260 @@
               "squee_upkeep_return": -3,
               "topdeck_manipulation_activated": -8,
               "tutor_resolved": -1
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Storm-Kiln Artist"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "storm_kiln_artist_cut_arcane_signet",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages storm_kiln_artist_cut_arcane_signet --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "spellchain_mana",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Storm-Kiln Artist"
+            ],
+            "adds_signature": [
+              "storm-kiln artist"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 20.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 1,
+                "lorehold_cost_paid": 38,
+                "lorehold_spell_cast": 29,
+                "lorehold_spell_rummage": 5,
+                "lorehold_spell_rummage_discards_squee": 1,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 8,
+                "squee_return_after_known_graveyard_entry": 1,
+                "squee_to_graveyard": 1,
+                "squee_upkeep_return": 1,
+                "topdeck_manipulation_activated": 5
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "spellchain_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000_storm_kiln_artist_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000_storm_kiln_artist_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "storm_kiln_artist_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -23,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -24,
+              "lorehold_spell_rummage": -11,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -5,
+              "random_discard_after_tutor": 0,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -2,
+              "squee_to_graveyard": -3,
+              "squee_upkeep_return": -2,
+              "topdeck_manipulation_activated": -7,
+              "tutor_resolved": -2
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Valakut Awakening // Valakut Stoneforge"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "valakut_hand_filter_cut_big_score",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages valakut_hand_filter_cut_big_score --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Big Score"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "hand_filter_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "valakut_hand_filter_cut_big_score",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Valakut Awakening // Valakut Stoneforge"
+            ],
+            "adds_signature": [
+              "valakut awakening // valakut stoneforge"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "losses": 3,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 21,
+                "lorehold_spell_cast": 16,
+                "lorehold_upkeep_rummage": 11,
+                "miracle_cast": 1,
+                "topdeck_manipulation_activated": 2
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "cuts": [
+              "Big Score"
+            ],
+            "cuts_signature": [
+              "big score"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -100.0,
+            "exposure_summary": {},
+            "family": "hand_filter_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real_valakut_hand_filter_cut_big_score.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real_valakut_hand_filter_cut_big_score.md",
+            "gate_returncode": 0,
+            "package_key": "valakut_hand_filter_cut_big_score",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -40,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -35,
+              "lorehold_spell_rummage": -12,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -13,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": -1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -10,
+              "tutor_resolved": -3
             }
           }
         ],
@@ -2236,18 +2736,10 @@
       },
       "readiness_blockers": [],
       "status": "blocked_hypothesis_queue_prior_negative"
-    },
-    {
-      "blockers": [
-        "unknown_package_definition"
-      ],
-      "decision": "not_run_unknown_package",
-      "package_key": "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
-      "status": "blocked_unknown_package_definition"
     }
   ],
   "postgres_writes": false,
-  "readiness_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
+  "readiness_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json",
   "ready_queue": [
     {
       "adds": [
@@ -2500,6 +2992,252 @@
               "squee_to_graveyard": 2,
               "squee_upkeep_return": 3,
               "topdeck_manipulation_activated": 6,
+              "tutor_resolved": -1
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Enlightened Tutor"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "enlightened_access_benchmark_cut_land_tax",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages enlightened_access_benchmark_cut_land_tax --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "enlightened_access_benchmark_cut_land_tax",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Enlightened Tutor"
+            ],
+            "adds_signature": [
+              "enlightened tutor"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 18.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "discard_to_top_replacement": 9,
+                "lorehold_cost_paid": 32,
+                "lorehold_rummage_discard_to_top": 9,
+                "lorehold_spell_cast": 27,
+                "lorehold_upkeep_rummage": 18,
+                "miracle_cast": 14,
+                "topdeck_manipulation_activated": 9
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Land Tax"
+            ],
+            "cuts_signature": [
+              "land tax"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "tutor_access_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_enlightened_access_benchmark_cut_land_tax.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_enlightened_access_benchmark_cut_land_tax.md",
+            "gate_returncode": 0,
+            "package_key": "enlightened_access_benchmark_cut_land_tax",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 9,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -29,
+              "lorehold_rummage_discard_to_top": 9,
+              "lorehold_spell_cast": -24,
+              "lorehold_spell_rummage": -12,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": 0,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": 1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -3,
+              "tutor_resolved": -4
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Gamble"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "gamble_access_benchmark_cut_land_tax",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages gamble_access_benchmark_cut_land_tax --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Land Tax"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "tutor_access_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "gamble_access_benchmark_cut_land_tax",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "adds_signature": [
+              "gamble"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 16.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 36,
+                "lorehold_spell_cast": 30,
+                "lorehold_spell_rummage": 8,
+                "lorehold_upkeep_rummage": 4,
+                "miracle_cast": 4
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Land Tax"
+            ],
+            "cuts_signature": [
+              "land tax"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "tutor_access_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real_gamble_access_benchmark_cut_land_tax.md",
+            "gate_returncode": 0,
+            "package_key": "gamble_access_benchmark_cut_land_tax",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -25,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -21,
+              "lorehold_spell_rummage": -4,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -10,
+              "random_discard_after_tutor": 1,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -12,
               "tutor_resolved": -1
             }
           }
@@ -2906,6 +3644,260 @@
     },
     {
       "adds": [
+        "Storm-Kiln Artist"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "storm_kiln_artist_cut_arcane_signet",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages storm_kiln_artist_cut_arcane_signet --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Arcane Signet"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "spellchain_mana",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "storm_kiln_artist_cut_arcane_signet",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Storm-Kiln Artist"
+            ],
+            "adds_signature": [
+              "storm-kiln artist"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 3,
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 53,
+                "lorehold_spell_rummage": 16,
+                "lorehold_spell_rummage_discards_squee": 4,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 13,
+                "squee_return_after_known_graveyard_entry": 3,
+                "squee_to_graveyard": 4,
+                "squee_upkeep_return": 3,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 20.0,
+              "losses": 2,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "graveyard_upkeep_return_self_to_hand": 1,
+                "lorehold_cost_paid": 38,
+                "lorehold_spell_cast": 29,
+                "lorehold_spell_rummage": 5,
+                "lorehold_spell_rummage_discards_squee": 1,
+                "lorehold_upkeep_rummage": 7,
+                "miracle_cast": 8,
+                "squee_return_after_known_graveyard_entry": 1,
+                "squee_to_graveyard": 1,
+                "squee_upkeep_return": 1,
+                "topdeck_manipulation_activated": 5
+              },
+              "win_rate": 33.33,
+              "wins": 1
+            },
+            "cuts": [
+              "Arcane Signet"
+            ],
+            "cuts_signature": [
+              "arcane signet"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -66.67,
+            "exposure_summary": {},
+            "family": "spellchain_mana",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000_storm_kiln_artist_cut_arcane_signet.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000_storm_kiln_artist_cut_arcane_signet.md",
+            "gate_returncode": 0,
+            "package_key": "storm_kiln_artist_cut_arcane_signet",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -23,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -24,
+              "lorehold_spell_rummage": -11,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -5,
+              "random_discard_after_tutor": 0,
+              "ritual_mana_added": 0,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": -2,
+              "squee_to_graveyard": -3,
+              "squee_upkeep_return": -2,
+              "topdeck_manipulation_activated": -7,
+              "tutor_resolved": -2
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
+        "Valakut Awakening // Valakut Stoneforge"
+      ],
+      "blockers": [],
+      "command": [
+        "python3",
+        "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py",
+        "--packages",
+        "valakut_hand_filter_cut_big_score",
+        "--games",
+        "1",
+        "--opponent-limit",
+        "3",
+        "--opponent-seed",
+        "20260626",
+        "--simulation-seed",
+        "42",
+        "--stem",
+        "lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run",
+        "--forced-access-mode",
+        "opening_hand"
+      ],
+      "command_text": "python3 /Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_synergy_package_gate.py --packages valakut_hand_filter_cut_big_score --games 1 --opponent-limit 3 --opponent-seed 20260626 --simulation-seed 42 --stem lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate_run --forced-access-mode opening_hand",
+      "cut_safety": {
+        "cuts": [],
+        "reason": "no proposed cut has previous blocker evidence",
+        "status": "clear"
+      },
+      "cuts": [
+        "Big Score"
+      ],
+      "decision": "diagnostic_only_low_exposure_requires_card_access",
+      "family": "hand_filter_benchmark",
+      "forced_access_mode": "opening_hand",
+      "hypothesis_negative": {},
+      "natural_promotion_allowed": false,
+      "package_key": "valakut_hand_filter_cut_big_score",
+      "prior_evidence": {
+        "matches": [
+          {
+            "adds": [
+              "Valakut Awakening // Valakut Stoneforge"
+            ],
+            "adds_signature": [
+              "valakut awakening // valakut stoneforge"
+            ],
+            "baseline": {
+              "avg_win_turn": 15.0,
+              "losses": 0,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 61,
+                "lorehold_spell_cast": 51,
+                "lorehold_spell_rummage": 12,
+                "lorehold_upkeep_rummage": 8,
+                "miracle_cast": 14,
+                "squee_to_graveyard": 1,
+                "topdeck_manipulation_activated": 12
+              },
+              "win_rate": 100.0,
+              "wins": 3
+            },
+            "candidate": {
+              "avg_win_turn": 0,
+              "losses": 3,
+              "stalls": 0,
+              "strategic_event_counts": {
+                "lorehold_cost_paid": 21,
+                "lorehold_spell_cast": 16,
+                "lorehold_upkeep_rummage": 11,
+                "miracle_cast": 1,
+                "topdeck_manipulation_activated": 2
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "cuts": [
+              "Big Score"
+            ],
+            "cuts_signature": [
+              "big score"
+            ],
+            "decision": "reject_or_rework",
+            "delta_pp": -100.0,
+            "exposure_summary": {},
+            "family": "hand_filter_benchmark",
+            "forced_access_mode": "none",
+            "gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real_valakut_hand_filter_cut_big_score.json",
+            "gate_markdown": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real_valakut_hand_filter_cut_big_score.md",
+            "gate_returncode": 0,
+            "package_key": "valakut_hand_filter_cut_big_score",
+            "source_report": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+            "source_section": null,
+            "strategic_delta": {
+              "birgi_spell_cast_mana": 0,
+              "damage_prevention_shield_created": 0,
+              "discard_to_top_replacement": 0,
+              "hand_to_topdeck_activation": 0,
+              "lorehold_cost_paid": -40,
+              "lorehold_rummage_discard_to_top": 0,
+              "lorehold_spell_cast": -35,
+              "lorehold_spell_rummage": -12,
+              "lorehold_spell_rummage_discard_to_top": 0,
+              "miracle_cast": -13,
+              "random_discard_after_tutor": -1,
+              "ritual_mana_added": -1,
+              "spell_cast_mana_trigger": 0,
+              "squee_return_after_known_graveyard_entry": 0,
+              "squee_to_graveyard": -1,
+              "squee_upkeep_return": 0,
+              "topdeck_manipulation_activated": -10,
+              "tutor_resolved": -3
+            }
+          }
+        ],
+        "reason": "exact package already produced `reject_or_rework`, but forced-access mode is diagnostic and still needs natural confirmation",
+        "status": "forced_access_diagnostic_despite_prior_reject"
+      },
+      "readiness_blockers": [],
+      "status": "forced_exposure_probe_ready"
+    },
+    {
+      "adds": [
         "Volcanic Vision"
       ],
       "blockers": [],
@@ -3191,34 +4183,36 @@
   "summary": {
     "actionable_added_card_readiness_count": 0,
     "blocked_added_card_readiness_count": 0,
-    "forced_exposure_probe_ready_count": 7,
+    "forced_exposure_probe_ready_count": 11,
     "natural_gate_ready_count": 0,
     "nonactionable_added_card_readiness_count": 0,
-    "package_count": 22,
+    "package_count": 25,
     "prior_inconclusive_low_exposure_keys": [
       "akromas_will_cut_avatar_wrath",
       "austere_command_wipe_over_emeria_tradeoff",
       "boros_charm_pressure_cut_avatar_wrath",
+      "enlightened_access_benchmark_cut_land_tax",
+      "gamble_access_benchmark_cut_land_tax",
       "grand_abolisher_cut_mother_of_runes",
       "hidden_retreat_stack_damage_topdeck_cut_promise",
       "perch_protection_cut_avatar_wrath",
       "pg245_twinflame_damage_payoff_cut_thor",
-      "planetarium_of_wan_shi_tong_same_lane_benchmark_cut_creative_technique",
       "plateau_timing_upgrade_cut_radiant_summit",
       "plateau_timing_upgrade_cut_turbulent_steppe",
       "seething_song_cut_fellwar_stone",
       "silence_cut_avatar_wrath",
+      "storm_kiln_artist_cut_arcane_signet",
+      "valakut_hand_filter_cut_big_score",
       "volcanic_recursion_cut_pinnacle",
       "wheel_hand_filter_cut_big_score"
     ],
-    "ready_count": 7,
-    "recommended_next_action": "run_forced_exposure_probe_before_natural_gate",
+    "ready_count": 11,
+    "recommended_next_action": "forced_exposure_diagnostic_only_review_focus_runtime_before_gate",
     "status_counts": {
       "blocked_cut_safety": 8,
       "blocked_hypothesis_queue_prior_negative": 5,
       "blocked_prior_evidence": 1,
-      "blocked_unknown_package_definition": 1,
-      "forced_exposure_probe_ready": 7
+      "forced_exposure_probe_ready": 11
     }
   }
 }

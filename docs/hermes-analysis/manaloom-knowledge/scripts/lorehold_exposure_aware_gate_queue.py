@@ -336,10 +336,10 @@ def classify_package(
 def recommended_next_action(rows: list[dict[str, Any]]) -> str:
     if any(row["status"] == "natural_gate_preflight_ready" for row in rows):
         return "run_next_natural_gate_package"
-    if any(row["status"] == "forced_exposure_probe_ready" for row in rows):
-        return "run_forced_exposure_probe_before_natural_gate"
     if any(actionable_added_card_readiness_blocker(row) for row in rows):
         return "resolve_runtime_or_pg_readiness_before_more_battles"
+    if any(row["status"] == "forced_exposure_probe_ready" for row in rows):
+        return "forced_exposure_diagnostic_only_review_focus_runtime_before_gate"
     return "no_package_ready; build_new_failure_targeted_package_or_cut_model"
 
 
