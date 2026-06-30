@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-06-30T14:31:00Z",
+  "branch": "codex/solo-consolidation-20260630",
+  "postgres_writes": false,
+  "deck_mutations": false,
+  "mapper_reconciliation": {
+    "generic_review_scope_guard": "implemented",
+    "deathbellow_exact_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+    "raw_agent2_merge": false
+  },
+  "rule_first_decisions": [
+    {
+      "card_name": "Deathbellow War Cry",
+      "decision": "closed_mapper_level",
+      "next_action": "oracle_hash_precheck_before_pg_package"
+    },
+    {
+      "card_name": "Charmbreaker Devils",
+      "decision": "deferred",
+      "reason": "random upkeep instant_or_sorcery recursion plus temporary spell-cast pump needs focused runtime"
+    },
+    {
+      "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+      "decision": "deferred",
+      "reason": "prepare condition plus wheel spell face needs prepare/MDFC/wheel scope"
+    },
+    {
+      "card_name": "Karn's Sylex",
+      "decision": "deferred",
+      "reason": "enters tapped plus pay-life/sacrifice restriction plus X board wipe"
+    },
+    {
+      "card_name": "Karn, the Great Creator",
+      "decision": "deferred",
+      "reason": "artifact activation lock plus loyalty animation plus wish/exile access"
+    }
+  ],
+  "queue_effect": {
+    "batch_metadata_candidate_requires_pg_precheck": 1,
+    "split_family_scope_review_required": 7
+  },
+  "validation": {
+    "test_xmage_to_manaloom_effect_hints": {"status": "pass", "tests": 273},
+    "semantic_batch_pipeline_validity_package_tests": {"status": "pass", "tests": 258}
+  }
+}

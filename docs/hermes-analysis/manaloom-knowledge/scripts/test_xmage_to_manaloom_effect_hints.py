@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import unittest
 
+import xmage_effect_json_batch_generator as generator
 import xmage_semantic_family_classifier as classifier
 import xmage_to_manaloom_effect_hints as hints
 
@@ -7622,6 +7623,24 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
             ),
             (
+                "DeathbellowWarCry",
+                {
+                    "effect_classes": ["SearchLibraryPutInPlayEffect"],
+                    "ability_classes": [],
+                    "cost_classes": [],
+                    "target_classes": ["TargetCardWithDifferentNameInLibrary"],
+                    "constructor_metadata": {"card_types": ["SORCERY"]},
+                    "raw_excerpt": (
+                        "new SearchLibraryPutInPlayEffect(new "
+                        "TargetCardWithDifferentNameInLibrary(0, 4, minotaurFilter)); "
+                        "FilterCreatureCard(\"Minotaur creature cards with different names\"); "
+                        "minotaurFilter.add(SubType.MINOTAUR.getPredicate());"
+                    ),
+                },
+                "tutor",
+                "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+            ),
+            (
                 "GhoulcallersBell",
                 {
                     "effect_classes": ["MillCardsEachPlayerEffect"],
@@ -7760,6 +7779,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
                 if class_name in {
+                    "DeathbellowWarCry",
                     "GhoulcallersBell",
                     "KaylasMusicBox",
                     "LanternOfInsight",
@@ -7800,6 +7820,72 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                         },
                     }
                     self.assertTrue(classifier.exact_scope_batch_safe(card))
+                if class_name == "DeathbellowWarCry":
+                    self.assertEqual(primary["target"], "minotaur_creatures_to_battlefield")
+                    self.assertEqual(primary["target_subtypes"], ["minotaur"])
+                    self.assertEqual(primary["target_card_types"], ["creature"])
+                    self.assertEqual(primary["tutor_destination"], "battlefield")
+                    self.assertEqual(primary["max_targets"], 4)
+                    self.assertEqual(primary["min_targets"], 0)
+                    self.assertTrue(primary["requires_different_names"])
+                    card = {
+                        "card_name": "Deathbellow War Cry",
+                        "ready_for_structured_pull": True,
+                        "status": "xmage_source_valid_mapper_required",
+                        "xmage": {
+                            "class_name": class_name,
+                            "types": ["SORCERY"],
+                            "ability_classes": entry.get("ability_classes", []),
+                            "effect_classes": entry.get("effect_classes", []),
+                            "cost_classes": entry.get("cost_classes", []),
+                            "target_classes": entry.get("target_classes", []),
+                            "primary_effect": primary,
+                        },
+                    }
+                    self.assertTrue(classifier.exact_scope_batch_safe(card))
+
+    def test_generic_xmage_review_scope_never_promotes_to_batch_candidate(self) -> None:
+        card = {
+            "card_name": "Blood Moon",
+            "ready_for_structured_pull": True,
+            "status": "xmage_source_valid_mapper_required",
+            "xmage": {
+                "types": ["ENCHANTMENT"],
+                "ability_classes": ["SimpleStaticAbility"],
+                "effect_classes": ["NonbasicLandsAreMountainsEffect"],
+                "primary_effect": {
+                    "effect": "passive",
+                    "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+                },
+            },
+        }
+        family = classifier.FAMILY_DEFINITIONS["passive"]
+
+        self.assertFalse(classifier.exact_scope_batch_safe(card))
+        self.assertEqual(classifier.promotion_lane(card, family), "split_family_scope_review_required")
+
+    def test_batch_generator_downgrades_stale_generic_review_batch_lane(self) -> None:
+        proposal = generator.build_proposal(
+            {
+                "card_name": "Blood Moon",
+                "normalized_name": "blood moon",
+                "family_id": "passive",
+                "effect": "passive",
+                "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+                "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+                "focused_test_scenario_count": 2,
+                "effect_json": {
+                    "effect": "passive",
+                    "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+                },
+            },
+            {"candidate_rule": {"oracle_hash": "abc123", "effect_json": {}}},
+        )
+
+        self.assertEqual(proposal["proposal_status"], "split_family_scope_review_required")
+        self.assertFalse(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["review_status"], "needs_review")
+        self.assertEqual(proposal["execution_status"], "review_only")
 
 
 if __name__ == "__main__":

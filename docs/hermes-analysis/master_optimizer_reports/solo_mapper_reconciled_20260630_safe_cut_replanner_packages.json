@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-06-30T14:32:00Z",
+  "packages": [],
+  "postgres_writes": false,
+  "purpose": "Safe-cut follow-up packages generated from ledger evidence.",
+  "source_db_mutated": false,
+  "source_ledger": "/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_learning_evidence_ledger_20260628_v6.json"
+}

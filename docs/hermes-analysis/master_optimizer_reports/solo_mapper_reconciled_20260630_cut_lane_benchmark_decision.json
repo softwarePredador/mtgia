@@ -1,0 +1,89 @@
+{
+  "benchmark_decision": {
+    "reason": "No current cut/lane model produced a gate-ready add/cut pair, and the registry runner dry run had zero queue results.",
+    "source_db_mutated": false,
+    "status": "benchmark_blocked_no_gate_ready_pair",
+    "postgres_writes": false
+  },
+  "cut_lane_models": {
+    "access": {
+      "evaluated_pair_count": 470,
+      "gate_ready_count": 0,
+      "recommended_next_action": "no_access_swap_ready; build_new_seed_safe_cut"
+    },
+    "hand_filter": {
+      "expanded_evaluated_pair_count": 445,
+      "expanded_gate_ready_count": 0,
+      "recommended_next_action": "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+    },
+    "recursion": {
+      "evaluated_pair_count": 10,
+      "gate_ready_count": 0,
+      "recommended_next_action": "do_not_gate_recursion_without_non_squee_cut_or_multi_card_package"
+    },
+    "safe_cut_replanner": {
+      "followup_count": 188,
+      "manifest_ready_count": 0
+    },
+    "tutor": {
+      "direct_gate_ready_count": 0,
+      "evaluated_pair_count": 188,
+      "recommended_next_action": "do_not_gate_direct_tutor_swap; benchmark same-access cuts or build additive package"
+    }
+  },
+  "mapper_reconciliation": {
+    "deathbellow_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+    "generic_xmage_review_scopes_batch_blocked": true,
+    "manual_reconcile_only": true
+  },
+  "registry_runner_dryrun": {
+    "execute": false,
+    "result_count": 0,
+    "status": "ready"
+  },
+  "rule_first_cards": [
+    {
+      "card": "Deathbellow War Cry",
+      "decision": "closed_at_mapper_level_waiting_oracle_hash_precheck",
+      "lane": "batch_metadata_candidate_requires_pg_precheck"
+    },
+    {
+      "card": "Charmbreaker Devils",
+      "decision": "deferred_runtime_split_required",
+      "lane": "split_family_scope_review_required"
+    },
+    {
+      "card": "Naktamun Lorespinner // Wheel of Fortune",
+      "decision": "deferred_runtime_split_required",
+      "lane": "split_family_scope_review_required"
+    },
+    {
+      "card": "Karn's Sylex",
+      "decision": "deferred_runtime_split_required",
+      "lane": "split_family_scope_review_required"
+    },
+    {
+      "card": "Karn, the Great Creator",
+      "decision": "deferred_runtime_split_required",
+      "lane": "split_family_scope_review_required"
+    }
+  ],
+  "validation": {
+    "artifact_topdeck_runtime": "PASS",
+    "deckbuilding_contract_surface_audit": "pass",
+    "lorehold_gate_tests": "52 tests OK",
+    "pg_hermes_sqlite_contract_audit_skip_pg": {
+      "pass": 29,
+      "status": "pass",
+      "warn": 3,
+      "warnings": [
+        "trusted_executable_rules_missing_oracle_hash=1418",
+        "skipped_pg",
+        "skipped_pg"
+      ]
+    },
+    "session_agent3_finisher_draw_recursion_runtime": "PASS",
+    "xmage_mapper_tests": "531 tests OK",
+    "xmage_strategy_consistency_audit": "pass"
+  }
+}
