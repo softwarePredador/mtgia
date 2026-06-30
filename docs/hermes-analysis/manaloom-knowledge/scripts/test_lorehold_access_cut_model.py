@@ -53,6 +53,19 @@ def memory_db():
             (607, "Low Exposure Topdeck Flex", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
             (
                 607,
+                "Improvisation Capstone",
+                1,
+                "draw",
+                '["draw", "exile_value"]',
+                "Sorcery - Lesson",
+                "Exile cards from the top of your library until you exile cards with total mana value 4 or greater. "
+                "You may cast any number of spells from among them without paying their mana costs.\n"
+                "Paradigm (Then exile this spell.)",
+                0,
+                0,
+            ),
+            (
+                607,
                 "Redirect Lightning",
                 1,
                 "draw",
@@ -323,6 +336,26 @@ def test_access_model_uses_oracle_to_correct_misleading_draw_tag():
     assert redirect["status"] == "blocked_cut_or_prior_evidence"
     assert "cut_cross_lane:protection" in redirect["blockers"]
     assert "cut_is_protection_shell" in redirect["blockers"]
+
+
+def test_access_model_blocks_free_cast_paradigm_core_cut():
+    with memory_db() as conn:
+        payload = model.build_model(
+            conn=conn,
+            strategy_report=strategy_report(),
+            seed_matrix_report=seed_matrix_report(),
+            candidates=["Brainstone"],
+        )
+
+    pairs = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["pair_evaluations"]
+    }
+    capstone = pairs[("Brainstone", "Improvisation Capstone")]
+    assert capstone["cut_lane"] == "spell_chain_conversion"
+    assert capstone["status"] == "blocked_cut_or_prior_evidence"
+    assert "cut_cross_lane:spell_chain_conversion" in capstone["blockers"]
+    assert "cut_is_miracle_core_big_spell" in capstone["blockers"]
 
 
 def test_access_model_records_squee_access_density_context():

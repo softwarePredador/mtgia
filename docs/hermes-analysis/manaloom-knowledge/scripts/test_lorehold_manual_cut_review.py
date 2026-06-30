@@ -5,6 +5,13 @@ from pathlib import Path
 import lorehold_manual_cut_review as review
 
 
+def test_default_safe_cut_replanner_uses_post_pg276_lane_corrected_report():
+    assert (
+        review.DEFAULT_SAFE_CUT_REPLANNER.name
+        == "lorehold_safe_cut_replanner_20260630_post_pg276_squee_access_density_lane_corrected.json"
+    )
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row

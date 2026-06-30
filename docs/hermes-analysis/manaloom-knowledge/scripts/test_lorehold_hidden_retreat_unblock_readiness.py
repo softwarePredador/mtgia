@@ -95,7 +95,7 @@ class LoreholdHiddenRetreatUnblockReadinessTest(unittest.TestCase):
     def test_default_focus_queue_uses_post_pg276_assemble_the_players_report(self):
         self.assertEqual(
             readiness.DEFAULT_FOCUS_QUEUE.name,
-            "lorehold_focus_access_package_generator_20260630_post_pg276_lane_corrected.json",
+            "lorehold_focus_access_package_generator_20260630_post_pg276_lane_core_blocked.json",
         )
 
     def test_blocks_blind_gate_when_no_preflight_or_deeper_candidate(self):

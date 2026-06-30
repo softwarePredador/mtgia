@@ -409,7 +409,7 @@ PG267/PG271 runtime-rule checkpoint:
   `mapper_metadata_or_test_scenario_required=12` and
   `split_family_scope_review_required=4`.
 - Current Lorehold runtime readiness after PG276:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_assemble_the_players.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_lane_core_blocked.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
   apply-pending; `Codex Shredder` and `Perpetual Timepiece` are filtered out of
   the runtime-gap queue as current verified/auto active rules; `Chaos Wand` is

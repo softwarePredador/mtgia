@@ -109,6 +109,12 @@ def json_list(value: object) -> list[Any]:
 
 def oracle_lane_override(row: dict[str, Any]) -> str | None:
     oracle_text = str(row.get("oracle_text") or "").lower()
+    if (
+        "without paying their mana costs" in oracle_text
+        or "exile cards from the top of your library" in oracle_text
+        or "paradigm" in oracle_text
+    ):
+        return "spell_chain_conversion"
     if "change the target of target spell or ability" in oracle_text:
         return "protection"
     if "counter target spell" in oracle_text or "counter target activated" in oracle_text:
@@ -605,6 +611,13 @@ def is_miracle_core_cut(cut: dict[str, Any]) -> bool:
     if functional_tags & {"board_wipe", "wincon"}:
         return True
     if ("Instant" in type_line or "Sorcery" in type_line) and cmc >= 4:
+        return True
+    if (
+        "without paying their mana costs" in oracle_text
+        or "exile cards from the top of your library" in oracle_text
+        or "paradigm" in oracle_text
+        or functional_tags & {"exile_value", "spell_copy", "topdeck_miracle_setup"}
+    ):
         return True
     if "instant or sorcery" in oracle_text and functional_tag in {"draw", "engine", "wincon"}:
         return True

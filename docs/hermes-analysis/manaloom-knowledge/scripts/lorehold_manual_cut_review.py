@@ -29,7 +29,9 @@ DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_cut_exposure_profile_20260628_v1.json",
 ]
 DEFAULT_EXPOSURE_PROFILE = DEFAULT_EXPOSURE_PROFILES[0]
-DEFAULT_SAFE_CUT_REPLANNER = REPORT_DIR / "lorehold_safe_cut_replanner_20260628_v4.json"
+DEFAULT_SAFE_CUT_REPLANNER = (
+    REPORT_DIR / "lorehold_safe_cut_replanner_20260630_post_pg276_squee_access_density_lane_corrected.json"
+)
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_LOREHOLD_VARIANT_DECK_IDS = tuple(range(607, 617))
 DEFAULT_BASELINE_DECK_ID = 607

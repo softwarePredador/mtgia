@@ -501,11 +501,13 @@ Cut-model baseline correction generated on 2026-06-30:
   `lorehold_safe_cut_replanner.py`, and `lorehold_manual_cut_review.py` now
   default to protected baseline deck `607`, not historical deck `6`.
 - The current corrected access model is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_corrected.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.md`.
   It evaluated deck `607` directly (`94` deck rows), found `0` preflight-ready
   access swaps, and still requires a safe cut before any battle gate. It also
   corrects misleading local draw tags by Oracle text, so `Redirect Lightning`
-  is treated as interaction/protection rather than a draw/topdeck cut. The
+  is treated as interaction/protection rather than a draw/topdeck cut; it also
+  blocks `Improvisation Capstone` as a spell-chain/free-cast/paradigm core
+  slot instead of allowing `Brainstone` to test over it as generic draw. The
   earlier PG272 Brainstone correction removed the invalid `Penance` over
   `Brainstone` path because `Brainstone` exists in deck `6`, not in protected
   deck `607`; PG275/PG276 did not change the safe-cut result.
@@ -793,9 +795,9 @@ Runtime enablement checkpoint generated on 2026-06-30:
   superseded by
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg276_lane_corrected.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg276_lane_core_blocked.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_assemble_the_players.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_lane_core_blocked.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
   back to PG apply, while `Codex Shredder` and `Perpetual Timepiece` are
   already filtered from runtime-gap work as current active rules; `Chaos Wand`
