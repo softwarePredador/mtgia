@@ -39,7 +39,7 @@ ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.da
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -135,13 +135,13 @@ def build_checks() -> list[Check]:
             XMAGE_FLOW,
             [
                 "Status: `current_operating_standard`",
-                "PG262 exact ritual runtime checkpoint",
+                "PG267 Neheb postcombat mana checkpoint",
                 CURRENT_XMAGE_MANIFEST,
-                "ready_for_structured_xmage_pull_review_required=73",
-                "xmage_source_valid_mapper_required=63",
+                "ready_for_structured_xmage_pull_review_required=70",
+                "xmage_source_valid_mapper_required=62",
                 "runtime_family_required_count=0",
             ],
-            "docs.xmage_flow_points_to_pg262",
+            "docs.xmage_flow_points_to_current_manifest",
         ),
         check_contains(
             BATTLE_RULES_CONTRACT,
@@ -180,10 +180,10 @@ def build_checks() -> list[Check]:
             XMAGE_AUDIT,
             [
                 CURRENT_XMAGE_MANIFEST,
-                '"ready_for_structured_xmage_pull_review_required": 73',
-                '"xmage_source_valid_mapper_required": 63',
-                '"mapper_metadata_or_test_scenario_required": 63',
-                '"split_family_scope_review_required": 73',
+                '"ready_for_structured_xmage_pull_review_required": 70',
+                '"xmage_source_valid_mapper_required": 62',
+                '"mapper_metadata_or_test_scenario_required": 62',
+                '"split_family_scope_review_required": 70',
             ],
             "scripts.xmage_strategy_audit_uses_current_manifest",
         ),

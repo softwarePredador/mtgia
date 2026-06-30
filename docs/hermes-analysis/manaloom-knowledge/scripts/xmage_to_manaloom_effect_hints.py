@@ -9659,6 +9659,51 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
             )
         )
 
+    if (
+        not candidates
+        and xmage_class_name == "NehebTheEternal"
+        and card_types == {"CREATURE"}
+        and effect_classes == {"DynamicManaEffect"}
+        and {"AfflictAbility", "BeginningOfPostcombatMainTriggeredAbility"}.issubset(ability_classes)
+        and not cost_classes
+        and "opponents have lost this turn" in normalized_text
+    ):
+        candidates.append(
+            _candidate(
+                effect="ramp_engine",
+                scope="postcombat_main_add_red_for_opponents_life_lost_this_turn_v1",
+                reason=(
+                    "XMage exposes Neheb's postcombat-main trigger using "
+                    "OpponentsLostLifeCount and DynamicManaEffect; ManaLoom can "
+                    "model the exact red mana burst from opponents' life lost this turn."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=False,
+                extra_effect_fields={
+                    "is_creature_permanent": True,
+                    "permanent_type": "creature",
+                    "power": 4,
+                    "toughness": 6,
+                    "afflict": 3,
+                    "trigger": "beginning_postcombat_main",
+                    "postcombat_main_add_red_for_opponents_life_lost_this_turn": True,
+                    "opponents_lost_life_this_turn": True,
+                    "mana_added_per_opponent_life_lost": 1,
+                    "produces": "R",
+                    "mana_color": "red",
+                    "dynamic_mana_amount": True,
+                    "mana_amount_source": "opponents_lost_life_count_this_turn",
+                },
+                matched_signals=[
+                    "NehebTheEternal",
+                    "BeginningOfPostcombatMainTriggeredAbility",
+                    "DynamicManaEffect",
+                    "OpponentsLostLifeCount",
+                    "AfflictAbility",
+                ],
+            )
+        )
+
     if not candidates and ("CREATURE" in card_types) and (has_mana_ability or has_mana_effect):
         candidates.append(
             _candidate(

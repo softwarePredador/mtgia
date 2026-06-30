@@ -215,6 +215,13 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "activated_targeted_protection_response",
             "timing": "activated_response",
         }
+    if effect_json.get("battle_model_scope") == "postcombat_main_add_red_for_opponents_life_lost_this_turn_v1":
+        return {
+            "category": "ramp",
+            "effect": "ramp_engine",
+            "subtype": "postcombat_life_lost_mana_trigger",
+            "timing": "beginning_postcombat_main",
+        }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             return {

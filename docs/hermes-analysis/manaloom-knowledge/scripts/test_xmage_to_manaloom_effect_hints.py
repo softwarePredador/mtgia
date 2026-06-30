@@ -198,6 +198,33 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["dynamic_mana_amount"])
         self.assertEqual(primary["produces"], "R")
 
+    def test_neheb_routes_to_exact_postcombat_life_lost_mana_engine(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "NehebTheEternal",
+                "effect_classes": ["DynamicManaEffect"],
+                "ability_classes": ["AfflictAbility", "BeginningOfPostcombatMainTriggeredAbility"],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["CREATURE"]},
+            },
+            (
+                "Afflict 3. At the beginning of your postcombat main phase, "
+                "add {R} for each 1 life your opponents have lost this turn."
+            ),
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "ramp_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "postcombat_main_add_red_for_opponents_life_lost_this_turn_v1",
+        )
+        self.assertEqual(primary["trigger"], "beginning_postcombat_main")
+        self.assertTrue(primary["opponents_lost_life_this_turn"])
+        self.assertEqual(primary["mana_added_per_opponent_life_lost"], 1)
+        self.assertEqual(primary["produces"], "R")
+
     def test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope(self) -> None:
         result = hints.build_effect_hints(
             {

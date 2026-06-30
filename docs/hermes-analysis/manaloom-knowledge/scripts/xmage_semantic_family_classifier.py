@@ -1000,6 +1000,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("back_face_status") == "annotation_only"
         )
 
+    if effect == "ramp_engine" and scope == "postcombat_main_add_red_for_opponents_life_lost_this_turn_v1":
+        return (
+            str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")
+            == "NehebTheEternal"
+            and types == {"CREATURE"}
+            and effect_classes == {"DynamicManaEffect"}
+            and {"AfflictAbility", "BeginningOfPostcombatMainTriggeredAbility"}.issubset(ability_classes)
+            and not cost_classes
+            and bool(effect_json.get("is_creature_permanent"))
+            and effect_json.get("permanent_type") == "creature"
+            and int(effect_json.get("power") or 0) == 4
+            and int(effect_json.get("toughness") or 0) == 6
+            and int(effect_json.get("afflict") or 0) == 3
+            and effect_json.get("trigger") == "beginning_postcombat_main"
+            and bool(effect_json.get("postcombat_main_add_red_for_opponents_life_lost_this_turn"))
+            and bool(effect_json.get("opponents_lost_life_this_turn"))
+            and int(effect_json.get("mana_added_per_opponent_life_lost") or 0) == 1
+            and effect_json.get("produces") == "R"
+            and effect_json.get("mana_color") == "red"
+            and bool(effect_json.get("dynamic_mana_amount"))
+            and effect_json.get("mana_amount_source") == "opponents_lost_life_count_this_turn"
+        )
+
     if (
         effect == "ramp_engine"
         and scope == "instant_sorcery_cast_red_mana_trigger_persistent_red_leaves_x_damage_annotation_v1"

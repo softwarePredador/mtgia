@@ -36328,6 +36328,72 @@ def process_precombat_main_phase_engines(player, opponents, all_players, turn, r
         )
 
 
+def process_postcombat_main_phase_engines(player, opponents, all_players, turn, rng=None, *, stack=None):
+    if not player.is_alive():
+        return 0
+
+    triggers = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "ramp_engine":
+            continue
+        if permanent.get("trigger") != "beginning_postcombat_main":
+            continue
+        if not permanent.get("postcombat_main_add_red_for_opponents_life_lost_this_turn"):
+            continue
+        if permanent.get("postcombat_main_last_trigger_turn") == turn:
+            continue
+        permanent["postcombat_main_last_trigger_turn"] = turn
+
+        def resolve_postcombat_life_lost_mana(permanent=permanent):
+            live_opponents = [
+                opponent
+                for opponent in (opponents or [])
+                if opponent is not player and getattr(opponent, "is_alive", lambda: True)()
+            ]
+            opponent_life_lost = sum(
+                opponent.life_lost_this_turn_count(turn)
+                for opponent in live_opponents
+                if hasattr(opponent, "life_lost_this_turn_count")
+            )
+            mana_per_life = max(0, int(permanent.get("mana_added_per_opponent_life_lost") or 1))
+            mana_added = max(0, opponent_life_lost * mana_per_life)
+            mana_color = str(permanent.get("mana_color") or "red").lower()
+            mana_before = player.mana_pool.snapshot()
+            if mana_added > 0:
+                player.mana_pool.add(mana_color, mana_added)
+            emit_replay_event(
+                "phase_trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_postcombat_main",
+                effect="add_mana",
+                mana_added=mana_added,
+                mana_color=mana_color,
+                mana_per_opponent_life_lost=mana_per_life,
+                opponents_life_lost_this_turn=opponent_life_lost,
+                mana_pool_before=mana_before,
+                mana_pool_after=player.mana_pool.snapshot(),
+                turn=turn,
+                phase="postcombat_main",
+                **replay_rule_fields(permanent),
+            )
+
+        resolve_or_enqueue_trigger(
+            player,
+            permanent,
+            "beginning_postcombat_main",
+            resolve_postcombat_life_lost_mana,
+            stack=stack,
+            active_player=player if stack is not None else None,
+            all_players=all_players,
+            data=replay_rule_fields(permanent),
+        )
+        triggers += 1
+    return triggers
+
+
 def process_end_step_phase_engines(active_player, all_players, turn, rng, *, stack=None):
     participants = [p for p in (all_players or []) if getattr(p, "is_alive", lambda: True)()]
     for controller in participants:
@@ -43648,7 +43714,18 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
             )
 
     # ── POSTCOMBAT MAIN ──
-    total_mana = player.available_mana()
+    process_postcombat_main_phase_engines(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        stack=stack,
+    )
+    while not stack.empty() or _pending_triggers:
+        priority_round(player, all_players, stack, turn, rng, phase="postcombat_main")
+        if turn_ended_by_effect(player):
+            return
     run_priority_loop(player, all_players, stack, turn, "postcombat_main", rng)
     if turn_ended_by_effect(player):
         return

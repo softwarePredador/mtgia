@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-29
+Updated: 2026-06-30
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -33,7 +33,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md`.
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:

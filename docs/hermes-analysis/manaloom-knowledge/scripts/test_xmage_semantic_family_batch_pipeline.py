@@ -6784,6 +6784,74 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         )
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_and_generator_mark_neheb_postcombat_mana_scope_as_batch_safe(self) -> None:
+        batch = {
+            "cards": [
+                {
+                    "card_name": "Neheb, the Eternal",
+                    "severity": "high",
+                    "oracle_hash": "nehebhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "NehebTheEternal",
+                        "path": "/xmage/NehebTheEternal.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["DynamicManaEffect"],
+                        "ability_classes": [
+                            "AfflictAbility",
+                            "BeginningOfPostcombatMainTriggeredAbility",
+                        ],
+                        "cost_classes": [],
+                        "primary_effect": {
+                            "effect": "ramp_engine",
+                            "battle_model_scope": "postcombat_main_add_red_for_opponents_life_lost_this_turn_v1",
+                            "is_creature_permanent": True,
+                            "permanent_type": "creature",
+                            "power": 4,
+                            "toughness": 6,
+                            "afflict": 3,
+                            "trigger": "beginning_postcombat_main",
+                            "postcombat_main_add_red_for_opponents_life_lost_this_turn": True,
+                            "opponents_lost_life_this_turn": True,
+                            "mana_added_per_opponent_life_lost": 1,
+                            "produces": "R",
+                            "mana_color": "red",
+                            "dynamic_mana_amount": True,
+                            "mana_amount_source": "opponents_lost_life_count_this_turn",
+                        },
+                    },
+                }
+            ]
+        }
+        family_report = classifier.build_family_report(batch)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "ramp_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit=batch,
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Neheb, the Eternal",
+                        "candidate_rule": {"oracle_hash": "nehebhash"},
+                        "external_references": {"scryfall": {"mana_cost": "{3}{R}{R}"}},
+                    }
+                ]
+            },
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "ramp")
+        self.assertEqual(
+            proposal["deck_role_json"]["subtype"],
+            "postcombat_life_lost_mana_trigger",
+        )
+
     def test_classifier_marks_birds_of_paradise_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

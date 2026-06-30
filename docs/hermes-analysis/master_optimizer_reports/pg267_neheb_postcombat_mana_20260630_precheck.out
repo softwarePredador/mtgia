@@ -1,0 +1,4 @@
+     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+--------------------+--------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Neheb, the Eternal | neheb, the eternal | 156a5b4b19a9754340b8849175270145 | battle_rule_v1:aeb836c3a1a534548dbce188e2982441 | deprecate_nonmatching_rows |                1 | d92df274-4e55-4336-b859-44a5ffb333d3 |                  2 |                         0 |                           2
+(1 row)

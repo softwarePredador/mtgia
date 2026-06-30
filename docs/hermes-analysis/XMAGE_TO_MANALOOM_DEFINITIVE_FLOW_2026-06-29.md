@@ -270,7 +270,7 @@ Subsequent runtime/promotion wave:
   `targeted_protection=8`, `passive=5`, `draw_engine=4`,
   `topdeck_play=3`, `board_wipe_choice=3`, `ramp_ritual=2`.
 
-PG262 exact ritual runtime checkpoint:
+PG262 exact ritual runtime checkpoint (historical):
 
 - PG262 was applied and synced for `Mana Geyser` and `Burnt Offering`.
 - `Mana Geyser` now uses exact scope
@@ -281,15 +281,15 @@ PG262 exact ritual runtime checkpoint:
   using the sacrificed creature mana value instead of a fixed heuristic amount.
 - PG262 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg262_exact_ritual_runtime_20260629_package.md`.
-- Current queue after PG262:
+- Queue after PG262:
   `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260629_1746_post_pg262_exact_ritual_runtime_manifest.md`.
-- Current combined severity counts:
+- PG262 combined severity counts:
   `{"critical": 1, "high": 108, "medium": 45, "pass": 637}`.
-- Current unresolved routing:
+- PG262 unresolved routing:
   `ready_for_structured_xmage_pull_review_required=73`,
   `xmage_source_valid_mapper_required=63`,
   `runtime_family_required_count=0`.
-- Current family counts include:
+- PG262 family counts include:
   `manual_model=63`, `targeted_interaction=12`, `recursion=11`, `tutor=10`,
   `free_cast=9`, `targeted_protection=8`, `ramp_permanent=6`, `passive=5`,
   `draw_engine=4`, `topdeck_play=3`, `board_wipe_choice=3`,
@@ -326,6 +326,36 @@ PG263/PG264 Lorehold runtime-gap checkpoint:
   `mapper_metadata_or_test_scenario_required=13`,
   `split_family_scope_review_required=13`,
   `safe_for_batch_pg_package_count=0`.
+
+PG267 Neheb postcombat mana checkpoint:
+
+- PG265 was applied and synced for `Lens of Clarity` with exact visibility-only
+  topdeck scope `look_top_library_any_time_and_opponent_face_down_creatures_v1`.
+- PG266 was applied and synced for `Eight-and-a-Half-Tails` with exact
+  activated protection scope
+  `creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1`.
+- PG267 was applied and synced for `Neheb, the Eternal` with exact postcombat
+  mana scope `postcombat_main_add_red_for_opponents_life_lost_this_turn_v1`.
+- PG267 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
+- Current queue after PG267:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_073000_post_pg267_neheb_manifest.md`.
+- Current combined severity counts:
+  `{"high": 105, "medium": 42, "pass": 644}`.
+- Current unresolved routing:
+  `ready_for_structured_xmage_pull_review_required=70`,
+  `xmage_source_valid_mapper_required=62`,
+  `runtime_family_required_count=0`.
+- Current family counts include:
+  `manual_model=62`, `targeted_interaction=12`, `recursion=11`, `tutor=10`,
+  `free_cast=9`, `targeted_protection=7`, `ramp_permanent=5`, `passive=5`,
+  `draw_engine=4`, `topdeck_play=2`, `board_wipe_choice=3`,
+  `copy_spell_engine=1`, `life_total_change=1`.
+- Current Lorehold runtime-gap queue:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg267_neheb.md`;
+  blocked runtime gaps are `23`, with
+  `mapper_metadata_or_test_scenario_required=13` and
+  `split_family_scope_review_required=10`.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope
