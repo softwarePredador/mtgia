@@ -1,0 +1,159 @@
+{
+  "generated_at": "2026-06-30T13:57:07Z",
+  "status": "report_only",
+  "worktree": "/Users/desenvolvimentomobile/.codex/worktrees/3dbe/mtgia",
+  "branch": "codex/session-agent-integration-validation-20260630",
+  "precommit_confirmation": {
+    "pwd": "/Users/desenvolvimentomobile/.codex/worktrees/3dbe/mtgia",
+    "branch": "codex/session-agent-integration-validation-20260630",
+    "status_short_branch": "## codex/session-agent-integration-validation-20260630"
+  },
+  "scope": {
+    "runtime_modified": false,
+    "mapper_modified": false,
+    "deck_gates_modified": false,
+    "postgres_modified": false,
+    "hermes_sqlite_modified": false,
+    "allowed_files_only": true,
+    "matrix_file_exists_in_branch": false,
+    "matrix_update_performed": false
+  },
+  "gates": [
+    {
+      "name": "pg_hermes_sqlite_contract_audit.py",
+      "status": "blocked_fail",
+      "details": [
+        "Full run failed because DATABASE_URL was not set and DB_*/PG* config was incomplete.",
+        "Skip-PG run failed because active knowledge.db was missing or empty in this worktree."
+      ]
+    },
+    {
+      "name": "workspace_contract_drift_audit.py",
+      "status": "fail",
+      "summary": {
+        "check_count": 28,
+        "pass": 27,
+        "fail": 1
+      },
+      "failure": "sqlite.active_knowledge_db_exists missing docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+    },
+    {
+      "name": "operational_surface_alignment_audit.py",
+      "status": "pass"
+    },
+    {
+      "name": "deckbuilding_contract_surface_audit.py",
+      "status": "fail",
+      "failure": "Missing docs/hermes-analysis/master_optimizer_reports/lorehold_variant_strategy_matrix_20260629_v615_mana_engine_candidate_v1.json"
+    },
+    {
+      "name": "xmage_strategy_consistency_audit.py",
+      "status": "pass",
+      "summary": {
+        "check_count": 26,
+        "pass": 26
+      }
+    },
+    {
+      "name": "lorehold_artifact_contract_audit.py",
+      "status": "fail",
+      "failure": "Default SQLite path was not a usable deck DB in this worktree: no such table deck_cards"
+    },
+    {
+      "name": "lorehold_promotion_gate_decision_audit.py",
+      "status": "fail",
+      "failure": "Default raw gate JSON files lorehold_promotion_gate_607_614_615_20260629_seed*_real8_games3.json were missing"
+    }
+  ],
+  "agents": [
+    {
+      "owner": "agent1 runtime artifact/topdeck",
+      "branches": [
+        "codex/lorehold-agent1-runtime-artifact-topdeck",
+        "codex/session-agent1-runtime-artifact-topdeck-20260630"
+      ],
+      "worktree": "/Users/desenvolvimentomobile/.codex/worktrees/1bff/mtgia",
+      "scope": "artifact/topdeck runtime test surface",
+      "dirty_files": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_artifact_topdeck_runtime.py"
+      ],
+      "commits_ahead_of_origin_master": [],
+      "risk": "low_medium"
+    },
+    {
+      "owner": "agent2 mapper static/tutor",
+      "branches": [
+        "codex/lorehold-agent2-runtime-static-wipe-tutor",
+        "codex/session-agent2-mapper-static-tutor-20260630"
+      ],
+      "scope": "static wipe/tutor mapper/runtime and PG281 evidence",
+      "commits_ahead_of_origin_master": [
+        "1bc444d37 Promote Blood Moon and Deathbellow runtime rules"
+      ],
+      "dirty_files_observed_elsewhere": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_effect_json_batch_generator.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py",
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py",
+        "untracked docs/hermes-analysis/master_optimizer_reports/*20260630*"
+      ],
+      "risk": "high"
+    },
+    {
+      "owner": "agent3 finisher/draw recursion",
+      "branches": [
+        "codex/lorehold-agent3-runtime-finisher-draw-recursion",
+        "codex/session-agent3-finisher-draw-recursion-20260630"
+      ],
+      "worktree": "/Users/desenvolvimentomobile/.codex/worktrees/7a8b/mtgia",
+      "scope": "finisher/draw/recursion runtime scopes",
+      "dirty_files": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py"
+      ],
+      "commits_ahead_of_origin_master": [
+        "fdcb1cbe Close Lorehold finisher draw recursion runtime scopes"
+      ],
+      "risk": "high"
+    },
+    {
+      "owner": "agent4 deck gates",
+      "branches": [
+        "codex/lorehold-agent4-integration-deck-gates",
+        "codex/session-agent-deck-gates-20260630"
+      ],
+      "worktree": "/Users/desenvolvimentomobile/.codex/worktrees/4650/mtgia",
+      "scope": "deck gate and cross-surface validation governance",
+      "dirty_files": [],
+      "commits_ahead_of_origin_master": [
+        "d9222a2ac Add cross-surface validation guardrails",
+        "a438531d2 Harden Lorehold deck gate integration",
+        "3c5045bfa Harden Lorehold deck gate candidate IDs"
+      ],
+      "risk": "high"
+    },
+    {
+      "owner": "integration/validation",
+      "branch": "codex/session-agent-integration-validation-20260630",
+      "worktree": "/Users/desenvolvimentomobile/.codex/worktrees/3dbe/mtgia",
+      "scope": "report-only coordination and gate status",
+      "dirty_files_before_report": [],
+      "risk": "low"
+    }
+  ],
+  "conflict_hotspots": [
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_semantic_family_classifier.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_to_manaloom_effect_hints.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_to_manaloom_effect_hints.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_variant_battle_gate.py",
+    "docs/hermes-analysis/MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md"
+  ],
+  "recommended_order": [
+    "Resolve and integrate one deck-gate governance lineage first.",
+    "Apply agent1 session test-only work if still relevant.",
+    "Reconcile agent2 and agent3 runtime/mapper overlaps together.",
+    "Rerun all global gates with DB env and active knowledge.db present.",
+    "Merge this integration report last as coordination evidence."
+  ]
+}
