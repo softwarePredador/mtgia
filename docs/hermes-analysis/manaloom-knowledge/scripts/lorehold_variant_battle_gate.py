@@ -35,11 +35,7 @@ DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_MATRIX = (
     REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
 )
-DEFAULT_CANDIDATE_DB = (
-    REPORT_DIR
-    / "lorehold_generated_candidate_20260626_pg243_strategy_first_v7"
-    / "knowledge_candidate.db"
-)
+DEFAULT_CANDIDATE_DB = None
 DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
 CARD_EXPOSURE_EVENTS = {
     "activated_ability",
@@ -330,6 +326,7 @@ def deck_specs(
     candidate_key: str = "candidate_v7",
     candidate_name: str = "Lorehold strategy-first candidate v7",
     candidate_archetype: str = "strategy-first-candidate",
+    candidate_deck_id: int = 6,
 ) -> list[dict[str, Any]]:
     metadata = load_deck_metadata(db, deck_ids)
     specs = []
@@ -342,7 +339,7 @@ def deck_specs(
             {
                 "deck_key": candidate_key,
                 "deck_id": None,
-                "load_deck_id": 6,
+                "load_deck_id": candidate_deck_id,
                 "deck_name": candidate_name,
                 "archetype": candidate_archetype,
                 "source_db": str(candidate_db),
@@ -1584,6 +1581,7 @@ def main() -> int:
     parser.add_argument("--candidate-key", default="candidate_v7")
     parser.add_argument("--candidate-name", default="Lorehold strategy-first candidate v7")
     parser.add_argument("--candidate-archetype", default="strategy-first-candidate")
+    parser.add_argument("--candidate-deck-id", type=int, default=6)
     parser.add_argument("--no-candidate", action="store_true")
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--games", type=int, default=1)
@@ -1627,6 +1625,7 @@ def main() -> int:
         candidate_key=args.candidate_key,
         candidate_name=args.candidate_name,
         candidate_archetype=args.candidate_archetype,
+        candidate_deck_id=args.candidate_deck_id,
     )
     opponent_kind, opponents = load_opponents(
         args.db,

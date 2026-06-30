@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 from collections import Counter
@@ -29,11 +30,7 @@ DEFAULT_EXPOSURE_PROFILES = [
 ]
 DEFAULT_EXPOSURE_PROFILE = DEFAULT_EXPOSURE_PROFILES[0]
 DEFAULT_SAFE_CUT_REPLANNER = REPORT_DIR / "lorehold_safe_cut_replanner_20260628_v4.json"
-DEFAULT_DB = (
-    REPORT_DIR
-    / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
-    / "knowledge_candidate.db"
-)
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_LOREHOLD_VARIANT_DECK_IDS = tuple(range(607, 617))
 
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}

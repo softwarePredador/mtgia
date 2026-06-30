@@ -2,7 +2,7 @@
 """Build and gate small Lorehold synergy packages against the current shell.
 
 The package runner is intentionally isolated: it copies a source SQLite DB,
-applies card swaps to the copied deck 6, and delegates the actual comparison to
+applies card swaps to the copied baseline deck, and delegates the actual comparison to
 ``lorehold_variant_battle_gate.py``. No source DB or PostgreSQL state is
 mutated.
 """
@@ -32,11 +32,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 CANONICAL_SNAPSHOT = SCRIPT_DIR / "known_cards_canonical_snapshot.json"
-DEFAULT_SOURCE_DB = (
-    REPORT_DIR
-    / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
-    / "knowledge_candidate.db"
-)
+DEFAULT_SOURCE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_RUNTIME_PACKAGE_PROPOSALS = (
@@ -1998,6 +1994,7 @@ def run_gate(
     source_db: Path,
     candidate_db: Path,
     package_key: str,
+    baseline_deck_id: int = 607,
     focus_cards: list[str] | None = None,
     games: int,
     opponent_limit: int,
@@ -2016,7 +2013,7 @@ def run_gate(
         "--db",
         str(source_db),
         "--deck-ids",
-        "6",
+        str(baseline_deck_id),
         "--candidate-db",
         str(candidate_db),
         "--candidate-key",
@@ -2025,6 +2022,8 @@ def run_gate(
         f"Lorehold synergy package: {package_key}",
         "--candidate-archetype",
         "synergy-package",
+        "--candidate-deck-id",
+        str(baseline_deck_id),
         "--games",
         str(games),
         "--opponent-limit",
@@ -2156,12 +2155,13 @@ def compact_gate_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def summarize_gate(report: dict[str, Any], candidate_key: str) -> dict[str, Any]:
+def summarize_gate(report: dict[str, Any], candidate_key: str, baseline_deck_id: int = 607) -> dict[str, Any]:
     rows = report.get("results") or []
     summary: dict[str, Any] = {}
+    baseline_key = f"deck_{baseline_deck_id}"
     for row in rows:
         key = str(row.get("deck_key") or "")
-        if key == "deck_6":
+        if key == baseline_key:
             summary["baseline"] = compact_gate_row(row)
         elif key == candidate_key:
             summary["candidate"] = compact_gate_row(row)
@@ -3111,6 +3111,7 @@ def main() -> int:
     parser.add_argument("--packages", default=",".join(PACKAGE_DEFINITIONS))
     parser.add_argument("--games", type=int, default=1)
     parser.add_argument("--opponent-limit", type=int, default=3)
+    parser.add_argument("--baseline-deck-id", type=int, default=607)
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
     parser.add_argument("--game-timeout-seconds", type=float, default=90.0)
@@ -3271,7 +3272,7 @@ def main() -> int:
             with connect(candidate_db) as conn:
                 candidate_meta = apply_package(
                     conn,
-                    deck_id=6,
+                    deck_id=args.baseline_deck_id,
                     adds=list(definition["adds"]),
                     cuts=list(definition["cuts"]),
                     allow_miracle_core_cuts=bool(definition.get("allow_miracle_core_cuts")),
@@ -3331,6 +3332,7 @@ def main() -> int:
             source_db=source_db,
             candidate_db=candidate_db,
             package_key=package_key,
+            baseline_deck_id=args.baseline_deck_id,
             focus_cards=list(definition["adds"]) + list(definition["cuts"]),
             games=max(1, args.games),
             opponent_limit=max(1, args.opponent_limit),
@@ -3350,6 +3352,7 @@ def main() -> int:
             gate_summary = summarize_gate(
                 load_gate_result(gate_json),
                 f"synergy_{package_key}",
+                baseline_deck_id=args.baseline_deck_id,
             )
         exposure_summary = (
             package_exposure_summary(

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 from collections import Counter
@@ -24,11 +25,7 @@ import lorehold_synergy_package_gate as package_gate
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = (
-    REPORT_DIR
-    / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
-    / "knowledge_candidate.db"
-)
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_MANUAL_REVIEW = (
     REPORT_DIR / "lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json"
 )
@@ -680,7 +677,7 @@ def build_report(
     cut_safety: dict[str, Any] | None = None,
     db_path: Path = DEFAULT_DB,
     manual_review_path: Path = DEFAULT_MANUAL_REVIEW,
-    deck_id: int = 6,
+    deck_id: int = 607,
     variant_deck_ids: Iterable[int] = DEFAULT_VARIANT_DECK_IDS,
     max_per_cut: int = 2,
 ) -> dict[str, Any]:
@@ -806,8 +803,9 @@ def build_report(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
+    generated_date = str(payload.get("generated_at") or "")[:10] or "unknown-date"
     lines = [
-        "# Lorehold Profiled Cut Benchmark Generator - 2026-06-28",
+        f"# Lorehold Profiled Cut Benchmark Generator - {generated_date}",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",

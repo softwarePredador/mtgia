@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 from collections import Counter, defaultdict
@@ -22,11 +23,7 @@ from typing import Any, Iterable
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = (
-    REPORT_DIR
-    / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
-    / "knowledge_candidate.db"
-)
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_TARGET_CARDS = [
     "Emeria's Call // Emeria, Shattered Skyclave",
     "Austere Command",

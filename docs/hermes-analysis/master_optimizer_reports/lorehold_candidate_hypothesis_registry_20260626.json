@@ -109,6 +109,13 @@
       "learning": "Past in Flames generated real spell-chain and topdeck telemetry, but the exact Pinnacle Monk cut reduced removal/pressure utility and collapsed the Winota slice. Do not promote this recursion swap in the current 607 shell."
     },
     {
+      "key": "electro_assaulting_battery_same_lane_benchmark_cut_bender_s_waterskin",
+      "swap_or_scope": "+Electro, Assaulting Battery; -Bender's Waterskin",
+      "status": "rejected_smoke",
+      "result": "smoke 6W/18L/0S vs deck_607 11W/12L/1S over 24 games after baseline/candidate deck-id fix; Electro recorded 9 use events, Bender's Waterskin recorded 8 baseline use events; Winota 0W/3L vs deck_607 2W/1L",
+      "learning": "Electro is legal and has an active ramp-engine rule, but replacing Bender's Waterskin cut the early-mana/miracle shell too hard: spell casts fell by 65, miracle casts fell by 23, discard-to-top fell by 4, and Winota collapsed. Bender's Waterskin remains protected until a same-function replacement beats deck_607."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",

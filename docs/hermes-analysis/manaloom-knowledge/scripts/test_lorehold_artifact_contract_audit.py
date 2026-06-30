@@ -106,6 +106,55 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.artifact_kind, "package_gate")
         self.assertEqual(classification.canonical_summary["package_count"], 1)
 
+    def test_profiled_cut_package_manifest_is_recognized(self) -> None:
+        payload = {
+            "source": "lorehold_profiled_cut_benchmark_generator",
+            "manual_review": "manual.md",
+            "prior_package_reports": ["past.json"],
+            "packages": [
+                {
+                    "package_key": "electro_same_lane",
+                    "adds": ["Electro, Assaulting Battery"],
+                    "cuts": ["Bender's Waterskin"],
+                    "family": "ramp",
+                    "hypothesis": "same-lane benchmark",
+                }
+            ],
+            "postgres_writes": False,
+            "source_db_mutated": False,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "manifest.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "profiled_cut_package_manifest")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
+
+    def test_exposure_aware_gate_queue_is_recognized(self) -> None:
+        payload = {
+            "readiness_report": "runtime_gap_readiness.json",
+            "summary": {
+                "natural_gate_ready_count": 0,
+                "forced_exposure_probe_ready_count": 11,
+                "recommended_next_action": "run_forced_exposure_probe_before_natural_gate",
+                "status_counts": {"forced_exposure_ready": 11},
+            },
+            "packages": [{"package_key": "probe"}],
+            "ready_queue": [{"package_key": "probe"}],
+            "postgres_writes": False,
+            "source_db_mutated": False,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "exposure_queue.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "exposure_aware_gate_queue")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["forced_exposure_probe_ready_count"], 11)
+
     def test_equal_battle_gate_checkpoint_is_recognized(self) -> None:
         payload = {
             "status": "ready",

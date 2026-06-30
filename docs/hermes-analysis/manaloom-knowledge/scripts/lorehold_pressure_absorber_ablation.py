@@ -22,6 +22,8 @@ from typing import Any
 import battle_analyst_v9 as battle
 from master_optimizer_common import REPORT_DIR, normalize_name
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
 TARGET_CARDS = [
     "Crawlspace",
@@ -465,14 +467,7 @@ def write_report(report: dict[str, Any], stem: str) -> tuple[Path, Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--db",
-        default=str(
-            REPORT_DIR
-            / "lorehold_generated_candidate_20260626_pg243_strategy_first_v7"
-            / "knowledge_candidate.db"
-        ),
-    )
+    parser.add_argument("--db", default=str(DEFAULT_DB))
     parser.add_argument("--games", type=int, default=2)
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--opponent-seed", type=int, default=20260626)

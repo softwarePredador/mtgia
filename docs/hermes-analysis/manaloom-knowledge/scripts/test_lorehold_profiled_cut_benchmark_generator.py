@@ -29,10 +29,10 @@ def build_conn() -> sqlite3.Connection:
         """
     )
     current_rows = [
-        (6, "Winds of Abandon", "removal", '["removal"]', 2, "Sorcery", "Exile target creature."),
-        (6, "Stroke of Midnight", "removal", '["removal"]', 3, "Instant", "Destroy target nonland permanent."),
-        (6, "Bender's Waterskin", "ramp", '["ramp"]', 3, "Artifact", "Mana rock."),
-        (6, "Creative Technique", "draw", '["draw"]', 5, "Sorcery", "Reveal into a free spell."),
+        (607, "Winds of Abandon", "removal", '["removal"]', 2, "Sorcery", "Exile target creature."),
+        (607, "Stroke of Midnight", "removal", '["removal"]', 3, "Instant", "Destroy target nonland permanent."),
+        (607, "Bender's Waterskin", "ramp", '["ramp"]', 3, "Artifact", "Mana rock."),
+        (607, "Creative Technique", "draw", '["draw"]', 5, "Sorcery", "Reveal into a free spell."),
     ]
     variant_rows = [
         (608, "Lightning Bolt", "removal", '["removal"]', 1, "Instant", "Deal 3 damage to any target."),
@@ -40,10 +40,12 @@ def build_conn() -> sqlite3.Connection:
         (610, "Untimely Malfunction", "removal", '["removal"]', 2, "Instant", "Destroy target artifact."),
         (611, "Red Elemental Blast", "removal", '["removal"]', 1, "Instant", "Counter target blue spell or destroy target blue permanent."),
         (612, "Mana Vault", "ramp", '["ramp"]', 1, "Artifact", "Tap to add three colorless mana."),
+        (612, "Bender's Waterskin", "ramp", '["ramp"]', 3, "Artifact", "Mana rock."),
         (612, "Chrome Mox", "ramp", '["ramp"]', 0, "Artifact", "Imprint. Tap: Add one mana of any of the exiled card's colors."),
         (613, "Storm-Kiln Artist", "ramp", '["ramp","creature"]', 4, "Creature — Dwarf Shaman", "Magecraft creates Treasure."),
         (614, "Galvanoth", "draw", '["draw"]', 5, "Creature — Beast", "May cast the top instant or sorcery without paying its mana cost."),
         (615, "Apex of Power", "draw", '["draw","payoff"]', 10, "Sorcery", "Exile seven cards and cast them this turn."),
+        (615, "Stroke of Midnight", "removal", '["removal"]', 3, "Instant", "Destroy target nonland permanent."),
         (616, "Lion's Eye Diamond", "ramp", '["ramp"]', 0, "Artifact", "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant."),
         (616, "Treasonous Ogre", "ramp", '["ramp","creature"]', 4, "Creature — Ogre Shaman", "Dethrone\nPay 3 life: Add {R}."),
         (616, "Surly Badgersaur", "ramp", '["ramp","creature"]', 4, "Creature — Dinosaur", "Whenever you discard a land card, create a Treasure token."),
@@ -151,6 +153,7 @@ def test_generator_selects_same_lane_removal_package_and_manifest():
     assert all(row["cut_role"] == "spot_removal" for row in selected)
     assert all(row["candidate_rule"]["active_rule_count"] > 0 for row in selected)
     assert all(package["cut_safety_override_reason"] for package in payload["manifest"]["packages"])
+    assert "Stroke of Midnight" not in {row["candidate"] for row in payload["top_pair_evaluations"]}
     assert "Red Elemental Blast" not in {row["candidate"] for row in selected}
     assert ("Lightning Bolt", "Stroke of Midnight") not in {
         (row["candidate"], row["cut"]) for row in selected
@@ -178,6 +181,7 @@ def test_generator_uses_cut_safety_roles_for_ramp_and_big_spell_packages():
     selected = {(row["candidate"], row["cut"], row["candidate_role"], row["cut_role"]) for row in payload["selected_pairs"]}
     assert ("Mana Vault", "Bender's Waterskin", "ramp", "ramp") in selected
     assert ("Galvanoth", "Creative Technique", "big_spell_value", "big_spell_value") in selected
+    assert "Bender's Waterskin" not in {row["candidate"] for row in payload["top_pair_evaluations"]}
     assert all(package["registry_protected_cut_override_reason"] for package in payload["manifest"]["packages"])
     package_by_cut = {
         package["cuts"][0]: package

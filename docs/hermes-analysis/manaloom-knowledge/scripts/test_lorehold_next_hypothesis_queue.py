@@ -194,3 +194,24 @@ def test_prior_negative_gate_demotes_package_from_ready_queue(tmp_path):
     assert by_key["perch_protection_cut_avatar_wrath"]["status"] == "tested_negative_do_not_promote"
     assert by_key["perch_protection_cut_avatar_wrath"]["prior_gate"]["candidate_wins"] == 1
     assert result["summary"]["tested_negative_count"] == 1
+
+
+def test_render_markdown_uses_generated_at_date_in_title():
+    payload = {
+        "generated_at": "2026-06-30T04:19:03Z",
+        "strategy_audit": "strategy.json",
+        "source_db": "knowledge.db",
+        "summary": {
+            "status_counts": {},
+            "gate_ready_count": 0,
+            "risky_same_lane_only_count": 0,
+            "tested_negative_count": 0,
+            "blocked_count": 0,
+        },
+        "queue": [],
+        "promotion_contract": {},
+    }
+
+    markdown = queue.render_markdown(payload)
+
+    assert markdown.startswith("# Lorehold Next Hypothesis Queue - 2026-06-30")

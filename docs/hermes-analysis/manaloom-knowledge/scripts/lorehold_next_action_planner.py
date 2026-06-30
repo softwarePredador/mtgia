@@ -1601,8 +1601,9 @@ def build_plan(
 
 
 def render_markdown(payload: dict[str, Any]) -> str:
+    generated_date = str(payload.get("generated_at") or "")[:10] or "unknown-date"
     lines = [
-        "# Lorehold Next Action Planner - 2026-06-28",
+        f"# Lorehold Next Action Planner - {generated_date}",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Miner report: `{payload['miner_report']}`",

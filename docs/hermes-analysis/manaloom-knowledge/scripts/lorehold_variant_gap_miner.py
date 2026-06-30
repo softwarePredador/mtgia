@@ -25,14 +25,7 @@ from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH, load_reviewe
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = Path(
-    os.environ.get(
-        "MANALOOM_KNOWLEDGE_DB",
-        REPORT_DIR
-        / "lorehold_squee_equal_gate_rerun_20260627_010256_squee_goblin_nabob"
-        / "knowledge_candidate.db",
-    )
-)
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_QUEUE_REPORT = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_BASE_DECK_ID = 6

@@ -214,6 +214,46 @@ def summarize_package_rows(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def summarize_profiled_cut_package_manifest(payload: Mapping[str, Any]) -> dict[str, Any]:
+    packages = payload.get("packages") or []
+    packages = packages if isinstance(packages, list) else []
+    valid_rows = [
+        row
+        for row in packages
+        if isinstance(row, Mapping)
+        and row.get("package_key")
+        and isinstance(row.get("adds"), list)
+        and isinstance(row.get("cuts"), list)
+    ]
+    return {
+        "source": payload.get("source"),
+        "package_count": len(packages),
+        "valid_package_row_count": len(valid_rows),
+        "prior_package_report_count": len(payload.get("prior_package_reports") or []),
+        "manual_review": payload.get("manual_review"),
+        "source_db_mutated": payload.get("source_db_mutated", False),
+        "postgres_writes": payload.get("postgres_writes", False),
+        "package_keys": [str(row.get("package_key")) for row in valid_rows],
+    }
+
+
+def summarize_exposure_aware_gate_queue(payload: Mapping[str, Any]) -> dict[str, Any]:
+    packages = payload.get("packages") or []
+    ready_queue = payload.get("ready_queue") or []
+    summary = payload.get("summary") if isinstance(payload.get("summary"), Mapping) else {}
+    return {
+        "package_count": len(packages) if isinstance(packages, list) else 0,
+        "ready_count": len(ready_queue) if isinstance(ready_queue, list) else 0,
+        "natural_gate_ready_count": as_int(summary.get("natural_gate_ready_count")),
+        "forced_exposure_probe_ready_count": as_int(summary.get("forced_exposure_probe_ready_count")),
+        "recommended_next_action": summary.get("recommended_next_action"),
+        "status_counts": summary.get("status_counts") or {},
+        "readiness_report": payload.get("readiness_report"),
+        "source_db_mutated": payload.get("source_db_mutated", False),
+        "postgres_writes": payload.get("postgres_writes", False),
+    }
+
+
 def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassification:
     keys = set(payload.keys())
     file_name = path.name
@@ -277,6 +317,33 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             schema_version="package_gate_v1",
             status="pass",
             detail="package gate; not an equal deck battle gate",
+            canonical_summary=summary,
+        )
+
+    if (
+        payload.get("source") == "lorehold_profiled_cut_benchmark_generator"
+        and "manual_review" in keys
+        and "prior_package_reports" in keys
+        and "packages" in keys
+    ):
+        summary = summarize_profiled_cut_package_manifest(payload)
+        return ArtifactClassification(
+            **base,
+            artifact_kind="profiled_cut_package_manifest",
+            schema_version="profiled_cut_package_manifest_v1",
+            status="pass" if summary["package_count"] == summary["valid_package_row_count"] else "warn",
+            detail="profiled cut benchmark package manifest",
+            canonical_summary=summary,
+        )
+
+    if "ready_queue" in keys and "readiness_report" in keys and "packages" in keys and "summary" in keys:
+        summary = summarize_exposure_aware_gate_queue(payload)
+        return ArtifactClassification(
+            **base,
+            artifact_kind="exposure_aware_gate_queue",
+            schema_version="exposure_aware_gate_queue_v1",
+            status="pass",
+            detail="exposure-aware package gate queue",
             canonical_summary=summary,
         )
 

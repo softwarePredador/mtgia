@@ -31,9 +31,49 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         args, kwargs = popen.call_args
         cmd = args[0]
         self.assertIn("--isolate-deck-process", cmd)
+        self.assertEqual(cmd[cmd.index("--deck-ids") + 1], "607")
+        self.assertEqual(cmd[cmd.index("--candidate-deck-id") + 1], "607")
         self.assertNotIn("--no-game-checkpoint", cmd)
         self.assertEqual(kwargs["env"]["PYTHONHASHSEED"], "0")
         self.assertEqual(kwargs["cwd"], str(gate.SCRIPT_DIR))
+
+    def test_run_gate_can_override_baseline_deck_id(self):
+        with patch("lorehold_synergy_package_gate.subprocess.Popen") as popen:
+            process = MagicMock()
+            process.pid = 123
+            process.returncode = 0
+            process.communicate.return_value = ("", "")
+            popen.return_value = process
+            gate.run_gate(
+                source_db=Path("/tmp/source.db"),
+                candidate_db=Path("/tmp/candidate.db"),
+                package_key="brainstone_topdeck_miracle",
+                baseline_deck_id=615,
+                games=3,
+                opponent_limit=3,
+                opponent_seed=20260626,
+                simulation_seed=42,
+                game_timeout_seconds=20.0,
+                stem="test_stem",
+            )
+
+        cmd = popen.call_args.args[0]
+        self.assertEqual(cmd[cmd.index("--deck-ids") + 1], "615")
+        self.assertEqual(cmd[cmd.index("--candidate-deck-id") + 1], "615")
+
+    def test_summarize_gate_uses_configured_baseline_deck_id(self):
+        report = {
+            "results": [
+                {"deck_key": "deck_607", "games": 2, "wins": 1, "losses": 1, "stalls": 0, "win_rate": 50.0},
+                {"deck_key": "synergy_pkg", "games": 2, "wins": 0, "losses": 2, "stalls": 0, "win_rate": 0.0},
+            ]
+        }
+
+        summary = gate.summarize_gate(report, "synergy_pkg", baseline_deck_id=607)
+
+        self.assertEqual(summary["baseline"]["wins"], 1)
+        self.assertEqual(summary["candidate"]["wins"], 0)
+        self.assertEqual(summary["delta_pp"], -50.0)
 
     def test_run_gate_can_disable_checkpoint_explicitly_for_smoke_runs(self):
         with patch("lorehold_synergy_package_gate.subprocess.Popen") as popen:

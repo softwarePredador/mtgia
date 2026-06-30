@@ -474,8 +474,22 @@ promote `candidate_607_return_the_favor_redirect_lightning_v1`; it ranked below
 `607` structurally and lost the smoke gate. Also do not promote
 `candidate_607_past_in_flames_pinnacle_monk_v1`; it generated real spell-chain
 telemetry but lost the smoke gate and collapsed Winota. The tested cards were
-exercised in battle but did not pass the promotion contract, so the protected
-baseline remains `607`.
+exercised in battle but did not pass the promotion contract. Also do not
+promote `electro_assaulting_battery_same_lane_benchmark_cut_bender_s_waterskin`;
+the corrected 607-baseline package gate exercised `Electro` but lost the smoke
+gate and collapsed Winota. The protected baseline remains `607`.
+
+Package-gate correction generated on 2026-06-30:
+
+- The package gate and profiled-cut generator were corrected to use protected
+  deck `607` as the default current shell instead of historical deck `6`.
+- `lorehold_variant_battle_gate.py` now accepts `--candidate-deck-id`; package
+  gates pass `607` so the candidate battle loads the modified `607` deck from
+  the copied candidate DB.
+- Any `lorehold_electro_waterskin_gate_20260630_20260630_042012` artifact is
+  invalid for deck promotion because it loaded the candidate from deck `6`.
+  Use the fixed gate only:
+  `lorehold_electro_waterskin_gate_20260630_fixed_20260630_042339`.
 
 Tibalt replacement decision generated on 2026-06-30:
 
@@ -577,6 +591,26 @@ Past in Flames recursion-probe decision generated on 2026-06-30:
   but this replacement does not improve the current `607` shell.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_past_in_flames_pinnacle_decision_20260630.md`.
+
+Electro ramp-benchmark decision generated on 2026-06-30:
+
+- Candidate:
+  `electro_assaulting_battery_same_lane_benchmark_cut_bender_s_waterskin`.
+- Add/cut: `+Electro, Assaulting Battery`; `-Bender's Waterskin`.
+- Scope: natural equal package gate, no forced access, 8 real opponents,
+  3 games per opponent, baseline deck `607`, candidate deck id `607`.
+- Corrected result: `607` = `11W/12L/1S`; candidate = `6W/18L/0S`.
+- Fast-pressure Winota check: `607` = `2W/1L`; candidate = `0W/3L`.
+- Direct card-use evidence: `Electro, Assaulting Battery` recorded `9` use
+  events; baseline `Bender's Waterskin` recorded `8` use events.
+- Promotion failure: candidate lost five wins, dropped miracle casts by `23`,
+  Lorehold spell casts by `65`, discard-to-top replacements by `4`, and
+  topdeck activations by `6`.
+- Decision: reject this exact same-lane ramp benchmark. `Electro` is legal and
+  battle-ready enough to test, but it is not a better replacement for
+  `Bender's Waterskin` in the current `607` shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_electro_waterskin_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell

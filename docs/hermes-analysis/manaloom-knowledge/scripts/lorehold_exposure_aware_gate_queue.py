@@ -435,8 +435,9 @@ def build_report(
 def render_markdown(report: dict[str, Any]) -> str:
     summary = report["summary"]
     sources = report.get("sources") or {}
+    generated_date = str(report.get("generated_at") or "")[:10] or "unknown-date"
     lines = [
-        "# Lorehold Exposure-Aware Gate Queue - 2026-06-28",
+        f"# Lorehold Exposure-Aware Gate Queue - {generated_date}",
         "",
         f"- Generated at: `{report['generated_at']}`",
         "- PostgreSQL writes: `false`",
