@@ -275,6 +275,31 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             }.intersection(plan["removed"])
         )
 
+    def test_past_in_flames_plan_is_recursion_spell_chain_probe(self):
+        plan = research.RESEARCH_PLANS["past_in_flames_pinnacle_monk_v1"]
+        self.assertEqual(plan["base_deck_id"], 607)
+        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_key"], "candidate_607_past_in_flames_pinnacle_monk_v1")
+        self.assertEqual(plan["added"], [{"card_name": "Past in Flames", "source_deck_id": 612}])
+        self.assertEqual(plan["removed"], ["Pinnacle Monk // Mystic Peak"])
+        self.assertIn("graveyard-recursion", plan["intent"])
+        self.assertFalse(
+            {
+                "Bender's Waterskin",
+                "Victory Chimes",
+                "Molecule Man",
+                "The Scarlet Witch",
+                "The Mind Stone",
+                "Insurrection",
+                "Storm Herd",
+                "Creative Technique",
+                "Tibalt's Trickery",
+                "Stroke of Midnight",
+                "Reforge the Soul",
+                "Mizzix's Mastery",
+            }.intersection(plan["removed"])
+        )
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

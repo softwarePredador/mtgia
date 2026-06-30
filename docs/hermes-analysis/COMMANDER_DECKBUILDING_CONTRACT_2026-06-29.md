@@ -471,9 +471,11 @@ the smoke gate but regressed Winota and miracle/discard-to-top cadence. The
 tested `candidate_607_chaos_warp_stroke_of_midnight_v1` is also rejected from
 the current evidence after losing the confirmed 72-game gate. Also do not
 promote `candidate_607_return_the_favor_redirect_lightning_v1`; it ranked below
-`607` structurally and lost the smoke gate. The tested cards were exercised in
-battle but did not pass the promotion contract, so the protected baseline
-remains `607`.
+`607` structurally and lost the smoke gate. Also do not promote
+`candidate_607_past_in_flames_pinnacle_monk_v1`; it generated real spell-chain
+telemetry but lost the smoke gate and collapsed Winota. The tested cards were
+exercised in battle but did not pass the promotion contract, so the protected
+baseline remains `607`.
 
 Tibalt replacement decision generated on 2026-06-30:
 
@@ -557,6 +559,24 @@ Return the Favor redirect/copy probe decision generated on 2026-06-30:
   does not improve the current `607` shell.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_return_the_favor_redirect_decision_20260630.md`.
+
+Past in Flames recursion-probe decision generated on 2026-06-30:
+
+- Candidate:
+  `candidate_607_past_in_flames_pinnacle_monk_v1`.
+- Structural result: rank `2`, score `141.0`, intent `100.0`, lands `34`,
+  rule-ready `97.9%`; `607` remained structurally ahead.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `8/24` versus `607` `11/24`.
+- Direct card-use evidence: `Past in Flames` had card events in `6/24` games,
+  spell-cast `4`, miracle-cast `2`, and resolved `6`.
+- Promotion failure: Winota regressed to `0/3` versus `607` `2/3`; battle
+  report removal count fell from `16` to `15`.
+- Decision: reject this exact `+Past in Flames; -Pinnacle Monk // Mystic Peak`
+  swap at smoke. The card is battle-ready and increased spell-chain telemetry,
+  but this replacement does not improve the current `607` shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_past_in_flames_pinnacle_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell

@@ -533,6 +533,29 @@ RESEARCH_PLANS = {
             "This is not a generic engine import: it must prove the copy/redirect flexibility improves 607 without reducing Winota, miracle, or topdeck cadence.",
         ],
     },
+    "past_in_flames_pinnacle_monk_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_past_in_flames_pinnacle_monk_v1",
+        "candidate_name": "Lorehold 607 + Past in Flames over Pinnacle Monk v1",
+        "candidate_archetype": "607-past-in-flames-pinnacle-monk",
+        "added": [{"card_name": "Past in Flames", "source_deck_id": 612}],
+        "removed": ["Pinnacle Monk // Mystic Peak"],
+        "intent": (
+            "Test a graveyard-recursion spell-chain sidegrade without touching "
+            "protected miracle/topdeck, ramp, protection, or finisher anchors. "
+            "Pinnacle Monk currently occupies the recursion/engine neighborhood "
+            "by returning one instant or sorcery from the graveyard; Past in "
+            "Flames turns the graveyard into a one-turn flashback engine for "
+            "multiple instants and sorceries."
+        ),
+        "external_signals": [
+            "Past in Flames appears in local Lorehold variant 612.",
+            "Local battle_card_rules has an active auto temporary-flashback rule for Past in Flames.",
+            "The frozen Lorehold matrix repeatedly reports a recursion-role shortfall, so this candidate targets a real structural gap.",
+            "External Lorehold/spellslinger references support flashback and graveyard recasting as a commander-specific support lane, but the swap still requires equal battle proof.",
+        ],
+    },
 }
 
 

@@ -102,6 +102,13 @@
       "learning": "Return the Favor is a coherent redirect/copy hypothesis, but it ranked below 607 structurally and lost the smoke gate immediately. Its extra copy mode did not offset the lost baseline slot in the current 607 shell."
     },
     {
+      "key": "candidate_607_past_in_flames_pinnacle_monk_v1",
+      "swap_or_scope": "+Past in Flames; -Pinnacle Monk // Mystic Peak",
+      "status": "rejected_smoke",
+      "result": "smoke 8W/16L/0S vs deck_607 11W/12L/1S over 24 games; Past in Flames had events in 6 games, spell-cast 4, miracle-cast 2, resolved 6; Winota 0W/3L vs deck_607 2W/1L",
+      "learning": "Past in Flames generated real spell-chain and topdeck telemetry, but the exact Pinnacle Monk cut reduced removal/pressure utility and collapsed the Winota slice. Do not promote this recursion swap in the current 607 shell."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",
