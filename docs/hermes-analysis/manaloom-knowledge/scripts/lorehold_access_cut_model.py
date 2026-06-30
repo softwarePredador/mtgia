@@ -941,7 +941,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
-    parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v2")
+    parser.add_argument("--stem", default="lorehold_access_cut_model_20260630_current")
     return parser.parse_args()
 
 

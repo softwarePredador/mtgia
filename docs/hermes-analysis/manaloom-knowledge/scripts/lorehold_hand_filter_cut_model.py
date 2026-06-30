@@ -795,7 +795,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
-    parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260628_v4_current_miner")
+    parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260630_current")
     return parser.parse_args()
 
 

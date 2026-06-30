@@ -22,7 +22,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_SYNTHESIS = REPORT_DIR / "lorehold_failure_targeted_synergy_hypotheses_20260628_v1.json"
+DEFAULT_SYNTHESIS = REPORT_DIR / "lorehold_failure_targeted_synergy_hypotheses_20260630_definitive_learning_v1.json"
 CANDIDATE_KEY = "candidate_607_squee_hashseed0_isolated_cached_timeout_v3"
 
 DEFAULT_GATE_PATHS = [
@@ -1111,7 +1111,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gate", dest="gate_paths", type=Path, action="append")
     parser.add_argument("--diagnostic-gate", dest="diagnostic_gate_paths", type=Path, action="append")
     parser.add_argument("--candidate-key", default=CANDIDATE_KEY)
-    parser.add_argument("--stem", default="lorehold_failure_targeted_trace_audit_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_failure_targeted_trace_audit_20260630_current")
     return parser.parse_args()
 
 

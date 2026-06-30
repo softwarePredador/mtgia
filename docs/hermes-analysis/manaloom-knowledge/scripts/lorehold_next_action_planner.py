@@ -26,7 +26,7 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
@@ -36,23 +36,23 @@ DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 )
 DEFAULT_HYPOTHESIS_QUEUE = (
-    REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+    REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 )
 DEFAULT_TRACE_AUDIT = (
-    REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+    REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
 )
-DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260628_v2_current_miner.json"]
+DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
-    REPORT_DIR / "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+    REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
 ]
 DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
-    REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
+    REPORT_DIR / "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
 ]
 DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
 ]
 DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS = [
-    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_generator_20260630_post_cloud_key_reject.json"
 ]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
@@ -1709,7 +1709,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mana-base-validator-report", type=Path, action="append")
     parser.add_argument("--profiled-cut-benchmark-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
-    parser.add_argument("--stem", default="lorehold_next_action_planner_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
 

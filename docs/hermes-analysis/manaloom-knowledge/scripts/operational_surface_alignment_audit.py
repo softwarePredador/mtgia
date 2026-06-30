@@ -40,6 +40,9 @@ LOREHOLD_RECURSION_CUT_MODEL = SCRIPT_DIR / "lorehold_recursion_cut_model.py"
 LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
+LOREHOLD_NEXT_ACTION_PLANNER = SCRIPT_DIR / "lorehold_next_action_planner.py"
+LOREHOLD_FAILURE_SYNERGY = SCRIPT_DIR / "lorehold_failure_targeted_synergy_hypotheses.py"
+LOREHOLD_FAILURE_TRACE = SCRIPT_DIR / "lorehold_failure_targeted_trace_audit.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
@@ -285,6 +288,31 @@ def build_checks() -> list[Check]:
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
             ["lorehold_runtime_gap_family_queue_20260630_definitive_learning_v1.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
+        ),
+        check_contains(
+            LOREHOLD_NEXT_ACTION_PLANNER,
+            [
+                "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
+                "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json",
+                "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json",
+                "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json",
+                "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json",
+                "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json",
+            ],
+            "scripts.lorehold_next_action_planner_uses_current_learning_inputs",
+        ),
+        check_contains(
+            LOREHOLD_FAILURE_SYNERGY,
+            [
+                "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
+                "lorehold_next_action_planner_20260630_after_profiled_gate.json",
+            ],
+            "scripts.lorehold_failure_synergy_uses_current_queue_and_planner",
+        ),
+        check_contains(
+            LOREHOLD_FAILURE_TRACE,
+            ["lorehold_failure_targeted_synergy_hypotheses_20260630_definitive_learning_v1.json"],
+            "scripts.lorehold_failure_trace_uses_current_synthesis",
         ),
         check_contains(
             IDEAL_MATRIX,

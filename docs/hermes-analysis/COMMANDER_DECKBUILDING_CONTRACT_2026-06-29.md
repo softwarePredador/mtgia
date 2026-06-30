@@ -621,6 +621,28 @@ Past in Flames recursion-probe decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_past_in_flames_pinnacle_decision_20260630.md`.
 
+Access-density from-scratch decision generated on 2026-06-30:
+
+- Candidate:
+  `challenger_lorehold_access_density_control_v1`.
+- Purpose: test whether the weak-seed access issue could be repaired by a full
+  shell that preserves the protected `607` miracle engine while adding both
+  `Enlightened Tutor` and `Gamble`.
+- Structural result: legal 100-card challenger with no missing required cards,
+  but the matrix flagged overfilled `topdeck_miracle_setup`, `hand_filter`,
+  `spell_chain_conversion`, and `graveyard_recursion`.
+- Natural smoke result against fixed `607`: candidate `0/4` versus `607`
+  `1/4`; the tutors did not naturally appear enough to prove card-level impact.
+- Forced tutor-access result with `Enlightened Tutor|Gamble` in opening hand:
+  candidate still `0/4` versus `607` `1/4`; `Enlightened Tutor` was accessed
+  `4/4`, cast `3`, resolved `4`, while `Gamble` was accessed `4/4`, cast `3`,
+  resolved `2`.
+- Decision: reject this exact from-scratch access-density shell. More access
+  alone is not sufficient evidence; future tutor work must use a smaller
+  same-lane package or a seed-safe cut model, not a broad overfilled shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_density_control_decision_20260630_goal_current.md`.
+
 Electro ramp-benchmark decision generated on 2026-06-30:
 
 - Candidate:

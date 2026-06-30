@@ -353,6 +353,16 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ("card_exposure_profile", {"card_profiles", "scan_summary"}, "card exposure profile"),
         ("battle_forensic", {"replay_files", "rule_findings", "turn_findings"}, "battle forensic report"),
         ("canonical_snapshot", {"canonical_decisions", "cards", "local_summary"}, "canonical snapshot"),
+        (
+            "from_scratch_challenger_summary",
+            {"candidates", "corpus_deck_ids", "fixed_opponent_deck_id_for_gate", "protected_baseline_deck_id"},
+            "from-scratch challenger summary",
+        ),
+        (
+            "from_scratch_challenger_candidate",
+            {"battle_gate_command", "candidate_key", "final_deck", "mode", "protected_baseline_deck_id"},
+            "from-scratch challenger candidate",
+        ),
         ("generated_candidate", {"final_deck", "validation", "candidate_hash"}, "generated candidate"),
         ("generator_source_mix", {"runtime_source_mix_counts", "total_card_entries"}, "generator source mix"),
         ("cut_model", {"pair_evaluations", "top_pair_evaluations", "guardrails"}, "cut model"),

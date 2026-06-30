@@ -4,8 +4,12 @@ import lorehold_next_action_planner as planner
 
 
 def test_defaults_use_current_cut_models():
-    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260628_v2_current_miner.json"
-    assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_post_pg276_lane_core_blocked.json"
+    assert planner.DEFAULT_HYPOTHESIS_QUEUE.name == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
+    assert planner.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
+    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.json"
+    assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
+    assert planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0].name == "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
 
 
 def miner_report():

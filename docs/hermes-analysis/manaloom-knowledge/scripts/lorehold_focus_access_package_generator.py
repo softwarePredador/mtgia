@@ -70,6 +70,13 @@ PROTECTED_CARDS = {
     "Land Tax",
     "Boros Signet",
 }
+ACCESS_DENSITY_CANDIDATE_KEYS = {
+    "brainstone",
+    "penance",
+    "hidden retreat",
+    "enlightened tutor",
+    "gamble",
+}
 
 RUNTIME_READY_CANDIDATE_STATUSES = {
     "runtime_ready_unexplored",
@@ -611,6 +618,7 @@ def blocked_rows_for_work(work_key: str, package_candidates: list[dict[str, Any]
             row
             for row in package_candidates
             if row.get("target_failure_mode") == "squee_graveyard_entry_route"
+            and card_key(row.get("add_card")) in ACCESS_DENSITY_CANDIDATE_KEYS
             and row.get("status") in {"blocked_no_safe_cut", "blocked_protected_cut"}
         ]
     return []
@@ -1051,7 +1059,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
     parser.add_argument("--runtime-gap-queue", type=Path, default=DEFAULT_RUNTIME_GAP_QUEUE)
     parser.add_argument("--hand-filter-cut-model", type=Path, default=DEFAULT_HAND_FILTER_CUT_MODEL)
-    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260628_v3")
+    parser.add_argument("--stem", default="lorehold_focus_access_package_generator_20260630_current")
     return parser.parse_args()
 
 

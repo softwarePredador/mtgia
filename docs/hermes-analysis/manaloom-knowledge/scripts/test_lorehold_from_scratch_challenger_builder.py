@@ -10,6 +10,7 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
         self.assertEqual(
             set(builder.CHALLENGER_PLANS),
             {
+                "access_density_control",
                 "miracle_topdeck_control",
                 "spellchain_big_sorcery",
                 "recursion_discard_engine",

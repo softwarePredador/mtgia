@@ -132,6 +132,35 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
 
+    def test_from_scratch_challenger_artifacts_are_recognized(self) -> None:
+        summary_payload = {
+            "candidates": [{"candidate_key": "challenger_lorehold_access_density_control_v1"}],
+            "corpus_deck_ids": [607, 608],
+            "fixed_opponent_deck_id_for_gate": 607,
+            "protected_baseline_deck_id": 607,
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "status": "ready",
+        }
+        candidate_payload = {
+            "battle_gate_command": ["python3", "gate.py"],
+            "candidate_key": "challenger_lorehold_access_density_control_v1",
+            "final_deck": [{"card_name": "Lorehold, the Historian"}],
+            "mode": "from_scratch",
+            "protected_baseline_deck_id": 607,
+            "postgres_writes": False,
+            "source_db_mutated": False,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = audit.classify_payload(Path(tmp) / "summary.json", summary_payload)
+            candidate = audit.classify_payload(Path(tmp) / "candidate.json", candidate_payload)
+
+        self.assertEqual(summary.artifact_kind, "from_scratch_challenger_summary")
+        self.assertEqual(summary.status, "pass")
+        self.assertEqual(candidate.artifact_kind, "from_scratch_challenger_candidate")
+        self.assertEqual(candidate.status, "pass")
+
     def test_focus_decision_wrapper_is_recognized(self) -> None:
         payload = {
             "generated_at": "2026-06-30T00:00:00Z",

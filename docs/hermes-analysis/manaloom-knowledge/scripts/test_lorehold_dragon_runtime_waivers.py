@@ -39,7 +39,7 @@ def test_lorehold_dragon_waivers_resolve_to_executable_runtime_rules():
     assert twinflame["battle_model_scope"] == (
         "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
     )
-    assert twinflame["_rule_logical_key"] == "battle_rule_v1:072370a98c9b332eef021390bfc1694a"
+    assert twinflame["_rule_logical_key"] == "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c"
     assert twinflame["_rule_oracle_hash"] == "e4ca0585f743b1c34c36649bfbb1fff6"
     assert twinflame["_rule_review_status"] == "verified"
     assert twinflame["_rule_execution_status"] == "auto"
@@ -50,7 +50,7 @@ def test_lorehold_dragon_waivers_resolve_to_executable_runtime_rules():
     assert terror["trigger_effect"] == "damage_any_target"
     assert terror["trigger_damage_amount_source"] == "entering_creature_power"
     assert terror["trigger_another_creature_you_control_enters"] is True
-    assert terror["_rule_logical_key"] == "battle_rule_v1:b495892461d2521bc633d7e9ab5cd443"
+    assert terror["_rule_logical_key"] == "battle_rule_v1:ae8cab02963098960997301b3c227a80"
     assert terror["_rule_oracle_hash"] == "90c007ac59cdd400f58e89c47d81440e"
     assert terror["_rule_review_status"] == "verified"
     assert terror["_rule_execution_status"] == "auto"

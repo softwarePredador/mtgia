@@ -3,6 +3,13 @@ import json
 import lorehold_failure_targeted_trace_audit as audit
 
 
+def test_default_synthesis_uses_current_learning_report():
+    assert (
+        audit.DEFAULT_SYNTHESIS.name
+        == "lorehold_failure_targeted_synergy_hypotheses_20260630_definitive_learning_v1.json"
+    )
+
+
 def write_json(path, payload):
     path.write_text(json.dumps(payload), encoding="utf-8")
     return path

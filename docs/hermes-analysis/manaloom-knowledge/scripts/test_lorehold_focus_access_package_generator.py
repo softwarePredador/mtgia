@@ -256,6 +256,27 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
 
 
+def test_squee_access_density_work_does_not_count_generic_recursion_packages():
+    rows = [
+        {
+            "target_failure_mode": "squee_graveyard_entry_route",
+            "status": "blocked_no_safe_cut",
+            "add_card": "Volcanic Vision",
+            "cut_card": "Pinnacle Monk // Mystic Peak",
+        },
+        {
+            "target_failure_mode": "squee_graveyard_entry_route",
+            "status": "blocked_no_safe_cut",
+            "add_card": "Gamble",
+            "cut_card": "Land Tax",
+        },
+    ]
+
+    blocked = gen.blocked_rows_for_work("squee_access_density_model", rows)
+
+    assert [row["add_card"] for row in blocked] == ["Gamble"]
+
+
 def test_zero_runtime_gap_queue_drops_runtime_work_from_operational_priority():
     pairing = {
         "candidate": "Gamble",

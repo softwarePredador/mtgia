@@ -27,10 +27,10 @@ DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 )
 DEFAULT_HYPOTHESIS_QUEUE = (
-    REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+    REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 )
 DEFAULT_NEXT_ACTION_PLANNER = (
-    REPORT_DIR / "lorehold_next_action_planner_20260628_v11_strategy_synthesis.json"
+    REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 )
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 
@@ -559,7 +559,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--next-action-planner", type=Path, default=DEFAULT_NEXT_ACTION_PLANNER)
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
-    parser.add_argument("--stem", default="lorehold_failure_targeted_synergy_hypotheses_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_failure_targeted_synergy_hypotheses_20260630_current")
     return parser.parse_args()
 
 
