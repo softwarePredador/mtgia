@@ -1,0 +1,200 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg281_artifact_topdeck_agent1_20260630_20260630_133609",
+  "deploy_id": "pg281",
+  "expected_rules": [
+    {
+      "card_name": "Leyline Dowser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8c65b5b5f3bb5683f8b944f864284ac",
+      "min_rule_version": 2,
+      "normalized_name": "leyline dowser",
+      "oracle_hash": "763c7f1b28df8d4a0cd0957cecb52929",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
+        "effect": "passive"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orcish Spy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
+      "min_rule_version": 2,
+      "normalized_name": "orcish spy",
+      "oracle_hash": "3db8959a9384e0c35d17fe89ad50d2da",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_look_top_three_target_player_library_v1",
+        "effect": "topdeck_play"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prototype Portal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d4479197c6e201840dd9a929ea5945",
+      "min_rule_version": 2,
+      "normalized_name": "prototype portal",
+      "oracle_hash": "14a3433526473af8426745e64f3ad35a",
+      "required_effect_fields": {
+        "battle_model_scope": "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1",
+        "effect": "passive"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyxis of Pandemonium",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b232f0d7c82204280509251715881187",
+      "min_rule_version": 2,
+      "normalized_name": "pyxis of pandemonium",
+      "oracle_hash": "2cb0261a10477dc1aa31d444646d248f",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1",
+        "effect": "passive"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "free_cast": 1,
+    "recursion": 1,
+    "token_maker": 1,
+    "topdeck_play": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg281_artifact_topdeck_agent1_20260630_rollback.sql"
+  },
+  "generated_at": "2026-06-30T13:36:09+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Leyline Dowser"
+      },
+      "card_name": "Leyline Dowser",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8c65b5b5f3bb5683f8b944f864284ac",
+      "normalized_name": "leyline dowser",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
+        "effect": "passive"
+      }
+    },
+    {
+      "card": {
+        "name": "Orcish Spy"
+      },
+      "card_name": "Orcish Spy",
+      "effect": "topdeck_play",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
+      "normalized_name": "orcish spy",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_look_top_three_target_player_library_v1",
+        "effect": "topdeck_play"
+      }
+    },
+    {
+      "card": {
+        "name": "Prototype Portal"
+      },
+      "card_name": "Prototype Portal",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d4479197c6e201840dd9a929ea5945",
+      "normalized_name": "prototype portal",
+      "required_effect_fields": {
+        "battle_model_scope": "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1",
+        "effect": "passive"
+      }
+    },
+    {
+      "card": {
+        "name": "Pyxis of Pandemonium"
+      },
+      "card_name": "Pyxis of Pandemonium",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b232f0d7c82204280509251715881187",
+      "normalized_name": "pyxis of pandemonium",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1",
+        "effect": "passive"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Leyline Dowser",
+    "Orcish Spy",
+    "Prototype Portal",
+    "Pyxis of Pandemonium"
+  ],
+  "selected_count": 4,
+  "slug": "artifact_topdeck_agent1_20260630",
+  "snapshot_checks": [
+    {
+      "card_name": "Leyline Dowser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8c65b5b5f3bb5683f8b944f864284ac",
+      "min_rule_version": 2,
+      "normalized_name": "leyline dowser",
+      "oracle_hash": "763c7f1b28df8d4a0cd0957cecb52929",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orcish Spy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
+      "min_rule_version": 2,
+      "normalized_name": "orcish spy",
+      "oracle_hash": "3db8959a9384e0c35d17fe89ad50d2da",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_look_top_three_target_player_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prototype Portal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:60d4479197c6e201840dd9a929ea5945",
+      "min_rule_version": 2,
+      "normalized_name": "prototype portal",
+      "oracle_hash": "14a3433526473af8426745e64f3ad35a",
+      "required_effect_fields": {
+        "battle_model_scope": "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyxis of Pandemonium",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b232f0d7c82204280509251715881187",
+      "min_rule_version": 2,
+      "normalized_name": "pyxis of pandemonium",
+      "oracle_hash": "2cb0261a10477dc1aa31d444646d248f",
+      "required_effect_fields": {
+        "battle_model_scope": "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

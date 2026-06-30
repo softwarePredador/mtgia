@@ -229,6 +229,7 @@ def classify_card(
             "effect_classes": xmage_card.get("effect_classes") or [],
             "cost_classes": xmage_card.get("cost_classes") or [],
             "target_classes": xmage_card.get("target_classes") or [],
+            "filter_classes": xmage_card.get("filter_classes") or [],
             "condition_classes": xmage_card.get("condition_classes") or [],
             "subtypes": metadata.get("subtypes") or [],
             "signals": xmage_card.get("signals") or [],

@@ -18438,6 +18438,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f76564d35e8cbcd2be2bb75b3381d499"
   },
+  "Leyline Dowser": {
+    "ability_kind": "activated",
+    "activated_self_mill_count": 1,
+    "activation_cost_generic": 1,
+    "activation_requires_tap": true,
+    "battle_model_scope": "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
+    "effect": "passive",
+    "graveyard_to_hand_target": "milled_instant_or_sorcery_this_way",
+    "mill_count": 1,
+    "milled_card_types_to_hand": [
+      "instant",
+      "sorcery"
+    ],
+    "permanent_type": "artifact",
+    "secondary_untap_source_by_tapping_legendary_creature": true,
+    "self_mill_activation_requires_tap": true,
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller_scope": "source_controller"
+    },
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8c65b5b5f3bb5683f8b944f864284ac",
+    "battle_rule_oracle_hash": "763c7f1b28df8d4a0cd0957cecb52929"
+  },
   "Leyline of Abundance": {
     "ability_kind": "static",
     "activated_counter_ability_not_modeled": true,
@@ -22795,6 +22825,28 @@
     "battle_rule_logical_key": "battle_rule_v1:3928f623fa6bea3e5c2fac2983d8df26",
     "battle_rule_oracle_hash": "b63a428ffc3dff109028c603c0f54923"
   },
+  "Orcish Spy": {
+    "ability_kind": "activated",
+    "activation_requires_tap": true,
+    "alternate_zone_permission": false,
+    "battle_model_scope": "tap_look_top_three_target_player_library_v1",
+    "effect": "topdeck_play",
+    "look_target_player_library_top_count": 3,
+    "may_cast_without_paying_mana_cost": false,
+    "play_lands_from_top_library": false,
+    "power": 1,
+    "target_constraints": {
+      "target": "player"
+    },
+    "toughness": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
+    "battle_rule_oracle_hash": "3db8959a9384e0c35d17fe89ad50d2da"
+  },
   "Orim's Chant": {
     "battle_model_scope": "orims_chant_kicker_attack_prevention_v1",
     "effect": "silence_spell",
@@ -24642,6 +24694,24 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8e724d64deb66b7fbdf3b9a3f4dbe5f0"
   },
+  "Prototype Portal": {
+    "ability_kind": "triggered_and_activated",
+    "activated_create_token_copy_of_imprinted_card": true,
+    "activation_requires_tap": true,
+    "activation_x_cost_source": "imprinted_card_mana_value",
+    "battle_model_scope": "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1",
+    "effect": "passive",
+    "imprint_artifact_card_from_hand_on_enter": true,
+    "permanent_type": "artifact",
+    "token_copy_source": "imprinted_card",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:60d4479197c6e201840dd9a929ea5945",
+    "battle_rule_oracle_hash": "14a3433526473af8426745e64f3ad35a"
+  },
   "Providence": {
     "cmc": 7.0,
     "effect": "finisher",
@@ -24859,6 +24929,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:007966224685ef74fe530ed78bcb8f84",
     "battle_rule_oracle_hash": "a87d2dc7618186343d2ecaf662405c11"
+  },
+  "Pyxis of Pandemonium": {
+    "ability_kind": "activated",
+    "activated_each_player_exile_top_face_down": true,
+    "activated_put_exiled_permanents_onto_battlefield": true,
+    "activation_requires_tap": true,
+    "alternate_zone_permission": true,
+    "battle_model_scope": "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1",
+    "effect": "passive",
+    "final_activation_cost_generic": 7,
+    "final_activation_requires_sacrifice": true,
+    "may_cast_without_paying_mana_cost": false,
+    "permanent_type": "artifact",
+    "put_permanent_cards_from_exile_onto_battlefield": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b232f0d7c82204280509251715881187",
+    "battle_rule_oracle_hash": "2cb0261a10477dc1aa31d444646d248f"
   },
   "Quandrix Campus": {
     "effect": "land",

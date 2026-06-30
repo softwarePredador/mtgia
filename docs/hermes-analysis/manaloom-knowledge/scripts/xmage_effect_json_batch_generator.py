@@ -155,6 +155,31 @@ def merged_effect_json(card: dict[str, Any], external_card: dict[str, Any] | Non
 
 def runtime_effect_json(card: dict[str, Any], effect_json: dict[str, Any]) -> dict[str, Any]:
     family_id = str(card.get("family_id") or "")
+    scope = str(effect_json.get("battle_model_scope") or "")
+    if scope == "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1":
+        runtime_json = dict(effect_json)
+        runtime_json["effect"] = "passive"
+        runtime_json["activated_self_mill_count"] = int(
+            runtime_json.get("activated_self_mill_count")
+            or runtime_json.get("mill_count")
+            or 1
+        )
+        runtime_json["self_mill_activation_requires_tap"] = bool(
+            runtime_json.get("activation_requires_tap", True)
+        )
+        runtime_json["graveyard_to_hand_target"] = "milled_instant_or_sorcery_this_way"
+        return runtime_json
+    if scope == "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1":
+        runtime_json = dict(effect_json)
+        runtime_json["effect"] = "passive"
+        return runtime_json
+    if (
+        scope
+        == "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1"
+    ):
+        runtime_json = dict(effect_json)
+        runtime_json["effect"] = "passive"
+        return runtime_json
     if family_id != "modal_mana_rock":
         return effect_json
     if str(effect_json.get("effect") or "") != "mana_rock_with_sacrifice_draw":
@@ -258,6 +283,36 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "effect": "free_cast",
             "subtype": "play_from_exile_normal_cost",
             "timing": "activated_alternate_zone_permission",
+        }
+    if (
+        effect_json.get("battle_model_scope")
+        == "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1"
+    ):
+        return {
+            "category": "combo_value",
+            "effect": "free_cast",
+            "subtype": "source_exile_then_put_permanents_onto_battlefield",
+            "timing": "activated_alternate_zone_permission",
+        }
+    if (
+        effect_json.get("battle_model_scope")
+        == "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1"
+    ):
+        return {
+            "category": "payoff",
+            "effect": "token_maker",
+            "subtype": "artifact_imprint_copy_token",
+            "timing": "triggered_and_activated",
+        }
+    if (
+        effect_json.get("battle_model_scope")
+        == "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1"
+    ):
+        return {
+            "category": "recursion",
+            "effect": "recursion",
+            "subtype": "mill_one_spell_to_hand_utility_artifact",
+            "timing": "activated",
         }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):

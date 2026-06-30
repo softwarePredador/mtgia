@@ -7692,7 +7692,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "recursion",
-                "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+                "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
             ),
             (
                 "OrcishSpy",
@@ -7704,7 +7704,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["CREATURE"]},
                 },
                 "topdeck_play",
-                "xmage_tap_look_top_three_target_player_library_review_v1",
+                "tap_look_top_three_target_player_library_v1",
             ),
             (
                 "PossibilityStorm",
@@ -7733,7 +7733,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "token_maker",
-                "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+                "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1",
             ),
             (
                 "PyxisOfPandemonium",
@@ -7748,7 +7748,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "free_cast",
-                "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+                "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1",
             ),
         ]
 
@@ -7763,7 +7763,11 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "GhoulcallersBell",
                     "KaylasMusicBox",
                     "LanternOfInsight",
+                    "LeylineDowser",
+                    "OrcishSpy",
                     "PossibilityStorm",
+                    "PrototypePortal",
+                    "PyxisOfPandemonium",
                 }:
                     self.assertFalse(expected_scope.startswith("xmage_"))
                     self.assertFalse(expected_scope.endswith("_review_v1"))

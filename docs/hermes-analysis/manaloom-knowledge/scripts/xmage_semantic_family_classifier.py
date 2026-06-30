@@ -879,6 +879,79 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "player"
         )
 
+    if effect == "topdeck_play" and scope == "tap_look_top_three_target_player_library_v1":
+        return (
+            types == {"CREATURE"}
+            and "LookLibraryTopCardTargetPlayerEffect" in effect_classes
+            and "SimpleActivatedAbility" in ability_classes
+            and "TapSourceCost" in cost_classes
+            and "TargetPlayer" in target_classes
+            and bool(effect_json.get("activation_requires_tap"))
+            and int(effect_json.get("look_target_player_library_top_count") or 0) == 3
+            and effect_json.get("target_constraints", {}).get("target") == "player"
+            and not bool(effect_json.get("play_lands_from_top_library"))
+            and not bool(effect_json.get("alternate_zone_permission"))
+            and not bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
+    if (
+        effect == "recursion"
+        and scope == "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {"MillThenPutInHandEffect", "UntapSourceEffect"}.issubset(effect_classes)
+            and "SimpleActivatedAbility" in ability_classes
+            and {"GenericManaCost", "TapSourceCost", "TapTargetCost"}.issubset(cost_classes)
+            and "TargetControlledPermanent" in target_classes
+            and "FilterControlledCreaturePermanent" in filter_classes
+            and int(effect_json.get("activation_cost_generic") or 0) == 1
+            and bool(effect_json.get("activation_requires_tap"))
+            and int(effect_json.get("mill_count") or 0) == 1
+            and int(effect_json.get("activated_self_mill_count") or 0) == 1
+            and effect_json.get("milled_card_types_to_hand") == ["instant", "sorcery"]
+            and bool(effect_json.get("secondary_untap_source_by_tapping_legendary_creature"))
+        )
+
+    if (
+        effect == "token_maker"
+        and scope == "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {"PrototypePortalEffect", "PrototypePortalCreateTokenEffect"}.issubset(effect_classes)
+            and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and "TapSourceCost" in cost_classes
+            and "TargetCard" in target_classes
+            and bool(effect_json.get("imprint_artifact_card_from_hand_on_enter"))
+            and bool(effect_json.get("activated_create_token_copy_of_imprinted_card"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and effect_json.get("activation_x_cost_source") == "imprinted_card_mana_value"
+            and effect_json.get("token_copy_source") == "imprinted_card"
+        )
+
+    if (
+        effect == "free_cast"
+        and scope == "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "PyxisOfPandemoniumExileEffect",
+                "PyxisOfPandemoniumPutOntoBattlefieldEffect",
+            }.issubset(effect_classes)
+            and "SimpleActivatedAbility" in ability_classes
+            and {"GenericManaCost", "SacrificeSourceCost", "TapSourceCost"}.issubset(cost_classes)
+            and bool(effect_json.get("activated_each_player_exile_top_face_down"))
+            and bool(effect_json.get("activated_put_exiled_permanents_onto_battlefield"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and int(effect_json.get("final_activation_cost_generic") or 0) == 7
+            and bool(effect_json.get("final_activation_requires_sacrifice"))
+            and bool(effect_json.get("put_permanent_cards_from_exile_onto_battlefield"))
+            and bool(effect_json.get("alternate_zone_permission"))
+            and not bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
     if effect == "static_cost_reduction" and scope == "chosen_card_type_cost_reduction_v1":
         return (
             str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")

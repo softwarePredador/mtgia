@@ -7658,7 +7658,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="recursion",
-                scope="xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+                scope="pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1",
                 reason=(
                     "XMage structure matches Leyline Dowser: pay and tap to mill one card and optionally "
                     "put an instant or sorcery milled this way into hand, plus tap a legendary creature "
@@ -7671,6 +7671,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "permanent_type": "artifact",
                     "activation_cost_generic": 1,
                     "activation_requires_tap": True,
+                    "activated_self_mill_count": 1,
                     "mill_count": 1,
                     "milled_card_types_to_hand": ["instant", "sorcery"],
                     "secondary_untap_source_by_tapping_legendary_creature": True,
@@ -7694,7 +7695,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="topdeck_play",
-                scope="xmage_tap_look_top_three_target_player_library_review_v1",
+                scope="tap_look_top_three_target_player_library_v1",
                 reason=(
                     "XMage structure matches Orcish Spy: activated tap ability looks at the top three "
                     "cards of target player's library."
@@ -7769,7 +7770,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="token_maker",
-                scope="xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+                scope="imprint_artifact_from_hand_create_token_copy_x_mana_value_v1",
                 reason=(
                     "XMage structure matches Prototype Portal: imprint an artifact card from hand on ETB, "
                     "then pay X and tap to create a token copy where X is the imprinted card's mana value."
@@ -7804,7 +7805,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="free_cast",
-                scope="xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+                scope="tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1",
                 reason=(
                     "XMage structure matches Pyxis of Pandemonium: tap to exile each player's top card "
                     "face down, then pay seven, tap, and sacrifice to reveal those cards and put all "

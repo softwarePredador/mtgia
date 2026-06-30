@@ -13530,6 +13530,14 @@ CURRENCY_CONVERTER_SCOPE = (
 KAYLAS_MUSIC_BOX_SCOPE = (
     "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1"
 )
+LEYLINE_DOWSER_SCOPE = (
+    "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1"
+)
+ORCISH_SPY_SCOPE = "tap_look_top_three_target_player_library_v1"
+PROTOTYPE_PORTAL_SCOPE = "imprint_artifact_from_hand_create_token_copy_x_mana_value_v1"
+PYXIS_OF_PANDEMONIUM_SCOPE = (
+    "tap_each_player_exile_top_face_down_seven_tap_sacrifice_put_exiled_permanents_onto_battlefield_v1"
+)
 
 
 def _available_discard_modal_modes(permanent):
@@ -14520,6 +14528,566 @@ def activate_kaylas_music_box(player, permanent, opponents, all_players, turn, r
         return True
 
     return _kaylas_music_box_exile_top_card(player, permanent, turn, phase=phase)
+
+
+def _is_leyline_dowser(permanent):
+    return (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == LEYLINE_DOWSER_SCOPE
+        and int(permanent.get("activated_self_mill_count") or permanent.get("mill_count") or 0) == 1
+        and bool(permanent.get("milled_card_types_to_hand"))
+    )
+
+
+def _card_has_any_type(card, allowed_types):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    return any(str(card_type).lower() in type_line for card_type in allowed_types or [])
+
+
+def _legendary_creature_untap_cost_options(player, source):
+    options = []
+    for permanent in getattr(player, "battlefield", []) or []:
+        if permanent is source or not isinstance(permanent, dict):
+            continue
+        type_line = str(permanent.get("type_line") or "").lower()
+        if "legendary" not in type_line or "creature" not in type_line:
+            continue
+        if permanent.get("tapped"):
+            continue
+        options.append(permanent)
+    options.sort(
+        key=lambda permanent: (
+            int(float(permanent.get("power") or 0)),
+            int(float(permanent.get("cmc") or permanent.get("mana_value") or 0)),
+            permanent.get("name", "?"),
+        )
+    )
+    return options
+
+
+def _maybe_untap_leyline_dowser_with_legendary_creature(player, permanent, turn, *, phase):
+    if not permanent.get("tapped"):
+        return True
+    if not permanent.get("secondary_untap_source_by_tapping_legendary_creature"):
+        return False
+    options = _legendary_creature_untap_cost_options(player, permanent)
+    if not options:
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "leyline_dowser_no_untapped_legendary_creature_to_pay_untap_cost",
+            phase=phase,
+            risk_flags=["missing_legendary_creature_cost"],
+        )
+        return False
+    tapped_creature = options[0]
+    tapped_creature["tapped"] = True
+    permanent["tapped"] = False
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="tap_legendary_creature_to_untap_source",
+        tapped_creature=tapped_creature.get("name", "?"),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
+def activate_leyline_dowser(player, permanent, opponents, all_players, turn, rng, *, phase):
+    if phase not in MAIN_PHASES or not _is_leyline_dowser(permanent):
+        return False
+    if permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if not _maybe_untap_leyline_dowser_with_legendary_creature(
+        player,
+        permanent,
+        turn,
+        phase=phase,
+    ):
+        return False
+    if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "leyline_dowser_already_tapped",
+            phase=phase,
+        )
+        return False
+    if not getattr(player, "library", None):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "leyline_dowser_no_library_card_to_mill",
+            phase=phase,
+        )
+        return False
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(permanent.get("activation_cost_generic") or 1),
+    )
+    activation_cost_text = _activation_cost_text(activation_cost)
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "leyline_dowser_failed_to_pay_activation_cost",
+            phase=phase,
+        )
+        return False
+
+    milled = player.library.pop(0)
+    allowed_types = permanent.get("milled_card_types_to_hand") or ["instant", "sorcery"]
+    recovered_to_hand = _card_has_any_type(milled, allowed_types)
+    if recovered_to_hand:
+        player.hand.append(milled)
+        destination = "hand"
+    else:
+        player.graveyard.append(milled)
+        destination = "graveyard"
+    if permanent.get("activation_requires_tap", True):
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    emit_decision_trace(
+        decision_type="utility_artifact_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                milled,
+                get_card_effect(milled) if isinstance(milled, dict) else None,
+                score=22 if recovered_to_hand else 8,
+                action="mill_one_then_maybe_put_spell_into_hand",
+            )
+        ],
+        chosen_option=decision_card_option(
+            milled,
+            get_card_effect(milled) if isinstance(milled, dict) else None,
+            score=22 if recovered_to_hand else 8,
+            action="activate_leyline_dowser",
+            destination=destination,
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost_generic": activation_cost,
+            "milled_card": milled.get("name", "?") if isinstance(milled, dict) else str(milled),
+            "destination": destination,
+        },
+        rule_source=permanent.get("_rule_source", "leyline_dowser_runtime_v1"),
+        rule_status=permanent.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=22 if recovered_to_hand else 8,
+        actual_outcome=f"milled_card_to_{destination}",
+        reason="convert_artifact_tap_into_spell_recursion_when_top_card_matches",
+        strategic_principle="use mill-to-hand only when the exact XMage rule permits the milled spell to move to hand",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={"mana": -activation_cost, "library": -1, destination: 1},
+        risk_flags=["tap_artifact", "self_mill"],
+    )
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="leyline_dowser_mill_one_maybe_spell_to_hand",
+        mana_paid=activation_cost,
+        milled=milled.get("name", "?") if isinstance(milled, dict) else str(milled),
+        destination=destination,
+        recovered_to_hand=recovered_to_hand,
+        allowed_card_types=allowed_types,
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
+def _is_orcish_spy_runtime_source(permanent):
+    return (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == ORCISH_SPY_SCOPE
+        and int(permanent.get("look_target_player_library_top_count") or 0) == 3
+    )
+
+
+def activate_top_library_look_sources(player, opponents, all_players, turn, rng, *, phase):
+    if phase not in MAIN_PHASES:
+        return 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not _is_orcish_spy_runtime_source(permanent):
+            continue
+        if permanent.get("utility_artifact_used_this_turn"):
+            continue
+        if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "top_library_look_source_already_tapped",
+                phase=phase,
+            )
+            continue
+        if is_battlefield_creature(permanent) and permanent.get("summoning_sick"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "top_library_look_source_summoning_sick",
+                phase=phase,
+            )
+            continue
+        target_options = [
+            participant
+            for participant in [*list(opponents or []), player]
+            if getattr(participant, "library", None)
+        ]
+        if not target_options:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "top_library_look_no_target_library",
+                phase=phase,
+            )
+            continue
+        target = target_options[0]
+        look_count = max(1, int(permanent.get("look_target_player_library_top_count") or 3))
+        seen_cards = [
+            card.get("name", "?") if isinstance(card, dict) else str(card)
+            for card in list(target.library)[:look_count]
+        ]
+        if permanent.get("activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        emit_replay_event(
+            "top_library_looked",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="tap_look_top_three_target_player_library",
+            target_player=target.name,
+            look_count=look_count,
+            seen_cards=seen_cards,
+            public=False,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="tap_look_top_three_target_player_library",
+            target_player=target.name,
+            look_count=look_count,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+    return 0
+
+
+def _prototype_portal_imprint_candidates(player, source_card):
+    candidates = [
+        card
+        for card in getattr(player, "hand", []) or []
+        if card is not source_card and isinstance(card, dict) and is_artifact_permanent(card)
+    ]
+    candidates.sort(
+        key=lambda card: (
+            int(float(card.get("cmc") or card_mana_value(card) or 0)),
+            lorehold_draw_priority(card, player),
+            card.get("name", "?"),
+        )
+    )
+    return candidates
+
+
+def resolve_prototype_portal_imprint(player, permanent, source_card, *, turn=None):
+    if not (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == PROTOTYPE_PORTAL_SCOPE
+        and permanent.get("imprint_artifact_card_from_hand_on_enter")
+    ):
+        return False
+    candidates = _prototype_portal_imprint_candidates(player, source_card)
+    if not candidates:
+        emit_replay_event(
+            "imprint_failed",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            cost="imprint_artifact_card_from_hand",
+            reason="no_artifact_card_in_hand",
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return False
+    imprint = candidates[0]
+    player.hand.remove(imprint)
+    move_to_exile(
+        player,
+        imprint,
+        face_down=False,
+        public=True,
+        reason="prototype_portal_imprint",
+        turn=turn,
+    )
+    imprinted_card = copy.deepcopy(imprint)
+    permanent["imprinted_card"] = imprint.get("name", "?")
+    permanent["imprinted_card_object"] = imprinted_card
+    permanent["imprinted_mana_value"] = int(float(card_mana_value(imprint) or imprint.get("cmc") or 0))
+    emit_replay_event(
+        "imprint_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        imprinted=imprint.get("name", "?"),
+        imprinted_mana_value=permanent["imprinted_mana_value"],
+        imprint_options=[candidate.get("name", "?") for candidate in candidates[:8]],
+        selection_reason="lowest_mana_value_artifact_card_from_hand",
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
+def activate_prototype_portal(player, permanent, opponents, all_players, turn, rng, *, phase):
+    if phase not in MAIN_PHASES:
+        return False
+    if not (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == PROTOTYPE_PORTAL_SCOPE
+        and permanent.get("activated_create_token_copy_of_imprinted_card")
+    ):
+        return False
+    if permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "prototype_portal_already_tapped",
+            phase=phase,
+        )
+        return False
+    imprinted_card = permanent.get("imprinted_card_object")
+    if not isinstance(imprinted_card, dict):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "prototype_portal_no_imprinted_artifact",
+            phase=phase,
+        )
+        return False
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(permanent.get("imprinted_mana_value") or card_mana_value(imprinted_card) or 0),
+    )
+    activation_cost_text = _activation_cost_text(activation_cost)
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "prototype_portal_failed_to_pay_x_cost",
+            phase=phase,
+        )
+        return False
+    token = copy.deepcopy(imprinted_card)
+    token["name"] = f"{imprinted_card.get('name', 'Artifact')} Token"
+    token["is_token"] = True
+    token["token_copy_of"] = imprinted_card.get("name", "?")
+    token["copied_by"] = permanent.get("name", "Prototype Portal")
+    token["effect"] = get_card_effect(imprinted_card).get("effect", token.get("effect", "passive"))
+    token = prepare_entering_permanent(
+        enrich_card(token),
+        controller=player,
+        all_players=all_players or [player, *(opponents or [])],
+        turn=turn,
+    )
+    player.battlefield.append(token)
+    if permanent.get("activation_requires_tap", True):
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    emit_replay_event(
+        "token_created",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="prototype_portal_create_token_copy",
+        token_created=token.get("name", "?"),
+        token_copy_of=imprinted_card.get("name", "?"),
+        mana_paid=activation_cost,
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="prototype_portal_create_token_copy",
+        token_created=token.get("name", "?"),
+        token_copy_of=imprinted_card.get("name", "?"),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
+def _pyxis_exiled_cards(permanent):
+    cards = permanent.setdefault("pyxis_exiled_cards", [])
+    if not isinstance(cards, list):
+        cards = []
+        permanent["pyxis_exiled_cards"] = cards
+    return cards
+
+
+def activate_pyxis_of_pandemonium(player, permanent, opponents, all_players, turn, rng, *, phase):
+    if phase not in MAIN_PHASES:
+        return False
+    if not (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == PYXIS_OF_PANDEMONIUM_SCOPE
+        and permanent.get("activated_each_player_exile_top_face_down")
+    ):
+        return False
+    if permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "pyxis_already_tapped",
+            phase=phase,
+        )
+        return False
+    players = all_players or [player, *(opponents or [])]
+    stored_cards = _pyxis_exiled_cards(permanent)
+    can_final_activate = (
+        bool(stored_cards)
+        and bool(permanent.get("activated_put_exiled_permanents_onto_battlefield"))
+        and player.can_pay(_activation_cost_text(int(permanent.get("final_activation_cost_generic") or 7)))
+    )
+    if can_final_activate:
+        activation_cost = int(permanent.get("final_activation_cost_generic") or 7)
+        activation_cost_text = _activation_cost_text(activation_cost)
+        if not player.spend_mana(activation_cost_text):
+            return False
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        if permanent.get("activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        put_onto_battlefield = []
+        nonpermanents_revealed = []
+        for entry in list(stored_cards):
+            owner = entry.get("owner")
+            owner_player = next((participant for participant in players if participant.name == owner), player)
+            card = entry.get("card")
+            if not isinstance(card, dict):
+                continue
+            card["_pyxis_face_down"] = False
+            if card in getattr(owner_player, "exile", []) or []:
+                owner_player.exile.remove(card)
+            if is_permanent_card(card):
+                effect_data = get_card_effect(card)
+                entering = prepare_entering_permanent(
+                    enrich_card({**card, **effect_data}),
+                    controller=owner_player,
+                    all_players=players,
+                    turn=turn,
+                )
+                owner_player.battlefield.append(entering)
+                put_onto_battlefield.append(
+                    {"owner": owner_player.name, "card": entering.get("name", "?")}
+                )
+            else:
+                owner_player.exile.append(card)
+                nonpermanents_revealed.append(
+                    {"owner": owner_player.name, "card": card.get("name", "?")}
+                )
+        stored_cards.clear()
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="pyxis_reveal_exiled_put_permanents_onto_battlefield",
+            mana_paid=activation_cost,
+            put_onto_battlefield=put_onto_battlefield,
+            put_onto_battlefield_count=len(put_onto_battlefield),
+            nonpermanents_revealed=nonpermanents_revealed,
+            sacrificed_self=True,
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return True
+
+    exiled = []
+    for participant in players:
+        if not getattr(participant, "library", None):
+            continue
+        top_card = participant.library.pop(0)
+        if isinstance(top_card, dict):
+            top_card["_pyxis_face_down"] = True
+            top_card["_exiled_with"] = permanent.get("name", "Pyxis of Pandemonium")
+            top_card["_owned_by"] = participant.name
+        move_to_exile(
+            participant,
+            top_card,
+            face_down=True,
+            public=False,
+            reason="pyxis_exile_top_face_down",
+            turn=turn,
+        )
+        stored_cards.append({"owner": participant.name, "card": top_card})
+        exiled.append(
+            {
+                "owner": participant.name,
+                "card": top_card.get("name", "?") if isinstance(top_card, dict) else str(top_card),
+            }
+        )
+    if not exiled:
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "pyxis_no_library_cards_to_exile",
+            phase=phase,
+        )
+        return False
+    if permanent.get("activation_requires_tap", True):
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="pyxis_each_player_exile_top_face_down",
+        exiled=exiled,
+        exiled_count=len(exiled),
+        face_down=True,
+        public=False,
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
 
 
 def activate_currency_converter(player, permanent, opponents, all_players, turn, rng, *, phase):
@@ -25274,7 +25842,29 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         for permanent in utility_artifacts
     }
 
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_leyline_dowser(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
+
     if activate_graveyard_recycling_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_top_library_look_sources(
         player,
         opponents,
         all_players,
@@ -25308,6 +25898,30 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
 
     for permanent in list(getattr(player, "battlefield", []) or []):
         if activate_kaylas_music_box(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_prototype_portal(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_pyxis_of_pandemonium(
             player,
             permanent,
             opponents,
@@ -41454,6 +42068,11 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+            if (
+                permanent.get("battle_model_scope") == PROTOTYPE_PORTAL_SCOPE
+                and permanent.get("imprint_artifact_card_from_hand_on_enter")
+            ):
+                resolve_prototype_portal_imprint(player, permanent, card, turn=turn)
             register_static_spell_limit_restriction(
                 player,
                 permanent,
