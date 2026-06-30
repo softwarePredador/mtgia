@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T13:48:13.206373+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_manifest.json",
+  "package_id": "pg281_blood_moon_deathbellow_static_tutor_20260630_manifest",
+  "snapshot": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+          "card_name": "Blood Moon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+          "oracle_hash": "f9b52f264dbb36074c8c151ad47331cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+          "card_name": "Deathbellow War Cry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+          "oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+          "card_name": "Blood Moon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+          "oracle_hash": "f9b52f264dbb36074c8c151ad47331cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+          "card_name": "Deathbellow War Cry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+          "oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blood Moon",
+          "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathbellow War Cry",
+          "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Blood Moon",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathbellow War Cry",
+          "component_keys": [],
+          "effect": "tutor",
+          "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

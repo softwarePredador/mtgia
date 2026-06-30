@@ -1,0 +1,40 @@
+{
+  "Blood Moon": {
+    "ability_kind": "static",
+    "affected_lands": "nonbasic",
+    "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+    "effect": "passive",
+    "nonbasic_lands_are_mountains": true,
+    "nonbasic_lands_produce": "R",
+    "resulting_basic_land_type": "mountain",
+    "static_rule_restriction": true,
+    "suppresses_land_nonmana_abilities": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+    "battle_rule_oracle_hash": "f9b52f264dbb36074c8c151ad47331cb"
+  },
+  "Deathbellow War Cry": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+    "creature_type_filter": "Minotaur",
+    "different_names": true,
+    "effect": "tutor",
+    "instant": false,
+    "max_count": 4,
+    "sorcery": true,
+    "subtype_filter": "Minotaur",
+    "target": "minotaur_creature_to_battlefield",
+    "tutor_destination": "battlefield",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+    "battle_rule_oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294"
+  }
+}

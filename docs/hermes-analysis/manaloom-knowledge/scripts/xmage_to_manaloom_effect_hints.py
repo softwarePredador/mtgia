@@ -186,6 +186,18 @@ def _scenario_names(effect: str, scope: str = "") -> list[str]:
             "tap land for one colorless mana without sacrificing it",
             "tap and sacrifice land for two colorless mana when the extra mana unlocks a cast",
         ]
+    if scope == "nonbasic_lands_are_mountains_static_v1":
+        return [
+            "existing nonbasic lands become Mountains and tap for red",
+            "basic lands keep their original land type and mana ability",
+            "nonmana abilities on affected nonbasic lands are suppressed",
+        ]
+    if scope == "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1":
+        return [
+            "search up to four Minotaur creature cards with different names",
+            "put the selected Minotaur creatures directly onto the battlefield",
+            "leave duplicate-name and non-Minotaur library cards untouched",
+        ]
     mapping = {
         "static_cost_reduction": [
             "cast matching spell with one less generic cost",
@@ -1816,6 +1828,37 @@ def _build_exact_runtime_variant_fields(
     rules_text: str,
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
+
+    if (
+        xmage_class_name == "BloodMoon"
+        and card_types == {"ENCHANTMENT"}
+        and effect_classes == {"NonbasicLandsAreMountainsEffect"}
+        and ability_classes == {"SimpleStaticAbility"}
+        and not target_classes
+        and not filter_classes
+        and not cost_classes
+    ):
+        return {
+            "effect": "passive",
+            "scope": "nonbasic_lands_are_mountains_static_v1",
+            "fields": {
+                "nonbasic_lands_are_mountains": True,
+                "affected_lands": "nonbasic",
+                "resulting_basic_land_type": "mountain",
+                "nonbasic_lands_produce": "R",
+                "suppresses_land_nonmana_abilities": True,
+                "static_rule_restriction": True,
+            },
+            "reason": (
+                "XMage structure matches Blood Moon exactly: a single static battlefield ability "
+                "using NonbasicLandsAreMountainsEffect."
+            ),
+            "signals": [
+                "BloodMoon",
+                "SimpleStaticAbility",
+                "NonbasicLandsAreMountainsEffect",
+            ],
+        }
 
     if (
         xmage_class_name == "CloudKey"
@@ -6592,6 +6635,44 @@ def _build_tutor_to_battlefield_fields(
 ) -> dict[str, Any] | None:
     normalized = _normalized_rules_text(rules_text)
     is_instant = card_types == {"INSTANT"}
+
+    if (
+        xmage_class_name == "DeathbellowWarCry"
+        and card_types == {"SORCERY"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and not ability_classes
+        and (
+            "targetcardwithdifferentnameinlibrary" in normalized
+            or "different names" in normalized
+        )
+        and "minotaur" in normalized
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": False,
+                "sorcery": True,
+                "target": "minotaur_creature_to_battlefield",
+                "tutor_destination": "battlefield",
+                "max_count": 4,
+                "different_names": True,
+                "creature_type_filter": "Minotaur",
+                "subtype_filter": "Minotaur",
+            },
+            "reason": (
+                "XMage structure matches Deathbellow War Cry: TargetCardWithDifferentNameInLibrary "
+                "constrains up to four Minotaur creature cards with different names and puts them "
+                "onto the battlefield."
+            ),
+            "signals": [
+                "DeathbellowWarCry",
+                "SearchLibraryPutInPlayEffect",
+                "TargetCardWithDifferentNameInLibrary",
+                "SubType.MINOTAUR",
+            ],
+        }
 
     if (
         card_types == {"INSTANT"}

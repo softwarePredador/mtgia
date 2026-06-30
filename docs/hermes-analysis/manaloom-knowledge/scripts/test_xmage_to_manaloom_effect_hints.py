@@ -7608,7 +7608,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
                 },
                 "passive",
-                "xmage_nonbasic_lands_are_mountains_static_review_v1",
+                "nonbasic_lands_are_mountains_static_v1",
             ),
             (
                 "ChandrasIgnition",
@@ -7760,6 +7760,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
                 if class_name in {
+                    "BloodMoon",
                     "GhoulcallersBell",
                     "KaylasMusicBox",
                     "LanternOfInsight",

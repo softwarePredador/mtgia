@@ -1,0 +1,114 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg281_blood_moon_deathbellow_static_tutor_20260630_13402",
+  "deploy_id": "PG281",
+  "expected_rules": [
+    {
+      "card_name": "Blood Moon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+      "min_rule_version": 2,
+      "normalized_name": "blood moon",
+      "oracle_hash": "f9b52f264dbb36074c8c151ad47331cb",
+      "required_effect_fields": {
+        "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+        "effect": "passive"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathbellow War Cry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+      "min_rule_version": 2,
+      "normalized_name": "deathbellow war cry",
+      "oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294",
+      "required_effect_fields": {
+        "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+        "effect": "tutor"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "passive": 1,
+    "tutor": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg281_blood_moon_deathbellow_static_tutor_20260630_rollback.sql"
+  },
+  "generated_at": "2026-06-30T13:40:29+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Blood Moon"
+      },
+      "card_name": "Blood Moon",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+      "normalized_name": "blood moon",
+      "required_effect_fields": {
+        "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+        "effect": "passive"
+      }
+    },
+    {
+      "card": {
+        "name": "Deathbellow War Cry"
+      },
+      "card_name": "Deathbellow War Cry",
+      "effect": "tutor",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+      "normalized_name": "deathbellow war cry",
+      "required_effect_fields": {
+        "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1",
+        "effect": "tutor"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Blood Moon",
+    "Deathbellow War Cry"
+  ],
+  "selected_count": 2,
+  "slug": "blood_moon_deathbellow_static_tutor",
+  "snapshot_checks": [
+    {
+      "card_name": "Blood Moon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a",
+      "min_rule_version": 2,
+      "normalized_name": "blood moon",
+      "oracle_hash": "f9b52f264dbb36074c8c151ad47331cb",
+      "required_effect_fields": {
+        "battle_model_scope": "nonbasic_lands_are_mountains_static_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathbellow War Cry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64",
+      "min_rule_version": 2,
+      "normalized_name": "deathbellow war cry",
+      "oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294",
+      "required_effect_fields": {
+        "battle_model_scope": "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

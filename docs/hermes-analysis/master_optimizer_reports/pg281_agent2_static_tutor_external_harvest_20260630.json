@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-06-30T00:00:00+00:00",
+  "status": "manual_oracle_hash_harvest_from_postgresql_cards",
+  "cards": [
+    {
+      "card_name": "Blood Moon",
+      "candidate_rule": {
+        "oracle_hash": "f9b52f264dbb36074c8c151ad47331cb"
+      }
+    },
+    {
+      "card_name": "Deathbellow War Cry",
+      "candidate_rule": {
+        "oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294"
+      }
+    }
+  ]
+}

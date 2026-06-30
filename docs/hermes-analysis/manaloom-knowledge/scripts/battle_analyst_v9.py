@@ -15219,6 +15219,136 @@ def lands_have_nonmana_abilities_suppressed(all_players=None, *, player=None):
     return False
 
 
+def _is_nonbasic_land_for_blood_moon(permanent):
+    if not isinstance(permanent, dict) or not is_effective_land(permanent):
+        return False
+    type_line = str(permanent.get("type_line") or "").lower()
+    if "basic" in type_line:
+        return False
+    if normalize_card_name(permanent.get("name", "")) in {
+        "plains",
+        "island",
+        "swamp",
+        "mountain",
+        "forest",
+        "wastes",
+    }:
+        return False
+    return True
+
+
+def _blood_moon_mountain_type_line(permanent):
+    type_line = str(permanent.get("type_line") or "Land").strip()
+    card_type_prefix = type_line.split("-", 1)[0].strip() or "Land"
+    if "land" not in card_type_prefix.lower().split():
+        card_type_prefix = f"{card_type_prefix} Land".strip()
+    return f"{card_type_prefix} - Mountain"
+
+
+def blood_moon_static_sources(all_players=None, *, player=None):
+    participants = list(all_players or [])
+    if not participants and player is not None:
+        participants = [player]
+    sources = []
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if (
+                isinstance(permanent, dict)
+                and permanent.get("effect") == "passive"
+                and permanent.get("nonbasic_lands_are_mountains")
+            ):
+                sources.append((participant, permanent))
+    return sources
+
+
+def apply_nonbasic_lands_are_mountains_to_permanent(permanent, source=None):
+    if not _is_nonbasic_land_for_blood_moon(permanent):
+        return False
+    changed = (
+        not permanent.get("blood_moon_modified")
+        or permanent.get("produces") != "R"
+        or permanent.get("mana_produced") != 1
+    )
+    permanent.setdefault("_blood_moon_original_type_line", permanent.get("type_line"))
+    permanent.setdefault("_blood_moon_original_produces", permanent.get("produces"))
+    permanent.setdefault("_blood_moon_original_mana_produced", permanent.get("mana_produced"))
+    permanent.setdefault("_blood_moon_original_effect", permanent.get("effect"))
+    permanent["type_line"] = _blood_moon_mountain_type_line(permanent)
+    permanent["effect"] = "land"
+    permanent["is_mana_source"] = True
+    permanent["mana_produced"] = 1
+    permanent["produces"] = "R"
+    permanent["blood_moon_modified"] = True
+    permanent["nonbasic_land_mountain_static_applied"] = True
+    permanent["suppressed_land_nonmana_abilities"] = True
+    if isinstance(source, dict):
+        permanent["blood_moon_source"] = source.get("name", "Blood Moon")
+        permanent["blood_moon_rule_key"] = source.get("_rule_logical_key")
+    return changed
+
+
+def apply_nonbasic_lands_are_mountains_static(all_players=None, *, source=None, turn=None, phase=None):
+    participants = list(all_players or [])
+    affected = []
+    for participant in participants:
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if permanent is source:
+                continue
+            if apply_nonbasic_lands_are_mountains_to_permanent(permanent, source=source):
+                affected.append((participant, permanent))
+    if affected:
+        emit_replay_event(
+            "nonbasic_lands_are_mountains_static_applied",
+            player=getattr(affected[0][0], "name", "?"),
+            card=source.get("name", "Blood Moon") if isinstance(source, dict) else "Blood Moon",
+            affected_count=len(affected),
+            affected=[
+                {
+                    "controller": getattr(controller, "name", "?"),
+                    "name": permanent.get("name", "?"),
+                    "type_line": permanent.get("type_line", ""),
+                    "produces": permanent.get("produces"),
+                }
+                for controller, permanent in affected[:20]
+            ],
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source if isinstance(source, dict) else {}),
+        )
+    return [permanent for _controller, permanent in affected]
+
+
+def apply_nonbasic_lands_are_mountains_to_entering_permanent(
+    permanent,
+    controller=None,
+    all_players=None,
+    *,
+    turn=None,
+    phase=None,
+):
+    participants = list(all_players or [])
+    if controller is not None and controller not in participants:
+        participants.append(controller)
+    sources = blood_moon_static_sources(participants)
+    if not sources:
+        return False
+    _source_controller, source = sources[0]
+    changed = apply_nonbasic_lands_are_mountains_to_permanent(permanent, source=source)
+    if changed:
+        emit_replay_event(
+            "nonbasic_land_entered_as_mountain",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?") if isinstance(permanent, dict) else "?",
+            source=source.get("name", "Blood Moon"),
+            type_line=permanent.get("type_line", "") if isinstance(permanent, dict) else "",
+            produces=permanent.get("produces") if isinstance(permanent, dict) else None,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source),
+        )
+    return changed
+
+
 def _eldrazi_confluence_pump_target(opponents, legal_target_ids=None):
     candidates = []
     for opponent in opponents or []:
@@ -28759,6 +28889,9 @@ def library_tutor_candidates(player, target_type):
         elif target_type in ("creature", "creature_to_battlefield"):
             if is_creature_card(candidate):
                 candidates.append(candidate)
+        elif target_type in ("minotaur_creature", "minotaur_creature_to_battlefield"):
+            if is_creature_card(candidate) and permanent_has_subtype(candidate, "minotaur"):
+                candidates.append(candidate)
         elif target_type in (
             "small_creature",
             "creature_mana_value_1_or_less",
@@ -31112,6 +31245,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         turn=turn,
         phase="enter_battlefield",
         emit_event=True,
+    )
+    apply_nonbasic_lands_are_mountains_to_entering_permanent(
+        permanent,
+        controller,
+        all_players,
+        turn=turn,
+        phase="enter_battlefield",
     )
     if is_battlefield_creature(permanent):
         permanent["haste"] = has_haste(permanent)
@@ -41454,6 +41594,13 @@ def apply_effect_immediate(
             permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
             permanent["effect"] = "passive"
             player.battlefield.append(permanent)
+            if permanent.get("nonbasic_lands_are_mountains"):
+                apply_nonbasic_lands_are_mountains_static(
+                    all_players_for_entry,
+                    source=permanent,
+                    turn=turn,
+                    phase=phase or "resolution",
+                )
             register_static_spell_limit_restriction(
                 player,
                 permanent,
@@ -43233,7 +43380,18 @@ def apply_effect_immediate(
                 for candidate in candidates
             ]
             scored_candidates.sort(key=lambda item: (-item[1], -int(float(item[0].get("cmc") or 0)), item[0].get("name", "")))
-            selected_candidates = scored_candidates[:selection_count]
+            if effect_data.get("different_names"):
+                seen_names = set()
+                for scored_candidate in scored_candidates:
+                    normalized_candidate_name = normalize_card_name(scored_candidate[0].get("name", ""))
+                    if normalized_candidate_name in seen_names:
+                        continue
+                    seen_names.add(normalized_candidate_name)
+                    selected_candidates.append(scored_candidate)
+                    if len(selected_candidates) >= selection_count:
+                        break
+            else:
+                selected_candidates = scored_candidates[:selection_count]
             found, found_score, found_reason = selected_candidates[0]
         else:
             scored_candidates = []
@@ -43287,6 +43445,7 @@ def apply_effect_immediate(
                 "delirium_active": delirium_active,
                 "candidate_count": len(candidates),
                 "selection_count": selection_count,
+                "different_names": bool(effect_data.get("different_names")),
                 "selected_reason": found_reason,
                 "lands": controlled_land_count(player),
                 "opponent_creatures": sum(
@@ -43337,6 +43496,7 @@ def apply_effect_immediate(
             found=found.get("name", "?") if found else None,
             found_cards=[item.get("name", "?") for item in moved_cards],
             destination=destination,
+            different_names=bool(effect_data.get("different_names")),
             turn=turn,
             **fields,
         )

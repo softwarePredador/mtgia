@@ -1,0 +1,2199 @@
+{
+  "access_model": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json",
+  "active_rule_source": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "cards": [
+    {
+      "access_targets": [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng"
+      ],
+      "active_rule_count": 1,
+      "active_rules": [],
+      "batch_strategy": "pg_apply_or_runtime_upgrade_before_gate",
+      "battle_model_scope": "",
+      "candidate_lane": "topdeck_setup",
+      "candidate_score": 35,
+      "card_global_reject": false,
+      "card_name": "Brainstone",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "",
+      "family_id": "access_density",
+      "family_support_status": "access_model_candidate",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": null,
+          "deploy_id": "pg272_brainstone_executable_topdeck_20260630",
+          "expected_rules": [
+            {
+              "battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1",
+              "card_name": "Brainstone",
+              "effect": "topdeck_manipulation",
+              "execution_status": "auto",
+              "logical_rule_key": "battle_rule_v1:6aab083c9a25b2af50c2069683da5131",
+              "normalized_name": "brainstone",
+              "oracle_hash": "3c13a2b77d527812c94eae8a9c6f9615",
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {},
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_apply.sql",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "access_density_candidate",
+      "ready_for_structured_pull": false,
+      "review_only_rule_count": 0,
+      "runtime_blockers": [],
+      "source": "access_cut_model",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 0,
+      "variant_decks": [],
+      "xmage_class": ""
+    },
+    {
+      "access_targets": [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng"
+      ],
+      "active_rule_count": 1,
+      "active_rules": [],
+      "batch_strategy": "pg_apply_or_runtime_upgrade_before_gate",
+      "battle_model_scope": "",
+      "candidate_lane": "topdeck_protection",
+      "candidate_score": 35,
+      "card_global_reject": false,
+      "card_name": "Hidden Retreat",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "",
+      "family_id": "access_density",
+      "family_support_status": "access_model_candidate",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "pg271",
+          "expected_rules": [
+            {
+              "card_name": "Hidden Retreat",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:7148a419f22524cca81db7d14deeb043",
+              "min_rule_version": 2,
+              "normalized_name": "hidden retreat",
+              "oracle_hash": "816f631d821b5a48e187fafe519845d7",
+              "required_effect_fields": {
+                "battle_model_scope": "activated_put_card_from_hand_on_top_library_prevent_damage_from_target_instant_or_sorcery_spell_v1",
+                "effect": "damage_prevention_shield"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "damage_prevention_shield": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "access_density_candidate",
+      "ready_for_structured_pull": false,
+      "review_only_rule_count": 0,
+      "runtime_blockers": [],
+      "source": "access_cut_model",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 0,
+      "variant_decks": [],
+      "xmage_class": ""
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_cast_or_play_from_alternate_zone_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Assemble the Players",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "PG276",
+          "expected_rules": [
+            {
+              "card_name": "Assemble the Players",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+              "min_rule_version": 2,
+              "normalized_name": "assemble the players",
+              "oracle_hash": "ffdf411200b723c016fe9df0d85dd8e4",
+              "required_effect_fields": {
+                "battle_model_scope": "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1",
+                "effect": "topdeck_play"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "topdeck_play": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_rollback.sql",
+            "sync": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_sync.json"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "AssembleThePlayers"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_cast_or_play_from_alternate_zone_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Chaos Wand",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Applied with explicit standing approval in the active goal: precheck, apply, postcheck, PG -> SQLite sync, and focused runtime validation completed.",
+          "deploy_id": "PG275",
+          "expected_rules": [
+            {
+              "card_name": "Chaos Wand",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+              "min_rule_version": 2,
+              "normalized_name": "chaos wand",
+              "oracle_hash": "7b77d47629eb006df4e9754fee988c51",
+              "required_effect_fields": {
+                "battle_model_scope": "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1",
+                "effect": "passive"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "free_cast": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "ChaosWand"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Codex Shredder",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": null,
+          "deploy_id": "pg273_codex_shredder_mill_recursion_20260630",
+          "expected_rules": [
+            {
+              "battle_model_scope": "tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1",
+              "card_name": "Codex Shredder",
+              "execution_status": "auto",
+              "logical_rule_key": "battle_rule_v1:3417000adca740f0c5036e7232221df4",
+              "normalized_name": "codex shredder",
+              "oracle_hash": "48dd2cf11a80189f548581507ab88df9",
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {},
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_apply.sql",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_rollback.sql",
+            "sync": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_sync.json"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "CodexShredder"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "artifact_tap_each_player_mill_one_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Ghoulcaller's Bell",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "mill_engine",
+      "family_id": "mill_spell",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "PG277",
+          "expected_rules": [
+            {
+              "card_name": "Ghoulcaller's Bell",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:f5a40566d057c8e235241cfa88fd35d4",
+              "min_rule_version": 2,
+              "normalized_name": "ghoulcaller's bell",
+              "oracle_hash": "be79f523c3a5cd11de81a0dfdf0d1c2c",
+              "required_effect_fields": {
+                "battle_model_scope": "artifact_tap_each_player_mill_one_v1",
+                "effect": "mill_engine"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "mill_spell": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
+          "missing_files": [],
+          "status": "prepared_read_only_pending_apply_approval"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "GhoulcallersBell"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Kayla's Music Box",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "PG280",
+          "expected_rules": [
+            {
+              "card_name": "Kayla's Music Box",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:68e589311ca78d53076e317ab21a4151",
+              "min_rule_version": 2,
+              "normalized_name": "kayla's music box",
+              "oracle_hash": "348760fb8766d6a7185f9a09df78abd9",
+              "required_effect_fields": {
+                "battle_model_scope": "artifact_w_tap_exile_top_face_down_tap_play_owned_exiled_until_eot_v1",
+                "effect": "free_cast"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "free_cast": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json",
+          "missing_files": [],
+          "status": "prepared_read_only_pending_apply_approval"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "KaylasMusicBox"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Lantern of Insight",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "topdeck_play",
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "PG278",
+          "expected_rules": [
+            {
+              "card_name": "Lantern of Insight",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c",
+              "min_rule_version": 2,
+              "normalized_name": "lantern of insight",
+              "oracle_hash": "ff4b019a0df61b51a2dd5502ff616841",
+              "required_effect_fields": {
+                "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+                "effect": "topdeck_play"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "topdeck_play": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
+          "missing_files": [],
+          "status": "prepared_read_only_pending_apply_approval"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "LanternOfInsight"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Perpetual Timepiece",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": null,
+          "deploy_id": "pg274_perpetual_timepiece_graveyard_shuffle_20260630",
+          "expected_rules": [
+            {
+              "battle_model_scope": "tap_self_mill_two_or_exile_self_shuffle_any_number_graveyard_cards_into_library_v1",
+              "card_name": "Perpetual Timepiece",
+              "execution_status": "auto",
+              "logical_rule_key": "battle_rule_v1:26cffda59616c27dd2e137e165dc2d5d",
+              "normalized_name": "perpetual timepiece",
+              "oracle_hash": "4af52424df5fb9a51bff3fddb1c5c1ff",
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {},
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_apply.sql",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_rollback.sql",
+            "sync": "docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_sync.json"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_manifest.json",
+          "missing_files": [],
+          "status": "applied_synced"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "PerpetualTimepiece"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Possibility Storm",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Apply only after explicit approval for the exact precheck/apply/postcheck command sequence, then sync PG to Hermes.",
+      "pg_packages": [
+        {
+          "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+          "deploy_id": "PG279",
+          "expected_rules": [
+            {
+              "card_name": "Possibility Storm",
+              "execution_status": "auto",
+              "forbid_annotation_only": true,
+              "logical_rule_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
+              "min_rule_version": 2,
+              "normalized_name": "possibility storm",
+              "oracle_hash": "5da5211c6ce969ce3b5750e349c2b073",
+              "required_effect_fields": {
+                "battle_model_scope": "spell_from_hand_exile_until_shared_type_free_cast_bottom_rest_random_v1",
+                "effect": "free_cast"
+              },
+              "review_status": "verified"
+            }
+          ],
+          "family_counts": {
+            "free_cast": 1
+          },
+          "files": {
+            "apply": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_apply.sql",
+            "manifest": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+            "package": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_package.md",
+            "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_postcheck.sql",
+            "precheck": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_precheck.sql",
+            "rollback": "docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_rollback.sql"
+          },
+          "manifest": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+          "missing_files": [],
+          "status": "prepared_read_only_pending_apply_approval"
+        }
+      ],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "pg_package_prepared_pending_apply_approval",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "PossibilityStorm"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_life_gain_variant_review_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Heroes Remembered",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "life_gain",
+      "family_id": "life_total_change",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        614,
+        615
+      ],
+      "xmage_class": "HeroesRemembered"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Ancient Gold Dragon",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "token_maker",
+      "family_id": "token_maker",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "AncientGoldDragon"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Chandra's Ignition",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "sweeper_damage",
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        613
+      ],
+      "xmage_class": "ChandrasIgnition"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Charmbreaker Devils",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "CharmbreakerDevils"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_exile_then_return_target_variant_review_v1",
+      "candidate_lane": "pressure_absorber_or_protection",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Ephemerate",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "blink",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "Ephemerate"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Karn's Sylex",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "board_wipe",
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "KarnsSylex"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Karn, the Great Creator",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "passive",
+      "family_id": "passive",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "KarnTheGreatCreator"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Leyline Dowser",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "LeylineDowser"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_draw_card_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "draw_engine",
+      "family_id": "draw_engine",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        608
+      ],
+      "xmage_class": "NaktamunLorespinner"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Orcish Spy",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "topdeck_play",
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "OrcishSpy"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Prototype Portal",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "token_maker",
+      "family_id": "token_maker",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "PrototypePortal"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Pyxis of Pandemonium",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "PyxisOfPandemonium"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Single Combat",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "board_wipe",
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        615
+      ],
+      "xmage_class": "SingleCombat"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "The Warring Triad",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "TheWarringTriad"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "targeted_damage_variant_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Toralf, God of Fury // Toralf's Hammer",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "direct_damage",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "ToralfGodOfFury"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "candidate_lane": "pressure_absorber_or_protection",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "board_wipe",
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "UnstableGlyphbridge"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "static_cast_as_flash_permission_variant_review_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Vedalken Orrery",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "passive",
+      "family_id": "passive",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        613
+      ],
+      "xmage_class": "VedalkenOrrery"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Wand of Vertebrae",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "recursion",
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "WandOfVertebrae"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "xmage_targeted_protection_variant_review_v1",
+      "candidate_lane": "protection_window",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Whispersilk Cloak",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "grant_protection_from_chosen_color",
+      "family_id": "targeted_protection",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "WhispersilkCloak"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_choose_new_targets_variant_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Wild Ricochet",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "redirect_target",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Split the family scope and write focused runtime tests before creating a metadata package.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "split_scope_review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "WildRicochet"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Ancient Copper Dragon",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        608,
+        616
+      ],
+      "xmage_class": "AncientCopperDragon"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Beacon of Immortality",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        610,
+        615
+      ],
+      "xmage_class": "BeaconOfImmortality"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Invincible Hymn",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        610,
+        614
+      ],
+      "xmage_class": "InvincibleHymn"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Planetarium of Wan Shi Tong",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        611,
+        613
+      ],
+      "xmage_class": "PlanetariumOfWanShiTong"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Semblance Anvil",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        612,
+        616
+      ],
+      "xmage_class": "SemblanceAnvil"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Taunt from the Rampart",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        611,
+        615
+      ],
+      "xmage_class": "TauntFromTheRampart"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Radiant Performer",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "RadiantPerformer"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Rem Karolus, Stalwart Slayer",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "RemKarolusStalwartSlayer"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Rune-Tail, Kitsune Ascendant // Rune-Tail's Essence",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "RuneTailKitsuneAscendant"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Sawhorn Nemesis",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "SawhornNemesis"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Screaming Nemesis",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "ScreamingNemesis"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Serra Ascendant",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "SerraAscendant"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Slickshot Show-Off",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "SlickshotShowOff"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Stuffy Doll",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "StuffyDoll"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "The Walls of Ba Sing Se",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "TheWallsOfBaSingSe"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "not_batch_safe",
+      "battle_model_scope": "xmage_reference_requires_manual_model_review_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Zirda, the Dawnwaker",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "external_reference_required_manual_model",
+      "family_id": "manual_model",
+      "family_support_status": "manual_model_required",
+      "next_action": "Add mapper metadata or a focused test scenario before treating the XMage source as executable.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "mapper_metadata_or_test_scenario_required",
+      "ready_for_structured_pull": false,
+      "source": "runtime_gap_family_queue",
+      "status": "manual_mapper_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "ZirdaTheDawnwaker"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Twinflame Tyrant",
+      "cut_specific_negative_count": 1,
+      "cut_specific_negatives": [
+        {
+          "adds": [
+            "Twinflame Tyrant"
+          ],
+          "cut_guardrails": {
+            "Thor, God of Thunder": {
+              "card_name": "Thor, God of Thunder",
+              "guardrail_section": "locked_or_protected",
+              "lane": "graveyard_recursion",
+              "reason": "one or more packages collapsed the known strong seed when cutting this slot",
+              "status": "locked_do_not_cut",
+              "worst_strong_seed_delta_pp": -55.56
+            }
+          },
+          "cuts": [
+            "Thor, God of Thunder"
+          ],
+          "lane": "spell_chain_conversion",
+          "package_key": "pg245_twinflame_damage_payoff_cut_thor",
+          "prior_gate": {
+            "added_rule_counts": {
+              "Twinflame Tyrant": 1
+            },
+            "baseline_losses": 2,
+            "baseline_wins": 7,
+            "candidate_losses": 5,
+            "candidate_wins": 4,
+            "decision": "tested_negative_do_not_promote",
+            "delta_pp": -33.34,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+            "status": "gated"
+          },
+          "runtime_package_readiness": {
+            "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+            "effect": "damage_modifier",
+            "family_id": "static_damage_modifier",
+            "logical_rule_key": "battle_rule_v1:072370a98c9b332eef021390bfc1694a",
+            "oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+            "readiness": "runtime_ready_pg_precheck_blocked"
+          },
+          "status": "tested_negative_do_not_promote",
+          "targets": [
+            "spell_damage_conversion",
+            "combat_damage_conversion"
+          ]
+        }
+      ],
+      "effect": "damage_modifier",
+      "family_id": "static_damage_modifier",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Do not repeat the same add/cut pair; only retest with a new seed-safe cut and preserved telemetry.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "swap_negative_not_card_global_reject",
+      "variant_deck_count": 3,
+      "variant_decks": [
+        608,
+        611,
+        615
+      ],
+      "xmage_class": "TwinflameTyrant"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Verge Rangers",
+      "cut_specific_negative_count": 1,
+      "cut_specific_negatives": [
+        {
+          "adds": [
+            "Verge Rangers"
+          ],
+          "cut_guardrails": {
+            "Bender's Waterskin": {
+              "best_delta_pp": 3.7,
+              "card_name": "Bender's Waterskin",
+              "guardrail_section": "risky_same_lane_only",
+              "lane": "early_mana",
+              "reason": "aggregate upside exists, but it broke the known strong seed",
+              "status": "risky_cut_only_same_lane",
+              "worst_strong_seed_delta_pp": -44.45
+            }
+          },
+          "cuts": [
+            "Bender's Waterskin"
+          ],
+          "lane": "topdeck_miracle_setup",
+          "package_key": "pg245_verge_rangers_topdeck_land_cut_waterskin",
+          "prior_gate": {
+            "added_rule_counts": {
+              "Verge Rangers": 1
+            },
+            "baseline_losses": 0,
+            "baseline_wins": 3,
+            "candidate_losses": 3,
+            "candidate_wins": 0,
+            "decision": "tested_negative_do_not_promote",
+            "delta_pp": -100.0,
+            "source": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
+            "status": "gated"
+          },
+          "runtime_package_readiness": {
+            "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+            "effect": "topdeck_play",
+            "family_id": "topdeck_play",
+            "logical_rule_key": "battle_rule_v1:85ae1e46c9ad082e1807ac9e9f5420bd",
+            "oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+            "readiness": "runtime_ready_pg_precheck_blocked"
+          },
+          "status": "tested_negative_do_not_promote",
+          "targets": [
+            "seed_7_missing_early_engine",
+            "land_drop_velocity"
+          ]
+        }
+      ],
+      "effect": "topdeck_play",
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Do not repeat the same add/cut pair; only retest with a new seed-safe cut and preserved telemetry.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "swap_negative_not_card_global_reject",
+      "variant_deck_count": 3,
+      "variant_decks": [
+        609,
+        611,
+        613
+      ],
+      "xmage_class": "VergeRangers"
+    },
+    {
+      "access_targets": [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng"
+      ],
+      "active_rule_count": 1,
+      "active_rules": [],
+      "batch_strategy": "pg_apply_or_runtime_upgrade_before_gate",
+      "battle_model_scope": "",
+      "candidate_lane": "access_tutor",
+      "candidate_score": 67,
+      "card_global_reject": false,
+      "card_name": "Enlightened Tutor",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "",
+      "family_id": "access_density",
+      "family_support_status": "access_model_candidate",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "access_density_candidate",
+      "ready_for_structured_pull": false,
+      "review_only_rule_count": 0,
+      "runtime_blockers": [],
+      "source": "access_cut_model",
+      "status": "review_required",
+      "variant_deck_count": 6,
+      "variant_decks": [
+        608,
+        611,
+        612,
+        613,
+        614,
+        615
+      ],
+      "xmage_class": ""
+    },
+    {
+      "access_targets": [
+        "Squee, Goblin Nabob",
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng"
+      ],
+      "active_rule_count": 1,
+      "active_rules": [],
+      "batch_strategy": "pg_apply_or_runtime_upgrade_before_gate",
+      "battle_model_scope": "",
+      "candidate_lane": "access_tutor",
+      "candidate_score": 63,
+      "card_global_reject": false,
+      "card_name": "Gamble",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "",
+      "family_id": "access_density",
+      "family_support_status": "access_model_candidate",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "access_density_candidate",
+      "ready_for_structured_pull": false,
+      "review_only_rule_count": 0,
+      "runtime_blockers": [],
+      "source": "access_cut_model",
+      "status": "review_required",
+      "variant_deck_count": 5,
+      "variant_decks": [
+        609,
+        612,
+        613,
+        614,
+        615
+      ],
+      "xmage_class": ""
+    },
+    {
+      "access_targets": [
+        "Sensei's Divining Top",
+        "Scroll Rack",
+        "Library of Leng"
+      ],
+      "active_rule_count": 1,
+      "active_rules": [],
+      "batch_strategy": "pg_apply_or_runtime_upgrade_before_gate",
+      "battle_model_scope": "",
+      "candidate_lane": "topdeck_protection",
+      "candidate_score": 59,
+      "card_global_reject": false,
+      "card_name": "Penance",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "",
+      "family_id": "access_density",
+      "family_support_status": "access_model_candidate",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "access_density_candidate",
+      "ready_for_structured_pull": false,
+      "review_only_rule_count": 0,
+      "runtime_blockers": [],
+      "source": "access_cut_model",
+      "status": "review_required",
+      "variant_deck_count": 4,
+      "variant_decks": [
+        609,
+        611,
+        613,
+        614
+      ],
+      "xmage_class": ""
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": 10,
+      "card_global_reject": false,
+      "card_name": "Goliath Daydreamer",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "free_cast",
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 3,
+      "variant_decks": [
+        613,
+        614,
+        615
+      ],
+      "xmage_class": "GoliathDaydreamer"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Boros Reckoner",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "creature",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        612,
+        616
+      ],
+      "xmage_class": "BorosReckoner"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": 0,
+      "card_global_reject": false,
+      "card_name": "Terror of the Peaks",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "creature",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 2,
+      "variant_decks": [
+        608,
+        612
+      ],
+      "xmage_class": "TerrorOfThePeaks"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "static_double_life_gain_and_draw_except_first_draw_step_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Alhammarret's Archive",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "draw_engine",
+      "family_id": "draw_engine",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        611
+      ],
+      "xmage_class": "AlhammarretsArchive"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Balefire Liege",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "creature",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "BalefireLiege"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "chosen_card_type_cost_reduction_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Cloud Key",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "static_cost_reduction",
+      "family_id": "static_cost_reducer",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "CloudKey"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Currency Converter",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "draw_engine",
+      "family_id": "draw_engine",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        614
+      ],
+      "xmage_class": "CurrencyConverter"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Eight-and-a-Half-Tails",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "creature",
+      "family_id": "targeted_protection",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "EightAndAHalfTails"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Firesong and Sunspeaker",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "creature",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "FiresongAndSunspeaker"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1",
+      "candidate_lane": "finisher_or_big_spell",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Gisela, Blade of Goldnight",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "damage_modifier",
+      "family_id": "static_damage_modifier",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "GiselaBladeOfGoldnight"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "look_top_library_any_time_and_opponent_face_down_creatures_v1",
+      "candidate_lane": "hand_filter",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Lens of Clarity",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "topdeck_play",
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        610
+      ],
+      "xmage_class": "LensOfClarity"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "postcombat_main_add_red_for_opponents_life_lost_this_turn_v1",
+      "candidate_lane": "early_mana",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Neheb, the Eternal",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "ramp_engine",
+      "family_id": "ramp_engine",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        616
+      ],
+      "xmage_class": "NehebTheEternal"
+    },
+    {
+      "active_rules": [],
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+      "candidate_lane": "contextual",
+      "candidate_score": -10,
+      "card_global_reject": false,
+      "card_name": "Repercussion",
+      "cut_specific_negative_count": 0,
+      "cut_specific_negatives": [],
+      "effect": "passive",
+      "family_id": "targeted_interaction",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "next_action": "Review current evidence before gate.",
+      "pg_packages": [],
+      "pg_precheck_blockers": [],
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "ready_for_structured_pull": true,
+      "source": "runtime_gap_family_queue",
+      "status": "review_required",
+      "variant_deck_count": 1,
+      "variant_decks": [
+        612
+      ],
+      "xmage_class": "Repercussion"
+    }
+  ],
+  "generated_at": "2026-06-30T13:44:15Z",
+  "hypothesis_queue": "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json",
+  "manifests": [
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg277_ghoulcaller_each_player_mill_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg279_possibility_storm_shared_type_free_cast_20260630_manifest.json",
+    "/Users/desenvolvimentomobile/.codex/worktrees/lorehold-agent2-runtime-static-wipe-tutor/docs/hermes-analysis/master_optimizer_reports/pg280_kayla_music_box_exile_play_20260630_manifest.json"
+  ],
+  "postgres_writes": false,
+  "precheck_blockers": [],
+  "runtime_queue": "docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg281_agent2_static_tutor.json",
+  "source_db_mutated": false,
+  "summary": {
+    "card_count": 64,
+    "cut_specific_negative_count": 2,
+    "manual_mapper_required_count": 16,
+    "pg_package_applied_synced_count": 0,
+    "pg_package_files_missing_count": 0,
+    "pg_package_prepared_pending_apply_approval_count": 10,
+    "pg_precheck_blocked_count": 0,
+    "promotion_lane_counts": {
+      "access_density_candidate": 5,
+      "batch_metadata_candidate_requires_pg_precheck": 19,
+      "mapper_metadata_or_test_scenario_required": 16,
+      "split_family_scope_review_required": 24
+    },
+    "recommended_next_action": "run_approved_precheck_apply_postcheck_sync_or_split_scope_runtime_families",
+    "split_scope_review_required_count": 20,
+    "status_counts": {
+      "manual_mapper_required": 16,
+      "pg_package_prepared_pending_apply_approval": 10,
+      "review_required": 16,
+      "split_scope_review_required": 20,
+      "swap_negative_not_card_global_reject": 2
+    }
+  }
+}

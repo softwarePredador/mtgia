@@ -1184,6 +1184,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("suppresses_land_nonmana_abilities"))
         )
 
+    if effect == "passive" and scope == "nonbasic_lands_are_mountains_static_v1":
+        return (
+            types == {"ENCHANTMENT"}
+            and effect_classes == {"NonbasicLandsAreMountainsEffect"}
+            and ability_classes == {"SimpleStaticAbility"}
+            and not target_classes
+            and not cost_classes
+            and bool(effect_json.get("nonbasic_lands_are_mountains"))
+            and effect_json.get("affected_lands") == "nonbasic"
+            and effect_json.get("resulting_basic_land_type") == "mountain"
+            and effect_json.get("nonbasic_lands_produce") == "R"
+            and bool(effect_json.get("suppresses_land_nonmana_abilities"))
+        )
+
     if effect == "passive" and scope == "opponent_creature_enter_tapped_gain_life_v1":
         return (
             types == {"ENCHANTMENT"}
@@ -2656,6 +2670,20 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("target") == "creature_to_battlefield"
             and bool(effect_json.get("target_mana_value_max_from_x"))
             and bool(effect_json.get("harmonize"))
+        )
+
+    if effect == "tutor" and scope == "search_up_to_four_minotaur_creatures_different_names_to_battlefield_v1":
+        return (
+            types == {"SORCERY"}
+            and effect_classes == {"SearchLibraryPutInPlayEffect"}
+            and not ability_classes
+            and "TargetCardWithDifferentNameInLibrary" in target_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "minotaur_creature_to_battlefield"
+            and effect_json.get("tutor_destination") == "battlefield"
+            and int(effect_json.get("max_count") or 0) == 4
+            and bool(effect_json.get("different_names"))
+            and effect_json.get("creature_type_filter") == "Minotaur"
         )
 
     if effect == "copy_spell" and scope == "first_instant_sorcery_cast_each_turn_copy_own_spell_v1":

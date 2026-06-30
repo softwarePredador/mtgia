@@ -1,0 +1,5 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Blood Moon          | blood moon          | battle_rule_v1:9466d5adbf4ce91ed93a8ae9c18ecd1a |                  1 |                           1 |                         1 |           2
+ Deathbellow War Cry | deathbellow war cry | battle_rule_v1:1351ad9528edafe8a4fcb98d22697e64 |                  1 |                           1 |                         1 |           2
+(2 rows)
