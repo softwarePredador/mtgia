@@ -34,7 +34,26 @@ DEFAULT_PACKAGE_GATE_REPORTS = [
     REPORT_DIR / "lorehold_spell_payoff_gate_20260627_v1_fixed.json",
     REPORT_DIR / "lorehold_pg245_runtime_smoke_gate_20260628_pg245_smoke_v1.json",
     REPORT_DIR / "lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+    REPORT_DIR / "lorehold_forced_exposure_probe_decision_20260630.json",
+    REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
 ]
+NEGATIVE_PRIOR_DECISIONS = {
+    "reject_or_rework",
+    "forced_access_no_lift_reject_or_rework",
+    "tie_watch_strategy_regression",
+}
+POSITIVE_PRIOR_DECISIONS = {
+    "promote_to_deeper_gate",
+    "tie_promote_to_deeper_gate",
+    "positive_gate_needs_deeper_validation",
+    "forced_access_signal_requires_natural_confirmation",
+}
+INCONCLUSIVE_PRIOR_DECISIONS = {
+    "forced_access_tie_requires_natural_confirmation",
+    "forced_access_inconclusive_low_exposure",
+    "inconclusive_low_exposure",
+}
 
 
 PACKAGE_IDEAS = [
@@ -461,6 +480,7 @@ def load_prior_gate_results(paths: list[Path]) -> dict[str, dict[str, Any]]:
             result = {
                 "source": str(path),
                 "status": package.get("status"),
+                "raw_decision": package.get("decision"),
                 "baseline_wins": int(baseline.get("wins") or 0),
                 "baseline_losses": int(baseline.get("losses") or 0),
                 "candidate_wins": int(candidate.get("wins") or 0),
@@ -468,7 +488,14 @@ def load_prior_gate_results(paths: list[Path]) -> dict[str, dict[str, Any]]:
                 "delta_pp": float(gate.get("delta_pp") or 0.0),
                 "added_rule_counts": (package.get("candidate_meta") or {}).get("added_rule_counts") or {},
             }
-            if result["delta_pp"] < 0:
+            raw_decision = str(result.get("raw_decision") or "")
+            if raw_decision in NEGATIVE_PRIOR_DECISIONS:
+                result["decision"] = "tested_negative_do_not_promote"
+            elif raw_decision in POSITIVE_PRIOR_DECISIONS:
+                result["decision"] = "positive_gate_needs_deeper_validation"
+            elif raw_decision in INCONCLUSIVE_PRIOR_DECISIONS:
+                result["decision"] = "tested_inconclusive"
+            elif result["delta_pp"] < 0:
                 result["decision"] = "tested_negative_do_not_promote"
             elif result["candidate_wins"] >= result["baseline_wins"]:
                 result["decision"] = "positive_gate_needs_deeper_validation"

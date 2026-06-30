@@ -7107,6 +7107,48 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if (
+        xmage_class_name == "GiselaBladeOfGoldnight"
+        and card_types == {"CREATURE"}
+        and {
+            "GiselaBladeOfGoldnightDoubleDamageEffect",
+            "GiselaBladeOfGoldnightPreventionEffect",
+        }.issubset(effect_classes)
+        and "SimpleStaticAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="damage_modifier",
+                scope="opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1",
+                reason=(
+                    "XMage structure matches Gisela, Blade of Goldnight: static replacement effects "
+                    "double damage dealt to opponents or permanents opponents control and prevent half, "
+                    "rounded up, of damage dealt to you or permanents you control."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 5,
+                    "toughness": 5,
+                    "flying": True,
+                    "first_strike": True,
+                    "damage_multiplier": 2,
+                    "damage_modifier_applies_to": "any_source",
+                    "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                    "damage_modifier_duration": "while_on_battlefield",
+                    "prevent_half_damage_to_you_and_permanents_you_control": True,
+                    "prevent_half_rounding": "rounded_up",
+                },
+                matched_signals=[
+                    "SimpleStaticAbility",
+                    "GiselaBladeOfGoldnightDoubleDamageEffect",
+                    "GiselaBladeOfGoldnightPreventionEffect",
+                    "GameEvent.EventType.DAMAGE_PLAYER",
+                    "GameEvent.EventType.DAMAGE_PERMANENT",
+                ],
+            )
+        )
+
+    if (
         xmage_class_name == "VergeRangers"
         and card_types == {"CREATURE"}
         and {

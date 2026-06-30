@@ -1,3 +1,6 @@
+import json
+import sqlite3
+
 import lorehold_runtime_gap_family_queue as queue
 
 
@@ -41,6 +44,58 @@ def test_blocked_runtime_rows_uses_all_candidates_not_only_top() -> None:
     rows = queue.blocked_runtime_rows(miner_report())
 
     assert [row["card_name"] for row in rows] == ["Blocked Engine"]
+
+
+def test_blocked_runtime_rows_filters_current_verified_auto_sqlite_rule(tmp_path) -> None:
+    sqlite_db = tmp_path / "knowledge.db"
+    conn = sqlite3.connect(sqlite_db)
+    conn.execute(
+        """
+        CREATE TABLE battle_card_rules (
+          normalized_name TEXT,
+          logical_rule_key TEXT,
+          card_name TEXT,
+          effect_json TEXT,
+          deck_role_json TEXT,
+          source TEXT,
+          confidence REAL,
+          review_status TEXT,
+          execution_status TEXT,
+          rule_version INTEGER,
+          oracle_hash TEXT,
+          notes TEXT,
+          created_at TEXT,
+          updated_at TEXT,
+          last_seen_at TEXT,
+          PRIMARY KEY (normalized_name, logical_rule_key)
+        )
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO battle_card_rules (
+          normalized_name, logical_rule_key, card_name, effect_json,
+          deck_role_json, source, confidence, review_status, execution_status,
+          rule_version, oracle_hash, notes, created_at, updated_at, last_seen_at
+        ) VALUES (?, ?, ?, ?, '{}', 'curated', 1.0, 'verified', 'auto', 2, 'hash', '', '', '', '')
+        """,
+        (
+            "blocked engine",
+            "battle_rule_v1:abc",
+            "Blocked Engine",
+            json.dumps({"effect": "draw_engine", "battle_model_scope": "current_exact_scope_v1"}),
+        ),
+    )
+    conn.commit()
+    conn.close()
+    active_rules = queue.active_runtime_rule_index(sqlite_db)
+
+    rows = queue.blocked_runtime_rows(
+        miner_report(),
+        active_rule_index=active_rules,
+    )
+
+    assert rows == []
 
 
 def test_blocked_coherence_report_preserves_lorehold_context() -> None:

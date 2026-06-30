@@ -73,6 +73,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
     REPORT_DIR / "lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+    REPORT_DIR / "lorehold_forced_exposure_probe_decision_20260630.json",
+    REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
 )
 
 
@@ -939,7 +942,13 @@ CUT_SAFETY_BLOCKED_STATUSES = {
 }
 CUT_SAFETY_RISKY_STATUSES = {"risky_cut_only_same_lane"}
 CUT_SAFETY_PROTECTED_STATUSES = CUT_SAFETY_BLOCKED_STATUSES | CUT_SAFETY_RISKY_STATUSES
-PRIOR_PACKAGE_BLOCKED_DECISIONS = {"reject_or_rework", "invalid_or_incomplete"}
+PRIOR_PACKAGE_BLOCKED_DECISIONS = {
+    "reject_or_rework",
+    "invalid_or_incomplete",
+    "forced_access_no_lift_reject_or_rework",
+    "tie_watch_strategy_regression",
+    "insufficient_card_outcome_sample",
+}
 
 
 def card_signature(cards: object) -> tuple[str, ...]:

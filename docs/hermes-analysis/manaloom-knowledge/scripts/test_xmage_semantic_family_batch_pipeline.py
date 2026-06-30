@@ -159,6 +159,44 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_name["Promise of Loyalty"]["proposal_status"], "runtime_family_implementation_required")
         self.assertFalse(by_name["Molecule Man"]["safe_for_batch_pg_package"])
 
+    def test_generator_accepts_nested_family_report_input(self) -> None:
+        family_report = classifier.build_family_report(sample_batch_audit())
+        report = generator.build_generator_report(
+            batch_audit={"family_report": family_report, "source": "runtime_gap_queue"},
+            external_harvest=sample_external_harvest(),
+        )
+
+        by_name = {proposal["card_name"]: proposal for proposal in report["proposals"]}
+
+        self.assertEqual(report["summary"]["proposal_count"], 4)
+        self.assertTrue(by_name["Pearl Medallion"]["safe_for_batch_pg_package"])
+        self.assertTrue(by_name["Gods Willing"]["safe_for_batch_pg_package"])
+
+    def test_generator_can_reuse_previous_proposal_report_as_hash_source(self) -> None:
+        batch_audit = sample_batch_audit()
+        batch_audit["cards"][0]["oracle_hash"] = None
+        report = generator.build_generator_report(
+            batch_audit=batch_audit,
+            external_harvest={
+                "status": "previous_proposal_report",
+                "proposals": [
+                    {
+                        "card_name": "Pearl Medallion",
+                        "oracle_hash": "77f7f449ee56143d6b63814fecd37176",
+                        "effect_json": {
+                            "effect": "static_cost_reduction",
+                            "applies_to_spell_colors": ["W"],
+                        },
+                    }
+                ],
+            },
+        )
+
+        proposal = {row["card_name"]: row for row in report["proposals"]}["Pearl Medallion"]
+
+        self.assertEqual(proposal["oracle_hash"], "77f7f449ee56143d6b63814fecd37176")
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+
     def test_phase_out_protection_family_is_batch_safe_with_oracle_hash(self) -> None:
         batch_audit = {
             "cards": [
@@ -3562,6 +3600,47 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
                             },
                         },
                     },
+                    {
+                        "card_name": "Gisela, Blade of Goldnight",
+                        "severity": "high",
+                        "oracle_hash": "giselahash",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["no_active_battle_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "GiselaBladeOfGoldnight",
+                            "path": "/xmage/GiselaBladeOfGoldnight.java",
+                            "types": ["CREATURE"],
+                            "effect_classes": [
+                                "GiselaBladeOfGoldnightDoubleDamageEffect",
+                                "GiselaBladeOfGoldnightPreventionEffect",
+                            ],
+                            "ability_classes": [
+                                "FirstStrikeAbility",
+                                "FlyingAbility",
+                                "SimpleStaticAbility",
+                            ],
+                            "cost_classes": [],
+                            "primary_effect": {
+                                "effect": "damage_modifier",
+                                "battle_model_scope": (
+                                    "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1"
+                                ),
+                                "damage_modifier_applies_to": "any_source",
+                                "damage_modifier_duration": "while_on_battlefield",
+                                "damage_modifier_targets": ["opponents", "opponent_permanents"],
+                                "damage_multiplier": 2,
+                                "prevent_half_damage_to_you_and_permanents_you_control": True,
+                                "prevent_half_rounding": "rounded_up",
+                                "first_strike": True,
+                                "flying": True,
+                                "power": 5,
+                                "toughness": 5,
+                            },
+                        },
+                    },
                 ]
             }
         )
@@ -3575,6 +3654,11 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(by_card["Twinflame Tyrant"]["family_id"], "static_damage_modifier")
         self.assertEqual(
             by_card["Twinflame Tyrant"]["promotion_lane"],
+            "batch_metadata_candidate_requires_pg_precheck",
+        )
+        self.assertEqual(by_card["Gisela, Blade of Goldnight"]["family_id"], "static_damage_modifier")
+        self.assertEqual(
+            by_card["Gisela, Blade of Goldnight"]["promotion_lane"],
             "batch_metadata_candidate_requires_pg_precheck",
         )
 

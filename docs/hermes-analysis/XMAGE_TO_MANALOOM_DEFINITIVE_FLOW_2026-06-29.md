@@ -295,6 +295,38 @@ PG262 exact ritual runtime checkpoint:
   `draw_engine=4`, `topdeck_play=3`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 
+PG263/PG264 Lorehold runtime-gap checkpoint:
+
+- PG263 was applied and synced for eight Lorehold/opponent runtime-gap cards:
+  `Goliath Daydreamer`, `Twinflame Tyrant`, `Verge Rangers`,
+  `Boros Reckoner`, `Terror of the Peaks`, `Balefire Liege`,
+  `Firesong and Sunspeaker`, and `Repercussion`.
+- PG263 apply result: backup rows `17`, deprecated shadow rows `12`,
+  upserted rows `8`; E2E validation proved PostgreSQL `8/8`, SQLite `8/8`,
+  canonical snapshot `8/8`, and runtime `get_card_effect` `8/8`.
+- The E2E validator and package builder now require snapshot/runtime checks
+  derived from `expected_rules`, preventing a false-green package with
+  `validated_cards=0`.
+- The runtime-gap queue now filters cards that already have a synced
+  `verified/auto` exact rule in SQLite. This corrected the stale queue from
+  `61` raw blocked rows to `27` real pending rows after PG263.
+- PG264 implemented and applied the exact Gisela static-damage scope
+  `opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1`,
+  using local XMage classes
+  `GiselaBladeOfGoldnightDoubleDamageEffect` and
+  `GiselaBladeOfGoldnightPreventionEffect`.
+- PG264 apply result: backup rows `2`, deprecated shadow rows `2`, upserted
+  rows `1`; E2E validation proved PostgreSQL `1/1`, SQLite `1/1`, canonical
+  snapshot `1/1`, and runtime `get_card_effect` `1/1`.
+- Current queue after PG264:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.md`.
+- Current proposal report after PG264:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela_proposals.md`.
+- Current unresolved Lorehold runtime-gap queue: `26` cards,
+  `mapper_metadata_or_test_scenario_required=13`,
+  `split_family_scope_review_required=13`,
+  `safe_for_batch_pg_package_count=0`.
+
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope
 `station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1`

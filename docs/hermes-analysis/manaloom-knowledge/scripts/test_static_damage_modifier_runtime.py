@@ -42,6 +42,25 @@ def twinflame_tyrant():
     }
 
 
+def gisela_blade_of_goldnight():
+    return {
+        "name": "Gisela, Blade of Goldnight",
+        "effect": "damage_modifier",
+        "battle_model_scope": "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1",
+        "damage_modifier_applies_to": "any_source",
+        "damage_modifier_targets": ["opponents", "opponent_permanents"],
+        "damage_modifier_duration": "while_on_battlefield",
+        "damage_multiplier": 2,
+        "prevent_half_damage_to_you_and_permanents_you_control": True,
+        "prevent_half_rounding": "rounded_up",
+        "type_line": "Legendary Creature - Angel",
+        "power": 5,
+        "toughness": 5,
+        "flying": True,
+        "first_strike": True,
+    }
+
+
 def creature(name, toughness=4):
     return {
         "name": name,
@@ -190,3 +209,49 @@ def test_twinflame_tyrant_does_not_double_opponent_source_damage_to_controller()
     assert final_amount == 3
     assert damage_dealt == 3
     assert active.life == 37
+
+
+def test_gisela_doubles_any_source_damage_to_opponents():
+    battle = load_battle()
+    active = player(battle, "Lorehold")
+    opponent = player(battle, "Opponent")
+    active.battlefield = [gisela_blade_of_goldnight()]
+    source = {"name": "Lightning Bolt", "type_line": "Instant", "effect": "direct_damage", "owner": "Lorehold"}
+
+    damage_dealt, final_amount, dealt = battle.deal_damage_to_player_with_static_replacements(
+        active,
+        opponent,
+        source,
+        3,
+        turn=7,
+        phase="resolution",
+        damage_event_type="player",
+    )
+
+    assert dealt is True
+    assert final_amount == 6
+    assert damage_dealt == 6
+    assert opponent.life == 34
+
+
+def test_gisela_halves_damage_to_controller_rounded_up():
+    battle = load_battle()
+    active = player(battle, "Lorehold")
+    opponent = player(battle, "Opponent")
+    active.battlefield = [gisela_blade_of_goldnight()]
+    source = {"name": "Opponent Blast", "type_line": "Instant", "effect": "direct_damage", "owner": "Opponent"}
+
+    damage_dealt, final_amount, dealt = battle.deal_damage_to_player_with_static_replacements(
+        opponent,
+        active,
+        source,
+        5,
+        turn=8,
+        phase="resolution",
+        damage_event_type="player",
+    )
+
+    assert dealt is True
+    assert final_amount == 2
+    assert damage_dealt == 2
+    assert active.life == 38

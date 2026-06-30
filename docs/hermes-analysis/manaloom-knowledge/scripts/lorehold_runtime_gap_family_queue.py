@@ -11,7 +11,9 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sqlite3
 from collections import Counter
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -28,6 +30,7 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
+DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
 
 
 def utc_now() -> str:
@@ -57,11 +60,62 @@ def candidate_rows(miner_report: dict[str, Any]) -> list[dict[str, Any]]:
     return [row for row in rows if isinstance(row, dict)]
 
 
-def blocked_runtime_rows(miner_report: dict[str, Any]) -> list[dict[str, Any]]:
+def active_runtime_rule_index(sqlite_db: Path) -> dict[str, list[dict[str, Any]]]:
+    if not sqlite_db.exists():
+        return {}
+    with closing(sqlite3.connect(sqlite_db)) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT normalized_name, card_name, logical_rule_key, effect_json,
+                   review_status, execution_status, rule_version, oracle_hash
+            FROM battle_card_rules
+            WHERE review_status = 'verified'
+              AND execution_status = 'auto'
+            ORDER BY normalized_name, logical_rule_key
+            """
+        ).fetchall()
+    index: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        payload = dict(row)
+        effect_json = payload.get("effect_json") or "{}"
+        if isinstance(effect_json, str):
+            try:
+                effect_json = json.loads(effect_json)
+            except json.JSONDecodeError:
+                effect_json = {}
+        scope = str((effect_json or {}).get("battle_model_scope") or "")
+        if not scope or scope.startswith("xmage_"):
+            continue
+        payload["battle_model_scope"] = scope
+        for value in (payload.get("normalized_name"), payload.get("card_name")):
+            key = normalize_key(value)
+            if key:
+                index.setdefault(key, []).append(payload)
+    return index
+
+
+def current_rule_matches_card(row: dict[str, Any], active_rule_index: dict[str, list[dict[str, Any]]]) -> bool:
+    card_key = normalize_key(row.get("card_name"))
+    if not card_key:
+        return False
+    if card_key in active_rule_index:
+        return True
+    first_face = normalize_key(str(row.get("card_name") or "").split(" // ", 1)[0])
+    return bool(first_face and first_face in active_rule_index)
+
+
+def blocked_runtime_rows(
+    miner_report: dict[str, Any],
+    *,
+    active_rule_index: dict[str, list[dict[str, Any]]] | None = None,
+) -> list[dict[str, Any]]:
+    active_rule_index = active_rule_index or {}
     rows = [
         row
         for row in candidate_rows(miner_report)
         if row.get("status") == "blocked_runtime_rule_gap"
+        and not current_rule_matches_card(row, active_rule_index)
     ]
     rows.sort(
         key=lambda row: (
@@ -419,8 +473,21 @@ def build_queue_report(
     *,
     miner_report: dict[str, Any],
     xmage_root: Path,
+    sqlite_db: Path,
 ) -> dict[str, Any]:
-    blocked_rows = blocked_runtime_rows(miner_report)
+    active_rules = active_runtime_rule_index(sqlite_db)
+    raw_blocked_rows = [
+        row
+        for row in candidate_rows(miner_report)
+        if row.get("status") == "blocked_runtime_rule_gap"
+    ]
+    filtered_current_rule_rows = [
+        row for row in raw_blocked_rows if current_rule_matches_card(row, active_rules)
+    ]
+    blocked_rows = blocked_runtime_rows(
+        miner_report,
+        active_rule_index=active_rules,
+    )
     coherence_report = build_blocked_coherence_report(
         miner_report=miner_report,
         blocked_rows=blocked_rows,
@@ -468,11 +535,17 @@ def build_queue_report(
         "source": {
             "miner_report": miner_report.get("_source_path"),
             "xmage_root": str(xmage_root),
+            "sqlite_db": str(sqlite_db),
             "base_deck_id": miner_report.get("base_deck_id"),
             "variant_deck_ids": miner_report.get("variant_deck_ids") or [],
         },
         "summary": {
+            "raw_blocked_runtime_rule_gap_count": len(raw_blocked_rows),
             "blocked_runtime_rule_gap_count": len(blocked_rows),
+            "filtered_current_verified_auto_rule_count": len(filtered_current_rule_rows),
+            "filtered_current_verified_auto_rule_cards": [
+                row.get("card_name") for row in filtered_current_rule_rows
+            ],
             "candidate_lane_counts": dict(sorted(candidate_lane_counts.items())),
             "xmage_index_summary": index_report.get("summary") or {},
             "validity_summary": validity_report.get("summary") or {},
@@ -499,8 +572,11 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         f"- Generated at: `{report['generated_at']}`",
         f"- XMage root: `{(report.get('source') or {}).get('xmage_root')}`",
+        f"- SQLite current-rule filter: `{(report.get('source') or {}).get('sqlite_db')}`",
         "- PostgreSQL writes: `false`",
         "- SQLite source mutated: `false`",
+        f"- Raw blocked runtime cards: `{summary.get('raw_blocked_runtime_rule_gap_count')}`",
+        f"- Filtered current verified/auto rules: `{summary.get('filtered_current_verified_auto_rule_count')}`",
         f"- Blocked runtime cards: `{summary.get('blocked_runtime_rule_gap_count')}`",
         f"- Candidate lanes: `{json.dumps(summary.get('candidate_lane_counts'), sort_keys=True)}`",
         f"- Promotion lanes: `{json.dumps(summary.get('promotion_lane_counts'), sort_keys=True)}`",
@@ -582,6 +658,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--xmage-root", type=Path, default=DEFAULT_XMAGE_ROOT)
+    parser.add_argument("--sqlite-db", type=Path, default=DEFAULT_SQLITE_DB)
     parser.add_argument("--output-prefix")
     return parser.parse_args()
 
@@ -593,6 +670,7 @@ def main() -> int:
     report = build_queue_report(
         miner_report=miner_report,
         xmage_root=args.xmage_root,
+        sqlite_db=args.sqlite_db,
     )
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     output_prefix = Path(

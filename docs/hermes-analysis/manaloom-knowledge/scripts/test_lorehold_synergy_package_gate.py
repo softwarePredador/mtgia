@@ -682,6 +682,37 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         self.assertEqual(classification["status"], "blocked_prior_reject")
         self.assertIn("reject_or_rework", classification["reason"])
 
+    def test_prior_evidence_blocks_forced_no_lift_and_strategy_regression_ties(self):
+        for decision in (
+            "forced_access_no_lift_reject_or_rework",
+            "tie_watch_strategy_regression",
+        ):
+            with self.subTest(decision=decision):
+                prior_results = {
+                    "enabled": True,
+                    "by_package_key": {
+                        "enlightened_access_benchmark_cut_land_tax": [
+                            {
+                                "package_key": "enlightened_access_benchmark_cut_land_tax",
+                                "adds": ["Enlightened Tutor"],
+                                "cuts": ["Land Tax"],
+                                "decision": decision,
+                                "delta_pp": 0.0,
+                                "source_report": "/tmp/prior.json",
+                            }
+                        ]
+                    },
+                }
+
+                classification = gate.classify_package_prior_evidence(
+                    "enlightened_access_benchmark_cut_land_tax",
+                    gate.PACKAGE_DEFINITIONS["enlightened_access_benchmark_cut_land_tax"],
+                    prior_results,
+                )
+
+                self.assertEqual(classification["status"], "blocked_prior_reject")
+                self.assertIn(decision, classification["reason"])
+
     def test_forced_access_diagnostic_does_not_require_prior_ignore_flag(self):
         prior_results = {
             "enabled": True,
@@ -976,6 +1007,18 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         )
         self.assertIn(
             "lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_forced_exposure_probe_decision_20260630.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_forced_signal_natural_confirm_decision_20260630.json",
+            default_names,
+        )
+        self.assertIn(
+            "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
             default_names,
         )
         self.assertIn(

@@ -1,0 +1,4 @@
+         card_name          |      normalized_name       |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+----------------------------+----------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Gisela, Blade of Goldnight | gisela, blade of goldnight | c59105cb2fa02882b4485d6a06ab6187 | battle_rule_v1:a8b6b99ddc6deb9fe2fdb85033a950a4 | deprecate_nonmatching_rows |                1 | f79dce78-28f8-449d-8d0d-19a3dbb21702 |                  2 |                         0 |                           2
+(1 row)

@@ -78,9 +78,22 @@ def utc_now() -> str:
 def external_by_name(external_harvest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
     if not external_harvest:
         return {}
+    rows = list(external_harvest.get("cards") or [])
+    for proposal in external_harvest.get("proposals") or []:
+        if not isinstance(proposal, dict) or not proposal.get("card_name"):
+            continue
+        rows.append(
+            {
+                "card_name": proposal.get("card_name"),
+                "candidate_rule": {
+                    "oracle_hash": proposal.get("oracle_hash"),
+                    "effect_json": proposal.get("effect_json") or {},
+                },
+            }
+        )
     return {
         normalize_name(str(card.get("card_name") or "")): card
-        for card in external_harvest.get("cards", [])
+        for card in rows
         if isinstance(card, dict) and card.get("card_name")
     }
 
@@ -316,7 +329,11 @@ def build_generator_report(
     batch_audit: dict[str, Any],
     external_harvest: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    family_report = build_family_report(batch_audit)
+    nested_family_report = batch_audit.get("family_report")
+    if isinstance(nested_family_report, dict) and isinstance(nested_family_report.get("cards"), list):
+        family_report = nested_family_report
+    else:
+        family_report = build_family_report(batch_audit)
     ext_by_name = external_by_name(external_harvest)
     proposals = [
         build_proposal(card, ext_by_name.get(normalize_name(str(card.get("card_name") or ""))))
@@ -324,6 +341,7 @@ def build_generator_report(
     ]
     status_counts = Counter(proposal["proposal_status"] for proposal in proposals)
     family_counts = Counter(proposal["family_id"] for proposal in proposals)
+    source = batch_audit.get("source") if isinstance(batch_audit.get("source"), dict) else {}
     return {
         "generated_at": utc_now(),
         "status": "ready",
@@ -331,7 +349,7 @@ def build_generator_report(
         "source": {
             "family_summary": family_report.get("summary"),
             "external_harvest_status": (external_harvest or {}).get("status"),
-            "deck_id": (batch_audit.get("source") or {}).get("deck_id"),
+            "deck_id": source.get("deck_id"),
         },
         "summary": {
             "proposal_count": len(proposals),

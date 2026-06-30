@@ -2216,6 +2216,12 @@
       "power": 1,
       "toughness": 1
     },
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "zone": "stack"
+    },
     "toughness": 4,
     "trigger": "spell_cast",
     "trigger_effect": "spell_color_damage_life",
@@ -2225,7 +2231,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:23affc042720e62b237989441a5e1b0e",
+    "battle_rule_logical_key": "battle_rule_v1:4b0fa54a51902d1376423ffc131a34f0",
     "battle_rule_oracle_hash": "467dd11263f2854e2d9fc487a127ced6"
   },
   "Baleful Mastery": {
@@ -13138,14 +13144,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Gisela, Blade of Goldnight": {
-    "cmc": 7.0,
-    "effect": "finisher",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d816a3ec5c9c24e763abaccb27b2a2b3"
+    "ability_kind": "static",
+    "battle_model_scope": "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1",
+    "damage_modifier_applies_to": "any_source",
+    "damage_modifier_duration": "while_on_battlefield",
+    "damage_modifier_targets": [
+      "opponents",
+      "opponent_permanents"
+    ],
+    "damage_multiplier": 2,
+    "effect": "damage_modifier",
+    "first_strike": true,
+    "flying": true,
+    "power": 5,
+    "prevent_half_damage_to_you_and_permanents_you_control": true,
+    "prevent_half_rounding": "rounded_up",
+    "toughness": 5,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a8b6b99ddc6deb9fe2fdb85033a950a4",
+    "battle_rule_oracle_hash": "c59105cb2fa02882b4485d6a06ab6187"
   },
   "Gitaxian Probe": {
     "count": 1,
@@ -25654,7 +25675,7 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 0.94,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:d1a0c5cc0035945ec8bfd795da52d017",
+    "battle_rule_logical_key": "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c",
     "battle_rule_oracle_hash": "8e1ed4f8063ab89dd8906878a6232862"
   },
   "Replicating Ring": {
@@ -35291,7 +35312,6 @@
   "Twinflame Tyrant": {
     "ability_kind": "static",
     "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
-    "cmc": 5.0,
     "damage_modifier_applies_to": "sources_you_control",
     "damage_modifier_duration": "while_on_battlefield",
     "damage_modifier_targets": [
@@ -35303,13 +35323,12 @@
     "flying": true,
     "power": 3,
     "toughness": 5,
-    "xmage_effect": "TwinflameTyrantEffect replacement doubles DAMAGE_PLAYER and DAMAGE_PERMANENT when the source is controlled by Twinflame controller and target is an opponent or opponent-controlled permanent",
     "battle_rule_source": "curated",
     "battle_rule_review_status": "verified",
     "battle_rule_execution_status": "auto",
-    "battle_rule_confidence": 1.0,
+    "battle_rule_confidence": 0.94,
     "battle_rule_version": 2,
-    "battle_rule_logical_key": "battle_rule_v1:072370a98c9b332eef021390bfc1694a",
+    "battle_rule_logical_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c",
     "battle_rule_oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6"
   },
   "Twinning Staff": {

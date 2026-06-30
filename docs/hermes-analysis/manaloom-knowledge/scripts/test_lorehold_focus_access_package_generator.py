@@ -2,7 +2,7 @@ import lorehold_focus_access_package_generator as gen
 
 
 def test_default_planner_uses_current_rejection_integrated_report():
-    assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260628_v16_current_default_chain.json"
+    assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 
 
 def test_default_access_model_uses_runtime_overlay_report():
@@ -10,7 +10,7 @@ def test_default_access_model_uses_runtime_overlay_report():
 
 
 def test_default_runtime_gap_queue_uses_current_miner_report():
-    assert gen.DEFAULT_RUNTIME_GAP_QUEUE.name == "lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json"
+    assert gen.DEFAULT_RUNTIME_GAP_QUEUE.name == "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.json"
 
 
 def planner_payload(prior_keys=None):

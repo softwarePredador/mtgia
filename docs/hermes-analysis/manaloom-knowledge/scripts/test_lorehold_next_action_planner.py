@@ -962,6 +962,51 @@ def test_next_action_planner_defaults_include_exposure_contract_report():
 
     assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
     assert "lorehold_exposure_outcome_audit_20260628_actionability_v1.json" in default_names
+    assert "lorehold_forced_exposure_probe_decision_20260630.json" in default_names
+    assert "lorehold_forced_signal_natural_confirm_decision_20260630.json" in default_names
+    assert "lorehold_profiled_cut_benchmark_gate_decision_20260630.json" in default_names
+
+
+def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_rejections():
+    prior = (
+        Path("/tmp/lorehold_current_prior.json"),
+        {
+            "packages": [
+                {
+                    "package_key": "gamble_access_benchmark_cut_land_tax",
+                    "adds": ["Gamble"],
+                    "cuts": ["Land Tax"],
+                    "decision": "forced_access_no_lift_reject_or_rework",
+                    "gate_summary": {
+                        "baseline": {"wins": 9, "losses": 15, "stalls": 0},
+                        "candidate": {"wins": 7, "losses": 17, "stalls": 0},
+                        "delta_pp": -8.33,
+                    },
+                },
+                {
+                    "package_key": "enlightened_access_benchmark_cut_land_tax",
+                    "adds": ["Enlightened Tutor"],
+                    "cuts": ["Land Tax"],
+                    "decision": "tie_watch_strategy_regression",
+                    "gate_summary": {
+                        "baseline": {"wins": 11, "losses": 12, "stalls": 1},
+                        "candidate": {"wins": 11, "losses": 13, "stalls": 0},
+                        "delta_pp": 0.0,
+                    },
+                },
+            ]
+        },
+    )
+
+    rejected = planner.rejected_package_evidence([prior])
+
+    assert sorted(rejected) == [
+        "enlightened_access_benchmark_cut_land_tax",
+        "gamble_access_benchmark_cut_land_tax",
+    ]
+    assert rejected["enlightened_access_benchmark_cut_land_tax"]["decision"] == (
+        "tie_watch_strategy_regression"
+    )
 
 
 def test_next_action_planner_default_prior_reports_include_profiled_history():

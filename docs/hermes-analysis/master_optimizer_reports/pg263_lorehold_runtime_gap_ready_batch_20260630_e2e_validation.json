@@ -1,0 +1,334 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T05:31:02.815600+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg263_lorehold_runtime_gap_ready_batch_20260630_manifest.json",
+  "package_id": "pg263_lorehold_runtime_gap_ready_batch_20260630_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+          "card_name": "Goliath Daydreamer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+          "oracle_hash": "715d2c178b304a7c5e6beed655883851",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+          "card_name": "Twinflame Tyrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c",
+          "oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+          "card_name": "Verge Rangers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1",
+          "oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+          "card_name": "Boros Reckoner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef",
+          "oracle_hash": "8cb6c980428b2501343f3f38dc686efb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+          "card_name": "Terror of the Peaks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80",
+          "oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+          "card_name": "Balefire Liege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0fa54a51902d1376423ffc131a34f0",
+          "oracle_hash": "467dd11263f2854e2d9fc487a127ced6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+          "card_name": "Firesong and Sunspeaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6858198cb699117df42e073abcee357",
+          "oracle_hash": "834cfb8f0f869e7e9b4bc5342ad63046",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+          "card_name": "Repercussion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c",
+          "oracle_hash": "8e1ed4f8063ab89dd8906878a6232862",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+          "card_name": "Goliath Daydreamer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd",
+          "oracle_hash": "715d2c178b304a7c5e6beed655883851",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+          "card_name": "Twinflame Tyrant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c",
+          "oracle_hash": "e4ca0585f743b1c34c36649bfbb1fff6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+          "card_name": "Verge Rangers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1",
+          "oracle_hash": "44aa2eeb2eeb517fb30478aec7cec42f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+          "card_name": "Boros Reckoner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef",
+          "oracle_hash": "8cb6c980428b2501343f3f38dc686efb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+          "card_name": "Terror of the Peaks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80",
+          "oracle_hash": "90c007ac59cdd400f58e89c47d81440e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+          "card_name": "Balefire Liege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b0fa54a51902d1376423ffc131a34f0",
+          "oracle_hash": "467dd11263f2854e2d9fc487a127ced6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+          "card_name": "Firesong and Sunspeaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6858198cb699117df42e073abcee357",
+          "oracle_hash": "834cfb8f0f869e7e9b4bc5342ad63046",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+          "card_name": "Repercussion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c",
+          "oracle_hash": "8e1ed4f8063ab89dd8906878a6232862",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "instant_sorcery_from_hand_exile_dream_counter_attack_free_cast_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goliath Daydreamer",
+          "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+          "battle_rule_version": 2,
+          "card_name": "Twinflame Tyrant",
+          "logical_rule_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+          "battle_rule_version": 2,
+          "card_name": "Verge Rangers",
+          "logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "source_dealt_damage_reflect_to_any_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boros Reckoner",
+          "logical_rule_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Terror of the Peaks",
+          "logical_rule_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_spell_damage_white_spell_lifegain_static_creature_boost_v1",
+          "battle_rule_version": 2,
+          "card_name": "Balefire Liege",
+          "logical_rule_key": "battle_rule_v1:4b0fa54a51902d1376423ffc131a34f0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "red_instant_sorcery_lifelink_white_lifegain_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Firesong and Sunspeaker",
+          "logical_rule_key": "battle_rule_v1:f6858198cb699117df42e073abcee357"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "creature_damage_controller_reflect_global_v1",
+          "battle_rule_version": 2,
+          "card_name": "Repercussion",
+          "logical_rule_key": "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Goliath Daydreamer",
+          "component_keys": [],
+          "effect": "free_cast",
+          "logical_rule_key": "battle_rule_v1:65521ad249354a62c78b7c29ab866ecd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Twinflame Tyrant",
+          "component_keys": [],
+          "effect": "damage_modifier",
+          "logical_rule_key": "battle_rule_v1:2b4bda8e443bbbf48e1654884d61355c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Verge Rangers",
+          "component_keys": [],
+          "effect": "topdeck_play",
+          "logical_rule_key": "battle_rule_v1:9cbcc91673241a282f321ffb94963ca1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Boros Reckoner",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f344d0f95f1afcd03e9b0d840981aeef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Terror of the Peaks",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ae8cab02963098960997301b3c227a80"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Balefire Liege",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4b0fa54a51902d1376423ffc131a34f0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Firesong and Sunspeaker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f6858198cb699117df42e073abcee357"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Repercussion",
+          "component_keys": [],
+          "effect": "passive",
+          "logical_rule_key": "battle_rule_v1:9eb5bda15d554b0e5a97637322f4969c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

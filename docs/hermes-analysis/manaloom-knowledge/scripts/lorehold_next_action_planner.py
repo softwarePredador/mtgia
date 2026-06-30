@@ -73,6 +73,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     DEFAULT_STRATEGY_AUDIT,
     REPORT_DIR / "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json",
     REPORT_DIR / "lorehold_exposure_outcome_audit_20260628_actionability_v1.json",
+    REPORT_DIR / "lorehold_forced_exposure_probe_decision_20260630.json",
+    REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
 ]
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
@@ -83,6 +86,11 @@ INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "candidate_used_without_cut_comparator",
     "candidate_accessed_without_used_sample",
     "candidate_near_access_without_used_sample",
+}
+REJECTED_PRIOR_DECISIONS = {
+    "reject_or_rework",
+    "forced_access_no_lift_reject_or_rework",
+    "tie_watch_strategy_regression",
 }
 LOW_EXPOSURE_STATUSES = {
     "candidate_added_card_low_access",
@@ -433,7 +441,7 @@ def rejected_package_evidence(
                 if flat_gate:
                     result = {**result, "gate_summary": flat_gate}
             decision = infer_package_decision(result)
-            if decision != "reject_or_rework":
+            if decision not in REJECTED_PRIOR_DECISIONS:
                 if decision in INCONCLUSIVE_EXPOSURE_DECISIONS:
                     rejected.pop(key, None)
                 continue
@@ -481,7 +489,7 @@ def inconclusive_package_evidence(
                     result = {**result, "gate_summary": flat_gate}
             decision = infer_package_decision(result)
             if decision not in INCONCLUSIVE_EXPOSURE_DECISIONS:
-                if decision == "reject_or_rework":
+                if decision in REJECTED_PRIOR_DECISIONS:
                     inconclusive.pop(key, None)
                 continue
             gate = result.get("gate_summary") or {}

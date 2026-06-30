@@ -425,6 +425,58 @@ ORDER BY p.card_name;
 """
 
 
+def expected_rule_from_proposal(proposal: dict[str, Any]) -> dict[str, Any]:
+    effect_json = proposal.get("effect_json") if isinstance(proposal.get("effect_json"), dict) else {}
+    required_effect_fields = {}
+    for field in ("effect", "battle_model_scope"):
+        if effect_json.get(field) is not None:
+            required_effect_fields[field] = effect_json[field]
+    return {
+        "normalized_name": proposal["normalized_name"],
+        "card_name": proposal["card_name"],
+        "logical_rule_key": proposal["logical_rule_key"],
+        "oracle_hash": proposal["oracle_hash"],
+        "review_status": proposal.get("review_status") or "verified",
+        "execution_status": proposal.get("execution_status") or "auto",
+        "min_rule_version": 2,
+        "required_effect_fields": required_effect_fields,
+        "forbid_annotation_only": True,
+    }
+
+
+def snapshot_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    required = dict(rule.get("required_effect_fields") or {})
+    snapshot_required = {}
+    if required.get("battle_model_scope") is not None:
+        snapshot_required["battle_model_scope"] = required["battle_model_scope"]
+    return {
+        "card_name": rule["card_name"],
+        "normalized_name": rule["normalized_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+        "oracle_hash": rule["oracle_hash"],
+        "review_status": rule.get("review_status") or "verified",
+        "execution_status": rule.get("execution_status") or "auto",
+        "min_rule_version": rule.get("min_rule_version") or 2,
+        "required_effect_fields": snapshot_required,
+        "forbid_annotation_only": True,
+    }
+
+
+def runtime_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    required = dict(rule.get("required_effect_fields") or {})
+    check = {
+        "card": {"name": rule["card_name"]},
+        "card_name": rule["card_name"],
+        "normalized_name": rule["normalized_name"],
+        "logical_rule_key": rule["logical_rule_key"],
+        "required_effect_fields": required,
+        "forbid_annotation_only": True,
+    }
+    if required.get("effect") is not None:
+        check["effect"] = required["effect"]
+    return check
+
+
 def markdown_package(manifest: dict[str, Any]) -> str:
     lines = [
         f"# {manifest['deploy_id']} XMage Batch PostgreSQL Package",
@@ -507,6 +559,7 @@ def build_package(
     Path(files["postcheck"]).write_text(build_postcheck_sql(selected, backup_table), encoding="utf-8")
 
     family_counts = Counter(proposal["family_id"] for proposal in selected)
+    expected_rules = [expected_rule_from_proposal(proposal) for proposal in selected]
     manifest = {
         "generated_at": utc_now(),
         "status": "prepared_read_only_pending_apply_approval",
@@ -517,6 +570,9 @@ def build_package(
         "selected_count": len(selected),
         "selected_card_names": [proposal["card_name"] for proposal in selected],
         "family_counts": dict(sorted(family_counts.items())),
+        "expected_rules": expected_rules,
+        "snapshot_checks": [snapshot_check_from_expected_rule(rule) for rule in expected_rules],
+        "runtime_checks": [runtime_check_from_expected_rule(rule) for rule in expected_rules],
         "files": files,
         "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
     }

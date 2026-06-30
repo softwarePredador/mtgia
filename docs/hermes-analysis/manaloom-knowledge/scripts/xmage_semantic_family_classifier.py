@@ -138,6 +138,8 @@ FAMILY_DEFINITIONS: dict[str, dict[str, Any]] = {
             "test_twinflame_tyrant_doubles_damage_to_each_opponent",
             "test_twinflame_tyrant_doubles_wipe_damage_only_to_opponent_permanents",
             "test_twinflame_tyrant_doubles_combat_damage_and_commander_damage",
+            "test_gisela_doubles_any_source_damage_to_opponents",
+            "test_gisela_halves_damage_to_controller_rounded_up",
         ],
         "batch_strategy": "metadata_batch_after_pg_precheck",
     },
@@ -1142,6 +1144,30 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and set(targets) == {"opponents", "opponent_permanents"}
             and bool(effect_json.get("flying"))
             and int(effect_json.get("power") or 0) == 3
+            and int(effect_json.get("toughness") or 0) == 5
+        )
+
+    if (
+        effect == "damage_modifier"
+        and scope == "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1"
+    ):
+        targets = effect_json.get("damage_modifier_targets") or []
+        return (
+            types == {"CREATURE"}
+            and {
+                "GiselaBladeOfGoldnightDoubleDamageEffect",
+                "GiselaBladeOfGoldnightPreventionEffect",
+            }.issubset(effect_classes)
+            and {"FirstStrikeAbility", "FlyingAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and int(effect_json.get("damage_multiplier") or 0) == 2
+            and effect_json.get("damage_modifier_applies_to") == "any_source"
+            and effect_json.get("damage_modifier_duration") == "while_on_battlefield"
+            and set(targets) == {"opponents", "opponent_permanents"}
+            and bool(effect_json.get("prevent_half_damage_to_you_and_permanents_you_control"))
+            and effect_json.get("prevent_half_rounding") == "rounded_up"
+            and bool(effect_json.get("flying"))
+            and bool(effect_json.get("first_strike"))
+            and int(effect_json.get("power") or 0) == 5
             and int(effect_json.get("toughness") or 0) == 5
         )
 

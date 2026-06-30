@@ -130,6 +130,57 @@ def find_expected_rule(
     fail("manifest", f"unable to resolve expected rule for {normalized or card_name} {logical_key}")
 
 
+def snapshot_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    required = dict(rule.get("required_effect_fields") or {})
+    snapshot_required = {}
+    if required.get("battle_model_scope") is not None:
+        snapshot_required["battle_model_scope"] = required["battle_model_scope"]
+    return {
+        "card_name": rule["card_name"],
+        "normalized_name": rule.get("normalized_name"),
+        "logical_rule_key": rule["logical_rule_key"],
+        "oracle_hash": rule.get("oracle_hash"),
+        "review_status": rule.get("review_status", "verified"),
+        "execution_status": rule.get("execution_status", "auto"),
+        "min_rule_version": rule.get("min_rule_version", 1),
+        "required_effect_fields": snapshot_required,
+        "forbid_annotation_only": bool(rule.get("forbid_annotation_only", True)),
+    }
+
+
+def runtime_check_from_expected_rule(rule: dict[str, Any]) -> dict[str, Any]:
+    required = dict(rule.get("required_effect_fields") or {})
+    check = {
+        "card": {"name": rule["card_name"]},
+        "card_name": rule["card_name"],
+        "normalized_name": rule.get("normalized_name"),
+        "logical_rule_key": rule["logical_rule_key"],
+        "required_effect_fields": required,
+        "forbid_annotation_only": bool(rule.get("forbid_annotation_only", True)),
+    }
+    if required.get("effect") is not None:
+        check["effect"] = required["effect"]
+    return check
+
+
+def resolve_manifest_checks(
+    manifest: dict[str, Any],
+    field: str,
+    expected_by_key: dict[tuple[str, str], dict[str, Any]],
+    factory,
+) -> list[dict[str, Any]]:
+    raw_checks = manifest.get(field)
+    if raw_checks is None:
+        checks = [factory(rule) for rule in expected_by_key.values()]
+    else:
+        if not isinstance(raw_checks, list):
+            fail("manifest", f"{field} must be a list")
+        checks = raw_checks
+    if not checks:
+        fail("manifest", f"{field} resolved empty; expected_rules must be exercised")
+    return checks
+
+
 def validate_effect_fields(stage: str, logical_key: str, effect_json: dict[str, Any], expected: dict[str, Any]) -> None:
     required = expected.get("required_effect_fields") or expected.get("fields") or {}
     for field, expected_value in required.items():
@@ -248,7 +299,12 @@ def validate_snapshot(path: Path, manifest: dict[str, Any], expected_by_key: dic
     if not path.exists():
         fail("snapshot", f"missing snapshot {path}")
     snapshot = load_json(path)
-    checks = manifest.get("snapshot_checks") or []
+    checks = resolve_manifest_checks(
+        manifest,
+        "snapshot_checks",
+        expected_by_key,
+        snapshot_check_from_expected_rule,
+    )
     results: list[dict[str, Any]] = []
     for check in checks:
         card_name = str(check.get("card_name") or "").strip()
@@ -295,7 +351,13 @@ def component_by_key(effect: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def validate_runtime_lookup(battle, manifest: dict[str, Any]) -> list[dict[str, Any]]:
-    checks = manifest.get("runtime_checks") or []
+    expected_by_key = expected_rules_by_key(manifest)
+    checks = resolve_manifest_checks(
+        manifest,
+        "runtime_checks",
+        expected_by_key,
+        runtime_check_from_expected_rule,
+    )
     results: list[dict[str, Any]] = []
     for check in checks:
         card = check.get("card") or {}

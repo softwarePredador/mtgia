@@ -24,13 +24,13 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260628_v16_current_default_chain.json"
+DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
-DEFAULT_RUNTIME_GAP_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260628_v6_current_miner.json"
+DEFAULT_RUNTIME_GAP_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.json"
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -585,20 +585,20 @@ def next_command_for_work(work_key: str) -> str:
     commands = {
         "squee_access_density_model": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_access_cut_model.py "
-            "--stem lorehold_access_cut_model_20260628_v4_operational_queue"
+            "--stem lorehold_access_cut_model_20260630_after_profiled_gate"
         ),
         "contextual_tutor_cut_model": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_tutor_cut_model.py "
-            "--stem lorehold_tutor_cut_model_20260628_v3_operational_queue"
+            "--stem lorehold_tutor_cut_model_20260630_after_profiled_gate"
         ),
         "hand_filter_non_core_cut_search": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_hand_filter_cut_model.py "
-            "--stem lorehold_hand_filter_cut_model_20260628_v5_operational_queue"
+            "--stem lorehold_hand_filter_cut_model_20260630_after_profiled_gate"
         ),
         "runtime_rule_gap_batch": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
             "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
-            "lorehold_runtime_gap_family_queue_20260628_v7_operational_queue"
+            "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela"
         ),
     }
     return commands.get(work_key, "")
@@ -835,7 +835,7 @@ def build_report(
 def render_markdown(payload: dict[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# Lorehold Focus-Access Package Generator - 2026-06-28",
+        "# Lorehold Focus-Access Package Generator - 2026-06-30",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Planner: `{payload['planner']}`",

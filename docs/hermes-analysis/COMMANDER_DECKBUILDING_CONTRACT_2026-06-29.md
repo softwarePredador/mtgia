@@ -659,6 +659,48 @@ Forced-signal natural confirmation generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.md`.
 
+Profiled same-lane benchmark decision generated on 2026-06-30:
+
+- Scope: `3` same-lane benchmarks from profiled cut slots after current forced
+  confirmation evidence was added to prior-result defaults.
+- Forced access mode: `none`; protected baseline `607`, `8` real opponents,
+  `3` games per opponent, opponent seed `20260629`, simulation seed
+  `20260630`.
+- Result: `The Warring Triad` over `Bender's Waterskin` lost `6W/18L/0S`
+  versus `607` `11W/12L/1S` and regressed Winota to `0W/3L`; `Ephemerate`
+  over `Winds of Abandon` lost `9W/15L/0S` and also regressed Winota to
+  `0W/3L`.
+- `Planetarium of Wan Shi Tong` over `Creative Technique` lost `8W/16L/0S`
+  versus `607` `11W/12L/1S`; the card was used, but the package lost three
+  wins and the card-level outcome sample is not enough to override the
+  protected baseline.
+- Direct card-use evidence exists for all three candidates:
+  `The Warring Triad` use `12`, `Planetarium of Wan Shi Tong` use `21`, and
+  `Ephemerate` use `30`.
+- Decision: no deck change. Keep `Bender's Waterskin`, `Creative Technique`,
+  and `Winds of Abandon` in protected `deck_607`.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.md`.
+
+Runtime enablement checkpoint generated on 2026-06-30:
+
+- PG263 promoted and synced eight runtime-gap cards that occur in the
+  Lorehold/opponent candidate surface:
+  `Goliath Daydreamer`, `Twinflame Tyrant`, `Verge Rangers`,
+  `Boros Reckoner`, `Terror of the Peaks`, `Balefire Liege`,
+  `Firesong and Sunspeaker`, and `Repercussion`.
+- PG264 promoted and synced `Gisela, Blade of Goldnight` with the exact
+  static-damage scope
+  `opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1`.
+- The current runtime-gap queue after PG264 is
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.md`.
+- The current focus generator output is
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg264_gisela.md`.
+- Interpretation for deck work: this unlocks future candidate testing for more
+  cards, but it is not deck-promotion evidence by itself. `deck_607` remains
+  protected until a same-lane candidate ties or beats it with card-use and
+  replay-trace proof.
+
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell
 intact and look only for:

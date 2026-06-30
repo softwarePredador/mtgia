@@ -196,6 +196,40 @@ def test_prior_negative_gate_demotes_package_from_ready_queue(tmp_path):
     assert result["summary"]["tested_negative_count"] == 1
 
 
+def test_prior_strategy_regression_tie_demotes_package_from_ready_queue(tmp_path):
+    gate_path = tmp_path / "gate.json"
+    gate_path.write_text(
+        json.dumps(
+            {
+                "packages": [
+                    {
+                        "package_key": "akromas_will_cut_avatar_wrath",
+                        "status": "gated",
+                        "decision": "tie_watch_strategy_regression",
+                        "candidate_meta": {"added_rule_counts": {"Akroma's Will": 1}},
+                        "gate_summary": {
+                            "baseline": {"wins": 11, "losses": 12, "stalls": 1},
+                            "candidate": {"wins": 11, "losses": 13, "stalls": 0},
+                            "delta_pp": 0.0,
+                        },
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with memory_db() as conn:
+        result = queue.build_queue(report_payload(), conn, [gate_path])
+
+    by_key = {row["package_key"]: row for row in result["queue"]}
+    assert by_key["akromas_will_cut_avatar_wrath"]["status"] == "tested_negative_do_not_promote"
+    assert by_key["akromas_will_cut_avatar_wrath"]["prior_gate"]["raw_decision"] == (
+        "tie_watch_strategy_regression"
+    )
+    assert result["summary"]["tested_negative_count"] == 1
+
+
 def test_render_markdown_uses_generated_at_date_in_title():
     payload = {
         "generated_at": "2026-06-30T04:19:03Z",

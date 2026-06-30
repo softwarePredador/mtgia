@@ -31742,6 +31742,9 @@ def damage_amount_from_x_context(effect_data, default=0):
 CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE = (
     "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1"
 )
+GISELA_OPPONENT_DOUBLE_SELF_HALF_SCOPE = (
+    "opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1"
+)
 CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE = (
     "chosen_player_or_permanents_they_control_damage_doubled_v1"
 )
@@ -31800,11 +31803,13 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                     or effect_data.get("spell_damage_to_opponents_and_permanents_they_control_bonus")
                     or effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")
                     or effect_data.get("prevent_all_damage_to_controlled_creatures")
+                    or effect_data.get("prevent_half_damage_to_you_and_permanents_you_control")
                 ):
                     continue
                 scope = str(effect_data.get("battle_model_scope") or "")
                 if scope not in {
                     CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE,
+                    GISELA_OPPONENT_DOUBLE_SELF_HALF_SCOPE,
                     CHOSEN_PLAYER_DAMAGE_DOUBLED_SCOPE,
                     REM_KAROLUS_SPELL_DAMAGE_REPLACEMENT_SCOPE,
                     RUNE_TAIL_CONTROLLED_CREATURE_DAMAGE_PREVENTION_SCOPE,
@@ -31827,6 +31832,7 @@ def _static_damage_modifier_effects(controller, target_controller=None):
                     ),
                     bool(effect_data.get("prevent_spell_damage_to_you_and_permanents_you_control")),
                     bool(effect_data.get("prevent_all_damage_to_controlled_creatures")),
+                    bool(effect_data.get("prevent_half_damage_to_you_and_permanents_you_control")),
                 )
                 if modifier_key in seen_modifier_keys:
                     continue
@@ -31870,6 +31876,14 @@ def _static_damage_modifier_applies(
             return False
         if effect_data.get("damage_modifier_applies_to") not in (None, "sources_you_control"):
             return False
+        targets = effect_data.get("damage_modifier_targets") or []
+        if isinstance(targets, str):
+            targets = read_json_list(targets) or [targets]
+        return not targets or {"opponents", "opponent_permanents"}.issubset(set(targets))
+
+    if scope == GISELA_OPPONENT_DOUBLE_SELF_HALF_SCOPE:
+        if target_controller is modifier_controller:
+            return bool(effect_data.get("prevent_half_damage_to_you_and_permanents_you_control"))
         targets = effect_data.get("damage_modifier_targets") or []
         if isinstance(targets, str):
             targets = read_json_list(targets) or [targets]
@@ -31970,6 +31984,24 @@ def apply_static_damage_replacements(
                     "controller": getattr(modifier_controller, "name", None),
                     "scope": effect_data.get("battle_model_scope"),
                     "prevention": "all_damage_to_controlled_creature",
+                }
+            )
+            continue
+        if (
+            str(effect_data.get("battle_model_scope") or "")
+            == GISELA_OPPONENT_DOUBLE_SELF_HALF_SCOPE
+            and target_controller is modifier_controller
+            and effect_data.get("prevent_half_damage_to_you_and_permanents_you_control")
+        ):
+            prevented = (modified_amount + 1) // 2
+            modified_amount = max(0, modified_amount - prevented)
+            applied.append(
+                {
+                    "source": permanent.get("name", "?"),
+                    "controller": getattr(modifier_controller, "name", None),
+                    "scope": effect_data.get("battle_model_scope"),
+                    "prevention": "half_damage_rounded_up_to_self_or_controlled_permanent",
+                    "prevented": prevented,
                 }
             )
             continue
