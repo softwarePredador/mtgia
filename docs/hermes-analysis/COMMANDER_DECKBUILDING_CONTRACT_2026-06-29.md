@@ -469,9 +469,11 @@ from the current evidence. Also do not promote
 `candidate_607_deflecting_palm_redirect_lightning_v1`; it tied total wins in
 the smoke gate but regressed Winota and miracle/discard-to-top cadence. The
 tested `candidate_607_chaos_warp_stroke_of_midnight_v1` is also rejected from
-the current evidence after losing the confirmed 72-game gate. The tested cards
-were exercised in battle but did not pass the promotion contract, so the
-protected baseline remains `607`.
+the current evidence after losing the confirmed 72-game gate. Also do not
+promote `candidate_607_return_the_favor_redirect_lightning_v1`; it ranked below
+`607` structurally and lost the smoke gate. The tested cards were exercised in
+battle but did not pass the promotion contract, so the protected baseline
+remains `607`.
 
 Tibalt replacement decision generated on 2026-06-30:
 
@@ -537,6 +539,24 @@ Chaos Warp removal-probe decision generated on 2026-06-30:
   `607` removal slot.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_stroke_decision_20260630.md`.
+
+Return the Favor redirect/copy probe decision generated on 2026-06-30:
+
+- Candidate:
+  `candidate_607_return_the_favor_redirect_lightning_v1`.
+- Structural result: rank `2`, score `140.9`, intent `100.0`, lands `34`,
+  rule-ready `97.9%`; `607` remained structurally ahead at score `141.0`.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `8/24` versus `607` `11/24`.
+- Direct card-use evidence: `Return the Favor` was spell-cast/resolved `2`
+  times; `Redirect Lightning` in the baseline was spell-cast `1` time.
+- Promotion failure: Winota regressed to `1/3` versus `607` `2/3`; total wins
+  fell by three games.
+- Decision: reject this exact `+Return the Favor; -Redirect Lightning` swap at
+  smoke. The card is a coherent copy/redirect hypothesis, but this replacement
+  does not improve the current `607` shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_return_the_favor_redirect_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell

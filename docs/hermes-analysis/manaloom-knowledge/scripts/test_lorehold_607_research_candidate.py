@@ -248,6 +248,33 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             }.intersection(plan["removed"])
         )
 
+    def test_return_the_favor_plan_is_redirect_copy_probe(self):
+        plan = research.RESEARCH_PLANS["return_the_favor_redirect_lightning_v1"]
+        self.assertEqual(plan["base_deck_id"], 607)
+        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_key"], "candidate_607_return_the_favor_redirect_lightning_v1")
+        self.assertEqual(plan["added"], [{"card_name": "Return the Favor", "source_deck_id": 612}])
+        self.assertEqual(plan["removed"], ["Redirect Lightning"])
+        self.assertIn("redirect/copy", plan["intent"])
+        self.assertFalse(
+            {
+                "Bender's Waterskin",
+                "Victory Chimes",
+                "Molecule Man",
+                "The Scarlet Witch",
+                "The Mind Stone",
+                "Insurrection",
+                "Storm Herd",
+                "Creative Technique",
+                "Tibalt's Trickery",
+                "Stroke of Midnight",
+                "Generous Gift",
+                "Path to Exile",
+                "Swords to Plowshares",
+                "Winds of Abandon",
+            }.intersection(plan["removed"])
+        )
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

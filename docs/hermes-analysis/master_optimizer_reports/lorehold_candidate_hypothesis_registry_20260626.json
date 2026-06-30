@@ -95,6 +95,13 @@
       "learning": "Chaos Warp is battle-ready and a coherent same-lane removal card, but the confirmed gate lost five wins and regressed Winota, spell-chain volume, topdeck activation, and cost-reduction conversion. Stroke of Midnight remains ahead in the current 607 removal slot."
     },
     {
+      "key": "candidate_607_return_the_favor_redirect_lightning_v1",
+      "swap_or_scope": "+Return the Favor; -Redirect Lightning",
+      "status": "rejected_smoke",
+      "result": "smoke 8W/16L/0S vs deck_607 11W/12L/1S over 24 games; Return the Favor spell-cast/resolved 2; Winota 1W/2L vs deck_607 2W/1L",
+      "learning": "Return the Favor is a coherent redirect/copy hypothesis, but it ranked below 607 structurally and lost the smoke gate immediately. Its extra copy mode did not offset the lost baseline slot in the current 607 shell."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",

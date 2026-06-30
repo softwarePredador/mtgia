@@ -511,6 +511,28 @@ RESEARCH_PLANS = {
             "The candidate must beat or tie 607 without regressing Winota, miracle, or topdeck cadence because the cut removes an already-used removal spell.",
         ],
     },
+    "return_the_favor_redirect_lightning_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_return_the_favor_redirect_lightning_v1",
+        "candidate_name": "Lorehold 607 + Return the Favor over Redirect Lightning v1",
+        "candidate_archetype": "607-return-the-favor-redirect-lightning",
+        "added": [{"card_name": "Return the Favor", "source_deck_id": 612}],
+        "removed": ["Redirect Lightning"],
+        "intent": (
+            "Test a same-neighborhood redirect/copy sidegrade for the current "
+            "cheap interaction lesson slot. Return the Favor keeps the ability "
+            "to change a single target while adding a copy-spell mode that can "
+            "convert Lorehold discounted instants and sorceries into a stronger "
+            "spell-chain turn."
+        ),
+        "external_signals": [
+            "Return the Favor appears in local Lorehold variants 608 and 612.",
+            "Local battle_card_rules has a verified auto rule for Return the Favor.",
+            "Redirect Lightning is not a protected anchor and has recent cast-only exposure without promotion proof.",
+            "This is not a generic engine import: it must prove the copy/redirect flexibility improves 607 without reducing Winota, miracle, or topdeck cadence.",
+        ],
+    },
 }
 
 
