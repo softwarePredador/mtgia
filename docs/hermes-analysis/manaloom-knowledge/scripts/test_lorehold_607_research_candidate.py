@@ -222,6 +222,32 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             }.intersection(plan["removed"])
         )
 
+    def test_chaos_warp_plan_is_same_lane_removal_probe(self):
+        plan = research.RESEARCH_PLANS["chaos_warp_stroke_of_midnight_v1"]
+        self.assertEqual(plan["base_deck_id"], 607)
+        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_key"], "candidate_607_chaos_warp_stroke_of_midnight_v1")
+        self.assertEqual(plan["added"], [{"card_name": "Chaos Warp", "source_deck_id": 615}])
+        self.assertEqual(plan["removed"], ["Stroke of Midnight"])
+        self.assertIn("interaction/removal", plan["intent"])
+        self.assertFalse(
+            {
+                "Bender's Waterskin",
+                "Victory Chimes",
+                "Molecule Man",
+                "The Scarlet Witch",
+                "The Mind Stone",
+                "Insurrection",
+                "Storm Herd",
+                "Creative Technique",
+                "Tibalt's Trickery",
+                "Generous Gift",
+                "Path to Exile",
+                "Swords to Plowshares",
+                "Winds of Abandon",
+            }.intersection(plan["removed"])
+        )
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

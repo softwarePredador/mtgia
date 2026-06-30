@@ -88,6 +88,13 @@
       "learning": "Deflecting Palm is battle-ready and did produce real card events, but this same-lane pressure probe did not beat deck_607 and regressed the fast-pressure Winota slice plus miracle/discard-to-top cadence. Do not promote this exact swap in the current 607 shell."
     },
     {
+      "key": "candidate_607_chaos_warp_stroke_of_midnight_v1",
+      "swap_or_scope": "+Chaos Warp; -Stroke of Midnight",
+      "status": "rejected_confirmed",
+      "result": "confirmed 25W/47L/0S vs deck_607 30W/41L/1S over 72 games; Chaos Warp had events in 17 games, spell-cast 10, miracle-cast 5, resolved/removal-resolved 15; Winota 2W/7L vs deck_607 3W/6L",
+      "learning": "Chaos Warp is battle-ready and a coherent same-lane removal card, but the confirmed gate lost five wins and regressed Winota, spell-chain volume, topdeck activation, and cost-reduction conversion. Stroke of Midnight remains ahead in the current 607 removal slot."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",

@@ -468,8 +468,10 @@ any 2026-06-30 tested `Tibalt's Trickery` replacement as the final ideal deck
 from the current evidence. Also do not promote
 `candidate_607_deflecting_palm_redirect_lightning_v1`; it tied total wins in
 the smoke gate but regressed Winota and miracle/discard-to-top cadence. The
-tested cards were exercised in battle but did not pass the promotion contract,
-so the protected baseline remains `607`.
+tested `candidate_607_chaos_warp_stroke_of_midnight_v1` is also rejected from
+the current evidence after losing the confirmed 72-game gate. The tested cards
+were exercised in battle but did not pass the promotion contract, so the
+protected baseline remains `607`.
 
 Tibalt replacement decision generated on 2026-06-30:
 
@@ -513,6 +515,28 @@ Deflecting Palm pressure-probe decision generated on 2026-06-30:
   `607` shell.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_deflecting_palm_redirect_lightning_decision_20260630.md`.
+
+Chaos Warp removal-probe decision generated on 2026-06-30:
+
+- Candidate:
+  `candidate_607_chaos_warp_stroke_of_midnight_v1`.
+- Structural result: rank `1`, score `141.058`, intent `100.0`, lands `34`,
+  rule-ready `97.9%`.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `12/24` versus `607` `11/24`, with equal Winota `2/3` and improved
+  miracle/topdeck telemetry.
+- Confirmed result over seeds `20260630`, `123`, and `999`: candidate `25/72`
+  versus `607` `30/72`.
+- Direct card-use evidence: `Chaos Warp` had card events in `17/72` games,
+  spell-cast `10`, miracle-cast `5`, and resolved/removal-resolved `15`.
+- Promotion failure: Winota regressed to `2/9` versus `607` `3/9`; Lorehold
+  spell casts fell from `729` to `598`; topdeck activations fell from `132` to
+  `117`; static cost-reduction total fell from `221` to `144`.
+- Decision: reject this exact `+Chaos Warp; -Stroke of Midnight` swap. The
+  card is battle-ready, but `Stroke of Midnight` remains better in the current
+  `607` removal slot.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_stroke_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell

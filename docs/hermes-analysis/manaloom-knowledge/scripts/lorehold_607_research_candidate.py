@@ -489,6 +489,28 @@ RESEARCH_PLANS = {
             "Redirect Lightning is not a protected anchor, but prior The One Ring over Redirect Lightning failed because it was a cross-lane higher-curve value swap; this candidate keeps the cheap instant/protection lane.",
         ],
     },
+    "chaos_warp_stroke_of_midnight_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_chaos_warp_stroke_of_midnight_v1",
+        "candidate_name": "Lorehold 607 + Chaos Warp over Stroke of Midnight v1",
+        "candidate_archetype": "607-chaos-warp-stroke-of-midnight",
+        "added": [{"card_name": "Chaos Warp", "source_deck_id": 615}],
+        "removed": ["Stroke of Midnight"],
+        "intent": (
+            "Test a strict interaction/removal sidegrade without touching "
+            "miracle/topdeck, ramp, protection, or finisher anchors. Stroke of "
+            "Midnight is a used three-mana instant removal spell; Chaos Warp "
+            "keeps the same mana value and instant-speed interaction lane while "
+            "answering any permanent and tucking instead of destroying."
+        ),
+        "external_signals": [
+            "Chaos Warp appears in local Lorehold variants 611, 615, and 616.",
+            "Local battle_card_rules has a verified auto tuck/removal rule for Chaos Warp.",
+            "Stroke of Midnight has real recent 607 event exposure, so this is a high-bar same-lane probe rather than a low-use cut.",
+            "The candidate must beat or tie 607 without regressing Winota, miracle, or topdeck cadence because the cut removes an already-used removal spell.",
+        ],
+    },
 }
 
 
