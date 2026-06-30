@@ -1,0 +1,624 @@
+{
+  "card_profiles": [
+    {
+      "card_name": "Apex of Power",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "ramp_engine",
+      "matched_field_counts": {},
+      "metric_counts": {},
+      "raw_record_count": 0,
+      "role_confidence": "rule_only",
+      "role_signals": [
+        "ramp_engine"
+      ],
+      "rule_summary": {
+        "active_battle_model_scopes": {
+          "impulse_top_seven_plus_hand_cast_mana_annotation_v1": 1
+        },
+        "active_effects": {
+          "passive": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "impulse_top_seven_plus_hand_cast_mana_annotation_v1": 1
+        },
+        "card_name": "Apex of Power",
+        "effects": {
+          "passive": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "active": 1
+        },
+        "rule_count": 1
+      },
+      "samples": [],
+      "source_file_count": 0,
+      "source_files": [],
+      "summary_metric_count": 0,
+      "unique_exposure_count": 0
+    },
+    {
+      "card_name": "Ol\u00f3rin's Searing Light",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 8,
+      "effect_counts": {
+        "remove_creature": 8
+      },
+      "event_counts": {
+        "cost_paid": 8
+      },
+      "inferred_role": "spot_removal",
+      "matched_field_counts": {
+        "card": 8
+      },
+      "metric_counts": {},
+      "raw_record_count": 8,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "spot_removal"
+      ],
+      "rule_summary": {
+        "active_battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "active_effects": {
+          "remove_creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "effects": {
+          "draw_cards": 2,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "samples": [
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:K-9, Mark I #34 (real):2[72]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 11
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Kinnan, Bonder Prodigy #72 (real):1[31]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 6
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Rograkh, Son of Rohgahh #95 (real):0[83]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 15
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Thrasios, Triton Hero #101 (real):0[49]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 8
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:K-9, Mark I #34 (real):2[72]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 11
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Kinnan, Bonder Prodigy #72 (real):1[31]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 6
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Rograkh, Son of Rohgahh #95 (real):0[83]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 15
+        },
+        {
+          "effect": "remove_creature",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_olorin_hand_filter_cut_improvisation_capstone_expanded607:Thrasios, Triton Hero #101 (real):0[49]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 8
+        }
+      ],
+      "source_file_count": 2,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "unique_exposure_count": 4
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_olorin_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "unique_exposure_count": 4
+        }
+      ],
+      "summary_metric_count": 0,
+      "unique_exposure_count": 8
+    },
+    {
+      "card_name": "Valakut Awakening // Valakut Stoneforge",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 13,
+      "effect_counts": {
+        "hand_filter": 9
+      },
+      "event_counts": {
+        "cost_paid": 4,
+        "hand_filter_resolved": 4,
+        "runtime_rule_loaded": 1,
+        "spell_resolved": 4
+      },
+      "inferred_role": "draw_filter_value",
+      "matched_field_counts": {
+        "card": 13,
+        "metric_card": 1
+      },
+      "metric_counts": {
+        "cost_paid:Valakut Awakening // Valakut Stoneforge": 3
+      },
+      "raw_record_count": 14,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "draw_filter_value",
+        "paid_cast_exposure"
+      ],
+      "rule_summary": {
+        "active_battle_model_scopes": {
+          "bottom_then_draw_plus_one_mdfc_land_v1": 1
+        },
+        "active_effects": {
+          "hand_filter": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "bottom_then_draw_plus_one_mdfc_land_v1": 1
+        },
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "effects": {
+          "draw_cards": 1,
+          "hand_filter": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "event": "hand_filter_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:10",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "runtime_rule_loaded",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:4",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl"
+        },
+        {
+          "effect": "hand_filter",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:9",
+          "player": "Active",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:13",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl",
+          "turn": 7
+        },
+        {
+          "event": "hand_filter_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:14",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl",
+          "turn": 7
+        },
+        {
+          "effect": "hand_filter",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:8",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "turn": 4
+        },
+        {
+          "event": "hand_filter_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:9",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_valakut_hand_filter_cut_improvisation_capstone_expanded607:Rograkh, Son of Rohgahh #95 (real):2[19]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_valakut_hand_filter_cut_improvisation_capstone_expanded607:Thrasios, Triton Hero #101 (real):2[20]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_valakut_hand_filter_cut_improvisation_capstone_expanded607:Rograkh, Son of Rohgahh #95 (real):2[19]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 4
+        },
+        {
+          "effect": "hand_filter",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_valakut_hand_filter_cut_improvisation_capstone_expanded607:Thrasios, Triton Hero #101 (real):2[20]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 4
+        },
+        {
+          "event": "cost_paid",
+          "evidence_type": "summary_metric",
+          "matched_field": "metric_card",
+          "metric_count": 3,
+          "metric_key": "cost_paid:Valakut Awakening // Valakut Stoneforge",
+          "path": "results[0].telemetry.top_cards[8]",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json"
+        },
+        {
+          "effect": "hand_filter",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:1",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl",
+          "turn": 4
+        },
+        {
+          "event": "hand_filter_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:2",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl",
+          "turn": 4
+        }
+      ],
+      "source_file_count": 7,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_606_pg082_hash_only_focused_events_20260623_083100.jsonl",
+          "unique_exposure_count": 3
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg070_l2_hash_only_runtime_focused_events_20260623_011859.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/deck6_pg077_runtime_events_20260623_062156.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_valakut_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/valakut_awakening_pg042_focused_events_20260622_225355.jsonl",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed99_20260627_v1.json",
+          "unique_exposure_count": 1
+        }
+      ],
+      "summary_metric_count": 1,
+      "unique_exposure_count": 14
+    },
+    {
+      "card_name": "Wheel of Fortune",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 6,
+      "effect_counts": {
+        "draw_cards": 5
+      },
+      "event_counts": {
+        "cost_paid": 4,
+        "spell_resolved": 1,
+        "wheel_resolved": 1
+      },
+      "inferred_role": "draw_filter_value",
+      "matched_field_counts": {
+        "card": 6
+      },
+      "metric_counts": {},
+      "raw_record_count": 6,
+      "role_confidence": "direct_event_or_rule",
+      "role_signals": [
+        "discard_payoff",
+        "draw_filter_value"
+      ],
+      "rule_summary": {
+        "active_battle_model_scopes": {
+          "multiplayer_discard_draw_v1": 1
+        },
+        "active_effects": {
+          "draw_cards": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "multiplayer_discard_draw_v1": 1
+        },
+        "card_name": "Wheel of Fortune",
+        "effects": {
+          "draw_cards": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "samples": [
+        {
+          "effect": "draw_cards",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[0].telemetry.focus_card_game_traces.deck_607:Kefka, Court Mage #112 (real):0[45]",
+          "player": "Kraum, Ludevic's Opus #81 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 7
+        },
+        {
+          "effect": "draw_cards",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_wheel_hand_filter_cut_improvisation_capstone_expanded607:Kefka, Court Mage #112 (real):2[68]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "turn": 12
+        },
+        {
+          "effect": "draw_cards",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[0].telemetry.focus_card_game_traces.deck_607:Kefka, Court Mage #112 (real):0[45]",
+          "player": "Kraum, Ludevic's Opus #81 (real)",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 7
+        },
+        {
+          "effect": "draw_cards",
+          "event": "cost_paid",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "results[1].telemetry.focus_card_game_traces.synergy_wheel_hand_filter_cut_improvisation_capstone_expanded607:Kefka, Court Mage #112 (real):2[68]",
+          "player": "Lorehold",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "turn": 12
+        },
+        {
+          "effect": "draw_cards",
+          "event": "spell_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:3",
+          "player": "Caster",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_events_20260622_231859.jsonl",
+          "turn": 5
+        },
+        {
+          "event": "wheel_resolved",
+          "evidence_type": "event",
+          "matched_field": "card",
+          "path": "line:4",
+          "player": "Caster",
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_events_20260622_231859.jsonl",
+          "turn": 5
+        }
+      ],
+      "source_file_count": 3,
+      "source_files": [
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_package_gate_20260630_post_pg270_v2_20260630_080110_wheel_hand_filter_cut_improvisation_capstone_expanded607_partial.json",
+          "unique_exposure_count": 2
+        },
+        {
+          "source_file": "docs/hermes-analysis/master_optimizer_reports/wheel_of_fortune_pg043_focused_events_20260622_231859.jsonl",
+          "unique_exposure_count": 2
+        }
+      ],
+      "summary_metric_count": 0,
+      "unique_exposure_count": 6
+    },
+    {
+      "card_name": "Dance with Calamity",
+      "decision": {
+        "next_action": "connect role to an explicit package hypothesis",
+        "reason": "Role evidence exists but no cut decision is encoded for this card.",
+        "status": "review_required"
+      },
+      "direct_event_count": 0,
+      "effect_counts": {},
+      "event_counts": {},
+      "inferred_role": "draw_filter_value",
+      "matched_field_counts": {},
+      "metric_counts": {},
+      "raw_record_count": 0,
+      "role_confidence": "rule_only",
+      "role_signals": [
+        "draw_filter_value",
+        "ramp_engine"
+      ],
+      "rule_summary": {
+        "active_battle_model_scopes": {
+          "shuffle_top_exile_until_total_mana_value_lte_13_free_cast_v1": 1
+        },
+        "active_effects": {
+          "exile_value": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "shuffle_top_exile_until_total_mana_value_lte_13_free_cast_v1": 1
+        },
+        "card_name": "Dance with Calamity",
+        "effects": {
+          "exile_value": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "samples": [],
+      "source_file_count": 0,
+      "source_files": [],
+      "summary_metric_count": 0,
+      "unique_exposure_count": 0
+    }
+  ],
+  "generated_at": "2026-06-30T08:08:56Z",
+  "package_implications": [],
+  "parse_errors": [],
+  "postgres_writes": false,
+  "scan_summary": {
+    "evidence_path_count": 255,
+    "json_files_scanned": 181,
+    "jsonl_files_scanned": 74,
+    "parse_error_count": 0,
+    "scanned_bytes": 1156880966
+  },
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "target_cards": [
+    "Apex of Power",
+    "Ol\u00f3rin's Searing Light",
+    "Valakut Awakening // Valakut Stoneforge",
+    "Wheel of Fortune",
+    "Dance with Calamity"
+  ],
+  "target_deck_ids": []
+}

@@ -18,6 +18,14 @@ def memory_db():
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE deck_cards (
+            deck_id INTEGER,
+            card_name TEXT
+        )
+        """
+    )
     rows = [
         (
             "Emeria's Call // Emeria, Shattered Skyclave",
@@ -77,10 +85,35 @@ def memory_db():
                 "battle_model_scope": "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1",
             },
         ),
+        (
+            "Generated Shadow Draw Removal",
+            "generated shadow draw removal",
+            "auto",
+            "active",
+            {
+                "effect": "remove_creature",
+                "battle_model_scope": "each_opponent_greatest_power_edict_single_target_baseline_v1",
+            },
+        ),
+        (
+            "Generated Shadow Draw Removal",
+            "generated shadow draw removal",
+            "disabled",
+            "needs_review",
+            {"effect": "draw_cards"},
+        ),
     ]
     conn.executemany(
         "INSERT INTO battle_card_rules VALUES (?, ?, ?, ?, ?)",
         [(name, normalized, execution, review, json.dumps(effect)) for name, normalized, execution, review, effect in rows],
+    )
+    conn.executemany(
+        "INSERT INTO deck_cards VALUES (?, ?)",
+        [
+            (607, "Austere Command"),
+            (607, "Gamble"),
+            (608, "Wheel of Fortune"),
+        ],
     )
     return conn
 
@@ -202,6 +235,17 @@ def test_exposure_profiler_reads_jsonl_and_keeps_rule_only_candidates(tmp_path):
     assert by_card["Restoration Seminar"]["decision"]["status"] == "needs_non_squee_cut"
 
 
+def test_deck_card_names_reads_local_deck_cards_and_dedupes_manual_targets():
+    with memory_db() as conn:
+        deck_names = profiler.deck_card_names(conn, 607)
+
+    assert deck_names == ["Austere Command", "Gamble"]
+    assert profiler.dedupe_preserve_order(["Gamble", *deck_names]) == [
+        "Gamble",
+        "Austere Command",
+    ]
+
+
 def test_exposure_profiler_does_not_treat_tutor_found_target_as_tutor_source(tmp_path):
     evidence = tmp_path / "tutor_target.jsonl"
     evidence.write_text(
@@ -258,6 +302,21 @@ def test_exposure_profiler_labels_measured_removal(tmp_path):
     stroke = payload["card_profiles"][0]
     assert stroke["inferred_role"] == "spot_removal"
     assert "spot_removal" in stroke["role_signals"]
+
+
+def test_exposure_profiler_prefers_active_rule_role_over_disabled_generated_shadow():
+    with memory_db() as conn:
+        payload = profiler.build_profile(
+            evidence_paths=[],
+            card_names=["Generated Shadow Draw Removal"],
+            conn=conn,
+        )
+
+    row = payload["card_profiles"][0]
+    assert row["rule_summary"]["active_effects"] == {"remove_creature": 1}
+    assert row["rule_summary"]["effects"] == {"draw_cards": 1, "remove_creature": 1}
+    assert row["inferred_role"] == "spot_removal"
+    assert "draw_filter_value" not in row["role_signals"]
 
 
 def test_exposure_profiler_does_not_label_removed_target_as_removal_source(tmp_path):

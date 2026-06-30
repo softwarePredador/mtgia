@@ -206,7 +206,7 @@ def prior_reject_report(package_key, candidate, cut="Big Score"):
     )
 
 
-def test_hand_filter_model_selects_apex_big_score_benchmark_and_blocks_core_cuts():
+def test_hand_filter_model_blocks_big_score_cross_lane_and_blocks_core_cuts():
     with memory_db() as conn:
         payload = model.build_model(
             conn=conn,
@@ -215,25 +215,29 @@ def test_hand_filter_model_selects_apex_big_score_benchmark_and_blocks_core_cuts
         )
 
     assert payload["postgres_writes"] is False
-    assert payload["summary"]["preflight_benchmark_ready_count"] == 1
-    assert payload["summary"]["recommended_next_action"] == "preflight_Apex of Power_over_Big Score"
+    assert payload["summary"]["preflight_benchmark_ready_count"] == 0
+    assert payload["summary"]["recommended_next_action"] == (
+        "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+    )
 
     by_pair = {
         (row["candidate"], row["cut"]): row
         for row in payload["pair_evaluations"]
     }
     apex_big_score = by_pair[("Apex of Power", "Big Score")]
-    assert apex_big_score["status"] == "preflight_benchmark_ready"
+    assert apex_big_score["status"] == "blocked_cut_cross_lane"
     assert "candidate_zero_natural_exposure" in apex_big_score["blockers"]
+    assert "cut_cross_lane:ramp" in apex_big_score["blockers"]
     assert "cut_removes_ramp_or_treasure_role" in apex_big_score["blockers"]
 
     assert by_pair[("Apex of Power", "Esper Sentinel")]["status"] == "blocked_cut_core_or_high_exposure"
     assert "cut_high_exposure:612" in by_pair[("Apex of Power", "Esper Sentinel")]["blockers"]
-    assert by_pair[("Apex of Power", "Rise of the Eldrazi")]["status"] == "blocked_cut_core_or_high_exposure"
+    assert by_pair[("Apex of Power", "Rise of the Eldrazi")]["status"] == "blocked_cut_cross_lane"
+    assert "cut_cross_lane:wincon" in by_pair[("Apex of Power", "Rise of the Eldrazi")]["blockers"]
     assert "cut_is_wincon" in by_pair[("Apex of Power", "Rise of the Eldrazi")]["blockers"]
 
 
-def test_hand_filter_model_skips_prior_exact_reject_and_recommends_next_pair():
+def test_hand_filter_model_skips_prior_exact_reject_and_does_not_fallback_to_cross_lane():
     with memory_db() as conn:
         payload = model.build_model(
             conn=conn,
@@ -243,8 +247,10 @@ def test_hand_filter_model_skips_prior_exact_reject_and_recommends_next_pair():
         )
 
     assert payload["summary"]["prior_rejected_pair_count"] == 1
-    assert payload["summary"]["preflight_benchmark_ready_count"] == 1
-    assert payload["summary"]["recommended_next_action"] == "preflight_Wheel of Fortune_over_Big Score"
+    assert payload["summary"]["preflight_benchmark_ready_count"] == 0
+    assert payload["summary"]["recommended_next_action"] == (
+        "do_not_gate_hand_filter_without_new_cut_or_runtime_evidence"
+    )
 
     by_pair = {
         (row["candidate"], row["cut"]): row
@@ -252,7 +258,8 @@ def test_hand_filter_model_skips_prior_exact_reject_and_recommends_next_pair():
     }
     assert by_pair[("Apex of Power", "Big Score")]["status"] == "blocked_prior_reject"
     assert "prior_exact_package_reject" in by_pair[("Apex of Power", "Big Score")]["blockers"]
-    assert by_pair[("Wheel of Fortune", "Big Score")]["status"] == "preflight_benchmark_ready"
+    assert by_pair[("Wheel of Fortune", "Big Score")]["status"] == "blocked_cut_cross_lane"
+    assert "cut_cross_lane:ramp" in by_pair[("Wheel of Fortune", "Big Score")]["blockers"]
 
 
 def test_hand_filter_model_blocks_cut_after_repeated_benchmark_rejects():
@@ -284,3 +291,191 @@ def test_hand_filter_model_blocks_cut_after_repeated_benchmark_rejects():
     assert apex_big_score["status"] == "blocked_cut_repeated_benchmark_reject"
     assert "cut_repeated_prior_rejects:2" in apex_big_score["blockers"]
     assert by_pair[("Wheel of Fortune", "Big Score")]["status"] == "blocked_prior_reject"
+
+
+def test_expanded_non_core_cut_search_finds_same_lane_cut_and_blocks_cross_lane():
+    profiles = exposure_profiles()
+    profiles[0][1]["card_profiles"].extend(
+        [
+            {
+                "card_name": "Manual Flex",
+                "unique_exposure_count": 12,
+                "direct_event_count": 10,
+                "inferred_role": "draw_filter_value",
+                "decision": {"status": "review_required"},
+                "role_signals": [],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "effects": {"draw_cards": 1},
+                    "battle_model_scopes": {"draw_two_v1": 1},
+                },
+            },
+            {
+                "card_name": "Low Ramp",
+                "unique_exposure_count": 12,
+                "direct_event_count": 10,
+                "inferred_role": "ramp_engine",
+                "decision": {"status": "review_required"},
+                "role_signals": [],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "effects": {"mana": 1},
+                    "battle_model_scopes": {"tap_add_one_mana_v1": 1},
+                },
+            },
+            {
+                "card_name": "Hybrid Protection",
+                "unique_exposure_count": 12,
+                "direct_event_count": 10,
+                "inferred_role": "runtime_ready_unexposed",
+                "decision": {"status": "review_required"},
+                "role_signals": [],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "effects": {"protection": 1},
+                    "battle_model_scopes": {"target_permanent_protection_v1": 1},
+                },
+            },
+            {
+                "card_name": "Hybrid Draw Ramp",
+                "unique_exposure_count": 12,
+                "direct_event_count": 10,
+                "inferred_role": "draw_filter_value",
+                "decision": {"status": "review_required"},
+                "role_signals": ["draw_filter_value", "ramp_engine"],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "effects": {"draw_cards": 1, "mana": 1},
+                    "battle_model_scopes": {"draw_then_create_treasure_v1": 1},
+                },
+            },
+            {
+                "card_name": "Core Draw Spell",
+                "unique_exposure_count": 12,
+                "direct_event_count": 10,
+                "inferred_role": "draw_filter_value",
+                "decision": {"status": "review_required"},
+                "role_signals": ["draw_filter_value"],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "effects": {"draw_cards": 1},
+                    "battle_model_scopes": {"draw_two_v1": 1},
+                },
+            },
+        ]
+    )
+    with memory_db() as conn:
+        conn.executemany(
+            "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [
+                (607, "Manual Flex", "draw", '["draw"]', "Artifact", 3, 0),
+                (607, "Low Ramp", "ramp", '["ramp"]', "Artifact", 2, 0),
+                (
+                    607,
+                    "Hybrid Protection",
+                    "protection",
+                    '["protection","unknown"]',
+                    "Creature",
+                    1,
+                    0,
+                ),
+                (607, "Hybrid Draw Ramp", "draw", '["draw","ramp"]', "Instant", 4, 0),
+                (607, "Core Draw Spell", "draw", '["draw"]', "Sorcery", 3, 0),
+            ],
+        )
+        payload = model.build_model(
+            conn=conn,
+            miner_report=miner_report_with_two_candidates(),
+            exposure_profiles=profiles,
+            prior_package_reports=[
+                prior_reject_report(
+                    "valakut_hand_filter_cut_big_score",
+                    "Valakut Awakening // Valakut Stoneforge",
+                ),
+                prior_reject_report("wheel_hand_filter_cut_big_score", "Wheel of Fortune"),
+            ],
+        )
+
+    assert payload["summary"]["preflight_benchmark_ready_count"] == 0
+    assert payload["summary"]["expanded_preflight_benchmark_ready_count"] == 1
+    assert (
+        payload["summary"]["recommended_next_action"]
+        == "preflight_expanded_Wheel of Fortune_over_Manual Flex"
+    )
+
+    by_pair = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["expanded_non_core_cut_evaluations"]
+    }
+    wheel_manual = by_pair[("Wheel of Fortune", "Manual Flex")]
+    assert wheel_manual["status"] == "expanded_preflight_benchmark_ready"
+    assert wheel_manual["expanded_search"] is True
+
+    wheel_low_ramp = by_pair[("Wheel of Fortune", "Low Ramp")]
+    assert wheel_low_ramp["status"] == "blocked_expanded_cut_cross_lane"
+    assert "cut_cross_lane:ramp" in wheel_low_ramp["blockers"]
+
+    wheel_hybrid_protection = by_pair[("Wheel of Fortune", "Hybrid Protection")]
+    assert wheel_hybrid_protection["status"] == "blocked_expanded_cut_cross_lane"
+    assert "cut_cross_lane:protection" in wheel_hybrid_protection["blockers"]
+
+    wheel_hybrid_draw_ramp = by_pair[("Wheel of Fortune", "Hybrid Draw Ramp")]
+    assert wheel_hybrid_draw_ramp["status"] == "blocked_expanded_cut_cross_lane"
+    assert "cut_cross_lane_secondary_tags:ramp" in wheel_hybrid_draw_ramp["blockers"]
+    assert "cut_cross_lane_role_signals:ramp_engine" in wheel_hybrid_draw_ramp["blockers"]
+
+    wheel_core_draw = by_pair[("Wheel of Fortune", "Core Draw Spell")]
+    assert wheel_core_draw["status"] == "expanded_miracle_core_override_required"
+    assert (
+        "cut_miracle_core_spell_payoff_requires_explicit_override"
+        in wheel_core_draw["blockers"]
+    )
+
+
+def test_hand_filter_model_blocks_candidate_when_active_rule_is_removal_not_filter():
+    payload = {
+        "pairing_hypotheses": [
+            {
+                "candidate": "Removal Candidate",
+                "candidate_score": 92,
+                "lane": "hand_filter",
+                "status": "blocked_no_safe_cut_in_lane",
+                "cut_options": [
+                    {
+                        "card_name": "Big Score",
+                        "gate_readiness": "protected_same_lane_benchmark_required",
+                        "status": "requires_same_lane_gate",
+                        "lane": "hand_filter",
+                    }
+                ],
+            }
+        ]
+    }
+    profiles = exposure_profiles()
+    profiles[0][1]["card_profiles"].append(
+        {
+            "card_name": "Removal Candidate",
+            "unique_exposure_count": 18,
+            "direct_event_count": 12,
+            "inferred_role": "draw_filter_value",
+            "decision": {"status": "review_required"},
+            "role_signals": ["draw_filter_value"],
+            "rule_summary": {
+                "active_rule_count": 1,
+                "effects": {"draw_cards": 1, "remove_creature": 1},
+                "battle_model_scopes": {"each_opponent_greatest_power_edict_v1": 1},
+            },
+        }
+    )
+
+    with memory_db() as conn:
+        result = model.build_model(
+            conn=conn,
+            miner_report=payload,
+            exposure_profiles=profiles,
+        )
+
+    row = result["pair_evaluations"][0]
+    assert row["candidate"] == "Removal Candidate"
+    assert row["status"] == "blocked_candidate_lane_mismatch"
+    assert "candidate_active_rule_not_hand_filter" in row["blockers"]

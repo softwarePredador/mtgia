@@ -69,6 +69,38 @@ def target_lookup(card_names: Iterable[str]) -> dict[str, str]:
     return {normalize_key(name): str(name) for name in card_names if str(name).strip()}
 
 
+def dedupe_preserve_order(values: Iterable[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for value in values:
+        text = str(value or "").strip()
+        key = normalize_key(text)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append(text)
+    return out
+
+
+def deck_card_names(conn: sqlite3.Connection, deck_id: int) -> list[str]:
+    table = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='deck_cards'"
+    ).fetchone()
+    if table is None:
+        return []
+    rows = conn.execute(
+        """
+        SELECT card_name
+        FROM deck_cards
+        WHERE deck_id=?
+          AND coalesce(card_name, '') <> ''
+        ORDER BY card_name
+        """,
+        (deck_id,),
+    ).fetchall()
+    return [str(row["card_name"]) for row in rows]
+
+
 def split_metric_key(value: object) -> tuple[str, str]:
     raw = str(value or "")
     if ":" not in raw:
@@ -265,6 +297,8 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
             "rule_count": 0,
             "effects": Counter(),
             "battle_model_scopes": Counter(),
+            "active_effects": Counter(),
+            "active_battle_model_scopes": Counter(),
             "execution_statuses": Counter(),
             "review_statuses": Counter(),
         }
@@ -290,7 +324,8 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
         summary["rule_count"] += 1
         summary["execution_statuses"][execution_status] += 1
         summary["review_statuses"][review_status] += 1
-        if execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES:
+        is_active_rule = execution_status in ACTIVE_EXECUTION_STATUSES and review_status in ACTIVE_REVIEW_STATUSES
+        if is_active_rule:
             summary["active_rule_count"] += 1
         try:
             effect_json = json.loads(row["effect_json"] or "{}")
@@ -299,14 +334,25 @@ def load_rule_summaries(conn: sqlite3.Connection, names: Iterable[str]) -> dict[
         if isinstance(effect_json, dict):
             if effect_json.get("effect"):
                 summary["effects"][str(effect_json["effect"])] += 1
+                if is_active_rule:
+                    summary["active_effects"][str(effect_json["effect"])] += 1
             if effect_json.get("battle_model_scope"):
                 summary["battle_model_scopes"][str(effect_json["battle_model_scope"])] += 1
+                if is_active_rule:
+                    summary["active_battle_model_scopes"][str(effect_json["battle_model_scope"])] += 1
     return {key: finalize_rule_summary(value) for key, value in summaries.items()}
 
 
 def finalize_rule_summary(summary: dict[str, Any]) -> dict[str, Any]:
     finalized = dict(summary)
-    for key in ("effects", "battle_model_scopes", "execution_statuses", "review_statuses"):
+    for key in (
+        "effects",
+        "battle_model_scopes",
+        "active_effects",
+        "active_battle_model_scopes",
+        "execution_statuses",
+        "review_statuses",
+    ):
         finalized[key] = dict(sorted((summary.get(key) or {}).items()))
     return finalized
 
@@ -400,9 +446,14 @@ def infer_role_signals(
     rule: dict[str, Any],
 ) -> list[str]:
     signals: set[str] = set()
+    has_active_rules = int(rule.get("active_rule_count") or 0) > 0
     rule_effects = set((rule.get("effects") or {}).keys())
+    active_rule_effects = set((rule.get("active_effects") or {}).keys())
     scopes = set((rule.get("battle_model_scopes") or {}).keys())
-    all_effects = set(effect_counts) | rule_effects
+    active_scopes = set((rule.get("active_battle_model_scopes") or {}).keys())
+    role_rule_effects = active_rule_effects if has_active_rules else rule_effects
+    role_scopes = active_scopes if has_active_rules else scopes
+    all_effects = set(effect_counts) | role_rule_effects
     if {"tokens_created", "token_maker"} & set(event_counts) or "token_maker" in all_effects:
         signals.add("board_development_tokens")
     if all_effects & {"draw_cards", "draw_engine", "hand_filter", "exile_value"} or "wheel_resolved" in event_counts:
@@ -410,18 +461,18 @@ def infer_role_signals(
     if (
         "ramp_engine" in all_effects
         or any("treasure" in effect for effect in all_effects)
-        or any("treasure" in scope or "mana" in scope for scope in scopes)
+        or any("treasure" in scope or "mana" in scope for scope in role_scopes)
     ):
         signals.add("ramp_engine")
-    if any("discard" in effect for effect in all_effects) or any("discard" in scope for scope in scopes):
+    if any("discard" in effect for effect in all_effects) or any("discard" in scope for scope in role_scopes):
         signals.add("discard_payoff")
-    if "protection_resolved" in event_counts or any("indestructible" in scope for scope in scopes):
+    if "protection_resolved" in event_counts or any("indestructible" in scope for scope in role_scopes):
         signals.add("protection_window")
     if "board_wipe_resolved" in event_counts or "board_wipe" in all_effects:
         signals.add("pressure_reset_board_wipe")
     rule_removal_effect = any(
         effect.startswith("remove") or "removal" in effect
-        for effect in rule_effects
+        for effect in role_rule_effects
     )
     rule_removal_scope = any(
         "destroy_target" in scope
@@ -429,7 +480,9 @@ def infer_role_signals(
         or scope.startswith("path_to_exile")
         or scope.startswith("swords_to_plowshares")
         or scope.startswith("winds_of_abandon")
-        for scope in scopes
+        or "edict" in scope
+        or "greatest_power" in scope
+        for scope in role_scopes
     )
     if rule_removal_effect or rule_removal_scope:
         signals.add("spot_removal")
@@ -443,7 +496,7 @@ def infer_role_signals(
     )
     graveyard_scope = any(
         "graveyard" in scope and ("return" in scope or "recursion" in scope)
-        for scope in scopes
+        for scope in role_scopes
     )
     if graveyard_effect or graveyard_scope:
         signals.add("graveyard_recursion")
@@ -707,17 +760,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--evidence", type=Path, action="append")
     parser.add_argument("--card", action="append")
+    parser.add_argument(
+        "--deck-id",
+        type=int,
+        action="append",
+        default=[],
+        help="Include all card names from one or more local deck_cards deck ids.",
+    )
     parser.add_argument("--stem", default="lorehold_card_exposure_profile_20260628_v1")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    evidence_paths = args.evidence or default_evidence_paths()
-    card_names = args.card or DEFAULT_TARGET_CARDS
     with connect(args.db) as conn:
+        deck_cards = [
+            card_name
+            for deck_id in (args.deck_id or [])
+            for card_name in deck_card_names(conn, deck_id)
+        ]
+        card_names = dedupe_preserve_order(
+            [*(args.card or ([] if deck_cards else DEFAULT_TARGET_CARDS)), *deck_cards]
+        )
+        evidence_paths = args.evidence or default_evidence_paths()
         payload = build_profile(evidence_paths=evidence_paths, card_names=card_names, conn=conn)
     payload["source_db"] = str(args.db)
+    payload["target_deck_ids"] = list(args.deck_id or [])
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"
     md_path = REPORT_DIR / f"{args.stem}.md"

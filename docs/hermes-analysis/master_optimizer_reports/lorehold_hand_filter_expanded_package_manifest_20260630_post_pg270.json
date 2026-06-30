@@ -1,0 +1,39 @@
+{
+  "generated_from": "docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json",
+  "purpose": "Expanded deck-607 hand-filter same-lane package preflight after full baseline exposure profiling.",
+  "correction_note": "Olórin's Searing Light was removed from the corrected hand-filter package queue because its active rule scope is removal/edict, not hand-filter. The smoke gate that showed a positive result for Olórin over Improvisation Capstone is retained as invalid cross-lane evidence and must not be used for deck promotion.",
+  "packages": [
+    {
+      "package_key": "valakut_hand_filter_cut_improvisation_capstone_expanded607",
+      "family": "hand_filter_benchmark",
+      "hypothesis": "Valakut Awakening has verified hand-filter MDFC runtime and natural exposure. This tests whether lower-cost instant-speed hand smoothing and a land back face improve the Lorehold miracle window over Improvisation Capstone's current draw/filter Lesson slot without cutting ramp, protection, pressure, or finishers.",
+      "adds": ["Valakut Awakening // Valakut Stoneforge"],
+      "cuts": ["Improvisation Capstone"],
+      "allow_miracle_core_cuts": true,
+      "cut_safety_override_reason": "Expanded hand-filter model requires explicit miracle-core override for same-lane Improvisation Capstone benchmark; protected registry and prior evidence are still enforced."
+    },
+    {
+      "package_key": "valakut_hand_filter_cut_reforge_expanded607",
+      "family": "hand_filter_benchmark",
+      "hypothesis": "Valakut Awakening challenges Reforge the Soul as a same-lane hand-filter slot. This preserves ramp, protection, removal, pressure, recursion, and finisher anchors while testing whether targeted bottom-then-draw smoothing beats a five-mana wheel/miracle draw effect in the current 607 shell.",
+      "adds": ["Valakut Awakening // Valakut Stoneforge"],
+      "cuts": ["Reforge the Soul"]
+    },
+    {
+      "package_key": "wheel_hand_filter_cut_improvisation_capstone_expanded607",
+      "family": "hand_filter_benchmark",
+      "hypothesis": "Wheel of Fortune has verified multiplayer discard-draw runtime and strong hand-filter exposure. This tests whether a compact wheel improves Lorehold's miracle and spell-chain reload over Improvisation Capstone's current draw/filter Lesson slot.",
+      "adds": ["Wheel of Fortune"],
+      "cuts": ["Improvisation Capstone"],
+      "allow_miracle_core_cuts": true,
+      "cut_safety_override_reason": "Expanded hand-filter model requires explicit miracle-core override for same-lane Improvisation Capstone benchmark; protected registry and prior evidence are still enforced."
+    },
+    {
+      "package_key": "wheel_hand_filter_cut_reforge_expanded607",
+      "family": "hand_filter_benchmark",
+      "hypothesis": "Wheel of Fortune challenges Reforge the Soul as the lower-cost wheel in the same hand-filter lane. This keeps the rest of deck 607's miracle, pressure, protection, and finisher shell intact.",
+      "adds": ["Wheel of Fortune"],
+      "cuts": ["Reforge the Soul"]
+    }
+  ]
+}
