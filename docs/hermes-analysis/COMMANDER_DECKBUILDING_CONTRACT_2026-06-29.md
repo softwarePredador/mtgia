@@ -847,6 +847,30 @@ Access-density from-scratch decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_access_density_control_decision_20260630_goal_current.md`.
 
+From-scratch shell failure synthesis generated on 2026-06-30:
+
+- Scope: all current from-scratch shell gates consumed by the planner,
+  including recursion/discard, pressure repair, miracle pressure conversion,
+  and access-density natural plus forced tutor-access gates.
+- Result: `4` unique shells and `5` shell gate rows were evaluated; all were
+  rejected against protected `607`. Best natural delta was `-1` win and best
+  forced-access delta was also `-1` win.
+- Failure-mode counts now include `wins_below_protected_607=5`,
+  `upkeep_rummage_floor_regressed=5`, `package_lanes_overfilled=4`,
+  `miracle_floor_regressed=3`, and
+  `positive_squee_telemetry_not_converting=3`.
+- Decision: do not run another broad from-scratch shell gate now. The current
+  planner top action is `mine_closing_window_trace_before_next_shell`.
+- Required before the next shell: mine `607` win traces versus candidate loss
+  traces for closing-window sequence differences, name the exact lane or
+  pressure failure being repaired, predeclare miracle/topdeck/conversion-card
+  targets, and keep forced-access diagnostics separate from natural promotion
+  evidence.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_shell_failure_synthesis.md`.
+
 Electro ramp-benchmark decision generated on 2026-06-30:
 
 - Candidate:

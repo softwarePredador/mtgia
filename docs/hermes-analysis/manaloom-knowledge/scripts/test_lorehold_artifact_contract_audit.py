@@ -331,6 +331,18 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "source_ledger": "ledger.json",
                 },
             ),
+            (
+                "from_scratch_shell_failure_synthesis",
+                {
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "learning_constraints": [],
+                    "next_hypothesis_requirements": {},
+                    "postgres_writes": False,
+                    "shell_gate_rows": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
         ]
 
         with tempfile.TemporaryDirectory() as tmp:

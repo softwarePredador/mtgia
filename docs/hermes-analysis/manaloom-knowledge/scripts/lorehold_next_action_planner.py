@@ -52,6 +52,7 @@ DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS = [
     REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
     REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
     REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_access_density_control_v1.json",
 ]
 DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
     REPORT_DIR
@@ -60,7 +61,14 @@ DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
     / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
     REPORT_DIR
     / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_fixed607_gate.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json",
 ]
+DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT = (
+    REPORT_DIR / "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -151,6 +159,18 @@ def utc_now() -> str:
 
 def normalize_key(value: object) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def unique_nonempty(values: Iterable[object]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = str(value or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        out.append(text)
+    return out
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -1642,7 +1662,7 @@ def build_from_scratch_shell_action(
             "action_key": "rework_from_scratch_shell_after_current_shells_rejected",
             "status": "from_scratch_shells_not_promotable",
             "lane": "multi_card_shell",
-            "candidate_cards": [str(row.get("candidate_key") or "") for row in gate_rows[:5]],
+            "candidate_cards": unique_nonempty(row.get("candidate_key") for row in gate_rows[:5]),
             "cut_cards": [],
             "why_now": (
                 "Current from-scratch shells already tested against fixed 607 do not beat the "
@@ -1663,6 +1683,81 @@ def build_from_scratch_shell_action(
             "evidence": {
                 "generated_candidates": generated_candidates,
                 "from_scratch_gate_rows": gate_rows,
+            },
+        }
+    return None
+
+
+def build_from_scratch_failure_synthesis_action(
+    failure_synthesis: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not failure_synthesis:
+        return None
+    summary = failure_synthesis.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    if recommended == "confirm_non_negative_from_scratch_shell_signal":
+        signal_rows = [
+            row
+            for row in failure_synthesis.get("shell_gate_rows") or []
+            if row.get("can_promote_from_gate")
+        ]
+        return {
+            "priority": -6,
+            "action_key": "confirm_non_negative_from_scratch_shell_signal",
+            "status": "from_scratch_shell_signal_requires_confirmation",
+            "lane": "multi_card_shell",
+            "candidate_cards": unique_nonempty(
+                row.get("candidate_key") for row in signal_rows[:5]
+            ),
+            "cut_cards": [],
+            "why_now": (
+                "The shell failure synthesis found at least one natural from-scratch "
+                "shell that tied or beat protected 607. This is still shell-level "
+                "evidence and needs confirmation before any promotion."
+            ),
+            "blockers": list(summary.get("blockers") or []),
+            "next_steps": list(
+                (failure_synthesis.get("next_hypothesis_requirements") or {}).get(
+                    "required_before_next_shell"
+                )
+                or []
+            )
+            or [
+                "Run an equal protected-607 confirmation gate.",
+                "Inspect card-use and miracle/topdeck telemetry before any deck replacement.",
+            ],
+            "evidence": {
+                "failure_synthesis_summary": summary,
+                "signal_rows": signal_rows[:6],
+                "learning_constraints": failure_synthesis.get("learning_constraints") or [],
+            },
+        }
+    if recommended == "mine_closing_window_trace_before_next_shell":
+        rows = list(failure_synthesis.get("shell_gate_rows") or [])
+        return {
+            "priority": -6,
+            "action_key": "mine_closing_window_trace_before_next_shell",
+            "status": "from_scratch_shell_learning_requires_trace_mining",
+            "lane": "strategy_learning",
+            "candidate_cards": unique_nonempty(row.get("candidate_key") for row in rows[:5]),
+            "cut_cards": [],
+            "why_now": (
+                "The current from-scratch shells, including access-density and "
+                "pressure-conversion attempts, are already rejected against protected 607. "
+                "The next candidate must come from closing-window trace evidence, not another "
+                "broad shell gate."
+            ),
+            "blockers": list(summary.get("blockers") or []),
+            "next_steps": list(
+                (failure_synthesis.get("next_hypothesis_requirements") or {}).get(
+                    "required_before_next_shell"
+                )
+                or []
+            ),
+            "evidence": {
+                "failure_synthesis_summary": summary,
+                "top_failed_shell_rows": rows[:8],
+                "learning_constraints": failure_synthesis.get("learning_constraints") or [],
             },
         }
     return None
@@ -1778,6 +1873,7 @@ def build_plan(
     seed_safe_cut_hypothesis_report: dict[str, Any] | None = None,
     from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    from_scratch_failure_synthesis: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
@@ -1785,6 +1881,7 @@ def build_plan(
     trace_audit_path: Path = DEFAULT_TRACE_AUDIT,
     focus_access_package_path: Path = DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT,
     seed_safe_cut_hypothesis_path: Path = DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT,
+    from_scratch_failure_synthesis_path: Path = DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1809,6 +1906,11 @@ def build_plan(
     )
     if from_scratch_action:
         actions.append(from_scratch_action)
+    from_scratch_failure_action = build_from_scratch_failure_synthesis_action(
+        from_scratch_failure_synthesis
+    )
+    if from_scratch_failure_action:
+        actions.append(from_scratch_failure_action)
     focus_access_result_action = build_focus_access_package_result_action(
         focus_access_package_report
     )
@@ -1907,6 +2009,9 @@ def build_plan(
         "from_scratch_gate_reports": [
             str(path) for path, _payload in (from_scratch_gate_reports or [])
         ],
+        "from_scratch_failure_synthesis_report": str(from_scratch_failure_synthesis_path)
+        if from_scratch_failure_synthesis
+        else None,
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -1936,6 +2041,9 @@ def build_plan(
                 (seed_safe_cut_hypothesis_report or {}).get("summary") or {}
             ),
             "from_scratch_gate_count": len(from_scratch_gate_reports or []),
+            "from_scratch_failure_synthesis": (
+                (from_scratch_failure_synthesis or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -1955,6 +2063,7 @@ def build_plan(
             "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
             "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
             "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
+            "A rejected from-scratch shell synthesis blocks another broad shell gate until a closing-window trace target is declared.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1982,6 +2091,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         f"- From-scratch reports: `{', '.join(payload.get('from_scratch_reports') or []) or '-'}`",
         f"- From-scratch gate reports: `{', '.join(payload.get('from_scratch_gate_reports') or []) or '-'}`",
+        f"- From-scratch failure synthesis: `{payload.get('from_scratch_failure_synthesis_report') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -2069,6 +2179,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--from-scratch-report", type=Path, action="append")
     parser.add_argument("--from-scratch-gate-report", type=Path, action="append")
+    parser.add_argument(
+        "--from-scratch-failure-synthesis-report",
+        type=Path,
+        default=DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
+    )
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
@@ -2116,6 +2231,11 @@ def main() -> int:
     from_scratch_gate_reports = read_existing_json(
         args.from_scratch_gate_report or DEFAULT_FROM_SCRATCH_GATE_REPORTS
     )
+    from_scratch_failure_synthesis = (
+        read_json(args.from_scratch_failure_synthesis_report)
+        if args.from_scratch_failure_synthesis_report.exists()
+        else None
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -2133,6 +2253,7 @@ def main() -> int:
         seed_safe_cut_hypothesis_report=seed_safe_cut_hypothesis_report,
         from_scratch_reports=from_scratch_reports,
         from_scratch_gate_reports=from_scratch_gate_reports,
+        from_scratch_failure_synthesis=from_scratch_failure_synthesis,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
@@ -2140,6 +2261,7 @@ def main() -> int:
         trace_audit_path=args.trace_audit,
         focus_access_package_path=args.focus_access_package_report,
         seed_safe_cut_hypothesis_path=args.seed_safe_cut_hypothesis_report,
+        from_scratch_failure_synthesis_path=args.from_scratch_failure_synthesis_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

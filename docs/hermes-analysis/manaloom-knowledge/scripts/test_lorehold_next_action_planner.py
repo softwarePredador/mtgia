@@ -12,8 +12,14 @@ def test_defaults_use_current_cut_models():
     assert planner.DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS[0].name == (
         "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
     )
+    assert planner.DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS[-1].name == (
+        "lorehold_from_scratch_challengers_20260630_access_density_control_v1.json"
+    )
     assert planner.DEFAULT_FROM_SCRATCH_GATE_REPORTS[-1].name == (
-        "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json"
+        "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json"
+    )
+    assert planner.DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT.name == (
+        "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
     )
     assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
         "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
@@ -1425,6 +1431,48 @@ def test_next_action_planner_routes_non_negative_from_scratch_shell_to_confirmat
         "confirm_or_rework_from_scratch_shell_signal"
     )
     assert payload["action_queue"][0]["status"] == "from_scratch_shell_has_non_negative_gate_signal"
+
+
+def test_next_action_planner_prioritizes_from_scratch_failure_synthesis():
+    failure_synthesis = {
+        "summary": {
+            "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+            "can_run_next_battle_gate": False,
+            "blockers": ["all current shells are below protected 607"],
+        },
+        "shell_gate_rows": [
+            {
+                "candidate_key": "challenger_lorehold_access_density_control_v1",
+                "status": "forced_access_rejected",
+                "delta_wins": -1,
+            }
+        ],
+        "learning_constraints": [
+            {
+                "constraint_key": "forced_access_is_diagnostic_only",
+                "requirement": "Forced access cannot promote a deck.",
+            }
+        ],
+        "next_hypothesis_requirements": {
+            "required_before_next_shell": [
+                "mine closing-window trace before another shell",
+            ]
+        },
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_failure_synthesis=failure_synthesis,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "mine_closing_window_trace_before_next_shell"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "from_scratch_shell_learning_requires_trace_mining"
+    assert action["candidate_cards"] == ["challenger_lorehold_access_density_control_v1"]
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

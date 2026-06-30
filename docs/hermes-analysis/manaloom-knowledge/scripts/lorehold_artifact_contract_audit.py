@@ -487,6 +487,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             "seed-safe cut hypothesis synthesis",
         ),
         (
+            "from_scratch_shell_failure_synthesis",
+            {"learning_constraints", "next_hypothesis_requirements", "shell_gate_rows"},
+            "from-scratch shell failure synthesis",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",
