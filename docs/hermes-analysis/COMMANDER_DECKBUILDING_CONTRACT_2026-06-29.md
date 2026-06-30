@@ -770,15 +770,20 @@ Runtime enablement checkpoint generated on 2026-06-30:
   scope `brainstone_draw_three_put_two_back_for_first_draw_miracle_v1`, with
   PostgreSQL postcheck proving `active_unexecuted_rows_after=0` and the focused
   Brainstone runtime test passing.
+- PG273 promoted and synced `Codex Shredder` with exact activated artifact
+  runtime for target-player mill one and five-mana tap/sacrifice graveyard-card
+  recursion to hand. This removes one recursion split item from the runtime
+  gap queue but is not deck-promotion evidence by itself.
 - The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg272_brainstone.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg272_brainstone_v2.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg273_codex_shredder.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg272_brainstone_v2.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg273_codex_shredder.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
-  back to PG apply.
+  back to PG apply, while `Codex Shredder` is already filtered from runtime-gap
+  work as a current active rule.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and

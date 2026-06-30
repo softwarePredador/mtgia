@@ -24,16 +24,15 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
 
-DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg272_brainstone.json"
+DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
 DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_MANIFESTS = [
-    REPORT_DIR / "pg245_lorehold_topdeck_damage_runtime_20260628_manifest.json",
-    REPORT_DIR / "pg244_hidden_retreat_runtime_scope_20260628_v1_manifest.json",
+    REPORT_DIR / "pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+    REPORT_DIR / "pg272_brainstone_executable_topdeck_20260630_manifest.json",
+    REPORT_DIR / "pg273_codex_shredder_mill_recursion_20260630_manifest.json",
 ]
-DEFAULT_PRECHECK_BLOCKERS = [
-    REPORT_DIR / "pg245_lorehold_topdeck_damage_runtime_20260628_precheck_blocked.json",
-]
+DEFAULT_PRECHECK_BLOCKERS: list[Path] = []
 
 
 def utc_now() -> str:
@@ -185,7 +184,8 @@ def package_index(manifests: list[tuple[Path, dict[str, Any]]]) -> dict[str, lis
             and not resolve_report_path(str(value)).exists()
         ]
         expected_rules = manifest.get("expected_rules") or []
-        for card in manifest.get("selected_card_names") or []:
+        selected_cards = manifest.get("selected_card_names") or manifest.get("selected_cards") or []
+        for card in selected_cards:
             normalized_card = normalize_card_name(str(card))
             card_expected_rules = [
                 rule
@@ -193,9 +193,10 @@ def package_index(manifests: list[tuple[Path, dict[str, Any]]]) -> dict[str, lis
                 if normalize_card_name(str(rule.get("card_name") or rule.get("normalized_name") or ""))
                 == normalized_card
             ]
+            deploy_id = manifest.get("deploy_id") or path.name.removesuffix("_manifest.json")
             index[str(card)].append(
                 {
-                    "deploy_id": manifest.get("deploy_id"),
+                    "deploy_id": deploy_id,
                     "status": manifest.get("status"),
                     "manifest": str(path),
                     "apply_gate": manifest.get("apply_gate"),
@@ -440,7 +441,7 @@ def build_report(
 def render_markdown(report: dict[str, Any]) -> str:
     summary = report["summary"]
     lines = [
-        "# Lorehold Runtime Candidate Readiness - 2026-06-28",
+        "# Lorehold Runtime Candidate Readiness - 2026-06-30",
         "",
         f"- Generated at: `{report['generated_at']}`",
         f"- Runtime queue: `{report['runtime_queue']}`",
@@ -476,15 +477,16 @@ def render_markdown(report: dict[str, Any]) -> str:
                 action=row["next_action"],
             )
         )
-    lines.extend(["", "## Package Blockers", ""])
+    lines.extend(["", "## Package Evidence And Blockers", ""])
     for row in report["cards"]:
         if not row.get("pg_packages") and not row.get("pg_precheck_blockers") and not row.get("cut_specific_negatives"):
             continue
         lines.append(f"### {row['card_name']}")
         for package in row.get("pg_packages") or []:
             files = package.get("files") or {}
+            label = "Applied/synced package" if row.get("status") == "pg_package_applied_synced" else "PG package"
             lines.append(
-                f"- PG package `{package.get('deploy_id')}` status `{package.get('status')}`; apply `{files.get('apply') or '-'}`"
+                f"- {label} `{package.get('deploy_id')}` status `{package.get('status')}`; apply `{files.get('apply') or '-'}`"
             )
             if package.get("missing_files"):
                 lines.append(

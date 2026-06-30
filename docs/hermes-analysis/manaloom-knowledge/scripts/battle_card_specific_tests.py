@@ -19766,6 +19766,119 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player():
+        def codex_shredder():
+            return {
+                "name": "Codex Shredder",
+                "effect": "passive",
+                "type_line": "Artifact",
+                "artifact": True,
+                "battle_model_scope": (
+                    "tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1"
+                ),
+                "activated_target_player_mill_count": 1,
+                "target_player_mill_activation_requires_tap": True,
+                "graveyard_to_hand_activation_cost_generic": 5,
+                "graveyard_to_hand_activation_requires_tap": True,
+                "graveyard_to_hand_activation_requires_sacrifice": True,
+                "graveyard_to_hand_target": "any_card",
+                "graveyard_to_hand_target_count": 1,
+                "graveyard_to_hand_destination": "hand",
+                "_rule_logical_key": "battle_rule_v1:pg273_codex_shredder_test",
+                "_rule_oracle_hash": "pg273-codex-shredder-test-hash",
+            }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Codex Controller")
+            opponent = player("Opponent")
+            codex = codex_shredder()
+            high_value = {"name": "Rise of the Eldrazi", "type_line": "Sorcery", "cmc": 12}
+            low_value = {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0}
+            active.battlefield = [codex]
+            active.graveyard = [low_value, high_value]
+            active.mana_pool.add("generic", 5)
+
+            returned = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=6,
+                rng=random.Random(2731),
+                phase="postcombat_main",
+            )
+
+            mill_controller = player("Mill Controller")
+            mill_opponent = player("Mill Opponent")
+            mill_codex = codex_shredder()
+            mill_controller.battlefield = [mill_codex]
+            mill_opponent.library = [
+                {"name": "Opponent Top", "type_line": "Sorcery", "cmc": 3},
+                {"name": "Opponent Second", "type_line": "Creature", "cmc": 2},
+            ]
+
+            milled = battle.activate_utility_artifacts(
+                mill_controller,
+                [mill_opponent],
+                [mill_controller, mill_opponent],
+                turn=3,
+                rng=random.Random(2732),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert returned == 1
+        assert high_value in active.hand
+        assert low_value in active.graveyard
+        assert codex in active.graveyard
+        assert codex not in active.battlefield
+        assert active.mana_pool.total() == 0
+        assert any(
+            event == "recursion_resolved"
+            and data.get("card") == "Codex Shredder"
+            and data.get("activation_kind") == "tap_sacrifice_return_graveyard_to_hand"
+            and data.get("recovered") == ["Rise of the Eldrazi"]
+            and data.get("destination") == "hand"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg273_codex_shredder_test"
+            for event, data in events
+        )
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Codex Shredder"
+            and data.get("activation_kind") == "tap_sacrifice_return_graveyard_to_hand"
+            and data.get("recovered") == ["Rise of the Eldrazi"]
+            and data.get("sacrificed_self") is True
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("card") == "Rise of the Eldrazi"
+            and decision.get("chosen_option", {}).get("action")
+            == "activate_graveyard_to_hand_artifact"
+            and "graveyard_to_hand" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
+        assert milled == 1
+        assert mill_codex["tapped"] is True
+        assert [card.get("name") for card in mill_opponent.graveyard] == ["Opponent Top"]
+        assert len(mill_opponent.library) == 1
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Codex Shredder"
+            and data.get("activation_kind") == "tap_target_player_mill"
+            and data.get("target_player") == "Mill Opponent"
+            and data.get("milled") == ["Opponent Top"]
+            for event, data in events
+        )
+
     def test_pg215_green_goblin_discard_nonland_counter_and_land_treasure():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -21091,6 +21204,7 @@ def register_tests(battle, player):
         test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw,
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
+        test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
         test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
         test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
         test_pg216_black_market_connections_precombat_modal_resources,

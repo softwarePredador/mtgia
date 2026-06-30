@@ -1528,6 +1528,37 @@
     "review_status": "verified",
     "notes": "Oracle-reviewed on 2026-06-17 against official/Scryfall text: this enters only after imprinting a nonartifact, nonland colored card from hand. Runtime should use the dedicated imprint selector and never treat it as free unconditional mana."
   },
+  "Codex Shredder": {
+    "effect_json": {
+      "ability_kind": "activated",
+      "cmc": 1.0,
+      "effect": "passive",
+      "artifact": true,
+      "mana_cost": "{1}",
+      "activated_target_player_mill_count": 1,
+      "target_player_mill_activation_requires_tap": true,
+      "graveyard_to_hand_activation_cost_generic": 5,
+      "graveyard_to_hand_activation_requires_tap": true,
+      "graveyard_to_hand_activation_requires_sacrifice": true,
+      "graveyard_to_hand_target": "any_card",
+      "graveyard_to_hand_target_count": 1,
+      "graveyard_to_hand_destination": "hand",
+      "battle_model_scope": "tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1"
+    },
+    "deck_role_json": {
+      "category": "recursion",
+      "effect": "passive",
+      "subtype": "activated_graveyard_card_return_artifact",
+      "timing": "activated_main_phase"
+    },
+    "logical_rule_key": "battle_rule_v1:3417000adca740f0c5036e7232221df4",
+    "source": "curated",
+    "confidence": 0.92,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "48dd2cf11a80189f548581507ab88df9",
+    "notes": "Oracle-reviewed on 2026-06-30 against local XMage CodexShredder.java and PostgreSQL text: {T}: target player mills a card; {5}, {T}, sacrifice this artifact: return target card from your graveyard to your hand. Runtime executes the target-player mill fallback and the main graveyard-to-hand activation with tap, mana payment, sacrifice, decision trace, and recursion event."
+  },
   "Mox Diamond": {
     "effect_json": {
       "cmc": 0.0,

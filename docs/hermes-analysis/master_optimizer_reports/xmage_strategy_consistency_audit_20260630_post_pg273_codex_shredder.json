@@ -1,0 +1,142 @@
+{
+  "checks": [
+    {
+      "detail": "contains=['Status: `frozen_operating_contract`', 'Do not revalidate the whole battle/rules philosophy before each card wave.', 'PostgreSQL `card_battle_rules` is the durable source of truth', 'Hermes SQLite is cache/lab/runtime evidence and must not overwrite PostgreSQL', 'Broad XMage extraction may create review candidates and family lanes only', 'Generic `xmage_*_review_v1` scopes are review/split-only and never batch PG candidates', 'Pattern registry rows are `shadow_only`, non-executable, and non-autopromotable', 'A battle aggregate is not card-level proof unless the candidate card was drawn/used or a focused test exercised it', 'Rebuild the current replay/deck scope queue', 'ramp_permanent', 'targeted_interaction', \"Hazel's Brewmaster\"]",
+      "name": "docs.frozen_family_pipeline_contract",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['Status: `current_operating_standard`', 'BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md', 'If the contract checkpoint passes', 'broad XMage extraction may create review candidates and family lanes', 'must not create executable battle truth or PostgreSQL promotion by itself', 'PostgreSQL remains the durable source of truth', 'Hermes is cache/runtime evidence, not truth', 'Do not promote from `xmage_*_review_v1`', 'If a candidate card is not drawn/used in battle', \"Hazel's Brewmaster\"]",
+      "name": "docs.definitive_flow_contract",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md', 'frozen_operating_contract', 'XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md', 'current_operating_standard', 'Nao devem ser usados como contrato operacional', 'xmage_strategy_consistency_audit.py']",
+      "name": "docs.root_readme_points_to_definitive_flow",
+      "status": "pass"
+    },
+    {
+      "detail": "absent=['Decisao atual para acelerar XMage -> ManaLoom: usar\\n    `hybrid_effective_queue_pattern_registry`', 'Workflow operacional atual para a fila real Lorehold 608-616']",
+      "name": "docs.root_readme_no_old_strategy_as_current",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md', 'checkpoint curto de invariantes', 'XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md', 'current', 'supersede o uso operacional dos planos XMage de 2026-06-23/24']",
+      "name": "docs.status_index_marks_definitive_flow_current",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['evidence archive', 'not executable source of', 'Commit only reviewed summaries, package evidence, or final manifests', '../XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md']",
+      "name": "docs.report_archive_boundary",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['import xmage_pattern_registry_builder as pattern_registry_builder', 'pattern_registry_builder.build_report', '_pattern_registry.json', 'pattern_status_counts', 'forced_include_deck_ids']",
+      "name": "scripts.pipeline_emits_required_reports",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['PROMOTION_STATUS = \"shadow_only\"', '\"can_execute_in_battle\": False', '\"can_auto_promote_to_card_battle_rules\": False', \"promotion_status <> 'shadow_only'\", 'can_execute_in_battle = FALSE']",
+      "name": "scripts.pattern_registry_shadow_only",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['xmage_spell_mana_ritual_variant_review_v1', 'xmage_exile_then_return_target_variant_review_v1', 'static_one_spell_per_turn_restriction_variant_review_v1', 'static_cast_as_flash_permission_variant_review_v1', 'xmage_choose_new_targets_variant_review_v1', 'xmage_multi_target_damage_variant_review_v1', 'xmage_life_gain_variant_review_v1', 'station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1', '\"activation_cost_mana\": \"{3}{W}\"', '\"station_level_required\": 12', '\"token_legendary\": True', '_nonmana_ability_pending', 'nonmana_abilities_require_separate_scope']",
+      "name": "scripts.effect_mapper_family_lanes_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_adagia_station_gate_blocks_copy_before_level_12', 'test_adagia_precombat_engine_activates_station_copy_after_level_12', 'test_adagia_station_12_creates_legendary_artifact_or_enchantment_copy', 'station_level_required', 'token_legendary']",
+      "name": "scripts.adagia_station_runtime_tests_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['\"life_total_change\"', '\"blink\"', '\"multi_target_damage\"', '\"redirect_target\"', '\"untap_target\"', 'station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1']",
+      "name": "scripts.family_classifier_matches_mapper",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['effect_data.get(\"token_legendary\")', 'token_legendary=bool(effect_data.get(\"token_legendary\"))']",
+      "name": "scripts.runtime_copy_token_legendary_support",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token', 'test_neheb_routes_to_exact_postcombat_life_lost_mana_engine', 'test_cloud_key_maps_to_chosen_card_type_cost_reduction', 'test_alhammarrets_archive_maps_to_exact_draw_life_replacement_scope', 'test_dynamic_mana_spell_routes_to_ritual_family', 'test_generic_blink_effect_routes_to_targeted_zone_transition_family', 'test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope']",
+      "name": "tests.mapper_family_coverage_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_adagia_station_copy_creates_legendary_artifact_or_enchantment_token', 'station_12_copy_artifact_or_enchantment_you_control_legendary_token_v1', 'assert created[\"token_legendary\"] is True']",
+      "name": "tests.runtime_adagia_coverage_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_neheb_adds_red_equal_to_opponents_life_lost_this_turn', 'postcombat_main_add_red_for_opponents_life_lost_this_turn_v1', 'phase_trigger_resolved']",
+      "name": "tests.runtime_neheb_coverage_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_cloud_key_chooses_best_hand_type_and_reduces_only_that_type', 'chosen_card_type_cost_reduction_v1', 'chosen_card_type_resolved', 'spells_you_cast_of_chosen_card_type']",
+      "name": "tests.runtime_cloud_key_coverage_present",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['test_alhammarrets_archive_enters_without_drawing_and_doubles_life_gain', 'test_alhammarrets_archive_draw_replacement_respects_draw_step_exception', 'static_double_life_gain_and_draw_except_first_draw_step_v1', 'draw_replacement_applied', 'life_gain_replacement_applied']",
+      "name": "tests.runtime_alhammarret_archive_coverage_present",
+      "status": "pass"
+    },
+    {
+      "detail": "[6, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]",
+      "name": "evidence.forced_deck_ids",
+      "status": "pass"
+    },
+    {
+      "detail": "[6, 25, 31, 42, 54, 58, 62, 74, 83, 84, 104, 105, 116, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616]",
+      "name": "evidence.effective_deck_ids",
+      "status": "pass"
+    },
+    {
+      "detail": "{\"ready_for_structured_xmage_pull_review_required\": 67, \"xmage_source_valid_mapper_required\": 61}",
+      "name": "evidence.validity_status_counts",
+      "status": "pass"
+    },
+    {
+      "detail": "{\"mapper_metadata_or_test_scenario_required\": 61, \"split_family_scope_review_required\": 67}",
+      "name": "evidence.proposal_status_counts",
+      "status": "pass"
+    },
+    {
+      "detail": "{\"board_wipe_choice\": 3, \"copy_spell_engine\": 1, \"draw_engine\": 2, \"free_cast\": 9, \"life_total_change\": 1, \"manual_model\": 61, \"passive\": 5, \"ramp_permanent\": 5, \"recursion\": 10, \"targeted_interaction\": 12, \"targeted_protection\": 7, \"topdeck_play\": 2, \"tutor\": 10}",
+      "name": "evidence.family_counts",
+      "status": "pass"
+    },
+    {
+      "detail": "{\"candidate_template_requires_review_tests\": 9, \"manual_model_observation_only\": 1, \"requires_subpattern_split_before_promotion\": 10}",
+      "name": "evidence.pattern_status_counts",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['Pattern promotion status: `shadow_only`']",
+      "name": "evidence.pattern_promotion_shadow_only",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['Unclassified files: `0`', 'card_specific_runtime_rules', 'family_mapper_required', 'XMage/Oracle extraction creates review candidate; PG promotion requires focused test and safe lane']",
+      "name": "gate.runtime_surface_current",
+      "status": "pass"
+    },
+    {
+      "detail": "contains=['Gate status: `pass`', 'Required gaps: `0`', 'Required partials: `0`', 'Optional gaps: `0`', 'Official Wizards rules remain the authority', 'Scryfall and MTGJSON are metadata/rulings inputs', 'Open engines such as Forge, Magarena, and Cockatrice are comparison references only']",
+      "name": "gate.external_source_current",
+      "status": "pass"
+    }
+  ],
+  "mutations_performed": [],
+  "status": "pass",
+  "summary": {
+    "check_count": 26,
+    "status_counts": {
+      "pass": 26
+    }
+  }
+}

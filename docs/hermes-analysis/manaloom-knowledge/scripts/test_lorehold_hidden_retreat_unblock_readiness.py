@@ -92,6 +92,12 @@ class FakeRunner:
 
 
 class LoreholdHiddenRetreatUnblockReadinessTest(unittest.TestCase):
+    def test_default_focus_queue_uses_post_pg273_codex_report(self):
+        self.assertEqual(
+            readiness.DEFAULT_FOCUS_QUEUE.name,
+            "lorehold_focus_access_package_generator_20260630_post_pg273_codex_shredder.json",
+        )
+
     def test_blocks_blind_gate_when_no_preflight_or_deeper_candidate(self):
         with tempfile.TemporaryDirectory() as tmp:
             files = fixture_files(Path(tmp))

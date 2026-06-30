@@ -451,6 +451,24 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             "unexecuted",
             by_name["Brainstone"]["effect_json"]["battle_model_scope"],
         )
+        self.assertEqual(by_name["Codex Shredder"]["source"], "curated")
+        self.assertEqual(by_name["Codex Shredder"]["review_status"], "verified")
+        self.assertEqual(by_name["Codex Shredder"]["execution_status"], "auto")
+        self.assertEqual(by_name["Codex Shredder"]["logical_rule_key"], "battle_rule_v1:3417000adca740f0c5036e7232221df4")
+        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["effect"], "passive")
+        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["activated_target_player_mill_count"], 1)
+        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_cost_generic"], 5)
+        self.assertTrue(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_requires_tap"])
+        self.assertTrue(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_activation_requires_sacrifice"])
+        self.assertEqual(by_name["Codex Shredder"]["effect_json"]["graveyard_to_hand_target"], "any_card")
+        self.assertEqual(
+            by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
+            "tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1",
+        )
+        self.assertNotIn(
+            "xmage_graveyard_return_variant_review_v1",
+            by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
+        )
         self.assertEqual(by_name["Breena, the Demagogue"]["source"], "curated")
         self.assertEqual(by_name["Breena, the Demagogue"]["effect_json"]["effect"], "creature")
         self.assertTrue(by_name["Breena, the Demagogue"]["effect_json"]["political_attack_draw_trigger"])

@@ -67,5 +67,23 @@
       "review_status": "verified"
     }
   ],
-  "status": "prepared_read_only_pending_apply_approval"
+  "results": {
+    "apply": {
+      "backup_rows": 2,
+      "deprecated_shadow_rows": 2,
+      "upserted_rows": 1
+    },
+    "postcheck": {
+      "backup_rows": 2,
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    "sync": {
+      "canonical_snapshot_rows_exported": 3284,
+      "pg_rows_loaded": 1,
+      "sqlite_inserted_or_updated": 1
+    }
+  },
+  "status": "applied_synced"
 }

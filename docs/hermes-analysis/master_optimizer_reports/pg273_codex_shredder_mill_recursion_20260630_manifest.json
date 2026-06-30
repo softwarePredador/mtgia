@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-06-30T09:52:03Z",
+  "package": "pg273_codex_shredder_mill_recursion_20260630",
+  "status": "applied_synced",
+  "selected_cards": [
+    "Codex Shredder"
+  ],
+  "local_xmage_sources": [
+    "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CodexShredder.java"
+  ],
+  "focused_runtime_tests": [
+    "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_specific_tests.py::test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player"
+  ],
+  "expected_rules": [
+    {
+      "card_name": "Codex Shredder",
+      "normalized_name": "codex shredder",
+      "oracle_hash": "48dd2cf11a80189f548581507ab88df9",
+      "logical_rule_key": "battle_rule_v1:3417000adca740f0c5036e7232221df4",
+      "battle_model_scope": "tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1",
+      "review_status": "verified",
+      "execution_status": "auto"
+    }
+  ],
+  "files": {
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_precheck.sql",
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_apply.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_rollback.sql",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_postcheck.sql",
+    "sync": "docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_sync.json"
+  },
+  "results": {
+    "precheck": {
+      "target_card_rows": 1,
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "active_review_scope_rows_before": 0,
+      "would_deprecate_shadow_rows": 0
+    },
+    "apply": {
+      "backup_rows": 0,
+      "deprecated_shadow_rows": 0,
+      "upserted_rows": 1
+    },
+    "postcheck": {
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1,
+      "promoted_oracle_hash_rows": 1,
+      "promoted_expected_scope_rows": 1,
+      "active_runtime_rows_after": 1,
+      "active_review_scope_rows_after": 0,
+      "deprecated_disabled_rows_after": 0
+    },
+    "sync": {
+      "pg_rows_loaded": 1,
+      "sqlite_inserted_or_updated": 1,
+      "canonical_snapshot_rows_exported": 3285
+    }
+  }
+}

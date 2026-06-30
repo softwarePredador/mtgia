@@ -352,6 +352,10 @@ PG267/PG271 runtime-rule checkpoint:
   `brainstone_draw_three_put_two_back_for_first_draw_miracle_v1`, replacing
   the stale `unexecuted` scope label while preserving the activated
   tap/sacrifice, draw-three, put-two-back model.
+- PG273 was applied and synced for `Codex Shredder` with exact activated
+  artifact scopes for `{T}` target-player mill one and `{5}, {T}, sacrifice:
+  return target card from your graveyard to hand, using
+  `tap_target_player_mill_one_or_five_tap_sacrifice_return_target_card_from_your_graveyard_to_hand_v1`.
 - PG267 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
 - PG268 package evidence:
@@ -364,28 +368,31 @@ PG267/PG271 runtime-rule checkpoint:
   `docs/hermes-analysis/master_optimizer_reports/pg271_hidden_retreat_damage_prevention_20260630_package.md`.
 - PG272 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg272_brainstone_executable_topdeck_20260630_package.md`.
-- Current queue after PG272:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg272_brainstone_manifest.md`.
+- PG273 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_package.md`.
+- Current queue after PG273:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg273_codex_shredder_manifest.md`.
 - Current combined severity counts:
-  `{"high": 102, "medium": 42, "pass": 647}`.
+  `{"high": 101, "medium": 42, "pass": 648}`.
 - Current unresolved routing:
-  `ready_for_structured_xmage_pull_review_required=68`,
+  `ready_for_structured_xmage_pull_review_required=67`,
   `xmage_source_valid_mapper_required=61`,
   `runtime_family_required_count=0`.
 - Current family counts include:
-  `manual_model=61`, `targeted_interaction=12`, `recursion=11`, `tutor=10`,
+  `manual_model=61`, `targeted_interaction=12`, `recursion=10`, `tutor=10`,
   `free_cast=9`, `targeted_protection=7`, `ramp_permanent=5`, `passive=5`,
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg272_brainstone.md`;
-  blocked runtime gaps are `20`, with
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.md`;
+  blocked runtime gaps are `19`, with
   `mapper_metadata_or_test_scenario_required=12` and
-  `split_family_scope_review_required=8`.
-- Current Lorehold runtime readiness after PG272:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg272_brainstone_v2.md`;
+  `split_family_scope_review_required=7`.
+- Current Lorehold runtime readiness after PG273:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg273_codex_shredder.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
-  apply-pending.
+  apply-pending; `Codex Shredder` is filtered out of the runtime-gap queue as
+  a current verified/auto active rule.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

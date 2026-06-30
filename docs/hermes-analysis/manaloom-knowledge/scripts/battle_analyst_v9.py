@@ -23510,6 +23510,33 @@ def graveyard_recycle_targets(player, permanent, all_players, turn):
     return candidates[:target_count]
 
 
+def graveyard_to_hand_targets(player, permanent, all_players, turn):
+    target_count = max(1, int(permanent.get("graveyard_to_hand_target_count") or 1))
+    target_type = permanent.get("graveyard_to_hand_target") or permanent.get("target") or "any_card"
+    mana_value_max = recursion_mana_value_max(
+        permanent,
+        "graveyard_to_hand_mana_value_max",
+        "graveyard_return_mana_value_max",
+    )
+    candidates = [
+        grave_card
+        for grave_card in list(getattr(player, "graveyard", []) or [])
+        if graveyard_card_matches_recursion_target(
+            grave_card,
+            target_type,
+            mana_value_max=mana_value_max,
+        )
+    ]
+    candidates.sort(
+        key=lambda grave_card: (
+            -graveyard_recycle_candidate_score(grave_card, player, all_players, turn),
+            -int(float(grave_card.get("cmc") or card_mana_value(grave_card) or 0)),
+            grave_card.get("name", "?"),
+        )
+    )
+    return candidates[:target_count]
+
+
 def activate_graveyard_recycling_artifacts(
     player,
     opponents,
@@ -23526,11 +23553,164 @@ def activate_graveyard_recycling_artifacts(
             continue
         if not (
             permanent.get("activated_self_mill_count")
+            or permanent.get("activated_target_player_mill_count")
             or permanent.get("graveyard_shuffle_target_count")
+            or permanent.get("graveyard_to_hand_target_count")
         ):
             continue
         if permanent.get("utility_artifact_used_this_turn"):
             continue
+        graveyard_to_hand_count = int(permanent.get("graveyard_to_hand_target_count") or 0)
+        if graveyard_to_hand_count > 0:
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(
+                    permanent.get("graveyard_to_hand_activation_cost_generic")
+                    or permanent.get("activation_cost_generic")
+                    or 0
+                ),
+            )
+            activation_cost_text = _activation_cost_text(activation_cost)
+            targets = graveyard_to_hand_targets(player, permanent, all_players, turn)
+            if targets:
+                if (
+                    permanent.get("graveyard_to_hand_activation_requires_tap", True)
+                    and permanent.get("tapped")
+                ):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "artifact_already_tapped_for_graveyard_to_hand",
+                        phase=phase,
+                    )
+                    continue
+                if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "failed_to_pay_graveyard_to_hand_activation_cost",
+                        phase=phase,
+                    )
+                    continue
+                if permanent.get("graveyard_to_hand_activation_requires_tap", True):
+                    permanent["tapped"] = True
+                permanent["utility_artifact_used_this_turn"] = True
+                if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True):
+                    if permanent in player.battlefield:
+                        player.battlefield.remove(permanent)
+                    player.graveyard.append(permanent)
+                    player.record_permanent_sacrificed(permanent, turn)
+                recovered = []
+                for recovered_card in remove_cards_from_graveyard(
+                    player,
+                    targets,
+                    turn=turn,
+                    source_event="graveyard_to_hand_artifact",
+                ):
+                    player.hand.append(recovered_card)
+                    recovered.append(recovered_card)
+                target_type = permanent.get("graveyard_to_hand_target") or "any_card"
+                destination = permanent.get("graveyard_to_hand_destination") or "hand"
+                emit_decision_trace(
+                    decision_type="utility_artifact_activation",
+                    player=player,
+                    turn=turn,
+                    phase=phase,
+                    available_options=[
+                        decision_card_option(
+                            target,
+                            get_card_effect(target),
+                            score=graveyard_recycle_candidate_score(target, player, all_players, turn),
+                            action="return_graveyard_card_to_hand",
+                            target_type=target_type,
+                            destination=destination,
+                        )
+                        for target in targets[:8]
+                    ],
+                    chosen_option=decision_card_option(
+                        recovered[0] if recovered else None,
+                        get_card_effect(recovered[0]) if recovered else None,
+                        score=graveyard_recycle_candidate_score(recovered[0], player, all_players, turn)
+                        if recovered
+                        else 0,
+                        action="activate_graveyard_to_hand_artifact",
+                        target_type=target_type,
+                        destination=destination,
+                    ),
+                    score_components={
+                        "activation_cost_generic": activation_cost,
+                        "target_type": target_type,
+                        "recovered_count": len(recovered),
+                        "sacrificed_source": bool(
+                            permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
+                        ),
+                    },
+                    rule_source="utility_artifact_activation_v1",
+                    rule_status=permanent.get("_rule_review_status", "active"),
+                    confidence="medium",
+                    expected_benefit_score=(
+                        22
+                        + sum(
+                            graveyard_recycle_candidate_score(card, player, all_players, turn)
+                            for card in recovered
+                        )
+                    ),
+                    reason="cash_in_graveyard_artifact_for_best_recovery_target",
+                    strategic_principle="convert a spent utility artifact and spare mana into the highest-value graveyard card",
+                    heuristic_version=DECISION_STRATEGY_VERSION,
+                    resource_delta={
+                        "mana": -activation_cost,
+                        "cards_to_hand": len(recovered),
+                        "artifacts": -1
+                        if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
+                        else 0,
+                        "graveyard": -len(recovered)
+                        + (
+                            1
+                            if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
+                            else 0
+                        ),
+                        "returned": [card.get("name", "?") for card in recovered],
+                    },
+                    risk_flags=["tap_artifact", "sacrifice_artifact", "graveyard_to_hand"],
+                )
+                recursion_payload = {
+                    "player": player.name,
+                    "card": permanent.get("name", "?"),
+                    "trigger": "activated_ability",
+                    "activation_kind": "tap_sacrifice_return_graveyard_to_hand",
+                    "target_type": target_type,
+                    "destination": destination,
+                    "recovered": [card.get("name", "?") for card in recovered],
+                    "recovered_count": len(recovered),
+                    "mana_paid": activation_cost,
+                    "turn": turn,
+                    "phase": phase,
+                    **replay_rule_fields(permanent),
+                }
+                emit_replay_event("recursion_resolved", **recursion_payload)
+                emit_replay_event(
+                    "utility_artifact_activated",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    activation_kind="tap_sacrifice_return_graveyard_to_hand",
+                    mana_paid=activation_cost,
+                    recovered=[card.get("name", "?") for card in recovered],
+                    recovered_count=len(recovered),
+                    target_type=target_type,
+                    destination=destination,
+                    sacrificed_self=bool(
+                        permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
+                    ),
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+                return 1
+
         if permanent.get("graveyard_shuffle_target_count"):
             activation_cost = adjusted_activated_ability_generic_cost(
                 player,
@@ -23654,6 +23834,98 @@ def activate_graveyard_recycling_artifacts(
                     **replay_rule_fields(permanent),
                 )
                 return 1
+
+        target_player_mill_count = int(permanent.get("activated_target_player_mill_count") or 0)
+        if phase == "precombat_main" and target_player_mill_count > 0:
+            if permanent.get("target_player_mill_activation_requires_tap", True) and permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "artifact_already_tapped_for_target_player_mill",
+                    phase=phase,
+                )
+                continue
+            target = choose_mill_target(player, opponents, target_player_mill_count)
+            if target is None or not getattr(target, "library", None):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_target_library_for_target_player_mill",
+                    phase=phase,
+                )
+                continue
+            if permanent.get("target_player_mill_activation_requires_tap", True):
+                permanent["tapped"] = True
+            permanent["utility_artifact_used_this_turn"] = True
+            library_before = len(target.library)
+            graveyard_before = len(target.graveyard)
+            milled = []
+            for _ in range(min(target_player_mill_count, len(target.library))):
+                milled_card = target.library.pop(0)
+                target.graveyard.append(milled_card)
+                milled.append(milled_card)
+            emit_decision_trace(
+                decision_type="utility_artifact_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="tap_target_player_mill",
+                        effect=permanent.get("effect", "passive"),
+                        score=10 + len(milled),
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="tap_target_player_mill",
+                    effect=permanent.get("effect", "passive"),
+                    score=10 + len(milled),
+                    target_player=target.name,
+                ),
+                score_components={
+                    "milled_count": len(milled),
+                    "target_player": target.name,
+                    "target_library_before": library_before,
+                    "target_library_after": len(target.library),
+                },
+                rule_source="utility_artifact_activation_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=10 + len(milled),
+                reason="use_idle_artifact_to_pressure_target_library",
+                strategic_principle="spend a tap-only utility activation when no higher-value graveyard return is available",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "target_library": -len(milled),
+                    "target_graveyard": len(milled),
+                },
+                risk_flags=["tap_artifact", "target_player_mill"],
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="tap_target_player_mill",
+                target_player=target.name,
+                milled=[
+                    milled_card.get("name", "?")
+                    for milled_card in milled
+                    if isinstance(milled_card, dict)
+                ],
+                milled_count=len(milled),
+                target_library_before=library_before,
+                target_library_after=len(target.library),
+                target_graveyard_before=graveyard_before,
+                target_graveyard_after=len(target.graveyard),
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            return 1
 
         self_mill_count = int(permanent.get("activated_self_mill_count") or 0)
         if phase != "precombat_main" or self_mill_count <= 0:
@@ -30053,6 +30325,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
             return False
     target = str(target_type or "nonland").lower()
     type_line = str(card.get("type_line") or "").lower()
+    if target in ("any_card", "card", "target_card"):
+        return True
     if target in ("permanent", "permanent_card"):
         return is_land(card) or any(
             kind in type_line

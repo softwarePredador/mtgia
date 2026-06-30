@@ -5,6 +5,22 @@ def test_default_access_model_uses_post_pg272_brainstone_report():
     assert readiness.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
 
 
+def test_default_runtime_queue_uses_post_pg273_codex_report():
+    assert (
+        readiness.DEFAULT_RUNTIME_QUEUE.name
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg273_codex_shredder.json"
+    )
+
+
+def test_default_manifests_include_current_pg271_pg272_pg273_packages():
+    assert [path.name for path in readiness.DEFAULT_MANIFESTS] == [
+        "pg271_hidden_retreat_damage_prevention_20260630_manifest.json",
+        "pg272_brainstone_executable_topdeck_20260630_manifest.json",
+        "pg273_codex_shredder_mill_recursion_20260630_manifest.json",
+    ]
+    assert readiness.DEFAULT_PRECHECK_BLOCKERS == []
+
+
 def runtime_queue():
     return {
         "family_queue": [
@@ -228,6 +244,69 @@ def test_applied_synced_pg_package_is_not_reported_pending():
     assert report["summary"]["pg_package_applied_synced_count"] == 1
     assert report["summary"]["pg_package_prepared_pending_apply_approval_count"] == 0
     assert not report["summary"]["recommended_next_action"].startswith("run_approved_precheck_apply")
+
+
+def test_applied_synced_pg_package_accepts_selected_cards_manifest():
+    manifests = [
+        (
+            readiness.REPORT_DIR / "pg272_manifest.json",
+            {
+                "deploy_id": "PG272",
+                "status": "applied_synced",
+                "selected_cards": ["Brainstone"],
+                "files": {},
+                "expected_rules": [
+                    {
+                        "card_name": "Brainstone",
+                        "logical_rule_key": "battle_rule_v1:6aab083c9a25b2af50c2069683da5131",
+                        "review_status": "verified",
+                        "execution_status": "auto",
+                    }
+                ],
+            },
+        )
+    ]
+    access = {
+        "candidates": [
+            {
+                "card_name": "Brainstone",
+                "lane": "topdeck_setup",
+                "score": 35,
+                "access_targets": ["Sensei's Divining Top"],
+                "blockers": [],
+                "rule_summary": {
+                    "active_rule_count": 1,
+                    "review_only_rule_count": 0,
+                },
+                "variant_usage": {"deck_count": 0, "deck_ids": []},
+            }
+        ]
+    }
+    active_rule_index = {
+        "brainstone": [
+            {
+                "card_name": "Brainstone",
+                "logical_rule_key": "battle_rule_v1:6aab083c9a25b2af50c2069683da5131",
+                "review_status": "verified",
+                "execution_status": "auto",
+                "source": "curated",
+                "effect_json": {"battle_model_scope": "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1"},
+            }
+        ]
+    }
+
+    report = readiness.build_report(
+        runtime_queue={"family_queue": []},
+        access_model=access,
+        hypothesis_queue={"queue": []},
+        manifests=manifests,
+        precheck_blockers=[],
+        active_rule_index=active_rule_index,
+    )
+
+    brainstone = {row["card_name"]: row for row in report["cards"]}["Brainstone"]
+    assert brainstone["status"] == "pg_package_applied_synced"
+    assert report["summary"]["pg_package_applied_synced_count"] == 1
 
 
 def test_split_scope_and_access_runtime_blockers_get_separate_statuses():
