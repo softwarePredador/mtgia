@@ -151,6 +151,11 @@ ONE_TO_MANY_CARD_TABLES = (
     "card_semantic_tags_v2",
     "card_battle_rules",
 )
+CARD_INTELLIGENCE_JOIN_RE = re.compile(
+    r"\b(?:LEFT\s+JOIN|JOIN)\s+card_intelligence_snapshot"
+    r"(?:\s+(?:AS\s+)?([a-zA-Z_][a-zA-Z0-9_]*))?\s+ON\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -397,6 +402,96 @@ def check_direct_join_consumers() -> Check:
     return Check("query_consumers.no_unsafe_direct_1n_card_joins", "pass", "no unsafe joins")
 
 
+def card_intelligence_snapshot_join_findings(
+    files: Iterable[Path] | None = None,
+) -> dict[str, Any]:
+    files = list(files or query_consumer_files())
+    issues: list[dict[str, Any]] = []
+    canonical_alias_count = 0
+    compatibility_alias_count = 0
+    compatibility_alias_samples: list[dict[str, Any]] = []
+    for path in files:
+        text = read_text(path)
+        for match in CARD_INTELLIGENCE_JOIN_RE.finditer(text):
+            alias = match.group(1) or "card_intelligence_snapshot"
+            context = statement_context(text, match.start(), match.end())
+            line = text.count("\n", 0, match.start()) + 1
+            upper_context = context.upper()
+            on_index = upper_context.find(" ON ")
+            on_clause = context[on_index:] if on_index >= 0 else context
+            alias_card_id = re.search(
+                rf"\b{re.escape(alias)}\.card_id\b",
+                on_clause,
+                re.IGNORECASE,
+            )
+            alias_id = re.search(
+                rf"\b{re.escape(alias)}\.id\b",
+                on_clause,
+                re.IGNORECASE,
+            )
+            on_without_snapshot_alias = re.sub(
+                rf"\b{re.escape(alias)}\.(?:card_id|id)\b",
+                "",
+                on_clause,
+                flags=re.IGNORECASE,
+            )
+            other_identity = re.search(
+                r"\b[a-zA-Z_][a-zA-Z0-9_]*\.(?:card_id|id)\b",
+                on_without_snapshot_alias,
+                re.IGNORECASE,
+            )
+            if alias_card_id:
+                canonical_alias_count += 1
+            elif alias_id:
+                compatibility_alias_count += 1
+                if len(compatibility_alias_samples) < 10:
+                    compatibility_alias_samples.append(
+                        {
+                            "file": rel(path),
+                            "line": line,
+                            "alias": alias,
+                            "field": "id",
+                        }
+                    )
+            if not (alias_card_id or alias_id) or not other_identity:
+                issues.append(
+                    {
+                        "file": rel(path),
+                        "line": line,
+                        "alias": alias,
+                        "reason": "card_intelligence_snapshot join is not anchored on card identity fields",
+                    }
+                )
+    return {
+        "issues": issues,
+        "canonical_alias_count": canonical_alias_count,
+        "compatibility_alias_count": compatibility_alias_count,
+        "compatibility_alias_samples": compatibility_alias_samples,
+    }
+
+
+def check_card_intelligence_snapshot_joins() -> Check:
+    findings = card_intelligence_snapshot_join_findings()
+    issues = findings["issues"]
+    if issues:
+        return Check(
+            "query_consumers.card_intelligence_snapshot_identity_joins",
+            "fail",
+            f"issues={len(issues)}",
+            findings,
+        )
+    return Check(
+        "query_consumers.card_intelligence_snapshot_identity_joins",
+        "pass",
+        (
+            "canonical_card_id_joins="
+            f"{findings['canonical_alias_count']} compatibility_id_alias_joins="
+            f"{findings['compatibility_alias_count']}"
+        ),
+        findings,
+    )
+
+
 def build_report() -> dict[str, Any]:
     checks: list[Check] = [
         check_active_files_exist(),
@@ -405,6 +500,7 @@ def build_report() -> dict[str, Any]:
         *check_cron_sequences(),
         *check_sqlite_location(),
         check_direct_join_consumers(),
+        check_card_intelligence_snapshot_joins(),
     ]
     status_counts: dict[str, int] = {}
     for check in checks:

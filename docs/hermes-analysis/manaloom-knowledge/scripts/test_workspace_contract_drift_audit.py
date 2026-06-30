@@ -60,6 +60,41 @@ class WorkspaceContractDriftAuditTests(unittest.TestCase):
 
         self.assertEqual(issues, [])
 
+    def test_card_intelligence_snapshot_compat_id_alias_join_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "good.dart"
+            path.write_text(
+                """
+                SELECT c.name
+                FROM deck_cards dc
+                JOIN card_intelligence_snapshot c ON c.id = dc.card_id
+                """,
+                encoding="utf-8",
+            )
+            findings = audit.card_intelligence_snapshot_join_findings([path])
+
+        self.assertEqual(findings["issues"], [])
+        self.assertEqual(findings["compatibility_alias_count"], 1)
+
+    def test_card_intelligence_snapshot_name_join_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bad.dart"
+            path.write_text(
+                """
+                SELECT c.name
+                FROM cards raw
+                JOIN card_intelligence_snapshot c ON c.name = raw.name
+                """,
+                encoding="utf-8",
+            )
+            findings = audit.card_intelligence_snapshot_join_findings([path])
+
+        self.assertEqual(len(findings["issues"]), 1)
+        self.assertEqual(
+            findings["issues"][0]["reason"],
+            "card_intelligence_snapshot join is not anchored on card identity fields",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

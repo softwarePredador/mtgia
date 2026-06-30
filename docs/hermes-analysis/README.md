@@ -11,6 +11,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
 ## Contrato de dados / aliases
 
+- `MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md`
+  - Status: `current_guardrail`.
+  - Matriz obrigatoria para validar classes de falha antes de declarar que
+    battle, cards, deckbuilding, Hermes/SQLite e PostgreSQL estao alinhados.
+  - Sequencia minima: worktree/evidencia, PG/Hermes/SQLite, drift estatico de
+    workspace, superficie operacional, XMage, deckbuilding, Lorehold artifact,
+    promotion gate e testes.
+  - Inclui guardrails para aliases (`id/card_id`, `name/card_name`,
+    `oracle_id/scryfall_id`), fanout de joins, uso indevido de historico,
+    evidencia solta de agentes paralelos e overclaim de battle aggregate.
+
 - `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`
   - Status: `current_guardrail`.
   - Define os campos canonicos para evitar trabalho duplicado entre

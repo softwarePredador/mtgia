@@ -596,6 +596,88 @@ def pg_schema_checks(columns: dict[str, set[str]], counts: dict[str, int]) -> li
     return checks
 
 
+def pg_integrity_checks(columns: dict[str, set[str]]) -> list[Check]:
+    checks: list[Check] = []
+    snapshot_columns = columns.get("card_intelligence_snapshot", set())
+    if {"id", "card_id"}.issubset(snapshot_columns):
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM card_intelligence_snapshot
+                    WHERE id IS DISTINCT FROM card_id
+                    """
+                )
+                mismatch_count = int(cur.fetchone()[0] or 0)
+                sample: list[dict[str, str]] = []
+                if mismatch_count:
+                    cur.execute(
+                        """
+                        SELECT id::text, card_id::text, name
+                        FROM card_intelligence_snapshot
+                        WHERE id IS DISTINCT FROM card_id
+                        ORDER BY name
+                        LIMIT 20
+                        """
+                    )
+                    sample = [
+                        {"id": str(row[0]), "card_id": str(row[1]), "name": str(row[2])}
+                        for row in cur.fetchall()
+                    ]
+        checks.append(
+            Check(
+                "pg_integrity.card_intelligence_snapshot_id_alias_parity",
+                "pass" if mismatch_count == 0 else "fail",
+                f"id_card_id_mismatch_rows={mismatch_count}",
+                {
+                    "canonical_field": "card_id",
+                    "compatibility_alias": "id",
+                    "sample": sample,
+                },
+            )
+        )
+    if {"name", "card_name"}.issubset(snapshot_columns):
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM card_intelligence_snapshot
+                    WHERE name IS DISTINCT FROM card_name
+                    """
+                )
+                mismatch_count = int(cur.fetchone()[0] or 0)
+                sample = []
+                if mismatch_count:
+                    cur.execute(
+                        """
+                        SELECT id::text, name, card_name
+                        FROM card_intelligence_snapshot
+                        WHERE name IS DISTINCT FROM card_name
+                        ORDER BY name
+                        LIMIT 20
+                        """
+                    )
+                    sample = [
+                        {"id": str(row[0]), "name": str(row[1]), "card_name": str(row[2])}
+                        for row in cur.fetchall()
+                    ]
+        checks.append(
+            Check(
+                "pg_integrity.card_intelligence_snapshot_name_alias_parity",
+                "pass" if mismatch_count == 0 else "fail",
+                f"name_card_name_mismatch_rows={mismatch_count}",
+                {
+                    "canonical_field": "card_name",
+                    "compatibility_alias": "name",
+                    "sample": sample,
+                },
+            )
+        )
+    return checks
+
+
 def reviewed_runtime_keys() -> set[tuple[str, str]]:
     keys: set[tuple[str, str]] = set()
     for row in load_reviewed_rule_rows():
@@ -736,6 +818,7 @@ def build_report(sqlite_db: Path, *, skip_pg: bool = False) -> dict[str, Any]:
         pg_columns, pg_counts, pg_target = pg_columns_and_counts()
         checks.append(Check("pg_connection", "pass", pg_target))
         checks.extend(pg_schema_checks(pg_columns, pg_counts))
+        checks.extend(pg_integrity_checks(pg_columns))
 
     status_counts: dict[str, int] = {}
     for check in checks:
