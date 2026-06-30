@@ -43,6 +43,12 @@ RESEARCH_SOURCES = [
         "required_markers": ["mana_foundation_and_curve", "curve"],
     },
     {
+        "source": "EDHREC Top/Staples",
+        "url": "https://edhrec.com/top",
+        "imported_learning": "global staple popularity is a floor and consistency signal, not commander-specific truth",
+        "required_markers": ["staple_impact_and_role_policy", "staple_floor_and_context"],
+    },
+    {
         "source": "BinderBrew Commander template",
         "url": "https://binderbrew.com/commander-deck-building-template",
         "imported_learning": "core slots come before commander-specific payoffs and then tune by table/budget",
@@ -72,6 +78,7 @@ REQUIRED_FLOW = [
     "commander_specific_packages",
     "combo_synergy_and_finishers",
     "reference_corpus_and_learned_usage",
+    "staple_impact_and_role_policy",
     "lane_balanced_cuts_and_anchor_protection",
     "goldfish_battle_replay_iteration",
 ]
@@ -85,6 +92,7 @@ REQUIRED_OVERVIEW_FIELDS = [
     "mana_curve_and_sources",
     "package_lanes_with_key_cards",
     "source_provenance_by_anchor",
+    "staple_impact_by_role",
     "protected_anchors_and_cut_rules",
     "known_risks_and_validation_status",
 ]

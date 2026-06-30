@@ -9,7 +9,9 @@ class CommanderDeckbuildingFlowResearchAuditTest(unittest.TestCase):
 
         self.assertEqual(payload["status"], "pass")
         self.assertIn("primary_and_backup_win_plan", payload["required_flow"])
+        self.assertIn("staple_impact_and_role_policy", payload["required_flow"])
         self.assertIn("lane_balanced_cuts_and_anchor_protection", payload["required_flow"])
+        self.assertIn("staple_impact_by_role", payload["required_overview_fields"])
         self.assertIn("protected_anchors_and_cut_rules", payload["required_overview_fields"])
         self.assertFalse(payload["failures"])
 
@@ -21,6 +23,7 @@ class CommanderDeckbuildingFlowResearchAuditTest(unittest.TestCase):
         self.assertIn("EDHREC How to Build a Commander Deck", names)
         self.assertIn("The Command Zone template via EDHREC", names)
         self.assertIn("EDHREC Ramp in Commander", names)
+        self.assertIn("EDHREC Top/Staples", names)
         self.assertIn("Commander Spellbook", names)
 
 

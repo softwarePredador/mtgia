@@ -3,13 +3,14 @@ import 'commander_reference_card_stats_support.dart';
 import 'commander_reference_deck_corpus_support.dart';
 import 'commander_reference_generate_fallback_support.dart';
 import 'commander_reference_profile_support.dart';
+import 'commander_staple_impact_policy.dart';
 import 'deck_learning_event_support.dart';
 
 const commanderDeckbuildingContractVersion =
-    'commander_deckbuilding_contract_v2_2026-06-29';
+    'commander_deckbuilding_contract_v3_2026-06-30';
 
 const commanderDeckPlanningFlowVersion =
-    'commander_deck_planning_flow_v1_2026-06-29';
+    'commander_deck_planning_flow_v2_2026-06-30';
 
 const commanderDeckPlanningFlow = [
   'format_legality_and_power_bracket',
@@ -21,6 +22,7 @@ const commanderDeckPlanningFlow = [
   'commander_specific_packages',
   'combo_synergy_and_finishers',
   'reference_corpus_and_learned_usage',
+  'staple_impact_and_role_policy',
   'lane_balanced_cuts_and_anchor_protection',
   'goldfish_battle_replay_iteration',
 ];
@@ -44,6 +46,7 @@ const commanderDeckPlanningLaneOrder = [
   'combo_lines',
   'meta_pressure_answers',
   'budget_collection_constraints',
+  'staple_floor_and_context',
   'same_lane_cuts',
   'battle_and_replay_validation',
 ];
@@ -57,6 +60,7 @@ const commanderDeckOverviewRequiredFields = [
   'mana_curve_and_sources',
   'package_lanes_with_key_cards',
   'source_provenance_by_anchor',
+  'staple_impact_by_role',
   'protected_anchors_and_cut_rules',
   'known_risks_and_validation_status',
 ];
@@ -102,13 +106,17 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   final cardSourceSample = _cardSourceSample(cards, sourceSets);
   final validationIsValid = validationSummary['is_valid'] == true;
   final invalidCards = _listValue(validationSummary['invalid_cards']);
-  final referenceProfileUsable = referenceProfile != null &&
+  final referenceProfileUsable =
+      referenceProfile != null &&
       isReferenceProfileConfidenceUsable(referenceProfile['confidence']);
-  final statsResolvedCount =
-      referenceCardStats.where((stat) => !stat.unresolved).length;
-  final corpusUsable = referenceDeckCorpusGuidance != null &&
+  final statsResolvedCount = referenceCardStats
+      .where((stat) => !stat.unresolved)
+      .length;
+  final corpusUsable =
+      referenceDeckCorpusGuidance != null &&
       referenceDeckCorpusGuidance.isUsable;
-  final hasReferenceLane = referenceProfileUsable ||
+  final hasReferenceLane =
+      referenceProfileUsable ||
       statsResolvedCount > 0 ||
       corpusUsable ||
       activeLearnedDeck != null ||
@@ -123,7 +131,7 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   );
   final deterministicFallbackReady =
       referenceDeterministicDeckDiagnostics == null ||
-          (deterministicMainQuantity == 99 && deterministicDistinctCount >= 90);
+      (deterministicMainQuantity == 99 && deterministicDistinctCount >= 90);
   final coreCoverageRatio = _doubleFromPath(
     referenceDeckCorpusDiagnostics,
     const ['reference_deck_corpus_evaluation', 'core_package_coverage_ratio'],
@@ -201,8 +209,8 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   final status = blockers.isNotEmpty
       ? 'blocked'
       : battleGateRequired
-          ? 'ready_for_battle_gate'
-          : 'ready';
+      ? 'ready_for_battle_gate'
+      : 'ready';
 
   return {
     'version': commanderDeckbuildingContractVersion,
@@ -220,14 +228,17 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
       'reference_corpus_packages',
       'active_learned_deck',
       'usage_hot_cards',
+      'format_staples_role_filtered',
       'deterministic_fallback',
       'battle_gate',
     ],
+    'staple_impact_policy': commanderStapleImpactPolicyDiagnostics,
     'source_lanes': {
       'reference_profile_used': referenceProfile != null,
       if (referenceProfile != null)
         'reference_profile_confidence': normalizeCommanderReferenceConfidence(
-            referenceProfile['confidence']),
+          referenceProfile['confidence'],
+        ),
       'reference_card_stats_count': referenceCardStats.length,
       'reference_card_stats_resolved_count': statsResolvedCount,
       'reference_card_stats_unresolved_count': unresolvedReferenceCards.length,
@@ -275,26 +286,26 @@ Map<String, Set<String>> _buildSourceSets({
         .map(_normalize)
         .where((name) => name.isNotEmpty)
         .toSet(),
-    'reference_corpus_packages':
-        _referenceCorpusPackageNames(referenceDeckCorpusGuidance),
+    'reference_corpus_packages': _referenceCorpusPackageNames(
+      referenceDeckCorpusGuidance,
+    ),
     'active_learned_deck': activeLearnedDeck == null
         ? <String>{}
         : activeLearnedDeck.cards
-            .map((card) => card.name)
-            .map(_normalize)
-            .where((name) => name.isNotEmpty)
-            .toSet(),
-    'usage_hot_cards': usageHotCardCanonicalNames(usageHotCards)
-        .map(_normalize)
-        .where((name) => name.isNotEmpty)
-        .toSet(),
+              .map((card) => card.name)
+              .map(_normalize)
+              .where((name) => name.isNotEmpty)
+              .toSet(),
+    'usage_hot_cards': usageHotCardCanonicalNames(
+      usageHotCards,
+    ).map(_normalize).where((name) => name.isNotEmpty).toSet(),
     'deterministic_fallback':
         isLoreholdCommanderReferenceCandidate(commanderName)
-            ? loreholdDeterministicReferenceFallbackCards
-                .map(_normalize)
-                .where((name) => name.isNotEmpty)
-                .toSet()
-            : <String>{},
+        ? loreholdDeterministicReferenceFallbackCards
+              .map(_normalize)
+              .where((name) => name.isNotEmpty)
+              .toSet()
+        : <String>{},
   };
   return sets;
 }
@@ -319,11 +330,11 @@ Set<String> _referenceCorpusPackageNames(
   if (guidance == null || !guidance.isUsable) return <String>{};
   final packages = guidance.packages;
   return [
-    ...packages.corePackage,
-    ...packages.themePackage,
-    ...packages.supportPackage,
-    ...packages.optionalContextual,
-  ]
+        ...packages.corePackage,
+        ...packages.themePackage,
+        ...packages.supportPackage,
+        ...packages.optionalContextual,
+      ]
       .map((card) => card['card_name'])
       .map(_normalize)
       .where((name) => name.isNotEmpty)
@@ -359,11 +370,12 @@ List<Map<String, dynamic>> _cardSourceSample(
     final name = card['name']?.toString().trim() ?? '';
     final normalized = _normalize(name);
     if (name.isEmpty || normalized.isEmpty) continue;
-    final sources = sourceSets.entries
-        .where((entry) => entry.value.contains(normalized))
-        .map((entry) => entry.key)
-        .toList()
-      ..sort();
+    final sources =
+        sourceSets.entries
+            .where((entry) => entry.value.contains(normalized))
+            .map((entry) => entry.key)
+            .toList()
+          ..sort();
     sample.add({
       'card_name': name,
       'quantity': _quantity(card['quantity']),

@@ -49,6 +49,13 @@ Receber:
 - lista atual do deck (parcial)
 - pools de sugestão (sinergia e staples)
 
+POLÍTICA DE STAPLES
+
+- Staples são sinais de piso, consistência e densidade de função; não são verdade automática.
+- Separe staples estruturais (ramp/fixing, draw, remoção, proteção, terrenos) de staples contextuais do comandante.
+- Uma staple global só entra se preencher uma função que o deck precisa e respeitar bracket, identidade, curva e plano do comandante.
+- Não substitua uma carta de engine/sinergia do comandante por uma staple genérica sem preservar a mesma lane funcional.
+
 E retornar APENAS JSON estrito com uma lista de ADIÇÕES para completar o deck até o tamanho alvo.
 
 REGRAS IMPORTANTES

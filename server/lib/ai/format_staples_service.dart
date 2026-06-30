@@ -1,7 +1,11 @@
 import 'package:postgres/postgres.dart';
 
 /// Serviço para buscar staples de formato do banco de dados local.
-/// 
+///
+/// Este serviço entrega candidatos legal/color/archetype-filtered. A decisão de
+/// incluir, proteger ou cortar uma staple precisa passar pela política de
+/// impacto por comandante, role/lane e bracket.
+///
 /// Benefícios vs Scryfall direto:
 /// - ~10x mais rápido (5-20ms vs 200-500ms)
 /// - Sem rate limits
@@ -10,15 +14,15 @@ import 'package:postgres/postgres.dart';
 /// - Funciona offline
 class FormatStaplesService {
   final dynamic _conn;
-  
+
   FormatStaplesService(this._conn);
 
   /// Busca staples do banco filtrados por cores e arquétipo.
-  /// 
+  ///
   /// [colors] - Identidade de cor do deck (ex: ['U', 'B'])
   /// [archetype] - Arquétipo opcional (ramp, control, combo, draw, removal, etc)
   /// [limit] - Número máximo de cartas (default: 50)
-  /// 
+  ///
   /// Retorna lista de nomes de cartas ordenadas por EDHREC rank (menores = melhores)
   Future<List<String>> getStaples({
     required List<String> colors,
@@ -27,25 +31,27 @@ class FormatStaplesService {
   }) async {
     // Normaliza cores para uppercase
     final normalizedColors = colors.map((c) => c.toUpperCase()).toList();
-    
+
     // Monta query dinâmica
     String whereClause = "format = 'commander' AND is_banned = false";
     final params = <String, dynamic>{};
-    
+
     // Filtro de cor: cartas devem ter identidade de cor compatível
     // (todos os elementos de color_identity devem estar nas cores do deck)
     if (normalizedColors.isNotEmpty) {
-      whereClause += " AND (color_identity <@ @colors OR color_identity = '{}')";
+      whereClause +=
+          " AND (color_identity <@ @colors OR color_identity = '{}')";
       params['colors'] = normalizedColors;
     }
-    
+
     // Filtro de arquétipo opcional
     if (archetype != null && archetype.isNotEmpty) {
       whereClause += " AND archetype = @archetype";
       params['archetype'] = _normalizeArchetype(archetype);
     }
-    
-    final sql = '''
+
+    final sql =
+        '''
       SELECT card_name FROM (
         SELECT DISTINCT ON (LOWER(card_name)) card_name, COALESCE(edhrec_rank, 99999) as rank_order
         FROM format_staples
@@ -56,13 +62,10 @@ class FormatStaplesService {
       LIMIT @limit
     ''';
     params['limit'] = limit;
-    
+
     try {
-      final result = await _conn.execute(
-        Sql.named(sql),
-        parameters: params,
-      );
-      
+      final result = await _conn.execute(Sql.named(sql), parameters: params);
+
       final names = <String>[];
       for (final row in result) {
         names.add(row[0] as String);
@@ -84,14 +87,14 @@ class FormatStaplesService {
   }) async {
     final results = <String>[];
     final seen = <String>{};
-    
+
     for (final archetype in archetypes) {
       final staples = await getStaples(
         colors: colors,
         archetype: archetype,
         limit: limitPerArchetype,
       );
-      
+
       for (final card in staples) {
         if (!seen.contains(card.toLowerCase())) {
           seen.add(card.toLowerCase());
@@ -99,7 +102,7 @@ class FormatStaplesService {
         }
       }
     }
-    
+
     return results;
   }
 
@@ -116,7 +119,9 @@ class FormatStaplesService {
   Future<bool> hasData() async {
     try {
       final result = await _conn.execute(
-        Sql.named('SELECT EXISTS(SELECT 1 FROM format_staples LIMIT 1) as has_data'),
+        Sql.named(
+          'SELECT EXISTS(SELECT 1 FROM format_staples LIMIT 1) as has_data',
+        ),
       );
       return (result.first[0] as bool?) ?? false;
     } catch (_) {
@@ -127,7 +132,7 @@ class FormatStaplesService {
   /// Normaliza nome de arquétipo para match com banco.
   String _normalizeArchetype(String archetype) {
     final lower = archetype.toLowerCase().trim();
-    
+
     // Mapeamento de aliases
     const aliases = {
       'aggro': 'aggro',
@@ -158,7 +163,7 @@ class FormatStaplesService {
       'red': 'red',
       'green': 'green',
     };
-    
+
     return aliases[lower] ?? lower;
   }
 }

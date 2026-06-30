@@ -13,6 +13,7 @@ import 'hate_cards_service.dart';
 import 'sinergia.dart';
 import 'theme_contextual_rules_service.dart';
 import 'commander_reference_profile_support.dart' as cmd_ref;
+import 'commander_staple_impact_policy.dart';
 
 class DeckOptimizerService {
   final String openAiKey;
@@ -26,14 +27,14 @@ class DeckOptimizerService {
   final dynamic _db;
 
   DeckOptimizerService(this.openAiKey, {dynamic db})
-      : _db = db,
-        synergyEngine = SynergyEngine(),
-        edhrecService = EdhrecService(),
-        _logService = db != null ? AiLogService(db) : null,
-        _mlService = db != null ? MLKnowledgeService(db) : null,
-        _staplesService = db != null ? FormatStaplesService(db) : null,
-        _hateService = db != null ? HateCardsService(db) : null,
-        _themeRulesService = db != null ? ThemeContextualRulesService(db) : null;
+    : _db = db,
+      synergyEngine = SynergyEngine(),
+      edhrecService = EdhrecService(),
+      _logService = db != null ? AiLogService(db) : null,
+      _mlService = db != null ? MLKnowledgeService(db) : null,
+      _staplesService = db != null ? FormatStaplesService(db) : null,
+      _hateService = db != null ? HateCardsService(db) : null,
+      _themeRulesService = db != null ? ThemeContextualRulesService(db) : null;
 
   /// O fluxo principal de otimização
   Future<Map<String, dynamic>> optimizeDeck({
@@ -59,11 +60,13 @@ class DeckOptimizerService {
     // NOTA: Pular se não há comandante (Modern, Standard, etc.)
     EdhrecCommanderData? edhrecData;
     if (commanders.isNotEmpty) {
-      edhrecData =
-          await edhrecService.fetchCommanderData(commanders.firstOrNull ?? "");
+      edhrecData = await edhrecService.fetchCommanderData(
+        commanders.firstOrNull ?? "",
+      );
       if (edhrecData != null) {
         Log.i(
-            'EDHREC: ${edhrecData.deckCount} decks analisados, ${edhrecData.topCards.length} cartas, temas: ${edhrecData.themes.join(", ")}');
+          'EDHREC: ${edhrecData.deckCount} decks analisados, ${edhrecData.topCards.length} cartas, temas: ${edhrecData.themes.join(", ")}',
+        );
       }
     }
 
@@ -74,8 +77,10 @@ class DeckOptimizerService {
     // CORREÇÃO: Agora considera sinergia com o comandante.
     // Cartas que compartilham keywords mecânicos com o commander recebem bônus.
     // MELHORIA: Também usa dados reais do EDHREC quando disponíveis.
-    final commanderKeywords =
-        _extractMechanicKeywords(commanders, currentCards);
+    final commanderKeywords = _extractMechanicKeywords(
+      commanders,
+      currentCards,
+    );
     final scoredCards = _calculateEfficiencyScoresWithEdhrec(
       currentCards,
       commanderKeywords,
@@ -94,8 +99,9 @@ class DeckOptimizerService {
 
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
       // Verificar se tema detectado corresponde aos temas EDHREC
-      final edhrecThemesLower =
-          edhrecData.themes.map((t) => t.toLowerCase()).toList();
+      final edhrecThemesLower = edhrecData.themes
+          .map((t) => t.toLowerCase())
+          .toList();
       final targetLower = targetArchetype.toLowerCase();
 
       for (final edhrecTheme in edhrecThemesLower) {
@@ -113,7 +119,8 @@ class DeckOptimizerService {
             .map((c) => c.name)
             .toList();
         Log.i(
-            'EDHREC synergy pool (theme match): ${synergyCards.length} cartas');
+          'EDHREC synergy pool (theme match): ${synergyCards.length} cartas',
+        );
       } else {
         // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
         final edhrecCards = edhrecService
@@ -140,14 +147,16 @@ class DeckOptimizerService {
         ];
 
         Log.i(
-            'HYBRID synergy pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas');
+          'HYBRID synergy pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas',
+        );
       }
     } else {
       // Fallback: busca no Scryfall
       synergyCards = await synergyEngine.fetchCommanderSynergies(
-          commanderName: commanders.firstOrNull ?? '',
-          colors: colors,
-          archetype: targetArchetype);
+        commanderName: commanders.firstOrNull ?? '',
+        colors: colors,
+        archetype: targetArchetype,
+      );
     }
 
     final prioritizedSynergyCards = mergePriorityPool(
@@ -172,7 +181,8 @@ class DeckOptimizerService {
         );
         mlContext = _mlService!.generatePromptContext(mlData);
         Log.i(
-            'ML Knowledge: ${mlData.recommendations.length} recomendações, ${mlData.relevantSynergies.length} sinergias (${mlData.queryTimeMs}ms)');
+          'ML Knowledge: ${mlData.recommendations.length} recomendações, ${mlData.relevantSynergies.length} sinergias (${mlData.queryTimeMs}ms)',
+        );
       } catch (e) {
         Log.w('ML Knowledge error (continuando sem): $e');
       }
@@ -190,7 +200,8 @@ class DeckOptimizerService {
         if (hateCards.isNotEmpty) {
           hateContext = _hateService!.generatePromptContext(hateCards);
           Log.i(
-              'Hate Cards: ${hateCards.length} categorias de hate disponíveis');
+            'Hate Cards: ${hateCards.length} categorias de hate disponíveis',
+          );
         }
       } catch (e) {
         Log.w('Hate Cards error (continuando sem): $e');
@@ -214,7 +225,9 @@ class DeckOptimizerService {
           commanderName: commanders.first,
         );
         if (profile != null) {
-          commanderProfileText = cmd_ref.buildCommanderReferenceProfilePrompt(profile);
+          commanderProfileText = cmd_ref.buildCommanderReferenceProfilePrompt(
+            profile,
+          );
           Log.i('Commander profile loaded for: ${commanders.first}');
         }
       } catch (e) {
@@ -226,16 +239,24 @@ class DeckOptimizerService {
     Map<String, dynamic>? themeRules;
     if (_themeRulesService != null) {
       try {
-        final rules = await _themeRulesService!.getRulesForArchetype(targetArchetype);
+        final rules = await _themeRulesService!.getRulesForArchetype(
+          targetArchetype,
+        );
         if (rules.isNotEmpty) {
           themeRules = {
-            'theme': ThemeContextualRulesService.archetypeToTheme(targetArchetype),
-            'rules': rules.map((r) => {
-              'function': r.function,
-              'min': r.minCount,
-              'max': r.maxCount,
-              'priority': r.priority,
-            }).toList(),
+            'theme': ThemeContextualRulesService.archetypeToTheme(
+              targetArchetype,
+            ),
+            'rules': rules
+                .map(
+                  (r) => {
+                    'function': r.function,
+                    'min': r.minCount,
+                    'max': r.maxCount,
+                    'priority': r.priority,
+                  },
+                )
+                .toList(),
           };
           Log.i('Theme rules loaded: ${rules.length} rules');
         }
@@ -287,16 +308,18 @@ class DeckOptimizerService {
 
     // Busca dados EDHREC para sugestões mais precisas
     // HÍBRIDO: Se tema detectado não bate com EDHREC, mistura 70% EDHREC + 30% tema
-    final edhrecData =
-        await edhrecService.fetchCommanderData(commanders.firstOrNull ?? "");
+    final edhrecData = await edhrecService.fetchCommanderData(
+      commanders.firstOrNull ?? "",
+    );
 
     List<String> synergyCards;
     bool themeMatchesEdhrec = false;
 
     if (edhrecData != null && edhrecData.topCards.isNotEmpty) {
       // Verificar se tema detectado corresponde aos temas EDHREC
-      final edhrecThemesLower =
-          edhrecData.themes.map((t) => t.toLowerCase()).toList();
+      final edhrecThemesLower = edhrecData.themes
+          .map((t) => t.toLowerCase())
+          .toList();
       final targetLower = targetArchetype.toLowerCase();
 
       for (final edhrecTheme in edhrecThemesLower) {
@@ -314,7 +337,8 @@ class DeckOptimizerService {
             .map((c) => c.name)
             .toList();
         Log.i(
-            'EDHREC complete pool (theme match): ${synergyCards.length} cartas');
+          'EDHREC complete pool (theme match): ${synergyCards.length} cartas',
+        );
       } else {
         // Tema NÃO bate: HÍBRIDO 70% EDHREC + 30% tema do usuário
         final edhrecCards = edhrecService
@@ -341,7 +365,8 @@ class DeckOptimizerService {
         ];
 
         Log.i(
-            'HYBRID complete pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas');
+          'HYBRID complete pool: ${edhrecPortion} EDHREC + ${themePortion} theme ($targetArchetype) = ${synergyCards.length} cartas',
+        );
       }
     } else {
       // Fallback para Scryfall
@@ -366,7 +391,8 @@ class DeckOptimizerService {
         );
         mlContext = _mlService!.generatePromptContext(mlData);
         Log.i(
-            'ML Knowledge (complete): ${mlData.recommendations.length} recomendações (${mlData.queryTimeMs}ms)');
+          'ML Knowledge (complete): ${mlData.recommendations.length} recomendações (${mlData.queryTimeMs}ms)',
+        );
       } catch (e) {
         Log.w('ML Knowledge error (continuando sem): $e');
       }
@@ -417,7 +443,9 @@ class DeckOptimizerService {
   /// Extrai keywords mecânicos do commander para detecção de sinergia.
   /// Analisa o oracle_text do commander e retorna keywords relevantes.
   Set<String> _extractMechanicKeywords(
-      List<String> commanders, List<dynamic> currentCards) {
+    List<String> commanders,
+    List<dynamic> currentCards,
+  ) {
     final keywords = <String>{};
     for (final cmdr in commanders) {
       Map<String, dynamic>? cmdrCard;
@@ -486,7 +514,9 @@ class DeckOptimizerService {
   /// recebem bônus de sinergia (score ÷2), evitando que peças sinérgicas
   /// sejam erroneamente marcadas como "fracas" só por serem impopulares globalmente.
   List<Map<String, dynamic>> _calculateEfficiencyScores(
-      List<dynamic> cards, Set<String> commanderKeywords) {
+    List<dynamic> cards,
+    Set<String> commanderKeywords,
+  ) {
     // Primeiro, calcula a mediana do EDHREC rank das cartas que têm rank
     final ranksWithValue = cards
         .where((c) => c['edhrec_rank'] != null)
@@ -534,15 +564,18 @@ class DeckOptimizerService {
       final adjustedScore = synergyHits >= 2
           ? score / 2
           : synergyHits == 1
-              ? score * 0.7
-              : score;
+          ? score * 0.7
+          : score;
 
       return {'name': card['name'], 'weakness_score': adjustedScore};
     }).toList();
 
     // Ordena do maior score (pior carta) para o menor
-    scored.sort((a, b) => (b['weakness_score'] as double)
-        .compareTo(a['weakness_score'] as double));
+    scored.sort(
+      (a, b) => (b['weakness_score'] as double).compareTo(
+        a['weakness_score'] as double,
+      ),
+    );
 
     // Remove terrenos básicos da lista de "ruins"
     scored.removeWhere((c) => (c['weakness_score'] as double) < 0);
@@ -598,25 +631,18 @@ class DeckOptimizerService {
       var score = rank * (cmc > 4 ? 1.5 : 1.0);
 
       // VERIFICAÇÃO EDHREC: se a carta está nas top do commander, protege ela
+      // por sinergia e por adoção contextual. Staples são proteção de piso,
+      // não carta livre para corte só porque a sinergia específica é baixa.
       final edhrecCard = edhrecData.findCard(cardName);
       if (edhrecCard != null) {
-        // Carta está na lista do EDHREC para este commander!
-        // Synergy > 0.3 = muito sinérgica → score ÷4
-        // Synergy > 0.15 = sinérgica → score ÷2.5
-        // Synergy > 0 = alguma sinergia → score ÷1.5
-        // Synergy <= 0 = staple genérica (pode ser cortada se necessário)
-        if (edhrecCard.synergy > 0.3) {
-          score /= 4;
+        final tier = commanderStapleImpactTier(edhrecCard);
+        final multiplier = commanderStapleWeaknessMultiplier(edhrecCard);
+        score *= multiplier;
+        if (tier == 'structural_foundation' ||
+            tier == 'commander_contextual_staple') {
           Log.d(
-              'EDHREC: $cardName é muito sinérgica (${edhrecCard.synergy.toStringAsFixed(2)}) - protegida');
-        } else if (edhrecCard.synergy > 0.15) {
-          score /= 2.5;
-        } else if (edhrecCard.synergy > 0) {
-          score /= 1.5;
-        }
-        // Bônus adicional por inclusion alta (muita gente usa)
-        if (edhrecCard.inclusion > 0.5) {
-          score *= 0.8; // Reduz score (protege)
+            'EDHREC: $cardName tier=$tier synergy=${edhrecCard.synergy.toStringAsFixed(2)} inclusionRate=${edhrecCard.inclusionRate.toStringAsFixed(2)} - protected floor/context',
+          );
         }
       } else {
         // Carta NÃO está no EDHREC para este commander
@@ -639,8 +665,11 @@ class DeckOptimizerService {
     }).toList();
 
     // Ordena do maior score (pior carta) para o menor
-    scored.sort((a, b) => (b['weakness_score'] as double)
-        .compareTo(a['weakness_score'] as double));
+    scored.sort(
+      (a, b) => (b['weakness_score'] as double).compareTo(
+        a['weakness_score'] as double,
+      ),
+    );
 
     // Remove terrenos básicos da lista
     scored.removeWhere((c) => (c['weakness_score'] as double) < 0);
@@ -651,7 +680,9 @@ class DeckOptimizerService {
   /// Busca staples de formato prioritizando banco local (mais rápido e filtrado por arquétipo).
   /// Fallback para Scryfall se banco não tiver dados.
   Future<List<String>> _fetchFormatStaples(
-      List<String> colors, String archetype) async {
+    List<String> colors,
+    String archetype,
+  ) async {
     // 1. Tentar buscar do banco local (format_staples) - ~10x mais rápido
     if (_staplesService != null) {
       final hasData = await _staplesService!.hasData();
@@ -674,7 +705,8 @@ class DeckOptimizerService {
 
         if (combined.isNotEmpty) {
           Log.i(
-              'FormatStaples (DB): ${archetypeStaples.length} $archetype + ${genericStaples.length} generic = ${combined.length} total');
+            'FormatStaples (DB): ${archetypeStaples.length} $archetype + ${genericStaples.length} generic = ${combined.length} total',
+          );
           return combined.toList();
         }
       }
@@ -731,11 +763,12 @@ class DeckOptimizerService {
     final suggestedSwaps = weakCount <= 5
         ? weakCount.clamp(2, 5)
         : weakCount <= 10
-            ? (weakCount * 0.7).round().clamp(4, 8)
-            : (weakCount * 0.5).round().clamp(6, 12);
+        ? (weakCount * 0.7).round().clamp(4, 8)
+        : (weakCount * 0.5).round().clamp(6, 12);
 
     Log.d(
-        'Trocas dinâmicas: $suggestedSwaps (baseado em $weakCount cartas fracas)');
+      'Trocas dinâmicas: $suggestedSwaps (baseado em $weakCount cartas fracas)',
+    );
 
     // Construir prompt com dados contextuais enriquecidos
     final promptMap = <String, dynamic>{
@@ -756,7 +789,8 @@ class DeckOptimizerService {
         "commander_priority_options": priorityPool,
         "deterministic_swap_candidates": deterministicSwapCandidates,
         "format_staples": staplesPool,
-        if (metaEvidenceContext != null) "meta_deck_evidence": metaEvidenceContext,
+        if (metaEvidenceContext != null)
+          "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList,
@@ -787,12 +821,12 @@ class DeckOptimizerService {
               'messages': [
                 {
                   'role': 'system',
-                  'content': _getSystemPrompt()
+                  'content': _getSystemPrompt(),
                 }, // Função que retorna o texto do arquivo Markdown
                 {'role': 'user', 'content': userPrompt},
               ],
               'temperature': temperature,
-              'response_format': {"type": "json_object"}
+              'response_format': {"type": "json_object"},
             }),
           )
           .timeout(const Duration(seconds: 30));
@@ -919,7 +953,8 @@ class DeckOptimizerService {
       "context": {
         "high_synergy_options": synergyPool,
         "format_staples": staplesPool,
-        if (metaEvidenceContext != null) "meta_deck_evidence": metaEvidenceContext,
+        if (metaEvidenceContext != null)
+          "meta_deck_evidence": metaEvidenceContext,
         if (mlContext != null) "ml_knowledge": mlContext,
       },
       "current_decklist": deckList,
@@ -940,7 +975,7 @@ class DeckOptimizerService {
                 {'role': 'user', 'content': userPrompt},
               ],
               'temperature': temperature,
-              'response_format': {"type": "json_object"}
+              'response_format': {"type": "json_object"},
             }),
           )
           .timeout(const Duration(seconds: 30));

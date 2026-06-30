@@ -33,9 +33,11 @@ template"; it is a planning order:
    Commander Spellbook/public primers/reference corpus;
 9. score public reference decks and EDHREC data as evidence lanes, not as
    automatic truth;
-10. cut by lane: each added card must compete with the same functional slot or
+10. classify staple impact before deciding cuts: a staple is a floor,
+    consistency, or role-density signal, not automatic deck truth;
+11. cut by lane: each added card must compete with the same functional slot or
     carry an explicit package hypothesis and equal-gate evidence;
-11. validate by legal service, strategy matrix, goldfish/curve checks, battle
+12. validate by legal service, strategy matrix, goldfish/curve checks, battle
     gates, and replay traces, then iterate.
 
 Canonical planning flow identifiers exposed by backend diagnostics:
@@ -49,8 +51,9 @@ Canonical planning flow identifiers exposed by backend diagnostics:
 7. `commander_specific_packages`
 8. `combo_synergy_and_finishers`
 9. `reference_corpus_and_learned_usage`
-10. `lane_balanced_cuts_and_anchor_protection`
-11. `goldfish_battle_replay_iteration`
+10. `staple_impact_and_role_policy`
+11. `lane_balanced_cuts_and_anchor_protection`
+12. `goldfish_battle_replay_iteration`
 
 Current source learning:
 
@@ -60,6 +63,7 @@ Current source learning:
 | EDHREC Commander deckbuilding guide | https://edhrec.com/articles/how-to-build-a-commander-deck | deckbuilding starts from categories and then checks whether the list plays the intended way | category counts are starting points, not final proof |
 | The Command Zone template discussion via EDHREC | https://edhrec.com/articles/the-command-zone-commander-deckbuilding-template-for-the-new-era-the-command-zone-658-mtg-edh-magic-gathering | Commander decks need balanced ratios of ramp, draw, disruption, and related roles | template ratios must bend to commander intent and table speed |
 | EDHREC ramp guide | https://edhrec.com/guides/the-edhrec-guide-to-ramp-in-commander | ramp is about playing ahead of curve; commander mana value and ramp timing matter | "more mana" is not enough if ramp competes with the commander turn |
+| EDHREC Top/Staples pages | https://edhrec.com/top | global popularity identifies common format staples and structural floor cards | global staple rank does not override commander-specific inclusion, role fit, or battle proof |
 | BinderBrew Commander template | https://binderbrew.com/commander-deck-building-template | core slots are lands, ramp, draw, removal before commander-specific payoffs | template is flexible by power, budget, theme, and commander |
 | Card Kingdom ramp/draw article | https://blog.cardkingdom.com/whats-better-in-commander-card-draw-or-ramp/ | ramp, draw, removal, and recursion are structural pillars | pillar counts do not replace package synergy or battle proof |
 | Commander Spellbook | https://commanderspellbook.com/ | combo package discovery, variants, bracket hints, and deterministic finishers | combo relation is not full deck balance or runtime proof |
@@ -87,8 +91,9 @@ diagnostics and use it when deciding cuts:
 16. `combo_lines`
 17. `meta_pressure_answers`
 18. `budget_collection_constraints`
-19. `same_lane_cuts`
-20. `battle_and_replay_validation`
+19. `staple_floor_and_context`
+20. `same_lane_cuts`
+21. `battle_and_replay_validation`
 
 The deck overview is not allowed to be a loose card list. It must include:
 
@@ -99,6 +104,8 @@ The deck overview is not allowed to be a loose card list. It must include:
 - mana curve and color-source/ramp summary;
 - package lanes with key cards, enablers, payoffs, and protected anchors;
 - source provenance for important cards;
+- staple impact by role, including which staples are structural floor versus
+  contextual commander package cards;
 - cut rules and cross-lane tradeoffs;
 - known risks, validation status, battle status, and next gate.
 
@@ -112,8 +119,9 @@ Canonical deck overview field identifiers exposed by backend diagnostics:
 6. `mana_curve_and_sources`
 7. `package_lanes_with_key_cards`
 8. `source_provenance_by_anchor`
-9. `protected_anchors_and_cut_rules`
-10. `known_risks_and_validation_status`
+9. `staple_impact_by_role`
+10. `protected_anchors_and_cut_rules`
+11. `known_risks_and_validation_status`
 
 ## Frozen Decision
 
@@ -140,11 +148,51 @@ gate rules.
 | Official Commander rules | 100-card shape, commander requirement, singleton, color identity, ban/legal framing | Card popularity or strategic package proof |
 | Scryfall and MTGJSON | Identity, Oracle text, layout, legality, rulings, hashes, resolver inputs | Commander-specific strategic quality by itself |
 | EDHREC | Commander-specific popular cards, themes, role expectations, aggregate strategy signals | Exact deck copying or executable battle-rule truth |
+| EDHREC Top/Staples and `format_staples` | Global format staples, legal/color-filtered staple pool, role-floor candidates, banlist-backed fallback | Commander-specific fit, cross-lane cut proof, or reason to replace a protected engine |
 | Moxfield, Archidekt, public decklists | Reference corpus, recurring package choices, sample shells, bracket/style clues | Automatic promotion without legality/source validation |
 | Commander Spellbook | Combo package discovery and deterministic synergy candidates | General deck balance or rule execution by itself |
 | Local learned decks | Product-specific successful candidates and prior promoted shells | Replacing source provenance or current legality checks |
 | ManaLoom battles/replays | Outcome proof, pressure matchup proof, drawn/cast/used evidence for chosen cards | Card-level rule proof unless the card was exercised |
 | XMage | Runtime/rule behavior reference for cards used by decks | Deck popularity, intent, or metagame quality |
+
+## Staple Impact Policy
+
+`server/lib/ai/commander_staple_impact_policy.dart` defines the executable
+policy version `commander_staple_impact_policy_v1_2026-06-30`.
+
+Staples are useful because they raise the deck's floor: they improve opening
+hand quality, fixing, card flow, interaction density, recovery, and resilience.
+That makes them high-impact when the deck is missing that role. It does not
+mean every popular card belongs in every deck, and it does not mean a global
+staple can cut a commander-specific engine.
+
+ManaLoom must classify staples in this order:
+
+1. `structural_foundation`: high commander inclusion in ramp, fixing, draw,
+   removal, board wipe, protection, tutor, or land roles. These are protected
+   floor cards unless a same-role replacement or battle-proven package beats
+   them. Example: `Arcane Signet` in Lorehold is early-mana/fixing floor.
+2. `commander_contextual_staple`: high commander-specific adoption or synergy
+   with the plan. These are preferred package cards, but they still need
+   lane density and pressure validation. Example: `Storm-Kiln Artist` is a
+   spell-chain card for Lorehold, not a two-mana-rock replacement.
+3. `commander_synergy_candidate`: strong synergy with lower adoption or narrow
+   role fit. These become hypotheses, not automatic inclusions.
+4. `generic_or_low_context_signal`: global staples or low commander inclusion
+   cards. These may fill a missing role, but cannot override commander intent
+   or protected anchors. Example: `The One Ring` is globally powerful but low
+   adoption in the current Lorehold page, so it needs same-lane value/draw proof.
+
+Required scoring rule:
+
+- use `inclusionRate = num_decks / potential_decks`, not raw EDHREC
+  `inclusion` count, when measuring commander adoption;
+- combine commander-specific synergy and inclusion rate, with structural role
+  categories getting extra protection;
+- use `format_staples` as a candidate source and banlist/color/legal filter,
+  not as commander-specific proof;
+- never cut a structural staple across lanes just because the added card is
+  also famous or high-rank.
 
 ## Required Contract Per Commander
 
@@ -453,6 +501,8 @@ happen:
 - XMage rule availability is treated as proof that the card belongs in the
   deck;
 - a generic Commander ratio overrides a commander-specific intent profile;
+- a global staple rank or fixed staple list overrides commander-specific
+  inclusion rate, role fit, or package-lane evidence;
 - unresolved/off-color cards are repaired silently without diagnostics;
 - raw multi-row intelligence tables are joined into deck rows without
   aggregation.

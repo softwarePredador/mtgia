@@ -77,6 +77,13 @@ O sistema busca dados de três fontes para garantir informações sempre atualiz
 2. **Scryfall API (fallback):** Dados em tempo real quando o cache está desatualizado
 3. **Banlist Sincronizado:** Lista de cartas banidas atualizada automaticamente via sync_staples.dart
 
+POLÍTICA DE STAPLES
+
+- `format_staples` é fonte de candidatos e filtro de legalidade/cor/bracket, não prova de encaixe no comandante.
+- Proteja staples estruturais quando elas sustentam ramp/fixing, draw, remoção, proteção, board wipe, tutor ou base de mana.
+- Uma staple global com baixa adoção no comandante deve ser tratada como hipótese/filler, não como upgrade automático.
+- Nunca troque uma carta de engine do comandante por staple genérica sem mesma lane funcional e evidência de uso.
+
 DIRETRIZES DE OTIMIZAÇÃO (PROCESSO DE DECISÃO)
 
 Ao analisar o deck, siga estritamente este processo de decisão.

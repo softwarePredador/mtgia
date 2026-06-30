@@ -16,6 +16,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 CONTRACT_DOC = REPO_ROOT / "docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md"
 SUPPORT_FILE = REPO_ROOT / "server/lib/ai/commander_deckbuilding_contract_support.dart"
+STAPLE_POLICY_FILE = REPO_ROOT / "server/lib/ai/commander_staple_impact_policy.dart"
 GENERATE_ROUTE = REPO_ROOT / "server/routes/ai/generate/index.dart"
 SUPPORT_TEST = REPO_ROOT / "server/test/commander_deckbuilding_contract_support_test.dart"
 VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
@@ -94,6 +95,9 @@ def build_audit() -> dict[str, Any]:
                 "Lorehold Promotion Gate",
                 "Research-Backed Deck Planning Flow",
                 "Lane Order And Deck Overview Contract",
+                "Staple Impact Policy",
+                "staple_impact_and_role_policy",
+                "staple_impact_by_role",
                 "battle_cleared_with_cut_methodology_caveat",
                 "decks[] + ranked_deck_keys",
                 "lorehold_artifact_contract_audit.py",
@@ -111,8 +115,22 @@ def build_audit() -> dict[str, Any]:
                 "commanderDeckPlanningFlow",
                 "commanderDeckPlanningLaneOrder",
                 "commanderDeckOverviewRequiredFields",
+                "commanderStapleImpactPolicyDiagnostics",
                 "buildCommanderDeckbuildingContractDiagnostics",
                 "ready_for_battle_gate",
+            ],
+        )
+    )
+    checks.append(
+        check_contains(
+            STAPLE_POLICY_FILE,
+            [
+                "commanderStapleImpactPolicyVersion",
+                "commanderStapleImpactPolicyDiagnostics",
+                "commanderStapleWeaknessMultiplier",
+                "inclusionRate",
+                "structural_foundation",
+                "generic_or_low_context_signal",
             ],
         )
     )
@@ -132,6 +150,8 @@ def build_audit() -> dict[str, Any]:
                 "ready_for_battle_gate",
                 "reference_lanes_missing",
                 "planning_flow",
+                "staple_impact_and_role_policy",
+                "staple_impact_by_role",
                 "lane_balanced_cuts_and_anchor_protection",
             ],
         )
