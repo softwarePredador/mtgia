@@ -1578,6 +1578,41 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("draw_replacement_first_draw_step_exception"))
         )
 
+    if effect == "draw_engine" and scope == "currency_converter_discard_exile_draw_discard_token_v1":
+        return (
+            str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")
+            == "CurrencyConverter"
+            and types == {"ARTIFACT"}
+            and {"DiscardCardControllerTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+            and {
+                "CurrencyConverterExileEffect",
+                "CurrencyConverterTokenEffect",
+                "DrawDiscardControllerEffect",
+                "OneShotEffect",
+            }.issubset(effect_classes)
+            and {"GenericManaCost", "TapSourceCost"}.issubset(cost_classes)
+            and {"TargetCard", "TargetCardInExile"}.issubset(target_classes)
+            and effect_json.get("permanent_type") == "artifact"
+            and effect_json.get("trigger") == "controller_discard"
+            and bool(effect_json.get("controller_discard_may_exile_discarded_card_from_graveyard"))
+            and bool(effect_json.get("activated_draw_discard"))
+            and int(effect_json.get("draw_discard_activation_cost_generic") or 0) == 2
+            and bool(effect_json.get("draw_discard_activation_requires_tap"))
+            and int(effect_json.get("activated_draw_count") or 0) == 1
+            and int(effect_json.get("activated_discard_count") or 0) == 1
+            and bool(effect_json.get("activated_put_exiled_card_into_graveyard_create_token"))
+            and bool(effect_json.get("token_activation_requires_tap"))
+            and effect_json.get("token_from_exiled_land") == "treasure"
+            and effect_json.get("token_from_exiled_nonland") == "rogue"
+            and int(effect_json.get("treasure_count") or 0) == 1
+            and int(effect_json.get("token_count") or 0) == 1
+            and effect_json.get("token_name") == "Rogue Token"
+            and effect_json.get("token_subtype") == "Rogue"
+            and effect_json.get("token_colors") == ["B"]
+            and int(effect_json.get("token_power") or 0) == 2
+            and int(effect_json.get("token_toughness") or 0) == 2
+        )
+
     if (
         effect == "draw_engine"
         and scope

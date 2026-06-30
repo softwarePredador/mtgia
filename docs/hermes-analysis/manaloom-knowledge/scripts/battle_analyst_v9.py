@@ -13511,6 +13511,9 @@ THE_MIND_STONE_SCOPE = (
 SURGE_TO_VICTORY_SCOPE = (
     "graveyard_spell_exile_team_pump_combat_damage_copy_cast_until_eot_v1"
 )
+CURRENCY_CONVERTER_SCOPE = (
+    "currency_converter_discard_exile_draw_discard_token_v1"
+)
 
 
 def _available_discard_modal_modes(permanent):
@@ -13957,6 +13960,272 @@ def _resolve_discard_card_type_resource_trigger(
     return events
 
 
+def _currency_converter_exiled_cards(permanent):
+    if not isinstance(permanent, dict):
+        return []
+    cards = permanent.setdefault("currency_converter_exiled_cards", [])
+    if not isinstance(cards, list):
+        cards = []
+        permanent["currency_converter_exiled_cards"] = cards
+    return cards
+
+
+def _remove_matching_zone_card(zone, card):
+    if not isinstance(zone, list):
+        return None
+    for index, zone_card in enumerate(zone):
+        if zone_card is card:
+            return zone.pop(index)
+    if isinstance(card, dict):
+        target_name = card.get("name") or card.get("card_name")
+        for index, zone_card in enumerate(zone):
+            if not isinstance(zone_card, dict):
+                continue
+            if target_name and (zone_card.get("name") or zone_card.get("card_name")) == target_name:
+                return zone.pop(index)
+    try:
+        zone.remove(card)
+        return card
+    except ValueError:
+        return None
+
+
+def resolve_currency_converter_discard_trigger(
+    player,
+    source,
+    discarded_card,
+    *,
+    turn=None,
+    phase=None,
+):
+    if not (
+        isinstance(source, dict)
+        and source in getattr(player, "battlefield", [])
+        and source.get("battle_model_scope") == CURRENCY_CONVERTER_SCOPE
+        and source.get("trigger") == "controller_discard"
+        and source.get("controller_discard_may_exile_discarded_card_from_graveyard")
+        and isinstance(discarded_card, dict)
+    ):
+        return []
+    moved = _remove_matching_zone_card(getattr(player, "graveyard", []), discarded_card)
+    if moved is None:
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=source.get("name", "?"),
+            trigger="controller_discard",
+            discarded_card=discarded_card.get("name", "?"),
+            effect="exile_discarded_card",
+            result="not_in_graveyard",
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(source),
+        )
+        return []
+    moved = dict(moved)
+    moved["_exiled_with"] = source.get("name", "Currency Converter")
+    _currency_converter_exiled_cards(source).append(moved)
+    emit_replay_event(
+        "trigger_resolved",
+        player=player.name,
+        card=source.get("name", "?"),
+        trigger="controller_discard",
+        discarded_card=moved.get("name", "?"),
+        effect="exile_discarded_card",
+        result="exiled_with_source",
+        exiled_count=len(_currency_converter_exiled_cards(source)),
+        turn=turn,
+        phase=phase,
+        **replay_rule_fields(source),
+    )
+    return [moved]
+
+
+def _choose_currency_converter_discard(player):
+    candidates = [card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)]
+    if not candidates:
+        return None
+    return min(
+        candidates,
+        key=lambda card: (
+            lorehold_draw_priority(card, player),
+            int(_opening_hand_card_cmc(card) or 0),
+            card.get("name", "?"),
+        ),
+    )
+
+
+def _choose_currency_converter_exiled_card(permanent):
+    exiled = _currency_converter_exiled_cards(permanent)
+    if not exiled:
+        return None
+    land_cards = [card for card in exiled if _discarded_card_is_land(card)]
+    if land_cards:
+        return land_cards[0]
+    return max(
+        exiled,
+        key=lambda card: (
+            int(_opening_hand_card_cmc(card) or 0),
+            card.get("name", "?"),
+        ),
+    )
+
+
+def activate_currency_converter(player, permanent, opponents, all_players, turn, rng, *, phase):
+    if not (
+        isinstance(permanent, dict)
+        and permanent.get("battle_model_scope") == CURRENCY_CONVERTER_SCOPE
+        and not permanent.get("utility_artifact_used_this_turn")
+    ):
+        return False
+    if permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "currency_converter_already_tapped",
+            phase=phase,
+        )
+        return False
+
+    exiled_card = _choose_currency_converter_exiled_card(permanent)
+    if exiled_card is not None and permanent.get("activated_put_exiled_card_into_graveyard_create_token"):
+        _currency_converter_exiled_cards(permanent).remove(exiled_card)
+        player.graveyard.append(exiled_card)
+        permanent["utility_artifact_used_this_turn"] = True
+        if permanent.get("token_activation_requires_tap", True):
+            permanent["tapped"] = True
+        if _discarded_card_is_land(exiled_card):
+            treasure_count = max(1, int(permanent.get("treasure_count") or 1))
+            before = int(player.treasures or 0)
+            player.treasures += treasure_count
+            token_kind = "treasure"
+            tokens_created = treasure_count
+            token_name = "Treasure"
+            treasures_before = before
+            treasures_after = player.treasures
+        else:
+            tokens_created = create_creature_tokens_from_effect(
+                player,
+                permanent,
+                count=max(1, int(permanent.get("token_count") or 1)),
+                opponents=opponents,
+                turn=turn,
+                source_event="currency_converter_token_created",
+                all_players=all_players,
+            )
+            token_kind = "rogue"
+            token_name = permanent.get("token_name") or "Rogue Token"
+            treasures_before = int(player.treasures or 0)
+            treasures_after = int(player.treasures or 0)
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="currency_converter_token",
+            moved_card=exiled_card.get("name", "?"),
+            moved_card_type="land" if _discarded_card_is_land(exiled_card) else "nonland",
+            destination="graveyard",
+            token_kind=token_kind,
+            token_name=token_name,
+            tokens_created=tokens_created,
+            treasures_before=treasures_before,
+            treasures_after=treasures_after,
+            exiled_remaining=len(_currency_converter_exiled_cards(permanent)),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return True
+
+    if phase != "postcombat_main":
+        return False
+    if not permanent.get("activated_draw_discard"):
+        return False
+    if not getattr(player, "library", None):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "currency_converter_no_library_for_draw_discard",
+            phase=phase,
+        )
+        return False
+    if len(getattr(player, "hand", []) or []) > 2 and not player_has_discard_to_top_replacement(player):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "currency_converter_hand_not_low_enough_for_draw_discard",
+            phase=phase,
+        )
+        return False
+
+    activation_cost = adjusted_activated_ability_generic_cost(
+        player,
+        permanent,
+        int(permanent.get("draw_discard_activation_cost_generic") or 2),
+    )
+    activation_cost_text = _activation_cost_text(activation_cost)
+    if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "currency_converter_failed_to_pay_draw_discard",
+            phase=phase,
+        )
+        return False
+
+    permanent["utility_artifact_used_this_turn"] = True
+    if permanent.get("draw_discard_activation_requires_tap", True):
+        permanent["tapped"] = True
+    hand_before = len(player.hand)
+    draw_count = max(1, int(permanent.get("activated_draw_count") or 1))
+    drawn = player.draw(draw_count, rng)
+    process_player_draw_triggers(
+        player,
+        len(drawn),
+        turn,
+        phase,
+        all_players,
+        turn_player=player,
+    )
+    discarded = []
+    for _ in range(max(1, int(permanent.get("activated_discard_count") or 1))):
+        discard_card = _choose_currency_converter_discard(player)
+        if discard_card is None:
+            break
+        player.hand.remove(discard_card)
+        discarded.append(discard_card)
+    discard_result = resolve_effect_discard_cards(
+        player,
+        discarded,
+        opponents=opponents,
+        turn=turn,
+        phase=phase,
+        rng=rng,
+    ) if discarded else {"trigger_events": []}
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="currency_converter_draw_discard",
+        mana_paid=activation_cost,
+        cards_drawn=len(drawn),
+        drawn_cards=[card.get("name", "?") for card in drawn if isinstance(card, dict)],
+        discarded=[card.get("name", "?") for card in discarded if isinstance(card, dict)],
+        hand_before=hand_before,
+        hand_after=len(player.hand),
+        exiled_count=len(_currency_converter_exiled_cards(permanent)),
+        trigger_event_count=len(discard_result.get("trigger_events") or []),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(permanent),
+    )
+    return True
+
+
 def _choose_controlled_subtype_counter_target(player, source, subtype):
     subtype_norm = str(subtype or "").lower()
     candidates = []
@@ -14161,6 +14430,17 @@ def process_player_discard_triggers(
                     resolve_surly_badgersaur_discard_trigger(
                         player,
                         opponents,
+                        effect_data,
+                        discarded_card,
+                        turn=turn,
+                        phase=phase,
+                    )
+                )
+        if effect_data.get("controller_discard_may_exile_discarded_card_from_graveyard"):
+            for discarded_card in discarded:
+                trigger_events.extend(
+                    resolve_currency_converter_discard_trigger(
+                        player,
                         effect_data,
                         discarded_card,
                         turn=turn,
@@ -23600,6 +23880,18 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         phase=phase,
     ):
         return 1
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_currency_converter(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
 
     tutor_to_hand_artifacts = [
         permanent

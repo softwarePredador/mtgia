@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T07:36:52.482076+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg270_currency_converter_draw_engine_20260630_manifest.json",
+  "package_id": "pg270_currency_converter_draw_engine_20260630_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+          "card_name": "Currency Converter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f1e1192b52ed56e41a07b33e311bd313",
+          "oracle_hash": "61871a4bb30c2b48607cee649e2812aa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+          "card_name": "Currency Converter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f1e1192b52ed56e41a07b33e311bd313",
+          "oracle_hash": "61871a4bb30c2b48607cee649e2812aa",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+          "battle_rule_version": 2,
+          "card_name": "Currency Converter",
+          "logical_rule_key": "battle_rule_v1:f1e1192b52ed56e41a07b33e311bd313"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Currency Converter",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:f1e1192b52ed56e41a07b33e311bd313"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

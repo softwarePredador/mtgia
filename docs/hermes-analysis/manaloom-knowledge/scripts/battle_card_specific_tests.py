@@ -5301,7 +5301,7 @@ def register_tests(battle, player):
         assert snapback["target"] == "creature"
         assert rule_selection.get("selected_effect") == "remove_creature"
 
-    def test_functional_tag_gate_cards_resolve_from_manual_waivers():
+    def test_functional_tag_gate_cards_resolve_from_curated_pg_rules():
         mardu = battle.get_card_effect(
             {
                 "name": "Mardu Devotee",
@@ -5322,7 +5322,7 @@ def register_tests(battle, player):
         assert mardu["effect"] == "creature"
         assert mardu["etb_scry_count"] == 2
         assert mardu["mana_filter_once_per_turn"] is True
-        assert mardu_fields["rule_source"] == "manual_runtime_waiver"
+        assert mardu_fields["rule_source"] == "curated"
         assert mardu_fields["rule_review_status"] == "verified"
         assert mardu_fields["rule_logical_key"]
 
@@ -5330,7 +5330,7 @@ def register_tests(battle, player):
         assert lumberjack["is_mana_source"] is True
         assert lumberjack["mana_produced"] == 3
         assert lumberjack["requires_sacrifice_forest_for_mana"] is True
-        assert lumberjack_fields["rule_source"] == "manual_runtime_waiver"
+        assert lumberjack_fields["rule_source"] == "curated"
         assert lumberjack_fields["rule_review_status"] == "verified"
         assert lumberjack_fields["rule_logical_key"]
 
@@ -9468,7 +9468,12 @@ def register_tests(battle, player):
             battle.apply_effect_immediate(
                 active,
                 [],
-                {"name": "Adagia, Windswept Bastion", "cmc": 0, "type_line": "Land"},
+                {
+                    "name": "Adagia, Windswept Bastion",
+                    "cmc": 0,
+                    "type_line": "Land",
+                    "station_level": 12,
+                },
                 6,
                 random.Random(685),
                 effect_data_override={
@@ -19649,6 +19654,112 @@ def register_tests(battle, player):
             for event, data in events
         )
 
+    def test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards():
+        def currency_converter():
+            return {
+                "name": "Currency Converter",
+                "effect": "draw_engine",
+                "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+                "type_line": "Artifact",
+                "permanent_type": "artifact",
+                "trigger": "controller_discard",
+                "controller_discard_may_exile_discarded_card_from_graveyard": True,
+                "activated_draw_discard": True,
+                "draw_discard_activation_cost_generic": 2,
+                "draw_discard_activation_requires_tap": True,
+                "activated_draw_count": 1,
+                "activated_discard_count": 1,
+                "activated_put_exiled_card_into_graveyard_create_token": True,
+                "token_activation_requires_tap": True,
+                "token_from_exiled_land": "treasure",
+                "token_from_exiled_nonland": "rogue",
+                "treasure_count": 1,
+                "token_count": 1,
+                "token_name": "Rogue Token",
+                "token_subtype": "Rogue",
+                "token_colors": ["B"],
+                "token_power": 2,
+                "token_toughness": 2,
+                "_rule_logical_key": "battle_rule_v1:pg270_currency_converter_test",
+                "_rule_oracle_hash": "pg270-currency-converter-test-hash",
+            }
+
+        events = []
+        previous_handler = battle.REPLAY_EVENT_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        try:
+            active = player("Currency Controller")
+            opponent = player("Opponent")
+            converter = currency_converter()
+            active.battlefield = [converter]
+            discarded_land = {"name": "Discarded Plains", "type_line": "Basic Land - Plains", "cmc": 0}
+
+            result = battle.resolve_effect_discard_cards(
+                active,
+                [discarded_land],
+                opponents=[opponent],
+                turn=4,
+                phase="precombat_main",
+                rng=random.Random(2701),
+            )
+            activated_token = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=4,
+                rng=random.Random(2702),
+                phase="precombat_main",
+            )
+
+            active_two = player("Draw Discard Controller")
+            opponent_two = player("Opponent Two")
+            converter_two = currency_converter()
+            active_two.battlefield = [converter_two]
+            active_two.hand = [{"name": "Low Value Land", "type_line": "Land", "cmc": 0}]
+            active_two.library = [{"name": "High Impact Spell", "type_line": "Sorcery", "cmc": 7}]
+            active_two.mana_pool.add("generic", 2)
+            activated_draw_discard = battle.activate_utility_artifacts(
+                active_two,
+                [opponent_two],
+                [active_two, opponent_two],
+                turn=5,
+                rng=random.Random(2703),
+                phase="postcombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_handler
+
+        assert result["used_replacement"] is False
+        assert active.treasures == 1
+        assert activated_token == 1
+        assert converter["currency_converter_exiled_cards"] == []
+        assert any(card.get("name") == "Discarded Plains" for card in active.graveyard)
+        assert any(
+            event == "trigger_resolved"
+            and data.get("card") == "Currency Converter"
+            and data.get("effect") == "exile_discarded_card"
+            and data.get("result") == "exiled_with_source"
+            and data.get("rule_logical_key") == "battle_rule_v1:pg270_currency_converter_test"
+            for event, data in events
+        )
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("activation_kind") == "currency_converter_token"
+            and data.get("token_kind") == "treasure"
+            and data.get("tokens_created") == 1
+            for event, data in events
+        )
+        assert activated_draw_discard == 1
+        assert [card.get("name") for card in active_two.hand] == ["High Impact Spell"]
+        assert converter_two["currency_converter_exiled_cards"][0]["name"] == "Low Value Land"
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("activation_kind") == "currency_converter_draw_discard"
+            and data.get("cards_drawn") == 1
+            and data.get("discarded") == ["Low Value Land"]
+            for event, data in events
+        )
+
     def test_pg215_green_goblin_discard_nonland_counter_and_land_treasure():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -20806,7 +20917,7 @@ def register_tests(battle, player):
         test_samis_curiosity_creates_lander_token_not_tutor,
         test_audit_promoted_cards_keep_conservative_semantics,
         test_snapback_return_target_creature_stays_creature_removal,
-        test_functional_tag_gate_cards_resolve_from_manual_waivers,
+        test_functional_tag_gate_cards_resolve_from_curated_pg_rules,
         test_basking_broodscale_enters_as_creature_not_immediate_token_maker,
         test_scavenging_ooze_enters_as_creature_not_immediate_removal,
         test_mox_diamond_discards_land_when_it_unlocks_commander,
@@ -20973,6 +21084,7 @@ def register_tests(battle, player):
         test_pg213_soul_immolation_pays_blight_x_and_damages_opponents_and_their_creatures,
         test_pg214_waste_not_opponent_discard_card_type_triggers_create_mana_and_draw,
         test_pg214_bone_miser_controller_discard_card_type_triggers_create_mana_and_draw,
+        test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
         test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
         test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
         test_pg216_black_market_connections_precombat_modal_resources,

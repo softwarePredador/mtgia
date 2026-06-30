@@ -1887,6 +1887,59 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "CurrencyConverter"
+        and card_types == {"ARTIFACT"}
+        and {"DiscardCardControllerTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+        and {
+            "CurrencyConverterExileEffect",
+            "CurrencyConverterTokenEffect",
+            "DrawDiscardControllerEffect",
+            "OneShotEffect",
+        }.issubset(effect_classes)
+        and {"GenericManaCost", "TapSourceCost"}.issubset(cost_classes)
+        and {"TargetCard", "TargetCardInExile"}.issubset(target_classes)
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "currency_converter_discard_exile_draw_discard_token_v1",
+            "fields": {
+                "permanent_type": "artifact",
+                "trigger": "controller_discard",
+                "controller_discard_may_exile_discarded_card_from_graveyard": True,
+                "activated_draw_discard": True,
+                "draw_discard_activation_cost_generic": 2,
+                "draw_discard_activation_requires_tap": True,
+                "activated_draw_count": 1,
+                "activated_discard_count": 1,
+                "activated_put_exiled_card_into_graveyard_create_token": True,
+                "token_activation_requires_tap": True,
+                "token_from_exiled_land": "treasure",
+                "token_from_exiled_nonland": "rogue",
+                "treasure_count": 1,
+                "token_count": 1,
+                "token_name": "Rogue Token",
+                "token_subtype": "Rogue",
+                "token_colors": ["B"],
+                "token_power": 2,
+                "token_toughness": 2,
+            },
+            "reason": (
+                "XMage structure matches Currency Converter: controller discard may exile the discarded card "
+                "from graveyard, {2}{T} draws then discards, and {T} moves a card exiled with it to graveyard "
+                "to create Treasure for a land or a 2/2 black Rogue for a nonland."
+            ),
+            "signals": [
+                "CurrencyConverter",
+                "DiscardCardControllerTriggeredAbility",
+                "CurrencyConverterExileEffect",
+                "DrawDiscardControllerEffect(1,1)",
+                "CurrencyConverterTokenEffect",
+                "TreasureToken",
+                "RogueToken",
+            ],
+        }
+
+    if (
         xmage_class_name == "DevotedDruid"
         and card_types == {"CREATURE"}
         and ability_classes == {"GreenManaAbility", "SimpleActivatedAbility"}

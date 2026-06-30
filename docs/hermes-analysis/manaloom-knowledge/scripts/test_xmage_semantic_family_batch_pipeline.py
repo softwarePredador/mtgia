@@ -9995,6 +9995,87 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(proposal["deck_role_json"]["category"], "draw")
         self.assertEqual(proposal["deck_role_json"]["subtype"], "draw_and_life_gain_replacement")
 
+    def test_classifier_and_generator_mark_currency_converter_exact_scope_batch_safe(self) -> None:
+        batch = {
+            "cards": [
+                {
+                    "card_name": "Currency Converter",
+                    "severity": "medium",
+                    "oracle_hash": "currencyhash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "CurrencyConverter",
+                        "path": "/xmage/CurrencyConverter.java",
+                        "types": ["ARTIFACT"],
+                        "effect_classes": [
+                            "CurrencyConverterExileEffect",
+                            "CurrencyConverterTokenEffect",
+                            "DrawDiscardControllerEffect",
+                            "OneShotEffect",
+                        ],
+                        "ability_classes": [
+                            "DiscardCardControllerTriggeredAbility",
+                            "SimpleActivatedAbility",
+                        ],
+                        "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                        "target_classes": ["TargetCard", "TargetCardInExile"],
+                        "primary_effect": {
+                            "effect": "draw_engine",
+                            "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+                            "permanent_type": "artifact",
+                            "trigger": "controller_discard",
+                            "controller_discard_may_exile_discarded_card_from_graveyard": True,
+                            "activated_draw_discard": True,
+                            "draw_discard_activation_cost_generic": 2,
+                            "draw_discard_activation_requires_tap": True,
+                            "activated_draw_count": 1,
+                            "activated_discard_count": 1,
+                            "activated_put_exiled_card_into_graveyard_create_token": True,
+                            "token_activation_requires_tap": True,
+                            "token_from_exiled_land": "treasure",
+                            "token_from_exiled_nonland": "rogue",
+                            "treasure_count": 1,
+                            "token_count": 1,
+                            "token_name": "Rogue Token",
+                            "token_subtype": "Rogue",
+                            "token_colors": ["B"],
+                            "token_power": 2,
+                            "token_toughness": 2,
+                        },
+                    },
+                }
+            ]
+        }
+        family_report = classifier.build_family_report(batch)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "draw_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit=batch,
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Currency Converter",
+                        "candidate_rule": {"oracle_hash": "currencyhash"},
+                        "external_references": {"scryfall": {"mana_cost": "{1}"}},
+                    }
+                ]
+            },
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "draw")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "discard_exile_token_conversion")
+        self.assertEqual(
+            proposal["effect_json"]["battle_model_scope"],
+            "currency_converter_discard_exile_draw_discard_token_v1",
+        )
+
     def test_classifier_marks_palantir_of_orthanc_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

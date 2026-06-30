@@ -118,6 +118,41 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertTrue(primary["draw_replacement_double_except_first_draw_step"])
         self.assertTrue(primary["draw_replacement_first_draw_step_exception"])
 
+    def test_currency_converter_maps_to_exact_discard_exile_token_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "CurrencyConverter",
+                "effect_classes": [
+                    "CurrencyConverterExileEffect",
+                    "CurrencyConverterTokenEffect",
+                    "DrawDiscardControllerEffect",
+                    "OneShotEffect",
+                ],
+                "ability_classes": [
+                    "DiscardCardControllerTriggeredAbility",
+                    "SimpleActivatedAbility",
+                ],
+                "target_classes": ["TargetCard", "TargetCardInExile"],
+                "cost_classes": ["GenericManaCost", "TapSourceCost"],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                "raw_excerpt": "TreasureToken RogueToken DrawDiscardControllerEffect(1, 1)",
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "currency_converter_discard_exile_draw_discard_token_v1",
+        )
+        self.assertTrue(primary["controller_discard_may_exile_discarded_card_from_graveyard"])
+        self.assertTrue(primary["activated_draw_discard"])
+        self.assertEqual(primary["draw_discard_activation_cost_generic"], 2)
+        self.assertEqual(primary["token_from_exiled_land"], "treasure")
+        self.assertEqual(primary["token_from_exiled_nonland"], "rogue")
+        self.assertEqual(primary["token_name"], "Rogue Token")
+
     def test_unrecognized_xmage_source_stays_manual(self) -> None:
         result = hints.build_effect_hints(
             {
