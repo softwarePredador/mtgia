@@ -1,0 +1,4 @@
+       card_name        |    normalized_name     |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------------+------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Eight-and-a-Half-Tails | eight-and-a-half-tails | battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39 |                  1 |                           1 |                         1 |           0
+(1 row)

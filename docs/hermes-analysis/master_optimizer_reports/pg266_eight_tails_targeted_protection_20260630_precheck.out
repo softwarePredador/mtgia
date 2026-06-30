@@ -1,0 +1,4 @@
+       card_name        |    normalized_name     |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------------+------------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Eight-and-a-Half-Tails | eight-and-a-half-tails | 4f6c69b2d534cf39031dbdfc804377ce | battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39 | deprecate_nonmatching_rows |                1 | 73af6ad4-f54d-46e2-9cce-f19189378dbb |                  0 |                         0 |                           0
+(1 row)

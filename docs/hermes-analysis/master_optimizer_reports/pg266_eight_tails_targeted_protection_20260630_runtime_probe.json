@@ -1,0 +1,161 @@
+{
+  "card": "Eight-and-a-Half-Tails",
+  "rule_effect": "creature",
+  "rule_logical_key": "battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39",
+  "rule_oracle_hash": "4f6c69b2d534cf39031dbdfc804377ce",
+  "battle_model_scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+  "runtime_modeled_effect": "creature_body_plus_targeted_protection_response",
+  "responded": true,
+  "battlefield_after": [
+    "Lorehold, the Historian",
+    "Eight-and-a-Half-Tails"
+  ],
+  "commander_protection_from": [
+    "white"
+  ],
+  "available_mana_after": 0,
+  "tails_tapped": false,
+  "removal_colors_after_response": [
+    "W"
+  ],
+  "events": [
+    {
+      "event": "activated_ability",
+      "player": "Lorehold",
+      "card": "Eight-and-a-Half-Tails",
+      "activation_kind": "targeted_protection_response",
+      "target": "Lorehold, the Historian",
+      "protection_from": [
+        "white"
+      ],
+      "response_to": "Into the Flood Maw",
+      "source_color_changed_to": "white",
+      "activation_mana_cost": "{2}{W}",
+      "tapped": false,
+      "phase": "precombat_main",
+      "turn": 4,
+      "rule_source": "curated",
+      "rule_review_status": "verified",
+      "rule_execution_status": "auto",
+      "rule_confidence": 0.94,
+      "rule_version": 2,
+      "rule_logical_key": "battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39",
+      "rule_oracle_hash": "4f6c69b2d534cf39031dbdfc804377ce",
+      "rule_alternative_count": 1,
+      "rule_runtime_selection_mode": "single_selected"
+    },
+    {
+      "event": "targeted_protection_granted",
+      "player": "Lorehold",
+      "card": "Eight-and-a-Half-Tails",
+      "target": "Lorehold, the Historian",
+      "protection_from": [
+        "white"
+      ],
+      "target_found": true,
+      "activation_kind": "targeted_protection_response",
+      "response_to": "Into the Flood Maw",
+      "source_color_changed_to": "white",
+      "activation_mana_cost": "{2}{W}",
+      "turn": 4,
+      "rule_source": "curated",
+      "rule_review_status": "verified",
+      "rule_execution_status": "auto",
+      "rule_confidence": 0.94,
+      "rule_version": 2,
+      "rule_logical_key": "battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39",
+      "rule_oracle_hash": "4f6c69b2d534cf39031dbdfc804377ce",
+      "rule_alternative_count": 1,
+      "rule_runtime_selection_mode": "single_selected"
+    },
+    {
+      "event": "targeted_protection_activation_skipped",
+      "player": "Lorehold",
+      "card": "Eight-and-a-Half-Tails",
+      "reason": "insufficient_mana_for_activation_cost",
+      "activation_mana_cost": "{2}{W}",
+      "available_mana": 0,
+      "turn": 4,
+      "rule_source": "curated",
+      "rule_review_status": "verified",
+      "rule_execution_status": "auto",
+      "rule_confidence": 0.94,
+      "rule_version": 2,
+      "rule_logical_key": "battle_rule_v1:f7cc24bc3332146a3ab6da1d3397fa39",
+      "rule_oracle_hash": "4f6c69b2d534cf39031dbdfc804377ce",
+      "rule_alternative_count": 1,
+      "rule_runtime_selection_mode": "single_selected"
+    },
+    {
+      "event": "priority_pass",
+      "active_player": "Opponent",
+      "player": "Opponent",
+      "pass_index": 1,
+      "phase": "precombat_main",
+      "reason": "stack_top_no_response",
+      "stack_top": "Into the Flood Maw",
+      "turn": 4
+    },
+    {
+      "event": "priority_pass",
+      "active_player": "Opponent",
+      "player": "Lorehold",
+      "pass_index": 2,
+      "phase": "precombat_main",
+      "reason": "stack_top_no_response",
+      "stack_top": "Into the Flood Maw",
+      "turn": 4
+    },
+    {
+      "event": "spell_resolved",
+      "player": "Opponent",
+      "card": "Into the Flood Maw",
+      "cmc": 1,
+      "type_line": "Instant",
+      "effect": "remove_creature",
+      "turn": 4,
+      "phase": "precombat_main",
+      "priority_window": "stack_resolution",
+      "stack_depth": 1,
+      "stack_object": "Into the Flood Maw",
+      "resolved_from_stack": true,
+      "result": "resolved",
+      "destination": "graveyard",
+      "zone_after": "graveyard",
+      "to_zone": "graveyard",
+      "targets": [
+        {
+          "target": "Lorehold, the Historian",
+          "target_controller": "Lorehold",
+          "target_type": "creature",
+          "target_legal": true,
+          "targeting_pipeline": "targeting_formal_minimal"
+        }
+      ],
+      "target": "Lorehold, the Historian",
+      "target_controller": "Lorehold",
+      "target_type": "creature",
+      "target_legal": true,
+      "rule_source": "unknown",
+      "rule_review_status": "unknown",
+      "rule_execution_status": "auto",
+      "rule_confidence": 0.0,
+      "rule_version": null
+    },
+    {
+      "event": "removal_resolved",
+      "player": "Opponent",
+      "card": "Into the Flood Maw",
+      "target_player": "Lorehold",
+      "target": "Lorehold, the Historian",
+      "available_targets": 1,
+      "result": "no_legal_target",
+      "turn": 4,
+      "targeting_pipeline": "targeting_formal_minimal",
+      "target_name": "Lorehold, the Historian",
+      "target_type": "creature",
+      "target_legal": false,
+      "target_controller": "Lorehold"
+    }
+  ]
+}

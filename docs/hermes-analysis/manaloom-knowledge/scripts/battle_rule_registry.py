@@ -283,6 +283,13 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     if effect == "creature" and effect_json.get("is_mana_source"):
         category = "ramp"
         subtype = "mana_dork"
+    elif (
+        effect == "creature"
+        and effect_json.get("battle_model_scope")
+        == "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1"
+    ):
+        category = "protection"
+        subtype = "activated_targeted_protection_response"
     elif effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             category = "ramp"

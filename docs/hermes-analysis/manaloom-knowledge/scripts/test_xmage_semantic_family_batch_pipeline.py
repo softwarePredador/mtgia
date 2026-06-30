@@ -286,6 +286,50 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertFalse(proposal["safe_for_batch_pg_package"])
         self.assertEqual(proposal["proposal_status"], "split_family_scope_review_required")
 
+    def test_eight_and_a_half_tails_exact_scope_is_targeted_protection_batch_candidate(self) -> None:
+        batch_audit = {
+            "cards": [
+                {
+                    "card_name": "Eight-and-a-Half-Tails",
+                    "severity": "medium",
+                    "oracle_hash": "eight-hash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 1},
+                    "xmage": {
+                        "class_name": "EightAndAHalfTails",
+                        "path": "/xmage/EightAndAHalfTails.java",
+                        "types": ["CREATURE"],
+                        "effect_classes": ["GainAbilityTargetEffect", "BecomesColorTargetEffect"],
+                        "ability_classes": ["SimpleActivatedAbility"],
+                        "target_classes": ["TargetControlledPermanent", "TargetSpellOrPermanent"],
+                        "primary_effect": {
+                            "effect": "creature",
+                            "battle_model_scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+                            "runtime_modeled_effect": "creature_body_plus_targeted_protection_response",
+                            "protection_choices": ["white"],
+                            "can_make_source_white_for_protection": True,
+                            "targeted_protection_activation_mana_cost": "{2}{W}",
+                            "tap_activation": False,
+                        },
+                    },
+                }
+            ]
+        }
+
+        family_report = classifier.build_family_report(batch_audit)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "targeted_protection")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(batch_audit=batch_audit)
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "protection")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "activated_targeted_protection_response")
+
     def test_land_sacrifice_mana_mode_scope_stays_out_of_batch_pg_until_runtime(self) -> None:
         batch_audit = {
             "cards": [

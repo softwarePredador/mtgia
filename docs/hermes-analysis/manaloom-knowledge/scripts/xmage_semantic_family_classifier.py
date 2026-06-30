@@ -429,6 +429,13 @@ def family_for_effect(effect: str | None) -> str:
 def family_for_effect_json(effect_json: dict[str, Any]) -> str:
     if (
         str(effect_json.get("battle_model_scope") or "")
+        == "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1"
+        and effect_json.get("effect") == "creature"
+        and effect_json.get("runtime_modeled_effect") == "creature_body_plus_targeted_protection_response"
+    ):
+        return "targeted_protection"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
         == "etb_or_attack_exile_graveyard_card_create_food_share_exiled_creature_activated_abilities_v1"
         and effect_json.get("trigger") == "enters_battlefield_or_attacks"
         and effect_json.get("trigger_effect") == "exile_graveyard_card_create_food"
@@ -1145,6 +1152,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and not bool(effect_json.get("play_lands_from_top_library"))
             and not bool(effect_json.get("alternate_zone_permission"))
             and not bool(effect_json.get("may_cast_without_paying_mana_cost"))
+        )
+
+    if (
+        effect == "creature"
+        and scope == "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and {
+                "GainAbilityTargetEffect",
+                "BecomesColorTargetEffect",
+            }.issubset(effect_classes)
+            and "SimpleActivatedAbility" in ability_classes
+            and {
+                "TargetControlledPermanent",
+                "TargetSpellOrPermanent",
+            }.issubset(xmage_target_classes(card))
+            and effect_json.get("runtime_modeled_effect")
+            == "creature_body_plus_targeted_protection_response"
+            and effect_json.get("protection_choices") == ["white"]
+            and bool(effect_json.get("can_make_source_white_for_protection"))
+            and effect_json.get("targeted_protection_activation_mana_cost") == "{2}{W}"
+            and not bool(effect_json.get("tap_activation"))
         )
 
     if (

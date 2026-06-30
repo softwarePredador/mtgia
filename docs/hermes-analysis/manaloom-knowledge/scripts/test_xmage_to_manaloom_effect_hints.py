@@ -6262,6 +6262,35 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
             "target_creature_you_control_protection_from_chosen_color_until_eot_v1",
         )
 
+    def test_eight_and_a_half_tails_maps_to_creature_body_with_mana_protection_response(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "class_name": "EightAndAHalfTails",
+                "effect_classes": ["GainAbilityTargetEffect", "BecomesColorTargetEffect"],
+                "ability_classes": ["SimpleActivatedAbility"],
+                "target_classes": ["TargetControlledPermanent", "TargetSpellOrPermanent"],
+                "constructor_metadata": {
+                    "card_types": ["CREATURE"],
+                    "power": 2,
+                    "toughness": 2,
+                },
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+        self.assertEqual(primary["effect"], "creature")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+        )
+        self.assertEqual(
+            primary["runtime_modeled_effect"],
+            "creature_body_plus_targeted_protection_response",
+        )
+        self.assertTrue(primary["can_make_source_white_for_protection"])
+        self.assertEqual(primary["targeted_protection_activation_mana_cost"], "{2}{W}")
+        self.assertFalse(primary["tap_activation"])
+
     def test_manamorphose_maps_to_exact_mana_then_draw_scope(self) -> None:
         result = hints.build_effect_hints(
             {

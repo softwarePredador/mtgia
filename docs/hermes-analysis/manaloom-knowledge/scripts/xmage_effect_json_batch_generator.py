@@ -205,6 +205,16 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
     if effect:
         role.setdefault("effect", effect)
     effect_json = dict(card.get("effect_json") or {})
+    if (
+        effect_json.get("battle_model_scope")
+        == "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1"
+    ):
+        return {
+            "category": "protection",
+            "effect": "creature",
+            "subtype": "activated_targeted_protection_response",
+            "timing": "activated_response",
+        }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             return {

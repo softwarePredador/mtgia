@@ -399,3 +399,69 @@ def test_lorehold_uses_mother_of_runes_tap_response_for_targeted_commander_remov
         and data.get("activation_kind") == "targeted_protection_response"
         for event, data in events
     )
+
+
+def test_lorehold_uses_eight_and_a_half_tails_mana_response_without_tapping():
+    commander = lorehold_commander()
+    lorehold = player("Lorehold", commander=commander, is_human=True)
+    opponent = player("Opponent")
+    tails = {
+        "name": "Eight-and-a-Half-Tails",
+        "cmc": 2,
+        "type_line": "Legendary Creature - Fox Cleric",
+        "effect": "creature",
+        "power": 2,
+        "toughness": 2,
+        "runtime_modeled_effect": "creature_body_plus_targeted_protection_response",
+        "protection_choices": ["white"],
+        "can_make_source_white_for_protection": True,
+        "targeted_protection_activation_mana_cost": "{2}{W}",
+        "tap_activation": False,
+        "activation_requires_tap": False,
+        "battle_model_scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+        "_rule_logical_key": "battle_rule_v1:eight-test",
+        "_rule_oracle_hash": "eight-hash",
+    }
+    lorehold.battlefield = [commander, tails]
+    lorehold.mana_pool.white = 1
+    lorehold.mana_pool.colorless = 2
+    card, effect = flood_maw_stack_item(opponent, lorehold, commander)
+    stack = battle.Stack()
+    stack.push(card, opponent, effect)
+    events = []
+    previous_handler = battle.REPLAY_EVENT_HANDLER
+    battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+    try:
+        responded = battle.priority_round(
+            opponent,
+            [opponent, lorehold],
+            stack,
+            turn=4,
+            rng=random.Random(8),
+            phase="precombat_main",
+        )
+        resolve_targeted_removal_after_response(opponent, [opponent, lorehold], stack)
+    finally:
+        battle.REPLAY_EVENT_HANDLER = previous_handler
+
+    assert responded is True
+    assert tails.get("tapped") is not True
+    assert lorehold.available_mana() == 0
+    assert commander in lorehold.battlefield
+    assert commander["protection_from"] == ["white"]
+    assert any(
+        event == "targeted_protection_granted"
+        and data.get("card") == "Eight-and-a-Half-Tails"
+        and data.get("target") == "Lorehold, the Historian"
+        and data.get("protection_from") == ["white"]
+        and data.get("source_color_changed_to") == "white"
+        and data.get("activation_mana_cost") == "{2}{W}"
+        and data.get("rule_logical_key") == "battle_rule_v1:eight-test"
+        for event, data in events
+    )
+    assert any(
+        event == "removal_resolved"
+        and data.get("card") == "Into the Flood Maw"
+        and data.get("result") == "no_legal_target"
+        for event, data in events
+    )

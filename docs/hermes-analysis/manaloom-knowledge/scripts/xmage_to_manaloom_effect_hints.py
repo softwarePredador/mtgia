@@ -2173,6 +2173,54 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "EightAndAHalfTails"
+        and card_types == {"CREATURE"}
+        and {"GainAbilityTargetEffect", "BecomesColorTargetEffect"}.issubset(effect_classes)
+        and "SimpleActivatedAbility" in ability_classes
+        and {"TargetControlledPermanent", "TargetSpellOrPermanent"}.issubset(target_classes)
+    ):
+        return {
+            "effect": "creature",
+            "scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+            "fields": {
+                "is_creature_permanent": True,
+                "power": 2,
+                "toughness": 2,
+                "runtime_modeled_effect": "creature_body_plus_targeted_protection_response",
+                "activated_protection_status": "runtime_executor_v1",
+                "oracle_runtime_scope": "targeted_stack_removal_response_protection_activation_runtime_v1",
+                "protection_activation_timing": "targeted_stack_response",
+                "protection_target": "target_permanent_you_control",
+                "protection_choices": ["white"],
+                "can_make_source_white_for_protection": True,
+                "source_color_change_target": "target_spell_or_permanent",
+                "source_color_change_to": "white",
+                "targeted_protection_activation_mana_cost": "{2}{W}",
+                "activation_cost": "{1} plus {1}{W}",
+                "activation_requires_tap": False,
+                "tap_activation": False,
+                "source_must_be_untapped": False,
+                "summoning_sickness_applies_to_activation": False,
+                "duration": "until_end_of_turn",
+                "xmage_effect": (
+                    "SimpleActivatedAbility + GainAbilityTargetEffect(Protection from white) "
+                    "+ BecomesColorTargetEffect(white)"
+                ),
+            },
+            "reason": (
+                "XMage structure matches Eight-and-a-Half-Tails: a creature with activated abilities "
+                "that can make a spell or permanent white and give a controlled permanent protection "
+                "from white until end of turn."
+            ),
+            "signals": [
+                "GainAbilityTargetEffect",
+                "BecomesColorTargetEffect",
+                "TargetControlledPermanent",
+                "TargetSpellOrPermanent",
+            ],
+        }
+
+    if (
         card_types == {"INSTANT"}
         and xmage_class_name == "DeflectingPalm"
         and "PreventNextDamageFromChosenSourceEffect" in effect_classes

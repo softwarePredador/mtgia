@@ -334,32 +334,32 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
 
     expected_counts = {
         "Validity status counts": {
-            "ready_for_structured_xmage_pull_review_required": 73,
-            "xmage_source_valid_mapper_required": 63,
+            "ready_for_structured_xmage_pull_review_required": 71,
+            "xmage_source_valid_mapper_required": 62,
         },
         "Proposal status counts": {
-            "split_family_scope_review_required": 73,
-            "mapper_metadata_or_test_scenario_required": 63,
+            "split_family_scope_review_required": 71,
+            "mapper_metadata_or_test_scenario_required": 62,
         },
         "Family counts": {
-            "manual_model": 63,
+            "manual_model": 62,
             "ramp_permanent": 6,
             "targeted_interaction": 12,
             "recursion": 11,
             "free_cast": 9,
-            "targeted_protection": 8,
+            "targeted_protection": 7,
             "passive": 5,
             "draw_engine": 4,
-            "topdeck_play": 3,
+            "topdeck_play": 2,
             "board_wipe_choice": 3,
             "copy_spell_engine": 1,
             "life_total_change": 1,
             "tutor": 10,
         },
         "Pattern status counts": {
-            "candidate_template_requires_review_tests": 8,
+            "candidate_template_requires_review_tests": 9,
             "manual_model_observation_only": 1,
-            "requires_subpattern_split_before_promotion": 11,
+            "requires_subpattern_split_before_promotion": 10,
         },
     }
     for label, expected in expected_counts.items():

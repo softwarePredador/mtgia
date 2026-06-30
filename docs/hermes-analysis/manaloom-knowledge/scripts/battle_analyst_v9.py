@@ -11916,6 +11916,7 @@ def targeted_stack_protection_context(player, stack_item):
             "target": target,
             "target_name": target.get("name", "?"),
             "source_card": (getattr(stack_item, "card", None) or {}).get("name", "?"),
+            "source_object": getattr(stack_item, "card", None),
             "source_colors": source_colors,
             "target_is_commander": bool(target.get("is_commander")),
         }
@@ -11926,6 +11927,8 @@ def protection_card_can_cover_stack_context(card, effect_data, context):
     if not context:
         return False
     effect = (effect_data or {}).get("effect")
+    if (effect_data or {}).get("can_make_source_white_for_protection"):
+        return True
     if effect == "grant_protection_from_chosen_color":
         return any(color != "colorless" for color in context.get("source_colors") or [])
     choices = {
@@ -11939,22 +11942,69 @@ def protection_card_can_cover_stack_context(card, effect_data, context):
     ) or ("colorless" in choices and "colorless" in source_colors)
 
 
+def targeted_protection_effect_data_for_permanent(permanent):
+    effect_data = dict(get_card_effect(permanent))
+    if isinstance(permanent, dict):
+        effect_data.update(permanent)
+    return effect_data
+
+
 def activate_permanent_targeted_protection_response(player, permanent, context, turn, phase=None):
-    effect_data = get_card_effect(permanent)
-    if not effect_data.get("tap_activation") or not protection_card_can_cover_stack_context(permanent, effect_data, context):
+    effect_data = targeted_protection_effect_data_for_permanent(permanent)
+    if not protection_card_can_cover_stack_context(permanent, effect_data, context):
         return False
     target = context.get("target")
     if effect_data.get("protection_target") == "another_creature_you_control" and target is permanent:
         return False
-    if permanent.get("tapped") or permanent.get("summoning_sick"):
+    requires_tap = bool(effect_data.get("tap_activation") or effect_data.get("activation_requires_tap"))
+    if requires_tap and (permanent.get("tapped") or permanent.get("summoning_sick")):
         return False
-    colors = list(context.get("source_colors") or [])
+    activation_mana_cost = (
+        effect_data.get("targeted_protection_activation_mana_cost")
+        or effect_data.get("protection_activation_mana_cost")
+    )
+    if activation_mana_cost:
+        if not player.can_pay(activation_mana_cost):
+            emit_replay_event(
+                "targeted_protection_activation_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="insufficient_mana_for_activation_cost",
+                activation_mana_cost=activation_mana_cost,
+                available_mana=player.available_mana(),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            return False
+        if not player.spend_mana(activation_mana_cost):
+            emit_replay_event(
+                "targeted_protection_activation_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                reason="failed_to_pay_activation_mana_cost",
+                activation_mana_cost=activation_mana_cost,
+                available_mana=player.available_mana(),
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            return False
+    if effect_data.get("can_make_source_white_for_protection"):
+        colors = ["white"]
+        source_color_changed_to = "white"
+        source_object = context.get("source_object")
+        if isinstance(source_object, dict):
+            source_object.setdefault("_colors_before_targeted_protection_change", source_object.get("colors"))
+            source_object["colors"] = ["W"]
+    else:
+        colors = list(context.get("source_colors") or [])
+        source_color_changed_to = None
     existing = target.get("protection_from") or []
     if isinstance(existing, str):
         existing = [existing]
     merged = sorted({_normalize_color_symbol(color) for color in existing if color} | set(colors))
     set_until_eot(target, "protection_from", merged)
-    permanent["tapped"] = True
+    if requires_tap:
+        permanent["tapped"] = True
     emit_replay_event(
         "activated_ability",
         player=player.name,
@@ -11963,6 +12013,9 @@ def activate_permanent_targeted_protection_response(player, permanent, context, 
         target=context.get("target_name"),
         protection_from=colors,
         response_to=context.get("source_card"),
+        source_color_changed_to=source_color_changed_to,
+        activation_mana_cost=activation_mana_cost,
+        tapped=bool(permanent.get("tapped")),
         phase=phase,
         turn=turn,
         **replay_rule_fields(effect_data),
@@ -11976,6 +12029,8 @@ def activate_permanent_targeted_protection_response(player, permanent, context, 
         target_found=True,
         activation_kind="targeted_protection_response",
         response_to=context.get("source_card"),
+        source_color_changed_to=source_color_changed_to,
+        activation_mana_cost=activation_mana_cost,
         turn=turn,
         **replay_rule_fields(effect_data),
     )
@@ -12605,10 +12660,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                         permanent
                         for permanent in player.battlefield
                         if isinstance(permanent, dict)
-                        and get_card_effect(permanent).get("tap_activation")
                         and protection_card_can_cover_stack_context(
                             permanent,
-                            get_card_effect(permanent),
+                            targeted_protection_effect_data_for_permanent(permanent),
                             targeted_protection_context,
                         )
                     ]
@@ -12620,7 +12674,9 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                             turn,
                             phase=phase,
                         ):
-                            permanent_fields = replay_rule_fields(get_card_effect(permanent))
+                            permanent_fields = replay_rule_fields(
+                                targeted_protection_effect_data_for_permanent(permanent)
+                            )
                             emit_decision_trace(
                                 decision_type="response",
                                 player=player,
@@ -12629,7 +12685,7 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 available_options=[
                                     decision_card_option(
                                         option,
-                                        get_card_effect(option),
+                                        targeted_protection_effect_data_for_permanent(option),
                                         action="activate_protection",
                                         target=targeted_protection_context.get("target_name"),
                                     )
@@ -12637,14 +12693,14 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                                 ],
                                 chosen_option=decision_card_option(
                                     permanent,
-                                    get_card_effect(permanent),
+                                    targeted_protection_effect_data_for_permanent(permanent),
                                     action="activate_protection",
                                     target=targeted_protection_context.get("target_name"),
                                 ),
                                 rejected_options=[
                                     decision_card_option(
                                         option,
-                                        get_card_effect(option),
+                                        targeted_protection_effect_data_for_permanent(option),
                                         action="reject_protection_activation",
                                     )
                                     for option in protection_permanents
