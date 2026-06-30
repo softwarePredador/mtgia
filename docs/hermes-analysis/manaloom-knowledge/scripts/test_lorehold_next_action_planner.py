@@ -24,6 +24,15 @@ def test_defaults_use_current_cut_models():
     assert planner.DEFAULT_CLOSING_WINDOW_TRACE_REPORT.name == (
         "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
     )
+    assert planner.DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT.name == (
+        "lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT.name == (
+        "lorehold_current_champion_snapshot_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT.name == (
+        "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
+    )
     assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
         "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
     )
@@ -1518,6 +1527,144 @@ def test_next_action_planner_prioritizes_closing_window_trace_over_failure_synth
     action = payload["action_queue"][0]
     assert action["status"] == "closing_window_trace_targets_ready_for_micro_package_model"
     assert action["candidate_count"] == 1
+
+
+def test_next_action_planner_freezes_607_when_micro_package_model_has_no_safe_cuts():
+    closing_window = {
+        "summary": {
+            "recommended_next_action": "build_trace_targeted_micro_package_from_closing_window",
+            "comparison_count": 3,
+            "next_steps": ["build a trace-targeted micro-package"],
+        },
+        "hypothesis_queue": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "ready_for_micro_package_model",
+            }
+        ],
+        "closing_window_comparisons": [{"candidate_key": "challenger_shell"}],
+    }
+    micro_model = {
+        "summary": {
+            "recommended_next_action": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "ready_micro_package_count": 0,
+            "seed_safe_cut_ready_count": 0,
+            "same_lane_only_cut_cards": ["Creative Technique", "Bender's Waterskin"],
+            "next_steps": ["Snapshot protected deck_607 as the current champion candidate."],
+        },
+        "ready_packages": [],
+        "blocked_hypotheses": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "blocked_no_seed_safe_cut",
+            }
+        ],
+        "protected_anchor_evidence": {"top_strategic_deficits": []},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        closing_window_trace=closing_window,
+        trace_targeted_micro_package_model=micro_model,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "freeze_607_current_champion_snapshot_until_new_cut_evidence"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -8
+    assert action["status"] == (
+        "no_trace_targeted_micro_package_ready_current_607_champion_snapshot_required"
+    )
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert action["evidence"]["blocked_hypotheses"][0]["status"] == (
+        "blocked_no_seed_safe_cut"
+    )
+    assert payload["summary"]["trace_targeted_micro_package_model_summary"][
+        "seed_safe_cut_ready_count"
+    ] == 0
+
+
+def test_next_action_planner_moves_to_cut_evidence_after_champion_snapshot_exists():
+    micro_model = {
+        "summary": {
+            "recommended_next_action": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "ready_micro_package_count": 0,
+            "seed_safe_cut_ready_count": 0,
+            "same_lane_only_cut_cards": ["Creative Technique", "Bender's Waterskin"],
+        },
+        "ready_packages": [],
+        "blocked_hypotheses": [],
+        "protected_anchor_evidence": {},
+    }
+    champion_snapshot = {
+        "status": "current_champion_snapshot",
+        "summary": {"total_cards": 100, "validation_error_count": 0},
+        "protected_anchors": ["Sensei's Divining Top", "Scroll Rack"],
+        "champion_decision": {"decision": "keep_607_as_current_champion"},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        trace_targeted_micro_package_model=micro_model,
+        current_champion_snapshot=champion_snapshot,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "expand_trace_cut_evidence_after_607_champion_snapshot"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -9
+    assert action["status"] == "current_607_champion_snapshot_recorded_cut_evidence_required"
+    assert action["candidate_cards"] == ["Sensei's Divining Top", "Scroll Rack"]
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert payload["summary"]["current_champion_snapshot_summary"]["total_cards"] == 100
+
+
+def test_next_action_planner_records_exhausted_cut_evidence_contract():
+    champion_snapshot = {
+        "status": "current_champion_snapshot",
+        "summary": {"total_cards": 100, "validation_error_count": 0},
+        "protected_anchors": ["Sensei's Divining Top"],
+        "champion_decision": {"decision": "keep_607_as_current_champion"},
+    }
+    cut_expander = {
+        "summary": {
+            "recommended_next_action": "no_cut_slot_to_expand_under_current_607_contract",
+            "seed_safe_ready_count": 0,
+            "reviewable_evidence_gap_count": 0,
+            "hard_blocked_count": 94,
+        },
+        "all_cut_slots": [
+            {"card_name": "Creative Technique", "actionability": "same_lane_hard_blocked"},
+            {"card_name": "Bender's Waterskin", "actionability": "same_lane_hard_blocked"},
+        ],
+        "reviewable_evidence_gap_queue": [],
+        "seed_safe_cut_queue": [],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        current_champion_snapshot=champion_snapshot,
+        trace_cut_evidence_expander=cut_expander,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "no_cut_slot_to_expand_under_current_607_contract"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -10
+    assert action["status"] == (
+        "trace_cut_evidence_exhausted_current_607_one_for_one_contract"
+    )
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert action["evidence"]["cut_evidence_summary"]["hard_blocked_count"] == 94
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

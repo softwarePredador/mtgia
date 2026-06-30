@@ -497,6 +497,21 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             "closing-window trace miner",
         ),
         (
+            "trace_targeted_micro_package_model",
+            {"blocked_hypotheses", "protected_anchor_evidence", "ready_packages"},
+            "trace-targeted micro-package model",
+        ),
+        (
+            "lorehold_current_champion_snapshot",
+            {"cards", "champion_decision", "protected_anchors"},
+            "Lorehold current champion snapshot",
+        ),
+        (
+            "trace_cut_evidence_expansion_queue",
+            {"all_cut_slots", "hard_blocked_queue", "reviewable_evidence_gap_queue"},
+            "trace cut evidence expansion queue",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",

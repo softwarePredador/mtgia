@@ -72,6 +72,15 @@ DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT = (
 DEFAULT_CLOSING_WINDOW_TRACE_REPORT = (
     REPORT_DIR / "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
 )
+DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT = (
+    REPORT_DIR / "lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json"
+)
+DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT = (
+    REPORT_DIR / "lorehold_current_champion_snapshot_20260630_goal_learning.json"
+)
+DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT = (
+    REPORT_DIR / "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -1804,6 +1813,205 @@ def build_closing_window_trace_action(
     }
 
 
+def build_trace_targeted_micro_package_model_action(
+    model: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not model:
+        return None
+    summary = model.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    ready_packages = list(model.get("ready_packages") or [])
+    blocked_hypotheses = list(model.get("blocked_hypotheses") or [])
+    same_lane_only = list(summary.get("same_lane_only_cut_cards") or [])
+    if recommended == "build_trace_targeted_micro_package_gate_manifest":
+        return {
+            "priority": -8,
+            "action_key": "build_trace_targeted_micro_package_gate_manifest",
+            "status": "trace_targeted_micro_packages_ready_for_gate_manifest",
+            "lane": "strategy_learning",
+            "candidate_cards": unique_nonempty(
+                card
+                for package in ready_packages[:5]
+                for card in (package.get("adds") or package.get("candidate_cards") or [])
+            ),
+            "cut_cards": unique_nonempty(
+                card
+                for package in ready_packages[:5]
+                for card in (package.get("cuts") or package.get("cut_cards") or [])
+            ),
+            "why_now": (
+                "The trace-targeted model found concrete packages with named adds and "
+                "seed-safe cuts. These are the only Lorehold swaps that can move to a gate."
+            ),
+            "blockers": [],
+            "next_steps": list(summary.get("next_steps") or []),
+            "evidence": {
+                "micro_package_model_summary": summary,
+                "ready_packages": ready_packages[:8],
+            },
+        }
+    if recommended == "freeze_607_current_champion_snapshot_until_new_cut_evidence":
+        return {
+            "priority": -8,
+            "action_key": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "status": "no_trace_targeted_micro_package_ready_current_607_champion_snapshot_required",
+            "lane": "strategy_learning",
+            "candidate_cards": [],
+            "candidate_count": len(blocked_hypotheses),
+            "cut_cards": same_lane_only,
+            "why_now": (
+                "Closing-window hypotheses are strategically useful, but the current "
+                "seed-safe model has zero cuts ready. Running another swap or shell gate "
+                "would repeat the old error: testing a good idea through an unsafe cut."
+            ),
+            "blockers": [
+                "seed_safe_cut_ready_count is zero",
+                "no trace-targeted package has both named add cards and seed-safe cuts",
+                "same-lane-only cuts remain protected until new evidence changes their status",
+            ],
+            "next_steps": list(summary.get("next_steps") or []),
+            "evidence": {
+                "micro_package_model_summary": summary,
+                "blocked_hypotheses": blocked_hypotheses[:8],
+                "protected_anchor_evidence": model.get("protected_anchor_evidence") or {},
+            },
+        }
+    return None
+
+
+def build_current_champion_snapshot_action(
+    champion_snapshot: dict[str, Any] | None,
+    micro_package_model: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not champion_snapshot:
+        return None
+    if str(champion_snapshot.get("status") or "") != "current_champion_snapshot":
+        return None
+    model_summary = (micro_package_model or {}).get("summary") or {}
+    if str(model_summary.get("recommended_next_action") or "") != (
+        "freeze_607_current_champion_snapshot_until_new_cut_evidence"
+    ):
+        return None
+    same_lane_only = list(model_summary.get("same_lane_only_cut_cards") or [])
+    return {
+        "priority": -9,
+        "action_key": "expand_trace_cut_evidence_after_607_champion_snapshot",
+        "status": "current_607_champion_snapshot_recorded_cut_evidence_required",
+        "lane": "cut_safety_learning",
+        "candidate_cards": list(champion_snapshot.get("protected_anchors") or [])[:8],
+        "cut_cards": same_lane_only,
+        "why_now": (
+            "Deck 607 has been snapshotted as the current champion and the "
+            "trace-targeted micro-package model has zero seed-safe cuts. The next "
+            "productive work is cut-evidence expansion, not another shell or gate."
+        ),
+        "blockers": [
+            "ready_micro_package_count is zero",
+            "seed_safe_cut_ready_count is zero",
+            "same-lane-only cut slots are not seed-safe under current evidence",
+        ],
+        "next_steps": [
+            "Mine card-use, loss-window, and role-replacement evidence for exact cut slots.",
+            "Promote a cut slot only if removing it preserves the 607 miracle/topdeck/spell-volume floor.",
+            "Generate a new trace-targeted package only after a named add and seed-safe cut both exist.",
+        ],
+        "evidence": {
+            "champion_snapshot_summary": champion_snapshot.get("summary") or {},
+            "champion_decision": champion_snapshot.get("champion_decision") or {},
+            "micro_package_model_summary": model_summary,
+        },
+    }
+
+
+def build_trace_cut_evidence_expander_action(
+    cut_evidence_expander: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not cut_evidence_expander:
+        return None
+    summary = cut_evidence_expander.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    reviewable = list(cut_evidence_expander.get("reviewable_evidence_gap_queue") or [])
+    ready = list(cut_evidence_expander.get("seed_safe_cut_queue") or [])
+    near_miss = list(cut_evidence_expander.get("all_cut_slots") or [])[:8]
+    if recommended == "build_package_from_seed_safe_cut":
+        return {
+            "priority": -10,
+            "action_key": "build_package_from_seed_safe_cut",
+            "status": "trace_cut_evidence_found_seed_safe_cut",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in ready[:8]],
+            "why_now": (
+                "The cut evidence expander found seed-safe cuts after the 607 champion "
+                "snapshot. A package can now be designed from exact add/cut pairs."
+            ),
+            "blockers": [],
+            "next_steps": [
+                "Pair each cut with a trace-targeted add in the same strategic lane.",
+                "Run preflight for prior negatives before any battle gate.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "seed_safe_cut_queue": ready[:8],
+            },
+        }
+    if recommended == "review_cut_safety_rows_for_evidence_gap_slots":
+        return {
+            "priority": -10,
+            "action_key": "review_cut_safety_rows_for_evidence_gap_slots",
+            "status": "trace_cut_evidence_has_reviewable_gaps",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in reviewable[:8]],
+            "why_now": (
+                "The current 607 champion snapshot is fixed, and the cut evidence "
+                "queue found slots blocked by missing or stale cut-safety rows rather "
+                "than absolute deck-function blockers."
+            ),
+            "blockers": [
+                "reviewable slots are not seed-safe until the cut-safety row is updated",
+            ],
+            "next_steps": [
+                "Audit the listed cut-safety rows against battle exposure and strategy role.",
+                "Regenerate the seed-safe cut synthesis after any reviewed cut-safety change.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "reviewable_evidence_gap_queue": reviewable[:12],
+            },
+        }
+    if recommended == "no_cut_slot_to_expand_under_current_607_contract":
+        return {
+            "priority": -10,
+            "action_key": "no_cut_slot_to_expand_under_current_607_contract",
+            "status": "trace_cut_evidence_exhausted_current_607_one_for_one_contract",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in near_miss],
+            "why_now": (
+                "After the 607 champion snapshot, every deck slot is either seed-safe "
+                "blocked by an absolute role/protection/prior-negative reason or has no "
+                "reviewable evidence gap. Under the current one-for-one contract there is "
+                "no valid cut to test."
+            ),
+            "blockers": [
+                "seed_safe_ready_count is zero",
+                "reviewable_evidence_gap_count is zero",
+                "every current cut slot has an absolute blocker under the active contract",
+            ],
+            "next_steps": [
+                "Do not run more one-for-one package gates against 607.",
+                "Only resume deck changes if new external/card evidence changes a cut-safety row, the owner explicitly relaxes the cut contract, or a new full-shell archetype is evaluated under a separate contract.",
+                "Keep 607 as the current best Lorehold deck for battle validation while runtime/card-rule work continues.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "top_near_miss_cut_slots": near_miss,
+            },
+        }
+    return None
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1916,6 +2124,9 @@ def build_plan(
     from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     from_scratch_failure_synthesis: dict[str, Any] | None = None,
     closing_window_trace: dict[str, Any] | None = None,
+    trace_targeted_micro_package_model: dict[str, Any] | None = None,
+    current_champion_snapshot: dict[str, Any] | None = None,
+    trace_cut_evidence_expander: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
@@ -1925,6 +2136,11 @@ def build_plan(
     seed_safe_cut_hypothesis_path: Path = DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT,
     from_scratch_failure_synthesis_path: Path = DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
     closing_window_trace_path: Path = DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
+    trace_targeted_micro_package_model_path: Path = (
+        DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT
+    ),
+    current_champion_snapshot_path: Path = DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT,
+    trace_cut_evidence_expander_path: Path = DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1954,6 +2170,22 @@ def build_plan(
     )
     if from_scratch_failure_action:
         actions.append(from_scratch_failure_action)
+    cut_evidence_expander_action = build_trace_cut_evidence_expander_action(
+        trace_cut_evidence_expander
+    )
+    if cut_evidence_expander_action:
+        actions.append(cut_evidence_expander_action)
+    champion_snapshot_action = build_current_champion_snapshot_action(
+        current_champion_snapshot,
+        trace_targeted_micro_package_model,
+    )
+    if champion_snapshot_action:
+        actions.append(champion_snapshot_action)
+    micro_package_action = build_trace_targeted_micro_package_model_action(
+        trace_targeted_micro_package_model
+    )
+    if micro_package_action:
+        actions.append(micro_package_action)
     closing_window_action = build_closing_window_trace_action(closing_window_trace)
     if closing_window_action:
         actions.append(closing_window_action)
@@ -2061,6 +2293,17 @@ def build_plan(
         "closing_window_trace_report": str(closing_window_trace_path)
         if closing_window_trace
         else None,
+        "trace_targeted_micro_package_model_report": (
+            str(trace_targeted_micro_package_model_path)
+            if trace_targeted_micro_package_model
+            else None
+        ),
+        "current_champion_snapshot_report": (
+            str(current_champion_snapshot_path) if current_champion_snapshot else None
+        ),
+        "trace_cut_evidence_expander_report": (
+            str(trace_cut_evidence_expander_path) if trace_cut_evidence_expander else None
+        ),
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -2096,6 +2339,15 @@ def build_plan(
             "closing_window_trace_summary": (
                 (closing_window_trace or {}).get("summary") or {}
             ),
+            "trace_targeted_micro_package_model_summary": (
+                (trace_targeted_micro_package_model or {}).get("summary") or {}
+            ),
+            "current_champion_snapshot_summary": (
+                (current_champion_snapshot or {}).get("summary") or {}
+            ),
+            "trace_cut_evidence_expander_summary": (
+                (trace_cut_evidence_expander or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -2117,6 +2369,9 @@ def build_plan(
             "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
             "A rejected from-scratch shell synthesis blocks another broad shell gate until a closing-window trace target is declared.",
             "A completed closing-window trace routes to micro-package modeling; do not run another broad shell before the micro-package exists.",
+            "A trace-targeted micro-package model with zero seed-safe cuts freezes 607 as the current champion until new cut evidence exists.",
+            "After the 607 current champion snapshot exists, the next action is cut-evidence expansion for exact slots, not another snapshot.",
+            "If cut-evidence expansion has zero reviewable slots, the current 607 one-for-one deck contract is exhausted.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -2146,6 +2401,9 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- From-scratch gate reports: `{', '.join(payload.get('from_scratch_gate_reports') or []) or '-'}`",
         f"- From-scratch failure synthesis: `{payload.get('from_scratch_failure_synthesis_report') or '-'}`",
         f"- Closing-window trace report: `{payload.get('closing_window_trace_report') or '-'}`",
+        f"- Trace-targeted micro-package model: `{payload.get('trace_targeted_micro_package_model_report') or '-'}`",
+        f"- Current champion snapshot: `{payload.get('current_champion_snapshot_report') or '-'}`",
+        f"- Trace cut evidence expander: `{payload.get('trace_cut_evidence_expander_report') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -2243,6 +2501,21 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
     )
+    parser.add_argument(
+        "--trace-targeted-micro-package-model-report",
+        type=Path,
+        default=DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT,
+    )
+    parser.add_argument(
+        "--current-champion-snapshot-report",
+        type=Path,
+        default=DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT,
+    )
+    parser.add_argument(
+        "--trace-cut-evidence-expander-report",
+        type=Path,
+        default=DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
+    )
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
@@ -2300,6 +2573,21 @@ def main() -> int:
         if args.closing_window_trace_report.exists()
         else None
     )
+    trace_targeted_micro_package_model = (
+        read_json(args.trace_targeted_micro_package_model_report)
+        if args.trace_targeted_micro_package_model_report.exists()
+        else None
+    )
+    current_champion_snapshot = (
+        read_json(args.current_champion_snapshot_report)
+        if args.current_champion_snapshot_report.exists()
+        else None
+    )
+    trace_cut_evidence_expander = (
+        read_json(args.trace_cut_evidence_expander_report)
+        if args.trace_cut_evidence_expander_report.exists()
+        else None
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -2319,6 +2607,9 @@ def main() -> int:
         from_scratch_gate_reports=from_scratch_gate_reports,
         from_scratch_failure_synthesis=from_scratch_failure_synthesis,
         closing_window_trace=closing_window_trace,
+        trace_targeted_micro_package_model=trace_targeted_micro_package_model,
+        current_champion_snapshot=current_champion_snapshot,
+        trace_cut_evidence_expander=trace_cut_evidence_expander,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
@@ -2328,6 +2619,9 @@ def main() -> int:
         seed_safe_cut_hypothesis_path=args.seed_safe_cut_hypothesis_report,
         from_scratch_failure_synthesis_path=args.from_scratch_failure_synthesis_report,
         closing_window_trace_path=args.closing_window_trace_report,
+        trace_targeted_micro_package_model_path=args.trace_targeted_micro_package_model_report,
+        current_champion_snapshot_path=args.current_champion_snapshot_report,
+        trace_cut_evidence_expander_path=args.trace_cut_evidence_expander_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

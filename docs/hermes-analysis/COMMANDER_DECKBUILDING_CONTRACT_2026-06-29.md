@@ -894,6 +894,64 @@ Closing-window trace mining generated on 2026-06-30:
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_closing_window_trace.md`.
 
+Trace-targeted micro-package model generated on 2026-06-30:
+
+- Scope: consume the closing-window hypotheses and the current seed-safe cut
+  synthesis before allowing any new Lorehold swap or shell gate.
+- Result: `3` trace hypotheses were evaluated, but `ready_micro_package_count`
+  is `0` because `seed_safe_cut_ready_count` is also `0`.
+- Current same-lane-only cut slots are `Creative Technique` and
+  `Bender's Waterskin`; both remain non-seed-safe/protected under the current
+  model and cannot be used as generic cuts.
+- Decision: freeze protected `607` as the current champion snapshot until new
+  cut evidence exists. Do not run another deck gate unless it has a named
+  add/cut package, seed-safe cut status, and predeclared miracle/topdeck,
+  spell-volume, and pressure-window targets.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_trace_targeted_micro_package_model_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_micro_package_model.md`.
+
+Current champion snapshot generated on 2026-06-30:
+
+- Scope: read-only snapshot of deck `607` after the micro-package model blocked
+  new swaps without seed-safe cuts.
+- Validation: `100` cards, `94` deck rows, `1` commander, `34` lands, `0`
+  validation errors, and all `9` protected anchors present.
+- Role profile: `15` ramp, `12` draw, `9` protection, `9` wincon, `7`
+  removal, `6` board wipe, `2` engine, `2` creature, `2` unknown, `1` tutor,
+  plus commander and lands.
+- Decision: keep `607` as the current champion snapshot. After this snapshot
+  exists, the planner moves to
+  `expand_trace_cut_evidence_after_607_champion_snapshot`; it must not keep
+  repeating the snapshot or start a new shell gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.decklist.txt`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_champion_snapshot.md`.
+
+Trace cut-evidence expansion generated on 2026-06-30:
+
+- Scope: classify every current `607` cut slot after the champion snapshot to
+  determine whether cut-safety evidence can still be expanded before a new
+  package gate.
+- Result: `94` cut slots evaluated, `0` seed-safe cuts, `0` reviewable
+  evidence gaps, `92` hard-blocked slots, and `2` same-lane hard-blocked slots.
+- Same-lane hard-blocked slots remain `Creative Technique` and
+  `Bender's Waterskin`; neither is a current generic cut.
+- Decision: the current `607` one-for-one deck-improvement contract is
+  exhausted. Do not run more one-for-one swap gates against `607` unless new
+  external/card evidence changes a cut-safety row, the owner explicitly relaxes
+  the cut contract, or a new full-shell archetype is evaluated under a separate
+  contract.
+- Current planner top action:
+  `no_cut_slot_to_expand_under_current_607_contract`.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_cut_evidence_exhausted.md`.
+
 Electro ramp-benchmark decision generated on 2026-06-30:
 
 - Candidate:

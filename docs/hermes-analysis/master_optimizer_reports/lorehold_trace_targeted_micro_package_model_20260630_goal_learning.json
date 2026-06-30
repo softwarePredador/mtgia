@@ -1,0 +1,208 @@
+{
+  "artifact_type": "trace_targeted_micro_package_model",
+  "blocked_hypotheses": [
+    {
+      "blockers": [
+        "seed_safe_cut_ready_count_zero",
+        "607_anchor_cards_must_be_preserved",
+        "micro_package_requires_named_add_and_safe_cut_before_gate",
+        "same_lane_only_slots_are_not_seed_safe"
+      ],
+      "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+      "requirements": [
+        "do not cut Sensei's Divining Top, Scroll Rack, Bender's Waterskin, or Victory Chimes",
+        "predeclare miracle_cast and topdeck_manipulation_activated targets before gate",
+        "candidate must not overfill hand_filter plus graveyard_recursion plus conversion lanes together"
+      ],
+      "same_lane_only_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin"
+      ],
+      "status": "blocked_no_seed_safe_cut",
+      "target_gap_tags": [
+        "miracle_cast_deficit",
+        "topdeck_activation_deficit",
+        "topdeck_engine_card_deficit"
+      ]
+    },
+    {
+      "blockers": [
+        "seed_safe_cut_ready_count_zero",
+        "607_anchor_cards_must_be_preserved",
+        "micro_package_requires_named_add_and_safe_cut_before_gate",
+        "same_lane_only_slots_are_not_seed_safe"
+      ],
+      "hypothesis_key": "pressure_survival_without_engine_cuts",
+      "requirements": [
+        "repair early pressure only with cards that preserve the 607 topdeck/miracle floor",
+        "Winota/Sisay/Vivi losses must be evaluated by same opponent slot before confirmation"
+      ],
+      "same_lane_only_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin"
+      ],
+      "status": "blocked_no_seed_safe_cut",
+      "target_gap_tags": [
+        "candidate_died_before_closing_window",
+        "candidate_lost_multiple_turns_before_607_finish"
+      ]
+    },
+    {
+      "blockers": [
+        "seed_safe_cut_ready_count_zero",
+        "607_anchor_cards_must_be_preserved",
+        "micro_package_requires_named_add_and_safe_cut_before_gate",
+        "same_lane_only_slots_are_not_seed_safe"
+      ],
+      "hypothesis_key": "approach_big_spell_conversion_preservation",
+      "requirements": [
+        "protect Approach of the Second Sun, Mizzix's Mastery, and high-impact spell volume",
+        "do not treat tutor access as sufficient unless it restores spell volume and finish conversion"
+      ],
+      "same_lane_only_cut_cards": [
+        "Creative Technique",
+        "Bender's Waterskin"
+      ],
+      "status": "blocked_no_seed_safe_cut",
+      "target_gap_tags": [
+        "approach_conversion_missing",
+        "lorehold_spell_volume_deficit"
+      ]
+    }
+  ],
+  "closing_window_trace_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260630_goal_learning.json",
+  "generated_at": "2026-06-30T23:32:14Z",
+  "postgres_writes": false,
+  "protected_anchor_evidence": {
+    "gap_counts": {
+      "607_mana_timing_anchor_deficit": 9,
+      "approach_conversion_missing": 7,
+      "candidate_died_before_closing_window": 13,
+      "candidate_lost_multiple_turns_before_607_finish": 13,
+      "lorehold_spell_volume_deficit": 13,
+      "miracle_cast_deficit": 13,
+      "static_cost_reduction_deficit": 9,
+      "topdeck_activation_deficit": 9,
+      "topdeck_engine_card_deficit": 11,
+      "upkeep_rummage_deficit": 9
+    },
+    "top_anchor_card_deficits": [
+      {
+        "delta_total": 29,
+        "event": "topdeck_manipulation_activated:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 17,
+        "event": "cost_paid:Lorehold, the Historian"
+      },
+      {
+        "delta_total": 15,
+        "event": "cost_paid:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_cast:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 15,
+        "event": "spell_resolved:Sensei's Divining Top"
+      },
+      {
+        "delta_total": 14,
+        "event": "topdeck_manipulation_activated:Scroll Rack"
+      },
+      {
+        "delta_total": 13,
+        "event": "spell_resolved:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 8,
+        "event": "cost_paid:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Victory Chimes"
+      },
+      {
+        "delta_total": 7,
+        "event": "cost_paid:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 7,
+        "event": "spell_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 6,
+        "event": "spell_resolved:Mizzix's Mastery"
+      },
+      {
+        "delta_total": 5,
+        "event": "miracle_cast:Approach of the Second Sun"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Bender's Waterskin"
+      },
+      {
+        "delta_total": 4,
+        "event": "cost_paid:Scroll Rack"
+      },
+      {
+        "delta_total": 4,
+        "event": "miracle_cast:Jeska's Will"
+      }
+    ],
+    "top_strategic_deficits": [
+      {
+        "delta_total": 153,
+        "event": "lorehold_cost_paid"
+      },
+      {
+        "delta_total": 134,
+        "event": "lorehold_spell_cast"
+      },
+      {
+        "delta_total": 71,
+        "event": "miracle_cast"
+      },
+      {
+        "delta_total": 63,
+        "event": "lorehold_upkeep_rummage"
+      },
+      {
+        "delta_total": 41,
+        "event": "topdeck_manipulation_activated"
+      },
+      {
+        "delta_total": 37,
+        "event": "static_cost_reduction_total"
+      }
+    ]
+  },
+  "ready_packages": [],
+  "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json",
+  "source_db_mutated": false,
+  "summary": {
+    "blocked_hypothesis_count": 3,
+    "blocker_counts": {
+      "607_anchor_cards_must_be_preserved": 3,
+      "micro_package_requires_named_add_and_safe_cut_before_gate": 3,
+      "same_lane_only_slots_are_not_seed_safe": 3,
+      "seed_safe_cut_ready_count_zero": 3
+    },
+    "next_steps": [
+      "Snapshot protected deck_607 as the current champion candidate.",
+      "Do not run another deck gate without a named add/cut package and seed-safe cut.",
+      "Expand cut-safety only when new trace evidence can justify a specific cut slot."
+    ],
+    "ready_micro_package_count": 0,
+    "recommended_next_action": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+    "same_lane_only_count": 2,
+    "same_lane_only_cut_cards": [
+      "Creative Technique",
+      "Bender's Waterskin"
+    ],
+    "seed_safe_cut_ready_count": 0,
+    "trace_hypothesis_count": 3
+  }
+}

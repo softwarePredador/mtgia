@@ -355,6 +355,42 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "summary": {},
                 },
             ),
+            (
+                "trace_targeted_micro_package_model",
+                {
+                    "blocked_hypotheses": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "protected_anchor_evidence": {},
+                    "ready_packages": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "lorehold_current_champion_snapshot",
+                {
+                    "cards": [],
+                    "champion_decision": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "protected_anchors": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "trace_cut_evidence_expansion_queue",
+                {
+                    "all_cut_slots": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "hard_blocked_queue": [],
+                    "postgres_writes": False,
+                    "reviewable_evidence_gap_queue": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
         ]
 
         with tempfile.TemporaryDirectory() as tmp:
