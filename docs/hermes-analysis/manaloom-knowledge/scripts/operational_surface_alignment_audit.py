@@ -41,6 +41,7 @@ LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
 LOREHOLD_NEXT_ACTION_PLANNER = SCRIPT_DIR / "lorehold_next_action_planner.py"
+LOREHOLD_SEED_SAFE_CUT_HYPOTHESIS = SCRIPT_DIR / "lorehold_seed_safe_cut_hypothesis_builder.py"
 LOREHOLD_EXPOSURE_AWARE_GATE_QUEUE = SCRIPT_DIR / "lorehold_exposure_aware_gate_queue.py"
 LOREHOLD_FAILURE_SYNERGY = SCRIPT_DIR / "lorehold_failure_targeted_synergy_hypotheses.py"
 LOREHOLD_FAILURE_TRACE = SCRIPT_DIR / "lorehold_failure_targeted_trace_audit.py"
@@ -281,6 +282,11 @@ def build_checks() -> list[Check]:
             "scripts.lorehold_manual_cut_review_defaults_to_protected_607",
         ),
         check_contains(
+            LOREHOLD_SEED_SAFE_CUT_HYPOTHESIS,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_seed_safe_cut_hypothesis_defaults_to_protected_607",
+        ),
+        check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
             ["lorehold_access_cut_model_20260630_goal_learning_squee_access_density.json"],
             "scripts.lorehold_focus_generator_uses_corrected_access_model",
@@ -292,12 +298,12 @@ def build_checks() -> list[Check]:
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"],
+            ["lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"],
             "scripts.lorehold_focus_generator_uses_current_planner",
         ),
         check_contains(
             LOREHOLD_EXPOSURE_AWARE_GATE_QUEUE,
-            ["lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"],
+            ["lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"],
             "scripts.lorehold_exposure_queue_uses_current_planner",
         ),
         check_contains(
@@ -306,6 +312,7 @@ def build_checks() -> list[Check]:
                 "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
                 "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json",
                 "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
+                "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json",
                 "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json",
                 "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json",
                 "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
@@ -321,7 +328,7 @@ def build_checks() -> list[Check]:
             LOREHOLD_FAILURE_SYNERGY,
             [
                 "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
-                "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json",
+                "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json",
             ],
             "scripts.lorehold_failure_synergy_uses_current_queue_and_planner",
         ),

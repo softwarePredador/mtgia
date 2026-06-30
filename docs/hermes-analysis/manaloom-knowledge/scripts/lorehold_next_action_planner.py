@@ -45,6 +45,9 @@ DEFAULT_TRACE_AUDIT = (
 DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT = (
     REPORT_DIR / "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
 )
+DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT = (
+    REPORT_DIR / "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -1419,6 +1422,77 @@ def build_focus_access_package_result_action(
     }
 
 
+def build_seed_safe_cut_hypothesis_action(
+    seed_safe_cut_report: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not seed_safe_cut_report:
+        return None
+    summary = seed_safe_cut_report.get("summary") or {}
+    ready_count = int(summary.get("seed_safe_cut_ready_count") or 0)
+    ready_rows = list(seed_safe_cut_report.get("seed_safe_cut_candidates") or [])
+    same_lane_rows = list(seed_safe_cut_report.get("same_lane_only_cut_slots") or [])
+    blocker_counts = summary.get("blocker_counts") or {}
+    if ready_count > 0:
+        return {
+            "priority": -5,
+            "action_key": "build_packages_from_seed_safe_cut_hypotheses",
+            "status": "seed_safe_cut_slots_ready_for_package_design",
+            "lane": "strategy_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in ready_rows[:8]],
+            "why_now": (
+                "The seed-safe cut synthesis found current 607 cut slots that are not protected "
+                "by mana floor, protection, miracle core, prior-reject, or high-exposure evidence."
+            ),
+            "blockers": [
+                "this is still cut-slot evidence, not a deck promotion",
+                "each add card still needs exact package preflight and natural card-use evidence",
+            ],
+            "next_steps": [
+                "Attach only failure-targeted add cards to these cut slots.",
+                "Run exact package preflight before battle.",
+                "Run a natural equal gate only if preflight has no prior-negative exact signature.",
+            ],
+            "evidence": {
+                "seed_safe_summary": summary,
+                "seed_safe_cut_candidates": ready_rows[:12],
+            },
+        }
+    if (
+        summary.get("recommended_next_action")
+        == "expand_cut_safety_model_or_multi_card_shell_before_gate"
+    ):
+        return {
+            "priority": -4,
+            "action_key": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+            "status": "seed_safe_cut_unavailable",
+            "lane": "cut_modeling",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in same_lane_rows[:8]],
+            "why_now": (
+                "The requested seed-safe cut synthesis has now run and found zero generic "
+                "seed-safe cut slots in protected deck 607. Running another one-card battle "
+                "gate from the old queue would repeat a blocked or prior-negative cut."
+            ),
+            "blockers": [
+                "seed_safe_cut_ready_count is zero",
+                "current same-lane slots require a concrete same-lane add before battle",
+                "current flex ramp slots are mana-floor support or prior-negative cut slots",
+            ],
+            "next_steps": [
+                "Create a new cut-safety model from failed-seed traces and current 607 utilization.",
+                "Use multi-card shell hypotheses only when they preserve mana floor, protection, and miracle density.",
+                "Use forced-access diagnostics only for card-understanding, not deck promotion.",
+            ],
+            "evidence": {
+                "seed_safe_summary": summary,
+                "same_lane_only_cut_slots": same_lane_rows[:12],
+                "top_blocker_counts": blocker_counts,
+            },
+        }
+    return None
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1526,12 +1600,14 @@ def build_plan(
     hypothesis_queue: dict[str, Any] | None = None,
     trace_audit: dict[str, Any] | None = None,
     focus_access_package_report: dict[str, Any] | None = None,
+    seed_safe_cut_hypothesis_report: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
     trace_audit_path: Path = DEFAULT_TRACE_AUDIT,
     focus_access_package_path: Path = DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT,
+    seed_safe_cut_hypothesis_path: Path = DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1547,6 +1623,9 @@ def build_plan(
     inconclusive_action = build_inconclusive_exposure_action(inconclusive_packages)
     if inconclusive_action:
         actions.append(inconclusive_action)
+    seed_safe_action = build_seed_safe_cut_hypothesis_action(seed_safe_cut_hypothesis_report)
+    if seed_safe_action:
+        actions.append(seed_safe_action)
     focus_access_result_action = build_focus_access_package_result_action(
         focus_access_package_report
     )
@@ -1621,6 +1700,9 @@ def build_plan(
         "focus_access_package_report": (
             str(focus_access_package_path) if focus_access_package_report else ""
         ),
+        "seed_safe_cut_hypothesis_report": (
+            str(seed_safe_cut_hypothesis_path) if seed_safe_cut_hypothesis_report else ""
+        ),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
@@ -1663,6 +1745,9 @@ def build_plan(
             "trace_audit_status_counts": (
                 (trace_audit or {}).get("summary") or {}
             ).get("trace_status_counts", {}),
+            "seed_safe_cut_summary": (
+                (seed_safe_cut_hypothesis_report or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -1680,6 +1765,7 @@ def build_plan(
             "An exhausted hypothesis queue routes back to failure-targeted strategy synthesis before any new gate.",
             "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
             "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
+            "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1697,6 +1783,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Hypothesis queue: `{payload.get('hypothesis_queue') or '-'}`",
         f"- Trace audit: `{payload.get('trace_audit') or '-'}`",
         f"- Focus-access package report: `{payload.get('focus_access_package_report') or '-'}`",
+        f"- Seed-safe cut hypothesis report: `{payload.get('seed_safe_cut_hypothesis_report') or '-'}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
@@ -1781,6 +1868,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
     parser.add_argument("--focus-access-package-report", type=Path, default=DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT)
+    parser.add_argument("--seed-safe-cut-hypothesis-report", type=Path, default=DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
@@ -1802,6 +1890,11 @@ def main() -> int:
     focus_access_package_report = (
         read_json(args.focus_access_package_report)
         if args.focus_access_package_report.exists()
+        else None
+    )
+    seed_safe_cut_hypothesis_report = (
+        read_json(args.seed_safe_cut_hypothesis_report)
+        if args.seed_safe_cut_hypothesis_report.exists()
         else None
     )
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
@@ -1838,12 +1931,14 @@ def main() -> int:
         hypothesis_queue=hypothesis_queue,
         trace_audit=trace_audit,
         focus_access_package_report=focus_access_package_report,
+        seed_safe_cut_hypothesis_report=seed_safe_cut_hypothesis_report,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
         hypothesis_queue_path=args.hypothesis_queue,
         trace_audit_path=args.trace_audit,
         focus_access_package_path=args.focus_access_package_report,
+        seed_safe_cut_hypothesis_path=args.seed_safe_cut_hypothesis_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

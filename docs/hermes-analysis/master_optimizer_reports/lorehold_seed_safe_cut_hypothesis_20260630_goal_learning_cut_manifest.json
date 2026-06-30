@@ -1,0 +1,8 @@
+{
+  "cut_slots": [],
+  "deck_id": 607,
+  "generated_at": "2026-06-30T22:34:00Z",
+  "postgres_writes": false,
+  "purpose": "Seed-safe cut slots for future Lorehold package design.",
+  "source_db_mutated": false
+}

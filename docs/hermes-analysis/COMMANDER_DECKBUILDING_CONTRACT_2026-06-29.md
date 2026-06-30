@@ -726,6 +726,25 @@ Profiled cut queue closure generated on 2026-06-30:
 - Next-action report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_queue_closed.md`.
 
+Seed-safe cut synthesis generated on 2026-06-30:
+
+- Scope: protected baseline deck `607`, current manual cut review, current
+  deck-607 exposure profile, current cut-safety manifest, and current
+  safe-cut replanner blockers.
+- Result: `seed_safe_cut_ready_count=0` across `94` deck cards. The only
+  same-lane-only slots are `Creative Technique` and `Bender's Waterskin`; both
+  remain blocked for generic package work because they require concrete
+  same-lane replacement proof and have prior/protected evidence.
+- Decision: do not keep generating one-card swaps from the old queue. The next
+  deck-learning step is `expand_cut_safety_model_or_multi_card_shell_before_gate`:
+  build a new cut-safety model from failed-seed traces/current utilization, or
+  design a multi-card shell that preserves mana floor, protection, and miracle
+  density before any natural battle gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
+
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 
 - Candidate:

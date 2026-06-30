@@ -258,4 +258,4 @@ irrelevant package output
 
 
 def test_default_planner_uses_current_queue_closed_contract():
-    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"
+    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"

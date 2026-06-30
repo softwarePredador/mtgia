@@ -2,7 +2,7 @@ import lorehold_focus_access_package_generator as gen
 
 
 def test_default_planner_uses_current_rejection_integrated_report():
-    assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"
+    assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"
 
 
 def test_default_access_model_uses_goal_learning_access_density_report():

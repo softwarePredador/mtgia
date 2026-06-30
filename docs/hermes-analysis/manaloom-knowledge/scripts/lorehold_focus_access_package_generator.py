@@ -24,7 +24,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_goal_learning_queue_closed.json"
+DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"
 FALLBACK_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"

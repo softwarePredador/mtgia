@@ -469,9 +469,19 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ),
         ("safe_cut_replanner", {"manifest_ready_packages", "cut_safety"}, "safe cut replanner"),
         (
+            "seed_safe_cut_hypothesis",
+            {"cut_slots", "seed_safe_cut_candidates", "same_lane_only_cut_slots"},
+            "seed-safe cut hypothesis synthesis",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",
+        ),
+        (
+            "seed_safe_cut_manifest",
+            {"generated_at", "cut_slots", "purpose", "deck_id"},
+            "seed-safe cut manifest",
         ),
         ("action_critic", {"actions", "findings"}, "single replay action critic"),
         ("decision_audit", {"decision_findings", "baseline_findings"}, "single replay decision audit"),
