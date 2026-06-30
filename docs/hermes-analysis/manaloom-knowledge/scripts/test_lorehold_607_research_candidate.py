@@ -4,17 +4,25 @@ import lorehold_607_research_candidate as research
 
 
 class Lorehold607ResearchCandidateTest(unittest.TestCase):
+    def test_all_research_plans_materialize_on_protected_607_candidate_deck(self):
+        self.assertEqual(research.DEFAULT_BASELINE_DECK_ID, 607)
+        self.assertEqual(research.DEFAULT_CANDIDATE_DECK_ID, 607)
+        for plan_key, plan in research.RESEARCH_PLANS.items():
+            with self.subTest(plan_key=plan_key):
+                self.assertEqual(plan["base_deck_id"], 607)
+                self.assertEqual(plan["candidate_deck_id"], 607)
+
     def test_squee_plan_regenerates_current_champion_swap(self):
         plan = research.RESEARCH_PLANS["squee_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["added"], [{"card_name": "Squee, Goblin Nabob", "source_deck_id": 609}])
         self.assertEqual(plan["removed"], ["Insurrection"])
 
     def test_penance_plan_is_one_card_ablation(self):
         plan = research.RESEARCH_PLANS["penance_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["added"], [{"card_name": "Penance", "source_deck_id": 609}])
         self.assertEqual(plan["removed"], ["Promise of Loyalty"])
 
@@ -54,7 +62,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_v615_mana_engine_plan_is_narrow_package_not_whole_deck_swap(self):
         plan = research.RESEARCH_PLANS["v615_mana_engine_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["candidate_key"], "candidate_607_v615_mana_engine_v1")
         self.assertEqual(
             plan["added"],
@@ -195,7 +203,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             with self.subTest(plan_key=plan_key):
                 plan = research.RESEARCH_PLANS[plan_key]
                 self.assertEqual(plan["base_deck_id"], 607)
-                self.assertEqual(plan["candidate_deck_id"], 6)
+                self.assertEqual(plan["candidate_deck_id"], 607)
                 self.assertEqual(plan["added"], [{"card_name": add_card, "source_deck_id": 615}])
                 self.assertEqual(plan["removed"], ["Tibalt's Trickery"])
                 self.assertFalse(protected_cards.intersection(plan["removed"]))
@@ -203,7 +211,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_deflecting_palm_plan_is_same_lane_pressure_protection_probe(self):
         plan = research.RESEARCH_PLANS["deflecting_palm_redirect_lightning_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["candidate_key"], "candidate_607_deflecting_palm_redirect_lightning_v1")
         self.assertEqual(plan["added"], [{"card_name": "Deflecting Palm", "source_deck_id": 615}])
         self.assertEqual(plan["removed"], ["Redirect Lightning"])
@@ -225,7 +233,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_chaos_warp_plan_is_same_lane_removal_probe(self):
         plan = research.RESEARCH_PLANS["chaos_warp_stroke_of_midnight_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["candidate_key"], "candidate_607_chaos_warp_stroke_of_midnight_v1")
         self.assertEqual(plan["added"], [{"card_name": "Chaos Warp", "source_deck_id": 615}])
         self.assertEqual(plan["removed"], ["Stroke of Midnight"])
@@ -251,7 +259,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_return_the_favor_plan_is_redirect_copy_probe(self):
         plan = research.RESEARCH_PLANS["return_the_favor_redirect_lightning_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["candidate_key"], "candidate_607_return_the_favor_redirect_lightning_v1")
         self.assertEqual(plan["added"], [{"card_name": "Return the Favor", "source_deck_id": 612}])
         self.assertEqual(plan["removed"], ["Redirect Lightning"])
@@ -278,7 +286,7 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
     def test_past_in_flames_plan_is_recursion_spell_chain_probe(self):
         plan = research.RESEARCH_PLANS["past_in_flames_pinnacle_monk_v1"]
         self.assertEqual(plan["base_deck_id"], 607)
-        self.assertEqual(plan["candidate_deck_id"], 6)
+        self.assertEqual(plan["candidate_deck_id"], 607)
         self.assertEqual(plan["candidate_key"], "candidate_607_past_in_flames_pinnacle_monk_v1")
         self.assertEqual(plan["added"], [{"card_name": "Past in Flames", "source_deck_id": 612}])
         self.assertEqual(plan["removed"], ["Pinnacle Monk // Mystic Peak"])

@@ -12,11 +12,25 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
             gate.DEFAULT_MATRIX.name,
             "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json",
         )
+        self.assertEqual(gate.DEFAULT_BASELINE_DECK_ID, 607)
+        self.assertEqual(gate.DEFAULT_DECK_IDS[0], 607)
+        self.assertNotIn(6, gate.DEFAULT_DECK_IDS)
         focus = gate.focus_trace_cards()
         self.assertIn("Birgi, God of Storytelling // Harnfel, Horn of Bounty", focus)
         self.assertIn("Mana Vault", focus)
         self.assertIn("Aetherflux Reservoir", focus)
         self.assertIn("Molecule Man", focus)
+
+    def test_candidate_specs_default_to_protected_607_candidate_deck(self):
+        specs = gate.deck_specs(
+            db=Path("/tmp/missing.db"),
+            deck_ids=[],
+            candidate_db=Path("/tmp/missing-candidate.db"),
+            include_candidate=False,
+        )
+
+        self.assertEqual(specs, [])
+        self.assertEqual(gate.deck_specs.__kwdefaults__["candidate_deck_id"], 607)
 
     def test_gate_telemetry_counts_lorehold_strategy_events(self):
         telemetry = gate.GateTelemetry()

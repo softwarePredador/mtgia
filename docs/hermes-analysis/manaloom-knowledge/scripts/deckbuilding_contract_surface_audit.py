@@ -99,6 +99,8 @@ def build_audit() -> dict[str, Any]:
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
                 "candidate_607_v615_mana_engine_v1",
+                "lorehold_variant_battle_gate.py` now defaults",
+                "gate_ready_package_count=0",
             ],
         )
     )
@@ -146,6 +148,9 @@ def build_audit() -> dict[str, Any]:
         check_contains(
             VARIANT_GATE,
             [
+                "DEFAULT_BASELINE_DECK_ID = 607",
+                "DEFAULT_DECK_IDS = tuple(range(DEFAULT_BASELINE_DECK_ID, 617))",
+                "default=DEFAULT_BASELINE_DECK_ID",
                 "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json",
                 *sorted(REQUIRED_FOCUS_CARDS),
             ],

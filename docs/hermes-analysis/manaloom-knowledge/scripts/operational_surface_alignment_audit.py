@@ -40,6 +40,8 @@ LOREHOLD_RECURSION_CUT_MODEL = SCRIPT_DIR / "lorehold_recursion_cut_model.py"
 LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
+LOREHOLD_REGISTRY_CANDIDATE_RUNNER = SCRIPT_DIR / "lorehold_registry_candidate_runner.py"
+LOREHOLD_607_RESEARCH_CANDIDATE = SCRIPT_DIR / "lorehold_607_research_candidate.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
@@ -233,6 +235,9 @@ def build_checks() -> list[Check]:
         check_contains(
             VARIANT_GATE,
             [
+                "DEFAULT_BASELINE_DECK_ID = 607",
+                "DEFAULT_DECK_IDS = tuple(range(DEFAULT_BASELINE_DECK_ID, 617))",
+                "default=DEFAULT_BASELINE_DECK_ID",
                 f"{CURRENT_LOREHOLD_MATRIX}.json",
                 "Aetherflux Reservoir",
                 "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
@@ -240,6 +245,19 @@ def build_checks() -> list[Check]:
                 "Molecule Man",
             ],
             "scripts.lorehold_variant_gate_uses_contract_matrix_and_focus_cards",
+        ),
+        check_contains(
+            LOREHOLD_REGISTRY_CANDIDATE_RUNNER,
+            ["--candidate-deck-id", "candidate_deck_id"],
+            "scripts.lorehold_registry_runner_passes_candidate_deck_id",
+        ),
+        check_contains(
+            LOREHOLD_607_RESEARCH_CANDIDATE,
+            [
+                "DEFAULT_CANDIDATE_DECK_ID = DEFAULT_BASELINE_DECK_ID",
+                "\"candidate_deck_id\": DEFAULT_CANDIDATE_DECK_ID",
+            ],
+            "scripts.lorehold_research_candidate_materializes_on_607",
         ),
         check_contains(
             STRATEGY_LEARNING_AUDIT,
@@ -285,6 +303,15 @@ def build_checks() -> list[Check]:
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
             ["lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
+        ),
+        check_contains(
+            LOREHOLD_FOCUS_ACCESS_GENERATOR,
+            [
+                "DEFAULT_BASELINE_DECK_ID = 607",
+                "assert_gate_ready_consistency",
+                "gate_ready status is invalid when gate_ready_package_count=0",
+            ],
+            "scripts.lorehold_focus_generator_blocks_zero_count_gate_ready",
         ),
         check_contains(
             IDEAL_MATRIX,

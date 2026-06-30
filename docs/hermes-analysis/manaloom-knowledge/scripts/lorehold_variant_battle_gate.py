@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Run an equal battle gate for registered Lorehold decks.
 
-The gate compares deck 6, Lorehold variants, and the strategy-first candidate
-with the same opponent sample and simulation seed. It is read-only: no
+The gate compares protected deck 607, Lorehold variants, and an optional
+strategy-first candidate with the same opponent sample and simulation seed. It is read-only: no
 PostgreSQL writes, no source SQLite mutation, and no deck swaps.
 """
 
@@ -36,7 +36,8 @@ DEFAULT_MATRIX = (
     REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
 )
 DEFAULT_CANDIDATE_DB = None
-DEFAULT_DECK_IDS = (6, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616)
+DEFAULT_BASELINE_DECK_ID = 607
+DEFAULT_DECK_IDS = tuple(range(DEFAULT_BASELINE_DECK_ID, 617))
 CARD_EXPOSURE_EVENTS = {
     "activated_ability",
     "board_wipe_resolved",
@@ -326,9 +327,9 @@ def deck_specs(
     candidate_key: str = "candidate_v7",
     candidate_name: str = "Lorehold strategy-first candidate v7",
     candidate_archetype: str = "strategy-first-candidate",
-    candidate_deck_id: int = 6,
+    candidate_deck_id: int = DEFAULT_BASELINE_DECK_ID,
 ) -> list[dict[str, Any]]:
-    metadata = load_deck_metadata(db, deck_ids)
+    metadata = load_deck_metadata(db, deck_ids) if deck_ids else {}
     specs = []
     for deck_id in deck_ids:
         key = f"deck_{deck_id}"
@@ -1581,7 +1582,7 @@ def main() -> int:
     parser.add_argument("--candidate-key", default="candidate_v7")
     parser.add_argument("--candidate-name", default="Lorehold strategy-first candidate v7")
     parser.add_argument("--candidate-archetype", default="strategy-first-candidate")
-    parser.add_argument("--candidate-deck-id", type=int, default=6)
+    parser.add_argument("--candidate-deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
     parser.add_argument("--no-candidate", action="store_true")
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
     parser.add_argument("--games", type=int, default=1)
@@ -1653,6 +1654,8 @@ def main() -> int:
             "stem": checkpoint_stem,
             "source_db": str(args.db),
             "matrix": str(args.matrix),
+            "protected_baseline_deck_id": DEFAULT_BASELINE_DECK_ID,
+            "candidate_deck_id": args.candidate_deck_id,
             "games_per_opponent": max(1, args.games),
             "opponent_kind": opponent_kind,
             "opponent_seed": args.opponent_seed,
@@ -1733,6 +1736,8 @@ def main() -> int:
         "source_db": str(args.db),
         "matrix": str(args.matrix),
         "candidate_db": str(args.candidate_db) if args.candidate_db else None,
+        "protected_baseline_deck_id": DEFAULT_BASELINE_DECK_ID,
+        "candidate_deck_id": args.candidate_deck_id,
         "games_per_opponent": max(1, args.games),
         "opponent_kind": opponent_kind,
         "opponent_seed": args.opponent_seed,

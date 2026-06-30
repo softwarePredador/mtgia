@@ -26,11 +26,13 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
 DEFAULT_PLAN = "penance_v1"
+DEFAULT_BASELINE_DECK_ID = 607
+DEFAULT_CANDIDATE_DECK_ID = DEFAULT_BASELINE_DECK_ID
 
 RESEARCH_PLANS = {
     "squee_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Squee, Goblin Nabob", "source_deck_id": 609}],
         "removed": ["Insurrection"],
         "intent": (
@@ -47,7 +49,7 @@ RESEARCH_PLANS = {
     },
     "birgi_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty", "source_deck_id": 615}],
         "removed": ["Bender's Waterskin"],
         "intent": (
@@ -63,7 +65,7 @@ RESEARCH_PLANS = {
     },
     "penance_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Penance", "source_deck_id": 609}],
         "removed": ["Promise of Loyalty"],
         "intent": (
@@ -79,7 +81,7 @@ RESEARCH_PLANS = {
     },
     "longshot_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Longshot, Rebel Bowman", "source_deck_id": 615}],
         "removed": ["Storm Herd"],
         "intent": (
@@ -95,7 +97,7 @@ RESEARCH_PLANS = {
     },
     "reprieve_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Reprieve", "source_deck_id": 612}],
         "removed": ["Tibalt's Trickery"],
         "intent": (
@@ -112,7 +114,7 @@ RESEARCH_PLANS = {
     },
     "galvanoth_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Galvanoth", "source_deck_id": 614}],
         "removed": ["Creative Technique"],
         "intent": (
@@ -129,7 +131,7 @@ RESEARCH_PLANS = {
     },
     "ghostly_prison_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Ghostly Prison", "source_deck_id": 613}],
         "removed": ["Promise of Loyalty"],
         "intent": (
@@ -146,7 +148,7 @@ RESEARCH_PLANS = {
     },
     "guttersnipe_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": [{"card_name": "Guttersnipe", "source_deck_id": 615}],
         "removed": ["Prismari Pianist"],
         "intent": (
@@ -162,7 +164,7 @@ RESEARCH_PLANS = {
     },
     "v615_mana_engine_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_v615_mana_engine_v1",
         "candidate_name": "Lorehold 607 + 615 Mana Engine Candidate v1",
         "candidate_archetype": "607-615-mana-engine-candidate",
@@ -187,7 +189,7 @@ RESEARCH_PLANS = {
     },
     "v615_mana_engine_molecule_retest_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_v615_mana_engine_molecule_retest_v1",
         "candidate_name": "Lorehold 607 + 615 Mana Engine Molecule Retest v1",
         "candidate_archetype": "607-615-mana-engine-molecule-retest",
@@ -210,7 +212,7 @@ RESEARCH_PLANS = {
     },
     "v615_mana_engine_scarlet_retest_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_v615_mana_engine_scarlet_retest_v1",
         "candidate_name": "Lorehold 607 + 615 Mana Engine Scarlet Retest v1",
         "candidate_archetype": "607-615-mana-engine-scarlet-retest",
@@ -233,7 +235,7 @@ RESEARCH_PLANS = {
     },
     "v615_mana_engine_molecule_scarlet_retest_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_v615_mana_engine_molecule_scarlet_retest_v1",
         "candidate_name": "Lorehold 607 + 615 Mana Engine Molecule Scarlet Retest v1",
         "candidate_archetype": "607-615-mana-engine-molecule-scarlet-retest",
@@ -256,7 +258,7 @@ RESEARCH_PLANS = {
     },
     "v615_mana_vault_method_repair_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_v615_mana_vault_method_repair_v1",
         "candidate_name": "Lorehold 607 + 615 Mana Vault Method Repair v1",
         "candidate_archetype": "607-615-mana-vault-method-repair",
@@ -280,7 +282,7 @@ RESEARCH_PLANS = {
     },
     "one_ring_creative_technique_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_one_ring_creative_technique_v1",
         "candidate_name": "Lorehold 607 + The One Ring over Creative Technique v1",
         "candidate_archetype": "607-one-ring-creative-technique",
@@ -301,7 +303,7 @@ RESEARCH_PLANS = {
     },
     "one_ring_improvisation_capstone_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_one_ring_improvisation_capstone_v1",
         "candidate_name": "Lorehold 607 + The One Ring over Improvisation Capstone v1",
         "candidate_archetype": "607-one-ring-improvisation-capstone",
@@ -321,7 +323,7 @@ RESEARCH_PLANS = {
     },
     "one_ring_redirect_lightning_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_one_ring_redirect_lightning_v1",
         "candidate_name": "Lorehold 607 + The One Ring over Redirect Lightning v1",
         "candidate_archetype": "607-one-ring-redirect-lightning",
@@ -340,7 +342,7 @@ RESEARCH_PLANS = {
     },
     "enlightened_tutor_insurrection_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_enlightened_tutor_insurrection_v1",
         "candidate_name": "Lorehold 607 + Enlightened Tutor over Insurrection v1",
         "candidate_archetype": "607-enlightened-tutor-insurrection",
@@ -363,7 +365,7 @@ RESEARCH_PLANS = {
     },
     "enlightened_tutor_creative_technique_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_enlightened_tutor_creative_technique_v1",
         "candidate_name": "Lorehold 607 + Enlightened Tutor over Creative Technique v1",
         "candidate_archetype": "607-enlightened-tutor-creative-technique",
@@ -383,7 +385,7 @@ RESEARCH_PLANS = {
     },
     "gamble_storm_herd_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_gamble_storm_herd_v1",
         "candidate_name": "Lorehold 607 + Gamble over Storm Herd v1",
         "candidate_archetype": "607-gamble-storm-herd",
@@ -404,7 +406,7 @@ RESEARCH_PLANS = {
     },
     "boros_charm_tibalts_trickery_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_boros_charm_tibalts_trickery_v1",
         "candidate_name": "Lorehold 607 + Boros Charm over Tibalt's Trickery v1",
         "candidate_archetype": "607-boros-charm-tibalts-trickery",
@@ -427,7 +429,7 @@ RESEARCH_PLANS = {
     },
     "silence_tibalts_trickery_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_silence_tibalts_trickery_v1",
         "candidate_name": "Lorehold 607 + Silence over Tibalt's Trickery v1",
         "candidate_archetype": "607-silence-tibalts-trickery",
@@ -448,7 +450,7 @@ RESEARCH_PLANS = {
     },
     "grand_abolisher_tibalts_trickery_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_grand_abolisher_tibalts_trickery_v1",
         "candidate_name": "Lorehold 607 + Grand Abolisher over Tibalt's Trickery v1",
         "candidate_archetype": "607-grand-abolisher-tibalts-trickery",
@@ -469,7 +471,7 @@ RESEARCH_PLANS = {
     },
     "deflecting_palm_redirect_lightning_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_deflecting_palm_redirect_lightning_v1",
         "candidate_name": "Lorehold 607 + Deflecting Palm over Redirect Lightning v1",
         "candidate_archetype": "607-deflecting-palm-redirect-lightning",
@@ -491,7 +493,7 @@ RESEARCH_PLANS = {
     },
     "chaos_warp_stroke_of_midnight_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_chaos_warp_stroke_of_midnight_v1",
         "candidate_name": "Lorehold 607 + Chaos Warp over Stroke of Midnight v1",
         "candidate_archetype": "607-chaos-warp-stroke-of-midnight",
@@ -513,7 +515,7 @@ RESEARCH_PLANS = {
     },
     "return_the_favor_redirect_lightning_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_return_the_favor_redirect_lightning_v1",
         "candidate_name": "Lorehold 607 + Return the Favor over Redirect Lightning v1",
         "candidate_archetype": "607-return-the-favor-redirect-lightning",
@@ -535,7 +537,7 @@ RESEARCH_PLANS = {
     },
     "past_in_flames_pinnacle_monk_v1": {
         "base_deck_id": 607,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "candidate_key": "candidate_607_past_in_flames_pinnacle_monk_v1",
         "candidate_name": "Lorehold 607 + Past in Flames over Pinnacle Monk v1",
         "candidate_archetype": "607-past-in-flames-pinnacle-monk",
@@ -671,7 +673,7 @@ def build_candidate_rows(
 
     metadata = {
         "base_deck_id": base_deck_id,
-        "candidate_deck_id": 6,
+        "candidate_deck_id": DEFAULT_CANDIDATE_DECK_ID,
         "added": list(added),
         "removed": removed,
         "row_count": len(rows),

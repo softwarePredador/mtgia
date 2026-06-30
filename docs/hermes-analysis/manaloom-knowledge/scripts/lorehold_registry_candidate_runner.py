@@ -251,6 +251,8 @@ def command_payloads(
     force_focus_access: str,
     stem: str,
 ) -> dict[str, Any]:
+    plan_payload = research.RESEARCH_PLANS.get(plan) or {}
+    candidate_deck_id = int(plan_payload.get("candidate_deck_id") or 607)
     candidate_out_dir = REPORT_DIR / f"lorehold_607_research_candidate_20260626_{plan}"
     candidate_db = candidate_out_dir / "knowledge_candidate.db"
     gate_stem = f"{stem}_{plan}_gate"
@@ -284,6 +286,8 @@ def command_payloads(
         f"Lorehold 607 Research Candidate {plan}",
         "--candidate-archetype",
         "research-candidate",
+        "--candidate-deck-id",
+        str(candidate_deck_id),
         "--games",
         str(max(1, games)),
         "--opponent-limit",
@@ -323,6 +327,7 @@ def command_payloads(
         "battle_prior_markdown": str(battle_prior_md_path),
         "candidate_out_dir": str(candidate_out_dir),
         "candidate_db": str(candidate_db),
+        "candidate_deck_id": candidate_deck_id,
         "candidate_key": candidate_key,
         "focus_access_cards": candidate_cards,
         "focus_access_env": json.dumps(candidate_cards, ensure_ascii=False),

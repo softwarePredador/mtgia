@@ -1,4 +1,9 @@
 import lorehold_focus_access_package_generator as gen
+import pytest
+
+
+def test_default_baseline_is_protected_deck_607():
+    assert gen.DEFAULT_BASELINE_DECK_ID == 607
 
 
 def test_default_planner_uses_current_rejection_integrated_report():
@@ -177,6 +182,7 @@ def test_no_valid_package_routes_to_trace_runtime_or_cut_model_work():
     )
 
     assert report["summary"]["gate_ready_package_count"] == 0
+    assert report["summary"]["protected_baseline_deck_id"] == 607
     assert report["summary"]["recommended_next_action"].startswith("do_not_create_blind_swap")
     assert report["instrumentation_route"]["status"] == "trace_or_runtime_probe_required"
     assert report["package_candidates"][0]["status"] == "trace_or_runtime_probe_required"
@@ -223,6 +229,20 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert "PG271-synced" in required[0]["reason"]
     assert "seed-safe cut model" in required[0]["reason"]
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
+
+
+def test_gate_ready_consistency_rejects_zero_count_ready_status():
+    with pytest.raises(ValueError, match="gate_ready_package_count=0"):
+        gen.assert_gate_ready_consistency(
+            {
+                "summary": {
+                    "gate_ready_package_count": 0,
+                    "recommended_next_action": "run_package_preflight_then_seed42_anchor_gate",
+                },
+                "gate_ready_packages": [],
+                "instrumentation_route": {"status": "gate_ready_package_available"},
+            }
+        )
 
 
 def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batch():
@@ -298,6 +318,13 @@ def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batc
     queue = report["operational_work_queue"]
     assert report["summary"]["operational_work_count"] == 4
     assert report["summary"]["top_operational_work_key"] == "runtime_rule_gap_batch"
+    runtime_work = next(
+        row
+        for row in report["instrumentation_route"]["required_work"]
+        if row["work_key"] == "runtime_rule_gap_batch"
+    )
+    assert "Current runtime-gap queue has 61 blocked runtime-rule gaps" in runtime_work["reason"]
+    assert "ready_for_structured_pull_count=9" in runtime_work["reason"]
     assert queue[0]["work_key"] == "runtime_rule_gap_batch"
     assert queue[0]["blocked_runtime_rule_gap_count"] == 61
     assert queue[0]["runtime_ready_for_structured_pull_count"] == 9

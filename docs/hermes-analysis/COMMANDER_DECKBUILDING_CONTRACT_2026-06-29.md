@@ -489,6 +489,13 @@ Package-gate correction generated on 2026-06-30:
 - `lorehold_variant_battle_gate.py` now accepts `--candidate-deck-id`; package
   gates pass `607` so the candidate battle loads the modified `607` deck from
   the copied candidate DB.
+- Agent-4 integration follow-up: `lorehold_variant_battle_gate.py` now defaults
+  candidate loading to protected deck `607`, `lorehold_registry_candidate_runner.py`
+  passes `--candidate-deck-id` explicitly, and
+  `lorehold_607_research_candidate.py` materializes isolated candidates over
+  copied deck `607` instead of historical deck `6`.
+- `lorehold_focus_access_package_generator.py` now enforces that no route or
+  recommended action can claim `gate_ready` when `gate_ready_package_count=0`.
 - Any `lorehold_electro_waterskin_gate_20260630_20260630_042012` artifact is
   invalid for deck promotion because it loaded the candidate from deck `6`.
   Use the fixed gate only:

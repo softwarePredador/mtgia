@@ -23,6 +23,7 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
+DEFAULT_BASELINE_DECK_ID = 607
 
 DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
@@ -480,6 +481,7 @@ def instrumentation_route(
     trace_audit: dict[str, Any],
     squee_probe: dict[str, Any] | None = None,
     access_model: dict[str, Any] | None = None,
+    runtime_gap_queue: dict[str, Any] | None = None,
     squee_probe_path: Path | None = None,
     access_model_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -520,7 +522,7 @@ def instrumentation_route(
             {
                 "work_key": "runtime_rule_gap_batch",
                 "failure_mode": "blocked_runtime_rule_gap",
-                "reason": (runtime_action or {}).get("why_now"),
+                "reason": runtime_gap_reason(runtime_gap_queue, runtime_action),
                 "target_seeds": [],
             },
         ],
@@ -557,6 +559,23 @@ def runtime_gap_context(runtime_gap_queue: dict[str, Any] | None) -> dict[str, A
         "promotion_lane_counts": summary.get("promotion_lane_counts") or {},
         "top_families": top_families,
     }
+
+
+def runtime_gap_reason(
+    runtime_gap_queue: dict[str, Any] | None,
+    runtime_action: dict[str, Any] | None,
+) -> str:
+    context = runtime_gap_context(runtime_gap_queue)
+    if context:
+        blocked = int(context.get("blocked_runtime_rule_gap_count") or 0)
+        families = int(context.get("family_count") or 0)
+        ready_pull = int(context.get("ready_for_structured_pull_count") or 0)
+        return (
+            f"Current runtime-gap queue has {blocked} blocked runtime-rule gaps "
+            f"across {families} families; ready_for_structured_pull_count={ready_pull}. "
+            "Split exact scopes or continue mapper/runtime work before any deck gate."
+        )
+    return str((runtime_action or {}).get("why_now") or "")
 
 
 def blocked_rows_for_work(work_key: str, package_candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -806,6 +825,7 @@ def build_report(
         trace_audit=trace_audit,
         squee_probe=squee_probe,
         access_model=access_model,
+        runtime_gap_queue=runtime_gap_queue,
         squee_probe_path=squee_probe_path,
         access_model_path=access_model_path,
     )
@@ -818,7 +838,7 @@ def build_report(
         hand_filter_cut_model=hand_filter_cut_model,
         hand_filter_cut_model_path=hand_filter_cut_model_path,
     )
-    return {
+    payload = {
         "generated_at": utc_now(),
         "planner": str(planner_path),
         "trace_audit": str(trace_path),
@@ -831,6 +851,7 @@ def build_report(
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
+            "protected_baseline_deck_id": DEFAULT_BASELINE_DECK_ID,
             "focus_failure_mode_count": len(modes),
             "package_candidate_count": len(package_candidates),
             "gate_ready_package_count": len(gate_ready),
@@ -870,6 +891,26 @@ def build_report(
         "instrumentation_route": instrumentation,
         "operational_work_queue": operational_queue,
     }
+    assert_gate_ready_consistency(payload)
+    return payload
+
+
+def assert_gate_ready_consistency(payload: dict[str, Any]) -> None:
+    summary = payload.get("summary") or {}
+    gate_ready_packages = payload.get("gate_ready_packages") or []
+    gate_ready_count = int(summary.get("gate_ready_package_count") or 0)
+    route = payload.get("instrumentation_route") or {}
+    ready_next_action = summary.get("recommended_next_action") == "run_package_preflight_then_seed42_anchor_gate"
+    ready_route = route.get("status") == "gate_ready_package_available"
+    if gate_ready_count != len(gate_ready_packages):
+        raise ValueError(
+            "gate_ready_package_count must match gate_ready_packages length "
+            f"({gate_ready_count} != {len(gate_ready_packages)})"
+        )
+    if gate_ready_count == 0 and (ready_next_action or ready_route):
+        raise ValueError("gate_ready status is invalid when gate_ready_package_count=0")
+    if gate_ready_count > 0 and not (ready_next_action and ready_route):
+        raise ValueError("gate_ready packages require gate-ready route and next action")
 
 
 def render_markdown(payload: dict[str, Any]) -> str:

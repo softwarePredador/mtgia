@@ -67,7 +67,12 @@ class LoreholdRegistryCandidateRunnerTest(unittest.TestCase):
         )
 
         self.assertEqual(commands["candidate_key"], "candidate_607_birgi_v1")
+        self.assertEqual(commands["candidate_deck_id"], 607)
         self.assertIn("Birgi, God of Storytelling", commands["focus_access_env"])
+        self.assertEqual(
+            commands["gate_command"][commands["gate_command"].index("--candidate-deck-id") + 1],
+            "607",
+        )
         self.assertIn("opening_hand", commands["gate_command"])
         self.assertIn("--gate-report-json", commands["battle_prior_command"])
         self.assertIn("--candidate-card", commands["battle_prior_command"])
