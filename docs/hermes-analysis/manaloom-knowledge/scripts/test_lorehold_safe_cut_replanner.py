@@ -319,6 +319,86 @@ class LoreholdSafeCutReplannerTest(unittest.TestCase):
         self.assertEqual(artist_row["status"], "blocked")
         self.assertIn("prior_rejected_cut", artist_row["blockers"])
 
+    def test_spellchain_mana_does_not_auto_cut_early_mana_floor(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            ledger = tmp / "ledger.json"
+            registry = tmp / "registry.json"
+            cut_safety = tmp / "cut_safety.json"
+            source_db = tmp / "knowledge.db"
+            build_source_db(source_db)
+            conn = sqlite3.connect(source_db)
+            conn.execute(
+                "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (6, "Arcane Signet", 1, "ramp", 2, "Artifact", 0),
+            )
+            conn.execute(
+                "INSERT INTO card_oracle_cache VALUES (?, ?)",
+                ("storm kiln artist", "Storm-Kiln Artist"),
+            )
+            conn.commit()
+            conn.close()
+            write_json(
+                ledger,
+                {
+                    "package_groups": [
+                        {
+                            "package_key": "storm_kiln_artist_cut_protected_rock",
+                            "classification": "preflight_blocked_protected_cut",
+                            "families": ["spellchain_mana"],
+                            "best_delta_pp": 25.0,
+                            "critical_regression_count": 0,
+                            "critical_improvement_count": 1,
+                            "critical_tie_count": 0,
+                            "latest_adds": ["Storm-Kiln Artist"],
+                            "latest_cuts": ["Bender's Waterskin"],
+                        }
+                    ]
+                },
+            )
+            write_json(registry, {"protected_cards_until_same_function_replacement_wins": []})
+            write_json(
+                cut_safety,
+                {
+                    "cut_safety_manifest": {
+                        "cuts": [],
+                        "untested_flex_pool": [
+                            {
+                                "card_name": "Arcane Signet",
+                                "decision": "support_flex",
+                                "status": "core_support",
+                                "package_lane": "early_mana",
+                            }
+                        ],
+                    }
+                },
+            )
+
+            payload = replanner.build_report(
+                ledger_path=ledger,
+                registry_path=registry,
+                cut_safety_path=cut_safety,
+                source_db=source_db,
+                deck_id=6,
+                prior_reports=[],
+                max_per_source=4,
+                max_manifest_packages=4,
+            )
+
+        arcane_row = [
+            row
+            for row in payload["followups"]
+            if row["cuts"] == ["Arcane Signet"]
+        ][0]
+        self.assertEqual(arcane_row["status"], "blocked")
+        self.assertIn("incompatible_lane", arcane_row["blockers"])
+        self.assertIn("cut_is_early_mana_floor_support", arcane_row["blockers"])
+        manifest_cuts = [
+            package["cuts"][0]
+            for package in payload["manifest"]["packages"]
+        ]
+        self.assertNotIn("Arcane Signet", manifest_cuts)
+
 
 if __name__ == "__main__":
     unittest.main()

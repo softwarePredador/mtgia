@@ -37,7 +37,7 @@ FAMILY_LANE_COMPATIBILITY = {
     "pressure_absorber": {"protection", "removal", "pressure_reset"},
     "targeted_commander_protection": {"protection", "removal", "pressure_reset"},
     "spell_protection": {"protection", "removal", "pressure_reset"},
-    "spellchain_mana": {"early_mana", "spell_velocity"},
+    "spellchain_mana": {"spell_velocity"},
     "fast_mana": {"early_mana"},
     "payoff_challenge": {"wincon", "big_spell_value", "pressure_reset"},
     "cost_reduce_copy": {"early_mana", "spell_velocity"},
@@ -47,7 +47,7 @@ FAMILY_LANE_COMPATIBILITY = {
 
 NEVER_CUT_LANES = {"mana_base", "commander"}
 SAFE_CUT_DECISIONS = {"engine_flex", "manual_review", "support_flex"}
-EARLY_MANA_REPLACEMENT_FAMILIES = {"cost_reduce_copy", "fast_mana", "spellchain_mana"}
+EARLY_MANA_REPLACEMENT_FAMILIES = {"cost_reduce_copy", "fast_mana"}
 PROTECTION_LANES = {"protection", "pressure_absorber_or_protection"}
 STRATEGY_LANE_MAP = {
     "commander_engine": "commander",
