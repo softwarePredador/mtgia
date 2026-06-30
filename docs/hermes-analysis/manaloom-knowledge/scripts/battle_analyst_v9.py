@@ -38391,6 +38391,74 @@ def trigger_spell_cast_engines(
             continue
         if permanent.get("trigger") != "instant_sorcery_cast":
             continue
+        if permanent.get("trigger_effect") in {
+            "create_treasure",
+            "magecraft_create_treasure",
+        } or permanent.get("magecraft_treasure_status") == "runtime_executor_v1":
+            treasure_count = max(
+                1,
+                int(
+                    permanent.get("trigger_treasure_count")
+                    or permanent.get("magecraft_treasure_count")
+                    or permanent.get("treasure_count")
+                    or 1
+                ),
+            )
+
+            def resolve_instant_sorcery_cast_treasure_trigger(
+                permanent=permanent,
+                treasure_count=treasure_count,
+            ):
+                treasures_before = player.treasures
+                artifact_count_before = controlled_artifact_count_for_search(player)
+                player.treasures += treasure_count
+                artifact_count_after = controlled_artifact_count_for_search(player)
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    trigger_spell_is_copy=bool(spell.get("_is_spell_copy")),
+                    effect="create_treasure",
+                    treasures_created=treasure_count,
+                    treasures_before=treasures_before,
+                    treasures_after=player.treasures,
+                    artifact_count_before=artifact_count_before,
+                    artifact_count_after=artifact_count_after,
+                    magecraft_treasure_status="runtime_executor_v1",
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                emit_replay_event(
+                    "treasure_created",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    source_trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    treasures_created=treasure_count,
+                    treasures=player.treasures,
+                    artifact_count_after=artifact_count_after,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_instant_sorcery_cast_treasure_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "trigger_spell": spell.get("name", "?"),
+                    "treasures_created": treasure_count,
+                },
+            )
+            continue
         mana_amount = int(permanent.get("instant_sorcery_cast_add_mana") or 0)
         if mana_amount > 0:
             mana_color = source_colors(

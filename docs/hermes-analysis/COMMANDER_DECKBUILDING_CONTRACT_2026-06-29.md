@@ -688,6 +688,32 @@ Forced-signal natural confirmation generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.md`.
 
+Storm-Kiln runtime-corrected confirmation generated on 2026-06-30:
+
+- The earlier `Storm-Kiln Artist` result is historical but under-modeled:
+  the active rule treated the card as creature body plus artifact-power
+  annotation and did not execute the magecraft Treasure trigger.
+- Runtime was upgraded to
+  `creature_body_artifact_power_annotation_magecraft_treasure_runtime_v1`.
+  The battle executor now creates one Treasure when the controller casts or
+  copies an instant or sorcery; artifact-power scaling remains
+  `annotation_only`.
+- Retest scope: `Storm-Kiln Artist` over `Arcane Signet`, forced access mode
+  `none`, protected baseline `607`, `8` real opponents, `3` games per
+  opponent, opponent seed `20260629`, simulation seeds `20260630,123,999`.
+- Aggregate result: candidate `29W/43L/0S` across `72` games versus `607`
+  `27W/44L/1S`, with `Storm-Kiln Artist` recording `23` cast/cost events,
+  `17` `trigger_resolved` events, and `17` `treasure_created` events.
+- Strategic signal was real: miracle casts `+69`, topdeck activations `+65`,
+  discard-to-top replacements `+107`, Lorehold spell casts `+59`, and
+  spell-rummage events `+63` versus protected `607`.
+- Promotion failure: the Winota fast-pressure slice regressed to `3W/6L`
+  versus `607` `4W/5L`. Therefore do not change the deck. Keep
+  `Arcane Signet` protected until a pressure-safe same-lane or package-level
+  hypothesis beats `607` with direct card-use evidence.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_arcane_runtime_decision_20260630.md`.
+
 Profiled same-lane benchmark decision generated on 2026-06-30:
 
 - Scope: `3` same-lane benchmarks from profiled cut slots after current forced

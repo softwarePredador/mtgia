@@ -2998,6 +2998,36 @@
     "logical_rule_key": "battle_rule_v1:752f8cfd0a44d1889ffdb40610847374",
     "notes": "PG-244 promotion from local runtime patch: static creature engine grants miracle cost 0 to nonland cards in controller hand. Runtime scope is constrained to the first drawn nonland card path used by the battle miracle executor."
   },
+  "Storm-Kiln Artist": {
+    "effect_json": {
+      "artifact_power_bonus_status": "annotation_only",
+      "battle_model_scope": "creature_body_artifact_power_annotation_magecraft_treasure_runtime_v1",
+      "cmc": 4.0,
+      "effect": "creature",
+      "is_creature_permanent": true,
+      "magecraft_trigger": "cast_or_copy_instant_or_sorcery",
+      "magecraft_treasure_count": 1,
+      "magecraft_treasure_status": "runtime_executor_v1",
+      "power": 2,
+      "runtime_modeled_effect": "creature_body_magecraft_treasure",
+      "toughness": 2,
+      "trigger": "instant_sorcery_cast",
+      "trigger_effect": "magecraft_create_treasure"
+    },
+    "deck_role_json": {
+      "category": "ramp",
+      "effect": "creature",
+      "strategy_role": "spellchain_treasure_engine",
+      "subtype": "magecraft_treasure_payoff"
+    },
+    "source": "curated",
+    "confidence": 1.0,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "cb2cf161073de3983ac24385743ab78a",
+    "logical_rule_key": "battle_rule_v1:128e222b4de1e6308d98743711b54985",
+    "notes": "Runtime upgrade on 2026-06-30: magecraft now creates one Treasure when the controller casts or copies an instant or sorcery. Artifact-power bonus remains annotation_only because combat power is not the deck-gate proof being promoted."
+  },
   "Victory Chimes": {
     "effect_json": {
       "cmc": 3.0,
