@@ -43,6 +43,9 @@ aligned with the current XMage and Commander deckbuilding contracts:
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py \
   --out-prefix docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260629_current
+
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260630_current
 ```
 
 Run the v9 regression harness explicitly:

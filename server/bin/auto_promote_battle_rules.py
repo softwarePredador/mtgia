@@ -39,11 +39,25 @@ def load_env():
 
 
 def connect_pg():
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return psycopg2.connect(database_url, connect_timeout=10)
+    missing = []
+    if not os.environ.get("DB_HOST"):
+        missing.append("DB_HOST")
+    if not (os.environ.get("PGDATABASE") or os.environ.get("DB_NAME")):
+        missing.append("PGDATABASE or DB_NAME")
+    if not os.environ.get("DB_PASS"):
+        missing.append("DB_PASS")
+    if missing:
+        raise RuntimeError(
+            "Missing PostgreSQL env for auto promotion: " + ", ".join(missing)
+        )
     return psycopg2.connect(
         host=os.environ["DB_HOST"],
-        port=os.environ.get("DB_PORT", "5433"),
-        dbname=os.environ.get("DB_NAME", "halder"),
-        user=os.environ.get("DB_USER", "postgres"),
+        port=os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432",
+        dbname=os.environ.get("PGDATABASE") or os.environ.get("DB_NAME"),
+        user=os.environ.get("PGUSER") or os.environ.get("DB_USER") or "postgres",
         password=os.environ["DB_PASS"],
         connect_timeout=10,
     )

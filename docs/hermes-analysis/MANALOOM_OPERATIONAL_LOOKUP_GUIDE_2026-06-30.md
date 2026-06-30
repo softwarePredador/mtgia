@@ -28,6 +28,7 @@ Hermes SQLite is cache/lab evidence, not durable truth.
 | Lorehold historical artifact reuse | `lorehold_artifact_contract_audit.py` | never consume historical JSON directly without this audit |
 | Current operational alignment across docs/scripts | this guide plus `docs/hermes-analysis/README.md` | `operational_surface_alignment_audit.py` |
 | Workspace drift, stale DB paths, cron path rules | `workspace_contract_drift_audit.py` | no manual path assumptions |
+| Broad legacy contamination | `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json` | `legacy_contamination_audit.py`; new or increased old patterns fail |
 
 ## Canonical Database Lookup
 
@@ -132,6 +133,9 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contra
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/workspace_contract_drift_audit.py \
   --out-prefix /tmp/manaloom_workspace_contract_drift_current
+
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+  --out-prefix /tmp/manaloom_legacy_contamination_current
 ```
 
 For a focused test suite after Lorehold/deckbuilder routing changes:
@@ -149,7 +153,8 @@ python3 -m unittest \
   test_lorehold_607_research_candidate.py \
   test_lorehold_607_bridge_candidate.py \
   test_lorehold_ideal_deck_candidate_matrix.py \
-  test_pg_hermes_sqlite_contract_audit.py
+  test_pg_hermes_sqlite_contract_audit.py \
+  test_legacy_contamination_audit.py
 ```
 
 ## Redundancy Blocks
@@ -170,6 +175,9 @@ Do not do any of these:
 - run deck promotion from forced-access diagnostics;
 - use `build_optimized_deck.py` or `universal_optimizer.py` as active handoff;
   they are historical/blocked surfaces.
+- update `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json` just to make a gate
+  green; first remove the new stale pattern or document why it is explicitly
+  historical/test-only.
 
 ## If Something Looks Missing
 

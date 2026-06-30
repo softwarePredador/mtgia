@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Run mana base validation and generate report."""
-import sqlite3, json, datetime, os
+import sqlite3, json, datetime
+from master_optimizer_common import resolve_default_knowledge_db
 from semantic_role_metrics import load_deck_metric_rows
 
-DB = os.environ.get("MANALOOM_KNOWLEDGE_DB", os.path.join(os.path.dirname(__file__), "knowledge.db"))
+DB = str(resolve_default_knowledge_db())
 
 profile_dir_a = "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/profiles"
 profile_dir_b = "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_b_2026-05-12/profiles"

@@ -27,6 +27,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `deck_6` como shell atual, artefato legado sem normalizador, EDHREC por
     `inclusion` absoluto, PostgreSQL/Hermes fora de ordem e conclusao por
     batalha sem carta comprada/usada.
+  - O baseline `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json` e a auditoria
+    `manaloom-knowledge/scripts/legacy_contamination_audit.py` registram o
+    historico tolerado e falham se essas classes antigas crescerem de novo.
 
 ## Contrato de dados / aliases
 

@@ -44,11 +44,13 @@ LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
 LOREHOLD_REGISTRY_CANDIDATE_RUNNER = SCRIPT_DIR / "lorehold_registry_candidate_runner.py"
 LOREHOLD_LOSS_FAILURE_CLASSIFIER = SCRIPT_DIR / "lorehold_loss_failure_classifier.py"
+LEGACY_CONTAMINATION_AUDIT = SCRIPT_DIR / "legacy_contamination_audit.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 REBUILD_GUIDED_SERVICE = REPO_ROOT / "server" / "lib" / "ai" / "rebuild_guided_service.dart"
+LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
     "xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md"
@@ -140,6 +142,7 @@ def build_checks() -> list[Check]:
                 "COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md",
                 "MANALOOM_OPERATIONAL_LOOKUP_GUIDE_2026-06-30.md",
                 "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
+                "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
                 "build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos",
             ],
@@ -154,6 +157,7 @@ def build_checks() -> list[Check]:
                 "--allow-legacy-registry-runner",
                 "--candidate-deck-id 607",
                 "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
+                "legacy_contamination_audit.py",
                 "xmage_strategy_consistency_audit.py",
                 "--output-prefix",
             ],
@@ -168,6 +172,8 @@ def build_checks() -> list[Check]:
                 "inclusionRate",
                 "legacy baseline `deck_6`",
                 "PostgreSQL -> Hermes/SQLite",
+                "Legacy contamination",
+                "legacy_contamination_audit.py",
             ],
             "docs.failure_mode_matrix_exists_and_covers_old_bug_classes",
         ),
@@ -213,8 +219,34 @@ def build_checks() -> list[Check]:
                 "`battle_analyst_v9.py` is the active battle engine",
                 "Legacy engines",
                 "Refresh the SQLite battle cache from PostgreSQL first",
+                "legacy_contamination_audit.py",
             ],
             "scripts.readme_names_active_engine_and_cache_boundary",
+        ),
+        check_contains(
+            LEGACY_CONTAMINATION_AUDIT,
+            [
+                "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json",
+                "stale_sqlite_path",
+                "hardcoded_pg_fallback",
+                "legacy_deck6_current_default",
+                "legacy_ranked_decks_schema",
+                "raw_edhrec_inclusion_score",
+                "excess_group_count",
+            ],
+            "scripts.legacy_contamination_audit_blocks_new_old_patterns",
+        ),
+        check_contains(
+            LEGACY_CONTAMINATION_BASELINE,
+            [
+                "legacy_contamination_baseline",
+                "allowed_max_by_category_file",
+                "stale_sqlite_path",
+                "hardcoded_pg_fallback",
+                "legacy_deck6_current_default",
+                "legacy_ranked_decks_schema",
+            ],
+            "docs.legacy_contamination_baseline_exists",
         ),
         check_contains(
             XMAGE_AUDIT,

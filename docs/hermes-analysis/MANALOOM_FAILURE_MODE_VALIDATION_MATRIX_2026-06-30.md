@@ -32,6 +32,7 @@ Canonical contracts:
 | Lorehold artifacts | Historical `ranked_decks` reports are consumed as current schema | `lorehold_artifact_contract_audit.py` normalizes artifacts; current matrix uses `decks[] + ranked_deck_keys` |
 | Forced exposure | Forced-access probes promote deck changes | Forced exposure is diagnostic only; natural equal gate with forced access `none` is required for promotion |
 | Legacy runners | Deprecated builders or registry runners become active handoff | `build_optimized_deck.py`, `universal_optimizer.py`, and `lorehold_registry_candidate_runner.py` remain blocked/historical unless explicitly run in legacy mode |
+| Legacy contamination | Old path/default/schema/scoring bugs are reintroduced outside reviewed history | `legacy_contamination_audit.py` passes against `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json`; new or increased legacy occurrences fail |
 
 ## Minimum Command Set
 
@@ -49,6 +50,9 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_strategy_consisten
 
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py \
   --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_$(date -u +%Y%m%d_%H%M%S)_current
+
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/legacy_contamination_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_$(date -u +%Y%m%d_%H%M%S)_current
 ```
 
 Run this when the claim includes PostgreSQL/Hermes/SQLite field alignment:
@@ -78,6 +82,9 @@ Stop and fix before continuing if any of these occur:
   runtime exercise;
 - a PostgreSQL apply or SQLite sync is inferred from markdown instead of
   postcheck rows and sync output.
+- `legacy_contamination_audit.py` reports any new or increased stale SQLite
+  path, hardcoded PG fallback, `deck_6` default, raw `ranked_decks`, or raw
+  EDHREC `inclusion` score occurrence.
 
 ## Current Known Guardrails
 
@@ -92,3 +99,6 @@ Stop and fix before continuing if any of these occur:
 - `lorehold_artifact_contract_audit.py` normalizes current `decks[]` matrices
   and legacy `ranked_decks` reports instead of letting consumers read old
   shapes directly.
+- `legacy_contamination_audit.py` scans broad code/docs surfaces against
+  `LEGACY_CONTAMINATION_BASELINE_2026-06-30.json`, so reviewed historical
+  references can shrink but cannot silently grow.

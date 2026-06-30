@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Mana base validation pipeline for ManaLoom project."""
 import sqlite3, json, sys
+from master_optimizer_common import resolve_default_knowledge_db
 
-DB_PATH = "/opt/data/workspace/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
+DB_PATH = str(resolve_default_knowledge_db())
 
 PROFILE_FILES = {
     "kinnan_bonder_prodigy": "/opt/data/workspace/mtgia/server/test/artifacts/commander_reference_profile_anchor30_batch_a_2026-05-12/profiles/kinnan_bonder_prodigy.json",
