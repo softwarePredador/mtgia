@@ -8,10 +8,10 @@ def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     )
 
 
-def test_default_runtime_queue_uses_post_pg276_assemble_the_players_report():
+def test_default_runtime_queue_uses_post_pg276_manual_mapper_wave_report():
     assert (
         readiness.DEFAULT_RUNTIME_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.json"
     )
 
 

@@ -7588,6 +7588,180 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["controller_loses_life_on_trigger"], 1)
         self.assertEqual(primary["token_subtype"], "Necron Warrior")
 
+    def test_lorehold_manual_model_runtime_gap_cards_route_to_structured_review_families(self) -> None:
+        cases = [
+            (
+                "AncientGoldDragon",
+                {
+                    "effect_classes": ["AncientGoldDragonEffect", "OneShotEffect"],
+                    "ability_classes": ["DealsCombatDamageToAPlayerTriggeredAbility", "FlyingAbility"],
+                    "constructor_metadata": {"card_types": ["CREATURE"]},
+                },
+                "token_maker",
+                "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+            ),
+            (
+                "BloodMoon",
+                {
+                    "effect_classes": ["NonbasicLandsAreMountainsEffect"],
+                    "ability_classes": ["SimpleStaticAbility"],
+                    "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                },
+                "passive",
+                "xmage_nonbasic_lands_are_mountains_static_review_v1",
+            ),
+            (
+                "ChandrasIgnition",
+                {
+                    "effect_classes": ["ChandrasIgnitionEffect", "OneShotEffect"],
+                    "ability_classes": [],
+                    "target_classes": ["TargetControlledCreaturePermanent"],
+                    "constructor_metadata": {"card_types": ["SORCERY"]},
+                },
+                "sweeper_damage",
+                "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+            ),
+            (
+                "GhoulcallersBell",
+                {
+                    "effect_classes": ["MillCardsEachPlayerEffect"],
+                    "ability_classes": ["SimpleActivatedAbility"],
+                    "cost_classes": ["TapSourceCost"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "mill_engine",
+                "xmage_artifact_tap_each_player_mill_one_review_v1",
+            ),
+            (
+                "KarnTheGreatCreator",
+                {
+                    "effect_classes": [
+                        "KarnTheGreatCreatorAnimateEffect",
+                        "KarnTheGreatCreatorCantActivateEffect",
+                        "RestrictionEffect",
+                        "WishEffect",
+                    ],
+                    "ability_classes": ["LoyaltyAbility", "SimpleStaticAbility"],
+                    "target_classes": ["TargetPermanent"],
+                    "filter_classes": ["FilterArtifactPermanent", "FilterPermanent"],
+                    "constructor_metadata": {"card_types": ["PLANESWALKER"]},
+                },
+                "passive",
+                "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+            ),
+            (
+                "KaylasMusicBox",
+                {
+                    "effect_classes": [
+                        "ContinuousEffect",
+                        "KaylasMusicBoxExileEffect",
+                        "KaylasMusicBoxLookEffect",
+                        "KaylasMusicBoxPlayFromExileEffect",
+                        "OneShotEffect",
+                    ],
+                    "ability_classes": ["SimpleActivatedAbility"],
+                    "cost_classes": ["TapSourceCost"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "free_cast",
+                "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+            ),
+            (
+                "LanternOfInsight",
+                {
+                    "effect_classes": [
+                        "PlayWithTheTopCardRevealedEffect",
+                        "ShuffleLibraryTargetEffect",
+                    ],
+                    "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                    "cost_classes": ["SacrificeSourceCost", "TapSourceCost"],
+                    "target_classes": ["TargetPlayer"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "topdeck_play",
+                "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+            ),
+            (
+                "LeylineDowser",
+                {
+                    "effect_classes": ["MillThenPutInHandEffect", "UntapSourceEffect"],
+                    "ability_classes": ["SimpleActivatedAbility"],
+                    "cost_classes": ["GenericManaCost", "TapSourceCost", "TapTargetCost"],
+                    "target_classes": ["TargetControlledPermanent"],
+                    "filter_classes": ["FilterControlledCreaturePermanent"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "recursion",
+                "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+            ),
+            (
+                "OrcishSpy",
+                {
+                    "effect_classes": ["LookLibraryTopCardTargetPlayerEffect"],
+                    "ability_classes": ["SimpleActivatedAbility"],
+                    "cost_classes": ["TapSourceCost"],
+                    "target_classes": ["TargetPlayer"],
+                    "constructor_metadata": {"card_types": ["CREATURE"]},
+                },
+                "topdeck_play",
+                "xmage_tap_look_top_three_target_player_library_review_v1",
+            ),
+            (
+                "PossibilityStorm",
+                {
+                    "effect_classes": ["OneShotEffect", "PossibilityStormEffect"],
+                    "ability_classes": ["PossibilityStormTriggeredAbility"],
+                    "constructor_metadata": {"card_types": ["ENCHANTMENT"]},
+                },
+                "free_cast",
+                "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+            ),
+            (
+                "PrototypePortal",
+                {
+                    "effect_classes": [
+                        "OneShotEffect",
+                        "PrototypePortalCreateTokenEffect",
+                        "PrototypePortalEffect",
+                    ],
+                    "ability_classes": [
+                        "EntersBattlefieldTriggeredAbility",
+                        "SimpleActivatedAbility",
+                    ],
+                    "cost_classes": ["TapSourceCost"],
+                    "target_classes": ["TargetCard"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "token_maker",
+                "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+            ),
+            (
+                "PyxisOfPandemonium",
+                {
+                    "effect_classes": [
+                        "OneShotEffect",
+                        "PyxisOfPandemoniumExileEffect",
+                        "PyxisOfPandemoniumPutOntoBattlefieldEffect",
+                    ],
+                    "ability_classes": ["SimpleActivatedAbility"],
+                    "cost_classes": ["GenericManaCost", "SacrificeSourceCost", "TapSourceCost"],
+                    "constructor_metadata": {"card_types": ["ARTIFACT"]},
+                },
+                "free_cast",
+                "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+            ),
+        ]
+
+        for class_name, entry, expected_effect, expected_scope in cases:
+            with self.subTest(class_name=class_name):
+                result = hints.build_effect_hints({"xmage_class_name": class_name, **entry})
+                primary = result["primary_candidate"]["effect_json"]
+                self.assertEqual(primary["effect"], expected_effect)
+                self.assertEqual(primary["battle_model_scope"], expected_scope)
+                self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
+                self.assertTrue(expected_scope.startswith("xmage_"))
+                self.assertTrue(expected_scope.endswith("_review_v1"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -82,11 +82,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Redirect Lightning` tratados como draw e bloqueia `Improvisation
     Capstone` como nucleo de spell-chain, nao flex topdeck.
   - Fila runtime atual:
-    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`.
+    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.md`.
     `Codex Shredder`, `Perpetual Timepiece`, `Chaos Wand` e
     `Assemble the Players` agora estao aplicados/sincronizados como regras
-    ativas; a fila restante tem `16` gaps
-    runtime e o gerador de foco continua com `0` pacotes gate-ready.
+    ativas; a fila restante tem `16` gaps runtime, mas `0` manual mappers
+    depois da onda conservadora de mapeamento XMage. O gerador de foco
+    continua com `0` pacotes gate-ready porque os `16` itens restantes exigem
+    split/runtime exato por familia.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

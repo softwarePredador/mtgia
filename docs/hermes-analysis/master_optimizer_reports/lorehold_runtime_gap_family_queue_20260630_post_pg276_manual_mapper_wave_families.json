@@ -1,0 +1,1756 @@
+{
+  "cards": [
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+      "card_name": "Ancient Gold Dragon",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "token_maker",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+        "die_sides": 20,
+        "effect": "token_maker",
+        "flying": true,
+        "power": 7,
+        "token_colors": [
+          "U"
+        ],
+        "token_count_source": "d20_result",
+        "token_flying": true,
+        "token_name": "Faerie Dragon Token",
+        "token_power": 1,
+        "token_subtype": "Faerie Dragon",
+        "token_toughness": 1,
+        "toughness": 10,
+        "trigger": "combat_damage_to_player",
+        "trigger_effect": "roll_d20_create_tokens"
+      },
+      "family_id": "token_maker",
+      "family_support_status": "runtime_family_required",
+      "focused_test_scenario_count": 2,
+      "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
+      "normalized_name": "ancient gold dragon",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "DealsCombatDamageToAPlayerTriggeredAbility",
+        "FlyingAbility"
+      ],
+      "xmage_class": "AncientGoldDragon",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "AncientGoldDragonEffect",
+        "OneShotEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientGoldDragon.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "CREATURE"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+      "card_name": "Blood Moon",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "passive",
+      "effect_json": {
+        "ability_kind": "static",
+        "affected_lands": "nonbasic",
+        "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+        "effect": "passive",
+        "land_type_replacement": "nonbasic_lands_are_mountains",
+        "resulting_basic_land_type": "mountain",
+        "static_rule_restriction": true,
+        "suppresses_non_mountain_land_abilities": true
+      },
+      "family_id": "passive",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "static battlefield annotation and passive support execution",
+      "normalized_name": "blood moon",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleStaticAbility"
+      ],
+      "xmage_class": "BloodMoon",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "NonbasicLandsAreMountainsEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodMoon.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "ENCHANTMENT"
+      ]
+    },
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+      "card_name": "Chandra's Ignition",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "sweeper_damage",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+        "damage_amount_source": "target_creature_power",
+        "damage_each_opponent": true,
+        "damage_each_other_creature": true,
+        "damage_source": "target_creature",
+        "effect": "sweeper_damage",
+        "sorcery": true,
+        "target": "controlled_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "multi-player choice/wipe/sacrifice resolution",
+      "normalized_name": "chandra's ignition",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [],
+      "xmage_class": "ChandrasIgnition",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "ChandrasIgnitionEffect",
+        "OneShotEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChandrasIgnition.java",
+      "xmage_target_classes": [
+        "TargetControlledCreaturePermanent"
+      ],
+      "xmage_types": [
+        "SORCERY"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+      "card_name": "Charmbreaker Devils",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "recursion",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+        "effect": "recursion"
+      },
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+      "normalized_name": "charmbreaker devils",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "BeginningOfUpkeepTriggeredAbility",
+        "SpellCastControllerTriggeredAbility"
+      ],
+      "xmage_class": "CharmbreakerDevils",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "BoostSourceEffect",
+        "ReturnFromGraveyardAtRandomEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CharmbreakerDevils.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "CREATURE"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_library_search_variant_review_v1",
+      "card_name": "Deathbellow War Cry",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "tutor",
+      "effect_json": {
+        "ability_kind": "one_shot",
+        "battle_model_scope": "xmage_library_search_variant_review_v1",
+        "effect": "tutor",
+        "instant": false,
+        "sorcery": true,
+        "target": "library_card",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "tutor_destination": "battlefield"
+      },
+      "family_id": "tutor",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield",
+      "normalized_name": "deathbellow war cry",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [],
+      "xmage_class": "DeathbellowWarCry",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "SearchLibraryPutInPlayEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathbellowWarCry.java",
+      "xmage_target_classes": [
+        "TargetCardWithDifferentNameInLibrary"
+      ],
+      "xmage_types": [
+        "SORCERY"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_tap_each_player_mill_one_review_v1",
+      "card_name": "Ghoulcaller's Bell",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "mill_engine",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_artifact_tap_each_player_mill_one_review_v1",
+        "effect": "mill_engine",
+        "mill_count": 1,
+        "mill_scope": "each_player",
+        "permanent_type": "artifact",
+        "target": "each_player"
+      },
+      "family_id": "mill_spell",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "target-player library milling, storm copy counting, and activated mill engines",
+      "normalized_name": "ghoulcaller's bell",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "GhoulcallersBell",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "MillCardsEachPlayerEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GhoulcallersBell.java",
+      "xmage_target_classes": [
+        "TargetController"
+      ],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "card_name": "Karn's Sylex",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "board_wipe",
+      "effect_json": {
+        "ability_kind": "activated",
+        "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+        "effect": "board_wipe",
+        "instant": false,
+        "mass_effect": true,
+        "sorcery": false
+      },
+      "family_id": "board_wipe_choice",
+      "family_support_status": "runtime_family_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "multi-player choice/wipe/sacrifice resolution",
+      "normalized_name": "karn's sylex",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "ActivateAsSorceryActivatedAbility",
+        "CantPayLifeOrSacrificeAbility",
+        "EntersBattlefieldTappedAbility"
+      ],
+      "xmage_class": "KarnsSylex",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "KarnsSylexDestroyEffect",
+        "OneShotEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnsSylex.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+      "card_name": "Karn, the Great Creator",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "passive",
+      "effect_json": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+        "effect": "passive",
+        "minus_two_artifact_wish_or_exile_to_hand": true,
+        "opponent_artifact_activated_abilities_cant_be_activated": true,
+        "permanent_type": "planeswalker",
+        "plus_one_animates_noncreature_artifact_until_next_turn": true,
+        "starting_loyalty": 5,
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        }
+      },
+      "family_id": "passive",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "static battlefield annotation and passive support execution",
+      "normalized_name": "karn, the great creator",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "LoyaltyAbility",
+        "SimpleStaticAbility"
+      ],
+      "xmage_class": "KarnTheGreatCreator",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "KarnTheGreatCreatorAnimateEffect",
+        "KarnTheGreatCreatorCantActivateEffect",
+        "RestrictionEffect",
+        "WishEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnTheGreatCreator.java",
+      "xmage_target_classes": [
+        "TargetPermanent"
+      ],
+      "xmage_types": [
+        "PLANESWALKER"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+      "card_name": "Kayla's Music Box",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "free_cast",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activated_exile_top_card_face_down": true,
+        "activated_play_owned_cards_exiled_with_source_until_eot": true,
+        "alternate_zone_permission": true,
+        "battle_model_scope": "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+        "effect": "free_cast",
+        "exiled_card_look_permission_controller_only": true,
+        "legendary": true,
+        "may_cast_without_paying_mana_cost": false,
+        "permanent_type": "artifact"
+      },
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+      "normalized_name": "kayla's music box",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "KaylasMusicBox",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "ContinuousEffect",
+        "KaylasMusicBoxExileEffect",
+        "KaylasMusicBoxLookEffect",
+        "KaylasMusicBoxPlayFromExileEffect",
+        "OneShotEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KaylasMusicBox.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+      "card_name": "Lantern of Insight",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "topdeck_play",
+      "effect_json": {
+        "ability_kind": "static_and_activated",
+        "activated_target_player_shuffle_library": true,
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "alternate_zone_permission": false,
+        "battle_model_scope": "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+        "each_player_top_library_revealed": true,
+        "effect": "topdeck_play",
+        "may_cast_without_paying_mana_cost": false,
+        "permanent_type": "artifact",
+        "play_lands_from_top_library": false
+      },
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+      "normalized_name": "lantern of insight",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility",
+        "SimpleStaticAbility"
+      ],
+      "xmage_class": "LanternOfInsight",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "PlayWithTheTopCardRevealedEffect",
+        "ShuffleLibraryTargetEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LanternOfInsight.java",
+      "xmage_target_classes": [
+        "TargetPlayer"
+      ],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+      "card_name": "Leyline Dowser",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "recursion",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activation_cost_generic": 1,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+        "effect": "recursion",
+        "mill_count": 1,
+        "milled_card_types_to_hand": [
+          "instant",
+          "sorcery"
+        ],
+        "permanent_type": "artifact",
+        "secondary_untap_source_by_tapping_legendary_creature": true,
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller_scope": "source_controller"
+        }
+      },
+      "family_id": "recursion",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+      "normalized_name": "leyline dowser",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "LeylineDowser",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "MillThenPutInHandEffect",
+        "UntapSourceEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java",
+      "xmage_target_classes": [
+        "TargetControlledPermanent"
+      ],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_draw_card_variant_review_v1",
+      "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "draw_engine",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_draw_card_variant_review_v1",
+        "effect": "draw_engine",
+        "instant": false,
+        "sorcery": true
+      },
+      "family_id": "draw_engine",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "static and activated draw-engine bookkeeping with delayed card movement",
+      "normalized_name": "naktamun lorespinner // wheel of fortune",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "BeginningOfUpkeepTriggeredAbility"
+      ],
+      "xmage_class": "NaktamunLorespinner",
+      "xmage_condition_classes": [
+        "NaktamunLorespinnerCondition"
+      ],
+      "xmage_effect_classes": [
+        "BecomePreparedSourceEffect",
+        "DiscardHandAllEffect",
+        "DrawCardAllEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "CREATURE",
+        "SORCERY"
+      ]
+    },
+    {
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+      "card_name": "Orcish Spy",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "topdeck_play",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activation_requires_tap": true,
+        "alternate_zone_permission": false,
+        "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+        "effect": "topdeck_play",
+        "look_target_player_library_top_count": 3,
+        "may_cast_without_paying_mana_cost": false,
+        "play_lands_from_top_library": false,
+        "power": 1,
+        "target_constraints": {
+          "target": "player"
+        },
+        "toughness": 1
+      },
+      "family_id": "topdeck_play",
+      "family_support_status": "runtime_supported_family",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+      "normalized_name": "orcish spy",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "OrcishSpy",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "LookLibraryTopCardTargetPlayerEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java",
+      "xmage_target_classes": [
+        "TargetPlayer"
+      ],
+      "xmage_types": [
+        "CREATURE"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+      "card_name": "Possibility Storm",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "free_cast",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "alternate_zone_permission": true,
+        "battle_model_scope": "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+        "bottom_rest_random": true,
+        "effect": "free_cast",
+        "exile_from_top_until_shares_card_type": true,
+        "exile_original_spell": true,
+        "hit_card_may_cast_without_paying_mana_cost": true,
+        "may_cast_without_paying_mana_cost": true,
+        "trigger": "spell_cast_from_hand"
+      },
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+      "normalized_name": "possibility storm",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "PossibilityStormTriggeredAbility"
+      ],
+      "xmage_class": "PossibilityStorm",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "OneShotEffect",
+        "PossibilityStormEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PossibilityStorm.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "ENCHANTMENT"
+      ]
+    },
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+      "card_name": "Prototype Portal",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "token_maker",
+      "effect_json": {
+        "ability_kind": "triggered_and_activated",
+        "activated_create_token_copy_of_imprinted_card": true,
+        "activation_requires_tap": true,
+        "activation_x_cost_source": "imprinted_card_mana_value",
+        "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+        "effect": "token_maker",
+        "imprint_artifact_card_from_hand_on_enter": true,
+        "permanent_type": "artifact",
+        "token_copy_source": "imprinted_card"
+      },
+      "family_id": "token_maker",
+      "family_support_status": "runtime_family_required",
+      "focused_test_scenario_count": 2,
+      "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
+      "normalized_name": "prototype portal",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "EntersBattlefieldTriggeredAbility",
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "PrototypePortal",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "OneShotEffect",
+        "PrototypePortalCreateTokenEffect",
+        "PrototypePortalEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java",
+      "xmage_target_classes": [
+        "TargetCard"
+      ],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+      "card_name": "Pyxis of Pandemonium",
+      "coherence_findings": [
+        "no_active_battle_rule"
+      ],
+      "effect": "free_cast",
+      "effect_json": {
+        "ability_kind": "activated",
+        "activated_each_player_exile_top_face_down": true,
+        "activated_put_exiled_permanents_onto_battlefield": true,
+        "activation_requires_tap": true,
+        "alternate_zone_permission": true,
+        "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+        "effect": "free_cast",
+        "final_activation_cost_generic": 7,
+        "final_activation_requires_sacrifice": true,
+        "may_cast_without_paying_mana_cost": false,
+        "permanent_type": "artifact",
+        "put_permanent_cards_from_exile_onto_battlefield": true
+      },
+      "family_id": "free_cast",
+      "family_support_status": "runtime_family_partially_supported_review_required",
+      "focused_test_scenario_count": 1,
+      "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+      "normalized_name": "pyxis of pandemonium",
+      "oracle_hash": null,
+      "promotion_lane": "split_family_scope_review_required",
+      "ready_for_structured_pull": true,
+      "severity": "medium",
+      "status": "ready_for_structured_xmage_pull_review_required",
+      "valid_xmage_source": true,
+      "xmage_ability_classes": [
+        "SimpleActivatedAbility"
+      ],
+      "xmage_class": "PyxisOfPandemonium",
+      "xmage_condition_classes": [],
+      "xmage_effect_classes": [
+        "OneShotEffect",
+        "PyxisOfPandemoniumExileEffect",
+        "PyxisOfPandemoniumPutOntoBattlefieldEffect"
+      ],
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java",
+      "xmage_target_classes": [],
+      "xmage_types": [
+        "ARTIFACT"
+      ]
+    }
+  ],
+  "families": [
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "card_count": 2,
+      "cards": [
+        {
+          "batch_strategy": "implement_family_before_metadata_batch",
+          "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+          "card_name": "Chandra's Ignition",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "sweeper_damage",
+          "effect_json": {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+            "damage_amount_source": "target_creature_power",
+            "damage_each_opponent": true,
+            "damage_each_other_creature": true,
+            "damage_source": "target_creature",
+            "effect": "sweeper_damage",
+            "sorcery": true,
+            "target": "controlled_creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            }
+          },
+          "family_id": "board_wipe_choice",
+          "family_support_status": "runtime_family_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "multi-player choice/wipe/sacrifice resolution",
+          "normalized_name": "chandra's ignition",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [],
+          "xmage_class": "ChandrasIgnition",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "ChandrasIgnitionEffect",
+            "OneShotEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChandrasIgnition.java",
+          "xmage_target_classes": [
+            "TargetControlledCreaturePermanent"
+          ],
+          "xmage_types": [
+            "SORCERY"
+          ]
+        },
+        {
+          "batch_strategy": "implement_family_before_metadata_batch",
+          "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+          "card_name": "Karn's Sylex",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "board_wipe",
+          "effect_json": {
+            "ability_kind": "activated",
+            "battle_model_scope": "xmage_mass_removal_or_sacrifice_variant_review_v1",
+            "effect": "board_wipe",
+            "instant": false,
+            "mass_effect": true,
+            "sorcery": false
+          },
+          "family_id": "board_wipe_choice",
+          "family_support_status": "runtime_family_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "multi-player choice/wipe/sacrifice resolution",
+          "normalized_name": "karn's sylex",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "ActivateAsSorceryActivatedAbility",
+            "CantPayLifeOrSacrificeAbility",
+            "EntersBattlefieldTappedAbility"
+          ],
+          "xmage_class": "KarnsSylex",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "KarnsSylexDestroyEffect",
+            "OneShotEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnsSylex.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        }
+      ],
+      "family_id": "board_wipe_choice",
+      "family_tests": [],
+      "implementation_unit": "multi-player choice/wipe/sacrifice resolution",
+      "lane_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "sample_cards": [
+        "Chandra's Ignition",
+        "Karn's Sylex"
+      ],
+      "support_status": "runtime_family_required"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 1,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_draw_card_variant_review_v1",
+          "card_name": "Naktamun Lorespinner // Wheel of Fortune",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "draw_engine",
+          "effect_json": {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_draw_card_variant_review_v1",
+            "effect": "draw_engine",
+            "instant": false,
+            "sorcery": true
+          },
+          "family_id": "draw_engine",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "static and activated draw-engine bookkeeping with delayed card movement",
+          "normalized_name": "naktamun lorespinner // wheel of fortune",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "BeginningOfUpkeepTriggeredAbility"
+          ],
+          "xmage_class": "NaktamunLorespinner",
+          "xmage_condition_classes": [
+            "NaktamunLorespinnerCondition"
+          ],
+          "xmage_effect_classes": [
+            "BecomePreparedSourceEffect",
+            "DiscardHandAllEffect",
+            "DrawCardAllEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NaktamunLorespinner.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "CREATURE",
+            "SORCERY"
+          ]
+        }
+      ],
+      "family_id": "draw_engine",
+      "family_tests": [],
+      "implementation_unit": "static and activated draw-engine bookkeeping with delayed card movement",
+      "lane_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "sample_cards": [
+        "Naktamun Lorespinner // Wheel of Fortune"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 3,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+          "card_name": "Kayla's Music Box",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "free_cast",
+          "effect_json": {
+            "ability_kind": "activated",
+            "activated_exile_top_card_face_down": true,
+            "activated_play_owned_cards_exiled_with_source_until_eot": true,
+            "alternate_zone_permission": true,
+            "battle_model_scope": "xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+            "effect": "free_cast",
+            "exiled_card_look_permission_controller_only": true,
+            "legendary": true,
+            "may_cast_without_paying_mana_cost": false,
+            "permanent_type": "artifact"
+          },
+          "family_id": "free_cast",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+          "normalized_name": "kayla's music box",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "KaylasMusicBox",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "ContinuousEffect",
+            "KaylasMusicBoxExileEffect",
+            "KaylasMusicBoxLookEffect",
+            "KaylasMusicBoxPlayFromExileEffect",
+            "OneShotEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KaylasMusicBox.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        },
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+          "card_name": "Possibility Storm",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "free_cast",
+          "effect_json": {
+            "ability_kind": "triggered",
+            "alternate_zone_permission": true,
+            "battle_model_scope": "xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+            "bottom_rest_random": true,
+            "effect": "free_cast",
+            "exile_from_top_until_shares_card_type": true,
+            "exile_original_spell": true,
+            "hit_card_may_cast_without_paying_mana_cost": true,
+            "may_cast_without_paying_mana_cost": true,
+            "trigger": "spell_cast_from_hand"
+          },
+          "family_id": "free_cast",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+          "normalized_name": "possibility storm",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "PossibilityStormTriggeredAbility"
+          ],
+          "xmage_class": "PossibilityStorm",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "OneShotEffect",
+            "PossibilityStormEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PossibilityStorm.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "ENCHANTMENT"
+          ]
+        },
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+          "card_name": "Pyxis of Pandemonium",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "free_cast",
+          "effect_json": {
+            "ability_kind": "activated",
+            "activated_each_player_exile_top_face_down": true,
+            "activated_put_exiled_permanents_onto_battlefield": true,
+            "activation_requires_tap": true,
+            "alternate_zone_permission": true,
+            "battle_model_scope": "xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+            "effect": "free_cast",
+            "final_activation_cost_generic": 7,
+            "final_activation_requires_sacrifice": true,
+            "may_cast_without_paying_mana_cost": false,
+            "permanent_type": "artifact",
+            "put_permanent_cards_from_exile_onto_battlefield": true
+          },
+          "family_id": "free_cast",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+          "normalized_name": "pyxis of pandemonium",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "PyxisOfPandemonium",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "OneShotEffect",
+            "PyxisOfPandemoniumExileEffect",
+            "PyxisOfPandemoniumPutOntoBattlefieldEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PyxisOfPandemonium.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        }
+      ],
+      "family_id": "free_cast",
+      "family_tests": [
+        "test_pg102_creative_technique_demonstrates_top_nonland_free_casts",
+        "test_pg191_invoke_calamity_casts_two_hand_or_graveyard_spells_and_exiles_them",
+        "test_pg191_invoke_calamity_respects_total_mana_value_six_and_two_spell_limit"
+      ],
+      "implementation_unit": "cast-without-paying resolvers with source-zone, timing-bypass, and replacement-destination bookkeeping",
+      "lane_counts": {
+        "split_family_scope_review_required": 3
+      },
+      "sample_cards": [
+        "Kayla's Music Box",
+        "Possibility Storm",
+        "Pyxis of Pandemonium"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 1,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_artifact_tap_each_player_mill_one_review_v1",
+          "card_name": "Ghoulcaller's Bell",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "mill_engine",
+          "effect_json": {
+            "ability_kind": "activated",
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_artifact_tap_each_player_mill_one_review_v1",
+            "effect": "mill_engine",
+            "mill_count": 1,
+            "mill_scope": "each_player",
+            "permanent_type": "artifact",
+            "target": "each_player"
+          },
+          "family_id": "mill_spell",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "target-player library milling, storm copy counting, and activated mill engines",
+          "normalized_name": "ghoulcaller's bell",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "GhoulcallersBell",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "MillCardsEachPlayerEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GhoulcallersBell.java",
+          "xmage_target_classes": [
+            "TargetController"
+          ],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        }
+      ],
+      "family_id": "mill_spell",
+      "family_tests": [
+        "test_brain_freeze_mills_library_instead_of_dealing_life_damage"
+      ],
+      "implementation_unit": "target-player library milling, storm copy counting, and activated mill engines",
+      "lane_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "sample_cards": [
+        "Ghoulcaller's Bell"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 2,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+          "card_name": "Blood Moon",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "passive",
+          "effect_json": {
+            "ability_kind": "static",
+            "affected_lands": "nonbasic",
+            "battle_model_scope": "xmage_nonbasic_lands_are_mountains_static_review_v1",
+            "effect": "passive",
+            "land_type_replacement": "nonbasic_lands_are_mountains",
+            "resulting_basic_land_type": "mountain",
+            "static_rule_restriction": true,
+            "suppresses_non_mountain_land_abilities": true
+          },
+          "family_id": "passive",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "static battlefield annotation and passive support execution",
+          "normalized_name": "blood moon",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleStaticAbility"
+          ],
+          "xmage_class": "BloodMoon",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "NonbasicLandsAreMountainsEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodMoon.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "ENCHANTMENT"
+          ]
+        },
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+          "card_name": "Karn, the Great Creator",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "passive",
+          "effect_json": {
+            "ability_kind": "static",
+            "battle_model_scope": "xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+            "effect": "passive",
+            "minus_two_artifact_wish_or_exile_to_hand": true,
+            "opponent_artifact_activated_abilities_cant_be_activated": true,
+            "permanent_type": "planeswalker",
+            "plus_one_animates_noncreature_artifact_until_next_turn": true,
+            "starting_loyalty": 5,
+            "target_constraints": {
+              "card_types": [
+                "artifact"
+              ]
+            }
+          },
+          "family_id": "passive",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "static battlefield annotation and passive support execution",
+          "normalized_name": "karn, the great creator",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "LoyaltyAbility",
+            "SimpleStaticAbility"
+          ],
+          "xmage_class": "KarnTheGreatCreator",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "KarnTheGreatCreatorAnimateEffect",
+            "KarnTheGreatCreatorCantActivateEffect",
+            "RestrictionEffect",
+            "WishEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KarnTheGreatCreator.java",
+          "xmage_target_classes": [
+            "TargetPermanent"
+          ],
+          "xmage_types": [
+            "PLANESWALKER"
+          ]
+        }
+      ],
+      "family_id": "passive",
+      "family_tests": [],
+      "implementation_unit": "static battlefield annotation and passive support execution",
+      "lane_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "sample_cards": [
+        "Blood Moon",
+        "Karn, the Great Creator"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 2,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+          "card_name": "Charmbreaker Devils",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "recursion",
+          "effect_json": {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_graveyard_return_variant_review_v1",
+            "effect": "recursion"
+          },
+          "family_id": "recursion",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+          "normalized_name": "charmbreaker devils",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "BeginningOfUpkeepTriggeredAbility",
+            "SpellCastControllerTriggeredAbility"
+          ],
+          "xmage_class": "CharmbreakerDevils",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "BoostSourceEffect",
+            "ReturnFromGraveyardAtRandomEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CharmbreakerDevils.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "CREATURE"
+          ]
+        },
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+          "card_name": "Leyline Dowser",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "recursion",
+          "effect_json": {
+            "ability_kind": "activated",
+            "activation_cost_generic": 1,
+            "activation_requires_tap": true,
+            "battle_model_scope": "xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+            "effect": "recursion",
+            "mill_count": 1,
+            "milled_card_types_to_hand": [
+              "instant",
+              "sorcery"
+            ],
+            "permanent_type": "artifact",
+            "secondary_untap_source_by_tapping_legendary_creature": true,
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller_scope": "source_controller"
+            }
+          },
+          "family_id": "recursion",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+          "normalized_name": "leyline dowser",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "LeylineDowser",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "MillThenPutInHandEffect",
+            "UntapSourceEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeylineDowser.java",
+          "xmage_target_classes": [
+            "TargetControlledPermanent"
+          ],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        }
+      ],
+      "family_id": "recursion",
+      "family_tests": [
+        "test_profound_journey_rebounds_and_returns_permanents_to_battlefield",
+        "test_pg202_redress_fate_returns_all_artifact_enchantment_cards"
+      ],
+      "implementation_unit": "graveyard target selection, zone movement to hand or battlefield, and replacement-cost annotations",
+      "lane_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "sample_cards": [
+        "Charmbreaker Devils",
+        "Leyline Dowser"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    },
+    {
+      "batch_strategy": "implement_family_before_metadata_batch",
+      "card_count": 2,
+      "cards": [
+        {
+          "batch_strategy": "implement_family_before_metadata_batch",
+          "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+          "card_name": "Ancient Gold Dragon",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "token_maker",
+          "effect_json": {
+            "ability_kind": "triggered",
+            "battle_model_scope": "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+            "die_sides": 20,
+            "effect": "token_maker",
+            "flying": true,
+            "power": 7,
+            "token_colors": [
+              "U"
+            ],
+            "token_count_source": "d20_result",
+            "token_flying": true,
+            "token_name": "Faerie Dragon Token",
+            "token_power": 1,
+            "token_subtype": "Faerie Dragon",
+            "token_toughness": 1,
+            "toughness": 10,
+            "trigger": "combat_damage_to_player",
+            "trigger_effect": "roll_d20_create_tokens"
+          },
+          "family_id": "token_maker",
+          "family_support_status": "runtime_family_required",
+          "focused_test_scenario_count": 2,
+          "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
+          "normalized_name": "ancient gold dragon",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "DealsCombatDamageToAPlayerTriggeredAbility",
+            "FlyingAbility"
+          ],
+          "xmage_class": "AncientGoldDragon",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "AncientGoldDragonEffect",
+            "OneShotEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AncientGoldDragon.java",
+          "xmage_target_classes": [],
+          "xmage_types": [
+            "CREATURE"
+          ]
+        },
+        {
+          "batch_strategy": "implement_family_before_metadata_batch",
+          "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+          "card_name": "Prototype Portal",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "token_maker",
+          "effect_json": {
+            "ability_kind": "triggered_and_activated",
+            "activated_create_token_copy_of_imprinted_card": true,
+            "activation_requires_tap": true,
+            "activation_x_cost_source": "imprinted_card_mana_value",
+            "battle_model_scope": "xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+            "effect": "token_maker",
+            "imprint_artifact_card_from_hand_on_enter": true,
+            "permanent_type": "artifact",
+            "token_copy_source": "imprinted_card"
+          },
+          "family_id": "token_maker",
+          "family_support_status": "runtime_family_required",
+          "focused_test_scenario_count": 2,
+          "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
+          "normalized_name": "prototype portal",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "EntersBattlefieldTriggeredAbility",
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "PrototypePortal",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "OneShotEffect",
+            "PrototypePortalCreateTokenEffect",
+            "PrototypePortalEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrototypePortal.java",
+          "xmage_target_classes": [
+            "TargetCard"
+          ],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        }
+      ],
+      "family_id": "token_maker",
+      "family_tests": [],
+      "implementation_unit": "token creation with stats, abilities, duration, and zone cleanup",
+      "lane_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "sample_cards": [
+        "Ancient Gold Dragon",
+        "Prototype Portal"
+      ],
+      "support_status": "runtime_family_required"
+    },
+    {
+      "batch_strategy": "metadata_batch_after_pg_precheck",
+      "card_count": 2,
+      "cards": [
+        {
+          "batch_strategy": "metadata_batch_after_pg_precheck",
+          "battle_model_scope": "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+          "card_name": "Lantern of Insight",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "topdeck_play",
+          "effect_json": {
+            "ability_kind": "static_and_activated",
+            "activated_target_player_shuffle_library": true,
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "alternate_zone_permission": false,
+            "battle_model_scope": "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+            "each_player_top_library_revealed": true,
+            "effect": "topdeck_play",
+            "may_cast_without_paying_mana_cost": false,
+            "permanent_type": "artifact",
+            "play_lands_from_top_library": false
+          },
+          "family_id": "topdeck_play",
+          "family_support_status": "runtime_supported_family",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+          "normalized_name": "lantern of insight",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility",
+            "SimpleStaticAbility"
+          ],
+          "xmage_class": "LanternOfInsight",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "PlayWithTheTopCardRevealedEffect",
+            "ShuffleLibraryTargetEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LanternOfInsight.java",
+          "xmage_target_classes": [
+            "TargetPlayer"
+          ],
+          "xmage_types": [
+            "ARTIFACT"
+          ]
+        },
+        {
+          "batch_strategy": "metadata_batch_after_pg_precheck",
+          "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+          "card_name": "Orcish Spy",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "topdeck_play",
+          "effect_json": {
+            "ability_kind": "activated",
+            "activation_requires_tap": true,
+            "alternate_zone_permission": false,
+            "battle_model_scope": "xmage_tap_look_top_three_target_player_library_review_v1",
+            "effect": "topdeck_play",
+            "look_target_player_library_top_count": 3,
+            "may_cast_without_paying_mana_cost": false,
+            "play_lands_from_top_library": false,
+            "power": 1,
+            "target_constraints": {
+              "target": "player"
+            },
+            "toughness": 1
+          },
+          "family_id": "topdeck_play",
+          "family_support_status": "runtime_supported_family",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+          "normalized_name": "orcish spy",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [
+            "SimpleActivatedAbility"
+          ],
+          "xmage_class": "OrcishSpy",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "LookLibraryTopCardTargetPlayerEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrcishSpy.java",
+          "xmage_target_classes": [
+            "TargetPlayer"
+          ],
+          "xmage_types": [
+            "CREATURE"
+          ]
+        }
+      ],
+      "family_id": "topdeck_play",
+      "family_tests": [
+        "test_verge_rangers_plays_top_library_land_when_opponent_has_more_lands"
+      ],
+      "implementation_unit": "top-of-library visibility and permission to play cards from library under board-state conditions",
+      "lane_counts": {
+        "split_family_scope_review_required": 2
+      },
+      "sample_cards": [
+        "Lantern of Insight",
+        "Orcish Spy"
+      ],
+      "support_status": "runtime_supported_family"
+    },
+    {
+      "batch_strategy": "split_by_scope_before_metadata_batch",
+      "card_count": 1,
+      "cards": [
+        {
+          "batch_strategy": "split_by_scope_before_metadata_batch",
+          "battle_model_scope": "xmage_library_search_variant_review_v1",
+          "card_name": "Deathbellow War Cry",
+          "coherence_findings": [
+            "no_active_battle_rule"
+          ],
+          "effect": "tutor",
+          "effect_json": {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "xmage_library_search_variant_review_v1",
+            "effect": "tutor",
+            "instant": false,
+            "sorcery": true,
+            "target": "library_card",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "tutor_destination": "battlefield"
+          },
+          "family_id": "tutor",
+          "family_support_status": "runtime_family_partially_supported_review_required",
+          "focused_test_scenario_count": 1,
+          "implementation_unit": "library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield",
+          "normalized_name": "deathbellow war cry",
+          "oracle_hash": null,
+          "promotion_lane": "split_family_scope_review_required",
+          "ready_for_structured_pull": true,
+          "severity": "medium",
+          "status": "ready_for_structured_xmage_pull_review_required",
+          "valid_xmage_source": true,
+          "xmage_ability_classes": [],
+          "xmage_class": "DeathbellowWarCry",
+          "xmage_condition_classes": [],
+          "xmage_effect_classes": [
+            "SearchLibraryPutInPlayEffect"
+          ],
+          "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathbellowWarCry.java",
+          "xmage_target_classes": [
+            "TargetCardWithDifferentNameInLibrary"
+          ],
+          "xmage_types": [
+            "SORCERY"
+          ]
+        }
+      ],
+      "family_id": "tutor",
+      "family_tests": [],
+      "implementation_unit": "library search, constrained target selection, and zone movement to hand, top, graveyard, or battlefield",
+      "lane_counts": {
+        "split_family_scope_review_required": 1
+      },
+      "sample_cards": [
+        "Deathbellow War Cry"
+      ],
+      "support_status": "runtime_family_partially_supported_review_required"
+    }
+  ],
+  "generated_at": "2026-06-30T11:31:09+00:00",
+  "mutations_performed": [],
+  "source": {
+    "batch_audit_generated_at": "2026-06-30T11:31:09+00:00",
+    "batch_audit_summary": {
+      "audited_card_count": 16,
+      "exact_xmage_found_count": 16,
+      "focused_test_scenario_ready_count": 16,
+      "missing_xmage_class_count": 0,
+      "ready_for_structured_pull_count": 16,
+      "severity_counts": {
+        "medium": 16
+      },
+      "status_counts": {
+        "ready_for_structured_xmage_pull_review_required": 16
+      },
+      "valid_xmage_source_count": 16
+    },
+    "deck_id": 6
+  },
+  "status": "ready",
+  "summary": {
+    "batch_metadata_candidate_count": 0,
+    "card_count": 16,
+    "family_count": 9,
+    "family_counts": {
+      "board_wipe_choice": 2,
+      "draw_engine": 1,
+      "free_cast": 3,
+      "mill_spell": 1,
+      "passive": 2,
+      "recursion": 2,
+      "token_maker": 2,
+      "topdeck_play": 2,
+      "tutor": 1
+    },
+    "manual_or_blocked_count": 16,
+    "promotion_lane_counts": {
+      "split_family_scope_review_required": 16
+    },
+    "runtime_family_required_count": 0
+  }
+}

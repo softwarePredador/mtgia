@@ -7392,6 +7392,436 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         )
 
     if (
+        xmage_class_name == "AncientGoldDragon"
+        and card_types == {"CREATURE"}
+        and "AncientGoldDragonEffect" in effect_classes
+        and "DealsCombatDamageToAPlayerTriggeredAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="token_maker",
+                scope="xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+                reason=(
+                    "XMage structure matches Ancient Gold Dragon: combat damage to a player rolls a d20 "
+                    "and creates that many 1/1 blue Faerie Dragon creature tokens with flying. Keep it "
+                    "in split-scope review until ManaLoom has exact d20/token runtime tests."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 7,
+                    "toughness": 10,
+                    "flying": True,
+                    "trigger": "combat_damage_to_player",
+                    "trigger_effect": "roll_d20_create_tokens",
+                    "die_sides": 20,
+                    "token_count_source": "d20_result",
+                    "token_name": "Faerie Dragon Token",
+                    "token_subtype": "Faerie Dragon",
+                    "token_colors": ["U"],
+                    "token_power": 1,
+                    "token_toughness": 1,
+                    "token_flying": True,
+                },
+                matched_signals=[
+                    "DealsCombatDamageToAPlayerTriggeredAbility",
+                    "AncientGoldDragonEffect",
+                    "FaerieDragonToken",
+                    "rollDice(20)",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "BloodMoon"
+        and card_types == {"ENCHANTMENT"}
+        and "NonbasicLandsAreMountainsEffect" in effect_classes
+        and "SimpleStaticAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="xmage_nonbasic_lands_are_mountains_static_review_v1",
+                reason=(
+                    "XMage structure matches Blood Moon: a static battlefield effect makes nonbasic "
+                    "lands Mountains. This is a passive land-type replacement family, not a manual model."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "static_rule_restriction": True,
+                    "land_type_replacement": "nonbasic_lands_are_mountains",
+                    "affected_lands": "nonbasic",
+                    "resulting_basic_land_type": "mountain",
+                    "suppresses_non_mountain_land_abilities": True,
+                },
+                matched_signals=[
+                    "SimpleStaticAbility",
+                    "NonbasicLandsAreMountainsEffect",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "ChandrasIgnition"
+        and card_types == {"SORCERY"}
+        and "ChandrasIgnitionEffect" in effect_classes
+        and "TargetControlledCreaturePermanent" in target_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="sweeper_damage",
+                scope="xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+                reason=(
+                    "XMage structure matches Chandra's Ignition: target creature you control deals "
+                    "damage equal to its power to each other creature and each opponent."
+                ),
+                ability_kind="one_shot",
+                requires_runtime_executor=True,
+                target_constraints={"controller_scope": "source_controller", "card_types": ["creature"]},
+                extra_effect_fields={
+                    "sorcery": True,
+                    "target": "controlled_creature",
+                    "damage_amount_source": "target_creature_power",
+                    "damage_each_other_creature": True,
+                    "damage_each_opponent": True,
+                    "damage_source": "target_creature",
+                },
+                matched_signals=[
+                    "ChandrasIgnitionEffect",
+                    "TargetControlledCreaturePermanent",
+                    "targetCreature.getPower()",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "GhoulcallersBell"
+        and card_types == {"ARTIFACT"}
+        and "MillCardsEachPlayerEffect" in effect_classes
+        and "SimpleActivatedAbility" in ability_classes
+        and "TapSourceCost" in cost_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="mill_engine",
+                scope="xmage_artifact_tap_each_player_mill_one_review_v1",
+                reason=(
+                    "XMage structure matches Ghoulcaller's Bell: activated tap ability mills one "
+                    "card from each player's library."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "activation_requires_tap": True,
+                    "mill_count": 1,
+                    "mill_scope": "each_player",
+                    "target": "each_player",
+                },
+                matched_signals=[
+                    "SimpleActivatedAbility",
+                    "MillCardsEachPlayerEffect",
+                    "TapSourceCost",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "KarnTheGreatCreator"
+        and card_types == {"PLANESWALKER"}
+        and {
+            "KarnTheGreatCreatorAnimateEffect",
+            "KarnTheGreatCreatorCantActivateEffect",
+            "WishEffect",
+        }.issubset(effect_classes)
+        and {"LoyaltyAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+    ):
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+                reason=(
+                    "XMage structure matches Karn, the Great Creator: static artifact activation lock "
+                    "for opponents plus loyalty animation and artifact wish modes."
+                ),
+                ability_kind="static",
+                requires_runtime_executor=True,
+                target_constraints={"card_types": ["artifact"]},
+                extra_effect_fields={
+                    "permanent_type": "planeswalker",
+                    "starting_loyalty": 5,
+                    "opponent_artifact_activated_abilities_cant_be_activated": True,
+                    "plus_one_animates_noncreature_artifact_until_next_turn": True,
+                    "minus_two_artifact_wish_or_exile_to_hand": True,
+                },
+                matched_signals=[
+                    "KarnTheGreatCreatorCantActivateEffect",
+                    "KarnTheGreatCreatorAnimateEffect",
+                    "WishEffect",
+                    "LoyaltyAbility",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "KaylasMusicBox"
+        and card_types == {"ARTIFACT"}
+        and {
+            "KaylasMusicBoxExileEffect",
+            "KaylasMusicBoxLookEffect",
+            "KaylasMusicBoxPlayFromExileEffect",
+        }.issubset(effect_classes)
+        and "SimpleActivatedAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="free_cast",
+                scope="xmage_artifact_exile_top_face_down_play_owned_exiled_review_v1",
+                reason=(
+                    "XMage structure matches Kayla's Music Box: an activated ability looks at and exiles "
+                    "the top library card face down, and a second tap ability allows playing owned cards "
+                    "exiled with it until end of turn."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "legendary": True,
+                    "activated_exile_top_card_face_down": True,
+                    "exiled_card_look_permission_controller_only": True,
+                    "activated_play_owned_cards_exiled_with_source_until_eot": True,
+                    "alternate_zone_permission": True,
+                    "may_cast_without_paying_mana_cost": False,
+                },
+                matched_signals=[
+                    "KaylasMusicBoxExileEffect",
+                    "KaylasMusicBoxLookEffect",
+                    "KaylasMusicBoxPlayFromExileEffect",
+                    "PLAY_FROM_NOT_OWN_HAND_ZONE",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "LanternOfInsight"
+        and card_types == {"ARTIFACT"}
+        and {
+            "PlayWithTheTopCardRevealedEffect",
+            "ShuffleLibraryTargetEffect",
+        }.issubset(effect_classes)
+        and {"SimpleActivatedAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+    ):
+        candidates.append(
+            _candidate(
+                effect="topdeck_play",
+                scope="xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+                reason=(
+                    "XMage structure matches Lantern of Insight: static top-library reveal for each "
+                    "player plus tap-sacrifice target-player shuffle."
+                ),
+                ability_kind="static_and_activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "each_player_top_library_revealed": True,
+                    "activated_target_player_shuffle_library": True,
+                    "activation_requires_tap": True,
+                    "activation_requires_sacrifice": True,
+                    "play_lands_from_top_library": False,
+                    "alternate_zone_permission": False,
+                    "may_cast_without_paying_mana_cost": False,
+                },
+                matched_signals=[
+                    "PlayWithTheTopCardRevealedEffect",
+                    "ShuffleLibraryTargetEffect",
+                    "SimpleStaticAbility",
+                    "SimpleActivatedAbility",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "LeylineDowser"
+        and card_types == {"ARTIFACT"}
+        and {"MillThenPutInHandEffect", "UntapSourceEffect"}.issubset(effect_classes)
+        and "SimpleActivatedAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="recursion",
+                scope="xmage_artifact_mill_one_put_milled_instant_sorcery_into_hand_untap_review_v1",
+                reason=(
+                    "XMage structure matches Leyline Dowser: pay and tap to mill one card and optionally "
+                    "put an instant or sorcery milled this way into hand, plus tap a legendary creature "
+                    "to untap the artifact."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                target_constraints={"controller_scope": "source_controller", "card_types": ["creature"]},
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "activation_cost_generic": 1,
+                    "activation_requires_tap": True,
+                    "mill_count": 1,
+                    "milled_card_types_to_hand": ["instant", "sorcery"],
+                    "secondary_untap_source_by_tapping_legendary_creature": True,
+                },
+                matched_signals=[
+                    "MillThenPutInHandEffect",
+                    "UntapSourceEffect",
+                    "TapTargetCost",
+                    "FilterControlledCreaturePermanent",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "OrcishSpy"
+        and card_types == {"CREATURE"}
+        and "LookLibraryTopCardTargetPlayerEffect" in effect_classes
+        and "SimpleActivatedAbility" in ability_classes
+        and "TargetPlayer" in target_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="topdeck_play",
+                scope="xmage_tap_look_top_three_target_player_library_review_v1",
+                reason=(
+                    "XMage structure matches Orcish Spy: activated tap ability looks at the top three "
+                    "cards of target player's library."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                target_constraints={"target": "player"},
+                extra_effect_fields={
+                    "power": 1,
+                    "toughness": 1,
+                    "activation_requires_tap": True,
+                    "look_target_player_library_top_count": 3,
+                    "play_lands_from_top_library": False,
+                    "alternate_zone_permission": False,
+                    "may_cast_without_paying_mana_cost": False,
+                },
+                matched_signals=[
+                    "LookLibraryTopCardTargetPlayerEffect",
+                    "TargetPlayer",
+                    "TapSourceCost",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "PossibilityStorm"
+        and card_types == {"ENCHANTMENT"}
+        and "PossibilityStormTriggeredAbility" in ability_classes
+        and "PossibilityStormEffect" in effect_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="free_cast",
+                scope="xmage_spell_from_hand_exile_until_shared_type_free_cast_review_v1",
+                reason=(
+                    "XMage structure matches Possibility Storm: spell cast from hand is exiled, then "
+                    "library cards are exiled until a nonland sharing a card type may be cast for free, "
+                    "with the rest bottomed randomly."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "trigger": "spell_cast_from_hand",
+                    "exile_original_spell": True,
+                    "exile_from_top_until_shares_card_type": True,
+                    "hit_card_may_cast_without_paying_mana_cost": True,
+                    "bottom_rest_random": True,
+                    "alternate_zone_permission": True,
+                    "may_cast_without_paying_mana_cost": True,
+                },
+                matched_signals=[
+                    "PossibilityStormTriggeredAbility",
+                    "PossibilityStormEffect",
+                    "GameEvent.EventType.SPELL_CAST",
+                    "Zone.HAND",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "PrototypePortal"
+        and card_types == {"ARTIFACT"}
+        and {
+            "PrototypePortalEffect",
+            "PrototypePortalCreateTokenEffect",
+        }.issubset(effect_classes)
+        and {"EntersBattlefieldTriggeredAbility", "SimpleActivatedAbility"}.issubset(ability_classes)
+    ):
+        candidates.append(
+            _candidate(
+                effect="token_maker",
+                scope="xmage_imprint_artifact_create_copy_token_x_cost_review_v1",
+                reason=(
+                    "XMage structure matches Prototype Portal: imprint an artifact card from hand on ETB, "
+                    "then pay X and tap to create a token copy where X is the imprinted card's mana value."
+                ),
+                ability_kind="triggered_and_activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "imprint_artifact_card_from_hand_on_enter": True,
+                    "activated_create_token_copy_of_imprinted_card": True,
+                    "activation_requires_tap": True,
+                    "activation_x_cost_source": "imprinted_card_mana_value",
+                    "token_copy_source": "imprinted_card",
+                },
+                matched_signals=[
+                    "PrototypePortalEffect",
+                    "PrototypePortalCreateTokenEffect",
+                    "ImprintedManaValueXCostAdjuster",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "PyxisOfPandemonium"
+        and card_types == {"ARTIFACT"}
+        and {
+            "PyxisOfPandemoniumExileEffect",
+            "PyxisOfPandemoniumPutOntoBattlefieldEffect",
+        }.issubset(effect_classes)
+        and "SimpleActivatedAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="free_cast",
+                scope="xmage_each_player_exile_top_face_down_put_permanents_battlefield_review_v1",
+                reason=(
+                    "XMage structure matches Pyxis of Pandemonium: tap to exile each player's top card "
+                    "face down, then pay seven, tap, and sacrifice to reveal those cards and put all "
+                    "permanent cards among them onto the battlefield."
+                ),
+                ability_kind="activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "activated_each_player_exile_top_face_down": True,
+                    "activated_put_exiled_permanents_onto_battlefield": True,
+                    "activation_requires_tap": True,
+                    "final_activation_requires_sacrifice": True,
+                    "final_activation_cost_generic": 7,
+                    "alternate_zone_permission": True,
+                    "may_cast_without_paying_mana_cost": False,
+                    "put_permanent_cards_from_exile_onto_battlefield": True,
+                },
+                matched_signals=[
+                    "PyxisOfPandemoniumExileEffect",
+                    "PyxisOfPandemoniumPutOntoBattlefieldEffect",
+                    "SacrificeSourceCost",
+                    "GenericManaCost(7)",
+                ],
+            )
+        )
+
+    if (
         card_types == {"ENCHANTMENT"}
         and effect_classes == {"DamageTargetEffect"}
         and "DealtDamageAnyTriggeredAbility" in ability_classes

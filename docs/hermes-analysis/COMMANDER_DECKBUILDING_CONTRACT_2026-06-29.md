@@ -793,11 +793,15 @@ Runtime enablement checkpoint generated on 2026-06-30:
   item from the runtime-gap queue but is not deck-promotion evidence by itself.
 - The current runtime-gap queue is
   superseded by
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.md`.
+  The PG276 follow-up mapper wave reduced the Lorehold runtime manual mapper
+  backlog from `12` to `0`; the remaining `16` cards are all structured
+  split-scope work across nine families, so the next deck-quality blocker is
+  exact runtime/scope work rather than card-by-card identification.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg276_lane_core_blocked.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg276_manual_mapper_wave.md`.
 - The current readiness output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_lane_core_blocked.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_manual_mapper_wave.md`;
   `Hidden Retreat` and `Brainstone` are applied/synced and must not be routed
   back to PG apply, while `Codex Shredder` and `Perpetual Timepiece` are
   already filtered from runtime-gap work as current active rules; `Chaos Wand`

@@ -404,12 +404,14 @@ PG267/PG271 runtime-rule checkpoint:
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`;
-  blocked runtime gaps are `16`, with
-  `mapper_metadata_or_test_scenario_required=12` and
-  `split_family_scope_review_required=4`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.md`;
+  blocked runtime gaps are still `16`, but the manual mapper backlog is now
+  `0`; all `16` remaining cards are routed to `split_family_scope_review_required`.
+  The split families are `free_cast=3`, `passive=2`, `recursion=2`,
+  `board_wipe_choice=2`, `token_maker=2`, `topdeck_play=2`,
+  `draw_engine=1`, `mill_spell=1`, and `tutor=1`.
 - Current Lorehold runtime readiness after PG276:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_lane_core_blocked.md`;
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_manual_mapper_wave.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
   apply-pending; `Codex Shredder` and `Perpetual Timepiece` are filtered out of
   the runtime-gap queue as current verified/auto active rules; `Chaos Wand` is
