@@ -48,6 +48,16 @@ DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT = (
 DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT = (
     REPORT_DIR / "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json"
 )
+DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS = [
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
+]
+DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+]
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -89,6 +99,23 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
     REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
 ]
+FROM_SCRATCH_TELEMETRY_KEYS = (
+    "lorehold_cost_paid",
+    "lorehold_spell_cast",
+    "lorehold_upkeep_rummage",
+    "miracle_cast",
+    "topdeck_manipulation_activated",
+    "discard_to_top_replacement",
+    "lorehold_rummage_discard_to_top",
+    "lorehold_rummage_discards_squee",
+    "squee_to_graveyard",
+    "squee_upkeep_return",
+    "squee_return_after_known_graveyard_entry",
+    "static_cost_reduction_total",
+    "scarlet_static_cost_reduction_total",
+    "birgi_spell_cast_mana",
+    "spell_cast_mana_trigger",
+)
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
     "forced_access_inconclusive_low_exposure",
@@ -1493,6 +1520,150 @@ def build_seed_safe_cut_hypothesis_action(
     return None
 
 
+def side_record_from_results(results: list[dict[str, Any]], deck_key: str) -> dict[str, Any]:
+    for row in results:
+        if row.get("deck_key") == deck_key:
+            strategic_games = ((row.get("telemetry") or {}).get("strategic_games") or {})
+            return {
+                "deck_key": row.get("deck_key"),
+                "wins": int(row.get("wins") or 0),
+                "losses": int(row.get("losses") or 0),
+                "stalls": int(row.get("stalls") or 0),
+                "games": int(row.get("games") or 0),
+                "win_rate": float(row.get("win_rate") or 0.0),
+                "strategic_games": {
+                    key: strategic_games[key]
+                    for key in FROM_SCRATCH_TELEMETRY_KEYS
+                    if key in strategic_games
+                },
+            }
+    return {}
+
+
+def build_from_scratch_shell_action(
+    from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None,
+    from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None,
+) -> dict[str, Any] | None:
+    if not from_scratch_reports and not from_scratch_gate_reports:
+        return None
+    generated_candidates = []
+    for path, payload in from_scratch_reports or []:
+        for row in payload.get("candidates") or []:
+            generated_candidates.append(
+                {
+                    "source_report": str(path),
+                    "candidate_key": row.get("candidate_key"),
+                    "candidate_name": row.get("candidate_name"),
+                    "intent_score": ((row.get("commander_intent_alignment") or {}).get("score")),
+                    "missing_required_cards": row.get("missing_required_cards") or [],
+                    "battle_gate_json": row.get("battle_gate_json"),
+                }
+            )
+    gate_rows = []
+    for path, payload in from_scratch_gate_reports or []:
+        results = [row for row in payload.get("results") or [] if isinstance(row, dict)]
+        baseline = side_record_from_results(results, "deck_607")
+        for row in results:
+            deck_key = str(row.get("deck_key") or "")
+            if deck_key == "deck_607" or not deck_key:
+                continue
+            candidate = side_record_from_results(results, deck_key)
+            delta_wins = int(candidate.get("wins") or 0) - int(baseline.get("wins") or 0)
+            gate_rows.append(
+                {
+                    "source_report": str(path),
+                    "candidate_key": deck_key,
+                    "baseline": baseline,
+                    "candidate": candidate,
+                    "delta_wins": delta_wins,
+                    "candidate_squee_return_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get(
+                                "squee_upkeep_return"
+                            )
+                            or {}
+                        ).get("games")
+                    ),
+                    "candidate_miracle_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get("miracle_cast")
+                            or {}
+                        ).get("games")
+                    ),
+                    "candidate_topdeck_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get(
+                                "topdeck_manipulation_activated"
+                            )
+                            or {}
+                        ).get("games")
+                    ),
+                }
+            )
+    gate_rows.sort(
+        key=lambda row: (
+            -int(row.get("delta_wins") or 0),
+            row.get("candidate_key") or "",
+        )
+    )
+    if any(int(row.get("delta_wins") or 0) >= 0 for row in gate_rows):
+        best = gate_rows[0]
+        return {
+            "priority": -5,
+            "action_key": "confirm_or_rework_from_scratch_shell_signal",
+            "status": "from_scratch_shell_has_non_negative_gate_signal",
+            "lane": "multi_card_shell",
+            "candidate_cards": [str(best.get("candidate_key") or "")],
+            "cut_cards": [],
+            "why_now": (
+                "A from-scratch shell has tied or exceeded 607 in a current gate. Treat it as "
+                "a shell-level signal and require confirmation before any deck replacement."
+            ),
+            "blockers": [
+                "shell-level result is not card-level proof",
+                "must preserve fixed 607 opponent and direct strategic telemetry",
+            ],
+            "next_steps": [
+                "Run confirmation against the same protected 607 gate.",
+                "Inspect miracle/topdeck/Squee/pressure telemetry before promoting or cutting anything.",
+            ],
+            "evidence": {
+                "generated_candidates": generated_candidates,
+                "from_scratch_gate_rows": gate_rows,
+            },
+        }
+    if gate_rows:
+        return {
+            "priority": -5,
+            "action_key": "rework_from_scratch_shell_after_current_shells_rejected",
+            "status": "from_scratch_shells_not_promotable",
+            "lane": "multi_card_shell",
+            "candidate_cards": [str(row.get("candidate_key") or "") for row in gate_rows[:5]],
+            "cut_cards": [],
+            "why_now": (
+                "Current from-scratch shells already tested against fixed 607 do not beat the "
+                "protected baseline. The pressure-repair shell improves Squee telemetry, but still "
+                "loses the 8x3 gate, so the next shell must repair conversion/pressure without "
+                "discarding the 607 floor."
+            ),
+            "blockers": [
+                "best confirmed from-scratch shell is below protected 607",
+                "positive Squee telemetry did not convert into wins",
+                "do not promote shell-level telemetry without equal-gate wins",
+            ],
+            "next_steps": [
+                "Use the pressure-repair shell as telemetry, not as a deck replacement.",
+                "Build the next shell around pressure conversion and closing windows while preserving 607 mana/protection density.",
+                "Only run a new shell gate when the candidate changes materially from the rejected pressure-repair shell.",
+            ],
+            "evidence": {
+                "generated_candidates": generated_candidates,
+                "from_scratch_gate_rows": gate_rows,
+            },
+        }
+    return None
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1601,6 +1772,8 @@ def build_plan(
     trace_audit: dict[str, Any] | None = None,
     focus_access_package_report: dict[str, Any] | None = None,
     seed_safe_cut_hypothesis_report: dict[str, Any] | None = None,
+    from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
@@ -1626,6 +1799,12 @@ def build_plan(
     seed_safe_action = build_seed_safe_cut_hypothesis_action(seed_safe_cut_hypothesis_report)
     if seed_safe_action:
         actions.append(seed_safe_action)
+    from_scratch_action = build_from_scratch_shell_action(
+        from_scratch_reports,
+        from_scratch_gate_reports,
+    )
+    if from_scratch_action:
+        actions.append(from_scratch_action)
     focus_access_result_action = build_focus_access_package_result_action(
         focus_access_package_report
     )
@@ -1720,6 +1899,10 @@ def build_plan(
             str(path) for path, _payload in (profiled_cut_benchmark_reports or [])
         ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
+        "from_scratch_reports": [str(path) for path, _payload in (from_scratch_reports or [])],
+        "from_scratch_gate_reports": [
+            str(path) for path, _payload in (from_scratch_gate_reports or [])
+        ],
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -1748,6 +1931,7 @@ def build_plan(
             "seed_safe_cut_summary": (
                 (seed_safe_cut_hypothesis_report or {}).get("summary") or {}
             ),
+            "from_scratch_gate_count": len(from_scratch_gate_reports or []),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -1766,6 +1950,7 @@ def build_plan(
             "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
             "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
             "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
+            "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1791,6 +1976,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Mana-base validator reports: `{', '.join(payload.get('mana_base_validator_reports') or []) or '-'}`",
         f"- Profiled cut benchmark reports: `{', '.join(payload.get('profiled_cut_benchmark_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
+        f"- From-scratch reports: `{', '.join(payload.get('from_scratch_reports') or []) or '-'}`",
+        f"- From-scratch gate reports: `{', '.join(payload.get('from_scratch_gate_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -1876,6 +2063,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mana-base-validator-report", type=Path, action="append")
     parser.add_argument("--profiled-cut-benchmark-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
+    parser.add_argument("--from-scratch-report", type=Path, action="append")
+    parser.add_argument("--from-scratch-gate-report", type=Path, action="append")
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
@@ -1917,6 +2106,12 @@ def main() -> int:
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
+    from_scratch_reports = read_existing_json(
+        args.from_scratch_report or DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS
+    )
+    from_scratch_gate_reports = read_existing_json(
+        args.from_scratch_gate_report or DEFAULT_FROM_SCRATCH_GATE_REPORTS
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -1932,6 +2127,8 @@ def main() -> int:
         trace_audit=trace_audit,
         focus_access_package_report=focus_access_package_report,
         seed_safe_cut_hypothesis_report=seed_safe_cut_hypothesis_report,
+        from_scratch_reports=from_scratch_reports,
+        from_scratch_gate_reports=from_scratch_gate_reports,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,

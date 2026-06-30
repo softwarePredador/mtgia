@@ -745,6 +745,30 @@ Seed-safe cut synthesis generated on 2026-06-30:
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
 
+From-scratch shell handoff generated on 2026-06-30:
+
+- Scope: full 100-card challengers generated from the Lorehold `607-616`
+  corpus, with protected `607` fixed as the baseline opponent rather than
+  treated as a swap list.
+- Confirmed shell evidence now consumed by the current next-action planner:
+  `challenger_lorehold_recursion_discard_engine_v1` lost the 8x3 gate
+  `4/24` versus `607` at `6/24`, and
+  `challenger_lorehold_recursion_discard_pressure_repair_v1` lost `3/24`
+  versus `607` at `6/24`.
+- Interpretation: the recursion/Squee shell produced useful telemetry, but it
+  did not convert into wins. Shell-level telemetry is not card-level proof and
+  cannot promote an individual card or a full deck by itself.
+- Current planner top action:
+  `rework_from_scratch_shell_after_current_shells_rejected`. The next shell
+  must materially repair pressure conversion and closing windows while
+  preserving the `607` mana/protection/miracle floor before any new natural
+  battle gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
+
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 
 - Candidate:

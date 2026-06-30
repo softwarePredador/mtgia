@@ -9,6 +9,12 @@ def test_defaults_use_current_cut_models():
     assert planner.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
     assert planner.DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT.name == "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
     assert planner.DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT.name == "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json"
+    assert planner.DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS[0].name == (
+        "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
+    )
+    assert planner.DEFAULT_FROM_SCRATCH_GATE_REPORTS[-1].name == (
+        "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json"
+    )
     assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
     assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
     assert planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0].name == "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
@@ -1347,6 +1353,75 @@ def test_next_action_planner_can_route_ready_seed_safe_cut_slots_to_package_desi
     action = payload["action_queue"][0]
     assert action["status"] == "seed_safe_cut_slots_ready_for_package_design"
     assert action["cut_cards"] == ["Quiet Study"]
+
+
+def test_next_action_planner_uses_negative_from_scratch_shell_gates_as_rework_signal():
+    gate_report = (
+        Path("/tmp/from_scratch_gate.json"),
+        {
+            "results": [
+                {"deck_key": "deck_607", "wins": 6, "losses": 18, "games": 24, "win_rate": 25.0},
+                {
+                    "deck_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+                    "wins": 3,
+                    "losses": 21,
+                    "games": 24,
+                    "win_rate": 12.5,
+                    "telemetry": {
+                        "strategic_games": {
+                            "squee_upkeep_return": {"games": 3},
+                            "miracle_cast": {"games": 11},
+                        }
+                    },
+                },
+            ]
+        },
+    )
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_gate_reports=[gate_report],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "rework_from_scratch_shell_after_current_shells_rejected"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "from_scratch_shells_not_promotable"
+    assert action["evidence"]["from_scratch_gate_rows"][0]["delta_wins"] == -3
+    assert action["evidence"]["from_scratch_gate_rows"][0]["candidate_squee_return_games"] == 3
+
+
+def test_next_action_planner_routes_non_negative_from_scratch_shell_to_confirmation():
+    gate_report = (
+        Path("/tmp/from_scratch_gate.json"),
+        {
+            "results": [
+                {"deck_key": "deck_607", "wins": 4, "losses": 20, "games": 24, "win_rate": 16.67},
+                {
+                    "deck_key": "challenger_lorehold_new_shell_v1",
+                    "wins": 5,
+                    "losses": 19,
+                    "games": 24,
+                    "win_rate": 20.83,
+                },
+            ]
+        },
+    )
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_gate_reports=[gate_report],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "confirm_or_rework_from_scratch_shell_signal"
+    )
+    assert payload["action_queue"][0]["status"] == "from_scratch_shell_has_non_negative_gate_signal"
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

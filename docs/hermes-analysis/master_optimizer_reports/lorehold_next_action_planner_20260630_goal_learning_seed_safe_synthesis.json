@@ -1,6 +1,362 @@
 {
   "action_queue": [
     {
+      "action_key": "rework_from_scratch_shell_after_current_shells_rejected",
+      "blockers": [
+        "best confirmed from-scratch shell is below protected 607",
+        "positive Squee telemetry did not convert into wins",
+        "do not promote shell-level telemetry without equal-gate wins"
+      ],
+      "candidate_cards": [
+        "challenger_lorehold_recursion_discard_engine_v1",
+        "challenger_lorehold_recursion_discard_pressure_repair_v1"
+      ],
+      "cut_cards": [],
+      "evidence": {
+        "from_scratch_gate_rows": [
+          {
+            "baseline": {
+              "deck_key": "deck_607",
+              "games": 24,
+              "losses": 18,
+              "stalls": 0,
+              "strategic_games": {
+                "birgi_spell_cast_mana": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "discard_to_top_replacement": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_cost_paid": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_rummage_discard_to_top": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_rummage_discards_squee": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "lorehold_spell_cast": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 16,
+                  "rate": 0.6667
+                },
+                "miracle_cast": {
+                  "games": 9,
+                  "rate": 0.375
+                },
+                "scarlet_static_cost_reduction_total": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "spell_cast_mana_trigger": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_return_after_known_graveyard_entry": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_to_graveyard": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_upkeep_return": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "static_cost_reduction_total": {
+                  "games": 7,
+                  "rate": 0.2917
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 7,
+                  "rate": 0.2917
+                }
+              },
+              "win_rate": 25.0,
+              "wins": 6
+            },
+            "candidate": {
+              "deck_key": "challenger_lorehold_recursion_discard_engine_v1",
+              "games": 24,
+              "losses": 20,
+              "stalls": 0,
+              "strategic_games": {
+                "birgi_spell_cast_mana": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "discard_to_top_replacement": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "lorehold_cost_paid": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_rummage_discard_to_top": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "lorehold_rummage_discards_squee": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_spell_cast": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 13,
+                  "rate": 0.5417
+                },
+                "miracle_cast": {
+                  "games": 12,
+                  "rate": 0.5
+                },
+                "scarlet_static_cost_reduction_total": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "spell_cast_mana_trigger": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "squee_return_after_known_graveyard_entry": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "squee_to_graveyard": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "squee_upkeep_return": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "static_cost_reduction_total": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 8,
+                  "rate": 0.3333
+                }
+              },
+              "win_rate": 16.67,
+              "wins": 4
+            },
+            "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+            "candidate_miracle_games": 12,
+            "candidate_squee_return_games": 1,
+            "candidate_topdeck_games": 8,
+            "delta_wins": -2,
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json"
+          },
+          {
+            "baseline": {
+              "deck_key": "deck_607",
+              "games": 24,
+              "losses": 18,
+              "stalls": 0,
+              "strategic_games": {
+                "birgi_spell_cast_mana": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "discard_to_top_replacement": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_cost_paid": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_rummage_discard_to_top": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_rummage_discards_squee": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "lorehold_spell_cast": {
+                  "games": 24,
+                  "rate": 1.0
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 16,
+                  "rate": 0.6667
+                },
+                "miracle_cast": {
+                  "games": 9,
+                  "rate": 0.375
+                },
+                "scarlet_static_cost_reduction_total": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "spell_cast_mana_trigger": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_return_after_known_graveyard_entry": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_to_graveyard": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "squee_upkeep_return": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "static_cost_reduction_total": {
+                  "games": 7,
+                  "rate": 0.2917
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 7,
+                  "rate": 0.2917
+                }
+              },
+              "win_rate": 25.0,
+              "wins": 6
+            },
+            "candidate": {
+              "deck_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+              "games": 24,
+              "losses": 21,
+              "stalls": 0,
+              "strategic_games": {
+                "birgi_spell_cast_mana": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "discard_to_top_replacement": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_cost_paid": {
+                  "games": 23,
+                  "rate": 0.9583
+                },
+                "lorehold_rummage_discard_to_top": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "lorehold_rummage_discards_squee": {
+                  "games": 2,
+                  "rate": 0.0833
+                },
+                "lorehold_spell_cast": {
+                  "games": 23,
+                  "rate": 0.9583
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 13,
+                  "rate": 0.5417
+                },
+                "miracle_cast": {
+                  "games": 11,
+                  "rate": 0.4583
+                },
+                "scarlet_static_cost_reduction_total": {
+                  "games": 1,
+                  "rate": 0.0417
+                },
+                "spell_cast_mana_trigger": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "squee_return_after_known_graveyard_entry": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "squee_to_graveyard": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "squee_upkeep_return": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "static_cost_reduction_total": {
+                  "games": 3,
+                  "rate": 0.125
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 3,
+                  "rate": 0.125
+                }
+              },
+              "win_rate": 12.5,
+              "wins": 3
+            },
+            "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+            "candidate_miracle_games": 11,
+            "candidate_squee_return_games": 3,
+            "candidate_topdeck_games": 3,
+            "delta_wins": -3,
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json"
+          }
+        ],
+        "generated_candidates": [
+          {
+            "battle_gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_miracle_topdeck_control_fixed607_gate.json",
+            "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+            "candidate_name": "Lorehold From-Scratch Miracle Topdeck Control v1",
+            "intent_score": 94.653,
+            "missing_required_cards": [],
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
+          },
+          {
+            "battle_gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_spellchain_big_sorcery_fixed607_gate.json",
+            "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+            "candidate_name": "Lorehold From-Scratch Spellchain Big Sorcery v1",
+            "intent_score": 94.835,
+            "missing_required_cards": [],
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
+          },
+          {
+            "battle_gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_fixed607_gate.json",
+            "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+            "candidate_name": "Lorehold From-Scratch Recursion Discard Engine v1",
+            "intent_score": 92.431,
+            "missing_required_cards": [],
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
+          },
+          {
+            "battle_gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_fixed607_gate.json",
+            "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+            "candidate_name": "Lorehold From-Scratch Recursion Discard Pressure Repair v1",
+            "intent_score": 94.056,
+            "missing_required_cards": [],
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json"
+          }
+        ]
+      },
+      "lane": "multi_card_shell",
+      "next_steps": [
+        "Use the pressure-repair shell as telemetry, not as a deck replacement.",
+        "Build the next shell around pressure conversion and closing windows while preserving 607 mana/protection density.",
+        "Only run a new shell gate when the candidate changes materially from the rejected pressure-repair shell."
+      ],
+      "priority": -5,
+      "status": "from_scratch_shells_not_promotable",
+      "why_now": "Current from-scratch shells already tested against fixed 607 do not beat the protected baseline. The pressure-repair shell improves Squee telemetry, but still loses the 8x3 gate, so the next shell must repair conversion/pressure without discarding the 607 floor."
+    },
+    {
       "action_key": "expand_cut_safety_model_or_multi_card_shell_before_gate",
       "blockers": [
         "seed_safe_cut_ready_count is zero",
@@ -6885,7 +7241,15 @@
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_cut_exposure_profile_20260628_v1.json"
   ],
   "focus_access_package_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
-  "generated_at": "2026-06-30T22:34:06Z",
+  "from_scratch_gate_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json"
+  ],
+  "from_scratch_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json"
+  ],
+  "generated_at": "2026-06-30T22:47:14Z",
   "guardrails": [
     {
       "guardrail_key": "no_automatic_gate_without_safe_cut",
@@ -7018,6 +7382,7 @@
     "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
     "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
     "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
+    "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
     "PostgreSQL and SQLite are not mutated by this script."
   ],
   "miner_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json",
@@ -7057,10 +7422,11 @@
   "source_db_mutated": false,
   "strategy_audit": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
   "summary": {
-    "action_count": 9,
+    "action_count": 10,
     "action_status_counts": {
       "diagnostic_low_exposure_recorded_no_strategy_block": 1,
       "focus_access_cut_models_exhausted_new_seed_safe_cut_required": 1,
+      "from_scratch_shells_not_promotable": 1,
       "hypothesis_queue_exhausted_requires_new_synthesis": 1,
       "no_hand_filter_benchmark_ready": 1,
       "no_mana_base_preflight_ready": 1,
@@ -7069,6 +7435,7 @@
       "seed_safe_cut_unavailable": 1,
       "tutor_land_tax_benchmarks_rejected": 1
     },
+    "from_scratch_gate_count": 2,
     "gate_ready_now_count": 0,
     "hypothesis_queue_status_counts": {
       "tested_negative_do_not_promote": 13
@@ -7164,7 +7531,7 @@
       "velomachus_lorehold_same_lane_benchmark_cut_creative_technique",
       "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_winds_of_abandon"
     ],
-    "recommended_next_action": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+    "recommended_next_action": "rework_from_scratch_shell_after_current_shells_rejected",
     "seed_safe_cut_summary": {
       "blocked_count": 94,
       "blocker_counts": {
