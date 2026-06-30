@@ -9,6 +9,21 @@ Updated: 2026-06-30
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 
+## Contrato de dados / aliases
+
+- `DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md`
+  - Status: `current_guardrail`.
+  - Define os campos canonicos para evitar trabalho duplicado entre
+    `oracle*`, `card_id`, nomes normalizados, `logical_rule_key`,
+    `oracle_hash` e referencias.
+  - Regra principal: `card_id` vence alias de nome; `oracle_id` vence
+    `scryfall_id` para identidade jogavel; `logical_rule_key` vence labels de
+    efeito; `oracle_hash` e o campo de drift para regra de battle.
+  - Auditoria ativa:
+    `manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py`.
+    Evidencia atual:
+    `master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260630_alias_guardrail_final.md`.
+
 ## Decisoes atuais XMage -> ManaLoom
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
@@ -82,13 +97,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Redirect Lightning` tratados como draw e bloqueia `Improvisation
     Capstone` como nucleo de spell-chain, nao flex topdeck.
   - Fila runtime atual:
-    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_manual_mapper_wave.md`.
-    `Codex Shredder`, `Perpetual Timepiece`, `Chaos Wand` e
-    `Assemble the Players` agora estao aplicados/sincronizados como regras
-    ativas; a fila restante tem `16` gaps runtime, mas `0` manual mappers
-    depois da onda conservadora de mapeamento XMage. O gerador de foco
-    continua com `0` pacotes gate-ready porque os `16` itens restantes exigem
-    split/runtime exato por familia.
+    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.md`.
+    `Kayla's Music Box` agora esta aplicada/sincronizada como regra ativa; a
+    fila restante tem `12` gaps runtime, todos com XMage local encontrado,
+    `0` manual mappers, e todos ainda em
+    `split_family_scope_review_required`. O gerador de foco atual
+    `master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.md`
+    continua com `0` pacotes gate-ready porque falta split/runtime exato ou
+    corte seguro.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

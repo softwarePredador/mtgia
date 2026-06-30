@@ -397,6 +397,125 @@ def sqlite_cache_integrity_checks(conn: sqlite3.Connection) -> list[Check]:
                     f"all_deck_cards_missing_card_id={total_missing}",
                 )
             )
+        if (
+            table_exists(conn, "card_oracle_cache")
+            and {"card_id", "card_name"}.issubset(columns)
+            and {"normalized_name", "card_id", "name"}.issubset(sqlite_columns(conn, "card_oracle_cache"))
+        ):
+            drift_rows = conn.execute(
+                """
+                SELECT
+                  dc.deck_id,
+                  dc.card_name AS deck_card_name,
+                  COALESCE(dc.card_id, '') AS deck_card_id,
+                  coc.name AS oracle_cache_name,
+                  coc.card_id AS oracle_cache_card_id
+                FROM deck_cards dc
+                JOIN card_oracle_cache coc
+                  ON coc.normalized_name = lower(trim(dc.card_name))
+                WHERE COALESCE(coc.card_id, '') != ''
+                  AND (
+                    dc.card_id IS NULL
+                    OR dc.card_id = ''
+                    OR lower(dc.card_id) != lower(coc.card_id)
+                  )
+                ORDER BY dc.deck_id, dc.card_name
+                LIMIT 20
+                """
+            ).fetchall()
+            drift_count = int(
+                conn.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM deck_cards dc
+                    JOIN card_oracle_cache coc
+                      ON coc.normalized_name = lower(trim(dc.card_name))
+                    WHERE COALESCE(coc.card_id, '') != ''
+                      AND (
+                        dc.card_id IS NULL
+                        OR dc.card_id = ''
+                        OR lower(dc.card_id) != lower(coc.card_id)
+                      )
+                    """
+                ).fetchone()[0]
+                or 0
+            )
+            checks.append(
+                Check(
+                    "sqlite_integrity.deck_cards_card_id_cache_drift",
+                    "pass" if drift_count == 0 else "fail",
+                    f"deck_cards_rows_with_card_id_drift={drift_count}",
+                    {
+                        "canonical_field": "deck_cards.card_id",
+                        "source_field": "card_oracle_cache.card_id",
+                        "sample": [dict(row) for row in drift_rows],
+                    },
+                )
+            )
+            alias_rows = conn.execute(
+                """
+                SELECT
+                  dc.deck_id,
+                  dc.card_name AS deck_card_name,
+                  dc.card_id AS card_id,
+                  coc.name AS oracle_cache_name
+                FROM deck_cards dc
+                JOIN card_oracle_cache coc
+                  ON coc.normalized_name = lower(trim(dc.card_name))
+                WHERE dc.card_name != coc.name
+                  AND COALESCE(dc.card_id, '') != ''
+                  AND lower(dc.card_id) = lower(COALESCE(coc.card_id, ''))
+                ORDER BY dc.deck_id, dc.card_name
+                LIMIT 20
+                """
+            ).fetchall()
+            alias_count = int(
+                conn.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM deck_cards dc
+                    JOIN card_oracle_cache coc
+                      ON coc.normalized_name = lower(trim(dc.card_name))
+                    WHERE dc.card_name != coc.name
+                      AND COALESCE(dc.card_id, '') != ''
+                      AND lower(dc.card_id) = lower(COALESCE(coc.card_id, ''))
+                    """
+                ).fetchone()[0]
+                or 0
+            )
+            checks.append(
+                Check(
+                    "sqlite_integrity.deck_cards_name_aliases_canonicalized_by_card_id",
+                    "pass",
+                    f"name_alias_rows_with_matching_card_id={alias_count}",
+                    {
+                        "canonical_field": "deck_cards.card_id",
+                        "alias_fields": ["deck_cards.card_name", "card_oracle_cache.name"],
+                        "sample": [dict(row) for row in alias_rows],
+                    },
+                )
+            )
+
+    if table_exists(conn, "battle_card_rules"):
+        columns = sqlite_columns(conn, "battle_card_rules")
+        if {"oracle_hash", "source", "review_status", "execution_status"}.issubset(columns):
+            missing_hash = sqlite_count(
+                conn,
+                "battle_card_rules",
+                """
+                source IN ('curated', 'manual')
+                AND review_status IN ('verified', 'active')
+                AND execution_status IN ('auto', 'executable')
+                AND COALESCE(oracle_hash, '') = ''
+                """,
+            )
+            checks.append(
+                Check(
+                    "sqlite_integrity.battle_rules_trusted_oracle_hash_coverage",
+                    "pass" if missing_hash == 0 else "warn",
+                    f"trusted_executable_rules_missing_oracle_hash={missing_hash}",
+                )
+            )
 
     if table_exists(conn, "card_legalities"):
         for card_name, expected in (("Worldfire", "legal"), ("Mana Crypt", "banned")):
