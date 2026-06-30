@@ -1,6 +1,6 @@
 # Lorehold Exposure-Aware Gate Queue - 2026-06-30
 
-- Generated at: `2026-06-30T14:52:34Z`
+- Generated at: `2026-06-30T15:07:20Z`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Readiness report: `/Users/desenvolvimentomobile/.codex/worktrees/solo-consolidation-mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json`

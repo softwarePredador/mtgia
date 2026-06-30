@@ -19,12 +19,13 @@ from lorehold_strategy_profile import (
     commander_intent_alignment,
     strategy_tags_for_card,
 )
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SOURCE_DB = resolve_default_knowledge_db()
 DEFAULT_PLAN = "penance_v1"
 
 RESEARCH_PLANS = {

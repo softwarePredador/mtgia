@@ -10,7 +10,7 @@
     "Land Tax",
     "Lorehold, the Historian"
   ],
-  "generated_at": "2026-06-30T14:52:22Z",
+  "generated_at": "2026-06-30T15:07:20Z",
   "guardrails": [
     "Do not count aggregate event presence as proof of the intended card sequence.",
     "Do not test another blind swap until weak seeds have per-game focus-card payload.",

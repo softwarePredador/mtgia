@@ -21,6 +21,7 @@ from typing import Any
 import xmage_batch_validity_audit as validity_audit
 import xmage_local_rule_indexer as local_indexer
 import xmage_semantic_family_classifier as family_classifier
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -30,7 +31,7 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_XMAGE_ROOT = Path("/Users/desenvolvimentomobile/Downloads/mage-master")
-DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 
 
 def utc_now() -> str:

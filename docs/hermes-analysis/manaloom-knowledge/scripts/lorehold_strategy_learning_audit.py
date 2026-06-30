@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sqlite3
 from collections import Counter, defaultdict
@@ -19,12 +18,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_MATRIX = REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
 DEFAULT_SQUEE_GATES = [
     REPORT_DIR / "lorehold_squee_hashseed0_isolated_cached_timeout_gate_seed7_20260627_v1.json",

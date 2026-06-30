@@ -18,11 +18,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 
 DEFAULT_RUNTIME_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"

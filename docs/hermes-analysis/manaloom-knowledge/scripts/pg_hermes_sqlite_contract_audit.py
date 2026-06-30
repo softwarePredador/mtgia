@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -22,13 +21,14 @@ from typing import Any
 
 import battle_rule_registry
 from db_helper import connect, sanitized_database_target
+from master_optimizer_common import resolve_default_knowledge_db
 from reviewed_battle_card_rules import load_reviewed_rule_rows
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_SQLITE_DB = resolve_default_knowledge_db()
 STALE_SIBLING_DB = SCRIPT_DIR.parent / "knowledge.db"
 
 SQLITE_REQUIRED_COLUMNS: dict[str, set[str]] = {

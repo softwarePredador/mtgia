@@ -16,11 +16,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = resolve_default_knowledge_db()
 CURRENT_MATRIX = REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
 REQUIRED_DECK_IDS = tuple(range(607, 617))
 PROTECTED_BASELINE_KEY = "deck_607"
@@ -365,6 +367,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ("failure_targeted_synergy", {"weak_seed_findings", "hypothesis_queue"}, "failure targeted synergy"),
         ("failure_targeted_trace", {"hypothesis_assessments", "focus_cards"}, "failure targeted trace"),
         ("focus_access_package_queue", {"package_candidates", "guardrail_contract"}, "focus access package queue"),
+        (
+            "deckbuilder_alignment_reaudit",
+            {"current_flow", "decision", "evidence", "next_work"},
+            "deckbuilder handoff alignment reaudit",
+        ),
         (
             "focus_access_decision_wrapper",
             {"generated_at", "packages", "source_wrapper", "status", "summary"},

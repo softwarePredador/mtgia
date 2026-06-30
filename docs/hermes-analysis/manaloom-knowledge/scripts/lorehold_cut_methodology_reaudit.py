@@ -17,12 +17,13 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from lorehold_strategy_profile import STRATEGY_VERSION, strategy_tags_for_card
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SOURCE_DB = resolve_default_knowledge_db()
 DEFAULT_VALIDATION_REPORT = REPORT_DIR / "lorehold_molecule_scarlet_validation_20260629.json"
 DEFAULT_CANDIDATE_REPORT = (
     REPORT_DIR / "lorehold_607_research_candidate_20260629_v615_mana_engine_v1.json"

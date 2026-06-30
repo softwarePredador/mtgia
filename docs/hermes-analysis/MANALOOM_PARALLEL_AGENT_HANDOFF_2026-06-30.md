@@ -1,10 +1,11 @@
 # ManaLoom Parallel Agent Handoff - 2026-06-30
 
-Status: `active_parallel_handoff`.
+Status: `historical_superseded_by_solo_consolidation`.
 
-Purpose: split the current Lorehold/ManaLoom work across four Codex agents
-without letting them repeat old gates, consume historical artifacts as current
-truth, or promote blind deck swaps.
+Purpose: historical record of a temporary four-agent split. It is superseded by
+the solo consolidation flow and must not be used as the current handoff. The
+current continuation is the trace/focus/exposure chain documented in
+`docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilder_alignment_reaudit_20260630.md`.
 
 ## Current Verified State
 
@@ -19,6 +20,8 @@ truth, or promote blind deck swaps.
   `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg280_kayla_music_box.json`.
 - Runtime candidate readiness:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg280_kayla_music_box.json`.
+- `lorehold_registry_candidate_runner.py` is no longer an operational handoff;
+  it is blocked by default as a historical 2026-06-26 registry runner.
 
 Current queue summary:
 
@@ -41,7 +44,7 @@ recognized and the current workspace audit can pass again.
 Run from `/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia`:
 
 ```bash
-python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_runtime_gap_family_queue.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_runtime_candidate_readiness.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_focus_access_package_generator.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_variant_battle_gate.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_registry_candidate_runner.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_artifact_contract_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_generate_lorehold_candidate_deck.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_607_research_candidate.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_607_bridge_candidate.py -q
+python3 -m pytest docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_runtime_gap_family_queue.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_runtime_candidate_readiness.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_focus_access_package_generator.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_variant_battle_gate.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_artifact_contract_audit.py docs/hermes-analysis/manaloom-knowledge/scripts/test_generate_lorehold_candidate_deck.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_607_research_candidate.py docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_607_bridge_candidate.py -q
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py --out-prefix docs/hermes-analysis/master_optimizer_reports/lorehold_artifact_contract_audit_20260630_125734_agent_split_recheck_after_patch
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/operational_surface_alignment_audit.py --out-prefix docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260630_125800_agent_split_after_artifact_patch
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py --out-prefix docs/hermes-analysis/master_optimizer_reports/deckbuilding_contract_surface_audit_20260630_125800_agent_split_after_artifact_patch
@@ -95,5 +98,5 @@ Expected current results:
 ## Command For Agent 4
 
 ```text
-/goal Em /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia, puxe master atual, crie a branch codex/lorehold-agent4-integration-deck-gates e trabalhe como agente de integracao/deckbuilding, sem promover cartas PostgreSQL que pertencem aos agentes 1-3. Use a skill manaloom-data-semantic-layer. Primeiro valide que docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py reconhece os artefatos atuais e que lorehold_artifact_contract_audit, operational_surface_alignment_audit, deckbuilding_contract_surface_audit e xmage_strategy_consistency_audit passam. Depois reanalise os scripts de cut/gate atuais: lorehold_access_cut_model.py, lorehold_hand_filter_cut_model.py, lorehold_tutor_cut_model.py, lorehold_recursion_cut_model.py, lorehold_safe_cut_replanner.py, lorehold_focus_access_package_generator.py, lorehold_registry_candidate_runner.py e lorehold_variant_battle_gate.py. Confirme que todos usam baseline protegido 607, que nao consomem ranked_decks legado sem normalizador, que nao aceitam gate_ready quando gate_ready_package_count=0 e que exigem drawn/cast/used para conclusao por carta. Se houver furo, corrija codigo/testes/docs. Depois, quando os agentes 1-3 tiverem branches/pushes ou quando master mudar, rebase/puxe, regenere runtime_gap_family_queue, runtime_candidate_readiness e focus_access_package_generator, e so rode equal battle gate se aparecer pacote gate-ready legitimo. Nao faca deck swap real. Commite e push sua branch; se master estiver limpo e mergear sem conflito, faca merge em master e push tambem. Responda com lista de divergencias encontradas, correcoes, e se o projeto esta pronto ou ainda bloqueado para montar o deck ideal.
+/goal Em /Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia, puxe master atual, crie a branch codex/lorehold-agent4-integration-deck-gates e trabalhe como agente de integracao/deckbuilding, sem promover cartas PostgreSQL que pertencem aos agentes 1-3. Use a skill manaloom-data-semantic-layer. Primeiro valide que docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_artifact_contract_audit.py reconhece os artefatos atuais e que lorehold_artifact_contract_audit, operational_surface_alignment_audit, deckbuilding_contract_surface_audit e xmage_strategy_consistency_audit passam. Depois reanalise os scripts de cut/gate atuais: lorehold_access_cut_model.py, lorehold_hand_filter_cut_model.py, lorehold_tutor_cut_model.py, lorehold_recursion_cut_model.py, lorehold_safe_cut_replanner.py, lorehold_focus_access_package_generator.py, lorehold_exposure_aware_gate_queue.py e lorehold_variant_battle_gate.py. Confirme que todos usam baseline protegido 607, que nao consomem ranked_decks legado sem normalizador, que nao aceitam gate_ready quando gate_ready_package_count=0 e que exigem drawn/cast/used para conclusao por carta. Trate lorehold_registry_candidate_runner.py apenas como legado bloqueado. Se houver furo, corrija codigo/testes/docs. Depois, quando os agentes 1-3 tiverem branches/pushes ou quando master mudar, rebase/puxe, regenere runtime_gap_family_queue, runtime_candidate_readiness e focus_access_package_generator, e so rode equal battle gate se aparecer pacote gate-ready legitimo. Nao faca deck swap real. Commite e push sua branch; se master estiver limpo e mergear sem conflito, faca merge em master e push tambem. Responda com lista de divergencias encontradas, correcoes, e se o projeto esta pronto ou ainda bloqueado para montar o deck ideal.
 ```

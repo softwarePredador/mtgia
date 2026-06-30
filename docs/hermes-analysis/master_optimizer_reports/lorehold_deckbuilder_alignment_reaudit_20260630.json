@@ -4,7 +4,8 @@
     "postgres_writes": false,
     "source_db_mutated": false,
     "create_new_flex_cut_flow_required": false,
-    "registry_runner_alone_is_correct_continuation": false
+    "registry_runner_alone_is_correct_continuation": false,
+    "registry_runner_blocked_by_default": true
   },
   "current_flow": [
     "lorehold_failure_targeted_synergy_hypotheses.py",

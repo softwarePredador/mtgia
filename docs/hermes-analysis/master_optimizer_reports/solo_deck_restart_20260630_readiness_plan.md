@@ -17,7 +17,7 @@
 | `solo_deck_restart_20260630_runtime_candidate_readiness` | 13 reviewed cards; 2 applied/synced packages; 3 review-required access cards; 8 split-scope review cards. |
 | `solo_deck_restart_20260630_next_action_planner` | 0 gate-ready actions; next action is review focus-access trace, then define deck/runtime package. |
 | `solo_deck_restart_20260630_ideal_deck_candidate_matrix` | 348 rows; 340 battle-ready; 5 no-rule-signal; 3 package-already-prepared; 172 priority benchmark candidates. |
-| `solo_deck_restart_20260630_registry_runner_dryrun` | Runner ready, but no queue rows emitted for the current registry dry-run slice. |
+| `solo_deck_restart_20260630_registry_runner_dryrun` | Superseded. The 2026-06-26 registry runner is blocked by default and must not be used as current handoff. |
 
 ## Cards Still Blocking Rule-First Strategy
 

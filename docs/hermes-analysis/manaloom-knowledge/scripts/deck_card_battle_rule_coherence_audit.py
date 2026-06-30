@@ -20,9 +20,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_REPORT_DIR = SCRIPT_DIR.parent.parent / "master_optimizer_reports"
 
 TRUSTED_REVIEW_STATUSES = {"verified", "active"}

@@ -21,11 +21,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from master_optimizer_common import resolve_default_knowledge_db
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-ACTIVE_SQLITE_DB = SCRIPT_DIR / "knowledge.db"
+ACTIVE_SQLITE_DB = resolve_default_knowledge_db()
 STALE_SIBLING_SQLITE_DB = SCRIPT_DIR.parent / "knowledge.db"
 
 ACTIVE_FILES = [
@@ -85,7 +87,7 @@ PATH_CONTRACT_SNIPPETS = {
     "_update_cron_status.py": ["MANALOOM_KNOWLEDGE_DB"],
     "wincon_pipeline.py": ["MANALOOM_KNOWLEDGE_DB", "DATABASE_URL"],
     "import_lorehold_decks.py": ["MANALOOM_KNOWLEDGE_DB", "--sqlite-db"],
-    "lorehold_canonical_deck_snapshot.py": ["MANALOOM_KNOWLEDGE_DB", "HERMES_KNOWLEDGE_BACKUP_DIR"],
+    "lorehold_canonical_deck_snapshot.py": ["resolve_default_knowledge_db", "HERMES_KNOWLEDGE_BACKUP_DIR"],
     "validate_deck_legalities.py": ["MANALOOM_KNOWLEDGE_DB"],
     "sync_hermes_learned_deck.sh": ["MANALOOM_REPO", "MANALOOM_KNOWLEDGE_DB", "MANALOOM_HERMES_SCRIPT_DIR"],
     "pull_learning_events.py": ["MANALOOM_KNOWLEDGE_DB", "PGHOST", "PGDATABASE"],

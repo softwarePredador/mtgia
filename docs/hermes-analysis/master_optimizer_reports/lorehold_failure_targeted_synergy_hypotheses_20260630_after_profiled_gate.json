@@ -198,7 +198,7 @@
       }
     }
   ],
-  "generated_at": "2026-06-30T14:52:14Z",
+  "generated_at": "2026-06-30T15:07:20Z",
   "guardrails": [
     "Do not register a new add/cut package while the current queue is fully prior-negative.",
     "Do not cut protected or locked cards without same-lane proof.",

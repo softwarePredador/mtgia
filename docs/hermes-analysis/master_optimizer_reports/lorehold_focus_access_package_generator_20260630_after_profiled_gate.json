@@ -83,7 +83,7 @@
     }
   ],
   "gate_ready_packages": [],
-  "generated_at": "2026-06-30T14:52:28Z",
+  "generated_at": "2026-06-30T15:07:20Z",
   "guardrail_contract": {
     "prior_negative_exact_match_must_be_false": true,
     "protected_cards": [

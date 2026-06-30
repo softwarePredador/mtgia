@@ -47,6 +47,7 @@ class LoreholdVariantStrategyMatrixTest(unittest.TestCase):
         if not db.exists():
             self.skipTest("knowledge.db fixture is not available")
         conn = sqlite3.connect(db)
+        self.addCleanup(conn.close)
         conn.row_factory = sqlite3.Row
 
         payload = matrix.build_matrix(conn, deck_ids=[6, 606], candidate_path=None)

@@ -40,6 +40,7 @@ LOREHOLD_RECURSION_CUT_MODEL = SCRIPT_DIR / "lorehold_recursion_cut_model.py"
 LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
+LOREHOLD_REGISTRY_CANDIDATE_RUNNER = SCRIPT_DIR / "lorehold_registry_candidate_runner.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
@@ -285,6 +286,16 @@ def build_checks() -> list[Check]:
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
             ["lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
+        ),
+        check_contains(
+            LOREHOLD_REGISTRY_CANDIDATE_RUNNER,
+            [
+                "blocked_legacy_registry_runner",
+                "--allow-legacy-registry-runner",
+                "lorehold_failure_targeted_synergy_hypotheses.py",
+                "lorehold_exposure_aware_gate_queue.py",
+            ],
+            "scripts.lorehold_registry_runner_blocked_by_default",
         ),
         check_contains(
             IDEAL_MATRIX,

@@ -20,10 +20,10 @@ from pathlib import Path
 from typing import Any
 
 import battle_analyst_v9 as battle
-from master_optimizer_common import REPORT_DIR, normalize_name
+from master_optimizer_common import REPORT_DIR, normalize_name, resolve_default_knowledge_db
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 
 TARGET_CARDS = [
     "Crawlspace",

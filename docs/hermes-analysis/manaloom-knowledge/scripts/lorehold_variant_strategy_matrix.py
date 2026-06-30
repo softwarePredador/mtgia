@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sqlite3
 from collections import Counter, defaultdict
@@ -27,12 +26,13 @@ from lorehold_strategy_profile import (
     commander_intent_alignment,
     strategy_tags_for_card,
 )
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_CANDIDATE = (
     REPORT_DIR / "lorehold_generated_candidate_20260626_pg243_strategy_first_v7.json"
 )

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Run the Lorehold candidate queue from the hypothesis registry.
+"""Legacy Lorehold candidate runner retained for historical replay only.
 
-The runner is intentionally conservative: registry entries with TBD swaps are
-reported as blocked until a matching same-function plan exists in
-``lorehold_607_research_candidate.RESEARCH_PLANS``.
+This runner consumed the 2026-06-26 hypothesis registry. That registry is now
+exhausted and is not the active Lorehold deckbuilder handoff. Accidental use is
+blocked by default so old empty queues cannot be mistaken for current work.
 """
 
 from __future__ import annotations
@@ -19,15 +19,27 @@ from typing import Any, Mapping
 
 import lorehold_607_research_candidate as research
 import seventeenlands_battle_prior_compare as battle_prior
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
-DEFAULT_SOURCE_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_SOURCE_DB = resolve_default_knowledge_db()
 DEFAULT_BATTLE_PRIOR_JSON = (
     REPORT_DIR / "seventeenlands_replay_profile_lci_premierdraft_sample_20260628.json"
+)
+CURRENT_HANDOFF_COMMANDS = [
+    "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_failure_targeted_synergy_hypotheses.py",
+    "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_failure_targeted_trace_audit.py",
+    "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_focus_access_package_generator.py",
+    "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_exposure_aware_gate_queue.py",
+]
+LEGACY_BLOCK_REASON = (
+    "lorehold_registry_candidate_runner.py is a legacy 2026-06-26 registry runner; "
+    "the registry untested_queue is exhausted and this is not the current "
+    "Lorehold deckbuilder continuation"
 )
 PRIORITY_RANK = {"P0": 0, "P1": 1, "P2": 2, "P3": 3, "P4": 4}
 BATTLE_PRIOR_EVIDENCE_GAP_STATUSES = {
@@ -361,12 +373,31 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- status: `{report['status']}`",
         "- postgres_writes: `false`",
         "- source_db_mutated: `false`",
-        "",
-        "## Queue Results",
-        "",
-        "| Key | Priority | Status | Plan | Reason | Next Action |",
-        "| --- | --- | --- | --- | --- | --- |",
     ]
+    if report.get("legacy_block_reason"):
+        lines.extend(
+            [
+                "",
+                "## Legacy Block",
+                "",
+                str(report["legacy_block_reason"]),
+                "",
+                "Use the current Lorehold handoff instead:",
+                "",
+                "```bash",
+            ]
+        )
+        lines.extend(str(command) for command in report.get("current_handoff_commands") or [])
+        lines.append("```")
+    lines.extend(
+        [
+            "",
+            "## Queue Results",
+            "",
+            "| Key | Priority | Status | Plan | Reason | Next Action |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+    )
     for row in report.get("results") or []:
         lines.append(
             f"| `{row.get('key')}` | {row.get('priority')} | `{row.get('status')}` | "
@@ -414,10 +445,51 @@ def write_report(report: Mapping[str, Any], stem: str) -> tuple[Path, Path]:
     return json_path, md_path
 
 
+def build_legacy_block_report(args: argparse.Namespace) -> dict[str, Any]:
+    return {
+        "generated_at": utc_now(),
+        "status": "blocked_legacy_registry_runner",
+        "registry": str(args.registry),
+        "source_db": str(args.source_db),
+        "battle_prior_gate_enabled": not args.skip_battle_prior_gate,
+        "battle_prior_json": str(args.battle_prior_json),
+        "battle_prior_player_slots": max(1, args.battle_prior_player_slots),
+        "execute": bool(args.execute),
+        "max_candidates": max(1, args.max_candidates),
+        "games": max(1, args.games),
+        "opponent_limit": max(1, args.opponent_limit),
+        "opponent_seed": args.opponent_seed,
+        "simulation_seed": args.simulation_seed,
+        "game_timeout_seconds": float(args.game_timeout_seconds or 0),
+        "force_focus_access": args.force_focus_access,
+        "legacy_block_reason": LEGACY_BLOCK_REASON,
+        "current_handoff_commands": CURRENT_HANDOFF_COMMANDS,
+        "results": [
+            {
+                "key": "legacy_registry_runner",
+                "priority": "blocked",
+                "status": "blocked_legacy_registry_runner",
+                "plan": None,
+                "reason": LEGACY_BLOCK_REASON,
+                "next_action": "run_current_lorehold_handoff_chain",
+            }
+        ],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--source-db", type=Path, default=DEFAULT_SOURCE_DB)
+    parser.add_argument(
+        "--allow-legacy-registry-runner",
+        action="store_true",
+        help=(
+            "Explicitly run the historical 2026-06-26 registry runner. "
+            "By default this command is blocked because the active Lorehold "
+            "handoff is the 2026-06-30 trace/focus/exposure chain."
+        ),
+    )
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--max-candidates", type=int, default=1)
     parser.add_argument("--games", type=int, default=1)
@@ -433,8 +505,24 @@ def main() -> int:
     parser.add_argument("--battle-prior-json", type=Path, default=DEFAULT_BATTLE_PRIOR_JSON)
     parser.add_argument("--battle-prior-player-slots", type=int, default=2)
     parser.add_argument("--skip-battle-prior-gate", action="store_true")
-    parser.add_argument("--stem", default="lorehold_registry_candidate_runner_20260626")
+    parser.add_argument("--stem", default="lorehold_registry_candidate_runner_legacy_blocked_20260630")
     args = parser.parse_args()
+
+    if not args.allow_legacy_registry_runner:
+        report = build_legacy_block_report(args)
+        json_path, md_path = write_report(report, args.stem)
+        print(
+            json.dumps(
+                {
+                    "status": report["status"],
+                    "json": str(json_path),
+                    "markdown": str(md_path),
+                    "current_handoff_commands": CURRENT_HANDOFF_COMMANDS,
+                },
+                indent=2,
+            )
+        )
+        return 2
 
     registry = load_registry(args.registry)
     selected = queue_entries(registry)[: max(1, args.max_candidates)]

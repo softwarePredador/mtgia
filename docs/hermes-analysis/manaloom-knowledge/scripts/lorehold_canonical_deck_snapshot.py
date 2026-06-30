@@ -23,13 +23,13 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-from master_optimizer_common import get_deck_summary
+from master_optimizer_common import get_deck_summary, resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_DECK_ID = 6
 DEFAULT_BACKUP_KEEP = 5
 RUNTIME_BACKUP_DIR = Path(

@@ -1,6 +1,6 @@
 # Lorehold Failure-Targeted Trace Audit - 2026-06-30
 
-- Generated at: `2026-06-30T14:52:22Z`
+- Generated at: `2026-06-30T15:07:20Z`
 - Candidate key: `candidate_607_squee_hashseed0_isolated_cached_timeout_v3`
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`

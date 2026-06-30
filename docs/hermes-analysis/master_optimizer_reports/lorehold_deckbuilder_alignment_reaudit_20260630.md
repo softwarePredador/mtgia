@@ -6,7 +6,7 @@
 - PostgreSQL writes: `false`
 - Source DB mutated: `false`
 - Main correction: do not create a new flex-cut/registry flow. The project already has the required surfaces: cut models, manual cut review, profiled cut benchmark generator, next hypothesis queue, failure-targeted synthesis, trace audit, focus-access package generator, exposure-aware gate queue, and package gate.
-- Previous ambiguity: using `lorehold_registry_candidate_runner.py` alone was the wrong continuation for this phase. That registry is empty, but the current deckbuilder handoff is not empty; it is the 2026-06-30 planner/trace/focus-access chain.
+- Previous ambiguity: using `lorehold_registry_candidate_runner.py` alone was the wrong continuation for this phase. That registry is empty, but the current deckbuilder handoff is not empty; it is the 2026-06-30 planner/trace/focus-access chain. The runner is now blocked by default and only available with an explicit legacy flag.
 
 ## Current Evidence
 

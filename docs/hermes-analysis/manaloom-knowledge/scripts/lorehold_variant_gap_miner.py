@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sqlite3
 from collections import Counter, defaultdict
@@ -19,13 +18,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from master_optimizer_common import resolve_default_knowledge_db
 from reviewed_battle_card_rules import DEFAULT_REVIEWED_RULES_PATH, load_reviewed_rule_rows
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_QUEUE_REPORT = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
 DEFAULT_BASE_DECK_ID = 6

@@ -36,7 +36,7 @@
 
 ## Runner check
 
-- `solo_mapper_reconciled_20260630_registry_runner_dryrun` returned `result_count=0`.
+- `solo_mapper_reconciled_20260630_registry_runner_dryrun` returned `result_count=0`; this is now treated as legacy evidence only because `lorehold_registry_candidate_runner.py` is blocked by default.
 - No battle benchmark was executed because there was no current package with a gate-ready add/cut pairing.
 - The next battle benchmark must start only after a generated package can force or observe the candidate card being drawn, cast, activated, triggered, or otherwise used.
 

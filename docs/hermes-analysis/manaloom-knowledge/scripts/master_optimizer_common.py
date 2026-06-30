@@ -34,14 +34,18 @@ KNOWLEDGE_DIR = DOCS_DIR / "manaloom-knowledge"
 def sqlite_has_table(path: Path, table_name: str) -> bool:
     if not path.exists() or path.stat().st_size <= 0:
         return False
+    conn: sqlite3.Connection | None = None
     try:
-        with sqlite3.connect(f"file:{path}?mode=ro", uri=True) as conn:
-            row = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
-                (table_name,),
-            ).fetchone()
+        conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        row = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+            (table_name,),
+        ).fetchone()
     except sqlite3.Error:
         return False
+    finally:
+        if conn is not None:
+            conn.close()
     return bool(row)
 
 

@@ -1,4 +1,5 @@
 import unittest
+from argparse import Namespace
 
 import lorehold_registry_candidate_runner as runner
 
@@ -132,6 +133,33 @@ class LoreholdRegistryCandidateRunnerTest(unittest.TestCase):
             runner.aggregate_report_status(["executed_battle_prior_passed"]),
             "ready",
         )
+
+    def test_legacy_runner_is_blocked_by_default_contract(self):
+        args = Namespace(
+            battle_prior_json=runner.DEFAULT_BATTLE_PRIOR_JSON,
+            battle_prior_player_slots=2,
+            execute=False,
+            force_focus_access="none",
+            game_timeout_seconds=30.0,
+            games=1,
+            max_candidates=1,
+            opponent_limit=3,
+            opponent_seed=20260626,
+            registry=runner.DEFAULT_REGISTRY,
+            simulation_seed=42,
+            skip_battle_prior_gate=False,
+            source_db=runner.DEFAULT_SOURCE_DB,
+        )
+
+        report = runner.build_legacy_block_report(args)
+
+        self.assertEqual(report["status"], "blocked_legacy_registry_runner")
+        self.assertIn("2026-06-26 registry runner", report["legacy_block_reason"])
+        self.assertIn(
+            "lorehold_failure_targeted_synergy_hypotheses.py",
+            "\n".join(report["current_handoff_commands"]),
+        )
+        self.assertEqual(report["results"][0]["next_action"], "run_current_lorehold_handoff_chain")
 
 
 if __name__ == "__main__":

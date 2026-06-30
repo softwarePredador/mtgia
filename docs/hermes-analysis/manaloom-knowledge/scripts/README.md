@@ -54,6 +54,22 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_
 
 The default harness also resolves to v9.
 
+## Lorehold Deckbuilder Handoff
+
+The active Lorehold deckbuilder continuation is the trace/focus/exposure chain:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_failure_targeted_synergy_hypotheses.py
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_failure_targeted_trace_audit.py
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_focus_access_package_generator.py
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_exposure_aware_gate_queue.py
+```
+
+`lorehold_registry_candidate_runner.py` is a historical 2026-06-26 registry
+runner. It is blocked by default because that registry's `untested_queue` is
+exhausted and it must not be mistaken for the current handoff. Historical replay
+requires the explicit `--allow-legacy-registry-runner` flag.
+
 ## Local Replay Audit
 
 For local Mac validation, do not trust a raw replay generated from an old

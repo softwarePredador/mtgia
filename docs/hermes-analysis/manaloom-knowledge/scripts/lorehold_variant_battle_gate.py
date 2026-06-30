@@ -26,12 +26,13 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 import battle_analyst_v9 as battle
+from master_optimizer_common import resolve_default_knowledge_db
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = SCRIPT_DIR / "knowledge.db"
+DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_MATRIX = (
     REPORT_DIR / "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract.json"
 )
