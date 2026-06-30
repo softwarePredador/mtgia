@@ -642,14 +642,25 @@
     "battle_rule_logical_key": "battle_rule_v1:7028e0aba8409e45d6156211b87d6f8e"
   },
   "Alhammarret's Archive": {
-    "cmc": 5.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:49c775bf9accb1a7e247cdeb66db02de"
+    "ability_kind": "static",
+    "battle_model_scope": "static_double_life_gain_and_draw_except_first_draw_step_v1",
+    "draw_on_enter": false,
+    "draw_replacement_amount_multiplier": 2,
+    "draw_replacement_controller_only": true,
+    "draw_replacement_double_except_first_draw_step": true,
+    "draw_replacement_first_draw_step_exception": true,
+    "effect": "draw_engine",
+    "legendary": true,
+    "life_gain_multiplier": 2,
+    "life_gain_replacement_double": true,
+    "permanent_type": "artifact",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b865a68cb5efcaf543f5ceda5d9ed599",
+    "battle_rule_oracle_hash": "88427c5aaa2391a1419a4e79a3690e4a"
   },
   "All Is Dust": {
     "effect": "board_wipe",

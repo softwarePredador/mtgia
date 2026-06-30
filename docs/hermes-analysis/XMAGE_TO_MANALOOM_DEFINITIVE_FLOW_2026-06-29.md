@@ -327,7 +327,7 @@ PG263/PG264 Lorehold runtime-gap checkpoint:
   `split_family_scope_review_required=13`,
   `safe_for_batch_pg_package_count=0`.
 
-PG267/PG268 runtime-rule checkpoint:
+PG267/PG269 runtime-rule checkpoint:
 
 - PG265 was applied and synced for `Lens of Clarity` with exact visibility-only
   topdeck scope `look_top_library_any_time_and_opponent_face_down_creatures_v1`.
@@ -338,28 +338,33 @@ PG267/PG268 runtime-rule checkpoint:
   mana scope `postcombat_main_add_red_for_opponents_life_lost_this_turn_v1`.
 - PG268 was applied and synced for `Cloud Key` with exact chosen-card-type
   cost-reduction scope `chosen_card_type_cost_reduction_v1`.
+- PG269 was applied and synced for `Alhammarret's Archive` with exact static
+  replacement scope
+  `static_double_life_gain_and_draw_except_first_draw_step_v1`.
 - PG267 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
 - PG268 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg268_cloud_key_chosen_type_cost_reduction_20260630_package.md`.
-- Current queue after PG268:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md`.
+- PG269 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg269_alhammarret_archive_replacements_20260630_package.md`.
+- Current queue after PG269:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_085000_post_pg269_alhammarret_archive_manifest.md`.
 - Current combined severity counts:
-  `{"high": 104, "medium": 42, "pass": 645}`.
+  `{"high": 103, "medium": 42, "pass": 646}`.
 - Current unresolved routing:
-  `ready_for_structured_xmage_pull_review_required=70`,
+  `ready_for_structured_xmage_pull_review_required=69`,
   `xmage_source_valid_mapper_required=61`,
   `runtime_family_required_count=0`.
 - Current family counts include:
   `manual_model=61`, `targeted_interaction=12`, `recursion=11`, `tutor=10`,
   `free_cast=9`, `targeted_protection=7`, `ramp_permanent=5`, `passive=5`,
-  `draw_engine=4`, `topdeck_play=2`, `board_wipe_choice=3`,
+  `draw_engine=3`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg268_cloud_key.md`;
-  blocked runtime gaps are `22`, with
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg269_alhammarret_archive.md`;
+  blocked runtime gaps are `21`, with
   `mapper_metadata_or_test_scenario_required=12` and
-  `split_family_scope_review_required=10`.
+  `split_family_scope_review_required=9`.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

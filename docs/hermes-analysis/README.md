@@ -33,7 +33,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md`.
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_085000_post_pg269_alhammarret_archive_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
@@ -72,6 +72,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/lorehold_promotion_gate_decision_audit.py`.
     Resultado atual: manter `607` como baseline protegido; `615` e fonte para
     teste estreito de pacote, nao troca direta de deck.
+  - Modelos ativos de corte/acesso Lorehold devem usar `607` como baseline
+    default. Evidencia corrigida:
+    `master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.md`.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.
   - `LOREHOLD_IDEAL_DECK_WORKFLOW_2026-06-24.md` fica como historico/metodologia

@@ -3,6 +3,10 @@ import sqlite3
 import lorehold_recursion_cut_model as model
 
 
+def test_default_baseline_deck_is_protected_607():
+    assert model.DEFAULT_BASELINE_DECK_ID == 607
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
@@ -20,11 +24,11 @@ def memory_db():
         """
     )
     rows = [
-        (6, "Squee, Goblin Nabob", "wincon", '["wincon"]', "Legendary Creature", 3, 0),
-        (6, "Farewell", "board_wipe", '["board_wipe","wipe"]', "Sorcery", 6, 0),
-        (6, "Furygale Flocking", "wincon", '["wincon","token_maker"]', "Sorcery", 10, 0),
-        (6, "Mizzix's Mastery", "wincon", '["wincon","overload_recursion"]', "Sorcery", 4, 0),
-        (6, "Pinnacle Monk // Mystic Peak", "engine", '["engine","removal"]', "Creature", 5, 0),
+        (607, "Squee, Goblin Nabob", "wincon", '["wincon"]', "Legendary Creature", 3, 0),
+        (607, "Farewell", "board_wipe", '["board_wipe","wipe"]', "Sorcery", 6, 0),
+        (607, "Furygale Flocking", "wincon", '["wincon","token_maker"]', "Sorcery", 10, 0),
+        (607, "Mizzix's Mastery", "wincon", '["wincon","overload_recursion"]', "Sorcery", 4, 0),
+        (607, "Pinnacle Monk // Mystic Peak", "engine", '["engine","removal"]', "Creature", 5, 0),
     ]
     conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     return conn

@@ -4,6 +4,10 @@ import sqlite3
 import lorehold_access_cut_model as model
 
 
+def test_default_baseline_deck_is_protected_607():
+    assert model.DEFAULT_BASELINE_DECK_ID == 607
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
@@ -36,11 +40,11 @@ def memory_db():
     conn.executemany(
         "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
-            (6, "Lorehold, the Historian", 1, "engine", '["engine"]', "Legendary Creature", "", 4, 1),
-            (6, "Sensei's Divining Top", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
-            (6, "Promise of Loyalty", 1, "draw", '["draw"]', "Sorcery", "", 5, 0),
-            (6, "Low Exposure Topdeck Flex", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
-            (6, "Boros Signet", 1, "ramp", '["ramp"]', "Artifact", "", 2, 0),
+            (607, "Lorehold, the Historian", 1, "engine", '["engine"]', "Legendary Creature", "", 4, 1),
+            (607, "Sensei's Divining Top", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
+            (607, "Promise of Loyalty", 1, "draw", '["draw"]', "Sorcery", "", 5, 0),
+            (607, "Low Exposure Topdeck Flex", 1, "draw", '["draw"]', "Artifact", "", 1, 0),
+            (607, "Boros Signet", 1, "ramp", '["ramp"]', "Artifact", "", 2, 0),
             (609, "Penance", 1, "draw", '["draw"]', "Enchantment", "", 3, 0),
             (609, "Hidden Retreat", 1, "draw", '["draw"]', "Enchantment", "", 3, 0),
             (611, "Brainstone", 1, "draw", '["draw"]', "Artifact", "", 1, 0),

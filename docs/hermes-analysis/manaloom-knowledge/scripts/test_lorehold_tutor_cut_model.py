@@ -7,6 +7,7 @@ import lorehold_tutor_cut_model as model
 def test_defaults_use_current_runtime_package_inputs():
     assert model.DEFAULT_STRATEGY_AUDIT.name == "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
     assert model.DEFAULT_MINER_REPORT.name == "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
+    assert model.DEFAULT_BASELINE_DECK_ID == 607
 
 
 def memory_db():
@@ -40,12 +41,12 @@ def memory_db():
     conn.executemany(
         "INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
-            (6, "Lorehold, the Historian", 1, "engine", 5, "Legendary Creature", '["engine"]', 1),
-            (6, "Land Tax", 1, "tutor", 1, "Enchantment", '["tutor"]', 0),
-            (6, "Sol Ring", 1, "ramp", 1, "Artifact", '["ramp"]', 0),
-            (6, "Thor, God of Thunder", 1, "removal", 5, "Legendary Creature", '["removal"]', 0),
-            (6, "Creative Technique", 1, "draw", 5, "Sorcery", '["draw"]', 0),
-            (6, "The Mind Stone", 1, "ramp", 2, "Artifact", '["ramp"]', 0),
+            (607, "Lorehold, the Historian", 1, "engine", 5, "Legendary Creature", '["engine"]', 1),
+            (607, "Land Tax", 1, "tutor", 1, "Enchantment", '["tutor"]', 0),
+            (607, "Sol Ring", 1, "ramp", 1, "Artifact", '["ramp"]', 0),
+            (607, "Thor, God of Thunder", 1, "removal", 5, "Legendary Creature", '["removal"]', 0),
+            (607, "Creative Technique", 1, "draw", 5, "Sorcery", '["draw"]', 0),
+            (607, "The Mind Stone", 1, "ramp", 2, "Artifact", '["ramp"]', 0),
         ],
     )
     conn.executemany(

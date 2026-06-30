@@ -9933,6 +9933,68 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(report["cards"][0]["family_id"], "draw_engine")
         self.assertEqual(report["cards"][0]["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_and_generator_mark_alhammarrets_archive_exact_scope_batch_safe(self) -> None:
+        batch = {
+            "cards": [
+                {
+                    "card_name": "Alhammarret's Archive",
+                    "severity": "medium",
+                    "oracle_hash": "archivehash",
+                    "status": "ready_for_structured_xmage_pull_review_required",
+                    "ready_for_structured_pull": True,
+                    "valid_xmage_source": True,
+                    "coherence_findings": ["no_active_battle_rule"],
+                    "checks": {"focused_test_scenario_count": 2},
+                    "xmage": {
+                        "class_name": "AlhammarretsArchive",
+                        "path": "/xmage/AlhammarretsArchive.java",
+                        "types": ["ARTIFACT"],
+                        "effect_classes": [
+                            "AlhammarretsArchiveReplacementEffect",
+                            "GainDoubleLifeReplacementEffect",
+                        ],
+                        "ability_classes": ["SimpleStaticAbility"],
+                        "cost_classes": [],
+                        "target_classes": [],
+                        "primary_effect": {
+                            "effect": "draw_engine",
+                            "battle_model_scope": "static_double_life_gain_and_draw_except_first_draw_step_v1",
+                            "permanent_type": "artifact",
+                            "legendary": True,
+                            "draw_on_enter": False,
+                            "life_gain_replacement_double": True,
+                            "life_gain_multiplier": 2,
+                            "draw_replacement_double_except_first_draw_step": True,
+                            "draw_replacement_amount_multiplier": 2,
+                            "draw_replacement_controller_only": True,
+                            "draw_replacement_first_draw_step_exception": True,
+                        },
+                    },
+                }
+            ]
+        }
+        family_report = classifier.build_family_report(batch)
+        card = family_report["cards"][0]
+        self.assertEqual(card["family_id"], "draw_engine")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
+        generator_report = generator.build_generator_report(
+            batch_audit=batch,
+            external_harvest={
+                "cards": [
+                    {
+                        "card_name": "Alhammarret's Archive",
+                        "candidate_rule": {"oracle_hash": "archivehash"},
+                        "external_references": {"scryfall": {"mana_cost": "{5}"}},
+                    }
+                ]
+            },
+        )
+        proposal = generator_report["proposals"][0]
+        self.assertTrue(proposal["safe_for_batch_pg_package"])
+        self.assertEqual(proposal["deck_role_json"]["category"], "draw")
+        self.assertEqual(proposal["deck_role_json"]["subtype"], "draw_and_life_gain_replacement")
+
     def test_classifier_marks_palantir_of_orthanc_exact_scope_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

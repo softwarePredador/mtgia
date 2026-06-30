@@ -90,6 +90,34 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
         self.assertEqual(primary["battle_model_scope"], "xmage_draw_card_variant_review_v1")
         self.assertEqual(primary["ability_kind"], "triggered")
 
+    def test_alhammarrets_archive_maps_to_exact_draw_life_replacement_scope(self) -> None:
+        result = hints.build_effect_hints(
+            {
+                "xmage_class_name": "AlhammarretsArchive",
+                "effect_classes": [
+                    "AlhammarretsArchiveReplacementEffect",
+                    "GainDoubleLifeReplacementEffect",
+                ],
+                "ability_classes": ["SimpleStaticAbility"],
+                "target_classes": [],
+                "cost_classes": [],
+                "constructor_metadata": {"card_types": ["ARTIFACT"]},
+            }
+        )
+
+        primary = result["primary_candidate"]["effect_json"]
+
+        self.assertEqual(primary["effect"], "draw_engine")
+        self.assertEqual(
+            primary["battle_model_scope"],
+            "static_double_life_gain_and_draw_except_first_draw_step_v1",
+        )
+        self.assertFalse(primary["draw_on_enter"])
+        self.assertTrue(primary["life_gain_replacement_double"])
+        self.assertEqual(primary["life_gain_multiplier"], 2)
+        self.assertTrue(primary["draw_replacement_double_except_first_draw_step"])
+        self.assertTrue(primary["draw_replacement_first_draw_step_exception"])
+
     def test_unrecognized_xmage_source_stays_manual(self) -> None:
         result = hints.build_effect_hints(
             {

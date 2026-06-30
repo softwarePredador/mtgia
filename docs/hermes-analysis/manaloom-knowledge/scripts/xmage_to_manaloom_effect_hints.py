@@ -1850,6 +1850,43 @@ def _build_exact_runtime_variant_fields(
         }
 
     if (
+        xmage_class_name == "AlhammarretsArchive"
+        and card_types == {"ARTIFACT"}
+        and ability_classes == {"SimpleStaticAbility"}
+        and effect_classes == {
+            "AlhammarretsArchiveReplacementEffect",
+            "GainDoubleLifeReplacementEffect",
+        }
+        and not target_classes
+        and not cost_classes
+    ):
+        return {
+            "effect": "draw_engine",
+            "scope": "static_double_life_gain_and_draw_except_first_draw_step_v1",
+            "fields": {
+                "permanent_type": "artifact",
+                "legendary": True,
+                "draw_on_enter": False,
+                "life_gain_replacement_double": True,
+                "life_gain_multiplier": 2,
+                "draw_replacement_double_except_first_draw_step": True,
+                "draw_replacement_amount_multiplier": 2,
+                "draw_replacement_controller_only": True,
+                "draw_replacement_first_draw_step_exception": True,
+            },
+            "reason": (
+                "XMage structure matches Alhammarret's Archive static replacement effects: "
+                "double life gain and replace eligible controller card draws with two draws."
+            ),
+            "signals": [
+                "AlhammarretsArchive",
+                "GainDoubleLifeReplacementEffect",
+                "AlhammarretsArchiveReplacementEffect",
+                "CardsDrawnDuringDrawStepWatcher",
+            ],
+        }
+
+    if (
         xmage_class_name == "DevotedDruid"
         and card_types == {"CREATURE"}
         and ability_classes == {"GreenManaAbility", "SimpleActivatedAbility"}

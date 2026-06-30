@@ -2,7 +2,7 @@
 """Build a seed-safe cut model for Lorehold tutor packages.
 
 This read-only helper turns the planner action ``build_tutor_seed_safe_cut_model``
-into concrete evidence. It evaluates every current deck-6 card as a possible
+into concrete evidence. It evaluates every protected deck-607 card as a possible
 cut for Gamble and Enlightened Tutor, then separates direct gate candidates from
 manual benchmarks and hard blocks. The script deliberately does not create a
 package when the cut would repeat a known strong-seed regression.
@@ -34,6 +34,7 @@ DEFAULT_EXPOSURE_PROFILES = [
     REPORT_DIR / "lorehold_tutor_cut_candidate_exposure_profile_20260627_v1.json",
 ]
 DEFAULT_CANDIDATES = ["Enlightened Tutor", "Gamble"]
+DEFAULT_BASELINE_DECK_ID = 607
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}
 ACTIVE_REVIEW_STATUSES = {"verified", "active", "needs_review", "reviewed"}
 COMPATIBLE_TUTOR_CUT_LANES = {"selection", "tutor_access"}
@@ -334,7 +335,7 @@ def build_model(
     miner_report: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
     candidates: list[str] = DEFAULT_CANDIDATES,
-    deck_id: int = 6,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
     db_path: Path = DEFAULT_DB,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     miner_path: Path = DEFAULT_MINER_REPORT,
@@ -450,6 +451,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
+        f"- Deck id: `{payload['deck_id']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",
         f"- Miner report: `{payload['miner_report']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
@@ -537,7 +539,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--candidate", action="append")
-    parser.add_argument("--deck-id", type=int, default=6)
+    parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
     parser.add_argument("--stem", default="lorehold_tutor_cut_model_20260628_v2_current_miner")
     return parser.parse_args()
 

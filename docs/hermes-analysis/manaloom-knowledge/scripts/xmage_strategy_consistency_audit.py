@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260630_085000_post_pg269_alhammarret_archive_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
@@ -287,6 +287,7 @@ def audit_script_surface() -> list[Check]:
                 "test_adagia_maps_to_station_legendary_artifact_enchantment_copy_token",
                 "test_neheb_routes_to_exact_postcombat_life_lost_mana_engine",
                 "test_cloud_key_maps_to_chosen_card_type_cost_reduction",
+                "test_alhammarrets_archive_maps_to_exact_draw_life_replacement_scope",
                 "test_dynamic_mana_spell_routes_to_ritual_family",
                 "test_generic_blink_effect_routes_to_targeted_zone_transition_family",
                 "test_red_utility_land_splits_exact_mana_mode_from_nonmana_scope",
@@ -320,6 +321,17 @@ def audit_script_surface() -> list[Check]:
                 "spells_you_cast_of_chosen_card_type",
             ],
             check_name="tests.runtime_cloud_key_coverage_present",
+        ),
+        contains_all(
+            scripts / "test_alhammarrets_archive_runtime.py",
+            [
+                "test_alhammarrets_archive_enters_without_drawing_and_doubles_life_gain",
+                "test_alhammarrets_archive_draw_replacement_respects_draw_step_exception",
+                "static_double_life_gain_and_draw_except_first_draw_step_v1",
+                "draw_replacement_applied",
+                "life_gain_replacement_applied",
+            ],
+            check_name="tests.runtime_alhammarret_archive_coverage_present",
         ),
     ]
 
@@ -355,11 +367,11 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
 
     expected_counts = {
         "Validity status counts": {
-            "ready_for_structured_xmage_pull_review_required": 70,
+            "ready_for_structured_xmage_pull_review_required": 69,
             "xmage_source_valid_mapper_required": 61,
         },
         "Proposal status counts": {
-            "split_family_scope_review_required": 70,
+            "split_family_scope_review_required": 69,
             "mapper_metadata_or_test_scenario_required": 61,
         },
         "Family counts": {
@@ -370,7 +382,7 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
             "free_cast": 9,
             "targeted_protection": 7,
             "passive": 5,
-            "draw_engine": 4,
+            "draw_engine": 3,
             "topdeck_play": 2,
             "board_wipe_choice": 3,
             "copy_spell_engine": 1,

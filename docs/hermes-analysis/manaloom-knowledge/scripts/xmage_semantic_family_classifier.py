@@ -1555,6 +1555,29 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("tax") or 0) == 0
         )
 
+    if effect == "draw_engine" and scope == "static_double_life_gain_and_draw_except_first_draw_step_v1":
+        return (
+            str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")
+            == "AlhammarretsArchive"
+            and types == {"ARTIFACT"}
+            and ability_classes == {"SimpleStaticAbility"}
+            and effect_classes == {
+                "AlhammarretsArchiveReplacementEffect",
+                "GainDoubleLifeReplacementEffect",
+            }
+            and not target_classes
+            and not cost_classes
+            and effect_json.get("permanent_type") == "artifact"
+            and bool(effect_json.get("legendary"))
+            and not bool(effect_json.get("draw_on_enter"))
+            and bool(effect_json.get("life_gain_replacement_double"))
+            and int(effect_json.get("life_gain_multiplier") or 0) == 2
+            and bool(effect_json.get("draw_replacement_double_except_first_draw_step"))
+            and int(effect_json.get("draw_replacement_amount_multiplier") or 0) == 2
+            and bool(effect_json.get("draw_replacement_controller_only"))
+            and bool(effect_json.get("draw_replacement_first_draw_step_exception"))
+        )
+
     if (
         effect == "draw_engine"
         and scope

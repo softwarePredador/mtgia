@@ -491,6 +491,26 @@ Package-gate correction generated on 2026-06-30:
   Use the fixed gate only:
   `lorehold_electro_waterskin_gate_20260630_fixed_20260630_042339`.
 
+Cut-model baseline correction generated on 2026-06-30:
+
+- `lorehold_access_cut_model.py`, `lorehold_hand_filter_cut_model.py`,
+  `lorehold_tutor_cut_model.py`, `lorehold_recursion_cut_model.py`,
+  `lorehold_safe_cut_replanner.py`, and `lorehold_manual_cut_review.py` now
+  default to protected baseline deck `607`, not historical deck `6`.
+- The corrected access model is
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_cut_model_20260630_after_pg269_alhammarret.md`.
+  It evaluated deck `607` directly (`94` deck rows), found `0` preflight-ready
+  access swaps, and removed the invalid `Penance` over `Brainstone` path
+  because `Brainstone` exists in deck `6`, not in protected deck `607`.
+- The corrected hand-filter, tutor, and recursion models also produced `0`
+  gate-ready direct swaps from deck `607`:
+  `lorehold_hand_filter_cut_model_20260630_after_pg269_alhammarret.md`,
+  `lorehold_tutor_cut_model_20260630_after_pg269_alhammarret.md`, and
+  `lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.md`.
+- `operational_surface_alignment_audit.py` now checks these active cut models
+  for `DEFAULT_BASELINE_DECK_ID = 607` before the project can claim script/doc
+  alignment.
+
 Tibalt replacement decision generated on 2026-06-30:
 
 - Candidates:

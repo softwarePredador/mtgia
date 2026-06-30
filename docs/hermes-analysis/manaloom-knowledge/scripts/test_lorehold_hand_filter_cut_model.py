@@ -4,6 +4,10 @@ import sqlite3
 import lorehold_hand_filter_cut_model as model
 
 
+def test_default_baseline_deck_is_protected_607():
+    assert model.DEFAULT_BASELINE_DECK_ID == 607
+
+
 def test_default_miner_uses_current_runtime_queue():
     assert model.DEFAULT_MINER_REPORT.name == "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 
@@ -25,9 +29,9 @@ def memory_db():
         """
     )
     rows = [
-        (6, "Big Score", "ramp", '["ramp"]', "Instant", 4, 0),
-        (6, "Esper Sentinel", "draw", '["draw"]', "Artifact Creature", 1, 0),
-        (6, "Rise of the Eldrazi", "wincon", '["wincon"]', "Sorcery", 12, 0),
+        (607, "Big Score", "ramp", '["ramp"]', "Instant", 4, 0),
+        (607, "Esper Sentinel", "draw", '["draw"]', "Artifact Creature", 1, 0),
+        (607, "Rise of the Eldrazi", "wincon", '["wincon"]', "Sorcery", 12, 0),
     ]
     conn.executemany("INSERT INTO deck_cards VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
     return conn

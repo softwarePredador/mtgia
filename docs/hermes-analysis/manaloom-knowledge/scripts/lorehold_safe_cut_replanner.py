@@ -28,6 +28,7 @@ DEFAULT_LEDGER = REPORT_DIR / "lorehold_learning_evidence_ledger_20260628_v6.jso
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_CUT_SAFETY = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_SOURCE_DB = package_gate.DEFAULT_SOURCE_DB
+DEFAULT_BASELINE_DECK_ID = 607
 
 FAMILY_LANE_COMPATIBILITY = {
     "graveyard_recast": {"early_mana", "draw", "spell_velocity", "hand_filter"},
@@ -598,7 +599,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     parser.add_argument("--cut-safety", type=Path, default=DEFAULT_CUT_SAFETY)
     parser.add_argument("--source-db", type=Path, default=DEFAULT_SOURCE_DB)
-    parser.add_argument("--deck-id", type=int, default=6)
+    parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--max-per-source", type=int, default=2)
     parser.add_argument("--max-manifest-packages", type=int, default=8)

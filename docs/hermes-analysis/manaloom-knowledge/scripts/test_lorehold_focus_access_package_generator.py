@@ -6,7 +6,7 @@ def test_default_planner_uses_current_rejection_integrated_report():
 
 
 def test_default_access_model_uses_runtime_overlay_report():
-    assert gen.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260628_v3_runtime_overlay.json"
+    assert gen.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
 
 
 def test_default_runtime_gap_queue_uses_current_miner_report():

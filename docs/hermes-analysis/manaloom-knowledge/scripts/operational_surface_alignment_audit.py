@@ -33,13 +33,20 @@ VARIANT_MATRIX = SCRIPT_DIR / "lorehold_variant_strategy_matrix.py"
 VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 STRATEGY_LEARNING_AUDIT = SCRIPT_DIR / "lorehold_strategy_learning_audit.py"
 IDEAL_MATRIX = SCRIPT_DIR / "lorehold_ideal_deck_candidate_matrix.py"
+LOREHOLD_ACCESS_CUT_MODEL = SCRIPT_DIR / "lorehold_access_cut_model.py"
+LOREHOLD_HAND_FILTER_CUT_MODEL = SCRIPT_DIR / "lorehold_hand_filter_cut_model.py"
+LOREHOLD_TUTOR_CUT_MODEL = SCRIPT_DIR / "lorehold_tutor_cut_model.py"
+LOREHOLD_RECURSION_CUT_MODEL = SCRIPT_DIR / "lorehold_recursion_cut_model.py"
+LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
+LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
+LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
 
 CURRENT_XMAGE_MANIFEST = (
-    "xmage_current_replay_batch_pipeline_20260630_081500_post_pg268_cloud_key_manifest.md"
+    "xmage_current_replay_batch_pipeline_20260630_085000_post_pg269_alhammarret_archive_manifest.md"
 )
 CURRENT_LOREHOLD_MATRIX = "lorehold_variant_strategy_matrix_20260629_deckbuilding_contract"
 
@@ -135,9 +142,9 @@ def build_checks() -> list[Check]:
             XMAGE_FLOW,
             [
                 "Status: `current_operating_standard`",
-                "PG267/PG268 runtime-rule checkpoint",
+                "PG267/PG269 runtime-rule checkpoint",
                 CURRENT_XMAGE_MANIFEST,
-                "ready_for_structured_xmage_pull_review_required=70",
+                "ready_for_structured_xmage_pull_review_required=69",
                 "xmage_source_valid_mapper_required=61",
                 "runtime_family_required_count=0",
             ],
@@ -180,10 +187,10 @@ def build_checks() -> list[Check]:
             XMAGE_AUDIT,
             [
                 CURRENT_XMAGE_MANIFEST,
-                '"ready_for_structured_xmage_pull_review_required": 70',
+                '"ready_for_structured_xmage_pull_review_required": 69',
                 '"xmage_source_valid_mapper_required": 61',
                 '"mapper_metadata_or_test_scenario_required": 61',
-                '"split_family_scope_review_required": 70',
+                '"split_family_scope_review_required": 69',
             ],
             "scripts.xmage_strategy_audit_uses_current_manifest",
         ),
@@ -238,6 +245,41 @@ def build_checks() -> list[Check]:
             STRATEGY_LEARNING_AUDIT,
             [f"{CURRENT_LOREHOLD_MATRIX}.json"],
             "scripts.lorehold_strategy_learning_uses_contract_matrix",
+        ),
+        check_contains(
+            LOREHOLD_ACCESS_CUT_MODEL,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_access_cut_model_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_HAND_FILTER_CUT_MODEL,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_hand_filter_cut_model_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_TUTOR_CUT_MODEL,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_tutor_cut_model_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_RECURSION_CUT_MODEL,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_recursion_cut_model_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_SAFE_CUT_REPLANNER,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_safe_cut_replanner_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_MANUAL_CUT_REVIEW,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_manual_cut_review_defaults_to_protected_607",
+        ),
+        check_contains(
+            LOREHOLD_FOCUS_ACCESS_GENERATOR,
+            ["lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"],
+            "scripts.lorehold_focus_generator_uses_corrected_access_model",
         ),
         check_contains(
             IDEAL_MATRIX,

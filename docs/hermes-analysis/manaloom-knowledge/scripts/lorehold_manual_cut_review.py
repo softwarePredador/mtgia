@@ -32,6 +32,7 @@ DEFAULT_EXPOSURE_PROFILE = DEFAULT_EXPOSURE_PROFILES[0]
 DEFAULT_SAFE_CUT_REPLANNER = REPORT_DIR / "lorehold_safe_cut_replanner_20260628_v4.json"
 DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_LOREHOLD_VARIANT_DECK_IDS = tuple(range(607, 617))
+DEFAULT_BASELINE_DECK_ID = 607
 
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}
 ACTIVE_REVIEW_STATUSES = {"verified", "active", "needs_review", "reviewed"}
@@ -277,7 +278,10 @@ def table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
     return {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
 
 
-def load_current_deck_cards(conn: sqlite3.Connection, deck_id: int = 6) -> list[dict[str, Any]]:
+def load_current_deck_cards(
+    conn: sqlite3.Connection,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
+) -> list[dict[str, Any]]:
     columns = table_columns(conn, "deck_cards")
     select_columns = [
         "deck_id",
@@ -593,7 +597,7 @@ def build_cut_evidence_expansion(
     cut_safety: dict[str, dict[str, Any]],
     exposures: dict[str, dict[str, Any]],
     safe_cut_report: dict[str, Any] | None,
-    deck_id: int = 6,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
 ) -> dict[str, Any]:
     decisions = card_decision_lookup(strategy_audit)
     deck_cards = load_current_deck_cards(conn, deck_id)

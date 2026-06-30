@@ -571,6 +571,30 @@ def deal_damage(player, amount, source=None):
     return dealt
 
 
+def _permanents_with_static_replacement(player, flag):
+    return [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if isinstance(permanent, dict) and permanent.get(flag)
+    ]
+
+
+def _first_static_replacement_permanent(player, flag):
+    permanents = _permanents_with_static_replacement(player, flag)
+    return permanents[0] if permanents else None
+
+
+def _life_gain_replacement_amount(player, amount):
+    source = _first_static_replacement_permanent(player, "life_gain_replacement_double")
+    if source is None:
+        return amount, None
+    try:
+        multiplier = max(1, int(source.get("life_gain_multiplier") or 2))
+    except (TypeError, ValueError):
+        multiplier = 2
+    return int(amount) * multiplier, source
+
+
 def gain_life(player, amount, cap=40):
     if getattr(player, "cant_gain_life", False):
         emit_replay_event(
@@ -583,7 +607,20 @@ def gain_life(player, amount, cap=40):
             turn=CURRENT_REPLAY_TURN,
         )
         return False
-    gained = _gain_life(player, amount, cap=cap, emit_replay_event=emit_replay_event)
+    requested_amount = int(amount or 0)
+    final_amount, replacement_source = _life_gain_replacement_amount(player, requested_amount)
+    if replacement_source is not None and final_amount != requested_amount:
+        emit_replay_event(
+            "life_gain_replacement_applied",
+            player=getattr(player, "name", "?"),
+            card=replacement_source.get("name", "?"),
+            original_amount=requested_amount,
+            final_amount=final_amount,
+            multiplier=int(replacement_source.get("life_gain_multiplier") or 2),
+            turn=CURRENT_REPLAY_TURN,
+            **replay_rule_fields(replacement_source),
+        )
+    gained = _gain_life(player, final_amount, cap=cap, emit_replay_event=emit_replay_event)
     if gained:
         refresh_life_total_threshold_statics_for_player(
             player,
@@ -7805,20 +7842,58 @@ class Player:
             self._life_lost_turn_marker = turn_marker
         return int(getattr(self, "life_lost_this_turn", 0) or 0)
 
-    def draw(self, n=1, rng=None):
+    def _draw_replacement_source(self, phase=None):
+        source = _first_static_replacement_permanent(
+            self,
+            "draw_replacement_double_except_first_draw_step",
+        )
+        if source is None:
+            return None
+        draw_phase = str(phase or getattr(self, "_current_draw_phase", "") or "").strip()
+        if (
+            source.get("draw_replacement_first_draw_step_exception")
+            and draw_phase == "draw_step"
+            and int(getattr(self, "cards_drawn_this_turn", 0) or 0) <= 0
+        ):
+            return None
+        return source
+
+    def draw(self, n=1, rng=None, phase=None):
         drawn = []
         turn_marker = CURRENT_REPLAY_TURN
         if turn_marker is not None and getattr(self, "_cards_drawn_turn_marker", None) != turn_marker:
             self.cards_drawn_this_turn = 0
             self._cards_drawn_turn_marker = turn_marker
         for _ in range(n):
-            if self.library:
-                c = self.library.pop(0)
-                self.hand.append(c)
-                drawn.append(c)
-                self.cards_drawn_this_turn += 1
-            else:
-                self.failed_draw_from_empty_library = True
+            replacement_source = self._draw_replacement_source(phase=phase)
+            draw_events = 1
+            if replacement_source is not None:
+                try:
+                    draw_events = max(1, int(replacement_source.get("draw_replacement_amount_multiplier") or 2))
+                except (TypeError, ValueError):
+                    draw_events = 2
+            event_drawn = []
+            for _event_index in range(draw_events):
+                if self.library:
+                    c = self.library.pop(0)
+                    self.hand.append(c)
+                    drawn.append(c)
+                    event_drawn.append(c)
+                    self.cards_drawn_this_turn += 1
+                else:
+                    self.failed_draw_from_empty_library = True
+            if replacement_source is not None:
+                emit_replay_event(
+                    "draw_replacement_applied",
+                    player=self.name,
+                    card=replacement_source.get("name", "?"),
+                    original_draw_count=1,
+                    final_draw_count=draw_events,
+                    actual_drawn=len(event_drawn),
+                    phase=phase,
+                    turn=turn_marker,
+                    **replay_rule_fields(replacement_source),
+                )
         return drawn
 
     def __init__(self, name, commander, deck, is_human=False, strategy="midrange"):
@@ -43617,7 +43692,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     emit_focus_card_access_snapshot(player, turn=turn, phase="after_upkeep_engines")
 
     # ── DRAW ──
-    drawn_for_turn = player.draw(1, rng)
+    drawn_for_turn = player.draw(1, rng, phase="draw_step")
     process_player_draw_triggers(
         player,
         len(drawn_for_turn),

@@ -229,6 +229,16 @@ def deck_role_for(card: dict[str, Any]) -> dict[str, Any]:
             "subtype": "chosen_card_type_cost_reducer",
             "timing": "static_after_as_enters_choice",
         }
+    if (
+        effect_json.get("battle_model_scope")
+        == "static_double_life_gain_and_draw_except_first_draw_step_v1"
+    ):
+        return {
+            "category": "draw",
+            "effect": "draw_engine",
+            "subtype": "draw_and_life_gain_replacement",
+            "timing": "static_replacement",
+        }
     if effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             return {

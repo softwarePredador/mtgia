@@ -34,6 +34,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
     REPORT_DIR / "lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
 ]
+DEFAULT_BASELINE_DECK_ID = 607
 HIGH_EXPOSURE_CUTOFF = 200
 PROTECTED_EXPOSURE_CUTOFF = 80
 
@@ -76,7 +77,10 @@ def exposure_lookup(profiles: list[tuple[Path, dict[str, Any]]]) -> dict[str, di
     return out
 
 
-def deck_card_lookup(conn: sqlite3.Connection, deck_id: int = 6) -> dict[str, dict[str, Any]]:
+def deck_card_lookup(
+    conn: sqlite3.Connection,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
+) -> dict[str, dict[str, Any]]:
     rows = conn.execute(
         """
         SELECT card_name, functional_tag, functional_tags_json, type_line, cmc, is_commander
@@ -292,13 +296,14 @@ def build_model(
     miner_report: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
     prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
     db_path: Path = DEFAULT_DB,
     miner_path: Path = DEFAULT_MINER_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     rejected_pairs = rejected_pair_lookup(prior_package_reports or [])
     rejected_cut_counts = Counter(cut for _candidate, cut in rejected_pairs)
-    deck_cards = deck_card_lookup(conn)
+    deck_cards = deck_card_lookup(conn, deck_id)
     pair_rows: list[dict[str, Any]] = []
     for pairing in hand_filter_pairings(miner_report):
         for cut_option in pairing.get("cut_options") or []:
@@ -318,6 +323,7 @@ def build_model(
     return {
         "generated_at": utc_now(),
         "source_db": str(db_path),
+        "deck_id": deck_id,
         "miner_report": str(miner_path),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
@@ -358,6 +364,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
+        f"- Deck id: `{payload['deck_id']}`",
         f"- Miner report: `{payload['miner_report']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
@@ -435,6 +442,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
+    parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
     parser.add_argument("--stem", default="lorehold_hand_filter_cut_model_20260628_v4_current_miner")
     return parser.parse_args()
 
@@ -453,6 +461,7 @@ def main() -> int:
             miner_report=miner_report,
             exposure_profiles=exposure_profiles,
             prior_package_reports=prior_package_reports,
+            deck_id=args.deck_id,
             db_path=args.db,
             miner_path=args.miner_report,
         )

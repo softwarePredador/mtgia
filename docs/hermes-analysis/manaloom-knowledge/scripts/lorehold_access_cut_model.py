@@ -40,6 +40,7 @@ DEFAULT_CANDIDATES = [
     "Gamble",
     "Hidden Retreat",
 ]
+DEFAULT_BASELINE_DECK_ID = 607
 ACCESS_TARGETS = [
     "Squee, Goblin Nabob",
     "Sensei's Divining Top",
@@ -598,7 +599,7 @@ def build_model(
     seed_matrix_report: dict[str, Any],
     squee_probe_report: dict[str, Any] | None = None,
     candidates: list[str] = DEFAULT_CANDIDATES,
-    deck_id: int = 6,
+    deck_id: int = DEFAULT_BASELINE_DECK_ID,
     variant_deck_ids: Iterable[int] = DEFAULT_VARIANT_DECK_IDS,
     db_path: Path = DEFAULT_DB,
     strategy_path: Path = DEFAULT_STRATEGY_REPORT,
@@ -758,6 +759,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- generated_at: `{payload['generated_at']}`",
         f"- source_db: `{payload['source_db']}`",
+        f"- deck_id: `{payload['deck_id']}`",
         f"- strategy_report: `{payload['strategy_report']}`",
         f"- seed_matrix_report: `{payload['seed_matrix_report']}`",
         f"- squee_probe_report: `{payload.get('squee_probe_report') or '-'}`",
@@ -866,7 +868,7 @@ def parse_args() -> argparse.Namespace:
         help="Read-only runtime proposal reports to overlay while scoring candidates.",
     )
     parser.add_argument("--candidate", action="append")
-    parser.add_argument("--deck-id", type=int, default=6)
+    parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
     parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v2")
     return parser.parse_args()
 
