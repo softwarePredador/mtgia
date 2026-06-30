@@ -34,7 +34,7 @@ DEFAULT_ROOT_README = REPO_ROOT / "docs/hermes-analysis/README.md"
 DEFAULT_REPORT_README = REPORT_DIR / "README.md"
 DEFAULT_PIPELINE_MANIFEST_MD = (
     REPORT_DIR
-    / "xmage_current_replay_batch_pipeline_20260630_085000_post_pg269_alhammarret_archive_manifest.md"
+    / "xmage_current_replay_batch_pipeline_20260630_post_pg270_currency_converter_apply_sync_manifest.md"
 )
 DEFAULT_RUNTIME_SURFACE_MD = REPORT_DIR / "battle_runtime_surface_manifest_20260629_post_adagia_mapper.md"
 DEFAULT_EXTERNAL_SOURCE_MD = REPORT_DIR / "mtg_battle_external_source_audit_20260629_post_adagia_mapper.md"
@@ -367,11 +367,11 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
 
     expected_counts = {
         "Validity status counts": {
-            "ready_for_structured_xmage_pull_review_required": 69,
+            "ready_for_structured_xmage_pull_review_required": 68,
             "xmage_source_valid_mapper_required": 61,
         },
         "Proposal status counts": {
-            "split_family_scope_review_required": 69,
+            "split_family_scope_review_required": 68,
             "mapper_metadata_or_test_scenario_required": 61,
         },
         "Family counts": {
@@ -382,7 +382,7 @@ def audit_manifest(args: argparse.Namespace) -> list[Check]:
             "free_cast": 9,
             "targeted_protection": 7,
             "passive": 5,
-            "draw_engine": 3,
+            "draw_engine": 2,
             "topdeck_play": 2,
             "board_wipe_choice": 3,
             "copy_spell_engine": 1,

@@ -30,7 +30,9 @@ DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
 DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_after_pg269_alhammarret.json"
-DEFAULT_RUNTIME_GAP_QUEUE = REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.json"
+DEFAULT_RUNTIME_GAP_QUEUE = (
+    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json"
+)
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -598,7 +600,7 @@ def next_command_for_work(work_key: str) -> str:
         "runtime_rule_gap_batch": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
             "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
-            "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela"
+            "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync"
         ),
     }
     return commands.get(work_key, "")

@@ -23,9 +23,9 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                     [
                         "- Forced include deck ids: `[6, 607]`",
                         "- Effective deck ids: `[6, 25, 607]`",
-                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 69, "xmage_source_valid_mapper_required": 61}`',
-                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 3, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
-                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 69}`',
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 68, "xmage_source_valid_mapper_required": 61}`',
+                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 2, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
+                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 68}`',
                         '- Pattern status counts: `{"candidate_template_requires_review_tests": 9, "manual_model_observation_only": 1, "requires_subpattern_split_before_promotion": 10}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]
@@ -51,9 +51,9 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                     [
                         "- Forced include deck ids: `[6, 607, 608]`",
                         "- Effective deck ids: `[6, 25, 31, 607, 608]`",
-                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 69, "xmage_source_valid_mapper_required": 61}`',
-                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 3, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
-                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 69}`',
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 68, "xmage_source_valid_mapper_required": 61}`',
+                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 2, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
+                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 68}`',
                         '- Pattern status counts: `{"candidate_template_requires_review_tests": 9, "manual_model_observation_only": 1, "requires_subpattern_split_before_promotion": 10}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]
@@ -143,9 +143,9 @@ class XMageStrategyConsistencyAuditTests(unittest.TestCase):
                     [
                         "- Forced include deck ids: `[6, 607, 608]`",
                         "- Effective deck ids: `[6, 25, 31, 607, 608]`",
-                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 69, "xmage_source_valid_mapper_required": 61}`',
-                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 3, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
-                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 69}`',
+                        '- Validity status counts: `{"ready_for_structured_xmage_pull_review_required": 68, "xmage_source_valid_mapper_required": 61}`',
+                        '- Family counts: `{"board_wipe_choice": 3, "copy_spell_engine": 1, "draw_engine": 2, "free_cast": 9, "life_total_change": 1, "manual_model": 61, "passive": 5, "ramp_permanent": 5, "recursion": 11, "targeted_interaction": 12, "targeted_protection": 7, "topdeck_play": 2, "tutor": 10}`',
+                        '- Proposal status counts: `{"mapper_metadata_or_test_scenario_required": 61, "split_family_scope_review_required": 68}`',
                         '- Pattern status counts: `{"candidate_template_requires_review_tests": 9, "manual_model_observation_only": 1, "requires_subpattern_split_before_promotion": 10}`',
                         "- Pattern promotion status: `shadow_only`",
                     ]

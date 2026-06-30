@@ -10,7 +10,10 @@ def test_default_access_model_uses_runtime_overlay_report():
 
 
 def test_default_runtime_gap_queue_uses_current_miner_report():
-    assert gen.DEFAULT_RUNTIME_GAP_QUEUE.name == "lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.json"
+    assert (
+        gen.DEFAULT_RUNTIME_GAP_QUEUE.name
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.json"
+    )
 
 
 def planner_payload(prior_keys=None):

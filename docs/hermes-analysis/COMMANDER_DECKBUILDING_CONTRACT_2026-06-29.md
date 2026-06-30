@@ -726,6 +726,28 @@ Cloud Key same-lane benchmark decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_lane_decision_20260630_cloud_key_reject.md`.
 
+Hand-filter expanded decision generated after PG270 on 2026-06-30:
+
+- Scope: protected baseline deck `607`, full deck-607 exposure profile, and
+  hand-filter/value candidates from the current miner after `Currency
+  Converter` runtime promotion/sync.
+- Tooling correction: `lorehold_card_exposure_profiler.py` can profile a full
+  deck by `--deck-id`, records active effects/scopes, and prevents disabled
+  generated rules from overriding active card lanes.
+- Cut-model result: original miner pairs `25`, expanded deck-607 pairs `445`,
+  normal preflight-ready pairs `0`, expanded preflight-ready pairs `0`.
+- Natural gate evidence: `Valakut Awakening // Valakut Stoneforge` over
+  `Improvisation Capstone` lost `7W/17L/0S` versus `607` at `11W/12L/1S`;
+  `Wheel of Fortune` over `Improvisation Capstone` lost `9W/15L/0S`; `Olórin's
+  Searing Light` over `Improvisation Capstone` showed a positive smoke result
+  but was invalid for hand-filter promotion because the active lane is removal,
+  not hand-filter.
+- Decision: no deck change. Future Olórin work belongs in
+  interaction/removal benchmarking, and hand-filter work must first find a new
+  safe cut or runtime evidence.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_expanded_decision_20260630_post_pg270.md`.
+
 Runtime enablement checkpoint generated on 2026-06-30:
 
 - PG263 promoted and synced eight runtime-gap cards that occur in the
@@ -736,10 +758,15 @@ Runtime enablement checkpoint generated on 2026-06-30:
 - PG264 promoted and synced `Gisela, Blade of Goldnight` with the exact
   static-damage scope
   `opponent_or_opponent_permanent_damage_doubled_self_damage_halved_v1`.
+- PG265-PG270 subsequently promoted and synced `Lens of Clarity`,
+  `Eight-and-a-Half-Tails`, `Neheb, the Eternal`, `Cloud Key`,
+  `Alhammarret's Archive`, and `Currency Converter`; the focus-access generator
+  now defaults to the post-PG270 runtime-gap queue.
 - The current runtime-gap queue after PG264 is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg264_gisela.md`.
+  superseded by
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg270_currency_converter_apply_sync.md`.
 - The current focus generator output is
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg264_gisela.md`.
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_post_pg270_currency_converter_apply_sync.md`.
 - Interpretation for deck work: this unlocks future candidate testing for more
   cards, but it is not deck-promotion evidence by itself. `deck_607` remains
   protected until a same-lane candidate ties or beats it with card-use and
