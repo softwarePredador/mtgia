@@ -552,7 +552,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     package_files = [path.resolve() for path in args.package_file]
-    package_definitions, loaded_package_files = package_gate.merge_package_definitions(package_files)
+    package_definitions, loaded_package_files, _loaded_package_keys = package_gate.merge_package_definitions(package_files)
     cut_safety = package_gate.merge_registry_cut_guard(
         package_gate.load_cut_safety_manifest(args.cut_safety_report.resolve()),
         package_gate.load_registry_cut_guard(args.registry.resolve()),

@@ -145,3 +145,45 @@ def test_aggregate_promotes_when_total_wins_improve_without_strong_regression():
 
     assert aggregate["decision"] == "promote_to_confirm_gate"
     assert aggregate["candidate_record"] == "4-2"
+
+
+def test_aggregate_rejects_if_critical_matchup_regresses():
+    positive = gate_summary(1, 2, 2, 1, 33.33)
+    positive["baseline"]["critical_matchups"] = {
+        "Winota": {"wins": 1, "losses": 0, "stalls": 0, "games": 1}
+    }
+    positive["candidate"]["critical_matchups"] = {
+        "Winota": {"wins": 0, "losses": 1, "stalls": 0, "games": 1}
+    }
+    rows = [
+        {
+            "seed": 7,
+            "gate_returncode": 0,
+            "gate_summary": positive,
+        }
+    ]
+
+    aggregate = matrix.aggregate_seed_rows("example_package", rows, strong_seeds={42})
+
+    assert aggregate["decision"] == "reject_regresses_critical_matchup"
+    assert aggregate["critical_matchup_regressions"] == ["Winota"]
+
+
+def test_compact_gate_side_counts_winota_critical_matchup():
+    compact = matrix.compact_gate_side(
+        {
+            "wins": 1,
+            "losses": 1,
+            "game_results": [
+                {"opponent": "Winota, Joiner of Forces", "result": "win"},
+                {"opponent": "Kinnan, Bonder Prodigy", "result": "loss"},
+            ],
+        }
+    )
+
+    assert compact["critical_matchups"]["Winota"] == {
+        "wins": 1,
+        "losses": 0,
+        "stalls": 0,
+        "games": 1,
+    }

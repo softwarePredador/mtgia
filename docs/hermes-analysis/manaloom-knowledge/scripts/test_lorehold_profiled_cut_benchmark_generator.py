@@ -33,6 +33,15 @@ def build_conn() -> sqlite3.Connection:
         (607, "Stroke of Midnight", "removal", '["removal"]', 3, "Instant", "Destroy target nonland permanent."),
         (607, "Bender's Waterskin", "ramp", '["ramp"]', 3, "Artifact", "Mana rock."),
         (607, "Creative Technique", "draw", '["draw"]', 5, "Sorcery", "Reveal into a free spell."),
+        (
+            607,
+            "Monument to Endurance",
+            "ramp",
+            '["ramp","card_advantage","discard_trigger_modal_draw_treasure_opponent_life_loss"]',
+            3,
+            "Artifact",
+            "Whenever you discard a card, choose one that has not been chosen this turn: draw a card, create a Treasure token, or each opponent loses 3 life.",
+        ),
     ]
     variant_rows = [
         (608, "Lightning Bolt", "removal", '["removal"]', 1, "Instant", "Deal 3 damage to any target."),
@@ -49,6 +58,33 @@ def build_conn() -> sqlite3.Connection:
         (616, "Lion's Eye Diamond", "ramp", '["ramp"]', 0, "Artifact", "Discard your hand, Sacrifice this artifact: Add three mana of any one color. Activate only as an instant."),
         (616, "Treasonous Ogre", "ramp", '["ramp","creature"]', 4, "Creature — Ogre Shaman", "Dethrone\nPay 3 life: Add {R}."),
         (616, "Surly Badgersaur", "ramp", '["ramp","creature"]', 4, "Creature — Dinosaur", "Whenever you discard a land card, create a Treasure token."),
+        (
+            616,
+            "Currency Converter",
+            "ramp",
+            '["ramp","draw"]',
+            1,
+            "Artifact",
+            "Whenever you discard a card, you may exile that card from your graveyard. {2}, {T}: Draw a card, then discard a card. {T}: create a Treasure or Rogue token.",
+        ),
+        (
+            616,
+            "Wheel of Fortune",
+            "draw",
+            '["draw"]',
+            3,
+            "Sorcery",
+            "Each player discards their hand, then draws seven cards.",
+        ),
+        (
+            616,
+            "Faithless Looting",
+            "draw",
+            '["draw","draw_filter","loot"]',
+            1,
+            "Sorcery",
+            "Draw two cards, then discard two cards. Flashback {2}{R}.",
+        ),
         (616, "Grinding Station", "ramp", '["ramp"]', 2, "Artifact", "Tap, sacrifice an artifact: target player mills three cards."),
         (616, "Thrumming Stone", "engine", '["engine","ripple_engine"]', 5, "Legendary Artifact", "Spells you cast have ripple 4."),
     ]
@@ -62,6 +98,17 @@ def build_conn() -> sqlite3.Connection:
         ("Red Elemental Blast", "red elemental blast", "active", "active", {"effect": "modal_spell", "battle_model_scope": "counter_target_blue_spell_or_destroy_target_blue_permanent"}),
         ("Bender's Waterskin", "bender s waterskin", "auto", "verified", {"effect": "ramp_permanent", "battle_model_scope": "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1", "mana_produced": 1}),
         ("Creative Technique", "creative technique", "auto", "verified", {"effect": "exile_top_nonland_free_cast", "battle_model_scope": "shuffle_reveal_top_nonland_exile_free_cast_with_demonstrate_v1"}),
+        (
+            "Monument to Endurance",
+            "monument to endurance",
+            "auto",
+            "verified",
+            {
+                "effect": "discard_trigger_modal_draw_treasure_opponent_life_loss",
+                "battle_model_scope": "discard_trigger_choose_unpicked_mode_draw_treasure_life_loss_v1",
+                "trigger": "controller_discard",
+            },
+        ),
         ("Mana Vault", "mana vault", "auto", "active", {"effect": "ramp_permanent", "battle_model_scope": "fast_mana_artifact_partial_v1", "mana_produced": 3}),
         ("Chrome Mox", "chrome mox", "auto", "active", {"effect": "ramp_permanent", "battle_model_scope": "fast_mana_artifact_partial_v1", "mana_produced": 1}),
         ("Storm-Kiln Artist", "storm kiln artist", "auto", "verified", {"effect": "creature", "battle_model_scope": "creature_body_artifact_power_magecraft_treasure_annotation_v1", "magecraft_treasure_status": "annotation_only"}),
@@ -70,6 +117,20 @@ def build_conn() -> sqlite3.Connection:
         ("Lion's Eye Diamond", "lion s eye diamond", "auto", "verified", {"effect": "ramp_ritual", "mana_produced": 3, "produces": "WUBRGC"}),
         ("Treasonous Ogre", "treasonous ogre", "auto", "verified", {"effect": "creature", "is_mana_source": True, "mana_produced": 1, "produces": "R", "power": 2, "toughness": 3}),
         ("Surly Badgersaur", "surly badgersaur", "auto", "verified", {"effect": "creature", "battle_model_scope": "surly_badgersaur_discard_card_type_triggers_v1", "trigger": "controller_discard", "controller_discard_land_create_treasure": True}),
+        (
+            "Currency Converter",
+            "currency converter",
+            "auto",
+            "verified",
+            {
+                "effect": "draw_engine",
+                "battle_model_scope": "currency_converter_discard_exile_draw_discard_token_v1",
+                "trigger": "controller_discard",
+                "token_from_exiled_land": "treasure",
+            },
+        ),
+        ("Wheel of Fortune", "wheel of fortune", "auto", "active", {"effect": "draw_cards", "battle_model_scope": "multiplayer_discard_draw_v1"}),
+        ("Faithless Looting", "faithless looting", "auto", "verified", {"effect": "loot", "battle_model_scope": "draw_two_discard_two_flashback_annotation_v1"}),
         ("Grinding Station", "grinding station", "auto", "verified", {"effect": "ramp_permanent", "mana_produced": 1}),
         ("Thrumming Stone", "thrumming stone", "auto", "verified", {"effect": "ripple_engine", "battle_model_scope": "static_spell_ripple_4_same_name_runtime_v1"}),
     ]
@@ -108,7 +169,15 @@ def manual_review() -> dict:
                     "recommended_action": "manual_same_lane_only",
                     "cut_exposure": {"inferred_role": "unmeasured"},
                 },
-            ]
+            ],
+            "rows": [
+                {
+                    "card_name": "Monument to Endurance",
+                    "status": "measured_cut_exposure_needs_same_lane_benchmark",
+                    "recommended_action": "manual_same_lane_only",
+                    "cut_exposure": {"inferred_role": "discard_ramp_value"},
+                },
+            ],
         }
     }
 
@@ -216,6 +285,7 @@ def test_generator_can_restrict_to_removal_lane_without_ramp_fallback():
     assert payload["requested_cut_roles"] == ["spot_removal"]
     assert payload["summary"]["unfiltered_profiled_cut_count"] == 4
     assert payload["summary"]["profiled_cut_count"] == 2
+    assert payload["summary"]["supported_cut_count"] == 2
     assert payload["summary"]["filtered_out_cut_count"] == 2
     assert payload["summary"]["selected_package_count"] > 0
     assert all(row["cut_role"] == "spot_removal" for row in payload["selected_pairs"])
@@ -253,6 +323,36 @@ def test_generator_blocks_under_modeled_costs_and_conditional_ramp_payoffs():
     )
     assert payload["summary"]["blocker_counts"]["candidate_unmodeled_discard_hand_cost"] >= 1
     assert payload["summary"]["blocker_counts"]["candidate_unmodeled_life_payment_mana_cost"] >= 1
+
+
+def test_generator_supports_specific_discard_ramp_value_cut_lane():
+    with build_conn() as conn:
+        payload = generator.build_report(
+            conn=conn,
+            manual_review=manual_review(),
+            prior_results={"by_signature": {}},
+            cut_safety=cut_safety(),
+            db_path=Path("memory.db"),
+            manual_review_path=Path("manual_review.json"),
+            variant_deck_ids=[616],
+            max_per_cut=3,
+            cut_roles=["discard_ramp_value"],
+            cut_names=["Monument to Endurance"],
+        )
+
+    selected = {(row["candidate"], row["cut"], row["candidate_role"], row["cut_role"]) for row in payload["selected_pairs"]}
+    assert ("Currency Converter", "Monument to Endurance", "discard_ramp_value", "discard_ramp_value") in selected
+    assert ("Surly Badgersaur", "Monument to Endurance", "discard_ramp_value", "discard_ramp_value") in selected
+    assert payload["summary"]["selected_package_count"] == 2
+    assert payload["summary"]["supported_cut_count"] == 1
+    assert payload["summary"]["filtered_out_cut_count"] == 0
+    assert payload["requested_cut_names"] == ["Monument to Endurance"]
+    markdown = generator.render_markdown(payload)
+    assert "Requested cut cards: `Monument to Endurance`" in markdown
+    wheel_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Wheel of Fortune"]
+    assert any("candidate_role_mismatch" in " ".join(row["blockers"]) for row in wheel_rows)
+    looting_rows = [row for row in payload["top_pair_evaluations"] if row["candidate"] == "Faithless Looting"]
+    assert any("candidate_role_mismatch" in " ".join(row["blockers"]) for row in looting_rows)
 
 
 def test_generator_excludes_prior_exact_rejects():

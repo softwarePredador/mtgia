@@ -39,9 +39,10 @@ PROFILED_CUT_STATUSES = {
     "measured_cut_exposure_needs_same_lane_benchmark",
     "same_lane_only",
 }
-SUPPORTED_CUT_ROLES = {"big_spell_value", "ramp", "spot_removal"}
+SUPPORTED_CUT_ROLES = {"big_spell_value", "discard_ramp_value", "ramp", "spot_removal"}
 ROLE_FAMILIES = {
     "big_spell_value": "big_spell_value_benchmark",
+    "discard_ramp_value": "discard_ramp_value_benchmark",
     "ramp": "ramp_benchmark",
     "spot_removal": "interaction_removal_benchmark",
 }
@@ -288,12 +289,29 @@ def load_variant_candidates(
     return finalized
 
 
-def profiled_cut_rows(manual_review: dict[str, Any]) -> list[dict[str, Any]]:
+def profiled_cut_rows(
+    manual_review: dict[str, Any],
+    *,
+    cut_names: Iterable[str] | None = None,
+) -> list[dict[str, Any]]:
     rows = []
     expansion = manual_review.get("cut_evidence_expansion") or {}
-    for row in expansion.get("top_same_lane_candidates") or []:
+    wanted = {normalize_key(name) for name in (cut_names or []) if normalize_key(name)}
+    source_rows = (
+        expansion.get("rows") or []
+        if wanted
+        else expansion.get("top_same_lane_candidates") or []
+    )
+    seen: set[str] = set()
+    for row in source_rows:
+        key = normalize_key(row.get("card_name"))
+        if wanted and key not in wanted:
+            continue
+        if key in seen:
+            continue
         if row.get("status") not in PROFILED_CUT_STATUSES:
             continue
+        seen.add(key)
         rows.append(row)
     return rows
 
@@ -348,12 +366,49 @@ def rule_has_effect(rule: dict[str, Any], needles: Iterable[str]) -> bool:
     return any(needle in text for needle in needles)
 
 
+def has_discard_value_payoff(card: dict[str, Any], rule: dict[str, Any]) -> bool:
+    oracle = str(card.get("oracle_text") or "").lower()
+    rule_text = active_rule_text(rule)
+    scope_text = " ".join((rule.get("active_battle_model_scopes") or {}).keys()).lower()
+    effect_text = " ".join((rule.get("active_effects") or {}).keys()).lower()
+    text = f"{oracle} {rule_text} {scope_text} {effect_text}"
+    has_discard_trigger = any(
+        marker in text
+        for marker in (
+            "whenever you discard",
+            "whenever you discard one or more",
+            "controller_discard",
+            "discard_trigger",
+            "discard_exile",
+        )
+    )
+    if not has_discard_trigger:
+        return False
+    return any(
+        marker in text
+        for marker in (
+            "draw",
+            "treasure",
+            "opponent loses",
+            "opponents_lose",
+            "life_loss",
+            "damage",
+            "token",
+            "fight",
+            "+1/+1",
+            "counter",
+        )
+    )
+
+
 def candidate_role(candidate: dict[str, Any], rule: dict[str, Any]) -> str:
     functional_tags = {str(tag) for tag in candidate.get("functional_tags") or []}
     functional_tag = str(candidate.get("functional_tag") or "")
     oracle = str(candidate.get("oracle_text") or "").lower()
     type_line = str(candidate.get("type_line") or "")
     cmc = float(candidate.get("cmc") or 0)
+    if has_discard_value_payoff(candidate, rule):
+        return "discard_ramp_value"
     if rule_has_effect(
         rule,
         (
@@ -503,6 +558,21 @@ def compatible_big_spell_scope(cut: dict[str, Any], candidate: dict[str, Any], c
     )
 
 
+def compatible_discard_ramp_value_scope(
+    cut: dict[str, Any],
+    candidate: dict[str, Any],
+    candidate_rule: dict[str, Any],
+) -> bool:
+    candidate_type = str(candidate.get("type_line") or "")
+    candidate_cmc = float(candidate.get("cmc") or 0)
+    cut_cmc = float((cut.get("cut_metadata") or {}).get("cmc") or 0)
+    if "Land" in candidate_type:
+        return False
+    if cut_cmc and candidate_cmc > cut_cmc + 1:
+        return False
+    return has_discard_value_payoff(candidate, candidate_rule)
+
+
 def compatible_same_lane_scope(
     cut: dict[str, Any],
     cut_rule: dict[str, Any],
@@ -516,6 +586,8 @@ def compatible_same_lane_scope(
         return compatible_ramp_scope(cut, candidate, candidate_rule)
     if cut_role == "big_spell_value":
         return compatible_big_spell_scope(cut, candidate, candidate_rule)
+    if cut_role == "discard_ramp_value":
+        return compatible_discard_ramp_value_scope(cut, candidate, candidate_rule)
     return False
 
 
@@ -681,12 +753,14 @@ def build_report(
     variant_deck_ids: Iterable[int] = DEFAULT_VARIANT_DECK_IDS,
     max_per_cut: int = 2,
     cut_roles: Iterable[str] | None = None,
+    cut_names: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     current_metadata = current_deck_metadata(conn, deck_id)
     current_names = set(current_metadata)
     requested_cut_roles = sorted({str(role) for role in (cut_roles or []) if str(role)})
     requested_cut_role_set = set(requested_cut_roles)
-    unfiltered_cuts = profiled_cut_rows(manual_review)
+    requested_cut_names = sorted({str(name) for name in (cut_names or []) if str(name)})
+    unfiltered_cuts = profiled_cut_rows(manual_review, cut_names=requested_cut_names)
     cuts = unfiltered_cuts
     cut_names = [str(row.get("card_name") or "") for row in cuts]
     variant_candidates = load_variant_candidates(
@@ -701,6 +775,7 @@ def build_report(
     prior_rejects = exact_prior_rejects(prior_results)
     cut_safety_by_name = normalized_cut_safety(cut_safety or {})
     pair_rows = []
+    eligible_cut_rows = []
     filtered_out_cut_rows = []
     for cut in cuts:
         cut_name = str(cut.get("card_name") or "")
@@ -734,6 +809,7 @@ def build_report(
                 }
             )
             continue
+        eligible_cut_rows.append(cut)
         cut_rule = rules.get(cut_key) or {}
         for candidate in variant_candidates.values():
             pair_rows.append(
@@ -769,7 +845,7 @@ def build_report(
         for row in pair_rows
         for blocker in row.get("blockers", [])
     )
-    blocked_cut_rows = [
+    unsupported_cut_rows = [
         {
             "card_name": row.get("card_name"),
             "status": row.get("status"),
@@ -778,25 +854,26 @@ def build_report(
             "cut_safety": cut_safety_by_name.get(normalize_key(row.get("card_name")), {}),
             "reason": "no supported generator for this cut role yet",
         }
-        for row in cuts
+        for row in eligible_cut_rows
         if (
             (cut_safety_by_name.get(normalize_key(row.get("card_name")), {}).get("effective_role"))
             or (row.get("cut_exposure") or {}).get("inferred_role")
         ) not in SUPPORTED_CUT_ROLES
     ]
-    blocked_cut_rows.extend(filtered_out_cut_rows)
+    blocked_cut_rows = unsupported_cut_rows + filtered_out_cut_rows
     return {
         "generated_at": utc_now(),
         "source_db": str(db_path),
         "manual_review": str(manual_review_path),
         "variant_deck_ids": list(variant_deck_ids),
         "requested_cut_roles": requested_cut_roles,
+        "requested_cut_names": requested_cut_names,
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
             "unfiltered_profiled_cut_count": len(unfiltered_cuts),
-            "profiled_cut_count": len(cuts) - len(filtered_out_cut_rows),
-            "supported_cut_count": len(cuts) - len(blocked_cut_rows),
+            "profiled_cut_count": len(eligible_cut_rows),
+            "supported_cut_count": len(eligible_cut_rows) - len(unsupported_cut_rows),
             "filtered_out_cut_count": len(filtered_out_cut_rows),
             "candidate_pool_count": len(variant_candidates),
             "pair_evaluation_count": len(pair_rows),
@@ -837,6 +914,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Registry: `{payload.get('registry')}`",
         f"- Variant deck IDs: `{', '.join(str(deck_id) for deck_id in payload['variant_deck_ids'])}`",
         f"- Requested cut roles: `{', '.join(payload.get('requested_cut_roles') or []) or 'all'}`",
+        f"- Requested cut cards: `{', '.join(payload.get('requested_cut_names') or []) or 'all'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -912,6 +990,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--max-per-cut", type=int, default=2)
     parser.add_argument(
+        "--cut-card",
+        action="append",
+        default=[],
+        help=(
+            "Restrict candidate generation to this current deck cut card. "
+            "When present, rows are read from the full manual-review expansion."
+        ),
+    )
+    parser.add_argument(
         "--cut-role",
         action="append",
         choices=sorted(SUPPORTED_CUT_ROLES),
@@ -949,6 +1036,7 @@ def main() -> int:
             manual_review_path=args.manual_review,
             max_per_cut=args.max_per_cut,
             cut_roles=args.cut_role,
+            cut_names=args.cut_card,
         )
     payload["cut_safety_report"] = str(cut_safety_report)
     payload["registry"] = str(registry_path)

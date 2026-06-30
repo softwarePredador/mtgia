@@ -686,6 +686,7 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
         for decision in (
             "forced_access_no_lift_reject_or_rework",
             "tie_watch_strategy_regression",
+            "reject_regresses_critical_matchup",
         ):
             with self.subTest(decision=decision):
                 prior_results = {
@@ -712,6 +713,92 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
 
                 self.assertEqual(classification["status"], "blocked_prior_reject")
                 self.assertIn(decision, classification["reason"])
+
+    def test_gate_decision_rejects_critical_matchup_regression_even_with_positive_delta(self):
+        gate_summary = {
+            "delta_pp": 12.5,
+            "baseline": {
+                "wins": 1,
+                "losses": 2,
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "win"},
+                    {"opponent": "Kinnan, Bonder Prodigy #72 (real)", "result": "loss"},
+                    {"opponent": "Thrasios, Triton Hero #101 (real)", "result": "loss"},
+                ],
+                "telemetry": {"strategic_event_counts": {}},
+            },
+            "candidate": {
+                "wins": 2,
+                "losses": 1,
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "loss"},
+                    {"opponent": "Kinnan, Bonder Prodigy #72 (real)", "result": "win"},
+                    {"opponent": "Thrasios, Triton Hero #101 (real)", "result": "win"},
+                ],
+                "telemetry": {"strategic_event_counts": {}},
+            },
+        }
+
+        self.assertEqual(
+            gate.gate_decision(gate_summary),
+            "reject_regresses_critical_matchup",
+        )
+
+    def test_gate_decision_rejects_critical_matchup_regression_on_total_tie(self):
+        gate_summary = {
+            "delta_pp": 0.0,
+            "baseline": {
+                "wins": 2,
+                "losses": 1,
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "win"},
+                    {"opponent": "Kinnan, Bonder Prodigy #72 (real)", "result": "win"},
+                    {"opponent": "Thrasios, Triton Hero #101 (real)", "result": "loss"},
+                ],
+                "telemetry": {"strategic_event_counts": {"miracle_cast": 1, "lorehold_spell_cast": 1}},
+            },
+            "candidate": {
+                "wins": 2,
+                "losses": 1,
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "loss"},
+                    {"opponent": "Kinnan, Bonder Prodigy #72 (real)", "result": "win"},
+                    {"opponent": "Thrasios, Triton Hero #101 (real)", "result": "win"},
+                ],
+                "telemetry": {"strategic_event_counts": {"miracle_cast": 2, "lorehold_spell_cast": 2}},
+            },
+        }
+
+        self.assertEqual(
+            gate.gate_decision(gate_summary),
+            "reject_regresses_critical_matchup",
+        )
+
+    def test_critical_matchup_records_surface_baseline_and_candidate(self):
+        gate_summary = {
+            "baseline": {
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "win"},
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "loss"},
+                ],
+            },
+            "candidate": {
+                "game_results": [
+                    {"opponent": "Winota, Joiner of Forces #73 (real)", "result": "loss"},
+                    {"opponent": "Kinnan, Bonder Prodigy #72 (real)", "result": "win"},
+                ],
+            },
+        }
+
+        records = gate.critical_matchup_records(gate_summary)
+
+        self.assertEqual(
+            records["Winota"],
+            {
+                "baseline": {"wins": 1, "losses": 1, "stalls": 0, "games": 2},
+                "candidate": {"wins": 0, "losses": 1, "stalls": 0, "games": 1},
+            },
+        )
 
     def test_forced_access_diagnostic_does_not_require_prior_ignore_flag(self):
         prior_results = {
@@ -903,13 +990,38 @@ class LoreholdSynergyPackageGateTest(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            definitions, loaded = gate.merge_package_definitions([package_file])
+            definitions, loaded, loaded_keys = gate.merge_package_definitions([package_file])
 
         definition = definitions["gods_willing_commander_shield_cut_avatar_wrath"]
         self.assertEqual(loaded, [str(package_file)])
+        self.assertEqual(loaded_keys, ["gods_willing_commander_shield_cut_avatar_wrath"])
         self.assertEqual(definition["adds"], ["Gods Willing"])
         self.assertEqual(definition["cuts"], ["Avatar's Wrath"])
         self.assertTrue(definition["allow_miracle_core_cuts"])
+
+    def test_external_package_file_keys_are_selected_when_packages_arg_is_omitted(self):
+        selected = gate.selected_package_keys(
+            packages_arg=None,
+            loaded_package_keys=["external_one", "external_two"],
+        )
+
+        self.assertEqual(selected, ["external_one", "external_two"])
+
+    def test_static_package_definitions_are_selected_without_external_manifest(self):
+        selected = gate.selected_package_keys(
+            packages_arg=None,
+            loaded_package_keys=[],
+        )
+
+        self.assertEqual(selected, list(gate.PACKAGE_DEFINITIONS))
+
+    def test_explicit_packages_arg_overrides_external_manifest_default(self):
+        selected = gate.selected_package_keys(
+            packages_arg="static_one, external_two",
+            loaded_package_keys=["external_one", "external_two"],
+        )
+
+        self.assertEqual(selected, ["static_one", "external_two"])
 
     def test_external_package_definition_file_rejects_static_key_collision(self):
         with tempfile.TemporaryDirectory() as tmp:

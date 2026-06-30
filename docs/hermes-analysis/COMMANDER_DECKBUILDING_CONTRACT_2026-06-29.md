@@ -376,6 +376,9 @@ A Lorehold candidate can replace `607` only when all are true:
 - it ties or beats `607` in the same opponent set and seed window;
 - it does not regress the fast pressure matchup, especially Winota-style
   combat pressure;
+- a positive aggregate result is still rejected when a critical matchup record
+  regresses versus `607`; seed-matrix reports must surface those matchup
+  records before a package can be promoted;
 - decision traces show Lorehold actually uses topdeck/miracle setup and
   discounted spell-chain conversion before the game is decided.
 
@@ -480,7 +483,11 @@ the corrected 607-baseline package gate exercised `Electro` but lost the smoke
 gate and collapsed Winota. Also do not promote
 `cloud_key_same_lane_benchmark_cut_bender_s_waterskin`; `Cloud Key` was
 exercised in the natural gate but lost to protected `607` and regressed Winota
-and miracle cadence. The protected baseline remains `607`.
+and miracle cadence. Also do not promote
+`cool_but_rude_same_lane_benchmark_cut_monument_to_endurance` or
+`currency_converter_same_lane_benchmark_cut_monument_to_endurance`; both were
+same-lane discard-ramp-value tests over `Monument to Endurance`, and neither
+passed the protected fast-pressure gate. The protected baseline remains `607`.
 
 Package-gate correction generated on 2026-06-30:
 
@@ -584,6 +591,66 @@ Chaos Warp removal-probe decision generated on 2026-06-30:
   `607` removal slot.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_stroke_decision_20260630.md`.
+
+Chaos Warp/Generous Gift profiled-removal decision generated on 2026-06-30:
+
+- Candidate:
+  `chaos_warp_same_lane_benchmark_cut_generous_gift`.
+- Why it was tested: the current exposure/manual-cut pass found no automatic
+  safe cut, but did find a same-lane spot-removal benchmark where `Chaos Warp`
+  has active battle-rule support and appears in Lorehold variants while
+  `Generous Gift` had measured low exposure in deck `607`.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `14/24` versus `607` `11/24`.
+- Direct card-use evidence in the smoke gate: candidate `Chaos Warp` recorded
+  `31` use events, was accessed in `10/24` games, used in `9/24` games, and
+  its used-game record was `8W/1L/0S`. Baseline `Generous Gift` recorded `9`
+  use events and was accessed in `4/24` games.
+- Confirmed result over seeds `20260630`, `123`, and `999`: candidate
+  `30/72` versus `607` `27/72`, but seed `999` regressed `10/24` versus
+  `607` `11/24`.
+- Critical matchup failure: Winota fell from `4/9` on baseline `607` to `3/9`
+  on the candidate.
+- Decision: reject this exact `+Chaos Warp; -Generous Gift` swap despite the
+  positive aggregate. The swap is real and exercised, but it violates the
+  protected fast-pressure gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_gate_20260630_goal_learning_smoke_20260630_205058.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_seed_matrix_20260630_goal_learning_confirm_20260630_205527.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.md`.
+
+Discard-ramp-value / Monument decision generated on 2026-06-30:
+
+- Candidates:
+  `cool_but_rude_same_lane_benchmark_cut_monument_to_endurance` and
+  `currency_converter_same_lane_benchmark_cut_monument_to_endurance`.
+- Why they were tested: `Monument to Endurance` is not generic ramp in the
+  current shell; it is a discard-trigger value/ramp payoff tied to hand
+  filtering, treasure, and opponent life-loss pressure. The profiled-cut
+  generator was expanded with `discard_ramp_value` and `--cut-card` so this
+  lane can be benchmarked directly from the full manual-review expansion.
+- Smoke result for `Cool but Rude`: candidate `9W/15L/0S` versus `607`
+  `11W/12L/1S`; Winota regressed from `2W/1L/0S` to `0W/3L/0S`. The card was
+  used `20` times and accessed in `4` games, so the rejection is not a
+  no-exposure artifact.
+- Smoke result for `Currency Converter`: candidate tied total wins at
+  `11W/13L/0S` versus `607` `11W/12L/1S`, but Winota regressed from
+  `2W/1L/0S` to `1W/2L/0S`. The card was used `41` times and accessed in
+  `8` games.
+- Tooling decision: package gates now return
+  `reject_regresses_critical_matchup` when a critical matchup record drops,
+  even if aggregate win rate ties or improves.
+- Decision: keep `Monument to Endurance` protected in deck `607`. `Currency
+  Converter` remains a coherent card, but this exact cut is rejected; revisit
+  it only with a safer cut or a package-level hypothesis that preserves the
+  fast-pressure matchup.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_discard_ramp_value_monument.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_gate_20260630_goal_learning_smoke_20260630_210849.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_211343.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.md`.
 
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 
