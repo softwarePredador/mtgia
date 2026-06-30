@@ -514,6 +514,53 @@ class XMageSemanticFamilyBatchPipelineTests(unittest.TestCase):
         self.assertEqual(card["family_id"], "mill_spell")
         self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
 
+    def test_classifier_marks_lantern_of_insight_revealed_top_shuffle_scope_batch_safe(self) -> None:
+        report = classifier.build_family_report(
+            {
+                "cards": [
+                    {
+                        "card_name": "Lantern of Insight",
+                        "severity": "medium",
+                        "oracle_hash": "ff4b019a0df61b51a2dd5502ff616841",
+                        "status": "ready_for_structured_xmage_pull_review_required",
+                        "ready_for_structured_pull": True,
+                        "valid_xmage_source": True,
+                        "coherence_findings": ["review_only_or_needs_review_rule"],
+                        "checks": {"focused_test_scenario_count": 1},
+                        "xmage": {
+                            "class_name": "LanternOfInsight",
+                            "path": "/xmage/LanternOfInsight.java",
+                            "types": ["ARTIFACT"],
+                            "ability_classes": ["SimpleActivatedAbility", "SimpleStaticAbility"],
+                            "effect_classes": [
+                                "PlayWithTheTopCardRevealedEffect",
+                                "ShuffleLibraryTargetEffect",
+                            ],
+                            "cost_classes": ["SacrificeSourceCost", "TapSourceCost"],
+                            "target_classes": ["TargetPlayer"],
+                            "primary_effect": {
+                                "effect": "topdeck_play",
+                                "battle_model_scope": (
+                                    "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1"
+                                ),
+                                "ability_kind": "static_and_activated",
+                                "permanent_type": "artifact",
+                                "each_player_top_library_revealed": True,
+                                "activated_target_player_shuffle_library": True,
+                                "activation_requires_tap": True,
+                                "activation_requires_sacrifice": True,
+                                "target": "player",
+                            },
+                        },
+                    }
+                ]
+            }
+        )
+
+        card = report["cards"][0]
+        self.assertEqual(card["family_id"], "topdeck_play")
+        self.assertEqual(card["promotion_lane"], "batch_metadata_candidate_requires_pg_precheck")
+
     def test_classifier_marks_variable_self_spell_cost_reducer_as_batch_safe(self) -> None:
         report = classifier.build_family_report(
             {

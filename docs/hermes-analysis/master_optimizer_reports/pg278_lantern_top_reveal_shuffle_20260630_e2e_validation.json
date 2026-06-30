@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-06-30T12:07:40.173757+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg278_lantern_top_reveal_shuffle_20260630_manifest.json",
+  "package_id": "pg278_lantern_top_reveal_shuffle_20260630_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+          "card_name": "Lantern of Insight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c",
+          "oracle_hash": "ff4b019a0df61b51a2dd5502ff616841",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+          "card_name": "Lantern of Insight",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c",
+          "oracle_hash": "ff4b019a0df61b51a2dd5502ff616841",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lantern of Insight",
+          "logical_rule_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Lantern of Insight",
+          "component_keys": [],
+          "effect": "topdeck_play",
+          "logical_rule_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

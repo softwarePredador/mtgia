@@ -24317,6 +24317,200 @@ def _move_remaining_chaos_wand_exiled_to_bottom(opponent, exiled_cards, rng):
     return remaining
 
 
+def _target_player_shuffle_options_for_revealed_top(player, opponents, all_players, permanent, turn):
+    score_players = all_players or [player, *list(opponents or [])]
+    options = []
+    for target in [player, *list(opponents or [])]:
+        if not getattr(target, "is_alive", lambda: True)():
+            continue
+        library = list(getattr(target, "library", []) or [])
+        if len(library) <= 1:
+            continue
+        top_card = library[0]
+        if not isinstance(top_card, dict):
+            continue
+        effect_data = get_card_effect(top_card)
+        if target is player:
+            top_score = lorehold_draw_priority(top_card, player)
+            is_flooded_land = is_effective_land(top_card) and controlled_land_count(player) >= 4
+            score = 26 - top_score if top_score <= 18 or is_flooded_land else 0
+            action = "shuffle_own_revealed_low_priority_top_card"
+            reason = "own_revealed_top_card_is_low_value"
+        else:
+            top_score = threat_score(
+                effect_data.get("effect", "unknown"),
+                top_card.get("name", "?"),
+                target,
+                score_players,
+                turn,
+            )
+            if is_effective_land(top_card):
+                top_score = min(top_score, 5)
+            score = top_score - 18
+            action = "shuffle_opponent_revealed_high_threat_top_card"
+            reason = "opponent_revealed_top_card_is_high_threat"
+        if score <= 8:
+            continue
+        options.append(
+            {
+                "target": target,
+                "top_card": top_card,
+                "effect_data": effect_data,
+                "score": score,
+                "top_score": top_score,
+                "action": action,
+                "reason": reason,
+            }
+        )
+    options.sort(
+        key=lambda option: (
+            -float(option.get("score") or 0),
+            0 if option.get("target") is player else 1,
+            option["target"].name,
+        )
+    )
+    return options
+
+
+def activate_target_player_shuffle_artifacts(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="postcombat_main",
+):
+    if phase not in MAIN_PHASES:
+        return 0
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not permanent.get("activated_target_player_shuffle_library"):
+            continue
+        if permanent.get("utility_artifact_used_this_turn"):
+            continue
+        if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "artifact_already_tapped_for_target_player_shuffle",
+                phase=phase,
+            )
+            continue
+
+        target_options = _target_player_shuffle_options_for_revealed_top(
+            player,
+            opponents,
+            all_players,
+            permanent,
+            turn,
+        )
+        if not target_options:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_revealed_top_card_shuffle_target_above_threshold",
+                phase=phase,
+                risk_flags=["no_high_value_shuffle_target"],
+            )
+            continue
+
+        chosen = target_options[0]
+        target = chosen["target"]
+        revealed_top = chosen["top_card"]
+        library_before = len(getattr(target, "library", []) or [])
+        top_before_name = revealed_top.get("name", "?")
+        if permanent.get("activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        if permanent.get("activation_requires_sacrifice", True):
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            if not permanent.get("is_token"):
+                player.graveyard.append(permanent)
+            player.record_permanent_sacrificed(permanent, turn)
+        target.shuffle(rng)
+        top_after = (getattr(target, "library", []) or [None])[0]
+        top_after_name = top_after.get("name", "?") if isinstance(top_after, dict) else None
+
+        available_options = [
+            decision_card_option(
+                option["top_card"],
+                option["effect_data"],
+                score=option["score"],
+                action=option["action"],
+                target_player=option["target"].name,
+                revealed_top_score=option["top_score"],
+            )
+            for option in target_options[:8]
+        ]
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=available_options,
+            chosen_option=available_options[0],
+            rejected_options=[
+                decision_card_option(
+                    option["top_card"],
+                    option["effect_data"],
+                    score=option["score"],
+                    action="defer_target_player_shuffle",
+                    target_player=option["target"].name,
+                    revealed_top_score=option["top_score"],
+                )
+                for option in target_options[1:8]
+            ],
+            score_components={
+                "target_player": target.name,
+                "revealed_top_card": top_before_name,
+                "revealed_top_score": chosen["top_score"],
+                "library_before": library_before,
+                "library_after": len(getattr(target, "library", []) or []),
+                "top_after": top_after_name,
+                "sacrificed_source": bool(permanent.get("activation_requires_sacrifice", True)),
+            },
+            rule_source=permanent.get("_rule_source", "utility_artifact_activation_v1"),
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=chosen["score"],
+            actual_outcome="target_player_shuffled_library",
+            reason=chosen["reason"],
+            strategic_principle="use revealed-top information only when the known top card creates enough value to cash in the artifact",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "artifacts": -1 if permanent.get("activation_requires_sacrifice", True) else 0,
+                "target_library": 0,
+                "known_top_card_changed": top_after_name != top_before_name,
+            },
+            risk_flags=["tap_artifact", "sacrifice_artifact", "target_player_shuffle"],
+            rejected_reason="lower_revealed_top_shuffle_score",
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="tap_sacrifice_target_player_shuffle",
+            target_player=target.name,
+            revealed_top_card=top_before_name,
+            top_after=top_after_name,
+            library_before=library_before,
+            library_after=len(getattr(target, "library", []) or []),
+            sacrificed_self=bool(permanent.get("activation_requires_sacrifice", True)),
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+
+    return 0
+
+
 def activate_opponent_library_free_cast_artifacts(
     player,
     opponents,
@@ -24656,6 +24850,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             return 1
 
     if activate_opponent_library_free_cast_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_target_player_shuffle_artifacts(
         player,
         opponents,
         all_players,
@@ -40546,6 +40750,12 @@ def apply_effect_immediate(
                 player=player.name,
                 card=card.get("name", "?"),
                 look_top_library_any_time=bool(permanent.get("look_top_library_any_time")),
+                each_player_top_library_revealed=bool(
+                    permanent.get("each_player_top_library_revealed")
+                ),
+                activated_target_player_shuffle_library=bool(
+                    permanent.get("activated_target_player_shuffle_library")
+                ),
                 look_opponent_face_down_creatures_any_time=bool(
                     permanent.get("look_opponent_face_down_creatures_any_time")
                 ),

@@ -7679,7 +7679,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["ARTIFACT"]},
                 },
                 "topdeck_play",
-                "xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+                "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
             ),
             (
                 "LeylineDowser",
@@ -7759,7 +7759,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["effect"], expected_effect)
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
-                if class_name == "GhoulcallersBell":
+                if class_name in {"GhoulcallersBell", "LanternOfInsight"}:
                     self.assertFalse(expected_scope.startswith("xmage_"))
                     self.assertFalse(expected_scope.endswith("_review_v1"))
                 else:

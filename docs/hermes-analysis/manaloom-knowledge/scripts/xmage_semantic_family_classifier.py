@@ -859,6 +859,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and effect_json.get("mill_scope") == "each_player"
             and effect_json.get("target") == "each_player"
         )
+    if (
+        effect == "topdeck_play"
+        and scope == "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1"
+    ):
+        return (
+            types == {"ARTIFACT"}
+            and {
+                "PlayWithTheTopCardRevealedEffect",
+                "ShuffleLibraryTargetEffect",
+            }.issubset(effect_classes)
+            and {"SimpleActivatedAbility", "SimpleStaticAbility"}.issubset(ability_classes)
+            and {"SacrificeSourceCost", "TapSourceCost"}.issubset(cost_classes)
+            and "TargetPlayer" in target_classes
+            and bool(effect_json.get("each_player_top_library_revealed"))
+            and bool(effect_json.get("activated_target_player_shuffle_library"))
+            and bool(effect_json.get("activation_requires_tap"))
+            and bool(effect_json.get("activation_requires_sacrifice"))
+            and effect_json.get("target") == "player"
+        )
 
     if effect == "static_cost_reduction" and scope == "chosen_card_type_cost_reduction_v1":
         return (

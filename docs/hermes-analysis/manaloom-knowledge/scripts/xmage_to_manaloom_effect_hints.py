@@ -7616,7 +7616,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="topdeck_play",
-                scope="xmage_each_player_top_library_revealed_shuffle_activation_review_v1",
+                scope="each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
                 reason=(
                     "XMage structure matches Lantern of Insight: static top-library reveal for each "
                     "player plus tap-sacrifice target-player shuffle."
@@ -7629,6 +7629,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "activated_target_player_shuffle_library": True,
                     "activation_requires_tap": True,
                     "activation_requires_sacrifice": True,
+                    "target": "player",
                     "play_lands_from_top_library": False,
                     "alternate_zone_permission": False,
                     "may_cast_without_paying_mana_cost": False,

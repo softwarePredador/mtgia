@@ -19952,6 +19952,82 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_pg278_lantern_of_insight_reveals_top_cards_and_shuffles_target_player():
+        lantern = {
+            "name": "Lantern of Insight",
+            "effect": "topdeck_play",
+            "type_line": "Artifact",
+            "artifact": True,
+            "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+            "each_player_top_library_revealed": True,
+            "activated_target_player_shuffle_library": True,
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": True,
+            "target": "player",
+            "_rule_logical_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c",
+            "_rule_oracle_hash": "ff4b019a0df61b51a2dd5502ff616841",
+        }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Lantern Controller")
+            opponent = player("Lantern Opponent")
+            active.battlefield = [
+                lantern,
+                {"name": "Plains", "type_line": "Basic Land - Plains", "effect": "land"},
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "effect": "land"},
+                {"name": "Sacred Foundry", "type_line": "Land", "effect": "land"},
+                {"name": "Command Tower", "type_line": "Land", "effect": "land"},
+            ]
+            active.library = [
+                {"name": "Flooded Top Land", "type_line": "Land", "cmc": 0, "effect": "land"},
+                {"name": "Rise of the Eldrazi", "type_line": "Sorcery", "cmc": 12},
+                {"name": "Reforge the Soul", "type_line": "Sorcery", "cmc": 5},
+            ]
+            opponent.library = [
+                {"name": "Opponent Filler", "type_line": "Creature", "cmc": 2},
+                {"name": "Opponent Land", "type_line": "Land", "cmc": 0, "effect": "land"},
+            ]
+
+            activated = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=5,
+                rng=random.Random(2781),
+                phase="precombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert activated == 1
+        assert lantern not in active.battlefield
+        assert lantern in active.graveyard
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Lantern of Insight"
+            and data.get("activation_kind") == "tap_sacrifice_target_player_shuffle"
+            and data.get("target_player") == "Lantern Controller"
+            and data.get("revealed_top_card") == "Flooded Top Land"
+            and data.get("sacrificed_self") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:8a9cad6d923c0791303f0066b041621c"
+            and data.get("rule_oracle_hash") == "ff4b019a0df61b51a2dd5502ff616841"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("action")
+            == "shuffle_own_revealed_low_priority_top_card"
+            and "target_player_shuffle" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard():
         def perpetual_timepiece():
             return {
@@ -21631,6 +21707,7 @@ def register_tests(battle, player):
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
         test_pg277_ghoulcallers_bell_mills_each_player,
+        test_pg278_lantern_of_insight_reveals_top_cards_and_shuffles_target_player,
         test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard,
         test_pg275_chaos_wand_exiles_opponent_library_until_free_cast_hit,
         test_pg276_assemble_the_players_casts_small_top_creature_once_with_paid_cost,

@@ -12,10 +12,10 @@ def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     )
 
 
-def test_default_runtime_gap_queue_uses_post_pg277_ghoulcaller_report():
+def test_default_runtime_gap_queue_uses_post_pg278_lantern_report():
     assert (
         gen.DEFAULT_RUNTIME_GAP_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg277_ghoulcaller.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg278_lantern.json"
     )
 
 

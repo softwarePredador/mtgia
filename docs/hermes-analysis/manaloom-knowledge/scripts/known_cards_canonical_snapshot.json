@@ -18131,6 +18131,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Lantern of Insight": {
+    "ability_kind": "static_and_activated",
+    "activated_target_player_shuffle_library": true,
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "alternate_zone_permission": false,
+    "battle_model_scope": "each_player_top_library_revealed_tap_sacrifice_target_player_shuffle_v1",
+    "each_player_top_library_revealed": true,
+    "effect": "topdeck_play",
+    "may_cast_without_paying_mana_cost": false,
+    "permanent_type": "artifact",
+    "play_lands_from_top_library": false,
+    "target": "player",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.94,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a9cad6d923c0791303f0066b041621c",
+    "battle_rule_oracle_hash": "ff4b019a0df61b51a2dd5502ff616841"
+  },
   "Lantern-Lit Graveyard": {
     "effect": "land",
     "battle_rule_source": "curated",
