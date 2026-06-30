@@ -477,7 +477,10 @@ telemetry but lost the smoke gate and collapsed Winota. The tested cards were
 exercised in battle but did not pass the promotion contract. Also do not
 promote `electro_assaulting_battery_same_lane_benchmark_cut_bender_s_waterskin`;
 the corrected 607-baseline package gate exercised `Electro` but lost the smoke
-gate and collapsed Winota. The protected baseline remains `607`.
+gate and collapsed Winota. Also do not promote
+`cloud_key_same_lane_benchmark_cut_bender_s_waterskin`; `Cloud Key` was
+exercised in the natural gate but lost to protected `607` and regressed Winota
+and miracle cadence. The protected baseline remains `607`.
 
 Package-gate correction generated on 2026-06-30:
 
@@ -701,6 +704,27 @@ Profiled same-lane benchmark decision generated on 2026-06-30:
   and `Winds of Abandon` in protected `deck_607`.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.md`.
+
+Cloud Key same-lane benchmark decision generated on 2026-06-30:
+
+- Candidate:
+  `cloud_key_same_lane_benchmark_cut_bender_s_waterskin`.
+- Add/cut: `+Cloud Key`; `-Bender's Waterskin`.
+- Scope: natural equal package gate, no forced access, baseline deck `607`,
+  candidate deck id `607`, `8` real opponents, `3` games per opponent.
+- Corrected result: `607` = `11W/12L/1S`; candidate = `9W/15L/0S`.
+- Fast-pressure Winota check: `607` = `2W/1L`; candidate = `0W/3L`.
+- Direct card-use evidence: `Cloud Key` recorded `15` use events and was
+  accessed in `6` games; baseline `Bender's Waterskin` recorded `8` use
+  events.
+- Promotion failure: candidate lost two wins, dropped miracle casts from `48`
+  to `38`, spell casts from `240` to `229`, static cost reduction from `70` to
+  `65`, and upkeep rummage from `95` to `49`.
+- Decision: reject this exact same-lane ramp benchmark. `Cloud Key` is a
+  coherent cost-reduction hypothesis, but it is not a better replacement for
+  `Bender's Waterskin` in the current `607` shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_lane_decision_20260630_cloud_key_reject.md`.
 
 Runtime enablement checkpoint generated on 2026-06-30:
 

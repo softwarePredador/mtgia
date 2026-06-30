@@ -1,0 +1,5204 @@
+{
+  "blocked_cut_rows": [
+    {
+      "card_name": "Creative Technique",
+      "cut_exposure": {
+        "decision_status": "unmeasured",
+        "direct_event_count": 0,
+        "exposure_profile": "",
+        "inferred_role": "unmeasured",
+        "next_action": "",
+        "role_confidence": "unmeasured",
+        "role_signals": [],
+        "summary_metric_count": 0,
+        "unique_exposure_count": 0
+      },
+      "cut_safety": {
+        "best_delta_pp": 3.7,
+        "card_name": "Creative Technique",
+        "current_decision": "registry_protected",
+        "current_lane": "finisher_or_big_spell",
+        "effective_role": "big_spell_value",
+        "observation_count": 1,
+        "observations": [
+          {
+            "adds": [
+              "Gamble"
+            ],
+            "baseline": "8-19",
+            "candidate": "9-18",
+            "candidate_losses": 18,
+            "candidate_wins": 9,
+            "decision": "probation_deeper_gate_only",
+            "delta_pp": 3.7,
+            "family": "tutor_access",
+            "package_key": "gamble_approach_access_cut_creative",
+            "strong_seed_delta_pp": -44.45
+          }
+        ],
+        "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+        "status": "protected_until_same_function_replacement_wins",
+        "worst_delta_pp": 3.7,
+        "worst_strong_seed_delta_pp": -44.45
+      },
+      "effective_role": "big_spell_value",
+      "reason": "filtered_out_by_requested_cut_role",
+      "recommended_action": "requires_same_lane_gate",
+      "status": "same_lane_only"
+    },
+    {
+      "card_name": "Bender's Waterskin",
+      "cut_exposure": {
+        "decision_status": "unmeasured",
+        "direct_event_count": 0,
+        "exposure_profile": "",
+        "inferred_role": "unmeasured",
+        "next_action": "",
+        "role_confidence": "unmeasured",
+        "role_signals": [],
+        "summary_metric_count": 0,
+        "unique_exposure_count": 0
+      },
+      "cut_safety": {
+        "best_delta_pp": 3.7,
+        "card_name": "Bender's Waterskin",
+        "current_decision": "registry_protected",
+        "current_lane": "early_mana",
+        "effective_role": "ramp",
+        "observation_count": 3,
+        "observations": [
+          {
+            "adds": [
+              "Primal Amulet // Primal Wellspring"
+            ],
+            "baseline": "8-19",
+            "candidate": "7-20",
+            "candidate_losses": 20,
+            "candidate_wins": 7,
+            "decision": "reject_or_rework",
+            "delta_pp": -3.7,
+            "family": "cost_reduce_copy",
+            "package_key": "primal_amulet_spell_engine",
+            "strong_seed_delta_pp": -44.45
+          },
+          {
+            "adds": [
+              "Galvanoth"
+            ],
+            "baseline": "8-19",
+            "candidate": "9-18",
+            "candidate_losses": 18,
+            "candidate_wins": 9,
+            "decision": "probation_deeper_gate_only",
+            "delta_pp": 3.7,
+            "family": "topdeck_freecast",
+            "package_key": "galvanoth_topdeck_freecast",
+            "strong_seed_delta_pp": -44.45
+          },
+          {
+            "adds": [
+              "Brainstone"
+            ],
+            "baseline": "8-19",
+            "candidate": "6-21",
+            "candidate_losses": 21,
+            "candidate_wins": 6,
+            "decision": "reject_or_rework",
+            "delta_pp": -7.41,
+            "family": "topdeck_setup",
+            "package_key": "brainstone_topdeck_miracle",
+            "strong_seed_delta_pp": -33.33
+          }
+        ],
+        "reason": "registry protects this card until a same-function replacement wins a current-leader gate",
+        "status": "protected_until_same_function_replacement_wins",
+        "worst_delta_pp": -7.41,
+        "worst_strong_seed_delta_pp": -44.45
+      },
+      "effective_role": "ramp",
+      "reason": "filtered_out_by_requested_cut_role",
+      "recommended_action": "requires_same_lane_gate",
+      "status": "same_lane_only"
+    }
+  ],
+  "cut_safety_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+  "generated_at": "2026-06-30T08:26:46Z",
+  "manifest": {
+    "generated_at": "2026-06-30T08:26:46Z",
+    "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+    "packages": [],
+    "postgres_writes": false,
+    "prior_package_reports": [
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_exposure_probe_decision_20260630.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.json",
+      "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json"
+    ],
+    "source": "lorehold_profiled_cut_benchmark_generator",
+    "source_db_mutated": false
+  },
+  "manifest_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_removal_lane_audit_package_manifest.json",
+  "manual_review": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json",
+  "postgres_writes": false,
+  "prior_package_reports": [
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_gate_20260627_real2_v1_20260627_123013.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_general_synergy_confirm_20260627_real3_v1_20260627_125331.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_valakut_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hand_filter_wheel_big_score_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_recursion_volcanic_pinnacle_gate_20260627_v2_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_base_plateau_turbulent_gate_20260627_v1_real.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_targeted_shield_package_gate_20260628_seed42_targeted_shield_v2.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_hidden_retreat_synergy_gate_20260628_v2_20260628_071000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_brass_bounty_confirm_matrix_20260628_v2_20260628_072000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_pg245_twinflame_deeper_gate_20260628_pg245_twinflame_deeper_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_storm_kiln_artist_gate_20260628_v1_20260628_082000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_spellchain_safe_cuts_gate_20260628_v1_20260628_084000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_20260628_v1_20260628_092000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_gate_after_ramp_runtime_fix_20260628_v1_20260628_102000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_natural_confirmation_after_forced_20260628_v1_20260628_100237.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_protection_ready_gate_20260628_v1_20260628_095000.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_matrix_20260628_v1_20260628_083628.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v2_20260628_085703.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v3_20260628_090640.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_20260628_091321.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v4b_witch_confirm_20260628_091458.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v5_20260628_092712.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_family_benchmark_matrix_20260628_v6_20260628_093001.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_exposure_probe_decision_20260630.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json"
+  ],
+  "registry": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_candidate_hypothesis_registry_20260626.json",
+  "requested_cut_roles": [
+    "spot_removal"
+  ],
+  "selected_pairs": [],
+  "source_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "source_db_mutated": false,
+  "summary": {
+    "blocker_counts": {
+      "candidate_missing_active_rule": 40,
+      "candidate_much_higher_cmc": 100,
+      "candidate_narrow_color_hate": 2,
+      "candidate_policy_blocked_no_premium_mox": 4,
+      "candidate_role_mismatch:big_spell_value": 26,
+      "candidate_role_mismatch:ramp": 80,
+      "candidate_role_mismatch:unknown": 396,
+      "candidate_scope_not_same_lane": 431,
+      "candidate_unmodeled_discard_hand_cost": 2,
+      "candidate_unmodeled_life_payment_mana_cost": 6,
+      "prior_exact_reject": 10
+    },
+    "candidate_pool_count": 270,
+    "filtered_out_cut_count": 2,
+    "pair_evaluation_count": 540,
+    "preflight_ready_pair_count": 0,
+    "profiled_cut_count": 2,
+    "recommended_next_action": "no_profiled_cut_benchmark_package_ready",
+    "selected_package_count": 0,
+    "status_counts": {
+      "blocked": 540
+    },
+    "supported_cut_count": 2,
+    "unfiltered_profiled_cut_count": 4
+  },
+  "top_pair_evaluations": [
+    {
+      "blockers": [
+        "prior_exact_reject"
+      ],
+      "candidate": "Chaos Warp",
+      "candidate_metadata": {
+        "card_name": "Chaos Warp",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          615,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal",
+          "interaction"
+        ],
+        "oracle_text": "The owner of target permanent shuffles it into their library, then reveals the top card of their library. If it's a permanent card, they put it onto the battlefield.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1",
+            "destination": "library",
+            "effect": "remove_permanent",
+            "instant": true,
+            "nonpermanent_reveal_status": "revealed_card_remains_on_top_of_library",
+            "oracle_runtime_scope": "owner_shuffle_target_permanent_into_library_then_reveal_top_permanent_to_battlefield_v1",
+            "permanent_reveal_to_battlefield": true,
+            "target": "permanent",
+            "token_target_status": "token_vanishes_after_shuffle_replacement",
+            "top_reveal_after_shuffle": true
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_permanent_shuffle_into_owner_library_reveal_top_permanent_to_battlefield_v1": 1
+        },
+        "card_name": "Chaos Warp",
+        "effects": {
+          "draw_cards": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "chaos_warp_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 117,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_narrow_color_hate"
+      ],
+      "candidate": "Red Elemental Blast",
+      "candidate_metadata": {
+        "card_name": "Red Elemental Blast",
+        "cmc": 1.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          613,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "manual_review",
+          "modal_spell"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Counter target blue spell.\n\u2022 Destroy target blue permanent.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "counter_target_blue_spell_or_destroy_target_blue_permanent_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "counter_target_blue_spell_or_destroy_target_blue_permanent_v1",
+            "counter_target_blue_spell": true,
+            "destroy_target_blue_permanent": true,
+            "effect": "modal_spell",
+            "instant": true
+          }
+        ],
+        "active_effects": {
+          "modal_spell": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "counter_target_blue_spell_or_destroy_target_blue_permanent_v1": 1
+        },
+        "card_name": "Red Elemental Blast",
+        "effects": {
+          "counter": 1,
+          "modal_spell": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "red_elemental_blast_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 117,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Lightning Bolt",
+      "candidate_metadata": {
+        "card_name": "Lightning Bolt",
+        "cmc": 1.0,
+        "deck_count": 2,
+        "deck_ids": [
+          615,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "direct_damage",
+          "interaction"
+        ],
+        "oracle_text": "Lightning Bolt deals 3 damage to any target.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "targeted_damage_variant_v1",
+            "effect": "direct_damage",
+            "target_constraints": {
+              "scope": "any_target"
+            }
+          }
+        ],
+        "active_effects": {
+          "direct_damage": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "card_name": "Lightning Bolt",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "lightning_bolt_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 89,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Ol\u00f3rin's Searing Light",
+      "candidate_metadata": {
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "cmc": 4.0,
+        "deck_count": 4,
+        "deck_ids": [
+          609,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "removal"
+        ],
+        "oracle_text": "Each opponent exiles a creature with the greatest power among creatures that player controls.\nSpell mastery \u2014 If there are two or more instant and/or sorcery cards in your graveyard, Ol\u00f3rin's Searing Light deals damage to each opponent equal to the power of the creature they exiled.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "each_opponent_greatest_power_edict_single_target_baseline_v1",
+            "cmc": 4.0,
+            "effect": "remove_creature",
+            "instant": true,
+            "spell_mastery_damage_each_opponent": true,
+            "target": "each_opponent_greatest_power_creature"
+          }
+        ],
+        "active_effects": {
+          "remove_creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "each_opponent_greatest_power_edict_single_target_baseline_v1": 1
+        },
+        "card_name": "Ol\u00f3rin's Searing Light",
+        "effects": {
+          "draw_cards": 2,
+          "remove_creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "active": 1,
+          "deprecated": 1,
+          "needs_review": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "ol_rin_s_searing_light_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 89,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Untimely Malfunction",
+      "candidate_metadata": {
+        "card_name": "Untimely Malfunction",
+        "cmc": 2.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Destroy target artifact.\n\u2022 Change the target of target spell or ability with a single target.\n\u2022 One or two target creatures can't block this turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "modal_destroy_artifact_redirect_target_cant_block_runtime_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "modal_destroy_artifact_redirect_target_cant_block_runtime_v1",
+            "cant_block_mode_status": "runtime_executor_v1",
+            "cmc": 2.0,
+            "destroy_artifact_mode": true,
+            "effect": "remove_permanent",
+            "instant": true,
+            "modes": [
+              "destroy_artifact",
+              "redirect_target",
+              "cant_block"
+            ],
+            "oracle_runtime_scope": "destroy_target_artifact_redirect_target_cant_block_runtime_v1",
+            "redirect_target_mode_status": "runtime_executor_v1",
+            "target": "artifact",
+            "target_change_pipeline": "single_target_stack_object_redirect_runtime_v1"
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "modal_destroy_artifact_redirect_target_cant_block_runtime_v1": 1
+        },
+        "card_name": "Untimely Malfunction",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "untimely_malfunction_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 89,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Vandalblast",
+      "candidate_metadata": {
+        "card_name": "Vandalblast",
+        "cmc": 1.0,
+        "deck_count": 2,
+        "deck_ids": [
+          609,
+          615
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target artifact you don't control.\nOverload {4}{R} (You may cast this spell for its overload cost. If you do, change \"target\" in its text to \"each.\")",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1",
+            "effect": "remove_permanent",
+            "overload_cost": "{4}{R}",
+            "overload_status": "annotation_only",
+            "overload_target_rewrite": "target_to_each",
+            "sorcery": true,
+            "target": "artifact",
+            "target_controller": "opponent"
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_opponent_artifact_or_overload_all_opponent_artifacts_annotation_v1": 1
+        },
+        "card_name": "Vandalblast",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "vandalblast_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 89,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Wear // Tear",
+      "candidate_metadata": {
+        "card_name": "Wear // Tear",
+        "cmc": 2.0,
+        "deck_count": 2,
+        "deck_ids": [
+          609,
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target artifact.\nFuse (You may cast one or both halves of this card from your hand.)",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "split_artifact_or_enchantment_removal_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "split_artifact_or_enchantment_removal_v1",
+            "cmc": 2.0,
+            "effect": "remove_permanent",
+            "fuse": true,
+            "instant": true,
+            "split_card": true,
+            "target": "artifact"
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "split_artifact_or_enchantment_removal_v1": 1
+        },
+        "card_name": "Wear // Tear",
+        "effects": {
+          "remove_permanent": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "wear_tear_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 89,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Abrade",
+      "candidate_metadata": {
+        "card_name": "Abrade",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal",
+          "remove_artifact_or_3dmg"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Abrade deals 3 damage to target creature.\n\u2022 Destroy target artifact.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {},
+        "active_effect_jsons": [
+          {
+            "effect": "remove_artifact_or_3dmg",
+            "instant": true
+          }
+        ],
+        "active_effects": {
+          "remove_artifact_or_3dmg": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Abrade",
+        "effects": {
+          "remove_artifact_or_3dmg": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "abrade_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Bolt Bend",
+      "candidate_metadata": {
+        "card_name": "Bolt Bend",
+        "cmc": 4.0,
+        "deck_count": 2,
+        "deck_ids": [
+          609,
+          614
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw"
+        ],
+        "oracle_text": "This spell costs {3} less to cast if you control a creature with power 4 or greater.\nChange the target of target spell or ability with a single target.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1",
+            "chooses_new_targets": true,
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_condition": "control_creature_power_4_or_greater",
+            "cost_reduction_generic": 3,
+            "effect": "redirect_removal",
+            "instant": true,
+            "oracle_runtime_scope": "redirect_single_target_stack_object_compact_v1",
+            "target": "single_target_spell_or_ability",
+            "target_scope": "target_spell_or_ability"
+          }
+        ],
+        "active_effects": {
+          "redirect_removal": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "single_target_spell_or_ability_redirect_costs_three_less_if_control_power_four_v1": 1
+        },
+        "card_name": "Bolt Bend",
+        "effects": {
+          "draw_cards": 2,
+          "redirect_removal": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "bolt_bend_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Crackle with Power",
+      "candidate_metadata": {
+        "card_name": "Crackle with Power",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          611
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw"
+        ],
+        "oracle_text": "Crackle with Power deals five times X damage to each of up to X targets.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "targeted_damage_variant_v1",
+            "effect": "direct_damage",
+            "target_constraints": {
+              "scope": "any_target"
+            }
+          }
+        ],
+        "active_effects": {
+          "direct_damage": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "targeted_damage_variant_v1": 1
+        },
+        "card_name": "Crackle with Power",
+        "effects": {
+          "direct_damage": 1,
+          "draw_cards": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "crackle_with_power_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Ephemerate",
+      "candidate_metadata": {
+        "card_name": "Ephemerate",
+        "cmc": 1.0,
+        "deck_count": 1,
+        "deck_ids": [
+          612
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Exile target creature you control, then return it to the battlefield under its owner's control.\nRebound (If you cast this spell from your hand, exile it as it resolves. At the beginning of your next upkeep, you may cast this card from exile without paying its mana cost.)",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "exile_then_return_target_creature_you_control_rebound_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "exile_then_return_target_creature_you_control_rebound_v1",
+            "blink_target_scope": "creature_you_control",
+            "destination": "battlefield",
+            "effect": "blink",
+            "instant": true,
+            "rebound": true,
+            "return_timing": "immediate_or_same_resolution",
+            "target": "creature_you_control",
+            "zone_transition": "exile_then_return"
+          }
+        ],
+        "active_effects": {
+          "blink": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "exile_then_return_target_creature_you_control_rebound_v1": 1
+        },
+        "card_name": "Ephemerate",
+        "effects": {
+          "blink": 1,
+          "remove_creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "ephemerate_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Lightning Helix",
+      "candidate_metadata": {
+        "card_name": "Lightning Helix",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Lightning Helix deals 3 damage to any target and you gain 3 life.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "damage_any_target_and_gain_life_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "damage_any_target_and_gain_life_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "gain_life": 3,
+            "instant": true,
+            "target": "any_target"
+          }
+        ],
+        "active_effects": {
+          "direct_damage": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "damage_any_target_and_gain_life_v1": 1
+        },
+        "card_name": "Lightning Helix",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "lightning_helix_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Razorgrass Ambush // Razorgrass Field",
+      "candidate_metadata": {
+        "card_name": "Razorgrass Ambush // Razorgrass Field",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          608
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Razorgrass Ambush deals 3 damage to target attacking or blocking creature.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "instant": true,
+            "land_side_add_mana": "W",
+            "land_side_pay_three_life_else_tapped": true,
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "combat_state": "attacking_or_blocking"
+            }
+          }
+        ],
+        "active_effects": {
+          "direct_damage": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "damage_target_attacking_or_blocking_creature_or_tapped_white_land_v1": 1
+        },
+        "card_name": "Razorgrass Ambush // Razorgrass Field",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "razorgrass_ambush_razorgrass_field_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Sundering Eruption // Volcanic Fissure",
+      "candidate_metadata": {
+        "card_name": "Sundering Eruption // Volcanic Fissure",
+        "cmc": 3.0,
+        "deck_count": 1,
+        "deck_ids": [
+          609
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle. Creatures without flying can't block this turn.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "basic_land_compensation_count": 1,
+            "basic_land_compensation_destination": "battlefield_tapped",
+            "basic_land_compensation_status": "runtime_executor_v1",
+            "battle_model_scope": "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1",
+            "cant_block_mode_status": "runtime_executor_v1",
+            "cant_block_target_restriction": "creatures_without_flying",
+            "effect": "remove_permanent",
+            "land_side_add_mana": "R",
+            "land_side_pay_three_life_else_tapped": true,
+            "oracle_runtime_scope": "target_controller_basic_land_search_to_battlefield_tapped_nonfliers_cant_block_runtime_v1",
+            "shuffle_after_basic_land_compensation": true,
+            "sorcery": true,
+            "target": "land",
+            "target_controller_basic_land_tapped": true
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_land_target_controller_basic_land_tapped_runtime_nonfliers_cant_block_runtime_v1": 1
+        },
+        "card_name": "Sundering Eruption // Volcanic Fissure",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "sundering_eruption_volcanic_fissure_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 81,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Terror of the Peaks",
+      "candidate_metadata": {
+        "card_name": "Terror of the Peaks",
+        "cmc": 5.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          612
+        ],
+        "functional_tag": "creature",
+        "functional_tags": [
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "Flying\nSpells your opponents cast that target this creature cost an additional 3 life to cast.\nWhenever another creature you control enters, this creature deals damage equal to that creature's power to any target.",
+        "type_line": "Creature \u2014 Dragon"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "controlled_other_creature_enters_power_damage_any_target_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "triggered",
+            "battle_model_scope": "controlled_other_creature_enters_power_damage_any_target_v1",
+            "effect": "creature",
+            "flying": true,
+            "opponent_spells_targeting_this_additional_life_cost": 3,
+            "power": 5,
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "toughness": 4,
+            "trigger": "creature_you_control_enters",
+            "trigger_another_creature_you_control_enters": true,
+            "trigger_damage_amount_source": "entering_creature_power",
+            "trigger_effect": "damage_any_target"
+          }
+        ],
+        "active_effects": {
+          "creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "controlled_other_creature_enters_power_damage_any_target_v1": 1
+        },
+        "card_name": "Terror of the Peaks",
+        "effects": {
+          "creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "terror_of_the_peaks_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 76,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Witch Enchanter // Witch-Blessed Meadow",
+      "candidate_metadata": {
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "cmc": 4.0,
+        "deck_count": 2,
+        "deck_ids": [
+          608,
+          609
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "When this creature enters, destroy target artifact or enchantment an opponent controls.",
+        "type_line": "Creature \u2014 Human Warlock"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "creature_etb_destroy_opponent_artifact_or_enchantment_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "creature_etb_destroy_opponent_artifact_or_enchantment_v1",
+            "cmc": 4.0,
+            "effect": "creature",
+            "etb_remove_effect": "remove_permanent",
+            "etb_remove_target": "artifact_or_enchantment",
+            "mdfc_land_face_status": "annotation_only_not_selected_by_battle_ai",
+            "oracle_runtime_scope": "front_face_creature_enters_destroy_target_artifact_or_enchantment_opponent_controls_v1",
+            "target_controller": "opponent"
+          }
+        ],
+        "active_effects": {
+          "creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_etb_destroy_opponent_artifact_or_enchantment_v1": 1
+        },
+        "card_name": "Witch Enchanter // Witch-Blessed Meadow",
+        "effects": {
+          "creature": 1,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "witch_enchanter_witch_blessed_meadow_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 76,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Restoration Seminar",
+      "candidate_metadata": {
+        "card_name": "Restoration Seminar",
+        "cmc": 0.0,
+        "deck_count": 4,
+        "deck_ids": [
+          609,
+          610,
+          611,
+          612
+        ],
+        "functional_tag": "engine",
+        "functional_tags": [
+          "engine"
+        ],
+        "oracle_text": "Return target nonland permanent card from your graveyard to the battlefield.\nParadigm (Then exile this spell. After you first resolve a spell with this name, you may cast a copy of it from exile without paying its mana cost at the beginning of each of your first main phases.)",
+        "type_line": "Sorcery \u2014 Lesson"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "nonland_permanent_graveyard_to_battlefield_paradigm_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "nonland_permanent_graveyard_to_battlefield_paradigm_v1",
+            "cmc": 7.0,
+            "count": 1,
+            "destination": "battlefield",
+            "effect": "recursion",
+            "paradigm": true,
+            "sorcery": true,
+            "target": "nonland"
+          }
+        ],
+        "active_effects": {
+          "recursion": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "nonland_permanent_graveyard_to_battlefield_paradigm_v1": 1
+        },
+        "card_name": "Restoration Seminar",
+        "effects": {
+          "recursion": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "restoration_seminar_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 74,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Erode",
+      "candidate_metadata": {
+        "card_name": "Erode",
+        "cmc": 0.0,
+        "deck_count": 1,
+        "deck_ids": [
+          615
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target creature or planeswalker. Its controller may search their library for a basic land card, put it onto the battlefield tapped, then shuffle.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "basic_land_compensation_count": 1,
+            "basic_land_compensation_destination": "battlefield_tapped",
+            "basic_land_compensation_status": "runtime_executor_v1",
+            "battle_model_scope": "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "target_controller_basic_land_search_to_battlefield_tapped_runtime_v1",
+            "shuffle_after_basic_land_compensation": true,
+            "target": "creature_or_planeswalker",
+            "target_controller_basic_land_tapped": true
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_creature_or_planeswalker_target_controller_basic_land_tapped_runtime_v1": 1
+        },
+        "card_name": "Erode",
+        "effects": {
+          "remove_creature": 2,
+          "remove_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "erode_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 73,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Twinflame Tyrant",
+      "candidate_metadata": {
+        "card_name": "Twinflame Tyrant",
+        "cmc": 5.0,
+        "deck_count": 3,
+        "deck_ids": [
+          608,
+          611,
+          615
+        ],
+        "functional_tag": "wincon",
+        "functional_tags": [
+          "wincon"
+        ],
+        "oracle_text": "Flying\nIf a source you control would deal damage to an opponent or a permanent an opponent controls, it deals double that damage instead.",
+        "type_line": "Creature \u2014 Dragon"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "static",
+            "battle_model_scope": "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1",
+            "damage_modifier_applies_to": "sources_you_control",
+            "damage_modifier_duration": "while_on_battlefield",
+            "damage_modifier_targets": [
+              "opponents",
+              "opponent_permanents"
+            ],
+            "damage_multiplier": 2,
+            "effect": "damage_modifier",
+            "flying": true,
+            "power": 3,
+            "toughness": 5
+          }
+        ],
+        "active_effects": {
+          "damage_modifier": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "controlled_source_damage_to_opponent_or_opponent_permanent_doubled_v1": 1
+        },
+        "card_name": "Twinflame Tyrant",
+        "effects": {
+          "damage_modifier": 1,
+          "finisher": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 2,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "twinflame_tyrant_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 69,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane",
+        "candidate_much_higher_cmc"
+      ],
+      "candidate": "Explosive Singularity",
+      "candidate_metadata": {
+        "card_name": "Explosive Singularity",
+        "cmc": 10.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "As an additional cost to cast this spell, you may tap any number of untapped creatures you control. This spell costs {1} less to cast for each creature tapped this way.\nExplosive Singularity deals 10 damage to any target.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "static",
+            "additional_cost_kind": "tap_any_number_untapped_creatures_you_control",
+            "battle_model_scope": "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1",
+            "cost_reduction_amount_source": "creatures_tapped_as_additional_cost_while_casting",
+            "cost_reduction_applies_to": "this_spell",
+            "cost_reduction_counts_additional_tapped_creatures_while_casting": true,
+            "cost_reduction_generic": 1,
+            "damage": 10,
+            "effect": "direct_damage",
+            "sorcery": true,
+            "target": "any_target"
+          }
+        ],
+        "active_effects": {
+          "direct_damage": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "damage_any_target_cost_reduced_by_tapped_controlled_creatures_v1": 1
+        },
+        "card_name": "Explosive Singularity",
+        "effects": {
+          "direct_damage": 1,
+          "remove_creature": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "explosive_singularity_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 63,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_scope_not_same_lane",
+        "candidate_much_higher_cmc"
+      ],
+      "candidate": "Star of Extinction",
+      "candidate_metadata": {
+        "card_name": "Star of Extinction",
+        "cmc": 7.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target land. Star of Extinction deals 20 damage to each creature and each planeswalker.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "spot_removal",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1",
+            "damage": 20,
+            "damage_scope": "each_creature_and_planeswalker",
+            "effect": "destroy_target_land_then_damage_all_creatures_and_planeswalkers",
+            "sorcery": true,
+            "target": "land"
+          }
+        ],
+        "active_effects": {
+          "destroy_target_land_then_damage_all_creatures_and_planeswalkers": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_land_then_deal_20_to_each_creature_and_planeswalker_v1": 1
+        },
+        "card_name": "Star of Extinction",
+        "effects": {
+          "destroy_target_land_then_damage_all_creatures_and_planeswalkers": 1,
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "star_of_extinction_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 63,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Boros Charm",
+      "candidate_metadata": {
+        "card_name": "Boros Charm",
+        "cmc": 2.0,
+        "deck_count": 5,
+        "deck_ids": [
+          609,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "modal_boros_charm"
+        ],
+        "oracle_text": "Choose one \u2014\n\u2022 Boros Charm deals 4 damage to target player or planeswalker.\n\u2022 Permanents you control gain indestructible until end of turn.\n\u2022 Target creature gains double strike until end of turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "boros_charm_choose_one_damage_indestructible_double_strike_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "boros_charm_choose_one_damage_indestructible_double_strike_v1",
+            "effect": "modal_boros_charm",
+            "instant": true,
+            "modes": [
+              {
+                "amount": 4,
+                "mode": "damage_player_or_planeswalker",
+                "mode_status": "annotation_only",
+                "target": "player_or_planeswalker"
+              },
+              {
+                "duration": "until_end_of_turn",
+                "grants": [
+                  "indestructible"
+                ],
+                "mode": "permanents_you_control_gain_indestructible_until_eot",
+                "target_scope": "permanents_you_control"
+              },
+              {
+                "duration": "until_end_of_turn",
+                "grants": [
+                  "double_strike"
+                ],
+                "mode": "target_creature_gains_double_strike_until_eot",
+                "target_scope": "target_creature"
+              }
+            ]
+          }
+        ],
+        "active_effects": {
+          "modal_boros_charm": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "boros_charm_choose_one_damage_indestructible_double_strike_v1": 1
+        },
+        "card_name": "Boros Charm",
+        "effects": {
+          "indestructible": 1,
+          "modal_boros_charm": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "boros_charm_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Deflecting Palm",
+      "candidate_metadata": {
+        "card_name": "Deflecting Palm",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          614,
+          615,
+          616
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "The next time a source of your choice would deal damage to you this turn, prevent that damage. If damage is prevented this way, Deflecting Palm deals that much damage to that source's controller.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
+            "effect": "damage_prevention_reflect",
+            "instant": true,
+            "prevent_damage_amount": 999,
+            "prevent_damage_duration": "until_end_of_turn",
+            "prevent_damage_to": "you",
+            "prevent_next_damage_from_chosen_source": true,
+            "reflect_prevented_damage": true,
+            "reflect_target": "chosen_source_controller",
+            "source_choice_required": true
+          }
+        ],
+        "active_effects": {
+          "damage_prevention_reflect": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1": 1
+        },
+        "card_name": "Deflecting Palm",
+        "effects": {
+          "damage_prevention_reflect": 1,
+          "indestructible": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "deflecting_palm_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Enlightened Tutor",
+      "candidate_metadata": {
+        "card_name": "Enlightened Tutor",
+        "cmc": 1.0,
+        "deck_count": 6,
+        "deck_ids": [
+          608,
+          611,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor"
+        ],
+        "oracle_text": "Search your library for an artifact or enchantment card, reveal it, then shuffle and put that card on top.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "artifact_enchantment_tutor_to_library_top_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "artifact_enchantment_tutor_to_library_top_v1",
+            "cmc": 1.0,
+            "effect": "tutor",
+            "instant": true,
+            "oracle_runtime_scope": "instant_artifact_or_enchantment_reveal_shuffle_to_top_runtime",
+            "pg063_tutor_family": "deck608_tutor_search_package",
+            "reveals_tutored_card": true,
+            "target": "artifact_or_enchantment_to_top",
+            "tutor_destination": "library_top"
+          }
+        ],
+        "active_effects": {
+          "tutor": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_enchantment_tutor_to_library_top_v1": 1
+        },
+        "card_name": "Enlightened Tutor",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "enlightened_tutor_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Gamble",
+      "candidate_metadata": {
+        "card_name": "Gamble",
+        "cmc": 1.0,
+        "deck_count": 5,
+        "deck_ids": [
+          609,
+          612,
+          613,
+          614,
+          615
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor"
+        ],
+        "oracle_text": "Search your library for a card, put that card into your hand, discard a card at random, then shuffle.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "any_card_to_hand_then_random_discard_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "any_card_to_hand_then_random_discard_v1",
+            "discard_after_tutor_random": true,
+            "discard_risk": true,
+            "effect": "tutor",
+            "library_shuffle_status": "annotation_only_hidden_zone_shuffle_no_order_model",
+            "random_discard_status": "runtime_random_from_hand_after_tutor",
+            "sorcery": true,
+            "target": "any"
+          }
+        ],
+        "active_effects": {
+          "tutor": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "any_card_to_hand_then_random_discard_v1": 1
+        },
+        "card_name": "Gamble",
+        "effects": {
+          "tutor": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "gamble_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Reprieve",
+      "candidate_metadata": {
+        "card_name": "Reprieve",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          613,
+          615
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "Return target spell to its owner's hand.\nDraw a card.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "return_target_spell_to_owners_hand_draw_one_not_counter_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "return_target_spell_to_owners_hand_draw_one_not_counter_v1",
+            "cmc": 2.0,
+            "draw_cards": 1,
+            "draw_on_returned_spell": 1,
+            "effect": "return_target_spell_to_hand",
+            "instant": true,
+            "not_counter": true,
+            "oracle_runtime_scope": "return_target_spell_to_owners_hand_draw_one_not_counter",
+            "returns_target_spell_to_owners_hand": true,
+            "target": "spell",
+            "target_zone": "stack",
+            "works_on_uncounterable_spells": true,
+            "xmage_effect": "ReturnToHandTargetEffect on TargetSpell plus DrawCardSourceControllerEffect(1)"
+          }
+        ],
+        "active_effects": {
+          "return_target_spell_to_hand": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "return_target_spell_to_owners_hand_draw_one_not_counter_v1": 1
+        },
+        "card_name": "Reprieve",
+        "effects": {
+          "return_target_spell_to_hand": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "reprieve_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:ramp",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Seething Song",
+      "candidate_metadata": {
+        "card_name": "Seething Song",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          612,
+          614,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Add {R}{R}{R}{R}{R}.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "ramp",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "single_shot_red_ritual_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "single_shot_red_ritual_v1",
+            "cmc": 3.0,
+            "effect": "ramp_ritual",
+            "instant": true,
+            "mana_produced": 5,
+            "produces": "R"
+          }
+        ],
+        "active_effects": {
+          "ramp_ritual": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "single_shot_red_ritual_v1": 1
+        },
+        "card_name": "Seething Song",
+        "effects": {
+          "ramp_ritual": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "seething_song_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Silence",
+      "candidate_metadata": {
+        "card_name": "Silence",
+        "cmc": 1.0,
+        "deck_count": 5,
+        "deck_ids": [
+          612,
+          613,
+          614,
+          615,
+          616
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection",
+          "interaction",
+          "silence_spell"
+        ],
+        "oracle_text": "Your opponents can't cast spells this turn.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "silence_until_eot_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "silence_until_eot_v1",
+            "cmc": 1.0,
+            "effect": "silence_spell",
+            "instant": true
+          }
+        ],
+        "active_effects": {
+          "silence_spell": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "silence_until_eot_v1": 1
+        },
+        "card_name": "Silence",
+        "effects": {
+          "silence_opponents": 1,
+          "silence_spell": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "silence_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Twinflame",
+      "candidate_metadata": {
+        "card_name": "Twinflame",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          612,
+          613
+        ],
+        "functional_tag": "wincon",
+        "functional_tags": [
+          "wincon",
+          "combo",
+          "copy_creature_token",
+          "token_maker"
+        ],
+        "oracle_text": "Strive \u2014 This spell costs {2}{R} more to cast for each target beyond the first.\nChoose any number of target creatures you control. For each of them, create a token that's a copy of that creature, except it has haste. Exile those tokens at the beginning of the next end step.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "own_creature_single_copy_haste_exile_eot_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "own_creature_single_copy_haste_exile_eot_v1",
+            "cmc": 2.0,
+            "copy_target_types": [
+              "creature"
+            ],
+            "effect": "copy_creature_token",
+            "exile_token_at_end_step": true,
+            "strive_multi_target_status": "annotation_only_single_best_own_creature",
+            "target_controller": "own",
+            "token_haste": true
+          }
+        ],
+        "active_effects": {
+          "copy_creature_token": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "own_creature_single_copy_haste_exile_eot_v1": 1
+        },
+        "card_name": "Twinflame",
+        "effects": {
+          "copy_creature_token": 1,
+          "token_maker": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "twinflame_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Valakut Awakening // Valakut Stoneforge",
+      "candidate_metadata": {
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "cmc": 3.0,
+        "deck_count": 4,
+        "deck_ids": [
+          608,
+          609,
+          610,
+          611
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "hand_filter"
+        ],
+        "oracle_text": "Put any number of cards from your hand on the bottom of your library, then draw that many cards plus one.",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "bottom_then_draw_plus_one_mdfc_land_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "bottom_then_draw_plus_one_mdfc_land_v1",
+            "cmc": 3.0,
+            "draw_extra": 1,
+            "effect": "hand_filter",
+            "instant": true,
+            "max_bottom": 99,
+            "mdfc_land_face": {
+              "effect": "land",
+              "enters_tapped": true,
+              "mana_produced": 1,
+              "produces": "R"
+            }
+          }
+        ],
+        "active_effects": {
+          "hand_filter": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "bottom_then_draw_plus_one_mdfc_land_v1": 1
+        },
+        "card_name": "Valakut Awakening // Valakut Stoneforge",
+        "effects": {
+          "draw_cards": 1,
+          "hand_filter": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "valakut_awakening_valakut_stoneforge_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Wheel of Fortune",
+      "candidate_metadata": {
+        "card_name": "Wheel of Fortune",
+        "cmc": 3.0,
+        "deck_count": 4,
+        "deck_ids": [
+          608,
+          609,
+          612,
+          616
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw"
+        ],
+        "oracle_text": "Each player discards their hand, then draws seven cards.",
+        "type_line": "Sorcery"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "multiplayer_discard_draw_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "multiplayer_discard_draw_v1",
+            "cmc": 3.0,
+            "count": 7,
+            "discard_hand_each_player": true,
+            "effect": "draw_cards",
+            "sorcery": true,
+            "wheel_like": true
+          }
+        ],
+        "active_effects": {
+          "draw_cards": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "multiplayer_discard_draw_v1": 1
+        },
+        "card_name": "Wheel of Fortune",
+        "effects": {
+          "draw_cards": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "wheel_of_fortune_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 62,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Eight-and-a-Half-Tails",
+      "candidate_metadata": {
+        "card_name": "Eight-and-a-Half-Tails",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          616
+        ],
+        "functional_tag": "creature",
+        "functional_tags": [
+          "creature"
+        ],
+        "oracle_text": "{1}{W}: Target permanent you control gains protection from white until end of turn.\n{1}: Target spell or permanent becomes white until end of turn.",
+        "type_line": "Legendary Creature \u2014 Fox Cleric"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "activated",
+            "activated_protection_status": "runtime_executor_v1",
+            "activation_cost": "{1} plus {1}{W}",
+            "activation_requires_tap": false,
+            "battle_model_scope": "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1",
+            "can_make_source_white_for_protection": true,
+            "duration": "until_end_of_turn",
+            "effect": "creature",
+            "is_creature_permanent": true,
+            "oracle_runtime_scope": "targeted_stack_removal_response_protection_activation_runtime_v1",
+            "power": 2,
+            "protection_activation_timing": "targeted_stack_response",
+            "protection_choices": [
+              "white"
+            ],
+            "protection_target": "target_permanent_you_control",
+            "runtime_modeled_effect": "creature_body_plus_targeted_protection_response",
+            "source_color_change_target": "target_spell_or_permanent",
+            "source_color_change_to": "white",
+            "source_must_be_untapped": false,
+            "summoning_sickness_applies_to_activation": false,
+            "tap_activation": false,
+            "targeted_protection_activation_mana_cost": "{2}{W}",
+            "toughness": 2,
+            "xmage_effect": "SimpleActivatedAbility + GainAbilityTargetEffect(Protection from white) + BecomesColorTargetEffect(white)"
+          }
+        ],
+        "active_effects": {
+          "creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_body_target_permanent_protection_from_white_make_source_white_activation_runtime_v1": 1
+        },
+        "card_name": "Eight-and-a-Half-Tails",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "eight_and_a_half_tails_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Grinding Station",
+      "candidate_metadata": {
+        "card_name": "Grinding Station",
+        "cmc": 2.0,
+        "deck_count": 1,
+        "deck_ids": [
+          612
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "{T}, Sacrifice an artifact: Target player mills three cards.\nWhenever an artifact enters, you may untap this artifact.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "artifact_tap_sacrifice_permanent_target_player_mill_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "triggered",
+            "activation_requires_sacrifice_permanent": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_target_type": "artifact",
+            "artifact_enters_untap_source": true,
+            "artifact_enters_untap_source_status": "annotation_only",
+            "battle_model_scope": "artifact_tap_sacrifice_permanent_target_player_mill_v1",
+            "effect": "mill_engine",
+            "mill_count": 3,
+            "target": "player"
+          }
+        ],
+        "active_effects": {
+          "mill_engine": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "artifact_tap_sacrifice_permanent_target_player_mill_v1": 1
+        },
+        "card_name": "Grinding Station",
+        "effects": {
+          "mill_engine": 1,
+          "ramp_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "grinding_station_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 61,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown"
+      ],
+      "candidate": "Clever Concealment",
+      "candidate_metadata": {
+        "card_name": "Clever Concealment",
+        "cmc": 4.0,
+        "deck_count": 1,
+        "deck_ids": [
+          609
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "Convoke (Your creatures can help cast this spell. Each creature you tap while casting this spell pays for {1} or one mana of that creature's color.)\nAny number of target nonland permanents you control phase out. (Treat them and anything attached to them as though they don't exist until your next turn.)",
+        "type_line": "Instant"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "target_nonland_permanents_you_control_phase_out_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "one_shot",
+            "battle_model_scope": "target_nonland_permanents_you_control_phase_out_v1",
+            "choice_model": "phase_out_all_legal_nonland_permanents_you_control",
+            "convoke": true,
+            "effect": "phase_out",
+            "instant": true,
+            "phase_out_all_permanents_you_control": true,
+            "phase_out_includes_lands": false,
+            "target": "nonland_permanents_you_control",
+            "target_constraints": {
+              "card_types": [
+                "permanent"
+              ],
+              "controller_scope": "source_controller",
+              "exclude_card_types": [
+                "land"
+              ],
+              "target_count": "any_number"
+            }
+          }
+        ],
+        "active_effects": {
+          "phase_out": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "target_nonland_permanents_you_control_phase_out_v1": 1
+        },
+        "card_name": "Clever Concealment",
+        "effects": {
+          "phase_out": 3
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 2
+        },
+        "review_statuses": {
+          "deprecated": 1,
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 3
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "clever_concealment_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 58,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:ramp",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+      "candidate_metadata": {
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          608,
+          612,
+          615
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Whenever you cast a spell, add {R}. Until end of turn, you don't lose this mana as steps and phases end.\nCreatures you control can boast twice during each of your turns rather than once.",
+        "type_line": "Legendary Creature \u2014 God"
+      },
+      "candidate_role": "ramp",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "ability_kind": "triggered",
+            "back_face_harnfel_discard_exile_two_play_this_turn": true,
+            "back_face_status": "annotation_only",
+            "battle_model_scope": "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1",
+            "boast_twice_each_turn": true,
+            "boast_twice_status": "annotation_only",
+            "effect": "ramp_engine",
+            "is_creature_permanent": true,
+            "mana_persists_steps": true,
+            "power": 3,
+            "produces": "R",
+            "spell_cast_add_mana": 1,
+            "spell_cast_mana_color": "R",
+            "toughness": 3,
+            "trigger": "spell_cast"
+          }
+        ],
+        "active_effects": {
+          "ramp_engine": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "spell_cast_red_mana_trigger_boast_harnfel_annotation_v1": 1,
+          "spell_cast_red_mana_trigger_v1": 1
+        },
+        "card_name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "effects": {
+          "creature": 1,
+          "ramp_engine": 2,
+          "ramp_ritual": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 3
+        },
+        "review_statuses": {
+          "deprecated": 3,
+          "verified": 1
+        },
+        "rule_count": 4
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "birgi_god_of_storytelling_harnfel_horn_of_bounty_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Dragon's Rage Channeler",
+      "candidate_metadata": {
+        "card_name": "Dragon's Rage Channeler",
+        "cmc": 1.0,
+        "deck_count": 3,
+        "deck_ids": [
+          609,
+          613,
+          614
+        ],
+        "functional_tag": "draw",
+        "functional_tags": [
+          "draw",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "Whenever you cast a noncreature spell, surveil 1. (Look at the top card of your library. You may put that card into your graveyard.)\nDelirium \u2014 As long as there are four or more card types among cards in your graveyard, this creature gets +2/+2, has flying, and attacks each combat if able.",
+        "type_line": "Creature \u2014 Human Shaman"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "noncreature_spell_cast_surveil_one_delirium_plus2_plus2_flying_must_attack_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "noncreature_spell_cast_surveil_one_delirium_plus2_plus2_flying_must_attack_v1",
+            "cmc": 1.0,
+            "delirium_grants_keywords": [
+              "flying"
+            ],
+            "delirium_graveyard_card_types_required": 4,
+            "delirium_must_attack_each_combat_if_able": true,
+            "delirium_power_bonus": 2,
+            "delirium_toughness_bonus": 2,
+            "effect": "creature",
+            "is_creature_permanent": true,
+            "oracle_runtime_scope": "noncreature_spell_cast_surveil_one_delirium_body_upgrade",
+            "power": 1,
+            "runtime_modeled_effect": "creature_body_plus_noncreature_spell_surveil_and_delirium_static",
+            "surveil_count": 1,
+            "toughness": 1,
+            "trigger": "noncreature_spell_cast",
+            "trigger_effect": "surveil",
+            "xmage_effect": "SurveilEffect(1)",
+            "xmage_static": "DeliriumCondition grants BoostSourceEffect(2,2), FlyingAbility, and AttacksIfAbleSourceEffect",
+            "xmage_trigger": "SpellCastControllerTriggeredAbility(FILTER_SPELL_A_NON_CREATURE)"
+          }
+        ],
+        "active_effects": {
+          "creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "noncreature_spell_cast_surveil_one_delirium_plus2_plus2_flying_must_attack_v1": 1
+        },
+        "card_name": "Dragon's Rage Channeler",
+        "effects": {
+          "creature": 1
+        },
+        "execution_statuses": {
+          "auto": 1
+        },
+        "review_statuses": {
+          "verified": 1
+        },
+        "rule_count": 1
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "dragon_s_rage_channeler_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Dualcaster Mage",
+      "candidate_metadata": {
+        "card_name": "Dualcaster Mage",
+        "cmc": 3.0,
+        "deck_count": 3,
+        "deck_ids": [
+          611,
+          612,
+          613
+        ],
+        "functional_tag": "engine",
+        "functional_tags": [
+          "engine",
+          "copy_spell",
+          "interaction"
+        ],
+        "oracle_text": "Flash\nWhen this creature enters, copy target instant or sorcery spell. You may choose new targets for the copy.",
+        "type_line": "Creature \u2014 Human Wizard"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1",
+            "choose_new_targets_status": "runtime_executor_v1",
+            "cmc": 3.0,
+            "copy_is_not_cast": true,
+            "copy_target_selection_pipeline": "copy_spell_runtime_choose_new_targets_v1",
+            "copy_target_selection_status": "runtime_executor_v1",
+            "effect": "copy_spell",
+            "etb_copy_spell": true,
+            "instant": true,
+            "is_creature_permanent": true,
+            "keywords": [
+              "flash"
+            ],
+            "may_choose_new_targets": true,
+            "oracle_runtime_scope": "copy_target_instant_or_sorcery_stack_spell_choose_new_targets_runtime_v1",
+            "power": 2,
+            "target": "instant_or_sorcery_on_stack",
+            "toughness": 2
+          }
+        ],
+        "active_effects": {
+          "copy_spell": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "creature_etb_copy_stack_instant_or_sorcery_new_targets_runtime_v1": 1
+        },
+        "card_name": "Dualcaster Mage",
+        "effects": {
+          "copy_spell": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "dualcaster_mage_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Goblin Engineer",
+      "candidate_metadata": {
+        "card_name": "Goblin Engineer",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          608,
+          610,
+          611
+        ],
+        "functional_tag": "tutor",
+        "functional_tags": [
+          "tutor",
+          "creature",
+          "unknown"
+        ],
+        "oracle_text": "When this creature enters, you may search your library for an artifact card, put it into your graveyard, then shuffle.\n{R}, {T}, Sacrifice an artifact: Return target artifact card with mana value 3 or less from your graveyard to the battlefield.",
+        "type_line": "Creature \u2014 Goblin Artificer"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "goblin_engineer_etb_artifact_to_graveyard_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "activated_artifact_reanimation_cost": "R_tap_sacrifice_artifact",
+            "activated_artifact_reanimation_status": "annotation_only",
+            "activated_artifact_reanimation_target": "artifact_mv_lte_3_from_graveyard",
+            "battle_model_scope": "goblin_engineer_etb_artifact_to_graveyard_v1",
+            "cmc": 2.0,
+            "effect": "creature",
+            "etb_tutor_destination": "graveyard",
+            "etb_tutor_target": "artifact_to_graveyard",
+            "is_creature_permanent": true,
+            "oracle_runtime_scope": "creature_etb_artifact_library_to_graveyard_runtime_activated_reanimation_annotation",
+            "pg063_tutor_family": "deck608_tutor_search_package",
+            "power": 1,
+            "reveals_tutored_card": false,
+            "toughness": 2
+          }
+        ],
+        "active_effects": {
+          "creature": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "goblin_engineer_etb_artifact_to_graveyard_v1": 1
+        },
+        "card_name": "Goblin Engineer",
+        "effects": {
+          "creature": 1,
+          "tutor": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "active": 1,
+          "needs_review": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "goblin_engineer_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:unknown",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Grand Abolisher",
+      "candidate_metadata": {
+        "card_name": "Grand Abolisher",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          613,
+          615,
+          616
+        ],
+        "functional_tag": "protection",
+        "functional_tags": [
+          "protection"
+        ],
+        "oracle_text": "During your turn, your opponents can't cast spells or activate abilities of artifacts, creatures, or enchantments.",
+        "type_line": "Creature \u2014 Human Cleric"
+      },
+      "candidate_role": "unknown",
+      "candidate_rule": {
+        "active_battle_model_scopes": {
+          "static_opponent_spell_lock_activated_ability_lock_annotation_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "activated_ability_lock_status": "annotation_only",
+            "battle_model_scope": "static_opponent_spell_lock_activated_ability_lock_annotation_v1",
+            "effect": "silence_opponents",
+            "oracle_runtime_scope": "opponent_spell_cast_lock_runtime_activated_ability_lock_annotation_only",
+            "pg054_l6_silence_family": "deck6_silence_lock",
+            "timing_scope": "during_controller_turn"
+          }
+        ],
+        "active_effects": {
+          "silence_opponents": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "static_opponent_spell_lock_activated_ability_lock_annotation_v1": 1
+        },
+        "card_name": "Grand Abolisher",
+        "effects": {
+          "silence_opponents": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "grand_abolisher_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    },
+    {
+      "blockers": [
+        "candidate_role_mismatch:ramp",
+        "candidate_scope_not_same_lane"
+      ],
+      "candidate": "Helm of Awakening",
+      "candidate_metadata": {
+        "card_name": "Helm of Awakening",
+        "cmc": 2.0,
+        "deck_count": 3,
+        "deck_ids": [
+          610,
+          612,
+          614
+        ],
+        "functional_tag": "ramp",
+        "functional_tags": [
+          "ramp"
+        ],
+        "oracle_text": "Spells cost {1} less to cast.",
+        "type_line": "Artifact"
+      },
+      "candidate_role": "ramp",
+      "candidate_rule": {
+        "active_battle_model_scopes": {},
+        "active_effect_jsons": [
+          {
+            "effect": "ramp_engine"
+          }
+        ],
+        "active_effects": {
+          "ramp_engine": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {},
+        "card_name": "Helm of Awakening",
+        "effects": {
+          "ramp_engine": 1,
+          "ramp_permanent": 1
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "review_only": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut": "Stroke of Midnight",
+      "cut_metadata": {
+        "card_name": "Stroke of Midnight",
+        "cmc": 3.0,
+        "functional_tag": "removal",
+        "functional_tags": [
+          "removal"
+        ],
+        "oracle_text": "Destroy target nonland permanent. Its controller creates a 1/1 white Human creature token.",
+        "type_line": "Instant"
+      },
+      "cut_role": "spot_removal",
+      "cut_rule": {
+        "active_battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "active_effect_jsons": [
+          {
+            "battle_model_scope": "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1",
+            "cmc": 3.0,
+            "compensation_token_status": "dynamic_creature_token_executor",
+            "effect": "remove_permanent",
+            "instant": true,
+            "oracle_runtime_scope": "destroy_target_nonland_permanent_runtime_create_1_1_white_human_for_controller_v1",
+            "target": "nonland_permanent",
+            "target_controller_creature_tokens": 1,
+            "target_controller_token_colors": [
+              "W"
+            ],
+            "target_controller_token_name": "Human",
+            "target_controller_token_power": 1,
+            "target_controller_token_subtype": "Human",
+            "target_controller_token_toughness": 1
+          }
+        ],
+        "active_effects": {
+          "remove_permanent": 1
+        },
+        "active_rule_count": 1,
+        "battle_model_scopes": {
+          "destroy_target_nonland_permanent_create_1_1_white_human_for_controller_v1": 1
+        },
+        "card_name": "Stroke of Midnight",
+        "effects": {
+          "remove_permanent": 2
+        },
+        "execution_statuses": {
+          "auto": 1,
+          "disabled": 1
+        },
+        "review_statuses": {
+          "needs_review": 1,
+          "verified": 1
+        },
+        "rule_count": 2
+      },
+      "cut_safety": {},
+      "package_key": "helm_of_awakening_same_lane_benchmark_cut_stroke_of_midnight",
+      "score": 57,
+      "status": "blocked"
+    }
+  ],
+  "variant_deck_ids": [
+    608,
+    609,
+    610,
+    611,
+    612,
+    613,
+    614,
+    615,
+    616
+  ]
+}

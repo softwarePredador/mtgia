@@ -680,10 +680,14 @@ def build_report(
     deck_id: int = 607,
     variant_deck_ids: Iterable[int] = DEFAULT_VARIANT_DECK_IDS,
     max_per_cut: int = 2,
+    cut_roles: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     current_metadata = current_deck_metadata(conn, deck_id)
     current_names = set(current_metadata)
-    cuts = profiled_cut_rows(manual_review)
+    requested_cut_roles = sorted({str(role) for role in (cut_roles or []) if str(role)})
+    requested_cut_role_set = set(requested_cut_roles)
+    unfiltered_cuts = profiled_cut_rows(manual_review)
+    cuts = unfiltered_cuts
     cut_names = [str(row.get("card_name") or "") for row in cuts]
     variant_candidates = load_variant_candidates(
         conn,
@@ -697,6 +701,7 @@ def build_report(
     prior_rejects = exact_prior_rejects(prior_results)
     cut_safety_by_name = normalized_cut_safety(cut_safety or {})
     pair_rows = []
+    filtered_out_cut_rows = []
     for cut in cuts:
         cut_name = str(cut.get("card_name") or "")
         cut_key = normalize_key(cut_name)
@@ -715,6 +720,20 @@ def build_report(
                 },
             ),
         }
+        cut_role = effective_cut_role(cut_with_metadata)
+        if requested_cut_role_set and cut_role not in requested_cut_role_set:
+            filtered_out_cut_rows.append(
+                {
+                    "card_name": cut_name,
+                    "status": cut.get("status"),
+                    "recommended_action": cut.get("recommended_action"),
+                    "cut_exposure": cut.get("cut_exposure") or {},
+                    "cut_safety": cut_with_metadata.get("cut_safety") or {},
+                    "effective_role": cut_role,
+                    "reason": "filtered_out_by_requested_cut_role",
+                }
+            )
+            continue
         cut_rule = rules.get(cut_key) or {}
         for candidate in variant_candidates.values():
             pair_rows.append(
@@ -765,16 +784,20 @@ def build_report(
             or (row.get("cut_exposure") or {}).get("inferred_role")
         ) not in SUPPORTED_CUT_ROLES
     ]
+    blocked_cut_rows.extend(filtered_out_cut_rows)
     return {
         "generated_at": utc_now(),
         "source_db": str(db_path),
         "manual_review": str(manual_review_path),
         "variant_deck_ids": list(variant_deck_ids),
+        "requested_cut_roles": requested_cut_roles,
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
-            "profiled_cut_count": len(cuts),
+            "unfiltered_profiled_cut_count": len(unfiltered_cuts),
+            "profiled_cut_count": len(cuts) - len(filtered_out_cut_rows),
             "supported_cut_count": len(cuts) - len(blocked_cut_rows),
+            "filtered_out_cut_count": len(filtered_out_cut_rows),
             "candidate_pool_count": len(variant_candidates),
             "pair_evaluation_count": len(pair_rows),
             "preflight_ready_pair_count": len([row for row in pair_rows if row["status"] == "preflight_ready"]),
@@ -813,14 +836,17 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Cut-safety report: `{payload.get('cut_safety_report')}`",
         f"- Registry: `{payload.get('registry')}`",
         f"- Variant deck IDs: `{', '.join(str(deck_id) for deck_id in payload['variant_deck_ids'])}`",
+        f"- Requested cut roles: `{', '.join(payload.get('requested_cut_roles') or []) or 'all'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
         "## Summary",
         "",
         f"- Recommended next action: `{summary['recommended_next_action']}`",
+        f"- Unfiltered profiled cuts: `{summary.get('unfiltered_profiled_cut_count', summary['profiled_cut_count'])}`",
         f"- Profiled cuts: `{summary['profiled_cut_count']}`",
         f"- Supported cuts: `{summary['supported_cut_count']}`",
+        f"- Filtered-out cuts: `{summary.get('filtered_out_cut_count', 0)}`",
         f"- Candidate pool: `{summary['candidate_pool_count']}`",
         f"- Pair evaluations: `{summary['pair_evaluation_count']}`",
         f"- Preflight-ready pairs: `{summary['preflight_ready_pair_count']}`",
@@ -885,6 +911,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--registry", type=Path, default=package_gate.DEFAULT_REGISTRY)
     parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--max-per-cut", type=int, default=2)
+    parser.add_argument(
+        "--cut-role",
+        action="append",
+        choices=sorted(SUPPORTED_CUT_ROLES),
+        default=[],
+        help="Restrict candidate generation to profiled cuts with this effective role.",
+    )
     parser.add_argument("--stem", default="lorehold_profiled_cut_benchmark_generator_20260628_v1")
     return parser.parse_args()
 
@@ -915,6 +948,7 @@ def main() -> int:
             db_path=args.db,
             manual_review_path=args.manual_review,
             max_per_cut=args.max_per_cut,
+            cut_roles=args.cut_role,
         )
     payload["cut_safety_report"] = str(cut_safety_report)
     payload["registry"] = str(registry_path)

@@ -199,6 +199,34 @@ def test_generator_uses_cut_safety_roles_for_ramp_and_big_spell_packages():
     assert any("candidate_scope_not_same_lane" in row["blockers"] for row in thrumming_rows)
 
 
+def test_generator_can_restrict_to_removal_lane_without_ramp_fallback():
+    with build_conn() as conn:
+        payload = generator.build_report(
+            conn=conn,
+            manual_review=manual_review(),
+            prior_results={"by_signature": {}},
+            cut_safety=cut_safety(),
+            db_path=Path("memory.db"),
+            manual_review_path=Path("manual_review.json"),
+            variant_deck_ids=[608, 609, 610, 611, 612],
+            max_per_cut=2,
+            cut_roles=["spot_removal"],
+        )
+
+    assert payload["requested_cut_roles"] == ["spot_removal"]
+    assert payload["summary"]["unfiltered_profiled_cut_count"] == 4
+    assert payload["summary"]["profiled_cut_count"] == 2
+    assert payload["summary"]["filtered_out_cut_count"] == 2
+    assert payload["summary"]["selected_package_count"] > 0
+    assert all(row["cut_role"] == "spot_removal" for row in payload["selected_pairs"])
+    assert "Bender's Waterskin" not in {row["cut"] for row in payload["selected_pairs"]}
+    assert any(
+        row["card_name"] == "Bender's Waterskin"
+        and row["reason"] == "filtered_out_by_requested_cut_role"
+        for row in payload["blocked_cut_rows"]
+    )
+
+
 def test_generator_blocks_under_modeled_costs_and_conditional_ramp_payoffs():
     with build_conn() as conn:
         payload = generator.build_report(
