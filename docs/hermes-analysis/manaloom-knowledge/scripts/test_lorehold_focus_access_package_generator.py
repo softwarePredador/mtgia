@@ -12,10 +12,42 @@ def test_default_access_model_uses_post_pg276_assemble_access_density_report():
     )
 
 
-def test_default_runtime_gap_queue_uses_post_pg280_kayla_music_box_report():
+def test_default_runtime_gap_queue_uses_current_zero_gap_report():
     assert (
         gen.DEFAULT_RUNTIME_GAP_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
+        == "lorehold_runtime_gap_family_queue_20260630_definitive_learning_v1.json"
+    )
+
+
+def test_newest_report_prefers_latest_current_artifact(tmp_path):
+    old_path = tmp_path / "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v1.json"
+    new_path = tmp_path / "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v2.json"
+    fallback = tmp_path / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+    fallback.write_text("{}", encoding="utf-8")
+    old_path.write_text("{}", encoding="utf-8")
+    new_path.write_text("{}", encoding="utf-8")
+
+    assert (
+        gen.newest_report(
+            "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+            fallback,
+            report_dir=tmp_path,
+        )
+        == new_path
+    )
+
+
+def test_newest_report_falls_back_when_current_artifact_is_absent(tmp_path):
+    fallback = tmp_path / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+    fallback.write_text("{}", encoding="utf-8")
+
+    assert (
+        gen.newest_report(
+            "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+            fallback,
+            report_dir=tmp_path,
+        )
+        == fallback
     )
 
 
@@ -218,11 +250,54 @@ def test_completed_squee_probe_routes_to_access_density_model():
     assert required[0]["work_key"] == "squee_access_density_model"
     assert required[0]["target_seeds"] == ["7", "20260625"]
     assert report["summary"]["squee_probe_status"] == "squee_route_modeled_but_access_gap_remains"
-    assert report["summary"]["access_model_status"] == "squee_route_modeled_access_density_needed"
     assert required[0]["preflight_access_candidate_ready_count"] == 0
     assert "PG271-synced" in required[0]["reason"]
     assert "seed-safe cut model" in required[0]["reason"]
     assert "squee_graveyard_entry_probe" not in {row["work_key"] for row in required}
+
+
+def test_zero_runtime_gap_queue_drops_runtime_work_from_operational_priority():
+    pairing = {
+        "candidate": "Gamble",
+        "candidate_status": "high_frequency_runtime_ready_unexplored",
+        "candidate_score": 74,
+        "lane": "contextual",
+        "cut_options": [],
+        "recommended_action": "define contextual lane and candidate-specific cut model before gate",
+    }
+    squee_probe = {
+        "summary": {
+            "status": "squee_route_modeled_but_access_gap_remains",
+            "modeled_when_accessed": True,
+            "weak_material_missing_squee_seeds": ["7", "20260625"],
+        }
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner_with_pairing(pairing),
+        squee_probe=squee_probe,
+        access_model={
+            "summary": {
+                "access_density_status": "squee_route_modeled_access_density_needed",
+                "preflight_access_candidate_ready_count": 0,
+            }
+        },
+        runtime_gap_queue={
+            "summary": {
+                "blocked_runtime_rule_gap_count": 0,
+                "family_count": 0,
+            }
+        },
+    )
+
+    work_keys = [row["work_key"] for row in report["operational_work_queue"]]
+    route_work_keys = [row["work_key"] for row in report["instrumentation_route"]["required_work"]]
+    assert "runtime_rule_gap_batch" not in work_keys
+    assert "runtime_rule_gap_batch" not in route_work_keys
+    assert report["summary"]["top_operational_work_key"] != "runtime_rule_gap_batch"
+    assert report["summary"]["access_model_status"] == "squee_route_modeled_access_density_needed"
 
 
 def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batch():

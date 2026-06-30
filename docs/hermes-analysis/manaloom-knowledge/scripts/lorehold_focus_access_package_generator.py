@@ -25,17 +25,40 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
 DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
-DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+FALLBACK_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
 DEFAULT_MINER_REPORT = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_DESIGN_REPORT = REPORT_DIR / "lorehold_focus_access_package_design_20260628_v1.md"
-DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+FALLBACK_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_ACCESS_MODEL = REPORT_DIR / "lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"
 DEFAULT_RUNTIME_GAP_QUEUE = (
-    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box.json"
+    REPORT_DIR / "lorehold_runtime_gap_family_queue_20260630_definitive_learning_v1.json"
 )
 DEFAULT_HAND_FILTER_CUT_MODEL = (
     REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
 )
+
+
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+    matches = sorted(
+        report_dir.glob(pattern),
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_trace_audit() -> Path:
+    return newest_report(
+        "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v*.json",
+        FALLBACK_TRACE_AUDIT,
+    )
+
+
+def default_squee_probe() -> Path:
+    return newest_report(
+        "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+        FALLBACK_SQUEE_PROBE,
+    )
 
 PROTECTED_CARDS = {
     "Urza's Saga",
@@ -480,6 +503,7 @@ def instrumentation_route(
     trace_audit: dict[str, Any],
     squee_probe: dict[str, Any] | None = None,
     access_model: dict[str, Any] | None = None,
+    runtime_gap_queue: dict[str, Any] | None = None,
     squee_probe_path: Path | None = None,
     access_model_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -492,38 +516,45 @@ def instrumentation_route(
         }
     modes = focus_failure_modes(trace_audit)
     runtime_action = planner_runtime_action(planner_payload)
-    return {
-        "status": "trace_or_runtime_probe_required",
-        "next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
-        "required_work": [
-            squee_work_item(
-                squee_probe=squee_probe,
-                access_model=access_model,
-                modes=modes,
-                squee_probe_path=squee_probe_path,
-                access_model_path=access_model_path,
+    runtime_context = runtime_gap_context(runtime_gap_queue)
+    required_work = [
+        squee_work_item(
+            squee_probe=squee_probe,
+            access_model=access_model,
+            modes=modes,
+            squee_probe_path=squee_probe_path,
+            access_model_path=access_model_path,
+        ),
+        {
+            "work_key": "contextual_tutor_cut_model",
+            "failure_mode": "seed7_missing_engine_access",
+            "reason": "Enlightened Tutor and Gamble have runtime support but no safe cut option.",
+            "target_seeds": (modes.get("seed7_missing_engine_access") or {}).get("target_seeds", []),
+        },
+        {
+            "work_key": "hand_filter_non_core_cut_search",
+            "failure_mode": "seed20260625_conversion_under_pressure",
+            "reason": "Hand-filter candidates only pair with protected same-lane support cuts.",
+            "target_seeds": (modes.get("seed20260625_conversion_under_pressure") or {}).get(
+                "target_seeds", []
             ),
-            {
-                "work_key": "contextual_tutor_cut_model",
-                "failure_mode": "seed7_missing_engine_access",
-                "reason": "Enlightened Tutor and Gamble have runtime support but no safe cut option.",
-                "target_seeds": (modes.get("seed7_missing_engine_access") or {}).get("target_seeds", []),
-            },
-            {
-                "work_key": "hand_filter_non_core_cut_search",
-                "failure_mode": "seed20260625_conversion_under_pressure",
-                "reason": "Hand-filter candidates only pair with protected same-lane support cuts.",
-                "target_seeds": (modes.get("seed20260625_conversion_under_pressure") or {}).get(
-                    "target_seeds", []
-                ),
-            },
+        },
+    ]
+    if runtime_action and (
+        runtime_gap_queue is None or int(runtime_context.get("blocked_runtime_rule_gap_count") or 0) > 0
+    ):
+        required_work.append(
             {
                 "work_key": "runtime_rule_gap_batch",
                 "failure_mode": "blocked_runtime_rule_gap",
-                "reason": (runtime_action or {}).get("why_now"),
+                "reason": runtime_action.get("why_now"),
                 "target_seeds": [],
-            },
-        ],
+            }
+        )
+    return {
+        "status": "trace_or_runtime_probe_required",
+        "next_action": "do_not_create_blind_swap; run focused trace/runtime/cut-model work first",
+        "required_work": required_work,
     }
 
 
@@ -602,7 +633,7 @@ def next_command_for_work(work_key: str) -> str:
         "runtime_rule_gap_batch": (
             "python3 docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_runtime_gap_family_queue.py "
             "--output-prefix docs/hermes-analysis/master_optimizer_reports/"
-            "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"
+            "lorehold_runtime_gap_family_queue_20260630_current"
         ),
     }
     return commands.get(work_key, "")
@@ -685,6 +716,12 @@ def build_operational_work_queue(
     rows: list[dict[str, Any]] = []
     for work_item in instrumentation.get("required_work") or []:
         work_key = str(work_item.get("work_key") or "")
+        if (
+            work_key == "runtime_rule_gap_batch"
+            and runtime_gap_queue is not None
+            and int(runtime_context.get("blocked_runtime_rule_gap_count") or 0) == 0
+        ):
+            continue
         blocked_rows = blocked_rows_for_work(work_key, package_candidates)
         status_counts = Counter(row.get("status") for row in blocked_rows)
         runtime_card_count = 0
@@ -782,14 +819,16 @@ def build_report(
     runtime_gap_queue: dict[str, Any] | None = None,
     hand_filter_cut_model: dict[str, Any] | None = None,
     planner_path: Path = DEFAULT_PLANNER,
-    trace_path: Path = DEFAULT_TRACE_AUDIT,
+    trace_path: Path | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     design_path: Path = DEFAULT_DESIGN_REPORT,
-    squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
+    squee_probe_path: Path | None = None,
     access_model_path: Path = DEFAULT_ACCESS_MODEL,
     runtime_gap_path: Path = DEFAULT_RUNTIME_GAP_QUEUE,
     hand_filter_cut_model_path: Path = DEFAULT_HAND_FILTER_CUT_MODEL,
 ) -> dict[str, Any]:
+    trace_path = trace_path or default_trace_audit()
+    squee_probe_path = squee_probe_path or default_squee_probe()
     modes = focus_failure_modes(trace_audit)
     package_candidates = evaluate_pairings(
         miner_report=miner_report,
@@ -806,6 +845,7 @@ def build_report(
         trace_audit=trace_audit,
         squee_probe=squee_probe,
         access_model=access_model,
+        runtime_gap_queue=runtime_gap_queue,
         squee_probe_path=squee_probe_path,
         access_model_path=access_model_path,
     )
@@ -1004,10 +1044,10 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--planner", type=Path, default=DEFAULT_PLANNER)
-    parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
+    parser.add_argument("--trace-audit", type=Path, default=default_trace_audit())
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--design-report", type=Path, default=DEFAULT_DESIGN_REPORT)
-    parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
+    parser.add_argument("--squee-probe", type=Path, default=default_squee_probe())
     parser.add_argument("--access-model", type=Path, default=DEFAULT_ACCESS_MODEL)
     parser.add_argument("--runtime-gap-queue", type=Path, default=DEFAULT_RUNTIME_GAP_QUEUE)
     parser.add_argument("--hand-filter-cut-model", type=Path, default=DEFAULT_HAND_FILTER_CUT_MODEL)

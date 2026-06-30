@@ -30,6 +30,47 @@ def load_json(path: Path) -> dict[str, Any] | None:
     return payload if isinstance(payload, dict) else None
 
 
+def corrected_invalid_package_keys(report_path: Path, payload: Mapping[str, Any]) -> dict[str, str]:
+    """Return package keys invalidated by corrected package manifests.
+
+    Some historical gate reports were generated from a manifest that was later
+    corrected in place. If the corrected manifest has a correction note and no
+    longer contains a package that still appears in the old gate output, the
+    old package must not remain in the confirmation queue.
+    """
+
+    report_keys = {
+        str(package.get("package_key") or "")
+        for package in payload.get("packages") or []
+        if isinstance(package, Mapping) and package.get("package_key")
+    }
+    if not report_keys:
+        return {}
+
+    invalid: dict[str, str] = {}
+    for raw_path in payload.get("package_definition_files") or []:
+        manifest_path = Path(str(raw_path))
+        if not manifest_path.is_absolute():
+            manifest_path = report_path.parent / manifest_path
+        manifest = load_json(manifest_path)
+        if not manifest:
+            continue
+        correction_note = str(manifest.get("correction_note") or "")
+        if not correction_note:
+            continue
+        lowered_note = correction_note.lower()
+        if "removed" not in lowered_note and "invalid" not in lowered_note:
+            continue
+        valid_keys = {
+            str(package.get("package_key") or "")
+            for package in manifest.get("packages") or []
+            if isinstance(package, Mapping) and package.get("package_key")
+        }
+        for package_key in sorted(report_keys - valid_keys):
+            invalid[package_key] = correction_note
+    return invalid
+
+
 def numeric(value: Any, default: float = 0.0) -> float:
     try:
         return float(value)
@@ -62,9 +103,12 @@ def gate_decision(delta_pp: float, baseline: Mapping[str, Any], candidate: Mappi
 
 def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     observations: list[dict[str, Any]] = []
+    invalid_packages = corrected_invalid_package_keys(path, payload)
     for package in payload.get("packages") or []:
         if not isinstance(package, dict):
             continue
+        package_key = str(package.get("package_key") or "")
+        invalid_reason = invalid_packages.get(package_key)
         gate = package.get("gate_summary") or {}
         baseline = gate.get("baseline") or {}
         candidate = gate.get("candidate") or {}
@@ -85,7 +129,7 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
                     "source_mtime": path.stat().st_mtime,
                     "generated_at": payload.get("generated_at"),
                     "source_kind": "package_preflight",
-                    "package_key": str(package.get("package_key") or ""),
+                    "package_key": package_key,
                     "family": package.get("family"),
                     "adds": list(package.get("adds") or []),
                     "cuts": list(package.get("cuts") or []),
@@ -95,7 +139,10 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
                     "baseline": {},
                     "candidate": {},
                     "delta_pp": None,
-                    "decision": preflight_decision(package),
+                    "decision": "invalid_corrected_package_definition"
+                    if invalid_reason
+                    else preflight_decision(package),
+                    "invalid_reason": invalid_reason,
                     "games_per_opponent": payload.get("games_per_opponent"),
                     "opponent_limit": payload.get("opponent_limit"),
                     "opponent_seed": payload.get("opponent_seed"),
@@ -107,25 +154,28 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
             continue
         delta_pp = numeric(gate.get("delta_pp"), numeric(candidate.get("win_rate")) - numeric(baseline.get("win_rate")))
         observations.append(
-            {
-                "source_path": str(path),
-                "source_file": path.name,
-                "source_mtime": path.stat().st_mtime,
-                "generated_at": payload.get("generated_at"),
-                "source_kind": "package_gate",
-                "package_key": str(package.get("package_key") or ""),
-                "family": package.get("family"),
-                "adds": list(package.get("adds") or []),
-                "cuts": list(package.get("cuts") or []),
-                "status": package.get("status"),
-                "baseline": compact_result(baseline),
-                "candidate": compact_result(candidate),
-                "delta_pp": round(delta_pp, 2),
-                "decision": gate_decision(delta_pp, baseline, candidate),
-                "games_per_opponent": payload.get("games_per_opponent"),
-                "opponent_limit": payload.get("opponent_limit"),
-                "opponent_seed": payload.get("opponent_seed"),
-                "simulation_seed": payload.get("simulation_seed"),
+                {
+                    "source_path": str(path),
+                    "source_file": path.name,
+                    "source_mtime": path.stat().st_mtime,
+                    "generated_at": payload.get("generated_at"),
+                    "source_kind": "package_gate",
+                    "package_key": package_key,
+                    "family": package.get("family"),
+                    "adds": list(package.get("adds") or []),
+                    "cuts": list(package.get("cuts") or []),
+                    "status": package.get("status"),
+                    "baseline": compact_result(baseline),
+                    "candidate": compact_result(candidate),
+                    "delta_pp": round(delta_pp, 2),
+                    "decision": "invalid_corrected_package_definition"
+                    if invalid_reason
+                    else gate_decision(delta_pp, baseline, candidate),
+                    "invalid_reason": invalid_reason,
+                    "games_per_opponent": payload.get("games_per_opponent"),
+                    "opponent_limit": payload.get("opponent_limit"),
+                    "opponent_seed": payload.get("opponent_seed"),
+                    "simulation_seed": payload.get("simulation_seed"),
                 "source_db": payload.get("source_db"),
                 "runtime_package_proposal_reports": payload.get("runtime_package_proposal_reports") or [],
             }
@@ -417,6 +467,7 @@ def summarize_group(
         "latest_status": latest.get("status"),
         "latest_cut_safety": latest.get("cut_safety") or {},
         "latest_prior_evidence": latest.get("prior_evidence") or {},
+        "latest_invalid_reason": latest.get("invalid_reason"),
         "latest_adds": latest.get("adds") or [],
         "latest_cuts": latest.get("cuts") or [],
         "families": sorted({str(row.get("family")) for row in observations if row.get("family")}),
@@ -442,6 +493,8 @@ def classify_group(
         return "blocked_prior_evidence"
     if latest_decision == "candidate_apply_error":
         return "candidate_apply_error"
+    if latest_decision == "invalid_corrected_package_definition":
+        return "invalid_corrected_package_definition"
     if latest_decision in {"preflight_ready", "apply_ready"}:
         if positive_count:
             return "preflight_ready_needs_gate"
