@@ -16,7 +16,12 @@ from pathlib import Path
 from typing import Any
 
 from battle_rule_registry import logical_rule_key
-from xmage_semantic_family_classifier import build_family_report, load_json, normalize_name
+from xmage_semantic_family_classifier import (
+    build_family_report,
+    is_generic_xmage_review_scope,
+    load_json,
+    normalize_name,
+)
 
 
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
@@ -399,6 +404,10 @@ def proposal_status(
     *,
     shadow_handling: str,
 ) -> str:
+    effect_json = dict(card.get("effect_json") or {})
+    scope = str(effect_json.get("battle_model_scope") or card.get("battle_model_scope") or "")
+    if is_generic_xmage_review_scope(scope):
+        return "split_family_scope_review_required"
     if shadow_handling == PRESERVE_SHADOW_HANDLING:
         if not oracle_hash:
             return "oracle_hash_required_before_batch_pg"

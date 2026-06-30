@@ -6680,6 +6680,39 @@ def _build_tutor_to_battlefield_fields(
     if (
         card_types == {"SORCERY"}
         and effect_classes == {"SearchLibraryPutInPlayEffect"}
+        and not ability_classes
+        and xmage_class_name == "DeathbellowWarCry"
+        and (
+            "targetcardwithdifferentnameinlibrary(0, 4" in normalized
+            or "minotaur creature cards with different names" in normalized
+        )
+    ):
+        return {
+            "effect": "tutor",
+            "scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+            "ability_kind": "one_shot",
+            "fields": {
+                "instant": False,
+                "target": "minotaur_creatures_to_battlefield",
+                "target_subtypes": ["minotaur"],
+                "target_card_types": ["creature"],
+                "tutor_destination": "battlefield",
+                "max_targets": 4,
+                "min_targets": 0,
+                "requires_different_names": True,
+            },
+            "reason": "XMage structure matches Deathbellow War Cry tutoring up to four Minotaur creature cards with different names directly onto the battlefield.",
+            "signals": [
+                "SearchLibraryPutInPlayEffect",
+                "TargetCardWithDifferentNameInLibrary",
+                "FilterCreatureCard",
+                "SubType.MINOTAUR",
+            ],
+        }
+
+    if (
+        card_types == {"SORCERY"}
+        and effect_classes == {"SearchLibraryPutInPlayEffect"}
         and "HarmonizeAbility" in ability_classes
         and (
             xmage_class_name == "NaturesRhythm"

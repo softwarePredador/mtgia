@@ -416,6 +416,10 @@ def xmage_condition_classes(card: dict[str, Any]) -> set[str]:
     return {str(value or "") for value in ((card.get("xmage") or {}).get("condition_classes") or []) if value}
 
 
+def is_generic_xmage_review_scope(scope: str) -> bool:
+    return str(scope or "").startswith("xmage_") and str(scope or "").endswith("_review_v1")
+
+
 def family_for_effect(effect: str | None) -> str:
     effect = str(effect or "external_reference_required_manual_model")
     for family_id, definition in FAMILY_DEFINITIONS.items():
@@ -2731,6 +2735,25 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and bool(effect_json.get("harmonize"))
         )
 
+    if effect == "tutor" and scope == "up_to_four_different_name_minotaur_creatures_to_battlefield_v1":
+        return (
+            str((card.get("xmage") or {}).get("class_name") or card.get("xmage_class_name") or "")
+            == "DeathbellowWarCry"
+            and types == {"SORCERY"}
+            and effect_classes == {"SearchLibraryPutInPlayEffect"}
+            and not ability_classes
+            and not cost_classes
+            and "TargetCardWithDifferentNameInLibrary" in target_classes
+            and not bool(effect_json.get("instant"))
+            and effect_json.get("target") == "minotaur_creatures_to_battlefield"
+            and effect_json.get("target_subtypes") == ["minotaur"]
+            and effect_json.get("target_card_types") == ["creature"]
+            and effect_json.get("tutor_destination") == "battlefield"
+            and int(effect_json.get("max_targets") or 0) == 4
+            and int(effect_json.get("min_targets") or 0) == 0
+            and bool(effect_json.get("requires_different_names"))
+        )
+
     if effect == "copy_spell" and scope == "first_instant_sorcery_cast_each_turn_copy_own_spell_v1":
         return (
             types == {"ENCHANTMENT"}
@@ -4559,7 +4582,7 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
         return "blocked_missing_xmage_source"
     if not card.get("ready_for_structured_pull"):
         return "mapper_metadata_or_test_scenario_required"
-    if scope.startswith("xmage_") and scope.endswith("_review_v1"):
+    if is_generic_xmage_review_scope(scope):
         return "split_family_scope_review_required"
     if exact_scope_batch_safe(card):
         return "batch_metadata_candidate_requires_pg_precheck"
@@ -4578,7 +4601,7 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     ):
         return "split_family_scope_review_required"
     if support_status in {"runtime_supported_family", "runtime_supported_by_local_artifact"}:
-        return "batch_metadata_candidate_requires_pg_precheck"
+        return "split_family_scope_review_required"
     if support_status == "runtime_family_required":
         return "runtime_family_implementation_required"
     if support_status == "runtime_family_partially_supported_review_required":
