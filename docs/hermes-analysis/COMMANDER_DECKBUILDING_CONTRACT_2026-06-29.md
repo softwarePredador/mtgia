@@ -612,6 +612,53 @@ Electro ramp-benchmark decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_electro_waterskin_decision_20260630.md`.
 
+Forced-exposure probe decision generated on 2026-06-30:
+
+- Scope: `11` prior-negative or low-exposure packages, forced access mode
+  `opening_hand`, protected baseline `607`, `8` real opponents, `3` games per
+  opponent, opponent seed `20260629`, simulation seed `20260630`.
+- Purpose: prove whether the candidate card matters when actually accessed.
+  This is diagnostic only and cannot promote a deck without natural
+  confirmation.
+- Result counts: `6` packages showed forced-access signal requiring natural
+  confirmation, `3` tied and require natural confirmation if revisited, `1`
+  showed no lift, and `1` remained inconclusive because the card was accessed
+  but effectively not used.
+- Highest forced signals: `storm_kiln_artist_cut_arcane_signet` at `+16.66pp`,
+  `valakut_hand_filter_cut_big_score` at `+12.50pp`, and
+  `enlightened_access_benchmark_cut_land_tax` at `+8.33pp`.
+- Rejected from this diagnostic: `gamble_access_benchmark_cut_land_tax`.
+- Runtime/play-heuristic review: `volcanic_recursion_cut_pinnacle`, because
+  `Volcanic Vision` was accessed in forced mode but recorded `0` use.
+- Decision: do not change `deck_607` from forced-access evidence. Run natural
+  confirmation only for the forced-signal queue, starting with the largest
+  signal and smallest strategic-regression risk.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_forced_exposure_probe_decision_20260630.md`.
+
+Forced-signal natural confirmation generated on 2026-06-30:
+
+- Scope: natural confirmation for the three largest forced-access signals:
+  `storm_kiln_artist_cut_arcane_signet`,
+  `valakut_hand_filter_cut_big_score`, and
+  `enlightened_access_benchmark_cut_land_tax`.
+- Forced access mode: `none`; protected baseline `607`, `8` real opponents,
+  `3` games per opponent, opponent seed `20260629`, simulation seed
+  `20260630`.
+- Result: all three packages failed promotion under natural access.
+  `Storm-Kiln Artist` over `Arcane Signet` lost `9W/15L/0S` versus `607`
+  `11W/12L/1S`; `Valakut Awakening // Valakut Stoneforge` over `Big Score`
+  lost `9W/15L/0S` versus `607` `11W/12L/1S`; `Enlightened Tutor` over
+  `Land Tax` tied wins at `11W` but regressed the loss/stall profile
+  `11W/13L/0S` versus `607` `11W/12L/1S`.
+- Direct card-use evidence exists for all three candidates, so the rejection
+  is not an invisible-card sampling artifact.
+- Decision: no natural promotion. Keep `Arcane Signet`, `Big Score`, and
+  `Land Tax` in protected `deck_607`; do not rerun these exact swaps unless a
+  different same-lane or package-level hypothesis changes the cut logic.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_forced_signal_natural_confirm_decision_20260630.md`.
+
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell
 intact and look only for:
