@@ -7433,11 +7433,10 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="token_maker",
-                scope="xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+                scope="source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
                 reason=(
                     "XMage structure matches Ancient Gold Dragon: combat damage to a player rolls a d20 "
-                    "and creates that many 1/1 blue Faerie Dragon creature tokens with flying. Keep it "
-                    "in split-scope review until ManaLoom has exact d20/token runtime tests."
+                    "and creates that many 1/1 blue Faerie Dragon creature tokens with flying."
                 ),
                 ability_kind="triggered",
                 requires_runtime_executor=True,
@@ -7474,7 +7473,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="passive",
-                scope="xmage_nonbasic_lands_are_mountains_static_review_v1",
+                scope="nonbasic_lands_are_mountains_static_v1",
                 reason=(
                     "XMage structure matches Blood Moon: a static battlefield effect makes nonbasic "
                     "lands Mountains. This is a passive land-type replacement family, not a manual model."
@@ -7504,7 +7503,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="sweeper_damage",
-                scope="xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+                scope="target_controlled_creature_power_damage_each_other_creature_each_opponent_v1",
                 reason=(
                     "XMage structure matches Chandra's Ignition: target creature you control deals "
                     "damage equal to its power to each other creature and each opponent."
@@ -7574,7 +7573,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="passive",
-                scope="xmage_artifact_activation_lock_planeswalker_wish_review_v1",
+                scope="opponent_artifact_activation_lock_planeswalker_wish_v1",
                 reason=(
                     "XMage structure matches Karn, the Great Creator: static artifact activation lock "
                     "for opponents plus loyalty animation and artifact wish modes."
@@ -10558,6 +10557,106 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "sorcery": "SORCERY" in card_types,
                 },
                 matched_signals=["Search", "library"],
+            )
+        )
+
+    if not candidates and xmage_class_name == "KarnsSylex":
+        candidates.append(
+            _candidate(
+                effect="passive",
+                scope="legendary_artifact_tapped_life_payment_lock_x_tap_exile_destroy_nonland_mv_lte_x_v1",
+                reason=(
+                    "XMage structure matches Karn's Sylex: legendary artifact enters tapped, prevents "
+                    "life payments for spells/nonmana abilities, and has an X, tap, exile activated "
+                    "ability that destroys nonland permanents with mana value X or less."
+                ),
+                ability_kind="static_and_activated",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "permanent_type": "artifact",
+                    "legendary": True,
+                    "enters_battlefield_tapped": True,
+                    "players_cant_pay_life_to_cast_spells_or_nonmana_abilities": True,
+                    "activation_requires_tap": True,
+                    "activation_exiles_source": True,
+                    "activation_only_as_sorcery": True,
+                    "activated_destroy_nonland_permanents_mana_value_x_or_less": True,
+                },
+                matched_signals=[
+                    "EntersBattlefieldTappedAbility",
+                    "CantPayLifeOrSacrificeAbility",
+                    "ActivateAsSorceryActivatedAbility",
+                    "KarnsSylexDestroyEffect",
+                    "ExileSourceCost",
+                    "TapSourceCost",
+                ],
+            )
+        )
+
+    if not candidates and xmage_class_name == "NaktamunLorespinner":
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="prepare_upkeep_any_player_one_or_fewer_hand_wheel_face_v1",
+                reason=(
+                    "XMage structure matches Naktamun Lorespinner: a 3/3 creature becomes prepared "
+                    "at upkeep if any player has one or fewer cards in hand, and its prepared spell "
+                    "face is Wheel of Fortune."
+                ),
+                ability_kind="prepare_spell",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 3,
+                    "toughness": 3,
+                    "subtypes": ["Jackal", "Wizard"],
+                    "upkeep_prepare_if_any_player_hand_size_lte": 1,
+                    "prepared_spell_face": {
+                        "name": "Wheel of Fortune",
+                        "effect": "draw_cards",
+                        "sorcery": True,
+                        "mana_cost": "{2}{R}",
+                        "draw_count": 7,
+                        "wheel_like": True,
+                        "discard_draw_model": "each_player_discard_hand_draw_seven_v1",
+                    },
+                },
+                matched_signals=[
+                    "PrepareCard",
+                    "BecomePreparedSourceEffect",
+                    "DiscardHandAllEffect",
+                    "DrawCardAllEffect",
+                ],
+            )
+        )
+
+    if not candidates and xmage_class_name == "CharmbreakerDevils":
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="upkeep_random_instant_sorcery_graveyard_to_hand_instant_sorcery_cast_plus4_v1",
+                reason=(
+                    "XMage structure matches Charmbreaker Devils: beginning-of-upkeep random instant "
+                    "or sorcery recursion plus +4/+0 until end of turn when controller casts an "
+                    "instant or sorcery."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 4,
+                    "toughness": 4,
+                    "subtypes": ["Devil"],
+                    "upkeep_return_random_instant_sorcery_from_graveyard_to_hand": True,
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "boost_source_until_eot",
+                    "trigger_power_bonus_until_eot": 4,
+                    "trigger_toughness_bonus_until_eot": 0,
+                },
+                matched_signals=[
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "ReturnFromGraveyardAtRandomEffect",
+                    "SpellCastControllerTriggeredAbility",
+                    "BoostSourceEffect",
+                ],
             )
         )
 

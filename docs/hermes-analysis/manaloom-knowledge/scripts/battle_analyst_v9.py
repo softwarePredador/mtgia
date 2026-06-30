@@ -3552,6 +3552,72 @@ def is_mana_source_permanent(source):
     return source.get("effect") == "ramp_engine" and source.get("mana_produced") is not None
 
 
+def bind_table_context(all_players):
+    participants = [player for player in (all_players or []) if player is not None]
+    if not participants:
+        return []
+    for participant in participants:
+        try:
+            participant._known_table_players = participants
+        except Exception:
+            continue
+    return participants
+
+
+def _table_players_for(player):
+    table = getattr(player, "_known_table_players", None)
+    if isinstance(table, list) and table:
+        return table
+    return [player] if player is not None else []
+
+
+def _blood_moon_sources_for(player):
+    sources = []
+    for participant in _table_players_for(player):
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if (
+                isinstance(permanent, dict)
+                and permanent.get("land_type_replacement") == "nonbasic_lands_are_mountains"
+                and permanent.get("battle_model_scope") == "nonbasic_lands_are_mountains_static_v1"
+            ):
+                sources.append((participant, permanent))
+    return sources
+
+
+def is_nonbasic_land_for_blood_moon(source):
+    if not isinstance(source, dict) or not is_effective_land(source):
+        return False
+    type_line = str(source.get("type_line") or "").lower()
+    if "basic" in type_line:
+        return False
+    normalized_name = normalize_card_name(source.get("name", ""))
+    return normalized_name not in {"plains", "island", "swamp", "mountain", "forest", "wastes"}
+
+
+def blood_moon_applies_to_mana_source(player, source):
+    return bool(_blood_moon_sources_for(player)) and is_nonbasic_land_for_blood_moon(source)
+
+
+def _artifact_activation_lock_sources(player, all_players=None):
+    if all_players is not None:
+        bind_table_context(all_players)
+    locks = []
+    for participant in _table_players_for(player):
+        if participant is player:
+            continue
+        for permanent in getattr(participant, "battlefield", []) or []:
+            if (
+                isinstance(permanent, dict)
+                and permanent.get("opponent_artifact_activated_abilities_cant_be_activated")
+            ):
+                locks.append((participant, permanent))
+    return locks
+
+
+def artifact_activated_abilities_locked(player, permanent, all_players=None):
+    return bool(is_artifact_permanent(permanent) and _artifact_activation_lock_sources(player, all_players))
+
+
 def does_not_untap_in_untap_step(permanent):
     if not isinstance(permanent, dict):
         return False
@@ -3656,6 +3722,8 @@ def _has_untapped_mana_support_permanent(
 
 
 def mana_source_colors_for_state(player, source):
+    if blood_moon_applies_to_mana_source(player, source):
+        return ["red"]
     if _creature_has_any_color_mana_from_passive(player, source):
         return ["wildcard"]
     if isinstance(source, dict) and source.get("mana_colors_from_controlled_permanents"):
@@ -3828,6 +3896,8 @@ def _configured_conditional_mana_source_for_state(player, source, produced):
 
 
 def conditional_mana_source_for_state(player, source, produced):
+    if blood_moon_applies_to_mana_source(player, source):
+        return None
     configured = _configured_conditional_mana_source_for_state(player, source, produced)
     if configured:
         return configured
@@ -4151,6 +4221,8 @@ def mana_source_production_for_state(player, source):
     if source == "land":
         return 1
     if not isinstance(source, dict):
+        return 0
+    if artifact_activated_abilities_locked(player, source):
         return 0
     if _creature_has_any_color_mana_from_passive(player, source):
         return max(1, int(source.get("mana_produced") or 1))
@@ -5553,6 +5625,147 @@ HANDCRAFTED_KNOWN_CARD_RULES = {
             "token_colors": ["U"],
             "token_flying": True,
             "battle_model_scope": "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
+            "_rule_oracle_hash": "4ee7da13b4db1902895c7523fb04fdd2",
+        }
+    ),
+    "Blood Moon": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static",
+            "cmc": 3.0,
+            "effect": "passive",
+            "mana_cost": "{2}{R}",
+            "colors": ["R"],
+            "type_line": "Enchantment",
+            "static_rule_restriction": True,
+            "land_type_replacement": "nonbasic_lands_are_mountains",
+            "affected_lands": "nonbasic",
+            "resulting_basic_land_type": "mountain",
+            "suppresses_non_mountain_land_abilities": True,
+            "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
+            "_rule_oracle_hash": "f9b52f264dbb36074c8c151ad47331cb",
+        }
+    ),
+    "Karn, the Great Creator": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_and_loyalty",
+            "cmc": 4.0,
+            "effect": "planeswalker",
+            "mana_cost": "{4}",
+            "colors": [],
+            "type_line": "Legendary Planeswalker - Karn",
+            "permanent_type": "planeswalker",
+            "starting_loyalty": 5,
+            "opponent_artifact_activated_abilities_cant_be_activated": True,
+            "plus_one_animates_noncreature_artifact_until_next_turn": True,
+            "minus_two_artifact_wish_or_exile_to_hand": True,
+            "battle_model_scope": "opponent_artifact_activation_lock_planeswalker_wish_v1",
+            "_rule_oracle_hash": "a4fd549768b5cfea5234949fafd74bb2",
+        }
+    ),
+    "Chandra's Ignition": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 5.0,
+            "effect": "sweeper_damage",
+            "sorcery": True,
+            "mana_cost": "{3}{R}{R}",
+            "colors": ["R"],
+            "type_line": "Sorcery",
+            "target": "controlled_creature",
+            "damage_amount_source": "target_creature_power",
+            "damage_each_other_creature": True,
+            "damage_each_opponent": True,
+            "damage_source": "target_creature",
+            "battle_model_scope": "target_controlled_creature_power_damage_each_other_creature_each_opponent_v1",
+            "_rule_oracle_hash": "92b36154e7e9f9a2fd8abd64d5f9c032",
+        }
+    ),
+    "Karn's Sylex": handcrafted_runtime_rule(
+        {
+            "ability_kind": "static_and_activated",
+            "cmc": 3.0,
+            "effect": "passive",
+            "mana_cost": "{3}",
+            "colors": [],
+            "type_line": "Legendary Artifact",
+            "artifact": True,
+            "legendary": True,
+            "enters_battlefield_tapped": True,
+            "players_cant_pay_life_to_cast_spells_or_nonmana_abilities": True,
+            "activation_requires_tap": True,
+            "activation_exiles_source": True,
+            "activation_only_as_sorcery": True,
+            "activated_destroy_nonland_permanents_mana_value_x_or_less": True,
+            "battle_model_scope": "legendary_artifact_tapped_life_payment_lock_x_tap_exile_destroy_nonland_mv_lte_x_v1",
+            "_rule_oracle_hash": "52e66b340c048462a512fb6874942f98",
+        }
+    ),
+    "Naktamun Lorespinner // Wheel of Fortune": handcrafted_runtime_rule(
+        {
+            "ability_kind": "prepare_spell",
+            "cmc": 3.0,
+            "effect": "creature",
+            "mana_cost": "{2}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Jackal Wizard",
+            "is_creature_permanent": True,
+            "power": 3,
+            "toughness": 3,
+            "subtypes": ["Jackal", "Wizard"],
+            "upkeep_prepare_if_any_player_hand_size_lte": 1,
+            "prepared_spell_face": {
+                "name": "Wheel of Fortune",
+                "effect": "draw_cards",
+                "sorcery": True,
+                "mana_cost": "{2}{R}",
+                "draw_count": 7,
+                "wheel_like": True,
+                "discard_draw_model": "each_player_discard_hand_draw_seven_v1",
+            },
+            "battle_model_scope": "prepare_upkeep_any_player_one_or_fewer_hand_wheel_face_v1",
+            "_rule_oracle_hash": "17a8d82c246b858c8e7b5b3866515485",
+        }
+    ),
+    "Charmbreaker Devils": handcrafted_runtime_rule(
+        {
+            "ability_kind": "triggered",
+            "cmc": 6.0,
+            "effect": "creature",
+            "mana_cost": "{5}{R}",
+            "colors": ["R"],
+            "type_line": "Creature - Devil",
+            "is_creature_permanent": True,
+            "power": 4,
+            "toughness": 4,
+            "subtypes": ["Devil"],
+            "upkeep_return_random_instant_sorcery_from_graveyard_to_hand": True,
+            "trigger": "instant_sorcery_cast",
+            "trigger_effect": "boost_source_until_eot",
+            "trigger_power_bonus_until_eot": 4,
+            "trigger_toughness_bonus_until_eot": 0,
+            "battle_model_scope": "upkeep_random_instant_sorcery_graveyard_to_hand_instant_sorcery_cast_plus4_v1",
+            "_rule_oracle_hash": "84e84ddacde81b208e8b5cd06b87e10e",
+        }
+    ),
+    "Deathbellow War Cry": handcrafted_runtime_rule(
+        {
+            "ability_kind": "one_shot",
+            "cmc": 8.0,
+            "effect": "tutor",
+            "sorcery": True,
+            "mana_cost": "{5}{R}{R}{R}",
+            "colors": ["R"],
+            "type_line": "Sorcery",
+            "target": "minotaur_creatures_to_battlefield",
+            "target_subtypes": ["minotaur"],
+            "target_card_types": ["creature"],
+            "tutor_destination": "battlefield",
+            "max_targets": 4,
+            "min_targets": 0,
+            "requires_different_names": True,
+            "shuffle_after_tutor": True,
+            "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+            "_rule_oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294",
         }
     ),
     "Zirda, the Dawnwaker": handcrafted_runtime_rule(
@@ -5851,6 +6064,13 @@ MANUAL_RULE_RUNTIME_WAIVERS = {
     "Terror of the Peaks",
     "Taunt from the Rampart",
     "Verge Rangers",
+    "Blood Moon",
+    "Karn, the Great Creator",
+    "Chandra's Ignition",
+    "Karn's Sylex",
+    "Naktamun Lorespinner // Wheel of Fortune",
+    "Charmbreaker Devils",
+    "Deathbellow War Cry",
 }
 
 
@@ -6081,6 +6301,41 @@ MANUAL_RULE_RUNTIME_WAIVER_METADATA = {
         "Replace no_active runtime gap with XMage-backed combat-damage d20 Faerie Dragon token trigger semantics.",
         ["AncientGoldDragon.java", "session_agent3_finisher_draw_recursion_20260630"],
         "2026-06-30T14:00:00Z",
+    ),
+    "Blood Moon": manual_runtime_waiver_metadata(
+        "Replace review-only draw-engine rows with XMage-backed nonbasic lands are Mountains static mana-source semantics.",
+        ["BloodMoon.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Karn, the Great Creator": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed planeswalker artifact activation lock plus loyalty wish metadata.",
+        ["KarnTheGreatCreator.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Chandra's Ignition": manual_runtime_waiver_metadata(
+        "Replace review-only draw-card rows with XMage-backed target-controlled-creature power damage to each other creature and each opponent.",
+        ["ChandrasIgnition.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Karn's Sylex": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed tapped artifact, life-payment lock annotation, and X-cost activated nonland permanent wipe.",
+        ["KarnsSylex.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Naktamun Lorespinner // Wheel of Fortune": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed prepare condition and Wheel of Fortune spell-face semantics.",
+        ["NaktamunLorespinner.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Charmbreaker Devils": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed upkeep random instant/sorcery recursion and instant/sorcery cast self-pump semantics.",
+        ["CharmbreakerDevils.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
+    ),
+    "Deathbellow War Cry": manual_runtime_waiver_metadata(
+        "Replace no_active runtime gap with XMage-backed up-to-four different-name Minotaur creature tutor-to-battlefield semantics.",
+        ["DeathbellowWarCry.java", "lorehold_runtime_gap_family_queue_20260630_post_pg280_kayla_music_box"],
+        "2026-06-30T16:00:00Z",
     ),
     "Zirda, the Dawnwaker": manual_runtime_waiver_metadata(
         "Replace no_active battle-rule gap with XMage-backed activated-ability cost reduction and activated can't-block metadata.",
@@ -18436,6 +18691,170 @@ def process_graveyard_upkeep_self_return(player, turn):
     return returned
 
 
+def process_random_instant_sorcery_upkeep_return(player, turn, rng):
+    returned = 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if not effect_data.get("upkeep_return_random_instant_sorcery_from_graveyard_to_hand"):
+            continue
+        if permanent.get("upkeep_random_spell_return_last_turn") == turn:
+            continue
+        permanent["upkeep_random_spell_return_last_turn"] = turn
+        candidates = [
+            card
+            for card in getattr(player, "graveyard", []) or []
+            if isinstance(card, dict) and is_instant_or_sorcery_spell(card)
+        ]
+        if not candidates:
+            emit_replay_event(
+                "trigger_resolved",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                effect="random_instant_sorcery_graveyard_to_hand",
+                result="no_instant_or_sorcery_in_graveyard",
+                returned_count=0,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+        selected = rng.choice(candidates)
+        if selected not in player.graveyard:
+            continue
+        player.graveyard.remove(selected)
+        player.hand.append(selected)
+        returned += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="beginning_of_your_upkeep",
+            effect="random_instant_sorcery_graveyard_to_hand",
+            returned=selected.get("name", "?"),
+            returned_count=1,
+            destination="hand",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    return returned
+
+
+def process_prepare_upkeep_triggers(player, all_players, turn):
+    prepared = 0
+    participants = bind_table_context(all_players or [player])
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        threshold = effect_data.get("upkeep_prepare_if_any_player_hand_size_lte")
+        if threshold in (None, "", False):
+            continue
+        if permanent.get("prepared"):
+            continue
+        try:
+            max_hand_size = int(threshold)
+        except Exception:
+            max_hand_size = 1
+        qualifying_players = [
+            participant.name
+            for participant in participants
+            if len(getattr(participant, "hand", []) or []) <= max_hand_size
+        ]
+        if not qualifying_players:
+            emit_replay_event(
+                "trigger_skipped",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                trigger="beginning_of_your_upkeep",
+                reason="prepare_condition_not_met",
+                hand_size_threshold=max_hand_size,
+                turn=turn,
+                **replay_rule_fields(effect_data),
+            )
+            continue
+        permanent["prepared"] = True
+        permanent["prepared_turn"] = turn
+        permanent["prepared_spell_face"] = copy.deepcopy(effect_data.get("prepared_spell_face") or {})
+        prepared += 1
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="beginning_of_your_upkeep",
+            effect="become_prepared",
+            qualifying_players=qualifying_players,
+            hand_size_threshold=max_hand_size,
+            prepared=True,
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+    return prepared
+
+
+def cast_prepared_spell_faces(player, opponents, all_players, turn, phase, stack, rng):
+    if phase not in MAIN_PHASES:
+        return False
+    bind_table_context(all_players or [player] + list(opponents or []))
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or not permanent.get("prepared"):
+            continue
+        spell_face = copy.deepcopy(permanent.get("prepared_spell_face") or {})
+        if not spell_face:
+            continue
+        spell_face.setdefault("name", "Prepared Spell")
+        spell_face.setdefault("type_line", "Sorcery")
+        spell_face.setdefault("effect", "draw_cards")
+        if is_wheel_like_card({"name": spell_face.get("name", "?")}, spell_face):
+            draw_count = wheel_like_draw_count({"name": spell_face.get("name", "?")}, spell_face)
+            if not should_cast_wheel(player, opponents, {**spell_face, "name": spell_face.get("name")}):
+                continue
+        cost = spell_face.get("mana_cost") or "{0}"
+        if not player.can_pay(cost) or not player.spend_mana(cost):
+            continue
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        emit_replay_event(
+            "spell_cast",
+            player=player.name,
+            card=spell_face.get("name", "?"),
+            source_card=permanent.get("name", "?"),
+            effect=spell_face.get("effect", "draw_cards"),
+            type_line=spell_face.get("type_line", "Sorcery"),
+            prepared_spell=True,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        player.record_spell_cast(turn_marker=turn, card=spell_face, mana_value=spell_face.get("cmc", 3))
+        if is_wheel_like_card({"name": spell_face.get("name", "?")}, spell_face):
+            resolve_wheel_like_draw(
+                player,
+                opponents,
+                {"name": spell_face.get("name", "?"), "type_line": "Sorcery"},
+                draw_count,
+                turn,
+                rng,
+                spell_face,
+            )
+        else:
+            player.draw(int(spell_face.get("draw_count") or spell_face.get("count") or 1), rng)
+        emit_replay_event(
+            "prepared_spell_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            spell_face=spell_face.get("name", "?"),
+            effect=spell_face.get("effect", "draw_cards"),
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+        return True
+    return False
+
+
 def process_radiant_scrollwielder_upkeep_graveyard_recast(player, turn, rng):
     """Exile a random instant/sorcery from graveyard for Radiant Scrollwielder."""
     exiled_count = 0
@@ -25877,9 +26296,250 @@ def activate_opponent_library_free_cast_artifacts(
     return 0
 
 
+def karns_sylex_activation_plan(player, opponents, permanent):
+    available = max(0, int(player.available_mana() or 0))
+    participants = [player] + list(opponents or [])
+    best = None
+    for x_value in range(available, -1, -1):
+        destroyed = []
+        own_destroyed = 0
+        opponent_destroyed = 0
+        live_opponent_destroyed = 0
+        for controller in participants:
+            is_self = controller is player
+            is_live_opponent = (not is_self) and controller.is_alive()
+            for candidate in getattr(controller, "battlefield", []) or []:
+                if candidate is permanent or not isinstance(candidate, dict):
+                    continue
+                if is_effective_land(candidate) or not is_permanent_card(candidate):
+                    continue
+                if _permanent_mana_value(candidate) > x_value:
+                    continue
+                destroyed.append((controller, candidate))
+                if is_self:
+                    own_destroyed += 1
+                else:
+                    opponent_destroyed += 1
+                    if is_live_opponent:
+                        live_opponent_destroyed += 1
+        score = (live_opponent_destroyed * 3) + opponent_destroyed - (own_destroyed * 2)
+        if destroyed:
+            score += min(x_value, 5)
+        plan = {
+            "x_value": x_value,
+            "destroyed": destroyed,
+            "own_destroyed": own_destroyed,
+            "opponent_destroyed": opponent_destroyed,
+            "live_opponent_destroyed": live_opponent_destroyed,
+            "score": score,
+        }
+        if best is None or (
+            plan["score"],
+            plan["live_opponent_destroyed"],
+            -plan["own_destroyed"],
+        ) > (
+            best["score"],
+            best["live_opponent_destroyed"],
+            -best["own_destroyed"],
+        ):
+            best = plan
+    if best is None or not best["destroyed"] or best["score"] <= 0:
+        return None
+    return best
+
+
+def activate_karns_sylex(player, permanent, opponents, all_players, turn, rng, *, phase="postcombat_main"):
+    if not (
+        isinstance(permanent, dict)
+        and permanent.get("activated_destroy_nonland_permanents_mana_value_x_or_less")
+    ):
+        return False
+    if permanent.get("utility_artifact_used_this_turn"):
+        return False
+    if artifact_activated_abilities_locked(player, permanent, all_players):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "artifact_activation_locked_by_opponent_static",
+            phase=phase,
+            risk_flags=["opponent_artifact_activation_lock"],
+        )
+        return False
+    if phase not in MAIN_PHASES:
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "karns_sylex_activate_only_as_sorcery",
+            phase=phase,
+        )
+        return False
+    if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "karns_sylex_already_tapped",
+            phase=phase,
+        )
+        return False
+    plan = karns_sylex_activation_plan(player, opponents, permanent)
+    if not plan:
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "no_profitable_karns_sylex_x_wipe",
+            phase=phase,
+        )
+        return False
+    x_value = int(plan["x_value"])
+    if x_value > 0 and not player.spend_mana("{%d}" % x_value):
+        _utility_artifact_skip_event(
+            player,
+            permanent,
+            turn,
+            "failed_to_pay_karns_sylex_x_cost",
+            phase=phase,
+        )
+        return False
+    permanent["utility_artifact_used_this_turn"] = True
+    if permanent.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    if permanent in getattr(player, "battlefield", []):
+        player.battlefield.remove(permanent)
+    move_to_exile(player, permanent, reason="karns_sylex_activation_cost", turn=turn)
+
+    destroyed_records = []
+    for controller, candidate in list(plan["destroyed"]):
+        if candidate not in getattr(controller, "battlefield", []):
+            continue
+        if is_battlefield_creature(candidate):
+            destination = move_creature_from_battlefield(
+                controller,
+                candidate,
+                reason="karns_sylex",
+                source=permanent,
+            )
+        else:
+            destination = move_permanent_from_battlefield(
+                controller,
+                candidate,
+                reason="karns_sylex",
+                source=permanent,
+            )
+        destroyed_records.append(
+            {
+                "controller": controller.name,
+                "name": candidate.get("name", "?"),
+                "type_line": candidate.get("type_line", ""),
+                "mana_value": _permanent_mana_value(candidate),
+                "destination": destination,
+            }
+        )
+
+    fields = replay_rule_fields(permanent)
+    emit_decision_trace(
+        decision_type="utility_artifact_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                permanent,
+                score=plan["score"],
+                action="activate_karns_sylex",
+                x_value=x_value,
+            ),
+            {"action": "defer_karns_sylex"},
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            permanent,
+            score=plan["score"],
+            action="activate_karns_sylex",
+            x_value=x_value,
+        ),
+        rejected_options=[{"action": "defer_karns_sylex"}],
+        score_components={
+            "x_value": x_value,
+            "destroyed": len(destroyed_records),
+            "own_destroyed": plan["own_destroyed"],
+            "opponent_destroyed": plan["opponent_destroyed"],
+            "live_opponent_destroyed": plan["live_opponent_destroyed"],
+        },
+        rule_source=fields.get("rule_source", "manual_runtime_waiver"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=plan["score"],
+        reason="activate_x_wipe_when_asymmetry_is_positive",
+        strategic_principle="cash_in_sylex_only_when_x_destroy_count_advances_board_state",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -x_value,
+            "artifact_exiled": 1,
+            "destroyed": len(destroyed_records),
+        },
+        risk_flags=["exile_source", "x_cost_wipe"],
+        rejected_reason="lower_contextual_x_wipe_score",
+    )
+    emit_replay_event(
+        "utility_artifact_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="karns_sylex_x_wipe",
+        x_value=x_value,
+        mana_paid=x_value,
+        source_exiled=True,
+        destroyed=len(destroyed_records),
+        destroyed_cards=destroyed_records[:24],
+        own_destroyed=plan["own_destroyed"],
+        opponent_destroyed=plan["opponent_destroyed"],
+        live_opponent_destroyed=plan["live_opponent_destroyed"],
+        phase=phase,
+        turn=turn,
+        **fields,
+    )
+    return True
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
+    bind_table_context(all_players or [player] + list(opponents or []))
+    artifact_lock_sources = _artifact_activation_lock_sources(player, all_players)
+    if artifact_lock_sources:
+        locked_artifacts = [
+            permanent
+            for permanent in getattr(player, "battlefield", []) or []
+            if isinstance(permanent, dict)
+            and is_artifact_permanent(permanent)
+            and not permanent.get("utility_artifact_used_this_turn")
+        ]
+        if locked_artifacts:
+            _lock_controller, lock_source = artifact_lock_sources[0]
+            _utility_artifact_skip_event(
+                player,
+                locked_artifacts[0],
+                turn,
+                "artifact_activation_locked_by_opponent_static",
+                phase=phase,
+                risk_flags=["opponent_artifact_activation_lock"],
+            )
+            emit_replay_event(
+                "static_restriction_applied",
+                player=player.name,
+                card=lock_source.get("name", "?"),
+                affected_player=player.name,
+                restriction="opponent_artifact_activated_abilities_cant_be_activated",
+                affected_artifact_count=len(locked_artifacts),
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(lock_source),
+            )
+            return 0
 
     utility_artifacts = [
         permanent
@@ -25895,6 +26555,18 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         normalize_card_name(permanent.get("name", "")): permanent
         for permanent in utility_artifacts
     }
+
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if activate_karns_sylex(
+            player,
+            permanent,
+            opponents,
+            all_players,
+            turn,
+            rng,
+            phase=phase,
+        ):
+            return 1
 
     for permanent in list(getattr(player, "battlefield", []) or []):
         if activate_leyline_dowser(
@@ -29427,6 +30099,9 @@ def library_tutor_candidates(player, target_type):
         elif target_type in ("creature", "creature_to_battlefield"):
             if is_creature_card(candidate):
                 candidates.append(candidate)
+        elif target_type in ("minotaur_creatures", "minotaur_creatures_to_battlefield"):
+            if is_creature_card(candidate) and permanent_has_subtype(candidate, "minotaur"):
+                candidates.append(candidate)
         elif target_type in (
             "small_creature",
             "creature_mana_value_1_or_less",
@@ -29524,6 +30199,39 @@ def _tutor_mana_value_cap(effect_data):
 
 def constrained_library_tutor_candidates(player, target_type, effect_data=None):
     candidates = library_tutor_candidates(player, target_type)
+    if isinstance(effect_data, dict):
+        required_subtypes = [
+            str(subtype).strip().lower()
+            for subtype in _as_list(effect_data.get("target_subtypes"))
+            if str(subtype).strip()
+        ]
+        if required_subtypes:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if any(permanent_has_subtype(candidate, subtype) for subtype in required_subtypes)
+            ]
+        required_card_types = [
+            str(card_type).strip().lower()
+            for card_type in _as_list(effect_data.get("target_card_types"))
+            if str(card_type).strip()
+        ]
+        if required_card_types:
+            candidates = [
+                candidate
+                for candidate in candidates
+                if _card_type_matches(candidate, required_card_types)
+            ]
+        if effect_data.get("requires_different_names"):
+            unique = []
+            seen_names = set()
+            for candidate in candidates:
+                normalized = normalize_card_name(candidate.get("name", ""))
+                if normalized in seen_names:
+                    continue
+                seen_names.add(normalized)
+                unique.append(candidate)
+            candidates = unique
     mana_value_cap = _tutor_mana_value_cap(effect_data)
     if mana_value_cap is not None:
         filtered = []
@@ -31794,7 +32502,7 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         )
     if permanent.get("does_not_untap_normally"):
         permanent["does_not_untap_in_untap_step"] = True
-    enters_tapped = bool(permanent.get("enters_tapped"))
+    enters_tapped = bool(permanent.get("enters_tapped") or permanent.get("enters_battlefield_tapped"))
     if apply_opponent_enter_tapped_static(permanent, controller, all_players, turn=turn):
         enters_tapped = True
     apply_graveyard_count_creature_static(
@@ -35196,6 +35904,175 @@ def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spel
         finish_resolved_spell(player, card, turn=turn)
 
 
+def resolve_controlled_creature_power_sweeper(player, opponents, card, effect_data, turn):
+    own_creatures = [
+        permanent
+        for permanent in getattr(player, "battlefield", []) or []
+        if is_battlefield_creature(permanent)
+    ]
+    target_creature = max(
+        own_creatures,
+        key=lambda permanent: (card_power_value(permanent, default=0), target_priority(permanent)),
+        default=None,
+    )
+    fields = replay_rule_fields(effect_data)
+    if target_creature is None:
+        emit_replay_event(
+            "sweeper_damage_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            result="no_controlled_creature_target",
+            destroyed=0,
+            damaged_opponents=[],
+            turn=turn,
+            **fields,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return
+
+    amount = card_power_value(target_creature, default=0)
+    amount = apply_controller_noncombat_damage_modifiers(
+        player,
+        amount,
+        target_creature,
+        turn=turn,
+        phase="resolution",
+    )
+    participants = [player] + list(opponents or [])
+    damaged_opponents = []
+    destroyed = []
+    protected = []
+    survived_damage = []
+    creatures_seen = 0
+    own_creatures_destroyed = 0
+    opponent_creatures_destroyed = 0
+    live_opponent_creatures_destroyed = 0
+
+    for opponent in opponents or []:
+        if not opponent.is_alive():
+            continue
+        life_before = opponent.life
+        damage_dealt, target_amount, dealt = deal_damage_to_player_with_static_replacements(
+            player,
+            opponent,
+            target_creature,
+            amount,
+            turn=turn,
+            phase="resolution",
+            damage_event_type="player",
+        )
+        damaged_opponents.append(
+            {
+                "player": opponent.name,
+                "life_before": life_before,
+                "life_after": opponent.life,
+                "amount": target_amount,
+                "dealt": damage_dealt,
+                "result": "player_damage" if dealt else "prevented",
+            }
+        )
+
+    for participant in participants:
+        is_self = participant is player
+        is_live_opponent = (not is_self) and participant.is_alive()
+        for permanent in list(getattr(participant, "battlefield", []) or []):
+            if permanent is target_creature or not is_battlefield_creature(permanent):
+                continue
+            creatures_seen += 1
+            permanent_amount = apply_static_damage_replacements(
+                player,
+                participant,
+                permanent,
+                target_creature,
+                amount,
+                damage_event_type="permanent",
+                turn=turn,
+                phase="resolution",
+            )
+            trigger_creature_damage_controller_reflect(
+                participants,
+                player,
+                participant,
+                target_creature,
+                permanent,
+                permanent_amount,
+                turn=turn,
+                phase="resolution",
+                damage_event="chandras_ignition",
+            )
+            if permanent.get("indestructible"):
+                protected.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                        "damage_amount": permanent_amount,
+                    }
+                )
+                continue
+            toughness = _damage_sweep_creature_toughness(permanent)
+            if toughness > permanent_amount:
+                survived_damage.append(
+                    {
+                        "controller": participant.name,
+                        "name": permanent.get("name", "?"),
+                        "toughness": toughness,
+                        "damage_amount": permanent_amount,
+                    }
+                )
+                continue
+            process_taii_wakeen_noncombat_damage_to_creature(
+                player,
+                participant,
+                target_creature,
+                permanent,
+                permanent_amount,
+                turn=turn,
+                phase="resolution",
+            )
+            destination = move_creature_from_battlefield(
+                participant,
+                permanent,
+                reason="chandras_ignition",
+                source=card,
+            )
+            destroyed.append(
+                {
+                    "controller": participant.name,
+                    "name": permanent.get("name", "?"),
+                    "toughness": toughness,
+                    "damage_amount": permanent_amount,
+                    "destination": destination,
+                }
+            )
+            if is_self:
+                own_creatures_destroyed += 1
+            else:
+                opponent_creatures_destroyed += 1
+                if is_live_opponent:
+                    live_opponent_creatures_destroyed += 1
+
+    emit_replay_event(
+        "sweeper_damage_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect="target_creature_power_damage_each_other_creature_each_opponent",
+        source_creature=target_creature.get("name", "?"),
+        amount=amount,
+        damaged_opponents=damaged_opponents,
+        creatures_seen=creatures_seen,
+        destroyed=len(destroyed),
+        destroyed_cards=destroyed[:20],
+        protected=protected[:20],
+        survived_damage=survived_damage[:20],
+        own_creatures_destroyed=own_creatures_destroyed,
+        opponent_creatures_destroyed=opponent_creatures_destroyed,
+        live_opponent_creatures_destroyed=live_opponent_creatures_destroyed,
+        turn=turn,
+        **fields,
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
 def resolve_star_of_extinction(player, opponents, card, effect_data, turn, rng):
     removal_effect = dict(effect_data or {})
     removal_effect["effect"] = "remove_permanent"
@@ -35543,6 +36420,12 @@ def normalize_runtime_effect_aliases(card, effect_data):
         )
 
     if effect == "sweeper_damage":
+        if (
+            normalized.get("damage_amount_source") == "target_creature_power"
+            and normalized.get("damage_each_other_creature")
+            and normalized.get("damage_each_opponent")
+        ):
+            return normalized
         if card_name == "calamity of cinders":
             normalized["damage"] = 6
             normalized["damage_scope"] = "each_untapped_creature"
@@ -37548,6 +38431,58 @@ def trigger_spell_cast_engines(
                 stack=stack,
                 active_player=active_player,
                 all_players=all_players,
+            )
+            continue
+        if permanent.get("trigger_effect") == "boost_source_until_eot":
+            power_bonus = int(permanent.get("trigger_power_bonus_until_eot") or 0)
+            toughness_bonus = int(permanent.get("trigger_toughness_bonus_until_eot") or 0)
+            if power_bonus == 0 and toughness_bonus == 0:
+                continue
+
+            def resolve_instant_sorcery_boost_source_trigger(
+                permanent=permanent,
+                power_bonus=power_bonus,
+                toughness_bonus=toughness_bonus,
+            ):
+                power_before = int(float(permanent.get("power") or 0))
+                toughness_before = int(float(permanent.get("toughness") or 0))
+                if power_bonus:
+                    remember_until_eot(permanent, "power")
+                    permanent["power"] = power_before + power_bonus
+                if toughness_bonus:
+                    remember_until_eot(permanent, "toughness")
+                    permanent["toughness"] = toughness_before + toughness_bonus
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger="instant_sorcery_cast",
+                    trigger_spell=spell.get("name", "?"),
+                    effect="boost_source_until_eot",
+                    power_bonus=power_bonus,
+                    toughness_bonus=toughness_bonus,
+                    power_before=power_before,
+                    power_after=permanent.get("power"),
+                    toughness_before=toughness_before,
+                    toughness_after=permanent.get("toughness"),
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                "instant_sorcery_cast",
+                resolve_instant_sorcery_boost_source_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+                data={
+                    "trigger_spell": spell.get("name", "?"),
+                    "power_bonus": power_bonus,
+                    "toughness_bonus": toughness_bonus,
+                },
             )
             continue
         if permanent.get("trigger_effect") == "add_named_counter_then_transform":
@@ -39964,6 +40899,17 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
 
     is_own_turn = (player == all_players[0]) or (turn > 0)
     is_main_phase = phase in ("precombat_main", "postcombat_main")
+    if is_main_phase and cast_prepared_spell_faces(
+        player,
+        opponents,
+        all_players,
+        turn,
+        phase,
+        stack,
+        rng,
+    ):
+        note_action()
+        return True
 
     def ritual_unlocks_same_turn_action(ritual_card, ritual_effect):
         """One-shot mana is only useful when it unlocks a new same-turn action."""
@@ -41879,7 +42825,7 @@ def apply_effect_immediate(
         turn=turn,
         **spell_resolved_fields,
     )
-    all_players_for_entry = [player] + list(opponents or [])
+    all_players_for_entry = bind_table_context([player] + list(opponents or []))
 
     def prepare_resolved_permanent(payload):
         return prepare_entering_permanent(
@@ -42968,6 +43914,8 @@ def apply_effect_immediate(
         apply_damage_each_opponent_and_opponent_creatures(player, opponents, card, effect_data, turn)
     elif effect == "damage_player_and_creatures":
         apply_player_and_creatures_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "sweeper_damage":
+        resolve_controlled_creature_power_sweeper(player, opponents, card, effect_data, turn)
     elif effect == "destroy_target_land_then_damage_all_creatures_and_planeswalkers":
         resolve_star_of_extinction(player, opponents, card, effect_data, turn, rng)
     elif effect == "damage_wipe":
@@ -43938,7 +44886,15 @@ def apply_effect_immediate(
         found = None
         candidates = constrained_library_tutor_candidates(player, target_type, effect_data)
         selected_candidates = []
-        selection_count = max(1, int(effect_data.get("count") or effect_data.get("max_count") or 1))
+        selection_count = max(
+            1,
+            int(
+                effect_data.get("count")
+                or effect_data.get("max_count")
+                or effect_data.get("max_targets")
+                or 1
+            ),
+        )
         if candidates:
             scored_candidates = [
                 (
@@ -46592,6 +47548,7 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     CURRENT_REPLAY_TURN = turn
     if game_winner(all_players):
         return
+    bind_table_context(all_players)
     player._current_opponents = list(opponents or [])
     clear_turn_scoped_permanent_flags(all_players)
     emit_replay_event(
@@ -46634,6 +47591,8 @@ def play_turn_v8(player, opponents, all_players, turn, rng, stack):
     player.refresh_mana_sources(turn)
     process_upkeep_utility_lands(player, turn, all_players=all_players)
     process_graveyard_upkeep_self_return(player, turn)
+    process_random_instant_sorcery_upkeep_return(player, turn, rng)
+    process_prepare_upkeep_triggers(player, all_players, turn)
     process_radiant_scrollwielder_upkeep_graveyard_recast(player, turn, rng)
     process_rebound_upkeep(player, opponents, all_players, turn, rng, stack=stack)
     process_top_library_upkeep_free_cast(

@@ -317,6 +317,45 @@ def test_operational_work_queue_counts_blockers_and_prioritizes_runtime_gap_batc
     assert by_work["squee_access_density_model"]["postgres_write_required_to_run"] is False
 
 
+def test_operational_work_queue_does_not_resurrect_stale_runtime_count_when_current_queue_is_clear():
+    miner = {
+        "pairing_hypotheses": [
+            {
+                "candidate": "Gamble",
+                "candidate_status": "high_frequency_runtime_ready_unexplored",
+                "candidate_score": 74,
+                "lane": "contextual",
+                "cut_options": [],
+            }
+        ],
+    }
+    runtime_gap_queue = {
+        "summary": {
+            "raw_blocked_runtime_rule_gap_count": 61,
+            "filtered_current_verified_auto_rule_count": 61,
+            "blocked_runtime_rule_gap_count": 0,
+            "family_count": 0,
+            "validity_summary": {
+                "ready_for_structured_pull_count": 0,
+                "exact_xmage_found_count": 0,
+            },
+            "promotion_lane_counts": {},
+        },
+        "family_queue": [],
+    }
+
+    report = gen.build_report(
+        planner_payload=planner_payload(),
+        trace_audit=trace_audit(),
+        miner_report=miner,
+        runtime_gap_queue=runtime_gap_queue,
+    )
+
+    work_keys = [row["work_key"] for row in report["operational_work_queue"]]
+    assert "runtime_rule_gap_batch" not in work_keys
+    assert report["summary"]["top_operational_work_key"] != "runtime_rule_gap_batch"
+
+
 def test_completed_hand_filter_model_is_not_reprioritized_as_next_work():
     miner = {
         "pairing_hypotheses": [

@@ -1,0 +1,11 @@
+                card_name                 |             normalized_name              |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+------------------------------------------+------------------------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Ancient Gold Dragon                      | ancient gold dragon                      | battle_rule_v1:487b66416c2c3eeedf8ddcc215de21e2 |                  1 |                           1 |                         1 |           8
+ Blood Moon                               | blood moon                               | battle_rule_v1:544a658a2c0bc182ebfeb88ace95dc64 |                  1 |                           1 |                         1 |           8
+ Chandra's Ignition                       | chandra's ignition                       | battle_rule_v1:927b4d7b6092717afd3999ce110288c7 |                  1 |                           1 |                         1 |           8
+ Charmbreaker Devils                      | charmbreaker devils                      | battle_rule_v1:7cd637dd06467a81cf10a2e2f6563857 |                  1 |                           1 |                         1 |           8
+ Deathbellow War Cry                      | deathbellow war cry                      | battle_rule_v1:5c5d2824b29526e5fac573ed337ca7f4 |                  1 |                           1 |                         1 |           8
+ Karn's Sylex                             | karn's sylex                             | battle_rule_v1:234a67623cf5f551456e5af380b7e464 |                  1 |                           1 |                         1 |           8
+ Karn, the Great Creator                  | karn, the great creator                  | battle_rule_v1:3f1aee80d7b0907758d8bc481ff354dd |                  1 |                           1 |                         1 |           8
+ Naktamun Lorespinner // Wheel of Fortune | naktamun lorespinner // wheel of fortune | battle_rule_v1:dde68502ffffad4ca85e2200c71ef578 |                  1 |                           1 |                         1 |           8
+(8 rows)

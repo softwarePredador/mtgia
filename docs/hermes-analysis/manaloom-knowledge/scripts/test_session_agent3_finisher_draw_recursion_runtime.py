@@ -134,14 +134,14 @@ def test_ancient_gold_dragon_rolls_d20_for_combat_damage_faerie_dragon_tokens():
 def test_leyline_dowser_get_card_effect_and_mill_to_hand_runtime_source():
     battle = load_battle()
     effect = battle.get_card_effect(leyline_dowser_card())
-    assert effect["effect"] == "recursion"
+    assert effect["effect"] == "passive"
     assert effect["battle_model_scope"] == "pay_one_tap_mill_one_instant_sorcery_to_hand_tap_legendary_creature_to_untap_v1"
     assert effect["activated_self_mill_count"] == 1
     assert effect["milled_card_types_to_hand"] == ["instant", "sorcery"]
     assert effect["secondary_untap_source_by_tapping_legendary_creature"] is True
+    assert effect["_rule_source"] == "curated"
     assert effect["_rule_review_status"] == "verified"
     assert effect["_rule_execution_status"] == "auto"
-    assert "Leyline Dowser" in battle.MANUAL_RULE_RUNTIME_WAIVERS
 
     events = []
     previous_handler = battle.REPLAY_EVENT_HANDLER

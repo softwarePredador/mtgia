@@ -915,16 +915,42 @@
     "battle_rule_oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf"
   },
   "Ancient Gold Dragon": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
     "cmc": 7.0,
+    "colors": [
+      "W"
+    ],
+    "die_sides": 20,
     "effect": "token_maker",
-    "token_count": 5,
-    "token_power": 3,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b9c8732f6cafef392e640b0d77d92737"
+    "flying": true,
+    "is_creature_permanent": true,
+    "mana_cost": "{5}{W}{W}",
+    "power": 7,
+    "subtypes": [
+      "Elder",
+      "Dragon"
+    ],
+    "token_colors": [
+      "U"
+    ],
+    "token_count_source": "d20_result",
+    "token_flying": true,
+    "token_name": "Faerie Dragon Token",
+    "token_power": 1,
+    "token_subtype": "Faerie Dragon",
+    "token_toughness": 1,
+    "toughness": 10,
+    "trigger": "combat_damage_to_player",
+    "trigger_source_deals_combat_damage_to_player": true,
+    "type_line": "Creature - Elder Dragon",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:487b66416c2c3eeedf8ddcc215de21e2",
+    "battle_rule_oracle_hash": "4ee7da13b4db1902895c7523fb04fdd2"
   },
   "Ancient Silver Dragon": {
     "cmc": 8.0,
@@ -3295,14 +3321,27 @@
     "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
   },
   "Blood Moon": {
+    "ability_kind": "static",
+    "affected_lands": "nonbasic",
+    "battle_model_scope": "nonbasic_lands_are_mountains_static_v1",
     "cmc": 3.0,
-    "effect": "draw_engine",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+    "colors": [
+      "R"
+    ],
+    "effect": "passive",
+    "land_type_replacement": "nonbasic_lands_are_mountains",
+    "mana_cost": "{2}{R}",
+    "resulting_basic_land_type": "mountain",
+    "static_rule_restriction": true,
+    "suppresses_non_mountain_land_abilities": true,
+    "type_line": "Enchantment",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:544a658a2c0bc182ebfeb88ace95dc64",
+    "battle_rule_oracle_hash": "f9b52f264dbb36074c8c151ad47331cb"
   },
   "Blood Sun": {
     "ability_kind": "triggered",
@@ -5105,15 +5144,28 @@
     "battle_rule_logical_key": "battle_rule_v1:a68b5a577888a8eb123ac91d18ad8981"
   },
   "Chandra's Ignition": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "target_controlled_creature_power_damage_each_other_creature_each_opponent_v1",
     "cmc": 5.0,
-    "count": 1,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676"
+    "colors": [
+      "R"
+    ],
+    "damage_amount_source": "target_creature_power",
+    "damage_each_opponent": true,
+    "damage_each_other_creature": true,
+    "damage_source": "target_creature",
+    "effect": "sweeper_damage",
+    "mana_cost": "{3}{R}{R}",
+    "sorcery": true,
+    "target": "controlled_creature",
+    "type_line": "Sorcery",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:927b4d7b6092717afd3999ce110288c7",
+    "battle_rule_oracle_hash": "92b36154e7e9f9a2fd8abd64d5f9c032"
   },
   "Chandra, Flame's Fury": {
     "cmc": 6.0,
@@ -5281,6 +5333,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
+  },
+  "Charmbreaker Devils": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "upkeep_random_instant_sorcery_graveyard_to_hand_instant_sorcery_cast_plus4_v1",
+    "cmc": 6.0,
+    "colors": [
+      "R"
+    ],
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "mana_cost": "{5}{R}",
+    "power": 4,
+    "subtypes": [
+      "Devil"
+    ],
+    "toughness": 4,
+    "trigger": "instant_sorcery_cast",
+    "trigger_effect": "boost_source_until_eot",
+    "trigger_power_bonus_until_eot": 4,
+    "trigger_toughness_bonus_until_eot": 0,
+    "type_line": "Creature - Devil",
+    "upkeep_return_random_instant_sorcery_from_graveyard_to_hand": true,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7cd637dd06467a81cf10a2e2f6563857",
+    "battle_rule_oracle_hash": "84e84ddacde81b208e8b5cd06b87e10e"
   },
   "Charming Prince": {
     "effect": "creature",
@@ -7676,6 +7757,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3acd8f1cd0385cea4d18af84cb76b7bf",
     "battle_rule_oracle_hash": "7ee68f02b4a79a4c3e00fbe14caceda1"
+  },
+  "Deathbellow War Cry": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
+    "cmc": 8.0,
+    "colors": [
+      "R"
+    ],
+    "effect": "tutor",
+    "mana_cost": "{5}{R}{R}{R}",
+    "max_targets": 4,
+    "min_targets": 0,
+    "requires_different_names": true,
+    "shuffle_after_tutor": true,
+    "sorcery": true,
+    "target": "minotaur_creatures_to_battlefield",
+    "target_card_types": [
+      "creature"
+    ],
+    "target_subtypes": [
+      "minotaur"
+    ],
+    "tutor_destination": "battlefield",
+    "type_line": "Sorcery",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5c5d2824b29526e5fac573ed337ca7f4",
+    "battle_rule_oracle_hash": "eecf73eadb40281bfa698aeaa1ca6294"
   },
   "Deathcap Glade": {
     "effect": "land",
@@ -17389,6 +17501,51 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Karn's Sylex": {
+    "ability_kind": "static_and_activated",
+    "activated_destroy_nonland_permanents_mana_value_x_or_less": true,
+    "activation_exiles_source": true,
+    "activation_only_as_sorcery": true,
+    "activation_requires_tap": true,
+    "artifact": true,
+    "battle_model_scope": "legendary_artifact_tapped_life_payment_lock_x_tap_exile_destroy_nonland_mv_lte_x_v1",
+    "cmc": 3.0,
+    "colors": [],
+    "effect": "passive",
+    "enters_battlefield_tapped": true,
+    "legendary": true,
+    "mana_cost": "{3}",
+    "players_cant_pay_life_to_cast_spells_or_nonmana_abilities": true,
+    "type_line": "Legendary Artifact",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:234a67623cf5f551456e5af380b7e464",
+    "battle_rule_oracle_hash": "52e66b340c048462a512fb6874942f98"
+  },
+  "Karn, the Great Creator": {
+    "ability_kind": "static_and_loyalty",
+    "battle_model_scope": "opponent_artifact_activation_lock_planeswalker_wish_v1",
+    "cmc": 4.0,
+    "colors": [],
+    "effect": "planeswalker",
+    "mana_cost": "{4}",
+    "minus_two_artifact_wish_or_exile_to_hand": true,
+    "opponent_artifact_activated_abilities_cant_be_activated": true,
+    "permanent_type": "planeswalker",
+    "plus_one_animates_noncreature_artifact_until_next_turn": true,
+    "starting_loyalty": 5,
+    "type_line": "Legendary Planeswalker - Karn",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3f1aee80d7b0907758d8bc481ff354dd",
+    "battle_rule_oracle_hash": "a4fd549768b5cfea5234949fafd74bb2"
+  },
   "Karoo": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -21685,6 +21842,41 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Naktamun Lorespinner // Wheel of Fortune": {
+    "ability_kind": "prepare_spell",
+    "battle_model_scope": "prepare_upkeep_any_player_one_or_fewer_hand_wheel_face_v1",
+    "cmc": 3.0,
+    "colors": [
+      "R"
+    ],
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "mana_cost": "{2}{R}",
+    "power": 3,
+    "prepared_spell_face": {
+      "discard_draw_model": "each_player_discard_hand_draw_seven_v1",
+      "draw_count": 7,
+      "effect": "draw_cards",
+      "mana_cost": "{2}{R}",
+      "name": "Wheel of Fortune",
+      "sorcery": true,
+      "wheel_like": true
+    },
+    "subtypes": [
+      "Jackal",
+      "Wizard"
+    ],
+    "toughness": 3,
+    "type_line": "Creature - Jackal Wizard",
+    "upkeep_prepare_if_any_player_hand_size_lte": 1,
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dde68502ffffad4ca85e2200c71ef578",
+    "battle_rule_oracle_hash": "17a8d82c246b858c8e7b5b3866515485"
   },
   "Nantuko Monastery": {
     "effect": "land",

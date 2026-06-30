@@ -707,11 +707,12 @@ def build_operational_work_queue(
         runtime_card_count = 0
         runtime_ready_count = 0
         if work_key == "runtime_rule_gap_batch":
-            runtime_card_count = int(
-                runtime_context.get("blocked_runtime_rule_gap_count")
-                or runtime_action.get("candidate_count")
-                or 0
-            )
+            if runtime_context:
+                runtime_card_count = int(runtime_context.get("blocked_runtime_rule_gap_count") or 0)
+            else:
+                runtime_card_count = int(runtime_action.get("candidate_count") or 0)
+            if runtime_context and runtime_card_count <= 0:
+                continue
             runtime_ready_count = int(runtime_context.get("ready_for_structured_pull_count") or 0)
         requires_pg_to_promote = (
             work_key == "squee_access_density_model"
