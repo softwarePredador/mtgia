@@ -24114,6 +24114,382 @@ def activate_mill_engines(player, opponents, all_players, turn, rng, *, phase="p
     return 0
 
 
+def _opponent_library_free_cast_types(permanent):
+    configured = (
+        permanent.get("activated_opponent_library_exile_until_card_types")
+        or permanent.get("opponent_library_exile_until_card_types")
+        or ["instant", "sorcery"]
+    )
+    return {str(item).strip().lower() for item in configured if str(item).strip()}
+
+
+def _card_matches_opponent_library_free_cast_types(card, allowed_types):
+    if not isinstance(card, dict) or is_effective_land(card):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    return (
+        ("instant" in allowed_types and "instant" in type_line)
+        or ("sorcery" in allowed_types and "sorcery" in type_line)
+    )
+
+
+def _first_opponent_library_free_cast_hit(opponent, allowed_types):
+    for index, candidate in enumerate(list(getattr(opponent, "library", []) or [])):
+        if _card_matches_opponent_library_free_cast_types(candidate, allowed_types):
+            return index, candidate
+    return None, None
+
+
+def _score_opponent_library_free_cast_hit(player, opponents, candidate, turn):
+    if not isinstance(candidate, dict):
+        return 0
+    effect_data = get_card_effect(candidate)
+    score = threat_score(
+        effect_data.get("effect", "unknown"),
+        candidate.get("name", "?"),
+        player,
+        [player] + list(opponents or []),
+        turn,
+    )
+    score += min(12, int(card_mana_value(candidate) or 0))
+    if effect_data.get("effect") in {"unknown", "land", "counter"}:
+        score -= 20
+    return score
+
+
+def opponent_library_free_cast_target_options(player, opponents, permanent, turn):
+    allowed_types = _opponent_library_free_cast_types(permanent)
+    options = []
+    for opponent in opponents or []:
+        if not getattr(opponent, "is_alive", lambda: False)():
+            continue
+        hit_index, hit_card = _first_opponent_library_free_cast_hit(opponent, allowed_types)
+        if hit_card is None:
+            continue
+        hit_effect = get_card_effect(hit_card)
+        options.append(
+            {
+                "opponent": opponent,
+                "hit_index": hit_index,
+                "hit_card": hit_card,
+                "hit_effect": hit_effect,
+                "score": _score_opponent_library_free_cast_hit(player, opponents, hit_card, turn),
+            }
+        )
+    options.sort(
+        key=lambda row: (
+            -float(row.get("score") or 0),
+            int(row.get("hit_index") or 0),
+            getattr(row.get("opponent"), "name", ""),
+        )
+    )
+    return options
+
+
+def _move_remaining_chaos_wand_exiled_to_bottom(opponent, exiled_cards, rng):
+    remaining = [
+        card
+        for card in exiled_cards
+        if isinstance(card, dict) and card in getattr(opponent, "exile", [])
+    ]
+    if remaining:
+        rng.shuffle(remaining)
+    for card in remaining:
+        try:
+            opponent.exile.remove(card)
+        except ValueError:
+            pass
+        opponent.library.append(card)
+    return remaining
+
+
+def activate_opponent_library_free_cast_artifacts(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase="postcombat_main",
+    stack=None,
+):
+    if phase not in MAIN_PHASES:
+        return 0
+
+    artifacts = [
+        permanent
+        for permanent in list(getattr(player, "battlefield", []) or [])
+        if isinstance(permanent, dict)
+        and (
+            permanent.get("activated_opponent_library_exile_until_card_types")
+            or permanent.get("opponent_library_exile_until_card_types")
+        )
+        and permanent.get("opponent_library_exile_until_cast_without_paying_mana", True)
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if not artifacts:
+        return 0
+
+    for permanent in artifacts:
+        activation_cost = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(
+                permanent.get("opponent_library_free_cast_activation_cost_generic")
+                or permanent.get("activation_cost_generic")
+                or 4
+            ),
+        )
+        activation_cost_text = _activation_cost_text(activation_cost)
+        if permanent.get("activation_requires_tap", True) and permanent.get("tapped"):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "artifact_already_tapped_for_opponent_library_free_cast",
+                phase=phase,
+            )
+            continue
+        if player.available_mana() < activation_cost or not player.can_pay(activation_cost_text):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "insufficient_mana_for_opponent_library_free_cast",
+                phase=phase,
+            )
+            continue
+        target_options = opponent_library_free_cast_target_options(player, opponents, permanent, turn)
+        if not target_options:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "no_opponent_library_instant_or_sorcery_hit",
+                phase=phase,
+                risk_flags=["no_target_hit"],
+            )
+            continue
+        chosen = target_options[0]
+        target = chosen["opponent"]
+        hit_card = chosen["hit_card"]
+        hit_effect = copy.deepcopy(chosen["hit_effect"])
+        if hit_effect.get("effect") in {"unknown", "land", "counter"}:
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "unsupported_opponent_library_free_cast_hit",
+                phase=phase,
+                risk_flags=["unsupported_hit_effect"],
+            )
+            continue
+        if not player.spend_mana(activation_cost_text):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "failed_to_pay_opponent_library_free_cast_cost",
+                phase=phase,
+            )
+            continue
+
+        if permanent.get("activation_requires_tap", True):
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        exiled_cards = []
+        allowed_types = _opponent_library_free_cast_types(permanent)
+        while getattr(target, "library", None):
+            candidate = target.library.pop(0)
+            if not isinstance(candidate, dict):
+                continue
+            move_to_exile(
+                target,
+                candidate,
+                reason="opponent_library_exile_until_instant_or_sorcery",
+                turn=turn,
+            )
+            exiled_cards.append(candidate)
+            if candidate is hit_card or _card_matches_opponent_library_free_cast_types(candidate, allowed_types):
+                hit_card = candidate
+                hit_effect = copy.deepcopy(get_card_effect(hit_card))
+                break
+
+        cast_success = False
+        cast_result = "no_hit"
+        if hit_card in getattr(target, "exile", []) and hit_effect.get("effect") not in {"unknown", "land", "counter"}:
+            cast_ctx = begin_cast_context(
+                player,
+                hit_card,
+                phase,
+                effect_data=hit_effect,
+                role="opponent_library_free_cast",
+                modes=["cast_without_paying_mana", "opponent_library"],
+                alternative_cost="{0}",
+                source_zone="opponent_exile",
+                alternative_cost_kind="cast_without_paying_mana",
+            )
+            cast_ctx.is_legal = True
+            cast_ctx.locked_cost = zero_mana_cost_snapshot("cast_without_paying_mana_cost")
+            store_cast_context_fields(
+                hit_effect,
+                {
+                    "phase": phase,
+                    **cast_ctx.to_replay_fields(),
+                },
+            )
+            if commit_cast_payment(cast_ctx):
+                try:
+                    target.exile.remove(hit_card)
+                except ValueError:
+                    pass
+                emit_replay_event(
+                    "opponent_library_free_cast",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    target_player=target.name,
+                    cast_card=hit_card.get("name", "?"),
+                    cast_effect=hit_effect.get("effect", "unknown"),
+                    cast_without_paying_mana_cost=True,
+                    exiled_until_count=len(exiled_cards),
+                    turn=turn,
+                    phase=phase,
+                    **cast_ctx.to_replay_fields(),
+                    **replay_rule_fields(permanent),
+                )
+                emit_replay_event(
+                    "spell_cast",
+                    player=player.name,
+                    card=hit_card.get("name", "?"),
+                    effect=hit_effect.get("effect", "unknown"),
+                    type_line=hit_card.get("type_line", ""),
+                    cmc=hit_card.get("cmc", 0),
+                    turn=turn,
+                    phase=phase,
+                    **cast_ctx.to_replay_fields(),
+                    **replay_rule_fields(hit_effect),
+                )
+                mark_cast_ledger_emitted(hit_effect)
+                players = all_players or [player, *list(opponents or [])]
+                trigger_spell_cast_engines(
+                    player,
+                    players,
+                    hit_card,
+                    turn,
+                    phase,
+                    stack=stack,
+                    active_player=player,
+                )
+                trigger_opponent_spell_draw_engines(
+                    player,
+                    opponents,
+                    hit_card,
+                    turn,
+                    phase,
+                    rng,
+                    stack=stack,
+                    active_player=player,
+                    all_players=players,
+                )
+                apply_effect_immediate(
+                    player,
+                    opponents,
+                    hit_card,
+                    turn,
+                    rng,
+                    effect_data_override=hit_effect,
+                    stack=stack,
+                    phase=phase,
+                )
+                if hit_card in getattr(player, "graveyard", []):
+                    player.graveyard.remove(hit_card)
+                    target.graveyard.append(hit_card)
+                cast_success = True
+                cast_result = "cast_without_paying_mana"
+            else:
+                cast_result = "cast_payment_or_timing_failed"
+        elif hit_card in getattr(target, "exile", []):
+            cast_result = "unsupported_or_reactive_effect"
+
+        bottomed = _move_remaining_chaos_wand_exiled_to_bottom(target, exiled_cards, rng)
+        available = [
+            decision_card_option(
+                option["hit_card"],
+                option["hit_effect"],
+                score=option["score"],
+                action="activate_opponent_library_free_cast",
+                target_player=option["opponent"].name,
+                exiled_until_count=int(option.get("hit_index") or 0) + 1,
+            )
+            for option in target_options[:8]
+        ]
+        emit_decision_trace(
+            decision_type="utility_artifact_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=available,
+            chosen_option=available[0] if available else decision_card_option(permanent),
+            rejected_options=[
+                decision_card_option(
+                    option["hit_card"],
+                    option["hit_effect"],
+                    score=option["score"],
+                    action="defer_opponent_library_free_cast",
+                    target_player=option["opponent"].name,
+                )
+                for option in target_options[1:8]
+            ],
+            score_components={
+                "activation_cost_generic": activation_cost,
+                "target_player": target.name,
+                "exiled_until_count": len(exiled_cards),
+                "cast_card": hit_card.get("name", "?") if isinstance(hit_card, dict) else None,
+                "cast_result": cast_result,
+                "bottomed_count": len(bottomed),
+            },
+            rule_source=permanent.get("_rule_source", "utility_artifact_activation_v1"),
+            rule_status=permanent.get("_rule_review_status", "active"),
+            confidence="medium",
+            expected_benefit_score=chosen.get("score", 0),
+            actual_outcome=cast_result,
+            reason="use_artifact_to_convert_spare_mana_into_opponent_library_free_cast",
+            strategic_principle="spend_mana_on_randomized_opponent_library_access_only_when_a_castable_hit_exists",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -activation_cost,
+                "tapped": 1 if permanent.get("activation_requires_tap", True) else 0,
+                "cards_cast_without_paying_mana": 1 if cast_success else 0,
+                "bottomed": len(bottomed),
+            },
+            risk_flags=["tap_artifact", "opponent_library_random_access"],
+            rejected_reason="lower_free_cast_hit_score",
+        )
+        emit_replay_event(
+            "utility_artifact_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="target_opponent_library_exile_until_free_cast",
+            target_player=target.name,
+            mana_paid=activation_cost,
+            exiled_until=[
+                card.get("name", "?") for card in exiled_cards if isinstance(card, dict)
+            ],
+            cast_card=hit_card.get("name", "?") if isinstance(hit_card, dict) else None,
+            cast_without_paying_mana_cost=cast_success,
+            result=cast_result,
+            bottomed=[
+                card.get("name", "?") for card in bottomed if isinstance(card, dict)
+            ],
+            phase=phase,
+            turn=turn,
+            **replay_rule_fields(permanent),
+        )
+        return 1
+
+    return 0
+
+
 def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, phase="postcombat_main"):
     if not player.is_alive():
         return 0
@@ -24164,6 +24540,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             phase=phase,
         ):
             return 1
+
+    if activate_opponent_library_free_cast_artifacts(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
 
     tutor_to_hand_artifacts = [
         permanent
@@ -37541,10 +37927,217 @@ def cast_adventure_creature_from_exile(player, card, turn, phase):
     return True
 
 
+TOP_LIBRARY_SMALL_CREATURE_CAST_SCOPE = (
+    "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1"
+)
+
+
+def top_library_small_creature_permission_effect(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+    if not effect_data.get("top_library_cast_once_each_turn"):
+        return None
+    if effect_data.get("battle_model_scope") != TOP_LIBRARY_SMALL_CREATURE_CAST_SCOPE:
+        return None
+    cast_types = {
+        str(card_type or "").strip().lower()
+        for card_type in (effect_data.get("top_library_cast_card_types") or ["creature"])
+    }
+    if "creature" not in cast_types:
+        return None
+    return effect_data
+
+
+def top_library_small_creature_cast_candidate(player, phase, turn):
+    if phase not in MAIN_PHASES or not getattr(player, "library", None):
+        return None
+    top_card = player.library[0]
+    if not isinstance(top_card, dict) or not is_creature_card(top_card):
+        return None
+    top_effect = get_card_effect(top_card)
+    if top_effect.get("effect") == "unknown":
+        top_effect = {**top_effect, "effect": "creature"}
+    power = card_power_value(top_card, default=card_power_value(top_effect, default=999))
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        permission_effect = top_library_small_creature_permission_effect(permanent)
+        if not permission_effect:
+            continue
+        if permanent.get("top_library_small_creature_cast_last_turn") == turn:
+            continue
+        power_max = int(permission_effect.get("top_library_cast_power_max") or 2)
+        if power > power_max:
+            continue
+        if not can_cast_in_phase(top_card, top_effect, phase, controller=player):
+            continue
+        cast_plan = runtime_cast_plan_for_card(player, top_card, top_effect)
+        if cast_plan is None:
+            continue
+        return {
+            "source": permanent,
+            "source_effect": permission_effect,
+            "card": top_card,
+            "effect": top_effect,
+            "power": power,
+            "power_max": power_max,
+            "cast_plan": cast_plan,
+        }
+    return None
+
+
+def cast_top_library_small_creature_from_static_permission(
+    player,
+    opponents,
+    all_players,
+    turn,
+    phase,
+    stack,
+    rng,
+):
+    candidate = top_library_small_creature_cast_candidate(player, phase, turn)
+    if not candidate:
+        return False
+    source = candidate["source"]
+    source_effect = candidate["source_effect"]
+    card = candidate["card"]
+    effect_data = candidate["effect"]
+    cast_plan = candidate["cast_plan"]
+    mana_before = player.available_mana()
+    cast_ctx = begin_cast_context(
+        player,
+        card,
+        phase,
+        effect_data=effect_data,
+        role="top_library_small_creature_static_permission",
+        modes=["top_library_static_permission", "pay_mana_cost"],
+        source_zone="library",
+        x_value=cast_plan.get("x_value", 0),
+        additional_costs=cast_plan.get("additional_costs"),
+        locked_cost_override=cast_plan.get("locked_cost"),
+    )
+    if not commit_cast_payment(cast_ctx):
+        return False
+    if getattr(player, "library", None) and player.library[0] is card:
+        player.library.pop(0)
+    elif card in getattr(player, "library", []):
+        player.library.remove(card)
+    else:
+        return False
+    source["top_library_small_creature_cast_last_turn"] = turn
+    fields = replay_rule_fields(source_effect)
+    score = 20 + int(card_mana_value(card) or 0) + int(candidate.get("power") or 0)
+    emit_decision_trace(
+        decision_type="cast_spell",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                card,
+                effect_data,
+                score=score,
+                action="cast_top_library_small_creature",
+            )
+        ],
+        chosen_option=decision_card_option(
+            card,
+            effect_data,
+            score=score,
+            action="cast_top_library_small_creature",
+        ),
+        rejected_options=[],
+        score_components={
+            "role": "top_library_static_permission",
+            "source": source.get("name", "?"),
+            "power": candidate.get("power"),
+            "power_max": candidate.get("power_max"),
+            "mana_before": mana_before,
+            "mana_after_payment": player.available_mana(),
+        },
+        rule_source=fields.get("rule_source", "curated"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="high",
+        expected_benefit_score=score,
+        actual_outcome="cast_from_library_top",
+        reason="top_library_creature_within_power_limit_affordable",
+        strategic_principle="convert_static_topdeck_permission_into_extra_card_access_without_free_casting",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+    )
+    emit_replay_event(
+        "top_library_static_permission_used",
+        player=player.name,
+        source=source.get("name", "?"),
+        card=card.get("name", "?"),
+        type_line=card.get("type_line", ""),
+        power=candidate.get("power"),
+        power_max=candidate.get("power_max"),
+        normal_mana_cost_paid=True,
+        once_each_turn=True,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "spell_cast",
+        player=player.name,
+        card=card.get("name", "?"),
+        effect=effect_data.get("effect", "unknown"),
+        type_line=card.get("type_line", ""),
+        cmc=card.get("cmc", 0),
+        turn=turn,
+        phase=phase,
+        **cast_ctx.to_replay_fields(),
+        **replay_rule_fields(effect_data),
+    )
+    mark_cast_ledger_emitted(effect_data)
+    if not pay_additional_card_costs(
+        player,
+        card,
+        effect_data,
+        turn=turn,
+        cost_context=cast_plan.get("cost_context"),
+    ):
+        player.graveyard.append(card)
+        return False
+    trigger_spell_cast_engines(
+        player, all_players, card, turn, phase, stack=stack, active_player=player
+    )
+    trigger_opponent_spell_draw_engines(
+        player,
+        opponents,
+        card,
+        turn,
+        phase,
+        rng,
+        stack=stack,
+        active_player=player,
+        all_players=all_players,
+    )
+    if stack is not None:
+        stack.push(card, player, effect_data)
+        priority_round(player, all_players, stack, turn, rng, phase=phase)
+        while not stack.empty():
+            priority_round(player, all_players, stack, turn, rng, phase=phase)
+            if game_winner(all_players):
+                return True
+    else:
+        apply_effect_immediate(
+            player,
+            opponents,
+            card,
+            turn,
+            rng,
+            effect_data_override=effect_data,
+            phase=phase,
+        )
+    return True
+
+
 def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_actions=None):
     """v8: Cast spells respecting instant/sorcery timing and stack."""
     mana = player.available_mana()
     if mana <= 0:
+        has_top_library_castable = top_library_small_creature_cast_candidate(player, phase, turn) is not None
         has_free_castable = any(
             not is_effective_land(candidate)
             and player.can_pay_card(candidate)
@@ -37566,7 +38159,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
             and not should_hold_squee_for_lorehold_recursion(player, candidate, phase)
             for candidate in player.hand
         )
-        if not has_free_castable:
+        if not has_free_castable and not has_top_library_castable:
             return False
 
     actions_taken = 0
@@ -38376,6 +38969,20 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                 mana = player.available_mana()
                 if note_action():
                     return True
+
+    if is_main_phase:
+        if cast_top_library_small_creature_from_static_permission(
+            player,
+            opponents,
+            all_players,
+            turn,
+            phase,
+            stack,
+            rng,
+        ):
+            mana = player.available_mana()
+            if note_action():
+                return True
 
     # 2.5. Proactive silence before a same-turn high-impact payoff.
     if is_main_phase:

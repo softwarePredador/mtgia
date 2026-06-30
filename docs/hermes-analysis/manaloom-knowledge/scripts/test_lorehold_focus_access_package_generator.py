@@ -5,14 +5,17 @@ def test_default_planner_uses_current_rejection_integrated_report():
     assert gen.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_after_profiled_gate.json"
 
 
-def test_default_access_model_uses_runtime_overlay_report():
-    assert gen.DEFAULT_ACCESS_MODEL.name == "lorehold_access_cut_model_20260630_post_pg272_brainstone.json"
+def test_default_access_model_uses_post_pg276_assemble_access_density_report():
+    assert (
+        gen.DEFAULT_ACCESS_MODEL.name
+        == "lorehold_access_cut_model_20260630_post_pg276_assemble_the_players_squee_access_density.json"
+    )
 
 
-def test_default_runtime_gap_queue_uses_current_miner_report():
+def test_default_runtime_gap_queue_uses_post_pg276_assemble_the_players_report():
     assert (
         gen.DEFAULT_RUNTIME_GAP_QUEUE.name
-        == "lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.json"
+        == "lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.json"
     )
 
 

@@ -19998,6 +19998,239 @@ def register_tests(battle, player):
             for decision in decisions
         )
 
+    def test_pg276_assemble_the_players_casts_small_top_creature_once_with_paid_cost():
+        assemble = {
+            "name": "Assemble the Players",
+            "effect": "topdeck_play",
+            "type_line": "Enchantment",
+            "battle_model_scope": (
+                "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1"
+            ),
+            "look_top_library_any_time": True,
+            "top_library_cast_once_each_turn": True,
+            "top_library_cast_card_types": ["creature"],
+            "top_library_cast_power_max": 2,
+            "top_library_cast_requires_pay_mana_cost": True,
+            "_rule_logical_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+            "_rule_oracle_hash": "ffdf411200b723c016fe9df0d85dd8e4",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+        small_creature = {
+            "name": "Tiny Recruit",
+            "type_line": "Creature - Human Soldier",
+            "effect": "creature",
+            "mana_cost": "{1}{W}",
+            "cmc": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        big_creature = {
+            "name": "Large Recruit",
+            "type_line": "Creature - Human Soldier",
+            "effect": "creature",
+            "mana_cost": "{2}{W}",
+            "cmc": 3,
+            "power": 3,
+            "toughness": 3,
+        }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Assemble Controller")
+            opponent = player("Opponent")
+            stack = battle.Stack()
+            active.battlefield = [assemble]
+            active.library = [small_creature, big_creature]
+            active.mana_pool.add("white", 1)
+            active.mana_pool.add("generic", 1)
+
+            cast = battle.cast_top_library_small_creature_from_static_permission(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=8,
+                phase="precombat_main",
+                stack=stack,
+                rng=random.Random(276),
+            )
+
+            active.mana_pool.add("white", 1)
+            active.mana_pool.add("generic", 2)
+            blocked = battle.cast_top_library_small_creature_from_static_permission(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=8,
+                phase="postcombat_main",
+                stack=stack,
+                rng=random.Random(277),
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert cast is True
+        assert blocked is False
+        assert active.mana_pool.white == 1
+        assert active.mana_pool.generic == 2
+        assert assemble["top_library_small_creature_cast_last_turn"] == 8
+        assert small_creature not in active.library
+        assert [card.get("name") for card in active.library] == ["Large Recruit"]
+        assert any(
+            permanent.get("name") == "Tiny Recruit"
+            and permanent.get("effect") == "creature"
+            for permanent in active.battlefield
+        )
+        assert any(
+            event == "top_library_static_permission_used"
+            and data.get("source") == "Assemble the Players"
+            and data.get("card") == "Tiny Recruit"
+            and data.get("power") == 2
+            and data.get("power_max") == 2
+            and data.get("normal_mana_cost_paid") is True
+            and data.get("rule_logical_key") == "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882"
+            for event, data in events
+        )
+        assert any(
+            event == "spell_cast"
+            and data.get("card") == "Tiny Recruit"
+            and data.get("source_zone") == "library"
+            and data.get("role") == "top_library_small_creature_static_permission"
+            and data.get("locked_cost", {}).get("generic") == 1
+            and data.get("locked_cost", {}).get("colored", {}).get("white") == 1
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "cast_spell"
+            and decision.get("chosen_option", {}).get("card") == "Tiny Recruit"
+            and decision.get("chosen_option", {}).get("action") == "cast_top_library_small_creature"
+            and decision.get("score_components", {}).get("source") == "Assemble the Players"
+            for decision in decisions
+        )
+
+    def test_pg275_chaos_wand_exiles_opponent_library_until_free_cast_hit():
+        chaos_wand = {
+            "name": "Chaos Wand",
+            "effect": "passive",
+            "type_line": "Artifact",
+            "artifact": True,
+            "battle_model_scope": (
+                "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1"
+            ),
+            "activation_cost_generic": 4,
+            "activation_requires_tap": True,
+            "target": "opponent",
+            "activated_opponent_library_exile_until_card_types": ["instant", "sorcery"],
+            "opponent_library_exile_until_cast_without_paying_mana": True,
+            "opponent_library_bottom_uncast_exiled_random": True,
+            "_rule_logical_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+            "_rule_oracle_hash": "7b77d47629eb006df4e9754fee988c51",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+        }
+        opponent_land = {"name": "Opponent Plains", "type_line": "Basic Land - Plains", "cmc": 0}
+        opponent_creature = {
+            "name": "Opponent Bear",
+            "type_line": "Creature - Bear",
+            "cmc": 2,
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+        }
+        free_spell = {
+            "name": "Borrowed Insight",
+            "type_line": "Instant",
+            "cmc": 3,
+            "effect": "draw",
+        }
+
+        events = []
+        decisions = []
+        previous_event_handler = battle.REPLAY_EVENT_HANDLER
+        previous_decision_handler = battle.DECISION_TRACE_HANDLER
+        battle.REPLAY_EVENT_HANDLER = lambda event, data: events.append((event, data))
+        battle.DECISION_TRACE_HANDLER = decisions.append
+        try:
+            active = player("Chaos Controller")
+            opponent = player("Library Opponent")
+            active.battlefield = [chaos_wand]
+            active.library = [
+                {"name": "Controller Draw A", "type_line": "Sorcery", "cmc": 2},
+                {"name": "Controller Draw B", "type_line": "Sorcery", "cmc": 2},
+            ]
+            active.mana_pool.add("generic", 4)
+            opponent.library = [
+                opponent_land,
+                opponent_creature,
+                free_spell,
+                {"name": "Opponent Tail", "type_line": "Creature", "cmc": 4},
+            ]
+
+            activated = battle.activate_utility_artifacts(
+                active,
+                [opponent],
+                [active, opponent],
+                turn=7,
+                rng=random.Random(275),
+                phase="postcombat_main",
+            )
+        finally:
+            battle.REPLAY_EVENT_HANDLER = previous_event_handler
+            battle.DECISION_TRACE_HANDLER = previous_decision_handler
+
+        assert activated == 1
+        assert chaos_wand["tapped"] is True
+        assert chaos_wand["utility_artifact_used_this_turn"] is True
+        assert active.mana_pool.total() == 0
+        assert [card.get("name") for card in active.hand] == [
+            "Controller Draw A",
+            "Controller Draw B",
+        ]
+        assert free_spell in opponent.graveyard
+        assert free_spell not in active.graveyard
+        assert opponent.exile == []
+        assert [card.get("name") for card in opponent.library[:1]] == ["Opponent Tail"]
+        assert {
+            card.get("name")
+            for card in opponent.library[1:]
+            if isinstance(card, dict)
+        } == {"Opponent Plains", "Opponent Bear"}
+
+        assert any(
+            event == "opponent_library_free_cast"
+            and data.get("card") == "Chaos Wand"
+            and data.get("target_player") == "Library Opponent"
+            and data.get("cast_card") == "Borrowed Insight"
+            and data.get("cast_without_paying_mana_cost") is True
+            and data.get("source_zone") == "opponent_exile"
+            and data.get("locked_cost", {}).get("spend_tags") == ["cast_without_paying_mana_cost"]
+            and data.get("rule_logical_key") == "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0"
+            for event, data in events
+        )
+        assert any(
+            event == "utility_artifact_activated"
+            and data.get("card") == "Chaos Wand"
+            and data.get("activation_kind") == "target_opponent_library_exile_until_free_cast"
+            and data.get("exiled_until")
+            == ["Opponent Plains", "Opponent Bear", "Borrowed Insight"]
+            and set(data.get("bottomed") or []) == {"Opponent Plains", "Opponent Bear"}
+            and data.get("result") == "cast_without_paying_mana"
+            for event, data in events
+        )
+        assert any(
+            decision.get("decision_type") == "utility_artifact_activation"
+            and decision.get("chosen_option", {}).get("card") == "Borrowed Insight"
+            and decision.get("chosen_option", {}).get("target_player") == "Library Opponent"
+            and "opponent_library_random_access" in decision.get("risk_flags", [])
+            for decision in decisions
+        )
+
     def test_pg215_green_goblin_discard_nonland_counter_and_land_treasure():
         events = []
         previous_handler = battle.REPLAY_EVENT_HANDLER
@@ -21325,6 +21558,8 @@ def register_tests(battle, player):
         test_pg270_currency_converter_exiles_discarded_card_and_converts_exiled_cards,
         test_pg273_codex_shredder_returns_graveyard_card_or_mills_target_player,
         test_pg274_perpetual_timepiece_self_mills_or_exiles_to_shuffle_graveyard,
+        test_pg275_chaos_wand_exiles_opponent_library_until_free_cast_hit,
+        test_pg276_assemble_the_players_casts_small_top_creature_once_with_paid_cost,
         test_pg215_green_goblin_discard_nonland_counter_and_land_treasure,
         test_pg215_aclazotz_opponent_discard_land_creates_flying_bat,
         test_pg216_black_market_connections_precombat_modal_resources,

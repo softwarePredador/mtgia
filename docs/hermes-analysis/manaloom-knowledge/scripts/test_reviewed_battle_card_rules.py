@@ -225,6 +225,28 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
             by_name["Aetherflux Reservoir"]["effect_json"]["battle_model_scope"],
             "spell_cast_lifegain_pay_50_damage_annotation_v1",
         )
+        self.assertEqual(by_name["Assemble the Players"]["source"], "curated")
+        self.assertEqual(by_name["Assemble the Players"]["review_status"], "verified")
+        self.assertEqual(by_name["Assemble the Players"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Assemble the Players"]["logical_rule_key"],
+            "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+        )
+        self.assertEqual(
+            by_name["Assemble the Players"]["oracle_hash"],
+            "ffdf411200b723c016fe9df0d85dd8e4",
+        )
+        self.assertEqual(
+            by_name["Assemble the Players"]["effect_json"]["battle_model_scope"],
+            "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1",
+        )
+        self.assertTrue(
+            by_name["Assemble the Players"]["effect_json"]["top_library_cast_once_each_turn"]
+        )
+        self.assertEqual(
+            by_name["Assemble the Players"]["effect_json"]["top_library_cast_power_max"],
+            2,
+        )
         self.assertEqual(by_name["Molecule Man"]["source"], "curated")
         self.assertEqual(by_name["Molecule Man"]["review_status"], "verified")
         self.assertEqual(by_name["Molecule Man"]["execution_status"], "auto")
@@ -483,6 +505,36 @@ class ReviewedBattleCardRulesTests(unittest.TestCase):
         self.assertNotIn(
             "xmage_graveyard_return_variant_review_v1",
             by_name["Codex Shredder"]["effect_json"]["battle_model_scope"],
+        )
+        self.assertEqual(by_name["Chaos Wand"]["source"], "curated")
+        self.assertEqual(by_name["Chaos Wand"]["review_status"], "verified")
+        self.assertEqual(by_name["Chaos Wand"]["execution_status"], "auto")
+        self.assertEqual(
+            by_name["Chaos Wand"]["logical_rule_key"],
+            "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+        )
+        self.assertEqual(by_name["Chaos Wand"]["effect_json"]["effect"], "passive")
+        self.assertEqual(
+            by_name["Chaos Wand"]["effect_json"]["activated_effect"],
+            "opponent_library_free_cast",
+        )
+        self.assertEqual(by_name["Chaos Wand"]["effect_json"]["activation_cost_generic"], 4)
+        self.assertTrue(by_name["Chaos Wand"]["effect_json"]["activation_requires_tap"])
+        self.assertEqual(by_name["Chaos Wand"]["effect_json"]["target"], "opponent")
+        self.assertEqual(
+            by_name["Chaos Wand"]["effect_json"][
+                "activated_opponent_library_exile_until_card_types"
+            ],
+            ["instant", "sorcery"],
+        )
+        self.assertTrue(
+            by_name["Chaos Wand"]["effect_json"][
+                "opponent_library_exile_until_cast_without_paying_mana"
+            ]
+        )
+        self.assertEqual(
+            by_name["Chaos Wand"]["effect_json"]["battle_model_scope"],
+            "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1",
         )
         self.assertEqual(by_name["Perpetual Timepiece"]["source"], "curated")
         self.assertEqual(by_name["Perpetual Timepiece"]["review_status"], "verified")

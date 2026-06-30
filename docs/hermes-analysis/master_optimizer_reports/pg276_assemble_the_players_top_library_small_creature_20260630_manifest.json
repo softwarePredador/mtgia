@@ -1,0 +1,88 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg276_assemble_the_players_top_library_small_creature_20",
+  "deploy_id": "PG276",
+  "expected_rules": [
+    {
+      "card_name": "Assemble the Players",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+      "min_rule_version": 2,
+      "normalized_name": "assemble the players",
+      "oracle_hash": "ffdf411200b723c016fe9df0d85dd8e4",
+      "required_effect_fields": {
+        "battle_model_scope": "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1",
+        "effect": "topdeck_play"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "topdeck_play": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_rollback.sql",
+    "sync": "docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_sync.json"
+  },
+  "generated_at": "2026-06-30T10:51:23+00:00",
+  "mutations_performed": [
+    "postgres_apply",
+    "postgres_to_sqlite_sync",
+    "canonical_snapshot_export"
+  ],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Assemble the Players"
+      },
+      "card_name": "Assemble the Players",
+      "effect": "topdeck_play",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+      "normalized_name": "assemble the players",
+      "required_effect_fields": {
+        "battle_model_scope": "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1",
+        "effect": "topdeck_play"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Assemble the Players"
+  ],
+  "selected_count": 1,
+  "slug": "assemble_the_players_top_library_small_creature_20260630",
+  "snapshot_checks": [
+    {
+      "card_name": "Assemble the Players",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+      "min_rule_version": 2,
+      "normalized_name": "assemble the players",
+      "oracle_hash": "ffdf411200b723c016fe9df0d85dd8e4",
+      "required_effect_fields": {
+        "battle_model_scope": "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "apply_result": {
+    "backup_rows": 0,
+    "canonical_snapshot_rows_exported": 3287,
+    "deprecated_shadow_rows": 0,
+    "postcheck_promoted_oracle_hash_rows": 1,
+    "postcheck_promoted_rule_rows": 1,
+    "postcheck_promoted_verified_auto_rows": 1,
+    "precheck_expected_rule_rows_before": 0,
+    "precheck_target_card_rows": 1,
+    "sqlite_inserted_or_updated": 1,
+    "upserted_rows": 1
+  },
+  "status": "applied_synced"
+}

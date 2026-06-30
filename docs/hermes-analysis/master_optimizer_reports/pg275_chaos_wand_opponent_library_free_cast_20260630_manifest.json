@@ -1,0 +1,88 @@
+{
+  "apply_gate": "Applied with explicit standing approval in the active goal: precheck, apply, postcheck, PG -> SQLite sync, and focused runtime validation completed.",
+  "apply_result": {
+    "backup_rows": 0,
+    "deprecated_shadow_rows": 0,
+    "precheck_existing_rule_rows": 0,
+    "precheck_target_card_rows": 1,
+    "precheck_would_deprecate_shadow_rows": 0,
+    "promoted_expected_scope_rows": 1,
+    "promoted_oracle_hash_rows": 1,
+    "promoted_rule_rows": 1,
+    "promoted_verified_auto_rows": 1,
+    "sqlite_inserted_or_updated": 1,
+    "sync_pg_rows_loaded": 1
+  },
+  "backup_table": "manaloom_deploy_audit.pg275_chaos_wand_opponent_library_free_cast_20260630_202",
+  "deploy_id": "PG275",
+  "expected_rules": [
+    {
+      "card_name": "Chaos Wand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+      "min_rule_version": 2,
+      "normalized_name": "chaos wand",
+      "oracle_hash": "7b77d47629eb006df4e9754fee988c51",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1",
+        "effect": "passive"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "free_cast": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_rollback.sql"
+  },
+  "generated_at": "2026-06-30T10:32:39+00:00",
+  "mutations_performed": [
+    "postgres_apply",
+    "postgres_to_sqlite_sync",
+    "canonical_snapshot_export"
+  ],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Chaos Wand"
+      },
+      "card_name": "Chaos Wand",
+      "effect": "passive",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+      "normalized_name": "chaos wand",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1",
+        "effect": "passive"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Chaos Wand"
+  ],
+  "selected_count": 1,
+  "slug": "chaos_wand_opponent_library_free_cast_20260630",
+  "snapshot_checks": [
+    {
+      "card_name": "Chaos Wand",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+      "min_rule_version": 2,
+      "normalized_name": "chaos wand",
+      "oracle_hash": "7b77d47629eb006df4e9754fee988c51",
+      "required_effect_fields": {
+        "battle_model_scope": "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "applied_synced"
+}

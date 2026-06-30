@@ -33,7 +33,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg274_perpetual_timepiece_manifest.md`.
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
@@ -73,14 +73,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Resultado atual: manter `607` como baseline protegido; `615` e fonte para
     teste estreito de pacote, nao troca direta de deck.
   - Modelos ativos de corte/acesso Lorehold devem usar `607` como baseline
-    default. Evidencia corrigida pos-PG274:
-    `master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg272_brainstone.md`.
-    Brainstone agora esta `verified/auto` com escopo executavel, mas ainda nao
-    ha pacote gate-ready porque falta corte seguro.
+    default. Evidencia corrente pos-PG276:
+    `master_optimizer_reports/lorehold_access_cut_model_20260630_post_pg276_assemble_the_players_squee_access_density.md`.
+    Brainstone, Chaos Wand e Assemble the Players agora estao `verified/auto`
+    com escopos executaveis, mas ainda nao ha pacote gate-ready porque falta
+    corte seguro.
   - Fila runtime atual:
-    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.md`.
-    `Codex Shredder` e `Perpetual Timepiece` agora estao
-    aplicados/sincronizados como regras ativas; a fila restante tem `18` gaps
+    `master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`.
+    `Codex Shredder`, `Perpetual Timepiece`, `Chaos Wand` e
+    `Assemble the Players` agora estao aplicados/sincronizados como regras
+    ativas; a fila restante tem `16` gaps
     runtime e o gerador de foco continua com `0` pacotes gate-ready.
   - O auditor geral `operational_surface_alignment_audit.py` deve passar antes
     de declarar que scripts e docs estao conversando entre si.

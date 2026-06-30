@@ -360,6 +360,16 @@ PG267/PG271 runtime-rule checkpoint:
   artifact scopes for `{T}` self-mill two and `{2}, exile this artifact:
   shuffle selected graveyard cards into library, using
   `tap_self_mill_two_or_exile_self_shuffle_any_number_graveyard_cards_into_library_v1`.
+- PG275 was applied and synced for `Chaos Wand` with exact activated artifact
+  runtime for `{4}, {T}` target-opponent library exile until instant/sorcery,
+  optional free cast of the hit card, and random bottoming of uncast exiled
+  cards, using
+  `pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1`.
+- PG276 was applied and synced for `Assemble the Players` with exact static
+  top-library permission runtime: look at the top card any time and, once each
+  turn, cast a creature spell with power 2 or less from the top of library by
+  paying its normal mana cost, using
+  `top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1`.
 - PG267 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg267_neheb_postcombat_mana_20260630_package.md`.
 - PG268 package evidence:
@@ -376,29 +386,35 @@ PG267/PG271 runtime-rule checkpoint:
   `docs/hermes-analysis/master_optimizer_reports/pg273_codex_shredder_mill_recursion_20260630_package.md`.
 - PG274 package evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg274_perpetual_timepiece_graveyard_shuffle_20260630_package.md`.
-- Current queue after PG274:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg274_perpetual_timepiece_manifest.md`.
+- PG275 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg275_chaos_wand_opponent_library_free_cast_20260630_package.md`.
+- PG276 package evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg276_assemble_the_players_top_library_small_creature_20260630_package.md`.
+- Current queue after PG276:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
 - Current combined severity counts:
-  `{"high": 100, "medium": 42, "pass": 649}`.
+  `{"high": 98, "medium": 42, "pass": 651}`.
 - Current unresolved routing:
-  `ready_for_structured_xmage_pull_review_required=66`,
+  `ready_for_structured_xmage_pull_review_required=64`,
   `xmage_source_valid_mapper_required=61`,
   `runtime_family_required_count=0`.
 - Current family counts include:
   `manual_model=61`, `targeted_interaction=12`, `recursion=9`, `tutor=10`,
-  `free_cast=9`, `targeted_protection=7`, `ramp_permanent=5`, `passive=5`,
+  `free_cast=7`, `targeted_protection=7`, `ramp_permanent=5`, `passive=5`,
   `draw_engine=2`, `topdeck_play=2`, `board_wipe_choice=3`,
   `copy_spell_engine=1`, `life_total_change=1`.
 - Current Lorehold runtime-gap queue:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg274_perpetual_timepiece.md`;
-  blocked runtime gaps are `18`, with
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_gap_family_queue_20260630_post_pg276_assemble_the_players.md`;
+  blocked runtime gaps are `16`, with
   `mapper_metadata_or_test_scenario_required=12` and
-  `split_family_scope_review_required=6`.
-- Current Lorehold runtime readiness after PG274:
-  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg274_perpetual_timepiece.md`;
+  `split_family_scope_review_required=4`.
+- Current Lorehold runtime readiness after PG276:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_runtime_candidate_readiness_20260630_post_pg276_assemble_the_players.md`;
   `Hidden Retreat` and `Brainstone` are `pg_package_applied_synced`, not
   apply-pending; `Codex Shredder` and `Perpetual Timepiece` are filtered out of
-  the runtime-gap queue as current verified/auto active rules.
+  the runtime-gap queue as current verified/auto active rules; `Chaos Wand` is
+  also filtered out as a current verified/auto active rule; `Assemble the
+  Players` is filtered out after PG276 as a current verified/auto active rule.
 
 `Adagia, Windswept Bastion` is no longer blocked on
 `station_level_gate`: the exact scope

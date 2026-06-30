@@ -70,6 +70,36 @@
     "oracle_hash": "ea5327899fb66a2d583e80e8ca12d9b2",
     "notes": "PG-045 mirror of PostgreSQL source rule: spell-cast trigger gains life equal to spells cast this turn and is runtime-executable. The Pay 50 life, deal 50 damage activated ability remains annotation_only until a dedicated life-payment activated-wincon executor exists."
   },
+  "Assemble the Players": {
+    "effect_json": {
+      "ability_kind": "static",
+      "cmc": 2.0,
+      "effect": "topdeck_play",
+      "enchantment": true,
+      "mana_cost": "{1}{W}",
+      "look_top_library_any_time": true,
+      "top_library_cast_once_each_turn": true,
+      "top_library_cast_card_types": [
+        "creature"
+      ],
+      "top_library_cast_power_max": 2,
+      "top_library_cast_requires_pay_mana_cost": true,
+      "battle_model_scope": "top_library_look_any_time_cast_creature_power_2_or_less_once_each_turn_pay_cost_v1"
+    },
+    "deck_role_json": {
+      "category": "engine",
+      "effect": "topdeck_play",
+      "subtype": "static_top_library_small_creature_cast_permission",
+      "timing": "main_phase_normal_timing"
+    },
+    "logical_rule_key": "battle_rule_v1:692dcb8d1b5149bfef05a32ceb217882",
+    "source": "curated",
+    "confidence": 0.9,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "ffdf411200b723c016fe9df0d85dd8e4",
+    "notes": "Oracle-reviewed on 2026-06-30 against local XMage AssembleThePlayers.java and PostgreSQL text: you may look at the top card of your library any time; once each turn, you may cast a creature spell with power 2 or less from the top of your library. Runtime executes the exact static top-library permission slice with normal mana payment, main-phase timing, power check, once-per-turn source tracking, replay, and decision-trace assertions."
+  },
   "Ashnod's Altar": {
     "effect_json": {
       "cmc": 3.0,
@@ -1558,6 +1588,39 @@
     "execution_status": "auto",
     "oracle_hash": "48dd2cf11a80189f548581507ab88df9",
     "notes": "Oracle-reviewed on 2026-06-30 against local XMage CodexShredder.java and PostgreSQL text: {T}: target player mills a card; {5}, {T}, sacrifice this artifact: return target card from your graveyard to your hand. Runtime executes the target-player mill fallback and the main graveyard-to-hand activation with tap, mana payment, sacrifice, decision trace, and recursion event."
+  },
+  "Chaos Wand": {
+    "effect_json": {
+      "ability_kind": "activated",
+      "cmc": 3.0,
+      "effect": "passive",
+      "activated_effect": "opponent_library_free_cast",
+      "artifact": true,
+      "mana_cost": "{3}",
+      "activation_cost_generic": 4,
+      "activation_requires_tap": true,
+      "target": "opponent",
+      "activated_opponent_library_exile_until_card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "opponent_library_exile_until_cast_without_paying_mana": true,
+      "opponent_library_bottom_uncast_exiled_random": true,
+      "battle_model_scope": "pay_four_tap_target_opponent_exile_until_instant_sorcery_may_cast_free_bottom_rest_v1"
+    },
+    "deck_role_json": {
+      "category": "value",
+      "effect": "passive",
+      "subtype": "activated_opponent_library_free_cast_artifact",
+      "timing": "activated_main_phase"
+    },
+    "logical_rule_key": "battle_rule_v1:cb5acba44191c9c6711c017b4c3590d0",
+    "source": "curated",
+    "confidence": 0.91,
+    "review_status": "verified",
+    "execution_status": "auto",
+    "oracle_hash": "7b77d47629eb006df4e9754fee988c51",
+    "notes": "Oracle-reviewed on 2026-06-30 against local XMage ChaosWand.java and PostgreSQL text: {4}, {T}: target opponent exiles cards from the top of their library until an instant or sorcery card is exiled; controller may cast that card without paying its mana cost; remaining exiled cards are put on the bottom in random order. Runtime executes the activated artifact slice with target selection, mana payment, tap, opponent-library exile, free cast, bottom-rest handling, replay, and decision-trace assertions."
   },
   "Perpetual Timepiece": {
     "effect_json": {
