@@ -463,9 +463,34 @@ happen:
 
 For Lorehold, do not promote `614`, `615`, `candidate_607_v615_mana_engine_v1`,
 `candidate_607_v615_mana_vault_method_repair_v1`, any 2026-06-30
-`The One Ring` candidate, or any 2026-06-30 tested tutor/selection candidate as
-the final ideal deck from the current evidence. The tested cards were exercised
-in battle but lost to `607`, so the protected baseline remains `607`.
+`The One Ring` candidate, any 2026-06-30 tested tutor/selection candidate, or
+any 2026-06-30 tested `Tibalt's Trickery` replacement as the final ideal deck
+from the current evidence. The tested cards were exercised in battle but lost
+to `607`, so the protected baseline remains `607`.
+
+Tibalt replacement decision generated on 2026-06-30:
+
+- Candidates:
+  `candidate_607_boros_charm_tibalts_trickery_v1`,
+  `candidate_607_silence_tibalts_trickery_v1`, and
+  `candidate_607_grand_abolisher_tibalts_trickery_v1`.
+- Structural result: all three tied `607` at score `141.036`, intent `100.0`,
+  lands `34`, and rule-ready `97.87%`.
+- Smoke result at `opponent_seed=20260630`: `Boros Charm` beat the local smoke
+  baseline `8/24` versus `607` `6/24` with real card use; `Silence` beat the
+  smoke baseline `10/24` versus `607` `6/24` but had only one cast; `Grand
+  Abolisher` lost immediately `4/24` versus `607` `6/24`.
+- Confirmed result at `opponent_seed=20260629`, seeds `20260630`, `123`, and
+  `999`: `Boros Charm` lost `21/72` versus `607` `30/72`; `Silence` lost
+  `27/72` versus `607` `30/72`.
+- Direct card-use evidence: `Boros Charm` resolved `8` times in confirmation;
+  `Silence` was accessed in `22/72` games, drawn in `12/72`, cast `15` times,
+  and resolved `13` times.
+- Decision: keep `Tibalt's Trickery` protected until a different
+  same-function replacement beats `607`. The low recent event count is not
+  enough to cut it when exercised same-lane replacements lose confirmed gates.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_tibalt_replacement_decision_20260630.md`.
 
 The next real product step is to stop cutting already-used finishers or value
 spells for generic access cards. Keep the `607` miracle/topdeck/ramp shell

@@ -169,6 +169,37 @@ class Lorehold607ResearchCandidateTest(unittest.TestCase):
             }.intersection(plan["removed"])
         )
 
+    def test_tibalt_replacement_plans_preserve_protected_lorehold_shell(self):
+        expectations = {
+            "boros_charm_tibalts_trickery_v1": "Boros Charm",
+            "silence_tibalts_trickery_v1": "Silence",
+            "grand_abolisher_tibalts_trickery_v1": "Grand Abolisher",
+        }
+        protected_cards = {
+            "Bender's Waterskin",
+            "Victory Chimes",
+            "Molecule Man",
+            "The Scarlet Witch",
+            "The Mind Stone",
+            "Promise of Loyalty",
+            "Avatar's Wrath",
+            "High Noon",
+            "Dawn's Truce",
+            "Teferi's Protection",
+            "Flawless Maneuver",
+            "Insurrection",
+            "Storm Herd",
+            "Creative Technique",
+        }
+        for plan_key, add_card in expectations.items():
+            with self.subTest(plan_key=plan_key):
+                plan = research.RESEARCH_PLANS[plan_key]
+                self.assertEqual(plan["base_deck_id"], 607)
+                self.assertEqual(plan["candidate_deck_id"], 6)
+                self.assertEqual(plan["added"], [{"card_name": add_card, "source_deck_id": 615}])
+                self.assertEqual(plan["removed"], ["Tibalt's Trickery"])
+                self.assertFalse(protected_cards.intersection(plan["removed"]))
+
     def test_render_markdown_includes_final_decklist_sections(self):
         report = {
             "plan": "test",

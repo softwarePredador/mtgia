@@ -402,6 +402,71 @@ RESEARCH_PLANS = {
             "Storm Herd is a used high-cost finisher in the 607 shell, so this is a smoke candidate only until equal battle evidence proves the access upgrade.",
         ],
     },
+    "boros_charm_tibalts_trickery_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_boros_charm_tibalts_trickery_v1",
+        "candidate_name": "Lorehold 607 + Boros Charm over Tibalt's Trickery v1",
+        "candidate_archetype": "607-boros-charm-tibalts-trickery",
+        "added": [{"card_name": "Boros Charm", "source_deck_id": 615}],
+        "removed": ["Tibalt's Trickery"],
+        "intent": (
+            "Test a same-lane cheap protection upgrade without touching the "
+            "miracle/topdeck shell or pressure absorbers that prior gates "
+            "protected. Tibalt's Trickery is the current low-exposure counter "
+            "slot in recent 607 gates; Boros Charm appears across multiple "
+            "Lorehold variants and can protect permanents, add reach, or convert "
+            "combat damage."
+        ),
+        "external_signals": [
+            "Boros Charm appears in local Lorehold variants 609, 612, 613, 614, and 615.",
+            "Local battle_card_rules has an active auto modal Boros Charm rule.",
+            "Recent 72-game 607 evidence shows Tibalt's Trickery had zero card events, while the core pressure/protection and miracle cards were exercised.",
+            "The registry protects Tibalt's Trickery until a same-function replacement wins; this candidate is that exact same-function protection benchmark, not a generic cut.",
+        ],
+    },
+    "silence_tibalts_trickery_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_silence_tibalts_trickery_v1",
+        "candidate_name": "Lorehold 607 + Silence over Tibalt's Trickery v1",
+        "candidate_archetype": "607-silence-tibalts-trickery",
+        "added": [{"card_name": "Silence", "source_deck_id": 615}],
+        "removed": ["Tibalt's Trickery"],
+        "intent": (
+            "Test proactive one-mana stack protection over the current swingy "
+            "counter slot. The swap preserves High Noon, Promise of Loyalty, "
+            "Avatar's Wrath, Dawn's Truce, Teferi's Protection, and the full "
+            "miracle/topdeck/ramp shell."
+        ),
+        "external_signals": [
+            "Silence appears in local Lorehold variants 612, 613, 614, 615, and 616.",
+            "Local battle_card_rules has a verified auto Silence rule.",
+            "Silence is same-function stack protection for decisive Lorehold or Approach turns, but at lower mana and lower variance than Tibalt's Trickery.",
+            "The candidate must beat 607 in battle because previous Reprieve over Tibalt's Trickery failed despite being structurally coherent.",
+        ],
+    },
+    "grand_abolisher_tibalts_trickery_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_grand_abolisher_tibalts_trickery_v1",
+        "candidate_name": "Lorehold 607 + Grand Abolisher over Tibalt's Trickery v1",
+        "candidate_archetype": "607-grand-abolisher-tibalts-trickery",
+        "added": [{"card_name": "Grand Abolisher", "source_deck_id": 615}],
+        "removed": ["Tibalt's Trickery"],
+        "intent": (
+            "Test a permanent same-function spell-protection piece over the "
+            "current low-exposure counter slot. Grand Abolisher protects the "
+            "whole decisive Lorehold turn, while the candidate leaves all "
+            "miracle/topdeck, pressure, board-wipe, and finisher anchors intact."
+        ),
+        "external_signals": [
+            "Grand Abolisher appears in local Lorehold variants 613, 615, and 616.",
+            "Local battle_card_rules has a verified auto opponent spell-lock rule for Grand Abolisher.",
+            "This is weaker on instant/sorcery density than Silence or Boros Charm, so it must prove that permanent turn protection offsets the lost spell slot.",
+            "The registry protects Tibalt's Trickery until a same-function replacement wins; Grand Abolisher is included only as a same-function protection benchmark.",
+        ],
+    },
 }
 
 

@@ -60,6 +60,27 @@
       "learning": "Reprieve preserved Molecule Man and the structural intent score, but replacing Tibalt's Trickery removed too much protection/counter leverage. Tibalt's Trickery is now protected until a same-function replacement wins."
     },
     {
+      "key": "candidate_607_boros_charm_tibalts_trickery_v1",
+      "swap_or_scope": "+Boros Charm; -Tibalt's Trickery",
+      "status": "rejected",
+      "result": "confirmed 21W/51L/0S vs deck_607 30W/41L/1S over 72 games; smoke 8W/16L/0S vs deck_607 6W/18L/0S; Boros Charm resolved 8 and spell-cast/miracle-cast 4/4 in confirmation; Winota 0W/9L vs deck_607 3W/6L",
+      "learning": "Boros Charm is a real, battle-ready protection card and was exercised, but the confirmed gate reduced wins, topdeck activation, spell-chain volume, and Winota performance. Do not cut Tibalt's Trickery for Boros Charm in the current 607 shell."
+    },
+    {
+      "key": "candidate_607_silence_tibalts_trickery_v1",
+      "swap_or_scope": "+Silence; -Tibalt's Trickery",
+      "status": "rejected",
+      "result": "confirmed 27W/45L/0S vs deck_607 30W/41L/1S over 72 games; smoke 10W/14L/0S vs deck_607 6W/18L/0S; Silence accessed 22/72, drawn 12/72, spell-cast 15, resolved 13; Winota 1W/8L vs deck_607 3W/6L",
+      "learning": "Silence was exercised enough for the result to matter and still failed the promotion gate. Cheap proactive protection increased some spell volume but reduced topdeck/miracle conversion and did not beat the protected baseline."
+    },
+    {
+      "key": "candidate_607_grand_abolisher_tibalts_trickery_v1",
+      "swap_or_scope": "+Grand Abolisher; -Tibalt's Trickery",
+      "status": "rejected_smoke",
+      "result": "smoke 4W/20L/0S vs deck_607 6W/18L/0S; Grand Abolisher cost-paid/spell-cast 4 and resolved 3",
+      "learning": "Grand Abolisher protects a decisive own turn in theory, but this exact non-instant replacement reduced the smoke gate immediately. It should not be confirmed from this slot unless a future runtime or opponent model materially changes."
+    },
+    {
       "key": "candidate_607_galvanoth_v1",
       "swap_or_scope": "+Galvanoth; -Creative Technique",
       "status": "rejected",
