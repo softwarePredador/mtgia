@@ -51,12 +51,15 @@ DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT = (
 DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS = [
     REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
     REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json",
 ]
 DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
     REPORT_DIR
     / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
     REPORT_DIR
     / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json",
 ]
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
@@ -98,6 +101,7 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
     REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
     REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json",
 ]
 FROM_SCRATCH_TELEMETRY_KEYS = (
     "lorehold_cost_paid",
@@ -1647,14 +1651,14 @@ def build_from_scratch_shell_action(
                 "discarding the 607 floor."
             ),
             "blockers": [
-                "best confirmed from-scratch shell is below protected 607",
-                "positive Squee telemetry did not convert into wins",
+                "best current from-scratch gate is below protected 607",
+                "positive Squee or conversion telemetry did not convert into wins",
                 "do not promote shell-level telemetry without equal-gate wins",
             ],
             "next_steps": [
-                "Use the pressure-repair shell as telemetry, not as a deck replacement.",
-                "Build the next shell around pressure conversion and closing windows while preserving 607 mana/protection density.",
-                "Only run a new shell gate when the candidate changes materially from the rejected pressure-repair shell.",
+                "Use the rejected recursion and pressure-conversion shells as telemetry, not as deck replacements.",
+                "Build another shell only if it materially changes closing-window execution while preserving the 607 mana/protection/miracle floor.",
+                "Require a declared evidence target before the next gate: miracle frequency at least matches 607 and at least one conversion card is naturally accessed or used.",
             ],
             "evidence": {
                 "generated_candidates": generated_candidates,

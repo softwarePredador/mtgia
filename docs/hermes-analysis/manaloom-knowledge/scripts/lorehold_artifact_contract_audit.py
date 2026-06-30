@@ -321,6 +321,19 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             canonical_summary=summary,
         )
 
+    if payload.get("status") == "compact_gate_summary" and "results" in keys:
+        summary = normalize_equal_battle_gate(payload)
+        summary["schema_version"] = "compact_gate_summary_v1"
+        status = "pass" if summary["result_count"] > 0 else "warn"
+        return ArtifactClassification(
+            **base,
+            artifact_kind="compact_gate_summary",
+            schema_version="compact_gate_summary_v1",
+            status=status,
+            detail="compact battle gate summary for planner consumption",
+            canonical_summary=summary,
+        )
+
     if "package_rollups" in keys and "packages" in keys:
         summary = {
             "schema_version": "exposure_outcome_audit_v2",

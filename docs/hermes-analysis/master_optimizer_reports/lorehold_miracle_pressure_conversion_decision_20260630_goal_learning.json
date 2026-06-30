@@ -1,0 +1,102 @@
+{
+  "baseline_deck_id": 607,
+  "generated_at": "2026-06-30T22:59:00Z",
+  "packages": [
+    {
+      "adds": [
+        "Aetherflux Reservoir",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "Boros Charm",
+        "Faithless Looting",
+        "Silence",
+        "Squee, Goblin Nabob",
+        "Underworld Breach",
+        "Wheel of Fortune"
+      ],
+      "aggregate": {
+        "baseline": {
+          "games": 4,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 4,
+          "losses": 4,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp_total": -25.0
+      },
+      "blockers": [
+        "lost natural smoke gate",
+        "regressed Winota critical matchup from 0/1 to 0/1 with no compensating wins elsewhere",
+        "miracle games fell from 4/4 on protected 607 to 2/4 on the candidate",
+        "Squee was discarded once but never returned, so recursion telemetry did not convert"
+      ],
+      "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+      "candidate_record": "0W/4L/0S",
+      "cuts": [
+        "Artist's Talent",
+        "Avatar's Wrath",
+        "Fated Clash",
+        "Furygale Flocking",
+        "Hexing Squelcher",
+        "Prismari Pianist",
+        "Tempt with Bunnies",
+        "Tragic Arrogance"
+      ],
+      "decision": "reject_or_rework",
+      "gate_summary": {
+        "baseline": {
+          "games": 4,
+          "losses": 3,
+          "stalls": 0,
+          "win_rate": 25.0,
+          "wins": 1
+        },
+        "candidate": {
+          "games": 4,
+          "losses": 4,
+          "stalls": 0,
+          "win_rate": 0.0,
+          "wins": 0
+        },
+        "delta_pp": -25.0
+      },
+      "package_key": "miracle_pressure_conversion_shell_v1",
+      "source_section": "from_scratch_shell_smoke_gate",
+      "telemetry": {
+        "baseline": {
+          "discard_to_top_games": 1,
+          "lorehold_upkeep_rummage_games": 4,
+          "miracle_games": 4,
+          "topdeck_games": 1
+        },
+        "candidate": {
+          "birgi_mana_games": 0,
+          "lorehold_upkeep_rummage_games": 3,
+          "miracle_games": 2,
+          "squee_return_games": 0,
+          "squee_to_graveyard_games": 1,
+          "static_cost_reduction_games": 3,
+          "topdeck_games": 1
+        }
+      },
+      "why_tested": "materially different multi-card shell preserving the 607 land base and core miracle/protection floor while adding compact spell-chain, recursion, and closing-window cards"
+    }
+  ],
+  "postgres_writes": false,
+  "source": {
+    "battle_gate_markdown": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate.md",
+    "battle_gate_summary_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json",
+    "builder_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json",
+    "candidate_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion.json",
+    "decklist": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion.decklist.txt",
+    "matrix_json": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_matrix.json",
+    "matrix_markdown": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_matrix.md"
+  },
+  "source_db_mutated": false
+}

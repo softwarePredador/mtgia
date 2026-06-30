@@ -11,6 +11,7 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
             set(builder.CHALLENGER_PLANS),
             {
                 "access_density_control",
+                "miracle_pressure_conversion",
                 "miracle_topdeck_control",
                 "spellchain_big_sorcery",
                 "recursion_discard_engine",
@@ -53,6 +54,32 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
         self.assertIn("607", candidate["battle_gate_command"])
         self.assertIn("--deck-ids", candidate["battle_gate_command"])
         self.assertIn("--matrix", candidate["battle_gate_command"])
+
+    def test_miracle_pressure_conversion_preserves_607_land_floor(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            report = builder.build_all(
+                source_db=builder.DEFAULT_SOURCE_DB,
+                plan_keys=["miracle_pressure_conversion"],
+                corpus_deck_ids=list(builder.DEFAULT_CORPUS_DECK_IDS),
+                out_dir=Path(tmp),
+                stem="unit_from_scratch_pressure_conversion",
+                opponent_limit=3,
+                games=1,
+                game_timeout_seconds=5.0,
+            )
+
+        candidate = report["candidates"][0]
+        lands = {
+            card["card_name"]: int(card.get("quantity") or 1)
+            for card in candidate["final_deck"]
+            if card.get("is_land")
+        }
+        for land_name in builder.CHALLENGER_PLANS["miracle_pressure_conversion"]["land_priority"]:
+            self.assertIn(land_name, lands)
+        self.assertEqual(lands["Mountain // Mountain"], 4)
+        self.assertEqual(lands["Plains // Plains"], 4)
+        self.assertEqual(candidate["quantity_total"], 100)
+        self.assertEqual(candidate["missing_required_cards"], [])
 
 
 if __name__ == "__main__":

@@ -3,17 +3,110 @@
     {
       "action_key": "rework_from_scratch_shell_after_current_shells_rejected",
       "blockers": [
-        "best confirmed from-scratch shell is below protected 607",
-        "positive Squee telemetry did not convert into wins",
+        "best current from-scratch gate is below protected 607",
+        "positive Squee or conversion telemetry did not convert into wins",
         "do not promote shell-level telemetry without equal-gate wins"
       ],
       "candidate_cards": [
+        "challenger_lorehold_miracle_pressure_conversion_v1",
         "challenger_lorehold_recursion_discard_engine_v1",
         "challenger_lorehold_recursion_discard_pressure_repair_v1"
       ],
       "cut_cards": [],
       "evidence": {
         "from_scratch_gate_rows": [
+          {
+            "baseline": {
+              "deck_key": "deck_607",
+              "games": 4,
+              "losses": 3,
+              "stalls": 0,
+              "strategic_games": {
+                "discard_to_top_replacement": {
+                  "games": 1,
+                  "rate": 0.25
+                },
+                "lorehold_cost_paid": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "lorehold_rummage_discard_to_top": {
+                  "games": 1,
+                  "rate": 0.25
+                },
+                "lorehold_spell_cast": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "miracle_cast": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 1,
+                  "rate": 0.25
+                }
+              },
+              "win_rate": 25.0,
+              "wins": 1
+            },
+            "candidate": {
+              "deck_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+              "games": 4,
+              "losses": 4,
+              "stalls": 0,
+              "strategic_games": {
+                "lorehold_cost_paid": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "lorehold_rummage_discards_squee": {
+                  "games": 1,
+                  "rate": 0.25
+                },
+                "lorehold_spell_cast": {
+                  "games": 4,
+                  "rate": 1.0
+                },
+                "lorehold_upkeep_rummage": {
+                  "games": 3,
+                  "rate": 0.75
+                },
+                "miracle_cast": {
+                  "games": 2,
+                  "rate": 0.5
+                },
+                "squee_to_graveyard": {
+                  "games": 1,
+                  "rate": 0.25
+                },
+                "squee_upkeep_return": {
+                  "games": 0,
+                  "rate": 0.0
+                },
+                "static_cost_reduction_total": {
+                  "games": 3,
+                  "rate": 0.75
+                },
+                "topdeck_manipulation_activated": {
+                  "games": 1,
+                  "rate": 0.25
+                }
+              },
+              "win_rate": 0.0,
+              "wins": 0
+            },
+            "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+            "candidate_miracle_games": 2,
+            "candidate_squee_return_games": 0,
+            "candidate_topdeck_games": 1,
+            "delta_wins": -1,
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json"
+          },
           {
             "baseline": {
               "deck_key": "deck_607",
@@ -343,14 +436,22 @@
             "intent_score": 94.056,
             "missing_required_cards": [],
             "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json"
+          },
+          {
+            "battle_gate_json": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate.json",
+            "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+            "candidate_name": "Lorehold From-Scratch Miracle Pressure Conversion v1",
+            "intent_score": 99.008,
+            "missing_required_cards": [],
+            "source_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json"
           }
         ]
       },
       "lane": "multi_card_shell",
       "next_steps": [
-        "Use the pressure-repair shell as telemetry, not as a deck replacement.",
-        "Build the next shell around pressure conversion and closing windows while preserving 607 mana/protection density.",
-        "Only run a new shell gate when the candidate changes materially from the rejected pressure-repair shell."
+        "Use the rejected recursion and pressure-conversion shells as telemetry, not as deck replacements.",
+        "Build another shell only if it materially changes closing-window execution while preserving the 607 mana/protection/miracle floor.",
+        "Require a declared evidence target before the next gate: miracle frequency at least matches 607 and at least one conversion card is naturally accessed or used."
       ],
       "priority": -5,
       "status": "from_scratch_shells_not_promotable",
@@ -7243,13 +7344,15 @@
   "focus_access_package_report": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
   "from_scratch_gate_reports": [
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json"
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json"
   ],
   "from_scratch_reports": [
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json"
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json"
   ],
-  "generated_at": "2026-06-30T22:47:14Z",
+  "generated_at": "2026-06-30T23:01:01Z",
   "guardrails": [
     {
       "guardrail_key": "no_automatic_gate_without_safe_cut",
@@ -7263,7 +7366,7 @@
     {
       "guardrail_key": "prior_package_reports_have_rejections",
       "reason": "Loaded prior package reports include explicit rejected package evidence; the planner must not recommend those exact add/cut packages as fresh gates.",
-      "rejected_package_count": 59,
+      "rejected_package_count": 60,
       "rejected_package_keys": [
         "angel_grace_life_floor_cut_dawn",
         "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
@@ -7306,6 +7409,7 @@
         "mana_vault_fast_mana_cut_arcane_signet",
         "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
         "millikin_same_lane_benchmark_cut_bender_s_waterskin",
+        "miracle_pressure_conversion_shell_v1",
         "monologue_tax_same_lane_benchmark_cut_bender_s_waterskin",
         "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
         "one_ring_protection_draw_cut_squelcher",
@@ -7410,7 +7514,8 @@
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
-    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json"
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
+    "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
   ],
   "profiled_cut_benchmark_reports": [
     "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json"
@@ -7435,7 +7540,7 @@
       "seed_safe_cut_unavailable": 1,
       "tutor_land_tax_benchmarks_rejected": 1
     },
-    "from_scratch_gate_count": 2,
+    "from_scratch_gate_count": 3,
     "gate_ready_now_count": 0,
     "hypothesis_queue_status_counts": {
       "tested_negative_do_not_promote": 13
@@ -7469,7 +7574,7 @@
       "volcanic_recursion_cut_pinnacle",
       "wheel_hand_filter_cut_big_score"
     ],
-    "prior_rejected_package_count": 59,
+    "prior_rejected_package_count": 60,
     "prior_rejected_package_keys": [
       "angel_grace_life_floor_cut_dawn",
       "basalt_monolith_same_lane_benchmark_cut_bender_s_waterskin",
@@ -7512,6 +7617,7 @@
       "mana_vault_fast_mana_cut_arcane_signet",
       "mana_vault_same_lane_benchmark_cut_bender_s_waterskin",
       "millikin_same_lane_benchmark_cut_bender_s_waterskin",
+      "miracle_pressure_conversion_shell_v1",
       "monologue_tax_same_lane_benchmark_cut_bender_s_waterskin",
       "ol_rin_s_searing_light_interaction_benchmark_cut_winds_of_abandon",
       "one_ring_protection_draw_cut_squelcher",

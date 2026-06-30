@@ -192,6 +192,30 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(candidate.artifact_kind, "from_scratch_challenger_candidate")
         self.assertEqual(candidate.status, "pass")
 
+    def test_compact_gate_summary_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-06-30T00:00:00Z",
+            "results": [
+                {"deck_key": "deck_607", "games": 4, "wins": 1, "losses": 3, "stalls": 0},
+                {
+                    "deck_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+                    "games": 4,
+                    "wins": 0,
+                    "losses": 4,
+                    "stalls": 0,
+                },
+            ],
+            "source_gate_markdown": "gate.md",
+            "status": "compact_gate_summary",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            classification = audit.classify_payload(Path(tmp) / "gate_summary.json", payload)
+
+        self.assertEqual(classification.artifact_kind, "compact_gate_summary")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["result_count"], 2)
+
     def test_focus_decision_wrapper_is_recognized(self) -> None:
         payload = {
             "generated_at": "2026-06-30T00:00:00Z",

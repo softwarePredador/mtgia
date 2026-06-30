@@ -13,7 +13,10 @@ def test_defaults_use_current_cut_models():
         "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
     )
     assert planner.DEFAULT_FROM_SCRATCH_GATE_REPORTS[-1].name == (
-        "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json"
+        "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json"
+    )
+    assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
+        "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
     )
     assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
     assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"

@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-06-30T22:54:55Z",
+  "source_gate_markdown": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate.md",
+  "results": [
+    {
+      "deck_key": "deck_607",
+      "games": 4,
+      "losses": 3,
+      "stalls": 0,
+      "telemetry": {
+        "strategic_games": {
+          "discard_to_top_replacement": {
+            "games": 1,
+            "rate": 0.25
+          },
+          "lorehold_cost_paid": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discard_to_top": {
+            "games": 1,
+            "rate": 0.25
+          },
+          "lorehold_spell_cast": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "miracle_cast": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "topdeck_manipulation_activated": {
+            "games": 1,
+            "rate": 0.25
+          }
+        }
+      },
+      "win_rate": 25.0,
+      "wins": 1
+    },
+    {
+      "deck_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+      "games": 4,
+      "losses": 4,
+      "stalls": 0,
+      "telemetry": {
+        "strategic_games": {
+          "lorehold_cost_paid": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "lorehold_rummage_discards_squee": {
+            "games": 1,
+            "rate": 0.25
+          },
+          "lorehold_spell_cast": {
+            "games": 4,
+            "rate": 1.0
+          },
+          "lorehold_upkeep_rummage": {
+            "games": 3,
+            "rate": 0.75
+          },
+          "miracle_cast": {
+            "games": 2,
+            "rate": 0.5
+          },
+          "squee_to_graveyard": {
+            "games": 1,
+            "rate": 0.25
+          },
+          "squee_upkeep_return": {
+            "games": 0,
+            "rate": 0.0
+          },
+          "static_cost_reduction_total": {
+            "games": 3,
+            "rate": 0.75
+          },
+          "topdeck_manipulation_activated": {
+            "games": 1,
+            "rate": 0.25
+          }
+        }
+      },
+      "win_rate": 0.0,
+      "wins": 0
+    }
+  ],
+  "status": "compact_gate_summary"
+}

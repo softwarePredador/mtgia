@@ -769,6 +769,26 @@ From-scratch shell handoff generated on 2026-06-30:
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
 
+Miracle pressure-conversion shell decision generated on 2026-06-30:
+
+- Candidate:
+  `challenger_lorehold_miracle_pressure_conversion_v1`.
+- Why it was tested: preserve the `607` land base and protected
+  miracle/protection floor while adding a compact conversion package
+  (`Aetherflux Reservoir`, `Birgi`, `Squee`, `Faithless Looting`,
+  `Underworld Breach`, `Wheel of Fortune`, `Boros Charm`, and `Silence`).
+- Smoke result against fixed `607`: baseline `607` = `1/4`; candidate =
+  `0/4`.
+- Direct strategic signal: candidate miracle games fell to `2/4` versus
+  baseline `4/4`; `Squee` reached the graveyard once but returned `0` times;
+  `Birgi` generated `0` mana-trigger games.
+- Decision: reject this exact shell and do not confirm it to 8x3. Preserving
+  the `607` floor was necessary but not sufficient; the next shell must improve
+  actual closing-window execution instead of merely adding compact conversion
+  cards.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.md`.
+
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 
 - Candidate:
