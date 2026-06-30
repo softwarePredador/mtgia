@@ -82,6 +82,9 @@ class LoreholdIdealDeckCandidateMatrixTests(unittest.TestCase):
         )
 
     def add_rule(self, name: str, *, effect: str, category: str) -> None:
+        self.add_rule_with_alias(name, name, effect=effect, category=category)
+
+    def add_rule_with_alias(self, normalized_name: str, card_name: str, *, effect: str, category: str) -> None:
         self.conn.execute(
             """
             INSERT INTO battle_card_rules (
@@ -92,9 +95,9 @@ class LoreholdIdealDeckCandidateMatrixTests(unittest.TestCase):
             VALUES (?,?,?,?,?,?,?,?,?,?,?)
             """,
             (
-                matrix.normalize_name(name),
-                f"{matrix.normalize_name(name)}__rule",
-                name,
+                matrix.normalize_name(normalized_name),
+                f"{matrix.normalize_name(card_name)}__rule",
+                card_name,
                 json.dumps({"effect": effect, "battle_model_scope": f"{effect}_v1"}),
                 json.dumps({"category": category}),
                 "test",
@@ -171,6 +174,56 @@ class LoreholdIdealDeckCandidateMatrixTests(unittest.TestCase):
         self.assertEqual(row["recommendation_lane"], "policy_blocked")
         self.assertEqual(row["score"], -1000.0)
         self.assertEqual(row["next_action"], "exclude_from_lorehold_no_premium_mox_policy")
+
+    def test_basic_lands_do_not_block_strategy_for_missing_rules(self) -> None:
+        self.add_card(
+            608,
+            "Mountain // Mountain",
+            tag="land",
+            cmc=0,
+            type_line="Basic Land — Mountain",
+            oracle_text="",
+        )
+
+        report = matrix.build_candidate_matrix(
+            self.conn,
+            active_deck_id=6,
+            deck_ids=[6, 608],
+            proposals={},
+        )
+
+        row = next(item for item in report["rows"] if item["card_name"] == "Mountain // Mountain")
+        self.assertEqual(row["rule_status"], "battle_ready")
+        self.assertNotEqual(row["recommendation_lane"], "needs_rule_before_strategy")
+
+    def test_battle_rules_match_card_name_alias_when_normalized_face_differs(self) -> None:
+        full_name = "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+        self.add_card(
+            608,
+            full_name,
+            tag="ramp",
+            tags=["engine", "ramp"],
+            cmc=3,
+            type_line="Legendary Creature — God",
+            oracle_text="Whenever you cast a spell, add R.",
+        )
+        self.add_rule_with_alias(
+            "Birgi, God of Storytelling",
+            full_name,
+            effect="ramp_engine",
+            category="ramp",
+        )
+
+        report = matrix.build_candidate_matrix(
+            self.conn,
+            active_deck_id=6,
+            deck_ids=[6, 608],
+            proposals={},
+        )
+
+        row = next(item for item in report["rows"] if item["card_name"] == full_name)
+        self.assertEqual(row["rule_status"], "battle_ready")
+        self.assertNotEqual(row["recommendation_lane"], "needs_rule_before_strategy")
 
 
 if __name__ == "__main__":

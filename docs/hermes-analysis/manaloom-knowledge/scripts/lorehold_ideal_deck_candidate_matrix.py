@@ -269,6 +269,7 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
     grouped: dict[str, dict[str, Any]] = {}
     for row in rows:
         normalized = normalize_name(row["normalized_name"] or row["card_name"])
+        card_name_alias = normalize_name(row["card_name"])
         item = grouped.setdefault(
             normalized,
             {
@@ -281,8 +282,11 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
                 "roles": set(),
                 "logical_rule_keys": [],
                 "max_confidence": 0.0,
+                "_aliases": set(),
             },
         )
+        if card_name_alias:
+            item["_aliases"].add(card_name_alias)
         item["rule_count"] += 1
         review_status = str(row["review_status"] or "")
         execution_status = str(row["execution_status"] or "")
@@ -307,7 +311,8 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
             pass
     result: dict[str, dict[str, Any]] = {}
     for normalized, item in grouped.items():
-        result[normalized] = {
+        aliases = set(item.pop("_aliases", set()))
+        normalized_result = {
             **item,
             "review_statuses": sorted(item["review_statuses"]),
             "execution_statuses": sorted(item["execution_statuses"]),
@@ -315,6 +320,9 @@ def load_battle_rules(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
             "scopes": sorted(item["scopes"]),
             "roles": ordered_roles(item["roles"]),
         }
+        result[normalized] = normalized_result
+        for alias in aliases:
+            result.setdefault(alias, normalized_result)
     return result
 
 
@@ -426,6 +434,9 @@ def infer_rule_status(
     battle_rule: dict[str, Any] | None,
     proposal: dict[str, Any] | None,
 ) -> str:
+    type_line = str(item.get("type_line") or "")
+    if "Basic Land" in type_line:
+        return "battle_ready"
     if battle_rule and int(battle_rule.get("executable_rule_count") or 0) > 0:
         return "battle_ready"
     proposed = proposal_rule_status(proposal)

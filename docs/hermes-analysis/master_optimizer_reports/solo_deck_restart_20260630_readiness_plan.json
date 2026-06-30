@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-06-30T14:22:00Z",
+  "branch": "codex/solo-consolidation-20260630",
+  "baseline_deck_id": 607,
+  "variant_deck_ids": [608, 609, 610, 611, 612, 613, 614, 615, 616],
+  "postgres_writes": false,
+  "deck_mutations": false,
+  "summary": {
+    "variant_only_card_count": 270,
+    "runtime_ready_unexplored_count": 243,
+    "tested_negative_add_count": 18,
+    "gate_ready_pairing_count": 0,
+    "raw_runtime_gap_count": 9,
+    "filtered_runtime_gap_count": 8,
+    "matrix_rows": 348,
+    "matrix_battle_ready": 340,
+    "matrix_no_rule_signal": 5,
+    "matrix_package_already_prepared": 3,
+    "matrix_priority_benchmark_candidates": 172
+  },
+  "rule_first_blockers": [
+    {"card_name": "Deathbellow War Cry", "deck_ids": [616], "roles": ["tutor"], "score": 21.5, "next_action": "reconcile_exact_mapper_scope_then_focused_tutor_runtime_test"},
+    {"card_name": "Charmbreaker Devils", "deck_ids": [612], "roles": ["unknown"], "score": -1.0, "next_action": "inspect_xmage_recursion_trigger_then_decide_runtime_priority"},
+    {"card_name": "Naktamun Lorespinner // Wheel of Fortune", "deck_ids": [608], "roles": ["unknown"], "score": -2.0, "next_action": "split_draw_engine_wheel_scope_or_defer"},
+    {"card_name": "Karn's Sylex", "deck_ids": [610], "roles": ["unknown"], "score": -6.0, "next_action": "defer_unless_karn_sylex_package_becomes_strategy_relevant"},
+    {"card_name": "Karn, the Great Creator", "deck_ids": [610], "roles": ["unknown"], "score": -6.0, "next_action": "defer_unless_karn_artifact_lock_package_becomes_strategy_relevant"}
+  ],
+  "prepared_not_final_truth": [
+    {"card_name": "Chandra's Ignition", "deck_ids": [613], "status": "package_already_prepared_watchlist"},
+    {"card_name": "Blood Moon", "deck_ids": [616], "status": "package_already_prepared_watchlist"},
+    {"card_name": "Ancient Gold Dragon", "deck_ids": [612], "status": "runtime_local_package_prepared_low_priority_pg_pending"}
+  ],
+  "first_benchmark_pool": [
+    "Mizzix's Mastery",
+    "Library of Leng",
+    "Reforge the Soul",
+    "Deflecting Swat",
+    "Restoration Seminar",
+    "Enlightened Tutor",
+    "Gamble",
+    "Monument to Endurance",
+    "Sensei's Divining Top",
+    "Teferi's Protection",
+    "Scroll Rack",
+    "Boros Charm",
+    "Silence",
+    "Big Score",
+    "Storm-Kiln Artist",
+    "Olórin's Searing Light",
+    "Brass's Bounty",
+    "Volcanic Vision",
+    "Improvisation Capstone",
+    "Smothering Tithe"
+  ],
+  "next_steps": [
+    "reconcile_mapper_work_manually",
+    "close_or_defer_five_rule_first_cards",
+    "build_cut_lane_models_because_gate_ready_pairing_count_is_zero",
+    "run_baseline_hash_guard_then_single_package_benchmark_with_drawn_cast_used_evidence"
+  ],
+  "validation": {
+    "focused_unittest_suite": {"status": "pass", "result": "52 tests OK"},
+    "runtime_tests": {"status": "pass", "tests": ["test_artifact_topdeck_runtime", "test_session_agent3_finisher_draw_recursion_runtime"]},
+    "xmage_strategy_consistency_audit": {"status": "pass", "check_count": 26},
+    "operational_surface_alignment_audit": {"status": "pass"},
+    "deckbuilding_contract_surface_audit": {"status": "pass"},
+    "pg_hermes_sqlite_contract_audit_skip_pg_main_sqlite": {"status": "pass", "pass": 29, "warn": 3}
+  }
+}
