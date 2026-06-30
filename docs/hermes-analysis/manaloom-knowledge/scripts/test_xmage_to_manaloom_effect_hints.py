@@ -7598,7 +7598,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["CREATURE"]},
                 },
                 "token_maker",
-                "xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+                "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
             ),
             (
                 "BloodMoon",
@@ -7619,7 +7619,35 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "constructor_metadata": {"card_types": ["SORCERY"]},
                 },
                 "sweeper_damage",
-                "xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+                "controlled_creature_power_damage_each_other_creature_each_opponent_v1",
+            ),
+            (
+                "CharmbreakerDevils",
+                {
+                    "effect_classes": ["BoostSourceEffect", "ReturnFromGraveyardAtRandomEffect"],
+                    "ability_classes": [
+                        "BeginningOfUpkeepTriggeredAbility",
+                        "SpellCastControllerTriggeredAbility",
+                    ],
+                    "constructor_metadata": {"card_types": ["CREATURE"]},
+                },
+                "creature",
+                "upkeep_return_random_instant_sorcery_graveyard_to_hand_spell_cast_plus_4_0_v1",
+            ),
+            (
+                "NaktamunLorespinner",
+                {
+                    "effect_classes": [
+                        "BecomePreparedSourceEffect",
+                        "DiscardHandAllEffect",
+                        "DrawCardAllEffect",
+                    ],
+                    "ability_classes": ["BeginningOfUpkeepTriggeredAbility"],
+                    "condition_classes": ["NaktamunLorespinnerCondition"],
+                    "constructor_metadata": {"card_types": ["CREATURE", "SORCERY"]},
+                },
+                "creature",
+                "upkeep_prepare_if_player_hand_size_lte_one_prepared_wheel_discard_draw_seven_v1",
             ),
             (
                 "GhoulcallersBell",
@@ -7760,15 +7788,47 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                 self.assertEqual(primary["battle_model_scope"], expected_scope)
                 self.assertNotEqual(primary["effect"], "external_reference_required_manual_model")
                 if class_name in {
+                    "AncientGoldDragon",
+                    "ChandrasIgnition",
+                    "CharmbreakerDevils",
                     "GhoulcallersBell",
                     "KaylasMusicBox",
                     "LanternOfInsight",
+                    "NaktamunLorespinner",
                     "PossibilityStorm",
                 }:
                     self.assertFalse(expected_scope.startswith("xmage_"))
                     self.assertFalse(expected_scope.endswith("_review_v1"))
                 else:
                     self.assertTrue(expected_scope.startswith("xmage_"))
+                if class_name == "AncientGoldDragon":
+                    self.assertEqual(primary["trigger"], "combat_damage_to_player")
+                    self.assertEqual(primary["trigger_effect"], "token_maker")
+                    self.assertTrue(primary["trigger_source_deals_combat_damage_to_player"])
+                    self.assertEqual(primary["token_count_source"], "d20_result")
+                    self.assertEqual(primary["die_sides"], 20)
+                    self.assertEqual(primary["token_subtype"], "Faerie Dragon")
+                    self.assertTrue(primary["token_flying"])
+                if class_name == "ChandrasIgnition":
+                    self.assertEqual(primary["target"], "controlled_creature")
+                    self.assertEqual(primary["damage_amount_source"], "target_creature_power")
+                    self.assertTrue(primary["damage_each_other_creature"])
+                    self.assertTrue(primary["damage_each_opponent"])
+                    self.assertEqual(primary["damage_source"], "target_creature")
+                if class_name == "CharmbreakerDevils":
+                    self.assertTrue(primary["upkeep_return_random_instant_sorcery_from_graveyard_to_hand"])
+                    self.assertEqual(primary["upkeep_recursion_selection"], "random")
+                    self.assertEqual(primary["upkeep_recursion_destination"], "hand")
+                    self.assertEqual(primary["trigger"], "instant_sorcery_cast")
+                    self.assertEqual(primary["trigger_effect"], "boost_source_until_eot")
+                    self.assertEqual(primary["trigger_power_bonus_until_eot"], 4)
+                if class_name == "NaktamunLorespinner":
+                    self.assertEqual(primary["upkeep_prepare_if_any_player_hand_size_lte"], 1)
+                    self.assertTrue(primary["prepare_creates_spell_copy"])
+                    self.assertEqual(primary["prepared_spell_name"], "Wheel of Fortune")
+                    self.assertEqual(primary["prepare"]["effect"], "draw_cards")
+                    self.assertEqual(primary["prepare"]["count"], 7)
+                    self.assertTrue(primary["prepare"]["wheel_like"])
                 if class_name == "KaylasMusicBox":
                     self.assertTrue(primary["activated_exile_top_card_face_down"])
                     self.assertEqual(primary["activation_cost_mana"], "{W}")

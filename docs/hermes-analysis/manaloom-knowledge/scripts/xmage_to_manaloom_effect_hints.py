@@ -7400,11 +7400,10 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="token_maker",
-                scope="xmage_combat_damage_d20_faerie_dragon_token_review_v1",
+                scope="source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1",
                 reason=(
                     "XMage structure matches Ancient Gold Dragon: combat damage to a player rolls a d20 "
-                    "and creates that many 1/1 blue Faerie Dragon creature tokens with flying. Keep it "
-                    "in split-scope review until ManaLoom has exact d20/token runtime tests."
+                    "and creates that many 1/1 blue Faerie Dragon creature tokens with flying."
                 ),
                 ability_kind="triggered",
                 requires_runtime_executor=True,
@@ -7413,7 +7412,8 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "toughness": 10,
                     "flying": True,
                     "trigger": "combat_damage_to_player",
-                    "trigger_effect": "roll_d20_create_tokens",
+                    "trigger_effect": "token_maker",
+                    "trigger_source_deals_combat_damage_to_player": True,
                     "die_sides": 20,
                     "token_count_source": "d20_result",
                     "token_name": "Faerie Dragon Token",
@@ -7422,6 +7422,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "token_power": 1,
                     "token_toughness": 1,
                     "token_flying": True,
+                    "token_keywords": ["flying"],
                 },
                 matched_signals=[
                     "DealsCombatDamageToAPlayerTriggeredAbility",
@@ -7471,7 +7472,7 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
         candidates.append(
             _candidate(
                 effect="sweeper_damage",
-                scope="xmage_controlled_creature_power_damage_each_other_creature_each_opponent_review_v1",
+                scope="controlled_creature_power_damage_each_other_creature_each_opponent_v1",
                 reason=(
                     "XMage structure matches Chandra's Ignition: target creature you control deals "
                     "damage equal to its power to each other creature and each opponent."
@@ -7491,6 +7492,97 @@ def build_effect_hints(index_entry: dict[str, Any], oracle_text: str = "") -> di
                     "ChandrasIgnitionEffect",
                     "TargetControlledCreaturePermanent",
                     "targetCreature.getPower()",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "CharmbreakerDevils"
+        and card_types == {"CREATURE"}
+        and "ReturnFromGraveyardAtRandomEffect" in effect_classes
+        and "BoostSourceEffect" in effect_classes
+        and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+        and "SpellCastControllerTriggeredAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="upkeep_return_random_instant_sorcery_graveyard_to_hand_spell_cast_plus_4_0_v1",
+                reason=(
+                    "XMage structure matches Charmbreaker Devils: at controller upkeep it returns "
+                    "a random instant or sorcery card from graveyard to hand, and each instant/sorcery "
+                    "cast gives the source +4/+0 until end of turn."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 4,
+                    "toughness": 4,
+                    "upkeep_return_random_instant_sorcery_from_graveyard_to_hand": True,
+                    "upkeep_recursion_target": "instant_or_sorcery",
+                    "upkeep_recursion_destination": "hand",
+                    "upkeep_recursion_selection": "random",
+                    "trigger": "instant_sorcery_cast",
+                    "trigger_effect": "boost_source_until_eot",
+                    "trigger_power_bonus_until_eot": 4,
+                    "trigger_toughness_bonus_until_eot": 0,
+                },
+                matched_signals=[
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "ReturnFromGraveyardAtRandomEffect",
+                    "SpellCastControllerTriggeredAbility",
+                    "BoostSourceEffect",
+                ],
+            )
+        )
+
+    if (
+        xmage_class_name == "NaktamunLorespinner"
+        and "CREATURE" in card_types
+        and "SORCERY" in card_types
+        and "BecomePreparedSourceEffect" in effect_classes
+        and "DiscardHandAllEffect" in effect_classes
+        and "DrawCardAllEffect" in effect_classes
+        and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+    ):
+        candidates.append(
+            _candidate(
+                effect="creature",
+                scope="upkeep_prepare_if_player_hand_size_lte_one_prepared_wheel_discard_draw_seven_v1",
+                reason=(
+                    "XMage structure matches Naktamun Lorespinner // Wheel of Fortune: upkeep "
+                    "prepare condition is separate from the prepared back-face wheel that makes "
+                    "each player discard their hand and draw seven cards."
+                ),
+                ability_kind="triggered",
+                requires_runtime_executor=True,
+                extra_effect_fields={
+                    "power": 3,
+                    "toughness": 3,
+                    "upkeep_prepare_if_any_player_hand_size_lte": 1,
+                    "prepare_creates_spell_copy": True,
+                    "prepare_cleanup_when_unprepared": True,
+                    "prepared_spell_name": "Wheel of Fortune",
+                    "prepared_spell_effect": "draw_cards",
+                    "prepared_spell_count": 7,
+                    "prepared_spell_wheel_like": True,
+                    "prepare": {
+                        "name": "Wheel of Fortune",
+                        "mana_cost": "{2}{R}",
+                        "cmc": 3,
+                        "type_line": "Sorcery",
+                        "effect": "draw_cards",
+                        "count": 7,
+                        "wheel_like": True,
+                        "battle_model_scope": "prepared_each_player_discard_hand_draw_seven_v1",
+                    },
+                },
+                matched_signals=[
+                    "BeginningOfUpkeepTriggeredAbility",
+                    "NaktamunLorespinnerCondition",
+                    "BecomePreparedSourceEffect",
+                    "DiscardHandAllEffect",
+                    "DrawCardAllEffect",
                 ],
             )
         )

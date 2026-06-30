@@ -442,6 +442,28 @@ def family_for_effect_json(effect_json: dict[str, Any]) -> str:
     ):
         return "token_maker"
     if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1"
+        and effect_json.get("effect") == "token_maker"
+        and effect_json.get("trigger") == "combat_damage_to_player"
+        and effect_json.get("trigger_effect") == "token_maker"
+    ):
+        return "token_maker"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "upkeep_return_random_instant_sorcery_graveyard_to_hand_spell_cast_plus_4_0_v1"
+        and effect_json.get("effect") == "creature"
+        and effect_json.get("upkeep_return_random_instant_sorcery_from_graveyard_to_hand")
+    ):
+        return "recursion"
+    if (
+        str(effect_json.get("battle_model_scope") or "")
+        == "upkeep_prepare_if_player_hand_size_lte_one_prepared_wheel_discard_draw_seven_v1"
+        and effect_json.get("effect") == "creature"
+        and effect_json.get("prepare", {}).get("wheel_like")
+    ):
+        return "draw_engine"
+    if (
         str(effect_json.get("battle_model_scope") or "") == "controlled_creature_enters_damage_each_opponent_v1"
         and effect_json.get("trigger") == "creature_you_control_enters"
         and effect_json.get("trigger_effect") == "damage_each_opponent"
@@ -831,6 +853,7 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
     effect_classes = xmage_effect_classes(card)
     cost_classes = xmage_cost_classes(card)
     target_classes = xmage_target_classes(card)
+    condition_classes = xmage_condition_classes(card)
     filter_classes = set((card.get("xmage") or {}).get("filter_classes") or [])
 
     if effect == "mill_engine" and scope == "artifact_tap_sacrifice_permanent_target_player_mill_v1":
@@ -858,6 +881,78 @@ def exact_scope_batch_safe(card: dict[str, Any]) -> bool:
             and int(effect_json.get("mill_count") or 0) == 1
             and effect_json.get("mill_scope") == "each_player"
             and effect_json.get("target") == "each_player"
+        )
+    if (
+        effect == "token_maker"
+        and scope == "source_combat_damage_player_roll_d20_create_faerie_dragon_tokens_equal_result_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and "AncientGoldDragonEffect" in effect_classes
+            and "DealsCombatDamageToAPlayerTriggeredAbility" in ability_classes
+            and effect_json.get("trigger") == "combat_damage_to_player"
+            and effect_json.get("trigger_effect") == "token_maker"
+            and bool(effect_json.get("trigger_source_deals_combat_damage_to_player"))
+            and effect_json.get("token_count_source") == "d20_result"
+            and int(effect_json.get("die_sides") or 0) == 20
+            and effect_json.get("token_subtype") == "Faerie Dragon"
+            and int(effect_json.get("token_power") or 0) == 1
+            and int(effect_json.get("token_toughness") or 0) == 1
+            and bool(effect_json.get("token_flying"))
+        )
+    if (
+        effect == "sweeper_damage"
+        and scope == "controlled_creature_power_damage_each_other_creature_each_opponent_v1"
+    ):
+        return (
+            types == {"SORCERY"}
+            and "ChandrasIgnitionEffect" in effect_classes
+            and "TargetControlledCreaturePermanent" in target_classes
+            and effect_json.get("target") == "controlled_creature"
+            and effect_json.get("damage_amount_source") == "target_creature_power"
+            and bool(effect_json.get("damage_each_other_creature"))
+            and bool(effect_json.get("damage_each_opponent"))
+            and effect_json.get("damage_source") == "target_creature"
+        )
+    if (
+        effect == "creature"
+        and scope == "upkeep_return_random_instant_sorcery_graveyard_to_hand_spell_cast_plus_4_0_v1"
+    ):
+        return (
+            types == {"CREATURE"}
+            and {"ReturnFromGraveyardAtRandomEffect", "BoostSourceEffect"}.issubset(effect_classes)
+            and {
+                "BeginningOfUpkeepTriggeredAbility",
+                "SpellCastControllerTriggeredAbility",
+            }.issubset(ability_classes)
+            and bool(effect_json.get("upkeep_return_random_instant_sorcery_from_graveyard_to_hand"))
+            and effect_json.get("upkeep_recursion_target") == "instant_or_sorcery"
+            and effect_json.get("upkeep_recursion_destination") == "hand"
+            and effect_json.get("upkeep_recursion_selection") == "random"
+            and effect_json.get("trigger") == "instant_sorcery_cast"
+            and effect_json.get("trigger_effect") == "boost_source_until_eot"
+            and int(effect_json.get("trigger_power_bonus_until_eot") or 0) == 4
+            and int(effect_json.get("trigger_toughness_bonus_until_eot") or 0) == 0
+        )
+    if (
+        effect == "creature"
+        and scope == "upkeep_prepare_if_player_hand_size_lte_one_prepared_wheel_discard_draw_seven_v1"
+    ):
+        prepare = effect_json.get("prepare") or {}
+        return (
+            "CREATURE" in types
+            and "SORCERY" in types
+            and "BecomePreparedSourceEffect" in effect_classes
+            and "DiscardHandAllEffect" in effect_classes
+            and "DrawCardAllEffect" in effect_classes
+            and "BeginningOfUpkeepTriggeredAbility" in ability_classes
+            and "NaktamunLorespinnerCondition" in condition_classes
+            and int(effect_json.get("upkeep_prepare_if_any_player_hand_size_lte") or 0) == 1
+            and bool(effect_json.get("prepare_creates_spell_copy"))
+            and prepare.get("name") == "Wheel of Fortune"
+            and prepare.get("effect") == "draw_cards"
+            and int(prepare.get("count") or 0) == 7
+            and bool(prepare.get("wheel_like"))
         )
     if (
         effect == "topdeck_play"
