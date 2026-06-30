@@ -224,13 +224,20 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
 
     if "ranked_deck_keys" in keys and ("decks" in keys or "ranked_decks" in keys):
         summary = normalize_strategy_matrix(payload)
-        status = "pass" if not summary["missing_required_decks"] else "fail"
+        is_current_matrix = path.resolve() == CURRENT_MATRIX.resolve()
+        status = "pass" if (not is_current_matrix or not summary["missing_required_decks"]) else "fail"
         return ArtifactClassification(
             **base,
             artifact_kind="strategy_matrix",
             schema_version=summary["schema_version"],
             status=status,
-            detail="current matrix shape" if "decks" in keys else "legacy ranked_decks shape",
+            detail=(
+                "current matrix shape"
+                if is_current_matrix
+                else "candidate matrix shape"
+                if "decks" in keys
+                else "legacy ranked_decks shape"
+            ),
             canonical_summary=summary,
         )
 
@@ -313,6 +320,16 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ("thor_rule_runtime_audit", {"reviewed_rule", "runtime_test_verification"}, "Thor runtime audit"),
         ("tutor_cut_model", {"cut_pair_evaluations", "top_direct_gate_candidates"}, "tutor cut model"),
         ("variant_gap_miner", {"top_variant_candidates", "pairing_hypotheses"}, "variant gap miner"),
+        (
+            "cut_methodology_reaudit",
+            {"candidate_report", "validation_report", "pairs", "metric_contract", "decision"},
+            "Lorehold cut methodology decision audit",
+        ),
+        (
+            "molecule_scarlet_validation",
+            {"natural", "forced_opening_diagnostic", "structural_matrix", "decision"},
+            "Molecule Man and The Scarlet Witch validation decision",
+        ),
         (
             "commander_learned_deck_import",
             {"source_system", "source_ref", "commander_name", "card_list", "card_count"},

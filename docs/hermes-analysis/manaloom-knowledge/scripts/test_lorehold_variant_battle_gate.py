@@ -23,6 +23,24 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         telemetry.begin("game-1")
         telemetry.record("miracle_cast", {"player": "Lorehold", "card": "Austere Command"})
         telemetry.record("cost_paid", {"player": "Lorehold", "card": "Sol Ring"})
+        telemetry.record(
+            "cost_paid",
+            {
+                "player": "Lorehold",
+                "card": "Rise of the Eldrazi",
+                "locked_cost": {
+                    "generic": 8,
+                    "static_cost_reduction_total": 2,
+                    "static_cost_reductions": [
+                        {
+                            "source": "The Scarlet Witch",
+                            "applied_amount": 2,
+                            "scope": "power_based_instant_sorcery_cost_reduction_v1",
+                        }
+                    ],
+                },
+            },
+        )
         telemetry.record("cost_paid", {"player": "Lorehold", "card": "Thor, God of Thunder"})
         telemetry.record("spell_cast", {"player": "Opponent", "card": "Counterspell"})
         telemetry.record("spell_cast", {"player": "Lorehold", "card": "Thor, God of Thunder"})
@@ -135,6 +153,10 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["thor_spell_cast"], 1)
         self.assertEqual(payload["strategic_event_counts"]["spell_cast_mana_trigger"], 1)
         self.assertEqual(payload["strategic_event_counts"]["birgi_spell_cast_mana"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["static_cost_reduction_casts"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["static_cost_reduction_total"], 2)
+        self.assertEqual(payload["strategic_event_counts"]["scarlet_static_cost_reduction_casts"], 1)
+        self.assertEqual(payload["strategic_event_counts"]["scarlet_static_cost_reduction_total"], 2)
         self.assertEqual(payload["strategic_event_counts"]["hand_to_topdeck_activation"], 1)
         self.assertEqual(payload["strategic_event_counts"]["lorehold_upkeep_rummage"], 2)
         self.assertEqual(payload["strategic_event_counts"]["discard_to_top_replacement"], 2)
@@ -149,8 +171,12 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_event_counts"]["squee_return_without_known_graveyard_entry"], 1)
         self.assertEqual(payload["event_counts_by_game"]["game-1"]["miracle_cast"], 1)
         self.assertEqual(payload["card_event_counts"]["cost_paid:Sol Ring"], 1)
+        self.assertEqual(payload["card_event_counts"]["cost_paid:Rise of the Eldrazi"], 1)
         self.assertEqual(payload["card_event_counts"]["spell_cast:Thor, God of Thunder"], 1)
         self.assertEqual(payload["card_event_counts"]["treasure_created:Brass's Bounty"], 1)
+        self.assertEqual(payload["card_strategy_counts"]["static_cost_reduction_on:Rise of the Eldrazi"], 2)
+        self.assertEqual(payload["card_strategy_counts"]["static_cost_reduction_saved:The Scarlet Witch"], 2)
+        self.assertEqual(payload["card_strategy_counts"]["static_cost_reduction_source_cast:The Scarlet Witch"], 1)
         self.assertEqual(payload["card_strategy_counts"]["topdeck:Scroll Rack"], 1)
         self.assertEqual(payload["card_strategy_counts"]["discard_to_top:Storm Herd"], 1)
         self.assertEqual(payload["card_strategy_counts"]["spell_rummage_to_top:Rise of the Eldrazi"], 1)
@@ -201,6 +227,8 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertEqual(payload["strategic_games"]["miracle_cast"]["rate"], 0.5)
         self.assertEqual(payload["strategic_games"]["lorehold_spell_cast"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["birgi_spell_cast_mana"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["scarlet_static_cost_reduction_casts"]["games"], 1)
+        self.assertEqual(payload["strategic_games"]["scarlet_static_cost_reduction_total"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["hand_to_topdeck_activation"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["discard_to_top_replacement"]["games"], 1)
         self.assertEqual(payload["strategic_games"]["lorehold_rummage_discard_to_top"]["games"], 1)

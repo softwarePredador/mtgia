@@ -419,6 +419,10 @@ class GateTelemetry:
             "squee_return_after_known_graveyard_entry": set(),
             "squee_return_without_known_graveyard_entry": set(),
             "squee_upkeep_return": set(),
+            "static_cost_reduction_casts": set(),
+            "static_cost_reduction_total": set(),
+            "scarlet_static_cost_reduction_casts": set(),
+            "scarlet_static_cost_reduction_total": set(),
             "thor_cost_paid": set(),
             "thor_spell_cast": set(),
             "thor_noncreature_damage": set(),
@@ -470,6 +474,30 @@ class GateTelemetry:
             for key in ("destination", "to_zone", "zone_after", "discard_destination", "final_to_zone")
             if data.get(key)
         }
+
+    def _static_cost_reduction_payloads(self, data: Mapping[str, Any]) -> list[dict[str, Any]]:
+        locked_cost = data.get("locked_cost")
+        if not isinstance(locked_cost, Mapping):
+            return []
+        reductions = locked_cost.get("static_cost_reductions")
+        if not isinstance(reductions, list):
+            return []
+        payloads: list[dict[str, Any]] = []
+        for item in reductions:
+            if not isinstance(item, Mapping):
+                continue
+            applied_amount = max(0, int(item.get("applied_amount") or item.get("amount") or 0))
+            if applied_amount <= 0:
+                continue
+            payloads.append(
+                {
+                    "source": str(item.get("source") or "unknown"),
+                    "applied_amount": applied_amount,
+                    "scope": str(item.get("scope") or ""),
+                    "amount_source": str(item.get("amount_source") or ""),
+                }
+            )
+        return payloads
 
     def _discard_to_top_names(self, data: Mapping[str, Any]) -> list[str]:
         names = self._payload_names(data, ("discarded_to_top", "to_top", "cards_to_top"))
@@ -825,6 +853,25 @@ class GateTelemetry:
             self.games_with["lorehold_cost_paid"].add(self.current_game)
             if card:
                 self.cards[f"cost_paid:{card}"] += 1
+            static_reductions = self._static_cost_reduction_payloads(data)
+            if static_reductions:
+                total_saved = sum(int(item["applied_amount"]) for item in static_reductions)
+                self.strategic_events["static_cost_reduction_casts"] += 1
+                self.strategic_events["static_cost_reduction_total"] += total_saved
+                self.games_with["static_cost_reduction_casts"].add(self.current_game)
+                self.games_with["static_cost_reduction_total"].add(self.current_game)
+                if card:
+                    self.cards[f"static_cost_reduction_on:{card}"] += total_saved
+                for reduction in static_reductions:
+                    source = str(reduction.get("source") or "unknown")
+                    amount = int(reduction.get("applied_amount") or 0)
+                    self.cards[f"static_cost_reduction_saved:{source}"] += amount
+                    self.cards[f"static_cost_reduction_source_cast:{source}"] += 1
+                    if source == "The Scarlet Witch":
+                        self.strategic_events["scarlet_static_cost_reduction_casts"] += 1
+                        self.strategic_events["scarlet_static_cost_reduction_total"] += amount
+                        self.games_with["scarlet_static_cost_reduction_casts"].add(self.current_game)
+                        self.games_with["scarlet_static_cost_reduction_total"].add(self.current_game)
             if card == "Thor, God of Thunder":
                 self.strategic_events["thor_cost_paid"] += 1
                 self.games_with["thor_cost_paid"].add(self.current_game)

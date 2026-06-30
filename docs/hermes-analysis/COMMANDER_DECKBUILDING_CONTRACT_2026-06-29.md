@@ -265,6 +265,53 @@ reaudit:
   One Ring` over `Molecule Man` is cross-lane and must be recut before any
   ideal-deck claim.
 
+Method-repair decision generated on 2026-06-30:
+
+- Candidate: `candidate_607_v615_mana_vault_method_repair_v1`, built from
+  protected `607`.
+- Adds from `615`: `Mana Vault`.
+- Cuts from `607`: `Bender's Waterskin`.
+- Protected cards intentionally preserved: `Molecule Man`, `The Scarlet
+  Witch`, and `Victory Chimes`.
+- Structural matrix result: candidate rank `1`, `607` rank `2`, effectively
+  tied at score `141.0`, intent `100.0`, lands `34`, rule-ready `97.9%`.
+- Natural equal battle gate: `607` = `30/72`; repaired candidate = `24/72`.
+- Seed windows: seed `20260630` = `607 11/24` versus candidate `7/24`; seed
+  `123` = `607 8/24` versus candidate `7/24`; seed `999` = `607 11/24`
+  versus candidate `10/24`.
+- Direct card-use evidence: candidate `Mana Vault` cost-paid `36` and
+  spell-cast `18`, so the rejection is not caused by invisible-card sampling.
+- Decision: reject this exact one-card swap. `Bender's Waterskin` remains a
+  protected miracle-timing/ramp lane card until a same-lane replacement beats
+  `607` in an equal gate.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_mana_vault_method_repair_decision_20260630.md`.
+
+The One Ring cut decision generated on 2026-06-30:
+
+- Scope: retest `The One Ring` only against draw/protection/value slots, not
+  against `Molecule Man`.
+- Protected cards intentionally preserved in all candidates:
+  `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`, `The Scarlet Witch`,
+  and `The Mind Stone`.
+- Smoke candidates:
+  `candidate_607_one_ring_creative_technique_v1`,
+  `candidate_607_one_ring_improvisation_capstone_v1`, and
+  `candidate_607_one_ring_redirect_lightning_v1`.
+- Smoke result: the `Creative Technique` cut was closest at `10/24` versus
+  `607` at `11/24`; the `Improvisation Capstone` and `Redirect Lightning` cuts
+  both fell to `6/24` versus `607` at `11/24`.
+- Confirmed `Creative Technique` cut over seeds `20260630`, `123`, and `999`:
+  `607` = `30/72`; candidate = `25/72`.
+- Direct card-use evidence: candidate `The One Ring` accessed `24` games,
+  cost-paid `42`, spell-cast `21`, resolved `17`, and utility-activated `26`,
+  so the rejection is not caused by invisible-card sampling.
+- Decision: reject `The One Ring` for the current `607` shell. It is a real
+  value engine, but the current Lorehold spell/value and miracle cadence still
+  converts better.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_one_ring_cut_decision_20260630.md`.
+
 ## General Deckbuilding Gate
 
 Every generated or optimized Commander deck must pass:
@@ -382,17 +429,23 @@ happen:
 
 ## Next Product Step
 
-For Lorehold, do not promote `614` or `615` as a whole deck from the current
-evidence. Also do not promote `candidate_607_v615_mana_engine_v1` as the final
-ideal deck yet: it tied the protected baseline in battle but failed the
-post-hoc lane/cut methodology for `The One Ring` over `Molecule Man`.
+For Lorehold, do not promote `614`, `615`, `candidate_607_v615_mana_engine_v1`,
+`candidate_607_v615_mana_vault_method_repair_v1`, or any 2026-06-30
+`The One Ring` candidate as the final ideal deck from the current evidence.
+The repaired Mana Vault and The One Ring tests exercised their cards but lost
+to `607`, so the protected baseline remains `607`.
 
-The next real product step is a methodologically repaired candidate: keep the
-validated `Mana Vault` ramp lane, confirm or reject `Birgi` versus `The Scarlet
-Witch` with mana-produced/mana-saved telemetry, and test `The One Ring` only
-against draw/protection/value slots. Keep `607` as the comparison baseline for
-rollback and regression checks until the repaired candidate passes the same
-strategy, battle, and cut-method gates.
+The next real product step is to stop testing generic value/ramp upgrades into
+protected miracle slots. Keep the `607` miracle/topdeck/ramp shell intact and
+look only for:
+
+- true same-lane tutor/selection improvements that help find the topdeck or
+  miracle pieces without cutting pressure cards; or
+- pressure-matchup improvements that do not reduce miracle/topdeck frequency.
+
+Keep `Bender's Waterskin`, `Victory Chimes`, `Molecule Man`, `The Scarlet
+Witch`, and `The Mind Stone` protected until a direct same-lane challenger beats
+`607`.
 
 For other commanders, first create the same commander intent profile and source
 provenance layer, then use the same gate.

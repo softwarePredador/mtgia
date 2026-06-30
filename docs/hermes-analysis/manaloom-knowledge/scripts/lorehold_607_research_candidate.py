@@ -254,6 +254,90 @@ RESEARCH_PLANS = {
             "The validation must separate package fit from individual card-rule correctness.",
         ],
     },
+    "v615_mana_vault_method_repair_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_v615_mana_vault_method_repair_v1",
+        "candidate_name": "Lorehold 607 + 615 Mana Vault Method Repair v1",
+        "candidate_archetype": "607-615-mana-vault-method-repair",
+        "added": [
+            {"card_name": "Mana Vault", "source_deck_id": 615},
+        ],
+        "removed": ["Bender's Waterskin"],
+        "intent": (
+            "Repair the 615 package methodology by keeping the validated 607 "
+            "miracle/cost-reduction core intact. This tests only the same-lane "
+            "fast-mana question: Mana Vault versus Bender's Waterskin, while "
+            "preserving Molecule Man and The Scarlet Witch until their lanes are "
+            "beaten by direct evidence."
+        ),
+        "external_signals": [
+            "Cut-methodology reaudit permits Mana Vault over Bender's Waterskin as the only same-lane ramp cut from the 615 package.",
+            "The prior paired Molecule+Scarlet restore reached 19/72 natural wins versus 18/72 for baseline 607 and the promoted 615 package, but was not decisive enough for final promotion.",
+            "External Lorehold guidance treats opponent-turn mana support such as Bender's Waterskin/Victory Chimes as miracle-relevant, so this candidate must prove the fast-mana gain outweighs that timing loss.",
+            "Molecule Man and The Scarlet Witch stay because their direct lanes are miracle-zero casting and expensive instant/sorcery cost reduction, not generic draw or unrelated engine slots.",
+        ],
+    },
+    "one_ring_creative_technique_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_one_ring_creative_technique_v1",
+        "candidate_name": "Lorehold 607 + The One Ring over Creative Technique v1",
+        "candidate_archetype": "607-one-ring-creative-technique",
+        "added": [{"card_name": "The One Ring", "source_deck_id": 615}],
+        "removed": ["Creative Technique"],
+        "intent": (
+            "Test The One Ring only against an expensive value/free-cast slot. "
+            "This keeps Molecule Man, The Scarlet Witch, Bender's Waterskin, "
+            "Victory Chimes, and the pressure package intact while checking "
+            "whether repeatable draw plus one-turn protection beats a one-shot "
+            "topdeck free-cast effect."
+        ),
+        "external_signals": [
+            "The One Ring is tagged locally as draw/protection in Lorehold variant 615.",
+            "Creative Technique is an expensive value/free-cast sorcery, so this is a closer lane comparison than cutting Molecule Man.",
+            "The candidate must prove that losing one spell-chain/free-cast sorcery is worth the artifact draw/protection engine.",
+        ],
+    },
+    "one_ring_improvisation_capstone_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_one_ring_improvisation_capstone_v1",
+        "candidate_name": "Lorehold 607 + The One Ring over Improvisation Capstone v1",
+        "candidate_archetype": "607-one-ring-improvisation-capstone",
+        "added": [{"card_name": "The One Ring", "source_deck_id": 615}],
+        "removed": ["Improvisation Capstone"],
+        "intent": (
+            "Test The One Ring against the closest exile-value/free-cast lesson "
+            "slot. This preserves the protected miracle/ramp/cost-reduction "
+            "core and asks whether stable draw plus protection is better than "
+            "the Capstone paradigm value engine."
+        ),
+        "external_signals": [
+            "The One Ring is a repeatable draw/protection value engine.",
+            "Improvisation Capstone is tagged locally as draw/exile_value and occupies a nonprotected value slot.",
+            "This test is higher risk than Creative Technique because Capstone can repeatedly free-cast through paradigm.",
+        ],
+    },
+    "one_ring_redirect_lightning_v1": {
+        "base_deck_id": 607,
+        "candidate_deck_id": 6,
+        "candidate_key": "candidate_607_one_ring_redirect_lightning_v1",
+        "candidate_name": "Lorehold 607 + The One Ring over Redirect Lightning v1",
+        "candidate_archetype": "607-one-ring-redirect-lightning",
+        "added": [{"card_name": "The One Ring", "source_deck_id": 615}],
+        "removed": ["Redirect Lightning"],
+        "intent": (
+            "Test The One Ring against a narrow protection/redirect lesson slot. "
+            "This checks whether broad protection plus repeatable draw is worth "
+            "losing one cheap single-target redirection spell."
+        ),
+        "external_signals": [
+            "The One Ring provides one-turn protection from everything when cast and repeatable card draw afterward.",
+            "Redirect Lightning is cheap interaction, so this candidate must be rejected if the higher curve regresses early pressure handling.",
+            "This does not test The One Ring against a miracle-engine or ramp-timing card.",
+        ],
+    },
 }
 
 

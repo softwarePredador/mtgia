@@ -44,6 +44,24 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.schema_version, "strategy_matrix_legacy_ranked_decks_v0")
         self.assertEqual(classification.status, "pass")
 
+    def test_candidate_strategy_matrix_can_be_partial_without_blocking_contract(self) -> None:
+        payload = {
+            "ranked_deck_keys": ["candidate_607_test", "deck_607"],
+            "decks": [
+                {"deck_key": "candidate_607_test", "strategy_score": 141.1},
+                {"deck_key": "deck_607", "strategy_score": 141.0},
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "lorehold_variant_strategy_matrix_candidate.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "strategy_matrix")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.detail, "candidate matrix shape")
+        self.assertIn("deck_614", classification.canonical_summary["missing_required_decks"])
+
     def test_equal_battle_gate_is_not_confused_with_package_gate(self) -> None:
         payload = {
             "status": "ready",
@@ -118,6 +136,37 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
             classification = audit.classify_payload(path, payload)
 
         self.assertEqual(classification.artifact_kind, "promotion_gate_decision_audit")
+        self.assertEqual(classification.status, "pass")
+
+    def test_cut_methodology_reaudit_payload_is_recognized(self) -> None:
+        payload = {
+            "candidate_report": "candidate.json",
+            "validation_report": "validation.json",
+            "pairs": [],
+            "metric_contract": [],
+            "decision": {"ready_for_real_deck_change": False},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cut_methodology.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "cut_methodology_reaudit")
+        self.assertEqual(classification.status, "pass")
+
+    def test_molecule_scarlet_validation_payload_is_recognized(self) -> None:
+        payload = {
+            "natural": {},
+            "forced_opening_diagnostic": {},
+            "structural_matrix": {},
+            "decision": {},
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "molecule_scarlet.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "molecule_scarlet_validation")
         self.assertEqual(classification.status, "pass")
 
     def test_normalize_promotion_decision_extracts_ready_state(self) -> None:
