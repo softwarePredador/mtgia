@@ -7400,7 +7400,8 @@ def get_card_effect(card):
     effect = card.get("effect", "")
     effect_map = {"ramp": "ramp_permanent", "removal": "remove_creature",
                   "board_wipe": "board_wipe", "wincon": "finisher", "draw": "draw_cards",
-                  "counter": "counter", "land": "land", "extra_combat": "extra_combat"}
+                  "counter": "counter", "land": "land", "extra_combat": "extra_combat",
+                  "damage_each_opponent": "damage_each_opponent"}
     if effect in effect_map:
         if effect == "extra_combat":
             return normalize_effect_by_oracle(
@@ -7441,6 +7442,19 @@ def get_card_effect(card):
                 card,
                 with_rule_metadata(
                     {"effect": "draw_cards", "count": 2},
+                    source="card_effect_field",
+                    review_status="heuristic",
+                    confidence=0.25,
+                ),
+            )
+        if effect == "damage_each_opponent":
+            return normalize_effect_by_oracle(
+                card,
+                with_rule_metadata(
+                    {
+                        "effect": "damage_each_opponent",
+                        "amount": card.get("amount", 1),
+                    },
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -14364,7 +14378,6 @@ def _kaylas_music_box_play_card_from_exile(
         card=permanent.get("name", "?"),
         cast_card=card.get("name", "?"),
         cast_effect=effect_data.get("effect", "unknown"),
-        source_zone="exile",
         cast_without_paying_mana_cost=False,
         result="cast_with_normal_cost",
         turn=turn,
@@ -44823,6 +44836,24 @@ def defender_attack_limit(defender):
     return min(limits) if limits else None
 
 
+def defender_attack_restriction_sources(defender):
+    sources = []
+    for permanent in getattr(defender, "battlefield", []) or []:
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("effect") != "attack_limit":
+            continue
+        if (
+            permanent.get("max_attackers_against_you") is not None
+            or permanent.get("max_attacker_power_against_you") is not None
+            or permanent.get("attack_requires_keyword_against_you")
+        ):
+            name = str(permanent.get("name") or "").strip()
+            if name and name not in sources:
+                sources.append(name)
+    return sources
+
+
 def table_attack_limit(all_players):
     limits = []
     for controller in all_players or []:
@@ -44837,6 +44868,27 @@ def table_attack_limit(all_players):
             except (TypeError, ValueError):
                 continue
     return min(limits) if limits else None
+
+
+def table_attack_restriction_sources(all_players):
+    sources = []
+    for controller in all_players or []:
+        for permanent in getattr(controller, "battlefield", []) or []:
+            if not isinstance(permanent, dict):
+                continue
+            if permanent.get("effect") != "attack_limit":
+                continue
+            if (
+                permanent.get("max_attackers") is not None
+                or permanent.get("max_attacker_power") is not None
+                or permanent.get("max_attacker_power_by_controller_hand_size")
+                or permanent.get("max_attacker_power_by_defender_hand_size")
+                or permanent.get("attack_requires_keyword")
+            ):
+                name = str(permanent.get("name") or "").strip()
+                if name and name not in sources:
+                    sources.append(name)
+    return sources
 
 
 def table_attack_filter_restrictions(all_players):
@@ -44951,6 +45003,17 @@ def vow_attack_restricted_for_defender(card, defender):
     return getattr(defender, "name", None) in restricted_names
 
 
+def vow_attack_restriction_sources(cards):
+    sources = []
+    for card in cards or []:
+        if not isinstance(card, dict):
+            continue
+        source_name = str(card.get("vow_counter_source") or "").strip()
+        if source_name and source_name not in sources:
+            sources.append(source_name)
+    return sources
+
+
 def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
     if not group_attackers:
         return [], {}
@@ -44984,6 +45047,14 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
         allowed_count = min(allowed_count, limit)
 
     tax_per_creature, attack_tax_sources = defender_attack_tax_details(defender)
+    attack_restriction_sources = list(defender_attack_restriction_sources(defender))
+    for source_name in vow_attack_restriction_sources(vow_filtered_out):
+        if source_name not in attack_restriction_sources:
+            attack_restriction_sources.append(source_name)
+    for source in attack_tax_sources:
+        source_name = str(source.get("card") or "").strip()
+        if source_name and source_name not in attack_restriction_sources:
+            attack_restriction_sources.append(source_name)
     tax_paid = 0
     if tax_per_creature > 0:
         affordable = int(attacker.available_mana() or 0) // tax_per_creature
@@ -45018,11 +45089,7 @@ def apply_attack_restrictions_to_group(attacker, defender, group_attackers):
             "attack_limit": limit,
             "attack_tax_per_creature": tax_per_creature,
             "attack_tax_sources": attack_tax_sources,
-            "attack_restriction_sources": [
-                source.get("card", "?")
-                for source in attack_tax_sources
-                if source.get("card")
-            ],
+            "attack_restriction_sources": attack_restriction_sources,
             "attack_max_power": max_power,
             "attack_requires_keywords": required_keywords,
             "tax_paid": tax_paid,
@@ -45100,6 +45167,7 @@ def apply_global_attack_restrictions(attack_groups, all_players):
             "target": "all_defenders",
             "attack_limit": limit,
             "attack_tax_per_creature": 0,
+            "attack_restriction_sources": table_attack_restriction_sources(all_players),
             "attack_max_power": max_power,
             "attack_requires_keywords": required_keywords,
             "tax_paid": 0,

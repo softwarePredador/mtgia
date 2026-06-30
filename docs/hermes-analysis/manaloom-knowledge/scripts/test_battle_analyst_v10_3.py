@@ -307,6 +307,72 @@ def test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite():
         assert effect.get("_rule_execution_status") == "auto"
 
 
+def test_attack_restriction_details_include_limit_sources():
+    lorehold = player("Lorehold")
+    opponent = player("Opponent")
+    lorehold.battlefield.append(
+        {
+            "name": "Crawlspace",
+            "effect": "attack_limit",
+            "max_attackers_against_you": 2,
+        }
+    )
+    lorehold.battlefield.append(
+        {
+            "name": "Silent Arbiter",
+            "effect": "attack_limit",
+            "max_attackers": 1,
+        }
+    )
+    attackers = [
+        {"name": "Attacker A", "power": 2, "toughness": 2},
+        {"name": "Attacker B", "power": 2, "toughness": 2},
+        {"name": "Attacker C", "power": 2, "toughness": 2},
+    ]
+
+    _groups, details = battle.apply_attack_restrictions(
+        opponent,
+        [(lorehold, attackers)],
+        [lorehold, opponent],
+    )
+
+    sources = {
+        source
+        for detail in details
+        for source in detail.get("attack_restriction_sources", [])
+    }
+    assert "Silent Arbiter" in sources
+    assert "Crawlspace" in sources
+    assert "unattributed" not in sources
+
+
+def test_attack_restriction_details_include_vow_sources():
+    lorehold = player("Lorehold")
+    opponent = player("Opponent")
+    vowed_attacker = {
+        "name": "Vowed Creature",
+        "power": 4,
+        "toughness": 4,
+        "vow_counter": True,
+        "vow_cannot_attack_players": ["Lorehold"],
+        "vow_counter_source": "Promise of Loyalty",
+    }
+
+    _groups, details = battle.apply_attack_restrictions(
+        opponent,
+        [(lorehold, [vowed_attacker])],
+        [lorehold, opponent],
+    )
+
+    sources = {
+        source
+        for detail in details
+        for source in detail.get("attack_restriction_sources", [])
+    }
+    assert "Promise of Loyalty" in sources
+    assert "unattributed" not in sources
+
+
 if __name__ == "__main__":
     tests = [
         *battle_sba_zone_tests.register_tests(battle, player, card),
@@ -331,6 +397,8 @@ if __name__ == "__main__":
         *battle_decision_trace_tests.register_tests(battle, replay_auditor),
         test_promoted_hotfixes_resolve_from_sqlite_without_manual_override,
         test_pg078_deck606_l2_hash_scope_rules_resolve_from_sqlite,
+        test_attack_restriction_details_include_limit_sources,
+        test_attack_restriction_details_include_vow_sources,
     ]
     for test in tests:
         if hasattr(battle, "clear_pending_triggers"):

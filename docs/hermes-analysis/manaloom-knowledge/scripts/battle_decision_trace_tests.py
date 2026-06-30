@@ -184,7 +184,7 @@ def register_tests(battle, replay_auditor):
         assert any("missing available_option_scores" in finding["finding"] for finding in findings)
         assert any("missing rejected_option_scores" in finding["finding"] for finding in findings)
 
-    def test_approach_topdeck_setup_trace_is_auditable_without_hard_executor():
+    def test_approach_topdeck_setup_trace_uses_current_brainstone_runtime_scope():
         traces = []
         previous_handler = battle.DECISION_TRACE_HANDLER
         battle.DECISION_TRACE_HANDLER = traces.append
@@ -255,15 +255,15 @@ def register_tests(battle, replay_auditor):
                 rule_status=brainstone_option["rule_status"],
                 confidence="medium",
                 expected_benefit_score=45,
-                actual_outcome="audit_only_setup_not_executed",
+                actual_outcome="executable_topdeck_setup_available",
                 reason="setup_approach_second_cast",
-                expected_payoff_reason="prepare second Approach resolution without inventing a hard topdeck executor",
+                expected_payoff_reason="prepare second Approach resolution using the current first-draw topdeck executor",
                 strategic_principle="topdeck tools should be used when they materially improve a known win line",
                 resource_delta={
                     "approach_count": active.approach_count,
                     "target_spell": "Approach of the Second Sun",
                 },
-                risk_flags=["topdeck_executor_not_hard_modeled"],
+                risk_flags=["topdeck_setup_requires_card_access"],
             )
         finally:
             battle.DECISION_TRACE_HANDLER = previous_handler
@@ -272,12 +272,12 @@ def register_tests(battle, replay_auditor):
         trace = traces[0]
         assert trace["decision_type"] == "topdeck_setup"
         assert trace["chosen_option"]["card"] == "Brainstone"
-        assert trace["chosen_option"]["battle_model_scope"] == "brainstone_draw_three_put_two_back_unexecuted_v1"
+        assert trace["chosen_option"]["battle_model_scope"] == "brainstone_draw_three_put_two_back_for_first_draw_miracle_v1"
         assert trace["score_components"]["approach_already_resolved"] == 1
         assert trace["best_rejected_option_score"] == 40.0
         assert trace["score_gap_vs_best_rejected"] == 5.0
         assert trace["resource_delta"]["target_spell"] == "Approach of the Second Sun"
-        assert trace["risk_flags"] == ["topdeck_executor_not_hard_modeled"]
+        assert trace["risk_flags"] == ["topdeck_setup_requires_card_access"]
         assert replay_auditor.audit_decision_traces(traces) == []
 
     return [
@@ -286,5 +286,5 @@ def register_tests(battle, replay_auditor):
         test_decision_trace_auditor_flags_missing_score_and_duplicate_id,
         test_decision_trace_auditor_flags_chosen_outside_options,
         test_decision_trace_auditor_flags_missing_comparative_fields_for_multi_option_choice,
-        test_approach_topdeck_setup_trace_is_auditable_without_hard_executor,
+        test_approach_topdeck_setup_trace_uses_current_brainstone_runtime_scope,
     ]

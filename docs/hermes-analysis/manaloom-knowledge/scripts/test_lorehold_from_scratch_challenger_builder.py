@@ -13,6 +13,7 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
                 "miracle_topdeck_control",
                 "spellchain_big_sorcery",
                 "recursion_discard_engine",
+                "recursion_discard_pressure_repair",
             },
         )
         for plan in builder.CHALLENGER_PLANS.values():
