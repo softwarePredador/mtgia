@@ -74,7 +74,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -83,13 +83,17 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG283 promoted and synced 312 exact one-shot
-instant/sorcery rules for fixed draw, fixed direct damage, and destroy target
-spells. Evidence:
+Current applied checkpoint: PG284 promoted and synced 53 exact utility rules
+after PG283's 312 exact one-shot spell rules. The current splitter supports
+fixed draw, fixed direct damage, destroy target, fixed controller life gain,
+exile target, and simple tap mana-source permanents. Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.md`
+- `master_optimizer_reports/pg284_xmage_utility_wave_package.md`
+- `master_optimizer_reports/pg284_xmage_utility_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg284_xmage_utility_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.md`
 
 ## Local Replay Audit
 

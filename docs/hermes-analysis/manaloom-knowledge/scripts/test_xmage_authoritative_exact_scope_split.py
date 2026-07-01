@@ -8,7 +8,14 @@ import unittest
 import xmage_authoritative_exact_scope_split as split
 
 
-def queue_row(unit: str, *, effect_classes: list[str], card_id: str = "card-1", ability_kind: str = "one_shot"):
+def queue_row(
+    unit: str,
+    *,
+    effect_classes: list[str],
+    card_id: str = "card-1",
+    ability_kind: str = "one_shot",
+    ability_classes: list[str] | None = None,
+):
     return {
         "card_id": card_id,
         "card_name": "Fixture Spell",
@@ -17,6 +24,7 @@ def queue_row(unit: str, *, effect_classes: list[str], card_id: str = "card-1", 
         "adapter_work_unit": unit,
         "effect_json": {"ability_kind": ability_kind},
         "xmage_effect_classes": effect_classes,
+        "xmage_ability_classes": ability_classes or [],
         "xmage_class": "FixtureSpell",
         "xmage_path": "/tmp/FixtureSpell.java",
     }
@@ -102,6 +110,119 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "additional_cost_detected")
+
+    def test_fixed_life_gain_spell_maps_to_life_total_change_runtime(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 7 life."),
+            source_text="this.getSpellAbility().addEffect(new GainLifeEffect(7));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "life_total_change")
+        self.assertEqual(effect["battle_model_scope"], split.LIFE_SCOPE)
+        self.assertEqual(effect["life_gain_amount"], 7)
+        self.assertEqual(effect["target"], "self")
+
+    def test_life_gain_spell_with_condition_stays_blocked(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 4 life. If you control a creature, draw a card."),
+            source_text="this.getSpellAbility().addEffect(new GainLifeEffect(4));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "life_gain_oracle_not_simple")
+
+    def test_fixed_exile_target_spell_maps_destination_to_exile(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target creature or enchantment."),
+            source_text="this.getSpellAbility().addEffect(new ExileTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCOPE)
+        self.assertEqual(effect["target"], "creature_or_enchantment")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "enchantment"]})
+
+    def test_exile_spell_with_additional_cost_stays_blocked(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="As an additional cost to cast this spell, sacrifice a permanent. Exile target creature."),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost());"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "additional_cost_detected")
+
+    def test_simple_artifact_mana_source_maps_to_ramp_permanent(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="activated",
+            ability_classes=["BlackManaAbility", "RedManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(type_line="Artifact", oracle_text="{T}: Add {B} or {R}."),
+            source_text="this.addAbility(new BlackManaAbility()); this.addAbility(new RedManaAbility());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "BR")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["permanent_type"], "artifact")
+
+    def test_simple_creature_mana_source_maps_to_ramp_permanent(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["AddManaOfAnyColorEffect"],
+            ability_kind="activated",
+            ability_classes=["AnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(type_line="Creature - Druid", oracle_text="{T}: Add one mana of any color."),
+            source_text="this.addAbility(new AnyColorManaAbility());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["permanent_type"], "creature")
+
+    def test_conditional_mana_source_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["BasicManaEffect"],
+            ability_kind="activated",
+            ability_classes=["ConditionalAnyColorManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(type_line="Artifact", oracle_text="{T}: Add one mana of any color."),
+            source_text="this.addAbility(new ConditionalAnyColorManaAbility());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_unsafe_ability_class")
 
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [

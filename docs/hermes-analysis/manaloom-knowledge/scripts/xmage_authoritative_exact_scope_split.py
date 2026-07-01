@@ -25,11 +25,70 @@ REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_r
 DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
-SUPPORTED_UNITS = {DRAW_UNIT, DAMAGE_UNIT, DESTROY_UNIT}
+LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
+EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
+RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
+RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
+SUPPORTED_UNITS = {
+    DRAW_UNIT,
+    DAMAGE_UNIT,
+    DESTROY_UNIT,
+    LIFE_UNIT,
+    EXILE_UNIT,
+    RAMP_ARTIFACT_UNIT,
+    RAMP_CREATURE_UNIT,
+}
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
+LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
+EXILE_SCOPE = "xmage_exile_target_spell_v1"
+MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+
+SPELL_UNITS = {DRAW_UNIT, DAMAGE_UNIT, DESTROY_UNIT, LIFE_UNIT, EXILE_UNIT}
+RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
+
+SPELL_COMPLEXITY_TOKENS = {
+    "additional cost",
+    "choose one",
+    "choose two",
+    "one or both",
+    "kicker",
+    "buyback",
+    "flashback",
+    "convoke",
+    "strive",
+    "cycling",
+    "cascade",
+    "storm",
+    "recover",
+    "replicate",
+    "unless",
+    "instead",
+    "if ",
+    "when ",
+    "whenever ",
+}
+
+SAFE_MANA_ABILITY_CLASSES = {
+    "SimpleManaAbility",
+    "AnyColorManaAbility",
+    "ColorlessManaAbility",
+    "WhiteManaAbility",
+    "BlueManaAbility",
+    "BlackManaAbility",
+    "RedManaAbility",
+    "GreenManaAbility",
+}
+
+UNSAFE_MANA_ABILITY_CLASSES = {
+    "ConditionalAnyColorManaAbility",
+    "ConditionalColoredManaAbility",
+    "ConditionalColorlessManaAbility",
+    "DynamicManaAbility",
+    "LimitedTimesPerTurnActivatedManaAbility",
+}
 
 
 def utc_now() -> str:
@@ -108,8 +167,17 @@ def ability_kind(row: dict[str, Any]) -> str:
     return str((row.get("effect_json") or {}).get("ability_kind") or "")
 
 
+def ability_classes(row: dict[str, Any]) -> set[str]:
+    return {str(value) for value in (row.get("xmage_ability_classes") or []) if str(value)}
+
+
 def oracle_text(metadata: dict[str, Any]) -> str:
     return re.sub(r"\s+", " ", str(metadata.get("oracle_text") or "").strip()).lower()
+
+
+def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COMPLEXITY_TOKENS) -> bool:
+    text = oracle_text(metadata)
+    return any(token in text for token in tokens)
 
 
 def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
@@ -137,6 +205,25 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
     return None
 
 
+def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, tuple[str, str]]] = [
+        (r"^exile target artifact or enchantment\.?$", ("remove_permanent", "artifact_or_enchantment")),
+        (r"^exile target creature or planeswalker\.?$", ("remove_permanent", "creature_or_planeswalker")),
+        (r"^exile target creature or enchantment\.?$", ("remove_permanent", "creature_or_enchantment")),
+        (r"^exile target nonland permanent\.?$", ("remove_permanent", "nonland_permanent")),
+        (r"^exile target permanent\.?$", ("remove_permanent", "permanent")),
+        (r"^exile target creature\.?$", ("remove_creature", "creature")),
+        (r"^exile target artifact\.?$", ("remove_permanent", "artifact")),
+        (r"^exile target enchantment\.?$", ("remove_permanent", "enchantment")),
+        (r"^exile target land\.?$", ("remove_permanent", "land")),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return result
+    return None
+
+
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
     if "any target" in text:
@@ -149,6 +236,27 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         return "creature_or_planeswalker"
     if re.search(r"target creature\b", text):
         return "creature"
+    return None
+
+
+def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
+    match = re.match(r"^you gain (\d+) life\.?$", oracle_text(metadata))
+    if not match:
+        return None
+    return int(match.group(1))
+
+
+def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    if text == "{t}: add one mana of any color.":
+        return "WUBRG", 1
+    match = re.match(r"^\{t\}: add \{([wubrgc])\}\.?$", text)
+    if match:
+        return match.group(1).upper(), 1
+    match = re.match(r"^\{t\}: add \{([wubrgc])\} or \{([wubrgc])\}\.?$", text)
+    if match:
+        produced = "".join(dict.fromkeys([match.group(1).upper(), match.group(2).upper()]))
+        return produced, 1
     return None
 
 
@@ -167,17 +275,22 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": [target]}
     if target == "artifact_or_enchantment":
         return {"card_types": ["artifact", "enchantment"]}
+    if target == "creature_or_enchantment":
+        return {"card_types": ["creature", "enchantment"]}
     if target == "creature_enchantment_or_planeswalker":
         return {"card_types": ["creature", "enchantment", "planeswalker"]}
     return {"target": target}
 
 
 def proposal_notes(row: dict[str, Any], scope: str) -> str:
+    scope_kind = "instant/sorcery spell"
+    if str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
+        scope_kind = "activated mana-source permanent"
     return (
         "XMage authoritative exact-scope split: local class "
         f"{row.get('xmage_class')} translated into ManaLoom runtime scope {scope}. "
-        "This row is package-ready only because the source signature is a one-shot "
-        "instant/sorcery spell with no additional cost and focused runtime coverage."
+        "This row is package-ready only because the source signature is a narrow "
+        f"{scope_kind} with focused runtime coverage."
     )
 
 
@@ -231,14 +344,16 @@ def split_row(
         return None, "unsupported_adapter_work_unit"
     if not metadata:
         return None, "postgres_card_metadata_missing"
-    if not is_spell(metadata):
-        return None, "not_instant_or_sorcery_spell"
-    if ability_kind(row) != "one_shot":
-        return None, "not_one_shot_spell_ability"
-    if has_additional_cost(source_text):
-        return None, "additional_cost_detected"
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
+
+    if unit in SPELL_UNITS:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        if ability_kind(row) != "one_shot":
+            return None, "not_one_shot_spell_ability"
+        if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
+            return None, "additional_cost_detected"
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
@@ -296,6 +411,77 @@ def split_row(
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
+
+    if unit == LIFE_UNIT:
+        if classes != {"GainLifeEffect"}:
+            return None, "life_gain_effect_class_not_pure"
+        if has_oracle_complexity(metadata):
+            return None, "life_gain_oracle_not_simple"
+        amount = life_gain_amount_from_oracle(metadata)
+        constructor_amount = java_constructor_int(source_text, "GainLifeEffect")
+        if amount is None or amount <= 0:
+            return None, "life_gain_amount_not_fixed"
+        if constructor_amount is not None and constructor_amount != amount:
+            return None, "life_gain_amount_source_oracle_mismatch"
+        effect_json = {
+            "effect": "life_total_change",
+            "battle_model_scope": LIFE_SCOPE,
+            "life_gain_amount": amount,
+            "target": "self",
+            "xmage_effect_class": "GainLifeEffect",
+            **flags,
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_fixed_life_gain_spell"), "selected_exact_scope"
+
+    if unit == EXILE_UNIT:
+        if classes != {"ExileTargetEffect"}:
+            return None, "exile_effect_class_not_pure"
+        if has_oracle_complexity(metadata):
+            return None, "exile_oracle_not_simple"
+        target = exile_target_from_oracle(metadata)
+        if target is None:
+            return None, "exile_target_not_supported"
+        effect, target_type = target
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": EXILE_SCOPE,
+            "target": target_type,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "xmage_effect_class": "ExileTargetEffect",
+            **flags,
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_exile_target_spell"), "selected_exact_scope"
+
+    if unit in RAMP_UNITS:
+        if is_spell(metadata):
+            return None, "mana_source_spell_not_supported"
+        mana_ability_classes = ability_classes(row)
+        if mana_ability_classes.intersection(UNSAFE_MANA_ABILITY_CLASSES):
+            return None, "mana_source_unsafe_ability_class"
+        if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES):
+            return None, "mana_source_safe_ability_missing"
+        if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
+            return None, "mana_source_effect_class_not_simple"
+        mana_source = simple_mana_source_from_oracle(metadata)
+        if mana_source is None:
+            return None, "mana_source_oracle_not_simple"
+        produces, amount = mana_source
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = "creature" if "creature" in type_line else "artifact" if "artifact" in type_line else "permanent"
+        effect_json = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": MANA_SCOPE,
+            "is_mana_source": True,
+            "mana_produced": amount,
+            "produces": produces,
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": permanent_type,
+            "xmage_mana_ability_classes": sorted(mana_ability_classes),
+            "xmage_effect_classes": sorted(classes),
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_simple_mana_source_permanent"), "selected_exact_scope"
 
     return None, "unsupported_adapter_work_unit"
 

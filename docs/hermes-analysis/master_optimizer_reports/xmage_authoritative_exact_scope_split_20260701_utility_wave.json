@@ -1,0 +1,2538 @@
+{
+  "blocked_samples": {
+    "additional_cost_detected": [
+      "Acceptable Losses",
+      "Altar's Reap",
+      "Angelic Purge",
+      "Annihilating Glare",
+      "Artillerize",
+      "Bankrupt in Blood",
+      "Betrayer's Bargain",
+      "Bitter Triumph",
+      "Blood Divination",
+      "Bogslither's Embrace",
+      "Bone Shards",
+      "Bone Splinters"
+    ],
+    "damage_amount_not_fixed": [
+      "Armed Response",
+      "Artillery Blast",
+      "Blaze",
+      "Clan Defiance",
+      "Devil's Play",
+      "Divine Retribution",
+      "Dogpile",
+      "Earth Tremor",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Fanning the Flames",
+      "Feedback Bolt"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Bolt of Keranos",
+      "Bot Bashing Time",
+      "Brimstone Volley"
+    ],
+    "damage_target_not_supported": [
+      "Arrows of Justice",
+      "Burning Oil",
+      "Consuming Bonfire",
+      "Cosmium Blast",
+      "Divine Arrow",
+      "Dragon's Presence",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Gideon's Reproach",
+      "Hamato Ninp\u014d",
+      "Impeccable Timing",
+      "Iron Verdict"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Artisan's Sorrow",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle"
+    ],
+    "destroy_target_not_supported": [
+      "Asphyxiate",
+      "Assassin's Blade",
+      "Assassinate",
+      "Avalanche",
+      "Bramblecrush",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Crush",
+      "Curtains' Call"
+    ],
+    "draw_effect_class_not_pure": [
+      "Aang's Defense",
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afflict",
+      "Afterlife Insurance",
+      "Aggressive Urge",
+      "Airbending Lesson",
+      "Allied Strategies",
+      "Amass the Components",
+      "Ambition's Cost"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Devout Decree",
+      "Dispatch"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Sylvan Reclamation",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_target_not_supported": [
+      "Blade Banish",
+      "Blazing Hope",
+      "Bring to Trial",
+      "Celestial Purge",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Epic Downfall",
+      "Excoriate",
+      "Exorcise",
+      "Expel"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Aerial Assault",
+      "Aerial Predation",
+      "Agonizing Syphon",
+      "Appetite for the Unnatural",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Abzan Banner",
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "All-Fates Scroll",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Animal Attendant",
+      "Arcum's Astrolabe",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Agent of Stromgald",
+      "Apprentice Wizard",
+      "Arc Reactor",
+      "Basal Thrull",
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Blood Pet",
+      "Blood Vassal",
+      "Bog Initiate",
+      "Bog Witch",
+      "Catalyst Elemental",
+      "Charcoal Diamond"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aberrant",
+      "Abiding Grace",
+      "Abomination",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abyssal Hunter",
+      "Acid Web Spider",
+      "Acidic Dagger",
+      "Acidic Slime",
+      "Acidic Sliver",
+      "Acolyte of the Inferno",
+      "Acorn Catapult"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind",
+      "Bind // Liberate",
+      "Blessed Wine",
+      "Bone Harvest",
+      "Bouncer's Beatdown"
+    ]
+  },
+  "generated_at": "2026-07-01T07:51:37+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed one-shot spell scopes only",
+    "supported_adapter_work_units": [
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "8282e91b-dfe8-453b-bbfd-71df1e783743",
+      "card_name": "Alloy Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "alloy myr",
+      "notes": "XMage authoritative exact-scope split: local class AlloyMyr translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AlloyMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AlloyMyr.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "7327857b-76fd-426e-883a-87305aa4ae99",
+      "card_name": "Altar's Light",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "normalized_name": "altar's light",
+      "notes": "XMage authoritative exact-scope split: local class AltarsLight translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AltarsLight",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AltarsLight.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "5e8f6079-8469-4e2f-86df-234f489da6c7",
+      "card_name": "Angel's Mercy",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self",
+        "timing": "instant"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": true,
+        "life_gain_amount": 7,
+        "sorcery": false,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:0f25d24d3c5a3407ed57856db5992117",
+      "normalized_name": "angel's mercy",
+      "notes": "XMage authoritative exact-scope split: local class AngelsMercy translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8f47454e052a4054937fae161a34bdb8",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AngelsMercy",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AngelsMercy.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "7468373a-2c25-4fee-8a6c-4390a9705612",
+      "card_name": "Angelic Edict",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "creature_or_enchantment"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "normalized_name": "angelic edict",
+      "notes": "XMage authoritative exact-scope split: local class AngelicEdict translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AngelicEdict",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AngelicEdict.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "ab2c837b-c60c-4e73-9656-88be055d32d6",
+      "card_name": "Blessed Light",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "creature_or_enchantment",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:e35e9434e3ba0e376ce4d59aeeca7c53",
+      "normalized_name": "blessed light",
+      "notes": "XMage authoritative exact-scope split: local class BlessedLight translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BlessedLight",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BlessedLight.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "83062fc3-09dd-439e-88dd-694f26483da7",
+      "card_name": "Bloodstone Cameo",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "BR",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility",
+          "RedManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:157975c852f269cdf3bc89dcae7dd03f",
+      "normalized_name": "bloodstone cameo",
+      "notes": "XMage authoritative exact-scope split: local class BloodstoneCameo translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "612e3921fafd9adddd4f7abeb5387491",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BloodstoneCameo",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BloodstoneCameo.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "62f7fc9c-0f63-43f6-a88e-3f38e4daf6e2",
+      "card_name": "Boreal Druid",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "C",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "ColorlessManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "normalized_name": "boreal druid",
+      "notes": "XMage authoritative exact-scope split: local class BorealDruid translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BorealDruid",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BorealDruid.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "542a1217-8e40-41e3-824b-51db131e8d2c",
+      "card_name": "Caustic Rain",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "land"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:42742846342dec802c47c11ade2516ad",
+      "normalized_name": "caustic rain",
+      "notes": "XMage authoritative exact-scope split: local class CausticRain translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a79d9b365ef277002995b5c86f626247",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CausticRain",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CausticRain.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "5be339ac-6fe6-4282-bbaa-94fc5592b6dc",
+      "card_name": "Chaplain's Blessing",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": false,
+        "life_gain_amount": 5,
+        "sorcery": true,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:0efac9a4b073d02f8b4dccce6d09d0f4",
+      "normalized_name": "chaplain's blessing",
+      "notes": "XMage authoritative exact-scope split: local class ChaplainsBlessing translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ChaplainsBlessing",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ChaplainsBlessing.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "6f68b8b7-0826-4756-a2ca-aabde07ddab5",
+      "card_name": "Copper Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "copper myr",
+      "notes": "XMage authoritative exact-scope split: local class CopperMyr translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CopperMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CopperMyr.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "6fcf3f0a-319f-4d00-af17-30b9ce198ca5",
+      "card_name": "Drake-Skull Cameo",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "UB",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility",
+          "BlueManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:d0e08457f1641a563199afe86ac7e0a4",
+      "normalized_name": "drake-skull cameo",
+      "notes": "XMage authoritative exact-scope split: local class DrakeSkullCameo translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "7adb8a447bb3034560f7481744ec2b7b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DrakeSkullCameo",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DrakeSkullCameo.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "bd2b1386-7546-4849-b40d-374babfa1416",
+      "card_name": "Druid of the Cowl",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "druid of the cowl",
+      "notes": "XMage authoritative exact-scope split: local class DruidOfTheCowl translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DruidOfTheCowl",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DruidOfTheCowl.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "271caacf-6bc4-48b5-b332-38b522daf0c3",
+      "card_name": "Erase",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:ea17b91f68e124b22b0af2770e713b60",
+      "normalized_name": "erase",
+      "notes": "XMage authoritative exact-scope split: local class Erase translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "e37c2bdb638b65f98dc4833955f86bb6",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Erase",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/Erase.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "014c25c4-70f8-44d9-8628-d36a4000d210",
+      "card_name": "Fade into Antiquity",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "fade into antiquity",
+      "notes": "XMage authoritative exact-scope split: local class FadeIntoAntiquity translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FadeIntoAntiquity",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FadeIntoAntiquity.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "c8937c19-8195-40d9-abad-9439b29a3f2a",
+      "card_name": "Fate Forgotten",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "normalized_name": "fate forgotten",
+      "notes": "XMage authoritative exact-scope split: local class FateForgotten translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FateForgotten",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FateForgotten.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "6d8b7001-3b42-4cfb-8991-7ef8484bf60f",
+      "card_name": "Feed the Serpent",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "creature_or_planeswalker",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature_or_planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "planeswalker"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:a320309e986688f78d171c92e09fdf3d",
+      "normalized_name": "feed the serpent",
+      "notes": "XMage authoritative exact-scope split: local class FeedTheSerpent translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "f353a008494f54a06df337d8c8cb01e1",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FeedTheSerpent",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FeedTheSerpent.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "cfbd8298-f3ff-410c-81c5-73b8a9ed4847",
+      "card_name": "Final Death",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "target": "creature",
+        "timing": "instant"
+      },
+      "effect": "remove_creature",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "final death",
+      "notes": "XMage authoritative exact-scope split: local class FinalDeath translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FinalDeath",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FinalDeath.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "de5d3d4d-4b1f-442e-8e07-e3b69e69c1f8",
+      "card_name": "Final Reward",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "target": "creature",
+        "timing": "instant"
+      },
+      "effect": "remove_creature",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "final reward",
+      "notes": "XMage authoritative exact-scope split: local class FinalReward translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FinalReward",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FinalReward.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "252a053e-70b9-44b2-bc34-14b0a8ce6092",
+      "card_name": "Gold Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "W",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "WhiteManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:1f43cb19e0418cc56efdb5595373b2e5",
+      "normalized_name": "gold myr",
+      "notes": "XMage authoritative exact-scope split: local class GoldMyr translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GoldMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoldMyr.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "c6a675f6-e262-4de5-b0c1-5dae701ffd9e",
+      "card_name": "Golden Hind",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "golden hind",
+      "notes": "XMage authoritative exact-scope split: local class GoldenHind translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GoldenHind",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoldenHind.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "3a1850c0-ea60-46df-ae4c-845cb068c240",
+      "card_name": "Goobbue Gardener",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "goobbue gardener",
+      "notes": "XMage authoritative exact-scope split: local class GoobbueGardener translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GoobbueGardener",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GoobbueGardener.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "5c6b96a2-1a05-4a0c-b4e0-950cdf58a2ba",
+      "card_name": "Great Forest Druid",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "great forest druid",
+      "notes": "XMage authoritative exact-scope split: local class GreatForestDruid translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GreatForestDruid",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GreatForestDruid.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "67020687-4d32-47cd-9594-4831e2ca2ed3",
+      "card_name": "Iona's Judgment",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "creature_or_enchantment"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "normalized_name": "iona's judgment",
+      "notes": "XMage authoritative exact-scope split: local class IonasJudgment translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "IonasJudgment",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/IonasJudgment.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "a1a0d02f-5d1f-482a-9bb5-95e1811cb2fb",
+      "card_name": "Iron Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "R",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "RedManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "normalized_name": "iron myr",
+      "notes": "XMage authoritative exact-scope split: local class IronMyr translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "IronMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/IronMyr.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "881c4376-4e10-4b30-8be3-45906a28951d",
+      "card_name": "Ironwright's Cleansing",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "ironwright's cleansing",
+      "notes": "XMage authoritative exact-scope split: local class IronwrightsCleansing translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "IronwrightsCleansing",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/IronwrightsCleansing.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "84491866-7d6d-490d-aa3d-23fd8ecfea2c",
+      "card_name": "Leaden Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "B",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "leaden myr",
+      "notes": "XMage authoritative exact-scope split: local class LeadenMyr translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LeadenMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeadenMyr.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "a6d2fbe4-d865-43d9-bfbd-3af00cb106c4",
+      "card_name": "Leaf Gilder",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "leaf gilder",
+      "notes": "XMage authoritative exact-scope split: local class LeafGilder translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LeafGilder",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LeafGilder.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "8bb4b45a-1133-401e-9733-8df498f2eb5e",
+      "card_name": "Lifespring Druid",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "lifespring druid",
+      "notes": "XMage authoritative exact-scope split: local class LifespringDruid translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LifespringDruid",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LifespringDruid.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "bd9826f9-deed-4d9e-a8c1-11ec97290518",
+      "card_name": "Llanowar Dead",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "B",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "llanowar dead",
+      "notes": "XMage authoritative exact-scope split: local class LlanowarDead translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LlanowarDead",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LlanowarDead.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "648ad9b5-b648-4974-af9c-a247623eee27",
+      "card_name": "Manakin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "C",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "ColorlessManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "normalized_name": "manakin",
+      "notes": "XMage authoritative exact-scope split: local class Manakin translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Manakin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/Manakin.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "31d7a023-dc95-4a58-8678-86c52c03a964",
+      "card_name": "Nourish",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self",
+        "timing": "instant"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": true,
+        "life_gain_amount": 6,
+        "sorcery": false,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:a13cb6d631fa4df94fefbee9c04b6dea",
+      "normalized_name": "nourish",
+      "notes": "XMage authoritative exact-scope split: local class Nourish translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "cfe1512ef8aaa6146dbc252ccc4f5428",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Nourish",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/Nourish.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "aa3ce2d6-c52f-47b9-841d-e031f94dd0bf",
+      "card_name": "Opaline Unicorn",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "opaline unicorn",
+      "notes": "XMage authoritative exact-scope split: local class OpalineUnicorn translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "OpalineUnicorn",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OpalineUnicorn.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "a735a765-ad4d-4460-8927-0981eddd08ff",
+      "card_name": "Orochi Sustainer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "orochi sustainer",
+      "notes": "XMage authoritative exact-scope split: local class OrochiSustainer translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "OrochiSustainer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/o/OrochiSustainer.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "45c7fbfe-1703-4b91-a307-6d3e1ed8d440",
+      "card_name": "Princess Lucrezia",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "U",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlueManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:fc5d21fc34fa1e198cf8938b934a9b38",
+      "normalized_name": "princess lucrezia",
+      "notes": "XMage authoritative exact-scope split: local class PrincessLucrezia translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PrincessLucrezia",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrincessLucrezia.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "9b5b440b-090c-49f2-8057-14a8615eaae5",
+      "card_name": "Revoke Existence",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact_or_enchantment"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": false,
+        "sorcery": true,
+        "target": "artifact_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "revoke existence",
+      "notes": "XMage authoritative exact-scope split: local class RevokeExistence translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RevokeExistence",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RevokeExistence.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "d8652324-0799-4e7c-938c-8cd99c5b4048",
+      "card_name": "Riven Turnbull",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "B",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "riven turnbull",
+      "notes": "XMage authoritative exact-scope split: local class RivenTurnbull translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RivenTurnbull",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RivenTurnbull.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "af2fafb9-593b-4e76-b6ba-1ae6bce3c620",
+      "card_name": "Rosethorn Acolyte // Seasonal Ritual",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [
+          "AddManaOfAnyColorEffect"
+        ],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:27b46ea42ba71c2416b979903bdf5a0b",
+      "normalized_name": "rosethorn acolyte // seasonal ritual",
+      "notes": "XMage authoritative exact-scope split: local class RosethornAcolyte translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RosethornAcolyte",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RosethornAcolyte.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "937f4f00-4fe3-4806-9146-bf5ebb5cf48a",
+      "card_name": "Sacred Nectar",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": false,
+        "life_gain_amount": 4,
+        "sorcery": true,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:89294a30a7c038f531fd4a66bc98ef68",
+      "normalized_name": "sacred nectar",
+      "notes": "XMage authoritative exact-scope split: local class SacredNectar translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "51e9e72169eea5a194c86a09f6b3d062",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SacredNectar",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SacredNectar.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "b795a39f-7f87-4eb3-acb7-1f04bd94c813",
+      "card_name": "Scour from Existence",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:65a0a297fa7e8450d12dfb9250ad210f",
+      "normalized_name": "scour from existence",
+      "notes": "XMage authoritative exact-scope split: local class ScourFromExistence translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "0ecf4b83ecfce8cdbbea224f13dccf73",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ScourFromExistence",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ScourFromExistence.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "17c74c7f-c34e-4fba-8def-476cb35c9027",
+      "card_name": "Seashell Cameo",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WU",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlueManaAbility",
+          "WhiteManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:56fde69c1feefbe667383740024fb9a7",
+      "normalized_name": "seashell cameo",
+      "notes": "XMage authoritative exact-scope split: local class SeashellCameo translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "5ce1e001242c88c586c4226a693fee13",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SeashellCameo",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SeashellCameo.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "93f6004b-a62f-4f55-aeec-456042b81e3b",
+      "card_name": "Shattering Blow",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:518eccc35731deb7d285e0864f258fed",
+      "normalized_name": "shattering blow",
+      "notes": "XMage authoritative exact-scope split: local class ShatteringBlow translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "7e112f17ce1fa6512d50a9e83c06d614",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ShatteringBlow",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ShatteringBlow.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "d6b01ea6-cd4d-4084-8df7-0690f1dc109e",
+      "card_name": "Sisters of the Flame",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "R",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "RedManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "normalized_name": "sisters of the flame",
+      "notes": "XMage authoritative exact-scope split: local class SistersOfTheFlame translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SistersOfTheFlame",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SistersOfTheFlame.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "a29021f3-792e-48b8-807c-5ce29784f79e",
+      "card_name": "Skyshroud Troopers",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "skyshroud troopers",
+      "notes": "XMage authoritative exact-scope split: local class SkyshroudTroopers translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SkyshroudTroopers",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SkyshroudTroopers.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "e4cbd552-02dc-40b4-b0fa-c85e8824e650",
+      "card_name": "Spring of Eternal Peace",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": false,
+        "life_gain_amount": 8,
+        "sorcery": true,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:127239c6cb437de88829822693da2244",
+      "normalized_name": "spring of eternal peace",
+      "notes": "XMage authoritative exact-scope split: local class SpringOfEternalPeace translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "e677196afa232e3e43248e3dd9eddf94",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SpringOfEternalPeace",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SpringOfEternalPeace.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "b24316e7-add5-4b24-8f66-932aa008d4f9",
+      "card_name": "Three Tree Rootweaver",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "three tree rootweaver",
+      "notes": "XMage authoritative exact-scope split: local class ThreeTreeRootweaver translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ThreeTreeRootweaver",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/ThreeTreeRootweaver.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "f7af7c34-e5a0-4782-8300-01f8c11af8df",
+      "card_name": "Tigereye Cameo",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "GW",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility",
+          "WhiteManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:9bf13b73a48fa06ad07dcca49c12df44",
+      "normalized_name": "tigereye cameo",
+      "notes": "XMage authoritative exact-scope split: local class TigereyeCameo translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "7bfd56cac7efef173088b83133001919",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TigereyeCameo",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TigereyeCameo.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "d359f798-ac9e-4b0e-be37-e008b960d961",
+      "card_name": "Troll-Horn Cameo",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "RG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility",
+          "RedManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:fdc6bc7ee5024eaa2431d23343c8b97d",
+      "normalized_name": "troll-horn cameo",
+      "notes": "XMage authoritative exact-scope split: local class TrollHornCameo translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "f2db592fd050c588458cd7729beeabee",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TrollHornCameo",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TrollHornCameo.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "57f718ac-ef58-48bd-8fce-156a0ca43fe9",
+      "card_name": "Unmake",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "target": "creature",
+        "timing": "instant"
+      },
+      "effect": "remove_creature",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "unmake",
+      "notes": "XMage authoritative exact-scope split: local class Unmake translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Unmake",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/u/Unmake.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "c0e455c7-195f-4189-b77b-13f7c165bead",
+      "card_name": "Utopia Tree",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "AnyColorManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "utopia tree",
+      "notes": "XMage authoritative exact-scope split: local class UtopiaTree translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "UtopiaTree",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/u/UtopiaTree.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "5bfb2082-c398-4ba4-8198-24b6e4ff9c5f",
+      "card_name": "Utter End",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "nonland_permanent",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "nonland_permanent"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:138f212350697c8175f0f4f93e54bb6d",
+      "normalized_name": "utter end",
+      "notes": "XMage authoritative exact-scope split: local class UtterEnd translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "b86b750625a9504a09cc8e6ed1cdeac5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "UtterEnd",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/u/UtterEnd.java"
+    },
+    {
+      "adapter_work_unit": "removal_exile::targeted_exile_variant_v1",
+      "battle_model_scope": "xmage_exile_target_spell_v1",
+      "card_id": "920082b8-4a20-428b-9f8d-978e9bf9e0bf",
+      "card_name": "Wander Off",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "target": "creature",
+        "timing": "instant"
+      },
+      "effect": "remove_creature",
+      "effect_json": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "destination": "exile",
+        "effect": "remove_creature",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ExileTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_exile_target_spell",
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "wander off",
+      "notes": "XMage authoritative exact-scope split: local class WanderOff translated into ManaLoom runtime scope xmage_exile_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WanderOff",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WanderOff.java"
+    },
+    {
+      "adapter_work_unit": "life_gain::xmage_life_gain_variant_review_v1",
+      "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+      "card_id": "ac4ad134-b312-45e8-8f74-fba308f58c33",
+      "card_name": "Whitesun's Passage",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "life_total_change",
+        "target": "self",
+        "timing": "instant"
+      },
+      "effect": "life_total_change",
+      "effect_json": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change",
+        "instant": true,
+        "life_gain_amount": 5,
+        "sorcery": false,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_life_gain_spell",
+      "logical_rule_key": "battle_rule_v1:3deac22371fed5334c1541219c6c639d",
+      "normalized_name": "whitesun's passage",
+      "notes": "XMage authoritative exact-scope split: local class WhitesunsPassage translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WhitesunsPassage",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WhitesunsPassage.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "b221a3c8-1366-4b11-853a-b887d10c72aa",
+      "card_name": "Wirewood Elf",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "wirewood elf",
+      "notes": "XMage authoritative exact-scope split: local class WirewoodElf translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WirewoodElf",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WirewoodElf.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-01T05:44:51+00:00",
+    "queue_scope": "commander_legal_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "life_gain::xmage_life_gain_variant_review_v1": 6,
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1": 12,
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1": 17,
+      "removal_exile::targeted_exile_variant_v1": 18
+    },
+    "blocked_reason_counts": {
+      "additional_cost_detected": 97,
+      "damage_amount_not_fixed": 44,
+      "damage_effect_class_not_pure": 123,
+      "damage_target_not_supported": 24,
+      "destroy_effect_class_not_pure": 138,
+      "destroy_target_not_supported": 74,
+      "draw_effect_class_not_pure": 556,
+      "exile_effect_class_not_pure": 42,
+      "exile_oracle_not_simple": 9,
+      "exile_target_not_supported": 29,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_effect_class_not_pure": 166,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_effect_class_not_simple": 303,
+      "mana_source_oracle_not_simple": 119,
+      "mana_source_safe_ability_missing": 132,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 133,
+      "not_instant_or_sorcery_spell": 1824,
+      "not_one_shot_spell_ability": 163
+    },
+    "considered_supported_work_unit_rows": 4060,
+    "family_counts": {
+      "xmage_exile_target_spell": 18,
+      "xmage_fixed_life_gain_spell": 6,
+      "xmage_simple_mana_source_permanent": 29
+    },
+    "proposal_count": 53,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 53
+    },
+    "safe_for_batch_pg_package_count": 53,
+    "scope_counts": {
+      "xmage_exile_target_spell_v1": 18,
+      "xmage_fixed_controller_gain_life_spell_v1": 6,
+      "xmage_simple_tap_mana_source_permanent_v1": 29
+    }
+  }
+}

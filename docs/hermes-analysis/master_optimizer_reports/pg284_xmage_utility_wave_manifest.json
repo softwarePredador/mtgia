@@ -1,0 +1,2257 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg284_xmage_utility_wave_20260701_075150",
+  "deploy_id": "PG284",
+  "expected_rules": [
+    {
+      "card_name": "Alloy Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "alloy myr",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Altar's Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "min_rule_version": 2,
+      "normalized_name": "altar's light",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angel's Mercy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f25d24d3c5a3407ed57856db5992117",
+      "min_rule_version": 2,
+      "normalized_name": "angel's mercy",
+      "oracle_hash": "8f47454e052a4054937fae161a34bdb8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angelic Edict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "min_rule_version": 2,
+      "normalized_name": "angelic edict",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blessed Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e35e9434e3ba0e376ce4d59aeeca7c53",
+      "min_rule_version": 2,
+      "normalized_name": "blessed light",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bloodstone Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:157975c852f269cdf3bc89dcae7dd03f",
+      "min_rule_version": 2,
+      "normalized_name": "bloodstone cameo",
+      "oracle_hash": "612e3921fafd9adddd4f7abeb5387491",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boreal Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "min_rule_version": 2,
+      "normalized_name": "boreal druid",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Caustic Rain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42742846342dec802c47c11ade2516ad",
+      "min_rule_version": 2,
+      "normalized_name": "caustic rain",
+      "oracle_hash": "a79d9b365ef277002995b5c86f626247",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chaplain's Blessing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0efac9a4b073d02f8b4dccce6d09d0f4",
+      "min_rule_version": 2,
+      "normalized_name": "chaplain's blessing",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Copper Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "copper myr",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drake-Skull Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0e08457f1641a563199afe86ac7e0a4",
+      "min_rule_version": 2,
+      "normalized_name": "drake-skull cameo",
+      "oracle_hash": "7adb8a447bb3034560f7481744ec2b7b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Druid of the Cowl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "druid of the cowl",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Erase",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ea17b91f68e124b22b0af2770e713b60",
+      "min_rule_version": 2,
+      "normalized_name": "erase",
+      "oracle_hash": "e37c2bdb638b65f98dc4833955f86bb6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fade into Antiquity",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "fade into antiquity",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fate Forgotten",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "min_rule_version": 2,
+      "normalized_name": "fate forgotten",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Feed the Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a320309e986688f78d171c92e09fdf3d",
+      "min_rule_version": 2,
+      "normalized_name": "feed the serpent",
+      "oracle_hash": "f353a008494f54a06df337d8c8cb01e1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Final Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "final death",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Final Reward",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "final reward",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gold Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f43cb19e0418cc56efdb5595373b2e5",
+      "min_rule_version": 2,
+      "normalized_name": "gold myr",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Golden Hind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "golden hind",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goobbue Gardener",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "goobbue gardener",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Great Forest Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "great forest druid",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iona's Judgment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "min_rule_version": 2,
+      "normalized_name": "iona's judgment",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iron Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "min_rule_version": 2,
+      "normalized_name": "iron myr",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ironwright's Cleansing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "ironwright's cleansing",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaden Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "leaden myr",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaf Gilder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "leaf gilder",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lifespring Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "lifespring druid",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Dead",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar dead",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Manakin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "min_rule_version": 2,
+      "normalized_name": "manakin",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nourish",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a13cb6d631fa4df94fefbee9c04b6dea",
+      "min_rule_version": 2,
+      "normalized_name": "nourish",
+      "oracle_hash": "cfe1512ef8aaa6146dbc252ccc4f5428",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Opaline Unicorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "opaline unicorn",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orochi Sustainer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "orochi sustainer",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Princess Lucrezia",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fc5d21fc34fa1e198cf8938b934a9b38",
+      "min_rule_version": 2,
+      "normalized_name": "princess lucrezia",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revoke Existence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "revoke existence",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riven Turnbull",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "riven turnbull",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rosethorn Acolyte // Seasonal Ritual",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:27b46ea42ba71c2416b979903bdf5a0b",
+      "min_rule_version": 2,
+      "normalized_name": "rosethorn acolyte // seasonal ritual",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacred Nectar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:89294a30a7c038f531fd4a66bc98ef68",
+      "min_rule_version": 2,
+      "normalized_name": "sacred nectar",
+      "oracle_hash": "51e9e72169eea5a194c86a09f6b3d062",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scour from Existence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65a0a297fa7e8450d12dfb9250ad210f",
+      "min_rule_version": 2,
+      "normalized_name": "scour from existence",
+      "oracle_hash": "0ecf4b83ecfce8cdbbea224f13dccf73",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seashell Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56fde69c1feefbe667383740024fb9a7",
+      "min_rule_version": 2,
+      "normalized_name": "seashell cameo",
+      "oracle_hash": "5ce1e001242c88c586c4226a693fee13",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shattering Blow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:518eccc35731deb7d285e0864f258fed",
+      "min_rule_version": 2,
+      "normalized_name": "shattering blow",
+      "oracle_hash": "7e112f17ce1fa6512d50a9e83c06d614",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sisters of the Flame",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "min_rule_version": 2,
+      "normalized_name": "sisters of the flame",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skyshroud Troopers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "skyshroud troopers",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spring of Eternal Peace",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:127239c6cb437de88829822693da2244",
+      "min_rule_version": 2,
+      "normalized_name": "spring of eternal peace",
+      "oracle_hash": "e677196afa232e3e43248e3dd9eddf94",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Three Tree Rootweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "three tree rootweaver",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tigereye Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9bf13b73a48fa06ad07dcca49c12df44",
+      "min_rule_version": 2,
+      "normalized_name": "tigereye cameo",
+      "oracle_hash": "7bfd56cac7efef173088b83133001919",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Troll-Horn Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fdc6bc7ee5024eaa2431d23343c8b97d",
+      "min_rule_version": 2,
+      "normalized_name": "troll-horn cameo",
+      "oracle_hash": "f2db592fd050c588458cd7729beeabee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unmake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "unmake",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Utopia Tree",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "utopia tree",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Utter End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:138f212350697c8175f0f4f93e54bb6d",
+      "min_rule_version": 2,
+      "normalized_name": "utter end",
+      "oracle_hash": "b86b750625a9504a09cc8e6ed1cdeac5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wander Off",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "wander off",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whitesun's Passage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3deac22371fed5334c1541219c6c639d",
+      "min_rule_version": 2,
+      "normalized_name": "whitesun's passage",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wirewood Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "wirewood elf",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_exile_target_spell": 18,
+    "xmage_fixed_life_gain_spell": 6,
+    "xmage_simple_mana_source_permanent": 29
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg284_xmage_utility_wave_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg284_xmage_utility_wave_manifest.json",
+    "package": "../../master_optimizer_reports/pg284_xmage_utility_wave_package.md",
+    "postcheck": "../../master_optimizer_reports/pg284_xmage_utility_wave_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg284_xmage_utility_wave_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg284_xmage_utility_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-01T07:51:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Alloy Myr"
+      },
+      "card_name": "Alloy Myr",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "alloy myr",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Altar's Light"
+      },
+      "card_name": "Altar's Light",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "normalized_name": "altar's light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Angel's Mercy"
+      },
+      "card_name": "Angel's Mercy",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f25d24d3c5a3407ed57856db5992117",
+      "normalized_name": "angel's mercy",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Angelic Edict"
+      },
+      "card_name": "Angelic Edict",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "normalized_name": "angelic edict",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Blessed Light"
+      },
+      "card_name": "Blessed Light",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e35e9434e3ba0e376ce4d59aeeca7c53",
+      "normalized_name": "blessed light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Bloodstone Cameo"
+      },
+      "card_name": "Bloodstone Cameo",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:157975c852f269cdf3bc89dcae7dd03f",
+      "normalized_name": "bloodstone cameo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Boreal Druid"
+      },
+      "card_name": "Boreal Druid",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "normalized_name": "boreal druid",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Caustic Rain"
+      },
+      "card_name": "Caustic Rain",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42742846342dec802c47c11ade2516ad",
+      "normalized_name": "caustic rain",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Chaplain's Blessing"
+      },
+      "card_name": "Chaplain's Blessing",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0efac9a4b073d02f8b4dccce6d09d0f4",
+      "normalized_name": "chaplain's blessing",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Copper Myr"
+      },
+      "card_name": "Copper Myr",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "copper myr",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Drake-Skull Cameo"
+      },
+      "card_name": "Drake-Skull Cameo",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0e08457f1641a563199afe86ac7e0a4",
+      "normalized_name": "drake-skull cameo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Druid of the Cowl"
+      },
+      "card_name": "Druid of the Cowl",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "druid of the cowl",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Erase"
+      },
+      "card_name": "Erase",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ea17b91f68e124b22b0af2770e713b60",
+      "normalized_name": "erase",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Fade into Antiquity"
+      },
+      "card_name": "Fade into Antiquity",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "fade into antiquity",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Fate Forgotten"
+      },
+      "card_name": "Fate Forgotten",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "normalized_name": "fate forgotten",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Feed the Serpent"
+      },
+      "card_name": "Feed the Serpent",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a320309e986688f78d171c92e09fdf3d",
+      "normalized_name": "feed the serpent",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Final Death"
+      },
+      "card_name": "Final Death",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "final death",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Final Reward"
+      },
+      "card_name": "Final Reward",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "final reward",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Gold Myr"
+      },
+      "card_name": "Gold Myr",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f43cb19e0418cc56efdb5595373b2e5",
+      "normalized_name": "gold myr",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Golden Hind"
+      },
+      "card_name": "Golden Hind",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "golden hind",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Goobbue Gardener"
+      },
+      "card_name": "Goobbue Gardener",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "goobbue gardener",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Great Forest Druid"
+      },
+      "card_name": "Great Forest Druid",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "great forest druid",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Iona's Judgment"
+      },
+      "card_name": "Iona's Judgment",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "normalized_name": "iona's judgment",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Iron Myr"
+      },
+      "card_name": "Iron Myr",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "normalized_name": "iron myr",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Ironwright's Cleansing"
+      },
+      "card_name": "Ironwright's Cleansing",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "ironwright's cleansing",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Leaden Myr"
+      },
+      "card_name": "Leaden Myr",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "leaden myr",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Leaf Gilder"
+      },
+      "card_name": "Leaf Gilder",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "leaf gilder",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Lifespring Druid"
+      },
+      "card_name": "Lifespring Druid",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "lifespring druid",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Llanowar Dead"
+      },
+      "card_name": "Llanowar Dead",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "llanowar dead",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Manakin"
+      },
+      "card_name": "Manakin",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "normalized_name": "manakin",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Nourish"
+      },
+      "card_name": "Nourish",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a13cb6d631fa4df94fefbee9c04b6dea",
+      "normalized_name": "nourish",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Opaline Unicorn"
+      },
+      "card_name": "Opaline Unicorn",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "opaline unicorn",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Orochi Sustainer"
+      },
+      "card_name": "Orochi Sustainer",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "orochi sustainer",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Princess Lucrezia"
+      },
+      "card_name": "Princess Lucrezia",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fc5d21fc34fa1e198cf8938b934a9b38",
+      "normalized_name": "princess lucrezia",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Revoke Existence"
+      },
+      "card_name": "Revoke Existence",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "normalized_name": "revoke existence",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Riven Turnbull"
+      },
+      "card_name": "Riven Turnbull",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "normalized_name": "riven turnbull",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Rosethorn Acolyte // Seasonal Ritual"
+      },
+      "card_name": "Rosethorn Acolyte // Seasonal Ritual",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:27b46ea42ba71c2416b979903bdf5a0b",
+      "normalized_name": "rosethorn acolyte // seasonal ritual",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Sacred Nectar"
+      },
+      "card_name": "Sacred Nectar",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:89294a30a7c038f531fd4a66bc98ef68",
+      "normalized_name": "sacred nectar",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Scour from Existence"
+      },
+      "card_name": "Scour from Existence",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65a0a297fa7e8450d12dfb9250ad210f",
+      "normalized_name": "scour from existence",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Seashell Cameo"
+      },
+      "card_name": "Seashell Cameo",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56fde69c1feefbe667383740024fb9a7",
+      "normalized_name": "seashell cameo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Shattering Blow"
+      },
+      "card_name": "Shattering Blow",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:518eccc35731deb7d285e0864f258fed",
+      "normalized_name": "shattering blow",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Sisters of the Flame"
+      },
+      "card_name": "Sisters of the Flame",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "normalized_name": "sisters of the flame",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Skyshroud Troopers"
+      },
+      "card_name": "Skyshroud Troopers",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "skyshroud troopers",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Spring of Eternal Peace"
+      },
+      "card_name": "Spring of Eternal Peace",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:127239c6cb437de88829822693da2244",
+      "normalized_name": "spring of eternal peace",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Three Tree Rootweaver"
+      },
+      "card_name": "Three Tree Rootweaver",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "three tree rootweaver",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Tigereye Cameo"
+      },
+      "card_name": "Tigereye Cameo",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9bf13b73a48fa06ad07dcca49c12df44",
+      "normalized_name": "tigereye cameo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Troll-Horn Cameo"
+      },
+      "card_name": "Troll-Horn Cameo",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fdc6bc7ee5024eaa2431d23343c8b97d",
+      "normalized_name": "troll-horn cameo",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Unmake"
+      },
+      "card_name": "Unmake",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "unmake",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Utopia Tree"
+      },
+      "card_name": "Utopia Tree",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "normalized_name": "utopia tree",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Utter End"
+      },
+      "card_name": "Utter End",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:138f212350697c8175f0f4f93e54bb6d",
+      "normalized_name": "utter end",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Wander Off"
+      },
+      "card_name": "Wander Off",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "normalized_name": "wander off",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Whitesun's Passage"
+      },
+      "card_name": "Whitesun's Passage",
+      "effect": "life_total_change",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3deac22371fed5334c1541219c6c639d",
+      "normalized_name": "whitesun's passage",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "effect": "life_total_change"
+      }
+    },
+    {
+      "card": {
+        "name": "Wirewood Elf"
+      },
+      "card_name": "Wirewood Elf",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "normalized_name": "wirewood elf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Alloy Myr",
+    "Altar's Light",
+    "Angel's Mercy",
+    "Angelic Edict",
+    "Blessed Light",
+    "Bloodstone Cameo",
+    "Boreal Druid",
+    "Caustic Rain",
+    "Chaplain's Blessing",
+    "Copper Myr",
+    "Drake-Skull Cameo",
+    "Druid of the Cowl",
+    "Erase",
+    "Fade into Antiquity",
+    "Fate Forgotten",
+    "Feed the Serpent",
+    "Final Death",
+    "Final Reward",
+    "Gold Myr",
+    "Golden Hind",
+    "Goobbue Gardener",
+    "Great Forest Druid",
+    "Iona's Judgment",
+    "Iron Myr",
+    "Ironwright's Cleansing",
+    "Leaden Myr",
+    "Leaf Gilder",
+    "Lifespring Druid",
+    "Llanowar Dead",
+    "Manakin",
+    "Nourish",
+    "Opaline Unicorn",
+    "Orochi Sustainer",
+    "Princess Lucrezia",
+    "Revoke Existence",
+    "Riven Turnbull",
+    "Rosethorn Acolyte // Seasonal Ritual",
+    "Sacred Nectar",
+    "Scour from Existence",
+    "Seashell Cameo",
+    "Shattering Blow",
+    "Sisters of the Flame",
+    "Skyshroud Troopers",
+    "Spring of Eternal Peace",
+    "Three Tree Rootweaver",
+    "Tigereye Cameo",
+    "Troll-Horn Cameo",
+    "Unmake",
+    "Utopia Tree",
+    "Utter End",
+    "Wander Off",
+    "Whitesun's Passage",
+    "Wirewood Elf"
+  ],
+  "selected_count": 53,
+  "slug": "xmage_utility_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Alloy Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "alloy myr",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Altar's Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "min_rule_version": 2,
+      "normalized_name": "altar's light",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angel's Mercy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0f25d24d3c5a3407ed57856db5992117",
+      "min_rule_version": 2,
+      "normalized_name": "angel's mercy",
+      "oracle_hash": "8f47454e052a4054937fae161a34bdb8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Angelic Edict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "min_rule_version": 2,
+      "normalized_name": "angelic edict",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blessed Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e35e9434e3ba0e376ce4d59aeeca7c53",
+      "min_rule_version": 2,
+      "normalized_name": "blessed light",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bloodstone Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:157975c852f269cdf3bc89dcae7dd03f",
+      "min_rule_version": 2,
+      "normalized_name": "bloodstone cameo",
+      "oracle_hash": "612e3921fafd9adddd4f7abeb5387491",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Boreal Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "min_rule_version": 2,
+      "normalized_name": "boreal druid",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Caustic Rain",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42742846342dec802c47c11ade2516ad",
+      "min_rule_version": 2,
+      "normalized_name": "caustic rain",
+      "oracle_hash": "a79d9b365ef277002995b5c86f626247",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chaplain's Blessing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0efac9a4b073d02f8b4dccce6d09d0f4",
+      "min_rule_version": 2,
+      "normalized_name": "chaplain's blessing",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Copper Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "copper myr",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drake-Skull Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0e08457f1641a563199afe86ac7e0a4",
+      "min_rule_version": 2,
+      "normalized_name": "drake-skull cameo",
+      "oracle_hash": "7adb8a447bb3034560f7481744ec2b7b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Druid of the Cowl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "druid of the cowl",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Erase",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ea17b91f68e124b22b0af2770e713b60",
+      "min_rule_version": 2,
+      "normalized_name": "erase",
+      "oracle_hash": "e37c2bdb638b65f98dc4833955f86bb6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fade into Antiquity",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "fade into antiquity",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fate Forgotten",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
+      "min_rule_version": 2,
+      "normalized_name": "fate forgotten",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Feed the Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a320309e986688f78d171c92e09fdf3d",
+      "min_rule_version": 2,
+      "normalized_name": "feed the serpent",
+      "oracle_hash": "f353a008494f54a06df337d8c8cb01e1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Final Death",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "final death",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Final Reward",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "final reward",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Gold Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f43cb19e0418cc56efdb5595373b2e5",
+      "min_rule_version": 2,
+      "normalized_name": "gold myr",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Golden Hind",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "golden hind",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goobbue Gardener",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "goobbue gardener",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Great Forest Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "great forest druid",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iona's Judgment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be537a381b606ab55acffdaf22bdddef",
+      "min_rule_version": 2,
+      "normalized_name": "iona's judgment",
+      "oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Iron Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "min_rule_version": 2,
+      "normalized_name": "iron myr",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ironwright's Cleansing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "ironwright's cleansing",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaden Myr",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "leaden myr",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaf Gilder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "leaf gilder",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lifespring Druid",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "lifespring druid",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Dead",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar dead",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Manakin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae4457bc12786f7e5b4488c282f7004e",
+      "min_rule_version": 2,
+      "normalized_name": "manakin",
+      "oracle_hash": "3c17f6650e4898d6d1215ca8ea2287cd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nourish",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a13cb6d631fa4df94fefbee9c04b6dea",
+      "min_rule_version": 2,
+      "normalized_name": "nourish",
+      "oracle_hash": "cfe1512ef8aaa6146dbc252ccc4f5428",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Opaline Unicorn",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "opaline unicorn",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orochi Sustainer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "orochi sustainer",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Princess Lucrezia",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fc5d21fc34fa1e198cf8938b934a9b38",
+      "min_rule_version": 2,
+      "normalized_name": "princess lucrezia",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revoke Existence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
+      "min_rule_version": 2,
+      "normalized_name": "revoke existence",
+      "oracle_hash": "c112c51f55b3d1cd548152e1391fed2b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Riven Turnbull",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ada92998d97db6cefbc450fbf01d646e",
+      "min_rule_version": 2,
+      "normalized_name": "riven turnbull",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rosethorn Acolyte // Seasonal Ritual",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:27b46ea42ba71c2416b979903bdf5a0b",
+      "min_rule_version": 2,
+      "normalized_name": "rosethorn acolyte // seasonal ritual",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacred Nectar",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:89294a30a7c038f531fd4a66bc98ef68",
+      "min_rule_version": 2,
+      "normalized_name": "sacred nectar",
+      "oracle_hash": "51e9e72169eea5a194c86a09f6b3d062",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scour from Existence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65a0a297fa7e8450d12dfb9250ad210f",
+      "min_rule_version": 2,
+      "normalized_name": "scour from existence",
+      "oracle_hash": "0ecf4b83ecfce8cdbbea224f13dccf73",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Seashell Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:56fde69c1feefbe667383740024fb9a7",
+      "min_rule_version": 2,
+      "normalized_name": "seashell cameo",
+      "oracle_hash": "5ce1e001242c88c586c4226a693fee13",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shattering Blow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:518eccc35731deb7d285e0864f258fed",
+      "min_rule_version": 2,
+      "normalized_name": "shattering blow",
+      "oracle_hash": "7e112f17ce1fa6512d50a9e83c06d614",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sisters of the Flame",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:be0fafded425748b1945af1f8374ab11",
+      "min_rule_version": 2,
+      "normalized_name": "sisters of the flame",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Skyshroud Troopers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "skyshroud troopers",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spring of Eternal Peace",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:127239c6cb437de88829822693da2244",
+      "min_rule_version": 2,
+      "normalized_name": "spring of eternal peace",
+      "oracle_hash": "e677196afa232e3e43248e3dd9eddf94",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Three Tree Rootweaver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "three tree rootweaver",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tigereye Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9bf13b73a48fa06ad07dcca49c12df44",
+      "min_rule_version": 2,
+      "normalized_name": "tigereye cameo",
+      "oracle_hash": "7bfd56cac7efef173088b83133001919",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Troll-Horn Cameo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:fdc6bc7ee5024eaa2431d23343c8b97d",
+      "min_rule_version": 2,
+      "normalized_name": "troll-horn cameo",
+      "oracle_hash": "f2db592fd050c588458cd7729beeabee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unmake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "unmake",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Utopia Tree",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7082e6e49591d7b9efe2cc3aea718c08",
+      "min_rule_version": 2,
+      "normalized_name": "utopia tree",
+      "oracle_hash": "2cb86f263cc7e5d235b1db55361d97ae",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Utter End",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:138f212350697c8175f0f4f93e54bb6d",
+      "min_rule_version": 2,
+      "normalized_name": "utter end",
+      "oracle_hash": "b86b750625a9504a09cc8e6ed1cdeac5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wander Off",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
+      "min_rule_version": 2,
+      "normalized_name": "wander off",
+      "oracle_hash": "fd9f823347bc1af8d128deb10d562b9f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Whitesun's Passage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3deac22371fed5334c1541219c6c639d",
+      "min_rule_version": 2,
+      "normalized_name": "whitesun's passage",
+      "oracle_hash": "588d09494c785ee10f8d9a5d640db691",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wirewood Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e93a9c512a324d005ef1abc0b5da6934",
+      "min_rule_version": 2,
+      "normalized_name": "wirewood elf",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

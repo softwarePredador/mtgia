@@ -1,0 +1,63 @@
+BEGIN;
+
+DELETE FROM public.card_battle_rules
+WHERE normalized_name IN ('alloy myr', 'altar''s light', 'angel''s mercy', 'angelic edict', 'blessed light', 'bloodstone cameo', 'boreal druid', 'caustic rain', 'chaplain''s blessing', 'copper myr', 'drake-skull cameo', 'druid of the cowl', 'erase', 'fade into antiquity', 'fate forgotten', 'feed the serpent', 'final death', 'final reward', 'gold myr', 'golden hind', 'goobbue gardener', 'great forest druid', 'iona''s judgment', 'iron myr', 'ironwright''s cleansing', 'leaden myr', 'leaf gilder', 'lifespring druid', 'llanowar dead', 'manakin', 'nourish', 'opaline unicorn', 'orochi sustainer', 'princess lucrezia', 'revoke existence', 'riven turnbull', 'rosethorn acolyte // seasonal ritual', 'sacred nectar', 'scour from existence', 'seashell cameo', 'shattering blow', 'sisters of the flame', 'skyshroud troopers', 'spring of eternal peace', 'three tree rootweaver', 'tigereye cameo', 'troll-horn cameo', 'unmake', 'utopia tree', 'utter end', 'wander off', 'whitesun''s passage', 'wirewood elf')
+   OR normalized_name LIKE 'alloy myr // %'
+   OR normalized_name LIKE 'altar''s light // %'
+   OR normalized_name LIKE 'angel''s mercy // %'
+   OR normalized_name LIKE 'angelic edict // %'
+   OR normalized_name LIKE 'blessed light // %'
+   OR normalized_name LIKE 'bloodstone cameo // %'
+   OR normalized_name LIKE 'boreal druid // %'
+   OR normalized_name LIKE 'caustic rain // %'
+   OR normalized_name LIKE 'chaplain''s blessing // %'
+   OR normalized_name LIKE 'copper myr // %'
+   OR normalized_name LIKE 'drake-skull cameo // %'
+   OR normalized_name LIKE 'druid of the cowl // %'
+   OR normalized_name LIKE 'erase // %'
+   OR normalized_name LIKE 'fade into antiquity // %'
+   OR normalized_name LIKE 'fate forgotten // %'
+   OR normalized_name LIKE 'feed the serpent // %'
+   OR normalized_name LIKE 'final death // %'
+   OR normalized_name LIKE 'final reward // %'
+   OR normalized_name LIKE 'gold myr // %'
+   OR normalized_name LIKE 'golden hind // %'
+   OR normalized_name LIKE 'goobbue gardener // %'
+   OR normalized_name LIKE 'great forest druid // %'
+   OR normalized_name LIKE 'iona''s judgment // %'
+   OR normalized_name LIKE 'iron myr // %'
+   OR normalized_name LIKE 'ironwright''s cleansing // %'
+   OR normalized_name LIKE 'leaden myr // %'
+   OR normalized_name LIKE 'leaf gilder // %'
+   OR normalized_name LIKE 'lifespring druid // %'
+   OR normalized_name LIKE 'llanowar dead // %'
+   OR normalized_name LIKE 'manakin // %'
+   OR normalized_name LIKE 'nourish // %'
+   OR normalized_name LIKE 'opaline unicorn // %'
+   OR normalized_name LIKE 'orochi sustainer // %'
+   OR normalized_name LIKE 'princess lucrezia // %'
+   OR normalized_name LIKE 'revoke existence // %'
+   OR normalized_name LIKE 'riven turnbull // %'
+   OR normalized_name LIKE 'rosethorn acolyte // seasonal ritual // %'
+   OR normalized_name LIKE 'sacred nectar // %'
+   OR normalized_name LIKE 'scour from existence // %'
+   OR normalized_name LIKE 'seashell cameo // %'
+   OR normalized_name LIKE 'shattering blow // %'
+   OR normalized_name LIKE 'sisters of the flame // %'
+   OR normalized_name LIKE 'skyshroud troopers // %'
+   OR normalized_name LIKE 'spring of eternal peace // %'
+   OR normalized_name LIKE 'three tree rootweaver // %'
+   OR normalized_name LIKE 'tigereye cameo // %'
+   OR normalized_name LIKE 'troll-horn cameo // %'
+   OR normalized_name LIKE 'unmake // %'
+   OR normalized_name LIKE 'utopia tree // %'
+   OR normalized_name LIKE 'utter end // %'
+   OR normalized_name LIKE 'wander off // %'
+   OR normalized_name LIKE 'whitesun''s passage // %'
+   OR normalized_name LIKE 'wirewood elf // %';
+
+INSERT INTO public.card_battle_rules
+SELECT *
+FROM manaloom_deploy_audit.pg284_xmage_utility_wave_20260701_075150;
+
+COMMIT;

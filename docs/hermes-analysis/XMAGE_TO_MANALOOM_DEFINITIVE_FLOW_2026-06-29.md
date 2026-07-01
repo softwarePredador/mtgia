@@ -144,16 +144,18 @@ Interpretation:
   class/effect/ability signatures; they are blocked only from executable PG
   promotion until ManaLoom has the matching runtime adapter.
 
-## PG283 Exact Spell Adapter Wave
+## PG283/PG284 Exact Adapter Waves
 
-As of 2026-07-01, the first all-card exact adapter wave is applied and synced.
+As of 2026-07-01, the first two all-card exact adapter waves are applied and
+synced.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py`
 after building the authoritative queue. This splitter is the required bridge
 between broad XMage work units and PostgreSQL package candidates. It only
-selects one-shot instant/sorcery signatures with no additional cost and a
-runtime-backed exact scope:
+selects narrow, runtime-backed signatures and blocks modes, variables,
+additional costs, conditional costs, compound effects, and unsupported target
+patterns:
 
 - `draw_cards::xmage_draw_card_variant_review_v1` ->
   `xmage_fixed_source_controller_draw_spell_v1`
@@ -161,6 +163,13 @@ runtime-backed exact scope:
   `xmage_fixed_damage_target_spell_v1`
 - `removal_destroy::targeted_destroy_variant_v1` ->
   `xmage_destroy_target_spell_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` ->
+  `xmage_fixed_controller_gain_life_spell_v1`
+- `removal_exile::targeted_exile_variant_v1` ->
+  `xmage_exile_target_spell_v1`
+- `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
+  `ramp_permanent::xmage_creature_mana_source_variant_review_v1` ->
+  `xmage_simple_tap_mana_source_permanent_v1`
 
 PG283 evidence:
 
@@ -191,9 +200,44 @@ Measured result:
   `removal_destroy::targeted_destroy_variant_v1` `839 -> 691`, and
   `draw_cards::xmage_draw_card_variant_review_v1` `734 -> 676`.
 
-The blocked remainder is intentional, not refusal: it includes permanents,
-triggers, activated abilities, variable/X effects, additional costs, compound
-effects, and unsupported target patterns that require the next exact split.
+The blocked remainder is intentional, not refusal: it includes non-simple
+permanents, triggers, activated abilities, variable/X effects, additional
+costs, compound effects, and unsupported target patterns that require further
+exact subpattern splits.
+
+PG284 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_utility_wave.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg284_xmage_utility_wave_package.md`
+- PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg284_xmage_utility_wave_pg_apply_evidence.md`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg284_xmage_utility_wave_e2e_validation.md`
+- post-PG284 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg284_utility_wave_recheck.md`
+- post-PG284 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.md`
+
+PG284 measured result:
+
+- `53` exact utility rules promoted to PostgreSQL and synced to Hermes SQLite:
+  `29` simple tap mana-source permanents, `18` exile target spells, and `6`
+  fixed controller life-gain spells.
+- PostgreSQL precheck: `53/53` target rows found, `0` expected rows already
+  present, `8` stale shadow rows scheduled for deprecation.
+- PostgreSQL postcheck: `53/53` promoted rows, `53/53` verified/auto, and
+  `53/53` matching Oracle hash, with `8` stale shadow rows backed up.
+- E2E package validation: PostgreSQL `53/53`, SQLite `53/53`, canonical
+  snapshot `53/53`, and runtime `get_card_effect` `53/53`.
+- Authoritative queue moved from `target_identity_count=28524` to `28471` and
+  `xmage_authoritative_adapter_required_count=28210` to `28157`.
+- Top affected work units moved:
+  `life_gain::xmage_life_gain_variant_review_v1` `823 -> 817`,
+  `ramp_permanent::xmage_creature_mana_source_variant_review_v1` `390 -> 373`,
+  `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` `327 -> 315`,
+  and `removal_exile::targeted_exile_variant_v1` `174 -> 156`.
 
 ## Why This Is The Best Current Flow
 

@@ -41783,7 +41783,10 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
         requested_delta = int(effect_data.get("life_gain_amount") or 0)
         expected_life_after = life_before + requested_delta
 
-    changed = change_life(target, requested_delta) if requested_delta else False
+    if mode == "gain_life":
+        changed = gain_life(target, requested_delta, cap=999) if requested_delta else False
+    else:
+        changed = change_life(target, requested_delta) if requested_delta else False
     life_after = int(getattr(target, "life", life_before) or 0)
     emit_replay_event(
         "life_total_changed",

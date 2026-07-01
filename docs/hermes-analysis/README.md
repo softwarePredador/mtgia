@@ -76,14 +76,16 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG283:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.md`.
-    Resultado: `28524` identidades Commander-legais ainda com gap, `28210` com
+    Evidencia corrente pos-PG284:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.md`.
+    Resultado: `28471` identidades Commander-legais ainda com gap, `28157` com
     fonte XMage autoritativa resolvida, `314` excecoes sem fonte local, `0`
     parser gaps e `11961` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
-    simples (`draw`, `direct_damage`, `destroy target`), reduzindo
-    `battle_family_mapper_required` de `31772` para `31460`.
+    simples (`draw`, `direct_damage`, `destroy target`). O PG284 adicionou
+    `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
+    target, `6` life gain), com postcheck PostgreSQL `53/53`, E2E `53/53` em
+    PG/SQLite/snapshot/runtime, e fila XMage reduzida de `28524` para `28471`.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

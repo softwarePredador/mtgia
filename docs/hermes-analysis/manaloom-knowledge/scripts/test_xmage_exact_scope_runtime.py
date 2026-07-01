@@ -237,6 +237,156 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_life_gain_spell_uses_gain_life_runtime(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 10
+        effect = {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "life_gain_amount": 7,
+            "target": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Life", "type_line": "Sorcery", "oracle_text": "You gain 7 life."},
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 17)
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Fixture Life"
+                and data.get("mode") == "gain_life"
+                and data.get("requested_delta") == 7
+                and data.get("life_after") == 17
+                and data.get("changed") is True
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_life_gain_spell_respects_cant_gain_life(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 10
+        active.cant_gain_life = True
+        active.cant_gain_life_source = "Fixture Static"
+        effect = {
+            "effect": "life_total_change",
+            "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+            "life_gain_amount": 7,
+            "target": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Life", "type_line": "Sorcery", "oracle_text": "You gain 7 life."},
+            turn=4,
+            rng=random.Random(44),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 10)
+        self.assertTrue(
+            any(
+                event == "life_gain_prevented"
+                and data.get("player") == "Active"
+                and data.get("amount") == 7
+                and data.get("source") == "Fixture Static"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Fixture Life"
+                and data.get("changed") is False
+                and data.get("life_after") == 10
+                for event, data in self.events
+            )
+        )
+
+    def test_exile_target_spell_moves_permanent_to_exile(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "artifact",
+            "target_constraints": {"card_types": ["artifact"]},
+            "destination": "exile",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Exile", "type_line": "Sorcery", "oracle_text": "Exile target artifact."},
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Target Relic"])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Exile"
+                and data.get("target") == "Target Relic"
+                and data.get("destination") == "exile"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_mana_source_permanent_refreshes_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "C",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Rock", "type_line": "Artifact", "oracle_text": "{T}: Add {C}."},
+            turn=6,
+            rng=random.Random(6),
+            effect_data_override=effect,
+        )
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(active.mana_pool.colorless, 1)
+        self.assertEqual(active.battlefield[0]["name"], "Fixture Rock")
+        self.assertTrue(active.battlefield[0]["tapped"])
+        self.assertTrue(
+            any(
+                event == "mana_refreshed"
+                and data.get("player") == "Active"
+                and data.get("sources") == 1
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
