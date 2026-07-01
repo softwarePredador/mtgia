@@ -165,6 +165,10 @@ Resultado:
 
 ## Bloqueios restantes
 
+Backlog canonico:
+
+- `docs/qa/MANALOOM_PENDING_BACKLOG_2026-07-01.md`
+
 1. `BLOCKED_BY_DSN`: configurar `SENTRY_DSN` ou `SENTRY_MOBILE_DSN` por canal
    seguro e confirmar ingestao real de evento mobile.
 2. `BLOCKED_BY_SIGNING`: criar `app/android/key.properties` com keystore real

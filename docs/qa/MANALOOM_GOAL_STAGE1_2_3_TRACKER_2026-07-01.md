@@ -49,6 +49,8 @@ Status: `CONCLUIDA_PARA_TESTE_INTERNO`
 Documento de saida:
 
 - `docs/qa/MANALOOM_STAGE2_CORE_RELEASE_READINESS_2026-07-01.md`
+- Backlog consolidado:
+  `docs/qa/MANALOOM_PENDING_BACKLOG_2026-07-01.md`
 
 Objetivo:
 
@@ -352,7 +354,8 @@ Decks de QA possivelmente residuais:
 
 Proxima acao:
 
-- Corrigir os dois blockers de UX/harness, limpar decks residuais com token/admin apropriado e repetir aceite Android completo.
+- Repetir aceite Android completo apos as correcoes locais, limpar decks
+  residuais com token/admin apropriado e atualizar o backlog consolidado.
 
 ## Dependencias e bloqueios conhecidos
 
@@ -370,16 +373,22 @@ Proxima acao:
 
 ## Proximas acoes imediatas
 
-1. Especificar e implementar Etapa 4 comercial: Free/Pro, medidor de IA, limites, paywall, upgrade e textos legais.
-2. Especificar e implementar Etapa 5: otimizacao por colecao/orcamento, explicacao de trocas e relatorio antes/depois.
-3. Especificar e implementar Etapa 6: historico de partidas, notas pos-jogo, evolucao do deck e alertas.
-4. Especificar e implementar Etapa 7: deck publico, perfil, seguir, comentarios, binder publico, trade match e compartilhamento.
-5. Corrigir `ACCEPTANCE_BLOCKER_IMPORT_MODAL_CLOSE`.
-6. Corrigir `ACCEPTANCE_BLOCKER_OPTIMIZE_NEEDS_REPAIR_UX`.
-7. Limpar decks residuais de QA com token/admin apropriado.
-8. Repetir aceite Android completo.
-9. Injetar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` seguro e repetir smoke de observabilidade.
-10. Configurar signing Android/iOS antes de release publico.
+Fonte canonica:
+
+- `docs/qa/MANALOOM_PENDING_BACKLOG_2026-07-01.md`
+
+Top 10 atual:
+
+1. Repetir aceite Android fisico apos correcoes locais.
+2. Injetar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` seguro e repetir smoke de observabilidade.
+3. Configurar signing Android real e rebuildar AAB/APK distribuivel.
+4. Decidir se iOS entra no primeiro release; se sim, configurar signing/TestFlight.
+5. Rodar aceite final em build assinado.
+6. Limpar decks residuais de QA com token/admin apropriado.
+7. Implementar billing real antes de oferta paga.
+8. Implementar plano/quota server-side antes de oferta paga.
+9. Fazer backend honrar `recommendation_context`.
+10. Revisar Fan Content Policy/IP, termos, privacidade e disclaimer antes de venda publica.
 
 ## Regra de conclusao do goal
 
