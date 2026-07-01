@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_token_grouping_replan.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg303_fixed_token_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27731`
-- XMage authoritative source resolved: `27417`
+- target all-card battle-gap identities: `27704`
+- XMage authoritative source resolved: `27390`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27417`
+- XMage authoritative adapter required: `27390`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9887`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27445` identities, card semantics are accepted from XMage; work is now
+- For `27390` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG302 Exact Adapter Waves
+## PG283-PG303 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG302 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG303 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -232,6 +232,11 @@ patterns:
   `xmage_fixed_boost_target_creature_until_eot_spell_v1`
 - `xmage_signature::no_effect_class::<combat keyword ability classes>::no_target_class::no_condition_class::no_signal` ->
   `xmage_static_self_combat_keyword_creature_v1`
+- `token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token` with
+  one fixed `CreateTokenEffect`, a literal token class constructor, no
+  additional token fanout, no custom effect text, and token keywords limited to
+  `flying` or `haste` ->
+  `xmage_fixed_create_creature_tokens_spell_v1`
 
 PG283 evidence:
 
@@ -974,6 +979,60 @@ PG302 measured result:
   `CreateTokenEffect + EntersBattlefieldTriggeredAbility` (`60` cards).
 - Running the exact splitter after PG302 on supported units returns
   `proposal_count=0` over `7311` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG303 evidence:
+
+- PG303 fixed token spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg303_xmage_fixed_token_spell_wave_package.md`
+- PG303 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg303_xmage_fixed_token_spell_wave_pg_apply_evidence.md`
+- PG303 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg303_xmage_fixed_token_spell_wave_e2e_validation.md`
+- PG303 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg303_fixed_token_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg303_fixed_token_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg303_fixed_token_spell_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg303_fixed_token_spell_wave.md`
+- post-PG303 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg303_fixed_token_spell_wave_recheck.md`
+- post-PG303 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg303_fixed_token_spell_wave.md`
+- post-PG303 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg303_existing_supported_recheck.md`
+
+PG303 measured result:
+
+- PG303 promoted `27` exact one-shot token spells whose local XMage source is a
+  single fixed `CreateTokenEffect` over a literal creature token class.
+- The splitter now reads only the no-argument token constructor, extracts
+  fixed token count, token name, colors, subtype, power/toughness, and safe
+  `flying`/`haste` keywords, and blocks dynamic counts, unsupported token
+  keywords, custom text, additional token fanout, and non-literal token
+  descriptions.
+- PostgreSQL postcheck: `27/27` promoted rows, `27/27` verified/auto, `27/27`
+  matching Oracle hash, with `10` backup rows.
+- PG -> Hermes/SQLite sync loaded `6787` PostgreSQL rows, inserted/updated
+  `6581` SQLite rows, and exported `4395` canonical snapshot rows.
+- E2E package validation: PostgreSQL `27/27`, SQLite `27/27`, canonical
+  snapshot `27/27`, and runtime `get_card_effect` `27/27`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover fixed token spell mapping, dynamic count
+  blocking, additional token blocking, unsupported keyword blocking, and
+  runtime token creation; `107` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG303:
+  `target_identity_count=27704`, `xmage_authoritative_source_count=27390`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27390`.
+- Running the exact splitter after PG303 on supported units returns
+  `proposal_count=0` over `7353` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

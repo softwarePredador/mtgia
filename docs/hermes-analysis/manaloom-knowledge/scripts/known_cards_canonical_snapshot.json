@@ -1119,6 +1119,29 @@
     "battle_rule_logical_key": "battle_rule_v1:c68e635c5defec520b399779a409a08e",
     "battle_rule_oracle_hash": "35292c95c861c5c82fe5cb9302d5d012"
   },
+  "Allied Reinforcements": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "2/2 white Knight Ally creature token",
+    "token_name": "Knight Ally Token",
+    "token_power": 2,
+    "token_subtype": "Knight Ally",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "KnightAllyToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2234b61462850526c73d0d973d8f5921",
+    "battle_rule_oracle_hash": "c8ca548f1d79200db0d1d92fce79b63b"
+  },
   "Allosaurus Shepherd": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -7437,6 +7460,29 @@
     "battle_rule_logical_key": "battle_rule_v1:f1b2e00fe7ffd5fcdf4d0ab90bdd9739",
     "battle_rule_oracle_hash": "5e76c466448cabbfd764e746566b41c1"
   },
+  "Call of the Conclave": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "G"
+    ],
+    "token_count": 1,
+    "token_description": "3/3 green Centaur creature token",
+    "token_name": "Centaur Token",
+    "token_power": 3,
+    "token_subtype": "Centaur",
+    "token_toughness": 3,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "CentaurToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae742d49c6ed4d2a6dfd840e658aeeed",
+    "battle_rule_oracle_hash": "c288a506682c318f3c293ef98482bf1c"
+  },
   "Call of the Ring": {
     "cmc": 2.0,
     "effect": "draw_cards",
@@ -7599,6 +7645,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:802683f320c420eff2f09721ebefad4d"
+  },
+  "Captain's Call": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 white Soldier creature token",
+    "token_name": "Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Soldier",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f633f0a7a856e14e686b3f27118cd725",
+    "battle_rule_oracle_hash": "7938f688df9c4a6e07ddb70c0ed25d15"
   },
   "Captivating Cave": {
     "effect": "land",
@@ -14039,14 +14108,27 @@
     "battle_rule_logical_key": "battle_rule_v1:905d605e9436a924b0c013a8ade1733f"
   },
   "Dragon Fodder": {
-    "cmc": 2.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
     "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 red Goblin creature token",
+    "token_name": "Goblin Token",
+    "token_power": 1,
+    "token_subtype": "Goblin",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+    "battle_rule_oracle_hash": "af78ae9aa41c1318da0a99bc8792046b"
   },
   "Dragon Mage": {
     "cmc": 7.0,
@@ -15474,6 +15556,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+  },
+  "Elemental Summoning": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "U",
+      "R"
+    ],
+    "token_count": 1,
+    "token_description": "4/4 blue and red Elemental creature token",
+    "token_name": "Elemental Token",
+    "token_power": 4,
+    "token_subtype": "Elemental",
+    "token_toughness": 4,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "Elemental44Token",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6199a30cd9a3fd61f09587f55f66275a",
+    "battle_rule_oracle_hash": "f67c95ae11ea905ed0879c9b34b7c740"
   },
   "Elenda's Hierophant": {
     "cmc": 3.0,
@@ -19269,16 +19375,27 @@
     "battle_rule_oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d"
   },
   "Flurry of Horns": {
-    "cmc": 5.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
     "effect": "token_maker",
-    "token_count": 1,
-    "token_power": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 2,
+    "token_description": "2/3 red Minotaur creature token",
+    "token_name": "Minotaur Token",
+    "token_power": 2,
+    "token_subtype": "Minotaur",
+    "token_toughness": 3,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "MinotaurToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4e3d6bf3cb302f0d84723349d13264d0",
+    "battle_rule_oracle_hash": "599368d267257f18b97f6372c32df371"
   },
   "Flusterstorm": {
     "battle_model_scope": "counter_target_instant_or_sorcery_unless_pay_1_storm_annotation_v1",
@@ -21783,16 +21900,27 @@
     "battle_rule_logical_key": "battle_rule_v1:2434c487a4a822bcd42dfd83d639e7a9"
   },
   "Goblin Rally": {
-    "cmc": 5.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
     "effect": "token_maker",
-    "token_count": 1,
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 4,
+    "token_description": "1/1 red Goblin creature token",
+    "token_name": "Goblin Token",
     "token_power": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
+    "token_subtype": "Goblin",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:705776a7f59b0f60c79785f5e2cf5cf5",
+    "battle_rule_oracle_hash": "a29ba86f9f3e3d4e8b1172ca3e8e0e85"
   },
   "Goblin Scouts": {
     "cmc": 5.0,
@@ -24560,6 +24688,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Hive Stirrings": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_count": 2,
+    "token_description": "1/1 colorless Sliver creature token",
+    "token_name": "Sliver Token",
+    "token_power": 1,
+    "token_subtype": "Sliver",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SliverToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae40a6513b4562cf617a3a78672f40b8",
+    "battle_rule_oracle_hash": "49726f8eb30224766b4a36247045e7db"
+  },
   "Hobgoblin Dragoon": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -24634,6 +24782,52 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
     "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
+  },
+  "Hop to It": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 white Rabbit creature token",
+    "token_name": "Rabbit Token",
+    "token_power": 1,
+    "token_subtype": "Rabbit",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "RabbitToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8555e1703b029af4443600dd7f94c02b",
+    "battle_rule_oracle_hash": "92afd228721d31ead3f8c7d10531a068"
+  },
+  "Hordeling Outburst": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 red Goblin creature token",
+    "token_name": "Goblin Token",
+    "token_power": 1,
+    "token_subtype": "Goblin",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:02525e64e245bd544bbf7ae22a116650",
+    "battle_rule_oracle_hash": "25ad31c0129f36286cdf7e807bcc3791"
   },
   "Horizon Canopy": {
     "effect": "land",
@@ -25168,16 +25362,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Icatian Town": {
-    "cmc": 6.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
     "effect": "token_maker",
-    "token_count": 1,
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 4,
+    "token_description": "1/1 white Citizen creature token",
+    "token_name": "Citizen Token",
     "token_power": 1,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c04ea8861f209f15b99aa140a7ae2a4a"
+    "token_subtype": "Citizen",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "CitizenToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0759bd34a5de2242662968ee09b9829e",
+    "battle_rule_oracle_hash": "6d6a4c8ef340226e85dfdc09d8594be6"
   },
   "Ice Floe": {
     "effect": "land",
@@ -25916,6 +26121,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb",
     "battle_rule_oracle_hash": "f952302fb288a6663f8c5356e2a92d8d"
+  },
+  "Inkling Summoning": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W",
+      "B"
+    ],
+    "token_count": 1,
+    "token_description": "2/1 white and black Inkling creature token with flying",
+    "token_flying": true,
+    "token_keywords": [
+      "flying"
+    ],
+    "token_name": "Inkling Token",
+    "token_power": 2,
+    "token_subtype": "Inkling",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "InklingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:54d72f68ef93e23d0160f6bb852d607a",
+    "battle_rule_oracle_hash": "aff7b8d357da96cc5b4ce3c6ba6a96d9"
   },
   "Inkmoth Nexus": {
     "effect": "land",
@@ -26976,6 +27209,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:142a989548d61321e0bbc15acd5d6e14"
+  },
+  "Join the Ranks": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 white Soldier Ally creature token",
+    "token_name": "Soldier Ally Token",
+    "token_power": 1,
+    "token_subtype": "Soldier Ally",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "JoinTheRanksSoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4ea1eb2a0a0ebd8fb58f60d54aed996c",
+    "battle_rule_oracle_hash": "55d07496163c74bac90a7d53dd04c750"
   },
   "Jokulhaups": {
     "cmc": 6.0,
@@ -28200,14 +28456,27 @@
     "battle_rule_oracle_hash": "0e78187f1d9f9140f54461114be86fcd"
   },
   "Krenko's Command": {
-    "cmc": 2.0,
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
     "effect": "token_maker",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
+    "token_colors": [
+      "R"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 red Goblin creature token",
+    "token_name": "Goblin Token",
+    "token_power": 1,
+    "token_subtype": "Goblin",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+    "battle_rule_oracle_hash": "af78ae9aa41c1318da0a99bc8792046b"
   },
   "Krenko, Mob Boss": {
     "cmc": 4.0,
@@ -31283,6 +31552,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
   },
+  "Mass Production": {
+    "ability_kind": "one_shot",
+    "artifact_tokens": true,
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_count": 4,
+    "token_description": "1/1 colorless Soldier artifact creature token",
+    "token_name": "Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Soldier",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierArtifactToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:67fe7e6756f31c93bf07feb013cc6708",
+    "battle_rule_oracle_hash": "9a1ce301b0ff0064aa9d35ee382e2369"
+  },
   "Massacre Girl, Known Killer": {
     "cmc": 4.0,
     "effect": "draw_engine",
@@ -31302,6 +31592,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:332b66f2b05dab9cff48bfe602d740ae"
+  },
+  "Master's Call": {
+    "ability_kind": "one_shot",
+    "artifact_tokens": true,
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_count": 2,
+    "token_description": "1/1 colorless Myr artifact creature token",
+    "token_name": "Myr Token",
+    "token_power": 1,
+    "token_subtype": "Myr",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "MyrToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:105e6e035145d6e109ab4874b99b11a2",
+    "battle_rule_oracle_hash": "56b608f211c1069f7f5b222612b44373"
   },
   "Masterwork of Ingenuity": {
     "cmc": 1.0,
@@ -31776,6 +32087,33 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+  },
+  "Midnight Haunting": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 white Spirit creature token with flying",
+    "token_flying": true,
+    "token_keywords": [
+      "flying"
+    ],
+    "token_name": "Spirit Token",
+    "token_power": 1,
+    "token_subtype": "Spirit",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SpiritWhiteToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f",
+    "battle_rule_oracle_hash": "45d4b3a1a10b11a7f27e2e3614427281"
   },
   "Midnight Reaper": {
     "cmc": 3.0,
@@ -39596,6 +39934,29 @@
     "battle_rule_logical_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
     "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
+  "Raise the Alarm": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 white Soldier creature token",
+    "token_name": "Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Soldier",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59",
+    "battle_rule_oracle_hash": "6618c9d70d67f78294d4ec096204ab43"
+  },
   "Raise the Palisade": {
     "cmc": 5.0,
     "count": 1,
@@ -39708,6 +40069,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4f83814e656b2f0f373e87bcbd8ad50a",
     "battle_rule_oracle_hash": "074de20837bda24d5dd40ea510afe5fc"
+  },
+  "Ral's Reinforcements": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "U",
+      "R"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 blue and red Elemental creature token",
+    "token_name": "Elemental Token",
+    "token_power": 1,
+    "token_subtype": "Elemental",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "Elemental11BlueRedToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:24650340a35c919109d5613b432a4864",
+    "battle_rule_oracle_hash": "ca0d6616cca74b4938faebfbdcd6a23f"
   },
   "Ral, Crackling Wit": {
     "cmc": 4.0,
@@ -40862,6 +41247,29 @@
     "battle_rule_logical_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
     "battle_rule_oracle_hash": "7dc2505fff00a2cdcbe34336f545505b"
   },
+  "Release the Dogs": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 4,
+    "token_description": "1/1 white Dog creature token",
+    "token_name": "Dog Token",
+    "token_power": 1,
+    "token_subtype": "Dog",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "WhiteDogToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:387ad1790bbe16eaa7576ec52289dee1",
+    "battle_rule_oracle_hash": "e4992d37b48cdbc00fe60a6fa01ded0b"
+  },
   "Relentless Assault": {
     "cmc": 4.0,
     "effect": "extra_turn",
@@ -41600,6 +42008,34 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:daf1e5ac212a20bdfc37ca53384ade16"
+  },
+  "Revel of the Fallen God": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "R",
+      "G"
+    ],
+    "token_count": 4,
+    "token_description": "2/2 red and green Satyr creature token with haste",
+    "token_haste": true,
+    "token_keywords": [
+      "haste"
+    ],
+    "token_name": "Satyr Token",
+    "token_power": 2,
+    "token_subtype": "Satyr",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "XenagosSatyrToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185",
+    "battle_rule_oracle_hash": "d00621899997cc893fd3a254b0b1af57"
   },
   "Reverberate": {
     "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_v1",
@@ -48394,6 +48830,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d0cfc448e06bce117f8a1db3a55831a4"
   },
+  "Spectral Procession": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 white Spirit creature token with flying",
+    "token_flying": true,
+    "token_keywords": [
+      "flying"
+    ],
+    "token_name": "Spirit Token",
+    "token_power": 1,
+    "token_subtype": "Spirit",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SpiritWhiteToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:afe2169f26f33481858fbc333262b9e4",
+    "battle_rule_oracle_hash": "93bf9a105b7080178e3face21b1f7458"
+  },
   "Spectral Sailor": {
     "cmc": 1.0,
     "effect": "draw_cards",
@@ -48682,6 +49145,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:435d9a5e2fbde6e6de50a2a573820221"
   },
+  "Spirit Summoning": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W",
+      "R"
+    ],
+    "token_count": 1,
+    "token_description": "3/2 red and white Spirit creature token",
+    "token_name": "Spirit Token",
+    "token_power": 3,
+    "token_subtype": "Spirit",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "Spirit32Token",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fdeeb60c55639c0c88a4382501419a17",
+    "battle_rule_oracle_hash": "76cef3d8b8f40c13143c827142225fd6"
+  },
   "Spirited Companion": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
@@ -48820,6 +49307,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a0baa437192dfef239e3991fbcea8c45"
   },
+  "Spore Swarm": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "G"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 green Saproling creature token",
+    "token_name": "Saproling Token",
+    "token_power": 1,
+    "token_subtype": "Saproling",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SaprolingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bcf86c47ebc7dfdb7a7652943e17b8d8",
+    "battle_rule_oracle_hash": "6184be008ca8f5cbb36abf01c2a5a8f0"
+  },
   "Sporecap Spider": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -48955,6 +49465,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
     "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
+  "Sprout": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "G"
+    ],
+    "token_count": 1,
+    "token_description": "1/1 green Saproling creature token",
+    "token_name": "Saproling Token",
+    "token_power": 1,
+    "token_subtype": "Saproling",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SaprolingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e90b240bf0332dbf989ab32046133e06",
+    "battle_rule_oracle_hash": "fcd5ddd05ac2b7ef00bfeeac4c904cab"
   },
   "Spymaster's Vault": {
     "effect": "land",
@@ -51539,6 +52072,29 @@
     "battle_rule_logical_key": "battle_rule_v1:1dc787546713b8ba46fd75acf55c2668",
     "battle_rule_oracle_hash": "0069b571d4793bf0ae5e28fea41de46f"
   },
+  "Take Up Arms": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 white Warrior creature token",
+    "token_name": "Warrior Token",
+    "token_power": 1,
+    "token_subtype": "Warrior",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "WarriorToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4",
+    "battle_rule_oracle_hash": "7b31b4e584f811786f9dc6aa7ae82547"
+  },
   "Takenuma, Abandoned Mire": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -51743,6 +52299,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Talrand's Invocation": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "U"
+    ],
+    "token_count": 2,
+    "token_description": "2/2 blue Drake creature token with flying",
+    "token_flying": true,
+    "token_keywords": [
+      "flying"
+    ],
+    "token_name": "Drake Token",
+    "token_power": 2,
+    "token_subtype": "Drake",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "DrakeToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2a8492b508918bcf058ed094ebdf3d33",
+    "battle_rule_oracle_hash": "67249d44e68702ca939f05256a1c2d76"
   },
   "Talrand, Sky Summoner": {
     "cmc": 4.0,

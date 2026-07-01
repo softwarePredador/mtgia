@@ -39,6 +39,10 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+TOKEN_SPELL_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
+    "no_target_class::no_condition_class::token"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -53,6 +57,7 @@ SUPPORTED_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    TOKEN_SPELL_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -78,6 +83,7 @@ ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
+TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -91,6 +97,7 @@ SPELL_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    TOKEN_SPELL_UNIT,
 }
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
@@ -125,6 +132,43 @@ SAFE_MANA_ABILITY_CLASSES = {
     "BlackManaAbility",
     "RedManaAbility",
     "GreenManaAbility",
+}
+
+ALLOWED_TOKEN_ABILITY_KEYWORDS = {
+    "FlyingAbility": "flying",
+    "HasteAbility": "haste",
+}
+
+TOKEN_COLOR_SETTERS = {
+    "White": "W",
+    "Blue": "U",
+    "Black": "B",
+    "Red": "R",
+    "Green": "G",
+}
+
+TOKEN_COLOR_WORDS = {
+    "white": "W",
+    "blue": "U",
+    "black": "B",
+    "red": "R",
+    "green": "G",
+}
+
+UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
+    "when ",
+    "whenever ",
+    "infect",
+    "lifelink",
+    "vigilance",
+    "trample",
+    "menace",
+    "prowess",
+    "reach",
+    "toxic",
+    "sacrifice",
+    "mountainwalk",
+    "banding",
 }
 
 UNSAFE_MANA_ABILITY_CLASSES = {
@@ -237,6 +281,169 @@ def java_constructor_int_or_noarg_default(
 
 def has_additional_cost(source: str) -> bool:
     return bool(re.search(r"\.addCost\s*\(", source or ""))
+
+
+def source_xmage_root(row: dict[str, Any]) -> Path | None:
+    path = Path(str(row.get("xmage_path") or ""))
+    parts = path.parts
+    for marker in ("Mage.Sets", "Mage"):
+        if marker in parts:
+            index = parts.index(marker)
+            if index > 0:
+                return Path(*parts[:index])
+    return None
+
+
+def fixed_create_token_effect_from_source(source: str) -> tuple[str, int] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+CreateTokenEffect\s*\(", text)) != 1:
+        return "token_source_not_single_create_token_effect"
+    if ".withAdditionalTokens" in text:
+        return "token_source_additional_tokens_not_supported"
+    if ".entersWithCounters" in text:
+        return "token_source_counters_not_supported"
+    if ".setText" in text:
+        return "token_source_custom_text_not_supported"
+    match = re.search(
+        r"new\s+CreateTokenEffect\s*\(\s*new\s+(\w+)\s*\([^)]*\)\s*"
+        r"(?:,\s*(\d+))?\s*\)",
+        text,
+        re.S,
+    )
+    if not match:
+        return "token_source_create_token_not_fixed"
+    token_class = match.group(1)
+    count = int(match.group(2) or "1")
+    if count <= 0:
+        return "token_source_count_not_positive"
+    return token_class, count
+
+
+def token_class_source(row: dict[str, Any], source_text: str, token_class: str) -> str:
+    if re.search(rf"\bclass\s+{re.escape(token_class)}\b", source_text or ""):
+        return source_text
+    root = source_xmage_root(row)
+    if root is None:
+        return ""
+    direct = root / "Mage" / "src" / "main" / "java" / "mage" / "game" / "permanent" / "token" / f"{token_class}.java"
+    if direct.is_file():
+        return direct.read_text(encoding="utf-8", errors="replace")
+    for base in (
+        root / "Mage" / "src" / "main" / "java",
+        root / "Mage.Sets" / "src" / "mage" / "cards",
+    ):
+        if not base.is_dir():
+            continue
+        for candidate in base.rglob(f"{token_class}.java"):
+            return candidate.read_text(encoding="utf-8", errors="replace")
+    return ""
+
+
+def title_subtype(value: str) -> str:
+    return " ".join(part.capitalize() for part in str(value or "").split("_") if part)
+
+
+def token_colors_from_description(description: str) -> list[str]:
+    lower = str(description or "").lower()
+    if "colorless" in lower:
+        return []
+    return [
+        symbol
+        for color_word, symbol in TOKEN_COLOR_WORDS.items()
+        if re.search(rf"\b{re.escape(color_word)}\b", lower)
+    ]
+
+
+def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[str, Any], str | None]:
+    if not token_source:
+        return {}, "token_source_missing"
+    if "TokenImpl" not in token_source:
+        return {}, "token_source_not_token_impl"
+    constructor_match = re.search(
+        rf"public\s+{re.escape(token_class)}\s*\(\s*\)\s*\{{(?P<body>.*?)\n\s*\}}",
+        token_source,
+        re.S,
+    )
+    if not constructor_match:
+        return {}, "token_noarg_constructor_missing"
+    constructor_source = constructor_match.group("body")
+    description_match = re.search(r'super\("([^"]+)",\s*"([^"]+)"\)', constructor_source)
+    if not description_match:
+        return {}, "token_literal_description_missing"
+    token_name = description_match.group(1)
+    description = description_match.group(2)
+    lower_description = description.lower()
+    if "creature token" not in lower_description:
+        return {}, "token_description_not_creature_token"
+    unsupported_markers = [
+        marker
+        for marker in sorted(UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS)
+        if marker in lower_description
+    ]
+    if unsupported_markers:
+        return {}, "token_description_keyword_not_supported"
+    if " with " in lower_description and not (
+        lower_description.endswith(" with flying")
+        or lower_description.endswith(" with haste")
+    ):
+        return {}, "token_description_keyword_not_supported"
+    power_match = re.search(r"power\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
+    toughness_match = re.search(r"toughness\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
+    if not power_match or not toughness_match:
+        return {}, "token_power_toughness_not_fixed"
+    ability_classes = set(re.findall(r"addAbility\s*\(\s*([A-Za-z]+Ability)", constructor_source))
+    unsupported_abilities = ability_classes - set(ALLOWED_TOKEN_ABILITY_KEYWORDS)
+    if unsupported_abilities:
+        return {}, "token_ability_not_supported"
+    colors = [
+        symbol
+        for color_name, symbol in TOKEN_COLOR_SETTERS.items()
+        if re.search(rf"color\.set{color_name}\s*\(\s*true\s*\)", constructor_source)
+    ]
+    object_color_matches = re.findall(r"color\.setColor\s*\(\s*ObjectColor\.([A-Z]+)\s*\)", constructor_source)
+    object_color_symbols = {
+        "WHITE": "W",
+        "BLUE": "U",
+        "BLACK": "B",
+        "RED": "R",
+        "GREEN": "G",
+    }
+    for match in object_color_matches:
+        symbol = object_color_symbols.get(match)
+        if symbol and symbol not in colors:
+            colors.append(symbol)
+    if not colors:
+        colors = token_colors_from_description(description)
+    subtypes = [title_subtype(value) for value in re.findall(r"subtype\.add\s*\(\s*SubType\.([A-Z0-9_]+)\s*\)", constructor_source)]
+    token_keywords = [
+        keyword
+        for ability_class, keyword in ALLOWED_TOKEN_ABILITY_KEYWORDS.items()
+        if ability_class in ability_classes
+    ]
+    artifact = bool(
+        "artifact creature token" in lower_description
+        or re.search(r"cardType\.add\s*\(\s*CardType\.ARTIFACT\s*\)", constructor_source)
+    )
+    token_data: dict[str, Any] = {
+        "xmage_token_class": token_class,
+        "token_name": token_name,
+        "token_power": int(power_match.group(1)),
+        "token_toughness": int(toughness_match.group(1)),
+        "token_description": description,
+    }
+    if subtypes:
+        token_data["token_subtype"] = " ".join(subtypes)
+    if colors:
+        token_data["token_colors"] = colors
+    if token_keywords:
+        token_data["token_keywords"] = token_keywords
+    if "flying" in token_keywords:
+        token_data["token_flying"] = True
+    if "haste" in token_keywords:
+        token_data["token_haste"] = True
+    if artifact:
+        token_data["artifact_tokens"] = True
+    return token_data, None
 
 
 def is_spell(metadata: dict[str, Any]) -> bool:
@@ -1041,6 +1248,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "instant/sorcery spell"
     if str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
+    elif scope == TOKEN_SPELL_SCOPE:
+        scope_kind = "fixed spell-resolution creature-token maker"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -1113,6 +1322,7 @@ def split_row(
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
+    fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
@@ -1123,6 +1333,7 @@ def split_row(
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
+        and not fixed_token_spell_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
@@ -1149,6 +1360,32 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if fixed_token_spell_unit:
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        if isinstance(parsed_effect, str):
+            return None, parsed_effect
+        token_class, token_count = parsed_effect
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        effect_json = {
+            "effect": "token_maker",
+            "battle_model_scope": TOKEN_SPELL_SCOPE,
+            "ability_kind": "one_shot",
+            "token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            **token_data,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_create_creature_tokens_spell",
+        ), "selected_exact_scope"
 
     if keyword_creature_unit:
         if not is_creature_metadata(metadata):

@@ -1,0 +1,980 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T12:17:12.106743+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg303_xmage_fixed_token_spell_wave_manifest.json",
+  "package_id": "pg303_xmage_fixed_token_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Allied Reinforcements",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2234b61462850526c73d0d973d8f5921",
+          "oracle_hash": "c8ca548f1d79200db0d1d92fce79b63b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call of the Conclave",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae742d49c6ed4d2a6dfd840e658aeeed",
+          "oracle_hash": "c288a506682c318f3c293ef98482bf1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Captain's Call",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f633f0a7a856e14e686b3f27118cd725",
+          "oracle_hash": "7938f688df9c4a6e07ddb70c0ed25d15",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Dragon Fodder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+          "oracle_hash": "af78ae9aa41c1318da0a99bc8792046b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Elemental Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6199a30cd9a3fd61f09587f55f66275a",
+          "oracle_hash": "f67c95ae11ea905ed0879c9b34b7c740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Flurry of Horns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4e3d6bf3cb302f0d84723349d13264d0",
+          "oracle_hash": "599368d267257f18b97f6372c32df371",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Rally",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:705776a7f59b0f60c79785f5e2cf5cf5",
+          "oracle_hash": "a29ba86f9f3e3d4e8b1172ca3e8e0e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hive Stirrings",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae40a6513b4562cf617a3a78672f40b8",
+          "oracle_hash": "49726f8eb30224766b4a36247045e7db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hop to It",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8555e1703b029af4443600dd7f94c02b",
+          "oracle_hash": "92afd228721d31ead3f8c7d10531a068",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hordeling Outburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02525e64e245bd544bbf7ae22a116650",
+          "oracle_hash": "25ad31c0129f36286cdf7e807bcc3791",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Icatian Town",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0759bd34a5de2242662968ee09b9829e",
+          "oracle_hash": "6d6a4c8ef340226e85dfdc09d8594be6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Inkling Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:54d72f68ef93e23d0160f6bb852d607a",
+          "oracle_hash": "aff7b8d357da96cc5b4ce3c6ba6a96d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Join the Ranks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4ea1eb2a0a0ebd8fb58f60d54aed996c",
+          "oracle_hash": "55d07496163c74bac90a7d53dd04c750",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Krenko's Command",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+          "oracle_hash": "af78ae9aa41c1318da0a99bc8792046b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Mass Production",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67fe7e6756f31c93bf07feb013cc6708",
+          "oracle_hash": "9a1ce301b0ff0064aa9d35ee382e2369",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Master's Call",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:105e6e035145d6e109ab4874b99b11a2",
+          "oracle_hash": "56b608f211c1069f7f5b222612b44373",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Midnight Haunting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f",
+          "oracle_hash": "45d4b3a1a10b11a7f27e2e3614427281",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Raise the Alarm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59",
+          "oracle_hash": "6618c9d70d67f78294d4ec096204ab43",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Ral's Reinforcements",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:24650340a35c919109d5613b432a4864",
+          "oracle_hash": "ca0d6616cca74b4938faebfbdcd6a23f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Release the Dogs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:387ad1790bbe16eaa7576ec52289dee1",
+          "oracle_hash": "e4992d37b48cdbc00fe60a6fa01ded0b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Revel of the Fallen God",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185",
+          "oracle_hash": "d00621899997cc893fd3a254b0b1af57",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spectral Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:afe2169f26f33481858fbc333262b9e4",
+          "oracle_hash": "93bf9a105b7080178e3face21b1f7458",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spirit Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fdeeb60c55639c0c88a4382501419a17",
+          "oracle_hash": "76cef3d8b8f40c13143c827142225fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spore Swarm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bcf86c47ebc7dfdb7a7652943e17b8d8",
+          "oracle_hash": "6184be008ca8f5cbb36abf01c2a5a8f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Sprout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e90b240bf0332dbf989ab32046133e06",
+          "oracle_hash": "fcd5ddd05ac2b7ef00bfeeac4c904cab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Take Up Arms",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4",
+          "oracle_hash": "7b31b4e584f811786f9dc6aa7ae82547",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Talrand's Invocation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a8492b508918bcf058ed094ebdf3d33",
+          "oracle_hash": "67249d44e68702ca939f05256a1c2d76",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Allied Reinforcements",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2234b61462850526c73d0d973d8f5921",
+          "oracle_hash": "c8ca548f1d79200db0d1d92fce79b63b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call of the Conclave",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae742d49c6ed4d2a6dfd840e658aeeed",
+          "oracle_hash": "c288a506682c318f3c293ef98482bf1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Captain's Call",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f633f0a7a856e14e686b3f27118cd725",
+          "oracle_hash": "7938f688df9c4a6e07ddb70c0ed25d15",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Dragon Fodder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+          "oracle_hash": "af78ae9aa41c1318da0a99bc8792046b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Elemental Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6199a30cd9a3fd61f09587f55f66275a",
+          "oracle_hash": "f67c95ae11ea905ed0879c9b34b7c740",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Flurry of Horns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4e3d6bf3cb302f0d84723349d13264d0",
+          "oracle_hash": "599368d267257f18b97f6372c32df371",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Goblin Rally",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:705776a7f59b0f60c79785f5e2cf5cf5",
+          "oracle_hash": "a29ba86f9f3e3d4e8b1172ca3e8e0e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hive Stirrings",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae40a6513b4562cf617a3a78672f40b8",
+          "oracle_hash": "49726f8eb30224766b4a36247045e7db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hop to It",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8555e1703b029af4443600dd7f94c02b",
+          "oracle_hash": "92afd228721d31ead3f8c7d10531a068",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Hordeling Outburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02525e64e245bd544bbf7ae22a116650",
+          "oracle_hash": "25ad31c0129f36286cdf7e807bcc3791",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Icatian Town",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0759bd34a5de2242662968ee09b9829e",
+          "oracle_hash": "6d6a4c8ef340226e85dfdc09d8594be6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Inkling Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:54d72f68ef93e23d0160f6bb852d607a",
+          "oracle_hash": "aff7b8d357da96cc5b4ce3c6ba6a96d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Join the Ranks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4ea1eb2a0a0ebd8fb58f60d54aed996c",
+          "oracle_hash": "55d07496163c74bac90a7d53dd04c750",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Krenko's Command",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d",
+          "oracle_hash": "af78ae9aa41c1318da0a99bc8792046b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Mass Production",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67fe7e6756f31c93bf07feb013cc6708",
+          "oracle_hash": "9a1ce301b0ff0064aa9d35ee382e2369",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Master's Call",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:105e6e035145d6e109ab4874b99b11a2",
+          "oracle_hash": "56b608f211c1069f7f5b222612b44373",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Midnight Haunting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f",
+          "oracle_hash": "45d4b3a1a10b11a7f27e2e3614427281",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Raise the Alarm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59",
+          "oracle_hash": "6618c9d70d67f78294d4ec096204ab43",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Ral's Reinforcements",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:24650340a35c919109d5613b432a4864",
+          "oracle_hash": "ca0d6616cca74b4938faebfbdcd6a23f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Release the Dogs",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:387ad1790bbe16eaa7576ec52289dee1",
+          "oracle_hash": "e4992d37b48cdbc00fe60a6fa01ded0b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Revel of the Fallen God",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185",
+          "oracle_hash": "d00621899997cc893fd3a254b0b1af57",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spectral Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:afe2169f26f33481858fbc333262b9e4",
+          "oracle_hash": "93bf9a105b7080178e3face21b1f7458",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spirit Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fdeeb60c55639c0c88a4382501419a17",
+          "oracle_hash": "76cef3d8b8f40c13143c827142225fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Spore Swarm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bcf86c47ebc7dfdb7a7652943e17b8d8",
+          "oracle_hash": "6184be008ca8f5cbb36abf01c2a5a8f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Sprout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e90b240bf0332dbf989ab32046133e06",
+          "oracle_hash": "fcd5ddd05ac2b7ef00bfeeac4c904cab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Take Up Arms",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4",
+          "oracle_hash": "7b31b4e584f811786f9dc6aa7ae82547",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Talrand's Invocation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2a8492b508918bcf058ed094ebdf3d33",
+          "oracle_hash": "67249d44e68702ca939f05256a1c2d76",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Allied Reinforcements",
+          "logical_rule_key": "battle_rule_v1:2234b61462850526c73d0d973d8f5921"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Call of the Conclave",
+          "logical_rule_key": "battle_rule_v1:ae742d49c6ed4d2a6dfd840e658aeeed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Captain's Call",
+          "logical_rule_key": "battle_rule_v1:f633f0a7a856e14e686b3f27118cd725"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dragon Fodder",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elemental Summoning",
+          "logical_rule_key": "battle_rule_v1:6199a30cd9a3fd61f09587f55f66275a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flurry of Horns",
+          "logical_rule_key": "battle_rule_v1:4e3d6bf3cb302f0d84723349d13264d0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Rally",
+          "logical_rule_key": "battle_rule_v1:705776a7f59b0f60c79785f5e2cf5cf5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hive Stirrings",
+          "logical_rule_key": "battle_rule_v1:ae40a6513b4562cf617a3a78672f40b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hop to It",
+          "logical_rule_key": "battle_rule_v1:8555e1703b029af4443600dd7f94c02b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hordeling Outburst",
+          "logical_rule_key": "battle_rule_v1:02525e64e245bd544bbf7ae22a116650"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Icatian Town",
+          "logical_rule_key": "battle_rule_v1:0759bd34a5de2242662968ee09b9829e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Inkling Summoning",
+          "logical_rule_key": "battle_rule_v1:54d72f68ef93e23d0160f6bb852d607a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Join the Ranks",
+          "logical_rule_key": "battle_rule_v1:4ea1eb2a0a0ebd8fb58f60d54aed996c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krenko's Command",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mass Production",
+          "logical_rule_key": "battle_rule_v1:67fe7e6756f31c93bf07feb013cc6708"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Master's Call",
+          "logical_rule_key": "battle_rule_v1:105e6e035145d6e109ab4874b99b11a2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Midnight Haunting",
+          "logical_rule_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raise the Alarm",
+          "logical_rule_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ral's Reinforcements",
+          "logical_rule_key": "battle_rule_v1:24650340a35c919109d5613b432a4864"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Release the Dogs",
+          "logical_rule_key": "battle_rule_v1:387ad1790bbe16eaa7576ec52289dee1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Revel of the Fallen God",
+          "logical_rule_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spectral Procession",
+          "logical_rule_key": "battle_rule_v1:afe2169f26f33481858fbc333262b9e4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spirit Summoning",
+          "logical_rule_key": "battle_rule_v1:fdeeb60c55639c0c88a4382501419a17"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spore Swarm",
+          "logical_rule_key": "battle_rule_v1:bcf86c47ebc7dfdb7a7652943e17b8d8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sprout",
+          "logical_rule_key": "battle_rule_v1:e90b240bf0332dbf989ab32046133e06"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Take Up Arms",
+          "logical_rule_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Talrand's Invocation",
+          "logical_rule_key": "battle_rule_v1:2a8492b508918bcf058ed094ebdf3d33"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Allied Reinforcements",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2234b61462850526c73d0d973d8f5921"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Call of the Conclave",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:ae742d49c6ed4d2a6dfd840e658aeeed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Captain's Call",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:f633f0a7a856e14e686b3f27118cd725"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dragon Fodder",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elemental Summoning",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:6199a30cd9a3fd61f09587f55f66275a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flurry of Horns",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:4e3d6bf3cb302f0d84723349d13264d0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Rally",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:705776a7f59b0f60c79785f5e2cf5cf5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hive Stirrings",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:ae40a6513b4562cf617a3a78672f40b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hop to It",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:8555e1703b029af4443600dd7f94c02b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hordeling Outburst",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:02525e64e245bd544bbf7ae22a116650"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Icatian Town",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:0759bd34a5de2242662968ee09b9829e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Inkling Summoning",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:54d72f68ef93e23d0160f6bb852d607a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Join the Ranks",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:4ea1eb2a0a0ebd8fb58f60d54aed996c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krenko's Command",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:9ca5c1996b4c67d685a4f4b4d871065d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mass Production",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:67fe7e6756f31c93bf07feb013cc6708"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Master's Call",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:105e6e035145d6e109ab4874b99b11a2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Midnight Haunting",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Raise the Alarm",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ral's Reinforcements",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:24650340a35c919109d5613b432a4864"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Release the Dogs",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:387ad1790bbe16eaa7576ec52289dee1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Revel of the Fallen God",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spectral Procession",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:afe2169f26f33481858fbc333262b9e4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spirit Summoning",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:fdeeb60c55639c0c88a4382501419a17"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spore Swarm",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:bcf86c47ebc7dfdb7a7652943e17b8d8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sprout",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:e90b240bf0332dbf989ab32046133e06"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Take Up Arms",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Talrand's Invocation",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2a8492b508918bcf058ed094ebdf3d33"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

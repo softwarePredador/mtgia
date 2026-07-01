@@ -64,6 +64,51 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_create_creature_tokens_spell_creates_modeled_tokens(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 2,
+            "token_name": "Goblin Token",
+            "token_subtype": "Goblin",
+            "token_power": 1,
+            "token_toughness": 1,
+            "token_colors": ["R"],
+            "_rule_logical_key": "battle_rule_v1:fixture_token_spell",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Fodder",
+                "type_line": "Sorcery",
+                "oracle_text": "Create two 1/1 red Goblin creature tokens.",
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Goblin Token"]
+        self.assertEqual(len(tokens), 2)
+        self.assertTrue(all(token.get("power") == 1 and token.get("toughness") == 1 for token in tokens))
+        self.assertTrue(all(token.get("type_line") == "Creature Token — Goblin" for token in tokens))
+        self.assertTrue(all(token.get("colors") == ["R"] for token in tokens))
+        self.assertTrue(
+            any(
+                event == "tokens_created"
+                and data.get("card") == "Fixture Fodder"
+                and data.get("tokens_created") == 2
+                and data.get("token_name") == "Goblin Token"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_token_spell"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_target_spell_deals_numeric_damage_to_player(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

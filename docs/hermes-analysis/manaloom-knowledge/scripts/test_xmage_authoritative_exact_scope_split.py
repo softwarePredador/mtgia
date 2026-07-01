@@ -43,6 +43,105 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Fodder",
+                type_line="Sorcery",
+                oracle_text="Create two 1/1 red Goblin creature tokens.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new GoblinToken(), 2));
+                class GoblinToken extends TokenImpl {
+                    public GoblinToken() {
+                        super("Goblin Token", "1/1 red Goblin creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.GOBLIN);
+                        color.setRed(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "token_maker")
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_count"], 2)
+        self.assertEqual(effect["token_name"], "Goblin Token")
+        self.assertEqual(effect["token_subtype"], "Goblin")
+        self.assertEqual(effect["token_power"], 1)
+        self.assertEqual(effect["token_toughness"], 1)
+        self.assertEqual(effect["token_colors"], ["R"])
+
+    def test_fixed_create_creature_tokens_spell_blocks_dynamic_count(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Woods",
+                type_line="Sorcery",
+                oracle_text="Create X 1/1 green Forest Dryad land creature tokens.",
+            ),
+            source_text="this.getSpellAbility().addEffect(new CreateTokenEffect(new ForestDryadToken(), GetXValue.instance));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_source_create_token_not_fixed")
+
+    def test_fixed_create_creature_tokens_spell_blocks_additional_tokens(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Menace",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Create a 1/1 green Snake creature token, a 2/2 green Wolf "
+                    "creature token, and a 3/3 green Elephant creature token."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CreateTokenEffect(new SnakeToken())"
+                ".withAdditionalTokens(new WolfToken(), new ElephantToken()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_source_additional_tokens_not_supported")
+
+    def test_fixed_create_creature_tokens_spell_blocks_unsupported_token_keyword(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Wurm",
+                type_line="Instant",
+                oracle_text="Create a 5/5 green Wurm creature token with trample.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new WurmWithTrampleToken()));
+                class WurmWithTrampleToken extends TokenImpl {
+                    public WurmWithTrampleToken() {
+                        super("Wurm Token", "5/5 green Wurm creature token with trample");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.WURM);
+                        color.setGreen(true);
+                        power = new MageInt(5);
+                        toughness = new MageInt(5);
+                        addAbility(TrampleAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_description_keyword_not_supported")
+
     def test_fixed_source_controller_draw_spell_is_package_safe(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(
