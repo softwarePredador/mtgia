@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG328
+thread goal remains active, but execution must use the current post-PG329
 baseline and the stop criteria below.
 
 ## Objective
@@ -20,20 +20,20 @@ promotion, Hermes/SQLite sync, and audit evidence.
 
 Source artifacts:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg328_recursion_choose_one_wave_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg328_recursion_choose_one_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg329_recursion_battlefield_simple_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg329_recursion_battlefield_simple_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG328 counts:
+Post-PG329 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2347`
-- all-card readiness `battle_family_mapper_required`: `30200`
-- target battle-gap identities in authoritative queue: `27277`
-- XMage authoritative source resolved: `26963`
+- all-card readiness `battle_and_oracle_ready`: `2350`
+- all-card readiness `battle_family_mapper_required`: `30197`
+- target battle-gap identities in authoritative queue: `27274`
+- XMage authoritative source resolved: `26960`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26963`
+- XMage authoritative adapter required: `26960`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -87,9 +87,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG328 authoritative queue unless a newer queue exists:
+Use the post-PG329 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1959`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1956`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -102,7 +102,7 @@ Use the post-PG328 authoritative queue unless a newer queue exists:
 
 Next immediate work: continue splitting the highest reusable work unit,
 `recursion::xmage_graveyard_return_variant_review_v1`, into another exact
-runtime-backed subpattern. The post-PG328 supported splitter recheck has
+runtime-backed subpattern. The post-PG329 supported splitter recheck has
 `proposal_count=0`, so the next package requires a new exact subpattern rather
 than rerunning the current splitter unchanged.
 

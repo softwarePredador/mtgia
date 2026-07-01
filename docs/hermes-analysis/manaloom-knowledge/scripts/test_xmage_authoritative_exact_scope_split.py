@@ -1992,7 +1992,10 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 type_line="Sorcery",
                 oracle_text="Return target creature card from your graveyard to the battlefield.",
             ),
-            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());",
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter));
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+            """,
         )
 
         self.assertEqual(reason, "selected_exact_scope")
@@ -2003,24 +2006,93 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 1)
         self.assertEqual(effect["destination"], "battlefield")
         self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_graveyard_controller"], "self")
+        self.assertEqual(effect["battlefield_controller"], "self")
         self.assertEqual(
             effect["target_constraints"],
             {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
         )
 
-    def test_graveyard_to_battlefield_opponent_graveyard_stays_blocked(self) -> None:
+    def test_graveyard_to_battlefield_opponent_graveyard_maps_under_your_control(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
         proposal, reason = split.split_row(
             row,
             metadata(
+                name="Ashen Powder",
                 type_line="Sorcery",
                 oracle_text="Put target creature card from an opponent's graveyard onto the battlefield under your control.",
             ),
-            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());",
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCardInOpponentsGraveyard(new FilterCreatureCard()));
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+            """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "recursion_battlefield_target_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "opponent")
+        self.assertEqual(effect["target_graveyard_controller"], "opponent")
+        self.assertEqual(effect["battlefield_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "opponent", "card_types": ["creature"]},
+        )
+
+    def test_graveyard_to_battlefield_any_graveyard_maps_under_your_control(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Hymn of Rebirth",
+                type_line="Sorcery",
+                oracle_text="Put target creature card from a graveyard onto the battlefield under your control.",
+            ),
+            source_text="""
+                this.getSpellAbility().addTarget(new TargetCardInGraveyard(StaticFilters.FILTER_CARD_CREATURE_A_GRAVEYARD));
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "any_player")
+        self.assertEqual(effect["target_graveyard_controller"], "any_player")
+        self.assertEqual(effect["battlefield_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "any_player", "card_types": ["creature"]},
+        )
+
+    def test_graveyard_to_battlefield_mana_value_limit_and_tapped_are_preserved(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Helping Hand",
+                type_line="Sorcery",
+                oracle_text="Return target creature card with mana value 3 or less from your graveyard to the battlefield tapped.",
+            ),
+            source_text="""
+                filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect(true));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["recursion_mana_value_max"], 3)
+        self.assertTrue(effect["enters_tapped"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max": 3,
+            },
+        )
 
     def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])

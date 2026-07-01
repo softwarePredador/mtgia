@@ -47150,13 +47150,32 @@ def apply_effect_immediate(
         mana_value_max = recursion_mana_value_max(effect_data)
         destination = effect_data.get("destination", "hand")
         target_controller = str(effect_data.get("target_controller") or "self")
-        if target_controller == "each_player":
-            participants = [player] + list(opponents or [])
-        else:
-            participants = [player]
         recovered = []
         recovered_by_player = {}
         recovered_by_component = []
+        all_players = [player] + list(opponents or [])
+
+        def recursion_participants(controller_value):
+            controller = str(controller_value or "self").lower()
+            if controller == "each_player":
+                return all_players
+            if controller in {"opponent", "opponents"}:
+                return list(opponents or [])
+            if controller in {"any", "any_player", "any_graveyard"}:
+                return all_players
+            return [player]
+
+        def recursion_battlefield_controller(component_data, source_participant):
+            controller = str(
+                component_data.get("battlefield_controller")
+                or effect_data.get("battlefield_controller")
+                or ""
+            ).lower()
+            if controller in {"self", "you", "controller", "source_controller"}:
+                return player
+            if controller in {"source_graveyard_controller", "owner", "target_controller"}:
+                return source_participant
+            return source_participant
 
         def component_count(component_data):
             return (
@@ -47187,11 +47206,12 @@ def apply_effect_immediate(
             ]
 
         def component_score(component_data):
-            component_target_controller = str(component_data.get("target_controller") or target_controller)
-            if component_target_controller == "each_player":
-                component_participants = [player] + list(opponents or [])
-            else:
-                component_participants = [player]
+            component_target_controller = str(
+                component_data.get("target_graveyard_controller")
+                or component_data.get("target_controller")
+                or target_controller
+            )
+            component_participants = recursion_participants(component_target_controller)
             count = component_count(component_data)
             return sum(
                 min(count, len(matching_component_candidates(participant, component_data)))
@@ -47201,14 +47221,15 @@ def apply_effect_immediate(
         def resolve_recursion_component(component_data, component_index=None):
             component_target = component_data.get("target")
             component_destination = component_data.get("destination", destination)
-            component_target_controller = str(component_data.get("target_controller") or target_controller)
+            component_target_controller = str(
+                component_data.get("target_graveyard_controller")
+                or component_data.get("target_controller")
+                or target_controller
+            )
             component_mana_value_max = recursion_mana_value_max(component_data)
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
-            if component_target_controller == "each_player":
-                component_participants = [player] + list(opponents or [])
-            else:
-                component_participants = [player]
+            component_participants = recursion_participants(component_target_controller)
             component_recovered = []
             for participant in component_participants:
                 count = component_count(component_data)
@@ -47229,11 +47250,19 @@ def apply_effect_immediate(
                     recovered.append(recovered_card)
                     component_recovered.append(recovered_card)
                     if component_destination == "battlefield":
+                        destination_controller = recursion_battlefield_controller(component_data, participant)
                         permanent_effect = get_card_effect(recovered_card)
+                        enters_tapped = bool(
+                            component_data.get("enters_tapped")
+                            or effect_data.get("enters_tapped")
+                        )
+                        permanent_payload = {**recovered_card, **permanent_effect}
+                        if enters_tapped:
+                            permanent_payload["enters_tapped"] = True
                         permanent = prepare_entering_permanent(
-                            enrich_card({**recovered_card, **permanent_effect}),
-                            controller=participant,
-                            all_players=[player] + list(opponents or []),
+                            enrich_card(permanent_payload),
+                            controller=destination_controller,
+                            all_players=all_players,
                             turn=turn,
                         )
                         if effect_data.get("grants_haste_until_eot"):
@@ -47242,15 +47271,24 @@ def apply_effect_immediate(
                             permanent["effect"] = "creature"
                             permanent["haste"] = has_haste(permanent)
                             permanent["summoning_sick"] = not permanent["haste"]
-                            permanent["tapped"] = False
-                        participant.battlefield.append(permanent)
+                            permanent["tapped"] = bool(permanent.get("tapped") or enters_tapped)
+                        destination_controller.battlefield.append(permanent)
                     else:
                         participant.hand.append(recovered_card)
             recovered_by_component.append(
                 {
                     "index": component_index,
                     "target_type": component_target,
+                    "target_graveyard_controller": component_target_controller,
                     "destination": component_destination,
+                    "battlefield_controller": (
+                        str(
+                            component_data.get("battlefield_controller")
+                            or effect_data.get("battlefield_controller")
+                            or ""
+                        )
+                        or None
+                    ),
                     "recovered": [
                         recovered_card.get("name", "?")
                         for recovered_card in component_recovered
@@ -47287,8 +47325,11 @@ def apply_effect_immediate(
             recovered_by_component=recovered_by_component,
             target_type=target_type,
             target_controller=target_controller,
+            target_graveyard_controller=effect_data.get("target_graveyard_controller"),
+            battlefield_controller=effect_data.get("battlefield_controller"),
             destination=destination,
             mana_value_max=mana_value_max,
+            enters_tapped=bool(effect_data.get("enters_tapped")),
             return_all_matching=return_all_matching,
             mode_selection=effect_data.get("mode_selection"),
             grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),

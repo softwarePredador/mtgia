@@ -267,6 +267,147 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_recursion_battlefield_from_opponent_graveyard_enters_under_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        enemy = {
+            "name": "Enemy Bear",
+            "type_line": "Creature - Bear",
+            "cmc": 2,
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.graveyard.append(enemy)
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_controller": "opponent",
+            "target_graveyard_controller": "opponent",
+            "battlefield_controller": "self",
+            "target_constraints": {"zone": "graveyard", "controller": "opponent", "card_types": ["creature"]},
+            "count": 1,
+            "destination": "battlefield",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Ashen Powder", "type_line": "Sorcery"},
+            turn=3,
+            rng=random.Random(3),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Enemy Bear"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("recovered") == ["Enemy Bear"]
+                and data.get("target_graveyard_controller") == "opponent"
+                and data.get("battlefield_controller") == "self"
+                for event, data in self.events
+            )
+        )
+
+    def test_recursion_battlefield_from_any_graveyard_can_use_opponent_card_under_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        enemy = {
+            "name": "Opponent Angel",
+            "type_line": "Creature - Angel",
+            "cmc": 5,
+            "power": 4,
+            "toughness": 4,
+        }
+        opponent.graveyard.append(enemy)
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_controller": "any_player",
+            "target_graveyard_controller": "any_player",
+            "battlefield_controller": "self",
+            "target_constraints": {"zone": "graveyard", "controller": "any_player", "card_types": ["creature"]},
+            "count": 1,
+            "destination": "battlefield",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Hymn of Rebirth", "type_line": "Sorcery"},
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Opponent Angel"])
+        self.assertEqual(opponent.battlefield, [])
+
+    def test_recursion_battlefield_mana_value_limit_enters_tapped(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        large = {
+            "name": "Large Bear",
+            "type_line": "Creature - Bear",
+            "cmc": 4,
+            "power": 4,
+            "toughness": 4,
+        }
+        small = {
+            "name": "Small Bear",
+            "type_line": "Creature - Bear",
+            "cmc": 3,
+            "power": 3,
+            "toughness": 3,
+        }
+        active.graveyard.extend([large, small])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max": 3,
+            },
+            "count": 1,
+            "destination": "battlefield",
+            "recursion_mana_value_max": 3,
+            "enters_tapped": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Helping Hand", "type_line": "Sorcery"},
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect,
+        )
+
+        self.assertIn("Large Bear", [card["name"] for card in active.graveyard])
+        self.assertNotIn("Small Bear", [card["name"] for card in active.graveyard])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Small Bear"])
+        self.assertTrue(active.battlefield[0].get("tapped"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("recovered") == ["Small Bear"]
+                and data.get("mana_value_max") == 3
+                and data.get("enters_tapped") is True
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_permanent_pays_mana_taps_and_draws(self) -> None:
         active = self.battle.Player(
             "Active",

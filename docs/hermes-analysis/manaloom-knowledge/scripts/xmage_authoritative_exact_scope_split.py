@@ -760,8 +760,13 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
     return constraints
 
 
-def recursion_target_constraints_for(target: str) -> dict[str, Any]:
-    constraints: dict[str, Any] = {"zone": "graveyard", "controller": "self"}
+def recursion_target_constraints_for(
+    target: str,
+    *,
+    controller: str = "self",
+    mana_value_max: int | None = None,
+) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "graveyard", "controller": controller}
     if target == "any_card":
         constraints["scope"] = "any_card"
     elif target == "green_card":
@@ -807,6 +812,8 @@ def recursion_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"]
     else:
         constraints["target"] = target
+    if mana_value_max is not None:
+        constraints["mana_value_max"] = mana_value_max
     return constraints
 
 
@@ -1003,26 +1010,76 @@ def recursion_to_hand_exile_self_from_oracle(metadata: dict[str, Any]) -> tuple[
     return recursion_to_hand_from_text(text)
 
 
-def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text(metadata)
-    patterns: list[tuple[str, tuple[str, int]]] = [
+    patterns: list[tuple[str, dict[str, Any]]] = [
         (
             r"^return target permanent card from your graveyard to the battlefield\.?$",
-            ("permanent", 1),
+            {"target": "permanent", "count": 1},
         ),
         (
             r"^return target artifact card from your graveyard to the battlefield\.?$",
-            ("artifact", 1),
+            {"target": "artifact", "count": 1},
         ),
         (
             r"^return target creature card from your graveyard to the battlefield\.?$",
-            ("creature", 1),
+            {"target": "creature", "count": 1},
+        ),
+        (
+            r"^return target creature card with mana value (?P<mana_value_max>\d+) or less from your graveyard to the battlefield(?P<tapped> tapped)?\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+            },
+        ),
+        (
+            r"^put target creature card from an opponent's graveyard onto the battlefield under your control\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "opponent",
+                "battlefield_controller": "self",
+            },
+        ),
+        (
+            r"^put target creature card from a graveyard onto the battlefield under your control\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "any_player",
+                "battlefield_controller": "self",
+            },
         ),
     ]
-    for pattern, result in patterns:
-        if re.match(pattern, text):
-            return result
+    for pattern, spec in patterns:
+        match = re.match(pattern, text)
+        if not match:
+            continue
+        result = {
+            "target": spec["target"],
+            "count": spec["count"],
+            "target_graveyard_controller": spec.get("target_graveyard_controller", "self"),
+            "battlefield_controller": spec.get("battlefield_controller", "self"),
+            "enters_tapped": bool(match.groupdict().get("tapped")),
+        }
+        if match.groupdict().get("mana_value_max"):
+            result["mana_value_max"] = int(match.group("mana_value_max"))
+        return result
     return None
+
+
+def source_supports_battlefield_recursion_target(source_text: str, target_graveyard_controller: str) -> bool:
+    text = str(source_text or "")
+    controller = str(target_graveyard_controller or "self")
+    if controller == "self":
+        return "TargetCardInYourGraveyard" in text
+    if controller == "opponent":
+        return "TargetCardInOpponentsGraveyard" in text
+    if controller in {"any", "any_player"}:
+        return "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text
+    return False
 
 
 def destroy_all_types_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
@@ -4836,18 +4893,33 @@ def split_row(
             target = recursion_to_battlefield_from_oracle(metadata)
             if target is None:
                 return None, "recursion_battlefield_target_not_supported"
-            target_type, count = target
+            target_type = str(target["target"])
+            count = int(target["count"])
+            target_graveyard_controller = str(target.get("target_graveyard_controller") or "self")
+            if not source_supports_battlefield_recursion_target(source_text, target_graveyard_controller):
+                return None, "recursion_battlefield_source_target_not_supported"
+            mana_value_max = target.get("mana_value_max")
             effect_json = {
                 "effect": "recursion",
                 "battle_model_scope": RECURSION_BATTLEFIELD_SCOPE,
                 "target": target_type,
-                "target_constraints": recursion_target_constraints_for(target_type),
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    controller=target_graveyard_controller,
+                    mana_value_max=mana_value_max,
+                ),
                 "count": count,
                 "destination": "battlefield",
-                "target_controller": "self",
+                "target_controller": target_graveyard_controller,
+                "target_graveyard_controller": target_graveyard_controller,
+                "battlefield_controller": str(target.get("battlefield_controller") or "self"),
                 "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
                 **flags,
             }
+            if mana_value_max is not None:
+                effect_json["recursion_mana_value_max"] = mana_value_max
+            if target.get("enters_tapped"):
+                effect_json["enters_tapped"] = True
             return build_proposal(
                 row,
                 metadata,

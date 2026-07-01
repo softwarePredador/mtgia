@@ -60,10 +60,14 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "effect": "topdeck_play",
             "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
             "target": "land",
+            "target_graveyard_controller": "opponent",
+            "battlefield_controller": "self",
             "count": 1,
             "destination": "play",
+            "enters_tapped": True,
             "exiles_self": False,
             "mode_selection": "one_or_both",
+            "recursion_mana_value_max": 3,
             "recursion_components": [
                 {
                     "target": "creature",
@@ -84,16 +88,20 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     assert expected["oracle_hash"] == "hash123"
     assert expected["min_rule_version"] == 2
     assert expected["required_effect_fields"] == {
-        "effect": "topdeck_play",
-        "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
-        "target": "land",
-        "count": 1,
-        "destination": "play",
-        "exiles_self": False,
-        "mode_selection": "one_or_both",
-        "recursion_components": [
-            {
-                "target": "creature",
+            "effect": "topdeck_play",
+            "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+            "target": "land",
+            "target_graveyard_controller": "opponent",
+            "battlefield_controller": "self",
+            "count": 1,
+            "destination": "play",
+            "enters_tapped": True,
+            "exiles_self": False,
+            "mode_selection": "one_or_both",
+            "recursion_mana_value_max": 3,
+            "recursion_components": [
+                {
+                    "target": "creature",
                 "count": 1,
                 "destination": "hand",
                 "target_controller": "self",

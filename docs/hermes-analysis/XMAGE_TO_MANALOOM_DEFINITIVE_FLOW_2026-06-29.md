@@ -2759,6 +2759,66 @@ PG328 measured result:
 - Running the exact splitter after PG328 on supported units returns
   `proposal_count=0` over `7984` considered supported rows.
 
+PG329 evidence:
+
+- PG329 recursion battlefield simple package:
+  `docs/hermes-analysis/master_optimizer_reports/pg329_xmage_recursion_battlefield_simple_wave_package.md`
+- PG329 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg329_xmage_recursion_battlefield_simple_wave_pg_apply_evidence.md`
+- PG329 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg329_xmage_recursion_battlefield_simple_wave_pg_to_sqlite_sync.json`
+- PG329 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg329_xmage_recursion_battlefield_simple_wave_e2e_validation.md`
+- PG329 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg329_recursion_battlefield_simple_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg329_recursion_battlefield_simple_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg329_recursion_battlefield_simple_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg329_recursion_battlefield_simple_wave.md`
+- PG329 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg329_recursion_battlefield_simple_wave.md`
+- post-PG329 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg329_recursion_battlefield_simple_wave_commander_legal.md`
+- post-PG329 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg329_supported_recheck.md`
+- post-PG329 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg329_recursion_battlefield_simple_wave_recheck.md`
+
+PG329 measured result:
+
+- PG329 promoted `3` exact graveyard-to-battlefield recursion spells:
+  `Ashen Powder`, `Helping Hand`, and `Hymn of Rebirth`.
+- Runtime now distinguishes the graveyard source controller from the
+  battlefield controller for recursion effects. This supports opponent
+  graveyard and any-player graveyard targets entering under the source
+  controller's control, while preserving prior self-graveyard behavior.
+- Runtime also preserves exact `enters_tapped` and mana-value limit semantics
+  for the battlefield recursion scope.
+- Focused tests pass for the exact splitter (`156` tests), runtime (`89`
+  tests), and package builder (`4` tests).
+- PostgreSQL precheck found `3/3` target rows, `0` existing expected rows, and
+  `0` stale shadow rows.
+- PostgreSQL apply evidence reports `3/3` promoted rows, `3/3` verified/auto
+  rows, `3/3` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7217` PostgreSQL rules,
+  inserted/updated `7011` SQLite rows, and exported `4808` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  no-override battle package gate.
+- Post-PG329 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG329 rows themselves have `3/3` matching Oracle hashes.
+- Global all-card readiness after PG329:
+  `battle_and_oracle_ready=2350`, `battle_family_mapper_required=30197`, and
+  `snapshot_has_verified_rule=3498`.
+- Global all-card authoritative queue after PG329:
+  `target_identity_count=27274`, `xmage_authoritative_source_count=26960`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26960`.
+- Running the exact splitter after PG329 on supported units returns
+  `proposal_count=0` over `7981` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3398,10 +3458,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG328 queue, the next exact runtime-backed work should be selected from
+post-PG329 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1959`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1956`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
