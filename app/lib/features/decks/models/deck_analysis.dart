@@ -9,6 +9,7 @@ class DeckAnalysisData {
     this.cardBattleReadiness = const <DeckCardBattleReadiness>[],
     this.understandingSummary,
     this.commanderContract,
+    this.launchCapabilities,
   });
 
   final String deckId;
@@ -20,6 +21,7 @@ class DeckAnalysisData {
   final List<DeckCardBattleReadiness> cardBattleReadiness;
   final DeckUnderstandingSummary? understandingSummary;
   final DeckCommanderContractSummary? commanderContract;
+  final DeckLaunchCapabilities? launchCapabilities;
 
   factory DeckAnalysisData.fromJson(Map<String, dynamic> json) {
     final stats = _asStringMap(json['stats']);
@@ -36,6 +38,7 @@ class DeckAnalysisData {
     ).map(DeckCardBattleReadiness.fromJson).toList(growable: false);
     final understandingPayload = _asStringMap(json['understanding_summary']);
     final commanderContractPayload = _asStringMap(json['commander_contract']);
+    final launchCapabilitiesPayload = _asStringMap(json['launch_capabilities']);
 
     return DeckAnalysisData(
       deckId: json['deck_id']?.toString() ?? '',
@@ -59,6 +62,10 @@ class DeckAnalysisData {
           commanderContractPayload.isEmpty
               ? null
               : DeckCommanderContractSummary.fromJson(commanderContractPayload),
+      launchCapabilities:
+          launchCapabilitiesPayload.isEmpty
+              ? null
+              : DeckLaunchCapabilities.fromJson(launchCapabilitiesPayload),
     );
   }
 
@@ -98,6 +105,75 @@ class DeckAnalysisData {
       return 'functional_tags do backend';
     }
     return 'functional_tags ($version)';
+  }
+}
+
+class DeckLaunchCapabilities {
+  const DeckLaunchCapabilities({
+    required this.schemaVersion,
+    required this.releaseChannel,
+    required this.flags,
+    required this.surfaces,
+    this.disclaimer,
+  });
+
+  final String schemaVersion;
+  final String releaseChannel;
+  final Map<String, dynamic> flags;
+  final List<DeckLaunchSurfaceCapability> surfaces;
+  final String? disclaimer;
+
+  factory DeckLaunchCapabilities.fromJson(Map<String, dynamic> json) {
+    return DeckLaunchCapabilities(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      releaseChannel: json['release_channel']?.toString() ?? '',
+      flags: _asStringMap(json['flags']),
+      surfaces: _parseMapList(
+        json['surfaces'],
+      ).map(DeckLaunchSurfaceCapability.fromJson).toList(growable: false),
+      disclaimer: _optionalTrimmedString(json['disclaimer']),
+    );
+  }
+
+  Iterable<DeckLaunchSurfaceCapability> get visibleBetaSurfaces {
+    return surfaces.where(
+      (surface) =>
+          surface.enabled &&
+          surface.requiresReview &&
+          (surface.stage == 'beta' || surface.stage == 'advisory'),
+    );
+  }
+}
+
+class DeckLaunchSurfaceCapability {
+  const DeckLaunchSurfaceCapability({
+    required this.key,
+    required this.label,
+    required this.enabled,
+    required this.stage,
+    required this.requiresReview,
+  });
+
+  final String key;
+  final String label;
+  final bool enabled;
+  final String stage;
+  final bool requiresReview;
+
+  factory DeckLaunchSurfaceCapability.fromJson(Map<String, dynamic> json) {
+    return DeckLaunchSurfaceCapability(
+      key: json['key']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      enabled: _parseBool(json['enabled']),
+      stage: json['stage']?.toString() ?? '',
+      requiresReview: _parseBool(json['requires_review']),
+    );
+  }
+
+  String get safeLabel {
+    final text = label.trim();
+    if (text.isNotEmpty) return text;
+    return key.trim().isEmpty ? 'Capability' : key;
   }
 }
 

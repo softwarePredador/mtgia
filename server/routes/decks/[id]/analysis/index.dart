@@ -481,6 +481,11 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         cards: cards,
         issues: issues,
       ),
+      'launch_capabilities': _buildLaunchCapabilities(
+        format: format,
+        hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
+        hasSemanticV2: hasSemanticV2,
+      ),
       'meta_analysis': metaAnalysis,
       'mana_curve':
           manaCurve.map((key, value) => MapEntry(key.toString(), value)),
@@ -497,6 +502,66 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       body: {'error': 'Failed to analyze deck'},
     );
   }
+}
+
+Map<String, dynamic> _buildLaunchCapabilities({
+  required String format,
+  required bool hasCardIntelligenceSnapshot,
+  required bool hasSemanticV2,
+}) {
+  final normalizedFormat = format.toLowerCase().trim();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+  final betaSurfacesEnabled = _envFlag('MANALOOM_BETA_SURFACES', true);
+
+  return {
+    'schema_version': 'launch_capabilities_v1_2026-07-01',
+    'release_channel': betaSurfacesEnabled ? 'beta' : 'stable_only',
+    'flags': {
+      'beta_surfaces_enabled': betaSurfacesEnabled,
+      'card_intelligence_snapshot': hasCardIntelligenceSnapshot,
+      'semantic_v2_available': hasSemanticV2 || hasCardIntelligenceSnapshot,
+    },
+    'surfaces': [
+      {
+        'key': 'deck_analysis',
+        'label': 'Análise de deck',
+        'enabled': true,
+        'stage': 'stable',
+        'requires_review': false,
+      },
+      {
+        'key': 'commander_contract',
+        'label': 'Plano Commander',
+        'enabled': betaSurfacesEnabled && isCommander,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'battle_readiness',
+        'label': 'Battle readiness',
+        'enabled': betaSurfacesEnabled && hasCardIntelligenceSnapshot,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'optimize_explanations',
+        'label': 'Explicações de optimize',
+        'enabled': betaSurfacesEnabled,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'recommendations',
+        'label': 'Recomendações',
+        'enabled': true,
+        'stage': 'advisory',
+        'requires_review': true,
+      },
+    ],
+    'disclaimer':
+        'Superficies beta e advisory exigem preview/review; nao sao verdade final do deck.',
+  };
 }
 
 Map<String, dynamic> _buildCommanderContractSummary({
@@ -870,6 +935,14 @@ int _intValue(Object? value) {
   if (value is int) return value;
   if (value is num) return value.round();
   return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+bool _envFlag(String key, bool defaultValue) {
+  final value = Platform.environment[key]?.trim().toLowerCase();
+  if (value == null || value.isEmpty) return defaultValue;
+  if (value == '0' || value == 'false' || value == 'no') return false;
+  if (value == '1' || value == 'true' || value == 'yes') return true;
+  return defaultValue;
 }
 
 class ManaAnalysis {

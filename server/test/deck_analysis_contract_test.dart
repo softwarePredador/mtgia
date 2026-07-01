@@ -134,6 +134,7 @@ void main() {
         expect(body['card_battle_readiness'], isA<List>());
         expect(body['understanding_summary'], isA<Map<String, dynamic>>());
         expect(body['commander_contract'], isA<Map<String, dynamic>>());
+        expect(body['launch_capabilities'], isA<Map<String, dynamic>>());
         expect(body['mana_curve'], isA<Map<String, dynamic>>());
         expect(body['color_distribution'], isA<Map<String, dynamic>>());
         expect(body['legality'], isA<Map<String, dynamic>>());
@@ -146,6 +147,8 @@ void main() {
             body['understanding_summary'] as Map<String, dynamic>;
         final commanderContract =
             body['commander_contract'] as Map<String, dynamic>;
+        final launchCapabilities =
+            body['launch_capabilities'] as Map<String, dynamic>;
 
         expect(readiness['schema_version'], isA<String>());
         expect(readiness['status'], isA<String>());
@@ -171,6 +174,18 @@ void main() {
         expect(commanderContract['is_commander_applicable'], isA<bool>());
         expect(commanderContract['battle_gate'], isA<Map<String, dynamic>>());
         expect(commanderContract['planning_flow'], isA<List>());
+        expect(launchCapabilities['schema_version'], isA<String>());
+        expect(launchCapabilities['release_channel'], isA<String>());
+        expect(launchCapabilities['flags'], isA<Map<String, dynamic>>());
+        expect(launchCapabilities['surfaces'], isA<List>());
+        for (final item in launchCapabilities['surfaces'] as List) {
+          expect(item, isA<Map<String, dynamic>>());
+          final surface = item as Map<String, dynamic>;
+          expect(surface['key'], isA<String>());
+          expect(surface['enabled'], isA<bool>());
+          expect(surface['stage'], isA<String>());
+          expect(surface['requires_review'], isA<bool>());
+        }
       },
       skip: skipIntegration,
     );

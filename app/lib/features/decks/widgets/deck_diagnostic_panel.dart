@@ -112,6 +112,13 @@ class DeckDiagnosticPanel extends StatelessWidget {
           if (analysis?.hasLaunchSignals ?? false) ...[
             const SizedBox(height: 14),
             _LaunchReadinessStrip(analysis: analysis!),
+            if (analysis!.launchCapabilities?.visibleBetaSurfaces.isNotEmpty ??
+                false) ...[
+              const SizedBox(height: 10),
+              _LaunchCapabilityBadges(
+                capabilities: analysis!.launchCapabilities!,
+              ),
+            ],
             if (analysis!.cardBattleReadiness.isNotEmpty) ...[
               const SizedBox(height: 10),
               _CardBattleReadinessBadges(items: analysis!.cardBattleReadiness),
@@ -180,6 +187,68 @@ class DeckDiagnosticPanel extends StatelessWidget {
           const SizedBox(height: 10),
           ...snapshot.insights.asMap().entries.map(
             (entry) => _DiagnosticInsightRow(entry.value, index: entry.key),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LaunchCapabilityBadges extends StatelessWidget {
+  final DeckLaunchCapabilities capabilities;
+
+  const _LaunchCapabilityBadges({required this.capabilities});
+
+  @override
+  Widget build(BuildContext context) {
+    final surfaces = capabilities.visibleBetaSurfaces
+        .take(4)
+        .toList(growable: false);
+    if (surfaces.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      key: const Key('deck-launch-capability-badges'),
+      spacing: 8,
+      runSpacing: 8,
+      children: surfaces.map(_LaunchCapabilityBadge.new).toList(),
+    );
+  }
+}
+
+class _LaunchCapabilityBadge extends StatelessWidget {
+  final DeckLaunchSurfaceCapability capability;
+
+  const _LaunchCapabilityBadge(this.capability);
+
+  @override
+  Widget build(BuildContext context) {
+    final isAdvisory = capability.stage == 'advisory';
+    final tone = isAdvisory ? _DiagnosticTone.neutral : _DiagnosticTone.warn;
+
+    return Container(
+      key: Key('deck-launch-capability-${capability.key}'),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: tone.background,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: tone.border.withValues(alpha: 0.64)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isAdvisory ? Icons.info_outline_rounded : Icons.science_outlined,
+            size: 14,
+            color: tone.foreground,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${capability.safeLabel} ${capability.stage}',
+            style: TextStyle(
+              color: tone.foreground,
+              fontSize: AppTheme.fontSm,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),

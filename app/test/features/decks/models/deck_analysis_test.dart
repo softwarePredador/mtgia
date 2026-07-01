@@ -209,6 +209,38 @@ void main() {
           'next_actions': ['Rodar battle gate igualado.'],
           'disclaimer': 'Plano conservador.',
         },
+        'launch_capabilities': {
+          'schema_version': 'launch_capabilities_v1_2026-07-01',
+          'release_channel': 'beta',
+          'flags': {
+            'beta_surfaces_enabled': true,
+            'card_intelligence_snapshot': true,
+          },
+          'surfaces': [
+            {
+              'key': 'deck_analysis',
+              'label': 'Análise de deck',
+              'enabled': true,
+              'stage': 'stable',
+              'requires_review': false,
+            },
+            {
+              'key': 'battle_readiness',
+              'label': 'Battle readiness',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'recommendations',
+              'label': 'Recomendações',
+              'enabled': true,
+              'stage': 'advisory',
+              'requires_review': true,
+            },
+          ],
+          'disclaimer': 'Superfícies beta exigem review.',
+        },
       });
 
       expect(analysis.hasLaunchSignals, isTrue);
@@ -247,6 +279,11 @@ void main() {
       expect(
         analysis.commanderContract?.planningFlow.first.label,
         'Plano do comandante',
+      );
+      expect(analysis.launchCapabilities?.releaseChannel, 'beta');
+      expect(
+        analysis.launchCapabilities?.visibleBetaSurfaces.map((s) => s.key),
+        ['battle_readiness', 'recommendations'],
       );
     });
 

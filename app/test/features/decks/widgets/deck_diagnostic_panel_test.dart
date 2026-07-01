@@ -492,6 +492,38 @@ void main() {
           'warnings': [],
           'next_actions': ['Rodar battle gate igualado.'],
         },
+        'launch_capabilities': {
+          'schema_version': 'launch_capabilities_v1_2026-07-01',
+          'release_channel': 'beta',
+          'flags': {
+            'beta_surfaces_enabled': true,
+            'card_intelligence_snapshot': true,
+          },
+          'surfaces': [
+            {
+              'key': 'commander_contract',
+              'label': 'Plano Commander',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'battle_readiness',
+              'label': 'Battle readiness',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'recommendations',
+              'label': 'Recomendações',
+              'enabled': true,
+              'stage': 'advisory',
+              'requires_review': true,
+            },
+          ],
+          'disclaimer': 'Superfícies beta exigem review.',
+        },
       });
 
       await tester.pumpWidget(createSubject(deck, analysis: analysis));
@@ -519,6 +551,16 @@ void main() {
       expect(find.text('Plano Commander'), findsOneWidget);
       expect(find.text('Pronto para battle gate'), findsOneWidget);
       expect(find.text('Battle gate: Pendente'), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-launch-capability-badges')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-launch-capability-battle_readiness')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle readiness beta'), findsOneWidget);
+      expect(find.text('Recomendações advisory'), findsOneWidget);
       expect(
         find.byKey(const Key('deck-card-battle-readiness-badges')),
         findsOneWidget,
