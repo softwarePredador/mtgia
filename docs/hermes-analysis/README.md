@@ -61,7 +61,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Nao devem ser usados como contrato operacional quando divergirem do fluxo
     definitivo de 2026-06-29.
 
-## Decisao atual Lorehold deckbuilding
+## Decisao atual Commander deckbuilding global
 
 - `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
   - Status: `frozen_operating_contract`.
@@ -76,6 +76,18 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `server/lib/ai/commander_deckbuilding_contract_support.dart`, para ligar
     profile, stats, corpus, learned deck, usage hot cards, validacao e proximo
     gate em um unico diagnostico.
+  - A partir de 2026-07-01, o tratamento de decks deve ser globalizado pelo
+    metodo, nao pelo conteudo do Lorehold: rode
+    `manaloom-knowledge/scripts/global_commander_deck_contract_audit.py` para
+    separar `user_product`, `registered_pg_variant`, Hermes/lab e fixtures
+    antes de qualquer promocao.
+  - Evidencia global atual:
+    `master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md`.
+    Resultado: 13 variantes PostgreSQL registradas `structure_ready`; Hermes
+    local 6/606-621 estruturalmente pronto; deck 607 do usuario
+    `rafaelhalder@gmail.com` com 100 cartas, 1 comandante e legalidades
+    Commander completas. Ainda ha decks `user_product` incompletos que devem
+    ser reparados ou excluidos do gate global antes de promocao ampla.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

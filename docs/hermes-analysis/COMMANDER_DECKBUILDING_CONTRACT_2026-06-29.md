@@ -133,6 +133,48 @@ baseline, not universal truth. A future Lorehold candidate can replace it only
 when it ties or beats the protected baseline under the same strategy and battle
 gate rules.
 
+## Global Commander Rollout - 2026-07-01
+
+The Lorehold work is now the pilot methodology, not a special-case deckbuilder
+path. Before applying the Commander contract to all decks, run:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities
+```
+
+Current global audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md`
+- PostgreSQL registered variants: `13/13` are `structure_ready`.
+- Hermes local lab decks: Lorehold baseline `6`, Lorehold variants `606-616`,
+  and non-Lorehold variants `617-621` are structurally ready.
+- Product/user Commander scope: `27` likely user decks; `5` are
+  `structure_ready`, `6` are ready except missing legality rows, and `16` need
+  repair before entering global promotion gates.
+- Test/fixture decks are explicitly excluded from product promotion decisions.
+- Deck `607` materialized for `rafaelhalder@gmail.com` is structurally ready
+  after legalities sync: `100` cards, `1` commander, `0` missing legalities,
+  and `0` illegal rows.
+- Legalities syncs applied on 2026-07-01:
+  `msh` upserted `2921` `card_legalities` rows; `tdc,tle,blc,drc` upserted
+  `207` rows. These syncs updated legalities only, not cards or deck contents.
+
+Global promotion rules:
+
+- A deck cannot enter global deck-quality comparison until it is in an intended
+  scope (`user_product`, `registered_pg_variant`, or an explicitly selected
+  Hermes lab deck) and passes structure/legality gates.
+- Partner/background or multi-commander decks are blocked from automatic
+  promotion until the project has an explicit partner/background profile
+  contract.
+- Cards with printed deck-construction exceptions, such as `Nazgûl`, must be
+  handled by rule-aware duplicate validation rather than generic singleton
+  counting.
+- The global audit is a readiness and prioritization gate. It does not replace
+  commander intent profiles, source corpus, strategy matrix, or battle gate
+  evidence.
+
 ## Source Hierarchy
 
 | Source lane | Use for | Must not be used for |
