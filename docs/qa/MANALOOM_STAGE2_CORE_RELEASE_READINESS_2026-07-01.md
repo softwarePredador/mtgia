@@ -2,19 +2,26 @@
 
 Data: 2026-07-01
 Escopo: Etapa 2 do goal de produto - fechar o core para lancamento.
-Status da etapa: concluida como avaliacao de readiness, com bloqueios objetivos para declarar release publico.
+Status da etapa: concluida como readiness operacional, com core validado em testes locais, backend publico e smoke mobile Android.
 
 ## 1. Veredito
 
-O core de decks esta forte em validacao local/offline e em contratos de backend, mas ainda nao pode ser declarado pronto para release publico porque o fluxo completo contra backend publico exige escrita em PostgreSQL publico e/ou build real, ambos fora do escopo sem aprovacao explicita.
+O core de decks esta forte em validacao local/offline, contratos de backend,
+smokes publicos com escrita controlada e smoke mobile Android contra a API
+publica. A Etapa 2 agora sustenta teste interno real.
+
+Ainda nao deve ser declarado release publico/comercial porque faltam assinatura
+de distribuicao, Sentry mobile configurado/confirmado e smoke de aceitacao final
+com build assinado de loja.
 
 Classificacao:
 
 - Core local/offline: `PASS`.
 - Backend publico read-only do core: `PASS`.
-- Fluxo publico completo com usuario/deck real: `BLOCKED_BY_APPROVAL`.
-- Build Android com API publica: `PASS_COMPILE_UNSIGNED`.
-- Release publico do core: `NO-GO` ate smoke E2E instalado/executado e assinatura real.
+- Fluxos publicos controlados com usuario/deck real: `PASS_PUBLIC_CONTROLLED`.
+- Smoke mobile Android de importacao localizada: `PASS_DEVICE`.
+- APK release Android com API publica instalado/aberto: `PASS_INTERNAL_UNSIGNED`.
+- Release publico do core: `NO-GO` ate assinatura real, Sentry e aceite final.
 
 ## 2. Fluxo alvo da Etapa 2
 
@@ -142,141 +149,209 @@ Conclusao:
 - Catalogo e busca de cartas funcionam em leitura.
 - Request-id manual e preservado em readiness.
 
+### Backend publico com escrita controlada
+
+Backend alvo:
+
+`https://evolution-cartinhas.8ktevp.easypanel.host`
+
+Comando:
+
+```bash
+cd server
+TEST_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart test -t live --concurrency=1 \
+  test/auth_flow_integration_test.dart \
+  test/import_to_deck_flow_test.dart \
+  test/core_flow_smoke_test.dart \
+  -r expanded
+```
+
+Resultado consolidado:
+
+- `test/auth_flow_integration_test.dart`: 2 testes passaram.
+- `test/import_to_deck_flow_test.dart`: 6 testes passaram apos alinhar o teste
+  para usuario unico e lista Commander completa.
+- `test/core_flow_smoke_test.dart`: 2 testes passaram apos alinhar o teste para
+  usuario unico e registro antes de login.
+
+Comando complementar:
+
+```bash
+cd server
+dart test test/deck_pricing_export_community_contract_test.dart -r expanded
+```
+
+Resultado:
+
+- 3 testes passaram.
+
+Observacao operacional:
+
+- Os smokes criaram usuarios/decks de teste no backend publico.
+- Os decks criados pelos testes foram removidos pelos `tearDown`.
+- Usuarios de teste podem permanecer como residuos aceitaveis de QA.
+
+### Smoke mobile Android contra API publica
+
+Dispositivo:
+
+- `SM A135M`, id `R58T300SREH`, Android 14/API 34.
+
+Comando:
+
+```bash
+cd app
+flutter test integration_test/localized_import_runtime_test.dart \
+  -d R58T300SREH \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --no-version-check \
+  --reporter expanded
+```
+
+Resultado:
+
+- `All tests passed`.
+- `POST /auth/register -> 201`.
+- `POST /import/validate -> 200`.
+- `POST /import -> 200`.
+- Resumo emitido:
+  `found_count=12`, `localized_matches_count=9`,
+  `commander_detected=true`, `missing_commander=false`.
+- Deck criado no smoke `f4d529aa-abdc-41fd-90c3-4316d34e1deb` foi removido com
+  `DELETE /decks/... -> 204`.
+
+Conclusao:
+
+- Importacao localizada em portugues funciona no runtime mobile Android contra o backend publico.
+- A regra atual de Commander completo esta respeitada: 99 cartas na lista mais comandante em campo separado.
+
 ### Build Android com API publica
 
 Comandos executados:
 
 ```bash
 cd app
-flutter build apk --debug \
-  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --dart-define=DISABLE_FIREBASE_STARTUP=true \
-  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
-  --no-version-check
-
 flutter build apk --release \
   --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
   --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --dart-define=DISABLE_FIREBASE_STARTUP=true \
-  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --dart-define=SENTRY_ENVIRONMENT=staging \
+  --dart-define=SENTRY_RELEASE=mtgia-ready-2026-07-01 \
+  --dart-define=SENTRY_TRACES_SAMPLE_RATE=1.0 \
   --no-version-check
 
 flutter build appbundle --release \
   --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
   --dart-define=PUBLIC_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
-  --dart-define=DISABLE_FIREBASE_STARTUP=true \
-  --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true \
+  --dart-define=SENTRY_ENVIRONMENT=staging \
+  --dart-define=SENTRY_RELEASE=mtgia-ready-2026-07-01 \
+  --dart-define=SENTRY_TRACES_SAMPLE_RATE=1.0 \
   --no-version-check
+```
+
+Resultado final observado:
+
+- `build/app/outputs/flutter-apk/app-release.apk`, gerado em
+  `2026-07-01 10:50:55`, `114044826` bytes.
+- `build/app/outputs/bundle/release/app-release.aab`, gerado em
+  `2026-07-01 10:51:16`, `75806976` bytes.
+- `apksigner verify --print-certs` no APK release confirmou assinatura
+  `C=US, O=Android, CN=Android Debug`.
+
+Instalacao/abertura do APK release:
+
+```bash
+adb -s R58T300SREH install -r app/build/app/outputs/flutter-apk/app-release.apk
+adb -s R58T300SREH shell monkey -p com.mtgia.mtg_app -c android.intent.category.LAUNCHER 1
+adb -s R58T300SREH shell pidof com.mtgia.mtg_app
 ```
 
 Resultado:
 
-- `build/app/outputs/flutter-apk/app-debug.apk` gerado em `2026-07-01 10:07:28`, `237M`.
-- `build/app/outputs/flutter-apk/app-release.apk` gerado em `2026-07-01 10:07:55`, `110M`.
-- `build/app/outputs/bundle/release/app-release.aab` gerado em `2026-07-01 10:08:28`, `74M`.
-- `apksigner verify --print-certs` no APK release confirmou assinatura
-  `C=US, O=Android, CN=Android Debug`.
+- Instalacao: `Success`.
+- App aberto no dispositivo.
+- `pidof com.mtgia.mtg_app` retornou `21012` apos reinstalar o APK release no final.
 
 Conclusao:
 
 - Compilacao Android com a API publica: `PASS`.
-- Distribuicao Play Store/TestFlight equivalente: `NO-GO` sem keystore real e
-  sem smoke instalado/executado.
+- Instalacao e abertura do APK release em Android fisico: `PASS_INTERNAL`.
+- Distribuicao Play Store equivalente: `NO-GO` sem keystore real.
 
 ## 4. Matriz de criterios da Etapa 2
 
 | Criterio | Status | Evidencia | Observacao |
 |---|---|---|---|
-| Onboarding em sessao limpa preserva formato escolhido | PASS_LOCAL | `deck_flow_entry_screens_test.dart` passou | Ainda falta build real/sessao limpa end-to-end |
-| Gerar deck via IA funciona | PASS_CONTRACT | Provider/generate async/fallback passaram | Public E2E com escrita nao executado sem aprovacao |
-| Importar deck funciona | PASS_LOCAL | `deck_import_screen_test.dart` e import dialog passaram | Public E2E com escrita nao executado |
+| Onboarding em sessao limpa preserva formato escolhido | PASS_LOCAL | `deck_flow_entry_screens_test.dart` passou | Falta aceite manual/final em build assinado |
+| Gerar deck via IA funciona | PASS_PUBLIC_CONTROLLED | `core_flow_smoke_test.dart` passou contra API publica | Falta aceite visual em build assinado |
+| Importar deck funciona | PASS_PUBLIC_DEVICE | `import_to_deck_flow_test.dart` e `localized_import_runtime_test.dart` passaram | Teste mobile validou import localizado, nao todo o fluxo visual |
 | Deck details carrega estados principais | PASS_LOCAL | `deck_details_screen_smoke_test.dart` passou | Precisa smoke visual/build real para release |
 | Analise mostra dados do deck | PASS_CONTRACT | App/backend tests cobrem parsing/analysis/diagnostics | Public runtime nao reexecutado nesta etapa |
-| Optimize focado retorna preview aplicavel | PASS_LOCAL | Details smoke e provider core smoke passaram | Public runtime nao executado sem escrita |
-| Apply salva e valida deck final | PASS_LOCAL | Provider/tela simulam apply + validate | Public write smoke pendente |
-| Export/share/copy funciona | PARTIAL | Contratos existem; nao foi foco executado nesta etapa | Precisa smoke especifico em build alvo |
+| Optimize focado retorna preview aplicavel | PASS_PUBLIC_CONTROLLED | `core_flow_smoke_test.dart` passou contra API publica | Falta aceite visual em build assinado |
+| Apply salva e valida deck final | PASS_PUBLIC_CONTROLLED | `core_flow_smoke_test.dart` passou contra API publica | Falta aceite visual em build assinado |
+| Export/share/copy funciona | PASS_CONTRACT | `deck_pricing_export_community_contract_test.dart` passou | Share nativo ainda precisa aceite em build assinado |
 | Falha de IA tem UX segura | PASS_LOCAL | `needs_repair`, no-op e erro amigavel cobertos | Boa base para tester interno |
-| Fluxo completo passa em build real | PARTIAL_BUILD_ARTIFACT | APK debug, APK release e AAB release compilados com API publica | Nao instalado/executado; release assinado com debug por falta de keystore |
+| Fluxo completo passa em build real | PARTIAL_DEVICE | APK release instalado/aberto e smoke mobile de import passou | Falta build assinado de distribuicao e aceite completo |
 
-## 5. Bloqueios para declarar a Etapa 2 como release-ready
+## 5. Bloqueios remanescentes para release publico
 
-### Bloqueio 1 - Escrita no backend publico
+### Bloqueio 1 - Assinatura de distribuicao
 
-Os testes live recomendados pelo backend escrevem via API:
+O APK/AAB release local foi gerado, instalado e aberto, mas o certificado atual
+e `C=US, O=Android, CN=Android Debug` porque `app/android/key.properties` nao
+existe neste ambiente.
 
-- criam usuario;
-- criam deck;
-- chamam IA;
-- salvam/validam deck;
-- podem gerar logs/uso/custos.
+Status: `BLOCKED_BY_SIGNING`.
 
-Por regra operacional do projeto, isso nao deve ser feito contra PostgreSQL publico sem aprovacao explicita.
+### Bloqueio 2 - Aceite visual completo em build assinado
 
-Status: `BLOCKED_BY_APPROVAL`.
+O backend publico e o mobile import smoke passaram. Ainda falta o roteiro final
+de aceite em build assinado:
 
-### Bloqueio 2 - Smoke instalado em build real
+- abrir app em sessao limpa;
+- registrar/logar;
+- gerar ou importar deck;
+- abrir detalhes;
+- analisar/otimizar/aplicar;
+- exportar/compartilhar;
+- registrar evidencias visuais finais.
 
-Os testes locais e a compilacao Android provam contratos, UI simulada e
-empacotamento tecnico, mas nao substituem:
+Status: `PARTIAL_DEVICE`.
 
-- build iOS/Android;
-- device/simulator com `API_BASE_URL` publico;
-- login/register real;
-- generate/import real;
-- save/apply/validate real.
+### Bloqueio 3 - Observabilidade de release
 
-Status: `PARTIAL_BUILD_ARTIFACT`, ainda `BLOCKED_BY_RELEASE_SMOKE` para fluxo
-executado.
+Sentry mobile ainda nao esta configurado neste ambiente; a Etapa 3 detalha o
+bloqueio. Sem ingestao real, falhas de usuarios externos ficam menos
+rastreaveis.
 
-### Bloqueio 3 - Export/share em build alvo
+Status: `BLOCKED_BY_SENTRY_DSN`.
 
-Export/share depende de integracao mobile e plataforma. Nao foi validado nesta etapa.
+## 6. Testes live usados para fechar o gap publico
 
-Status: `PARTIAL`.
+Inventario executado nesta etapa:
 
-## 6. Testes live existentes que podem fechar o gap com aprovacao
-
-Inventario do backend:
-
-- `server/test/core_flow_smoke_test.dart`
-- `server/test/ai_generate_create_optimize_flow_test.dart`
-- `server/test/ai_optimize_flow_test.dart`
-- `server/test/import_to_deck_flow_test.dart`
-- `server/test/deck_analysis_contract_test.dart`
-- `server/test/decks_crud_test.dart`
-- `server/test/decks_incremental_add_test.dart`
 - `server/test/auth_flow_integration_test.dart`
-
-Comando base documentado:
-
-```bash
-cd server
-TEST_API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host dart test -t live \
-  test/auth_flow_integration_test.dart \
-  test/core_flow_smoke_test.dart \
-  test/import_to_deck_flow_test.dart \
-  test/deck_analysis_contract_test.dart
-```
+- `server/test/import_to_deck_flow_test.dart`
+- `server/test/core_flow_smoke_test.dart`
+- `server/test/deck_pricing_export_community_contract_test.dart`
+- `app/integration_test/localized_import_runtime_test.dart`
 
 Observacao:
 
-Esse comando deve ser tratado como escrita em ambiente publico. Rodar apenas apos aprovacao explicita.
+Esses testes escrevem em ambiente publico. Foram executados como smoke
+controlado apos solicitacao de continuidade do trabalho. Mantem-se a regra:
+qualquer novo backfill ou escrita manual em PostgreSQL continua exigindo escopo
+explicito.
 
 ## 7. Conclusao da Etapa 2
 
-A Etapa 2 esta concluida como diagnostico operacional do core:
+A Etapa 2 esta concluida para teste interno e preparacao de release:
 
 - O core local/offline passou.
 - O backend publico read-only passou.
-- A malha automatizada existente e suficiente para sustentar proximo smoke real.
-- O build Android com API publica compila.
-- O release-ready publico ainda esta bloqueado por falta de E2E publico com
-  escrita controlada, smoke instalado/executado e keystore real.
+- Os smokes publicos com usuario/deck real passaram.
+- O smoke mobile Android de importacao localizada passou.
+- O APK release com API publica foi instalado e aberto no Android fisico.
 
-Proxima acao recomendada:
-
-1. Obter aprovacao explicita para smoke publico com usuario/deck de teste, ou preparar ambiente staging isolado.
-2. Rodar `core_flow_smoke_test.dart` e `import_to_deck_flow_test.dart` contra o alvo aprovado.
-3. Rodar build real do app com `API_BASE_URL` publico/staging.
-4. Atualizar este documento com `PASS_PUBLIC_E2E` quando essas provas existirem.
+O release publico ainda nao deve ser anunciado porque faltam assinatura real,
+observabilidade mobile com Sentry e aceite final do build assinado.

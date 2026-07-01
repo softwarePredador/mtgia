@@ -8,8 +8,8 @@ Goal: concluir as Etapas 1, 2 e 3 do plano de produto do ManaLoom com evidencia 
 | Etapa | Nome | Status | Resultado esperado |
 |---|---|---|---|
 | 1 | Diagnostico final do estado atual | Concluida | Produto mapeado por funcionalidade, disponibilidade, atratividade, riscos e lacunas |
-| 2 | Fechar o core para lancamento | Concluida com bloqueios | Core local/offline validado; E2E publico com escrita e smoke instalado pendentes |
-| 3 | Confiabilidade tecnica e observabilidade | Concluida com bloqueios | Observabilidade por codigo/teste e probes read-only validados; Sentry mobile/signing/device smoke pendentes |
+| 2 | Fechar o core para lancamento | Concluida para teste interno | Core local/offline, smokes publicos controlados, smoke mobile Android e APK release instalado/aberto |
+| 3 | Confiabilidade tecnica e observabilidade | Concluida para teste interno com bloqueios de release publico | Firebase Performance e device smoke validados; Sentry DSN, signing Android/iOS e aceite final seguem pendentes |
 
 ## Etapa 1 - Diagnostico final do estado atual
 
@@ -37,7 +37,7 @@ Resultado:
 
 ## Etapa 2 - Fechar o core para lancamento
 
-Status: `CONCLUIDA_COM_BLOQUEIOS`
+Status: `CONCLUIDA_PARA_TESTE_INTERNO`
 
 Documento de saida:
 
@@ -54,15 +54,15 @@ Validar que um usuario consegue concluir o fluxo principal sem perda de contexto
 | Criterio | Status | Evidencia exigida |
 |---|---|---|
 | Onboarding em sessao limpa preserva formato escolhido | PASS_LOCAL | Teste/smoke com sessao limpa e registro do formato chegando em generate/import |
-| Gerar deck via IA funciona contra backend publico | BLOCKED_BY_APPROVAL | Runtime smoke com usuario real/teste, job async concluido e deck salvo |
-| Importar deck funciona contra backend publico | BLOCKED_BY_APPROVAL | Lista importada, commander preservado quando aplicavel, deck salvo |
+| Gerar deck via IA funciona contra backend publico | PASS_PUBLIC_CONTROLLED | `core_flow_smoke_test.dart` passou contra API publica |
+| Importar deck funciona contra backend publico | PASS_PUBLIC_DEVICE | `import_to_deck_flow_test.dart` e `localized_import_runtime_test.dart` passaram |
 | Deck details carrega estados de loading/erro/vazio/sucesso | PASS_LOCAL | Smoke de tela ou evidencia visual/logica atual |
 | Analise mostra legalidade, curva, funcoes e amostras | PASS_CONTRACT | Deck analisado com payload e UI conferidos |
 | Optimize focado retorna preview aplicavel | PASS_LOCAL | Sugestoes retornadas, preview exibido, selecao/apply executado |
 | Apply salva e valida o deck final | PASS_LOCAL | `PUT`/bulk concluido e `validate` final registrado |
-| Export/share/copy funciona no deck validado | PARTIAL | Acao executada sem erro em build alvo |
+| Export/share/copy funciona no deck validado | PASS_CONTRACT | `deck_pricing_export_community_contract_test.dart` passou; share nativo ainda precisa aceite final |
 | Falha de IA tem UX segura | PASS_LOCAL | Caso `needs_repair`, no-op ou erro amigavel documentado |
-| Fluxo completo passa em build real | BLOCKED_BY_RELEASE_SMOKE | Android APK release local foi gerado na Etapa 3; falta instalar/executar fluxo core minimo |
+| Fluxo completo passa em build real | PARTIAL_DEVICE | APK release instalado/aberto e import mobile validado; falta aceite final em build assinado |
 
 ### Subtarefas operacionais
 
@@ -80,7 +80,7 @@ Validar que um usuario consegue concluir o fluxo principal sem perda de contexto
 
 ## Etapa 3 - Confiabilidade tecnica e observabilidade
 
-Status: `CONCLUIDA_COM_BLOQUEIOS`
+Status: `CONCLUIDA_PARA_TESTE_INTERNO_COM_BLOQUEIOS_RELEASE_PUBLICO`
 
 Documento de saida:
 
@@ -96,10 +96,11 @@ Garantir que o produto seja operavel com usuarios reais: quando algo falhar, dev
 |---|---|---|
 | Backend health/ready publico estavel | PASS | Ja validado na Etapa 1; repetido no fechamento |
 | `x-request-id` manual preservado no backend | PASS | `/ready` preservou `stage3-observability-ready-20260701` |
-| `x-request-id` do app aparece em response/log/breadcrumb | PASS_LOCAL | Testes unitarios cobrem envio/eco/erro; falta smoke app real com request rastreavel |
+| `x-request-id` do app aparece em response/log/breadcrumb | PASS_LOCAL_DEVICE_EVIDENCE | Testes unitarios cobrem envio/eco/erro e smoke mobile emitiu request-id/breadcrumb |
 | Sentry backend com ingestao real confirmada | PASS_CODE_HISTORICAL | Documentado historicamente; nao reexecutado nesta etapa |
-| Sentry mobile com ingestao real confirmada | BLOCKED_BY_SECRET_AND_RUNTIME | Evento real vindo do app/build alvo |
-| Release/internal build smoke com API publica | PARTIAL_BUILD_ARTIFACT | APK release local gerado; falta assinatura de distribuicao e instalar/executar fluxo core minimo |
+| Sentry mobile com ingestao real confirmada | BLOCKED_BY_DSN | Smoke Android retornou `not_configured`; exige DSN segura |
+| Firebase Performance mobile | PASS_DEVICE | Smoke Android retornou `initialized` e `collection_enabled=true` |
+| Release/internal build smoke com API publica | PASS_INTERNAL_UNSIGNED | APK release instalado/aberto em `R58T300SREH`; falta assinatura de distribuicao |
 | Rate limit/paywall de IA nao quebra UX | NOT_STAGE3_CORE | Validar resposta `402`/headers/plano ou registrar como fora do release |
 | Logs nao expõem segredo/token | PASS_LOCAL_WITH_REVIEW | Testes de sanitizacao passaram; scan heuristico listou caminhos para revisao |
 | Scanner tem decisao explicita | PASS_SCOPE | Fora do release por default via `ENABLE_SCANNER_RELEASE=false`; falta sprint fisica para reativar |
@@ -127,17 +128,17 @@ Garantir que o produto seja operavel com usuarios reais: quando algo falhar, dev
 |---|---|---|
 | Worktree ja estava suja antes deste tracker | Operacional | Evitar reverter ou misturar mudancas preexistentes |
 | Scanner/OCR deferred | Produto | Deve ficar fora do marketing ate prova fisica |
-| Sentry mobile pendente | Observabilidade | Bloqueia release publico confiavel |
-| Release build smoke instalado pendente | Release | Artefatos Android compilam, mas falta instalar/executar e usar keystore real |
+| Sentry mobile sem DSN | Observabilidade | Bloqueia release publico confiavel ate configurar e confirmar ingestao |
+| Keystore Android ausente | Release | Artefatos Android compilam/instalam, mas assinatura atual e Android Debug |
 | Monetizacao incompleta | Comercial | Nao bloqueia teste interno, bloqueia produto pago |
 | Fan Content Policy / IP | Legal | Precisa revisao antes de assinatura paga |
 
 ## Proximas acoes imediatas
 
-1. Obter aprovacao explicita para smoke E2E publico com escrita, ou preparar staging isolado.
-2. Rodar `core_flow_smoke_test.dart` e `import_to_deck_flow_test.dart` contra o alvo aprovado.
-3. Injetar `SENTRY_DSN` seguro e rodar `mobile_sentry_smoke_test.dart` em build/dispositivo alvo.
-4. Configurar signing Android/iOS de distribuicao.
+1. Injetar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` seguro e repetir o smoke de observabilidade em Android.
+2. Configurar `app/android/key.properties` com keystore real fora do git e rebuildar AAB release.
+3. Executar aceite final em build assinado: login/register, import/generate, details, optimize, apply, export/share.
+4. Configurar signing iOS/TestFlight se o alvo incluir iOS.
 5. Revalidar push real ou declarar fora do release publico.
 
 ## Regra de conclusao do goal
