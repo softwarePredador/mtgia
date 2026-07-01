@@ -128,6 +128,14 @@ class ApiClient {
 
   static bool isReportableHttpStatus(int statusCode) => statusCode >= 400;
 
+  @visibleForTesting
+  static Duration timeoutForEndpoint(String endpoint, {Duration? override}) {
+    if (override != null) return override;
+    return endpoint.startsWith('/ai/')
+        ? const Duration(minutes: 2)
+        : const Duration(seconds: 15);
+  }
+
   Map<String, String> _getHeaders({String? requestId}) {
     final baseHeaders = {
       'Content-Type': 'application/json',
@@ -169,6 +177,7 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Get);
     final stopwatch = Stopwatch()..start();
+    final effectiveTimeout = timeoutForEndpoint(endpoint);
 
     debugPrint('[🌐 ApiClient] GET $url');
 
@@ -177,7 +186,7 @@ class ApiClient {
 
       final response = await _httpClient
           .get(Uri.parse(url), headers: headers)
-          .timeout(const Duration(seconds: 15));
+          .timeout(effectiveTimeout);
 
       stopwatch.stop();
 
@@ -241,12 +250,7 @@ class ApiClient {
     final bodyBytes = utf8.encode(jsonEncode(body));
 
     // Endpoints de IA têm timeout maior (2 minutos)
-    final isAiEndpoint = endpoint.startsWith('/ai/');
-    final effectiveTimeout =
-        timeout ??
-        (isAiEndpoint
-            ? const Duration(minutes: 2)
-            : const Duration(seconds: 15));
+    final effectiveTimeout = timeoutForEndpoint(endpoint, override: timeout);
 
     debugPrint('[🌐 ApiClient] POST $url');
 

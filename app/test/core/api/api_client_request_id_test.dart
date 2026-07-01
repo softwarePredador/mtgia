@@ -16,10 +16,9 @@ void main() {
     });
 
     test('appends x-request-id without dropping headers', () {
-      final headers = ApiClient.appendRequestIdHeaders(
-        const {'Authorization': 'Bearer token'},
-        requestId: 'req-123',
-      );
+      final headers = ApiClient.appendRequestIdHeaders(const {
+        'Authorization': 'Bearer token',
+      }, requestId: 'req-123');
 
       expect(headers['Authorization'], equals('Bearer token'));
       expect(headers['x-request-id'], equals('req-123'));
@@ -30,6 +29,24 @@ void main() {
       expect(ApiClient.isReportableHttpStatus(399), isFalse);
       expect(ApiClient.isReportableHttpStatus(400), isTrue);
       expect(ApiClient.isReportableHttpStatus(500), isTrue);
+    });
+
+    test('uses longer timeout for AI endpoints', () {
+      expect(
+        ApiClient.timeoutForEndpoint('/ai/generate/jobs/job-1'),
+        equals(const Duration(minutes: 2)),
+      );
+      expect(
+        ApiClient.timeoutForEndpoint('/decks/1/analysis'),
+        equals(const Duration(seconds: 15)),
+      );
+      expect(
+        ApiClient.timeoutForEndpoint(
+          '/ai/optimize',
+          override: const Duration(seconds: 3),
+        ),
+        equals(const Duration(seconds: 3)),
+      );
     });
   });
 }
