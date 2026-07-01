@@ -911,6 +911,7 @@ class _SparseDeckActions extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: Column(
@@ -974,7 +975,8 @@ class _QuickDeckAction extends StatelessWidget {
           color: AppTheme.backgroundAbyss.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           border: Border.all(
-            color: AppTheme.outlineMuted.withValues(alpha: 0.65),
+            color: AppTheme.outlineMuted.withValues(alpha: 0.52),
+            width: AppTheme.strokeHairline,
           ),
         ),
         child: Row(
@@ -1026,7 +1028,8 @@ class _DeckSpotlightCard extends StatelessWidget {
             color: AppTheme.surfaceSlate,
             borderRadius: BorderRadius.circular(AppTheme.radiusLg),
             border: Border.all(
-              color: AppTheme.brass400.withValues(alpha: 0.34),
+              color: AppTheme.outlineMuted.withValues(alpha: 0.58),
+              width: AppTheme.strokeHairline,
             ),
           ),
           clipBehavior: Clip.antiAlias,
@@ -1466,9 +1469,9 @@ class _DeckGalleryCard extends StatelessWidget {
             border: Border.all(
               color:
                   isComplete
-                      ? AppTheme.brass400.withValues(alpha: 0.92)
-                      : AppTheme.outlineMuted.withValues(alpha: 0.78),
-              width: isComplete ? 1.1 : 0.75,
+                      ? AppTheme.brass400.withValues(alpha: 0.52)
+                      : AppTheme.outlineMuted.withValues(alpha: 0.54),
+              width: isComplete ? AppTheme.strokeThin : AppTheme.strokeHairline,
             ),
           ),
           clipBehavior: Clip.antiAlias,
@@ -1509,7 +1512,8 @@ class _DeckGalleryCard extends StatelessWidget {
                     color: AppTheme.backgroundAbyss.withValues(alpha: 0.46),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppTheme.brass400.withValues(alpha: 0.72),
+                      color: AppTheme.brass400.withValues(alpha: 0.42),
+                      width: AppTheme.strokeHairline,
                     ),
                   ),
                   child: const Icon(
@@ -1756,7 +1760,7 @@ class _EmptyDeckConstellation extends StatelessWidget {
                 gradient: RadialGradient(
                   colors: [
                     AppTheme.brass400.withValues(alpha: 0.28),
-                    AppTheme.brass500.withValues(alpha: 0.08),
+                    AppTheme.brass500.withValues(alpha: 0.06),
                     AppTheme.transparent,
                   ],
                   stops: const [0, 0.46, 1],
@@ -1795,13 +1799,13 @@ class _EmptyDeckConstellation extends StatelessWidget {
                 color: AppTheme.backgroundAbyss.withValues(alpha: 0.82),
                 border: Border.all(
                   color: AppTheme.brass400.withValues(alpha: 0.72),
-                  width: 1.4,
+                  width: AppTheme.strokeThin,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.brass400.withValues(alpha: 0.26),
-                    blurRadius: 26,
-                    spreadRadius: 4,
+                    color: AppTheme.brass400.withValues(alpha: 0.18),
+                    blurRadius: 20,
+                    spreadRadius: 2,
                   ),
                 ],
               ),

@@ -8,9 +8,9 @@ Este relatorio valida sinais objetivos de drift visual, mas nao substitui prova 
 
 ## Metadata
 
-- Gerado em UTC: `2026-07-01T12:05:13.564672+00:00`
+- Gerado em UTC: `2026-07-01T13:24:28.846331+00:00`
 - Branch: `codex/session-agent-xmage-mapper-20260630`
-- SHA: `5325e6580`
+- SHA: `afc244e19`
 - Config: `server/config/premium_visual_qa_surfaces.json`
 - Arquivos auditados: `49`
 - Life Counter incluido: `True`

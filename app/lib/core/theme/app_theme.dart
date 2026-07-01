@@ -27,9 +27,9 @@ class AppTheme {
 
   // ── Brand palette (layout) ──────────────────────────────────
   // Core surfaces
-  static const Color backgroundAbyss = Color(0xFF0F1115); // obsidian-950
-  static const Color surfaceSlate = Color(0xFF171A21); // obsidian-900
-  static const Color surfaceElevated = Color(0xFF232735); // slate-800
+  static const Color backgroundAbyss = Color(0xFF0B0D12); // obsidian-950
+  static const Color surfaceSlate = Color(0xFF151821); // obsidian-900
+  static const Color surfaceElevated = Color(0xFF1D222C); // slate-850
 
   // Product accents
   static const Color brass500 = Color(0xFFC58B2A);
@@ -51,7 +51,7 @@ class AppTheme {
   static const Color textHint = Color(
     0xFF8A93A3,
   ); // mist-500 (hints/placeholders)
-  static const Color outlineMuted = Color(0xFF2B3142); // slate-700
+  static const Color outlineMuted = Color(0xFF293041); // slate-750
 
   // ── Shared overlays ───────────────────────────────────────
   static const Color overlayBlack20 = Color(0x33000000);
@@ -393,33 +393,33 @@ class AppTheme {
         base.displayLarge,
         fontWeight: FontWeight.w800,
         height: 1.04,
-        letterSpacing: -0.6,
+        letterSpacing: 0,
       ),
       displayMedium: display(
         base.displayMedium,
         fontWeight: FontWeight.w800,
         height: 1.04,
-        letterSpacing: -0.4,
+        letterSpacing: 0,
       ),
       displaySmall: display(
         base.displaySmall,
         fontWeight: FontWeight.w800,
         height: 1.05,
-        letterSpacing: -0.3,
+        letterSpacing: 0,
       ),
       headlineLarge: display(
         base.headlineLarge,
         fontSize: 30,
         fontWeight: FontWeight.w800,
         height: 1.08,
-        letterSpacing: -0.2,
+        letterSpacing: 0,
       ),
       headlineMedium: display(
         base.headlineMedium,
         fontSize: 26,
         fontWeight: FontWeight.w800,
         height: 1.08,
-        letterSpacing: -0.15,
+        letterSpacing: 0,
       ),
       headlineSmall: display(
         base.headlineSmall,
@@ -438,7 +438,7 @@ class AppTheme {
         fontSize: fontLg,
         fontWeight: FontWeight.w700,
         height: 1.22,
-        letterSpacing: -0.05,
+        letterSpacing: 0,
       ),
       titleSmall: ui(
         base.titleSmall,
@@ -469,21 +469,21 @@ class AppTheme {
         fontSize: fontMd,
         fontWeight: FontWeight.w700,
         height: 1.16,
-        letterSpacing: 0.05,
+        letterSpacing: 0,
       ),
       labelMedium: ui(
         base.labelMedium,
         fontSize: fontSm,
         fontWeight: FontWeight.w700,
         height: 1.14,
-        letterSpacing: 0.05,
+        letterSpacing: 0,
       ),
       labelSmall: ui(
         base.labelSmall,
         fontSize: fontXs,
         fontWeight: FontWeight.w700,
         height: 1.12,
-        letterSpacing: 0.08,
+        letterSpacing: 0,
       ),
     );
   }
@@ -528,14 +528,20 @@ class AppTheme {
       shadowColor: transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        side: const BorderSide(color: outlineMuted, width: 0.5),
+        side: const BorderSide(color: outlineMuted, width: 0.4),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -547,7 +553,13 @@ class AppTheme {
       style: FilledButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -556,8 +568,14 @@ class AppTheme {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: brass400,
-        side: const BorderSide(color: outlineMuted, width: 1),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        side: const BorderSide(color: outlineMuted, width: 0.7),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -603,7 +621,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        borderSide: const BorderSide(color: brass400, width: 1.5),
+        borderSide: const BorderSide(color: brass400, width: 1.1),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -612,7 +630,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(radiusLg),
         side: const BorderSide(color: outlineMuted, width: 0.5),
       ),
-      elevation: 8,
+      elevation: 0,
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: surfaceElevated,
@@ -663,8 +681,8 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: surfaceSlate,
-      indicatorColor: brass500.withValues(alpha: 0.15),
+      backgroundColor: backgroundAbyss,
+      indicatorColor: brass500.withValues(alpha: 0.10),
       indicatorShape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusSm),
       ),
@@ -685,9 +703,9 @@ class AppTheme {
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const IconThemeData(color: brass500, size: 22);
+          return const IconThemeData(color: brass500, size: 21);
         }
-        return const IconThemeData(color: textSecondary, size: 22);
+        return const IconThemeData(color: textSecondary, size: 21);
       }),
     ),
     popupMenuTheme: PopupMenuThemeData(

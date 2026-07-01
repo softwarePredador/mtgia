@@ -550,7 +550,7 @@ class _FormatChip extends StatelessWidget {
           color: accentColor,
           fontWeight: FontWeight.w700,
           fontSize: AppTheme.fontXs,
-          letterSpacing: 0.5,
+          letterSpacing: 0,
         ),
       ),
     );

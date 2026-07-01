@@ -164,7 +164,7 @@ class _HomeHeader extends StatelessWidget {
                         color: AppTheme.brass400,
                         fontWeight: FontWeight.w900,
                         fontSize: AppTheme.fontXl + 4,
-                        letterSpacing: 0.25,
+                        letterSpacing: 0,
                       ),
                     ),
                   ],
@@ -252,7 +252,7 @@ class _HomeHero extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontSize: AppTheme.fontDisplay - 8,
                       height: 1.03,
-                      letterSpacing: -0.45,
+                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 9),
@@ -319,10 +319,10 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 3,
+          width: 2,
           height: AppTheme.iconSpinnerSm,
           decoration: BoxDecoration(
-            color: AppTheme.frost400,
+            color: AppTheme.brass500,
             borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           ),
         ),
@@ -335,8 +335,8 @@ class _SectionHeader extends StatelessWidget {
             style: theme.textTheme.titleLarge?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w900,
-              fontSize: AppTheme.fontXl + 1,
-              letterSpacing: 0.1,
+              fontSize: AppTheme.fontXl,
+              letterSpacing: 0,
             ),
           ),
         ),
@@ -370,14 +370,14 @@ class _QuickActions extends StatelessWidget {
         icon: Icons.collections_bookmark_rounded,
         title: 'Meus Decks',
         subtitle: 'Ver e gerenciar seus decks',
-        accent: AppTheme.frost400,
+        accent: AppTheme.textSecondary,
         onTap: () => context.go('/decks'),
       ),
       _QuickActionData(
         icon: Icons.public_rounded,
         title: 'Coleção',
         subtitle: 'Suas cartas e coleções',
-        accent: AppTheme.frost400,
+        accent: AppTheme.textSecondary,
         onTap: () => context.go('/collection'),
       ),
       _QuickActionData(
@@ -440,13 +440,14 @@ class _QuickActionCard extends StatelessWidget {
             color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.9),
+              color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+              width: AppTheme.strokeHairline,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.backgroundAbyss.withValues(alpha: 0.14),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.10),
+                blurRadius: 12,
+                offset: const Offset(0, 7),
               ),
             ],
           ),
@@ -457,11 +458,11 @@ class _QuickActionCard extends StatelessWidget {
                 width: 34,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: data.accent.withValues(alpha: 0.12),
+                  color: data.accent.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   border: Border.all(
-                    color: data.accent.withValues(alpha: 0.18),
-                    width: AppTheme.strokeThin,
+                    color: data.accent.withValues(alpha: 0.12),
+                    width: AppTheme.strokeHairline,
                   ),
                 ),
                 child: Icon(data.icon, color: data.accent, size: 18),
@@ -491,8 +492,8 @@ class _QuickActionCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  fontSize: AppTheme.fontMicro - 0.5,
-                  height: 1.08,
+                  fontSize: AppTheme.fontTiny,
+                  height: 1.12,
                 ),
               ),
             ],

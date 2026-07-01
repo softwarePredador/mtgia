@@ -569,8 +569,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               children: [
                 const Icon(
                   Icons.auto_awesome,
-                  color: AppTheme.frost400,
-                  size: 32,
+                  color: AppTheme.brass400,
+                  size: 28,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -678,12 +678,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               label: Text(
                 _isGenerating ? 'Gerando proposta...' : 'Gerar proposta',
                 style: const TextStyle(
-                  fontSize: AppTheme.fontLg,
+                  fontSize: AppTheme.fontMd,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: AppTheme.brass500,
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
@@ -785,7 +785,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: AppTheme.brass500,
                   foregroundColor: AppTheme.backgroundAbyss,
                 ),
@@ -858,8 +858,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
-          width: AppTheme.strokeMedium,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.46),
+          width: AppTheme.strokeHairline,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
@@ -1213,7 +1213,7 @@ class _ExamplePromptList extends StatelessWidget {
                   Icon(
                     Icons.north_east_rounded,
                     size: 14,
-                    color: AppTheme.frost400.withValues(alpha: 0.72),
+                    color: AppTheme.textHint,
                   ),
                   const SizedBox(width: 9),
                   Expanded(
@@ -1253,7 +1253,7 @@ class _LearnedDeckPreviewSummary extends StatelessWidget {
         border: Border(
           left: BorderSide(
             color: AppTheme.frost400.withValues(alpha: 0.78),
-            width: AppTheme.strokeStrong,
+            width: AppTheme.strokeMedium,
           ),
         ),
       ),
@@ -1337,8 +1337,8 @@ class _GenerateProgressPanel extends StatelessWidget {
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.brass500.withValues(alpha: 0.28),
-          width: AppTheme.strokeMedium,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.58),
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: Column(
@@ -1402,7 +1402,7 @@ class _GenerateProgressChip extends StatelessWidget {
           color:
               isActive
                   ? AppTheme.brass500.withValues(alpha: 0.44)
-                  : AppTheme.outlineMuted,
+                  : AppTheme.outlineMuted.withValues(alpha: 0.6),
         ),
       ),
       child: Padding(
@@ -1429,11 +1429,11 @@ class _AiTrustPanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.frost400.withValues(alpha: 0.26),
-          width: AppTheme.strokeMedium,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.56),
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: Row(
@@ -1443,12 +1443,12 @@ class _AiTrustPanel extends StatelessWidget {
             width: AppTheme.touchTargetMin,
             height: AppTheme.touchTargetMin,
             decoration: BoxDecoration(
-              color: AppTheme.frost400.withValues(alpha: 0.14),
+              color: AppTheme.brass400.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             ),
             child: const Icon(
               Icons.psychology_alt_outlined,
-              color: AppTheme.frost400,
+              color: AppTheme.brass400,
               size: 20,
             ),
           ),

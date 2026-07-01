@@ -164,7 +164,7 @@ class AuthBrandHeader extends StatelessWidget {
               style: theme.textTheme.labelMedium?.copyWith(
                 color: AppTheme.brass400,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
+                letterSpacing: 0,
               ),
             ),
           ),
@@ -176,7 +176,7 @@ class AuthBrandHeader extends StatelessWidget {
           style: theme.textTheme.headlineLarge?.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.15,
+            letterSpacing: 0,
           ),
         ),
         const SizedBox(height: 8),

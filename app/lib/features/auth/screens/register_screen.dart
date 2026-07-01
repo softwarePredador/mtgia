@@ -309,7 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: AppTheme.backgroundAbyss,
                                   fontSize: AppTheme.fontLg,
                                   fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.3,
+                                  letterSpacing: 0,
                                 ),
                               ),
                             ),

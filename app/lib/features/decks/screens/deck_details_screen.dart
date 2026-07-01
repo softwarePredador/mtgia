@@ -567,7 +567,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 0.1,
+                    letterSpacing: 0,
                   ),
                 ),
               ),

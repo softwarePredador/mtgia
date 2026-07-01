@@ -23,19 +23,19 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1400),
       vsync: this,
     );
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _scaleAnimation = Tween<double>(
-      begin: 0.5,
+      begin: 0.96,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _controller.forward();
 
@@ -81,34 +81,98 @@ class _SplashScreenState extends State<SplashScreen>
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppTheme.backgroundAbyss.withValues(alpha: 0.13),
-                  AppTheme.transparent,
-                  AppTheme.backgroundAbyss.withValues(alpha: 0.6),
+                  AppTheme.backgroundAbyss.withValues(alpha: 0.1),
+                  AppTheme.backgroundAbyss.withValues(alpha: 0.18),
+                  AppTheme.backgroundAbyss.withValues(alpha: 0.72),
                 ],
-                stops: const [0, 0.46, 1],
+                stops: const [0, 0.52, 1],
               ),
             ),
           ),
           SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 56),
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: const SizedBox(
-                      width: 36,
-                      height: 36,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(28, 72, 28, 52),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  children: [
+                    const Spacer(flex: 5),
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 116,
+                            height: 116,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.backgroundAbyss.withValues(
+                                alpha: 0.34,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusLogoOuter,
+                              ),
+                              border: Border.all(
+                                color: AppTheme.brass400.withValues(
+                                  alpha: 0.24,
+                                ),
+                                width: AppTheme.strokeHairline,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusLogoInner,
+                              ),
+                              child: Image.asset(
+                                'assets/branding/app_logo.png',
+                                fit: BoxFit.cover,
+                                semanticLabel: 'ManaLoom logo',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            'ManaLoom',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineLarge?.copyWith(
+                              color: AppTheme.textPrimary,
+                              fontFamily: AppTheme.displayFontFamily,
+                              fontWeight: FontWeight.w900,
+                              fontSize: AppTheme.fontDisplay + 2,
+                              letterSpacing: 0,
+                              height: 1.03,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tecendo estratégias lendárias',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.textSecondary,
+                              fontWeight: FontWeight.w600,
+                              height: 1.28,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(flex: 4),
+                    const SizedBox(
+                      width: 32,
+                      height: 32,
                       child: CircularProgressIndicator(
-                        strokeWidth: 3,
+                        strokeWidth: 2.6,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppTheme.primarySoft,
+                          AppTheme.brass400,
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

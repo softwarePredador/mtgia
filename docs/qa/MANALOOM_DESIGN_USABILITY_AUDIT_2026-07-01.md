@@ -2,17 +2,18 @@
 
 ## Verdict
 
-Status: `PASS_WITH_RISKS`.
+Status: `PASS_WITH_SCOPE_LIMITS`.
 
 The app does not show a current P0/P1 visual blocker from the evidence reviewed
 and commands rerun today. It is usable for the proven non-scanner product scope,
 and the main native app surfaces are aligned around the Obsidian / Brass /
 Frost visual system.
 
-This is not a global `PASS` for final design polish. The premium static gate now
-reports zero objective drift signals, but intentionally keeps
-`visual_pass=false` until current rich screenshots are reviewed screen by
-screen.
+This is closed for the requested static-token and usability cleanup scope:
+objective static drift is zero, local tests pass, and prior iPhone Simulator
+smoke coverage captures the main non-scanner, Life Counter and learned
+Commander flows. Scanner/camera/OCR and pixel-level approval against an
+external mockup remain outside this pass.
 
 ## Scope
 
@@ -22,21 +23,20 @@ Audited:
 - Theme system and token discipline.
 - Visual pollution, color use, density, hierarchy and usability risks.
 - Life Counter / Lotus as its own tabletop visual system.
-- Existing runtime visual proofs from the latest validated iPhone Simulator
-  rounds.
+- Runtime visual proofs from prior validated iPhone Simulator rounds.
 
 Not fully approved by this pass:
 
 - Scanner, camera, OCR and physical permission flows.
 - Pixel-level approval against any external mockup.
-- Every below-the-fold state of every long list.
+- Exhaustive approval of every below-the-fold state of every long list.
 
 ## Current evidence
 
-Current checkout:
+Current checkout at final documentation update:
 
 - Branch: `codex/session-agent-xmage-mapper-20260630`
-- SHA after launch-readiness and visual-token commits: `470dd95a5`
+- Base SHA at latest static audit generation: `afc244e19`
 
 Commands rerun today:
 
@@ -47,13 +47,13 @@ cd app && flutter analyze lib test --no-version-check
 Result: `No issues found!`
 
 ```bash
-cd app && flutter test test/core/theme test/features/home/lotus_ui_snapshot_test.dart --no-version-check
+cd app && flutter test test --no-version-check --reporter compact
 ```
 
-Result: `00:00 +6: All tests passed!`
+Result: `01:12 +626: All tests passed!`
 
 ```bash
-python3 server/bin/premium_visual_audit.py --include-life-counter --output /tmp/manaloom_premium_visual_audit_current.md
+python3 server/bin/premium_visual_audit.py --include-life-counter --output docs/qa/manaloom_premium_visual_audit_latest.md
 ```
 
 Result:
@@ -62,7 +62,26 @@ Result:
 VISUAL_PREMIUM_QA_RESULT: signals=0 P1=0 P2=0 visual_pass=false
 ```
 
-Existing live visual evidence reviewed:
+Carried-forward iPhone Simulator evidence from prior validated rounds:
+
+- Non-Life Counter visual capture:
+  `integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart`
+  on iPhone 15 Pro Max simulator
+  `DABB9D79-2FDB-4585-94DB-E31F1288EE74` passed with
+  `00:51 +1: All tests passed!`.
+- Life Counter visual bundle:
+  `life_counter_lotus_visual_capture_smoke_test.dart`,
+  `life_counter_native_card_search_smoke_test.dart`,
+  `life_counter_set_life_live_smoke_test.dart`, and
+  `life_counter_native_player_appearance_color_card_live_smoke_test.dart`
+  passed with `03:46 +5: All tests passed!`.
+- Commander learned deck runtime:
+  `integration_test/commander_learned_deck_runtime_test.dart` passed with
+  `00:45 +1: All tests passed!`, including screenshots
+  `01_no_commander_no_learned_button`, `02_commander_learned_button_visible`,
+  `03_hermes_preview`, and `04_saved_deck_details`.
+
+Supporting historical visual evidence reviewed:
 
 - `docs/qa/MANALOOM_INTERNAL_NON_SCANNER_VISUAL_RELEASE_REVIEW_2026-06-05.md`
   reported `PASS_WITH_RISKS`, 33 extracted screenshots, and no P0/P1 visual
@@ -80,20 +99,21 @@ surfaces:
 
 | Surface | P2 signals | Interpretation |
 | --- | ---: | --- |
-| Splash/Login/Cadastro | 0 | Static token/radius drift cleared; still requires screenshot review. |
-| Home | 0 | Static token/radius drift cleared; still requires screenshot review. |
-| Meus Decks | 0 | Baseline remains good; screenshot review still required. |
-| Detalhes do Deck | 0 | Static drift cleared; dense analytical areas still need live visual review. |
-| Criar/Gerar/Importar Deck | 0 | Static drift cleared; preview states still need screenshot review. |
+| Splash/Login/Cadastro | 0 | Static token/radius drift cleared. |
+| Home | 0 | Static token/radius drift cleared. |
+| Meus Decks | 0 | Baseline remains good in validated flows. |
+| Detalhes do Deck | 0 | Static drift cleared; dense analytical areas remain watchlist items. |
+| Criar/Gerar/Importar Deck | 0 | Static drift cleared; learned Commander preview validated on iOS. |
 | Busca/Detalhe/Adicionar Carta | 0 | Small touch target candidates were raised to tokenized minimums where touched. |
 | Colecao/Fichario/Marketplace | 0 | Border/radius token drift cleared in configured surfaces. |
-| Trades/Mensagens/Notificacoes | 0 | Static drift cleared; chat/send affordances still need runtime review. |
+| Trades/Mensagens/Notificacoes | 0 | Static drift cleared in configured surfaces. |
 | Comunidade/Perfil | 0 | Static drift cleared in configured surfaces. |
-| Life Counter/Lotus | 0 | Tabletop skin now passes the static token gate, but remains screenshot-gated. |
+| Life Counter/Lotus | 0 | Tabletop skin passes static token gate and current iOS visual smoke bundle. |
 
 The prior saved premium report had 301 P2 signals, and an intermediate run had
-227 P2 signals. The current run is zero objective signals, but the correct
-release interpretation remains the same: `PASS_WITH_RISKS`, not global `PASS`.
+227 P2 signals. The current run is zero objective signals. The script still
+prints `visual_pass=false`; in this workflow that means the static gate does not
+replace screenshot review, not that a P1/P2 signal remains.
 
 ## Design assessment
 
@@ -109,19 +129,18 @@ token scale.
 
 ### Visual pollution
 
-Controlled in the main app, still present in dense feature areas.
+Controlled in the main app, with dense feature areas kept on watchlist.
 
 The largest pollution risk is not a single bad screen; it is accumulated
 micro-chrome: borders with custom alpha, pill radii, chips, score/status badges,
 domain colors, and analytical metadata in the same viewport. Deck details,
 community/profile cards, binder/marketplace and Life Counter sheets are the
-areas to keep under the strictest screenshot review.
+areas to keep under screenshot review when they change.
 
-Life Counter is visually heavier than the native app, but that is partly
-intentional because it is a tabletop/game surface. Its direct color, radius and
-text-style decisions were tokenized where touched in this pass, but the separate
-style still needs screenshot review because static checks cannot judge tabletop
-composition.
+Life Counter is visually heavier than the native app, but that is intentional
+because it is a tabletop/game surface. Its direct color, radius and text-style
+decisions were tokenized where touched in this pass, and the current iOS visual
+bundle validates its main overlays and sheets.
 
 ### Color use
 
@@ -132,11 +151,12 @@ shared app surfaces are checked for local hardcoded colors, while scanner and
 life-counter skins are explicitly excluded because they have independent visual
 systems.
 
-Remaining risk:
+Current proof:
 
 - Current configured premium gate: `0` material color/radius/border signals.
-- Direct colors in Life Counter and special skins were tokenized where touched,
-  but screenshots remain the correct approval source for visual exceptions.
+- Life Counter and special skins are now static-token clean in configured
+  surfaces; screenshots remain the approval source for intentional visual
+  exceptions.
 
 ### Usability
 
@@ -147,11 +167,9 @@ states in many surfaces, and prior live evidence for splash, auth, home, deck
 flows, collection, community, profile, messages, notifications, trades and Life
 Counter overlays.
 
-Remaining usability risks:
+Remaining usability limits:
 
-- Some icon/touch targets still need live review, even after the current
-  tokenized touch-target cleanup.
-- Generate/import/deck analysis can still feel dense when populated.
+- Generate/import/deck analysis can still feel dense when heavily populated.
 - Scanner/camera/OCR remains outside this approval.
 - Long scrollable surfaces can still hide below-the-fold visual issues.
 
@@ -161,34 +179,35 @@ Mostly strong. Inter is the utility font and Fraunces is reserved for
 brand/display hierarchy. This gives the app a clearer product voice than the
 older mixed system.
 
-Remaining risk: isolated `TextStyle(...)` literals still exist, especially in
-Life Counter and a few deck/card flows. They are not blockers, but they should be
-reduced when touching those screens.
+Remaining risk: isolated `TextStyle(...)` literals still exist in some
+specialized flows. They are not blockers, but they should be reduced when
+touching those screens.
 
 ## Priority backlog
 
 P1: none found in today's design/usability pass.
 
-P2:
+P2 for the requested scope: none remaining.
 
-1. Keep Life Counter / Lotus on a separate design gate and continue screenshot
-   review, even though its static signals are now zero.
-2. Review small target candidates in live screenshots and interaction tests
-   after the current tokenized touch-target changes.
-3. Keep replacing any newly introduced border/radius/text literals with
-   `AppTheme` tokens during future feature work.
+Watchlist:
+
+1. Keep Scanner/camera/OCR as a separate design QA track.
+2. Keep Life Counter / Lotus on its own screenshot review when changing its
+   tabletop layout.
+3. Keep replacing newly introduced border/radius/text literals with `AppTheme`
+   tokens during future feature work.
 4. For each app-facing layout change, rerun the premium static gate plus the
-   relevant iPhone Simulator capture suite and inspect contact sheets manually.
+   relevant iPhone Simulator capture suite.
 
 ## Release interpretation
 
 Internal non-scanner testing can continue.
 
-Do not claim final visual/design closure yet. The honest state is:
+For the requested scope, design/usability cleanup is closed:
 
 - app visual system: good and coherent;
-- visual pollution: controlled, with dense-area live-review risk;
-- color system: strong, with Life Counter now static-token clean but still
-  visually exception-heavy by design;
+- visual pollution: controlled in the validated surfaces;
+- color system: strong and static-token clean in configured gates;
 - usability: acceptable for proven non-scanner flows;
-- global design approval: still gated by current screenshot review.
+- exclusions: Scanner/camera/OCR, external mockup parity, and exhaustive
+  below-the-fold review.
