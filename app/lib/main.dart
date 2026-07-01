@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/config/launch_features.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
@@ -262,6 +263,18 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         if (isAuthRoute && _authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /home (já autenticado)');
           return '/home';
+        }
+
+        final uriPath = state.uri.path;
+        if (!LaunchFeatures.scannerEnabled && uriPath.endsWith('/scan')) {
+          final fallbackPath = uriPath.replaceFirst(
+            RegExp(r'/scan$'),
+            '/search',
+          );
+          debugPrint(
+            '[🧭 Router] → $fallbackPath (scanner deferred neste build)',
+          );
+          return fallbackPath;
         }
 
         debugPrint('[🧭 Router] → null (sem redirect)');

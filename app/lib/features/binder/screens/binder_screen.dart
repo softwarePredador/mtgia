@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -344,7 +345,7 @@ class _BinderListViewState extends State<_BinderListView>
               _StatsBar(
                 stats: stats,
                 onAdd: _openAddCard,
-                onScan: _openScanCard,
+                onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
               ),
 
             // Search + filters
@@ -509,15 +510,16 @@ class _BinderListViewState extends State<_BinderListView>
                         foregroundColor: AppTheme.backgroundAbyss,
                       ),
                     ),
-                    OutlinedButton.icon(
-                      onPressed: _openScanCard,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Escanear'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.brass400,
-                        side: const BorderSide(color: AppTheme.outlineMuted),
+                    if (LaunchFeatures.scannerEnabled)
+                      OutlinedButton.icon(
+                        onPressed: _openScanCard,
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Escanear'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.brass400,
+                          side: const BorderSide(color: AppTheme.outlineMuted),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],
