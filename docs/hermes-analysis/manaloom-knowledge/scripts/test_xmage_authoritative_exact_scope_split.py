@@ -1881,6 +1881,59 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "recursion_choose_one_or_both_source_not_supported")
 
+    def test_graveyard_to_hand_choose_one_maps_subtype_component(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ghoulcaller's Chant",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Return target creature card from your graveyard to your hand.\n"
+                    "• Return two target Zombie cards from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                Mode mode = new Mode(new ReturnFromGraveyardToHandTargetEffect());
+                mode.addTarget(new TargetCardInYourGraveyard(2, filter));
+                this.getSpellAbility().addMode(mode);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1")
+        self.assertEqual(effect["mode_selection"], "choose_one")
+        self.assertEqual(effect["recursion_components"][1]["target"], "zombie_card")
+        self.assertEqual(effect["recursion_components"][1]["count"], 2)
+
+    def test_graveyard_to_hand_choose_one_maps_shared_creature_type_component(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unbury",
+                oracle_text=(
+                    "Choose one —\n"
+                    "• Return target creature card from your graveyard to your hand.\n"
+                    "• Return two target creature cards that share a creature type from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                Mode mode = new Mode(new ReturnFromGraveyardToHandTargetEffect());
+                mode.addTarget(new UnburyTarget());
+                this.getSpellAbility().addMode(mode);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["mode_selection"], "choose_one")
+        self.assertEqual(effect["recursion_components"][1]["target"], "shared_creature_type")
+        self.assertEqual(effect["recursion_components"][1]["shared_subtype_group"], "creature_type")
+
     def test_graveyard_to_hand_exile_self_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

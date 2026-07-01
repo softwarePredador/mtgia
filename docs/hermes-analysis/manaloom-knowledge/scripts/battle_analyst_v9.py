@@ -33983,6 +33983,10 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return len(_spell_color_symbols(card)) >= 2
     if target in ("goblin_card", "goblin"):
         return "goblin" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("zombie_card", "zombie"):
+        return "zombie" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("pirate_card", "pirate"):
+        return "pirate" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("human_creature", "human"):
         return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
@@ -34009,6 +34013,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
             or get_card_effect(card).get("effect") not in ("land", "unknown")
         )
     if target in ("creature", "creature_card"):
+        return is_creature_card(card)
+    if target in ("shared_creature_type", "creature_share_type"):
         return is_creature_card(card)
     if target in ("artifact", "artifact_card"):
         return "artifact" in type_line
@@ -34043,6 +34049,37 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
     if target in ("instant_or_sorcery", "instant_or_sorcery_card"):
         return is_instant(card) or is_sorcery(card)
     return False
+
+
+def creature_subtype_tokens(card):
+    type_line = str((card or {}).get("type_line") or "")
+    if "—" in type_line:
+        subtype_text = type_line.split("—", 1)[1]
+    elif " - " in type_line:
+        subtype_text = type_line.split(" - ", 1)[1]
+    elif "-" in type_line:
+        subtype_text = type_line.split("-", 1)[1]
+    else:
+        subtype_text = ""
+    return [
+        token.lower()
+        for token in re.split(r"[^A-Za-z0-9']+", subtype_text)
+        if token
+    ]
+
+
+def choose_shared_creature_type_cards(cards, count):
+    groups = {}
+    for card in cards:
+        if not is_creature_card(card):
+            continue
+        for subtype in creature_subtype_tokens(card):
+            groups.setdefault(subtype, []).append(card)
+    best_group = []
+    for group in groups.values():
+        if len(group) > len(best_group):
+            best_group = group
+    return best_group[:count] if len(best_group) >= count else []
 
 
 def recursion_mana_value_max(effect_data, *keys):
@@ -47121,6 +47158,46 @@ def apply_effect_immediate(
         recovered_by_player = {}
         recovered_by_component = []
 
+        def component_count(component_data):
+            return (
+                len(player.graveyard)
+                if return_all_matching or component_data.get("return_all_matching")
+                else int(component_data.get("count") or 2)
+            )
+
+        def matching_component_candidates(participant, component_data):
+            component_target = component_data.get("target")
+            count = component_count(component_data)
+            if component_data.get("shared_subtype_group") == "creature_type" or component_target in (
+                "shared_creature_type",
+                "creature_share_type",
+            ):
+                return choose_shared_creature_type_cards(participant.graveyard, count)
+            component_mana_value_max = recursion_mana_value_max(component_data)
+            if component_mana_value_max is None:
+                component_mana_value_max = mana_value_max
+            return [
+                grave_card
+                for grave_card in participant.graveyard
+                if graveyard_card_matches_recursion_target(
+                    grave_card,
+                    component_target,
+                    mana_value_max=component_mana_value_max,
+                )
+            ]
+
+        def component_score(component_data):
+            component_target_controller = str(component_data.get("target_controller") or target_controller)
+            if component_target_controller == "each_player":
+                component_participants = [player] + list(opponents or [])
+            else:
+                component_participants = [player]
+            count = component_count(component_data)
+            return sum(
+                min(count, len(matching_component_candidates(participant, component_data)))
+                for participant in component_participants
+            )
+
         def resolve_recursion_component(component_data, component_index=None):
             component_target = component_data.get("target")
             component_destination = component_data.get("destination", destination)
@@ -47134,20 +47211,8 @@ def apply_effect_immediate(
                 component_participants = [player]
             component_recovered = []
             for participant in component_participants:
-                count = (
-                    len(participant.graveyard)
-                    if return_all_matching or component_data.get("return_all_matching")
-                    else int(component_data.get("count") or 2)
-                )
-                candidates = [
-                    grave_card
-                    for grave_card in participant.graveyard
-                    if graveyard_card_matches_recursion_target(
-                        grave_card,
-                        component_target,
-                        mana_value_max=component_mana_value_max,
-                    )
-                ]
+                count = component_count(component_data)
+                candidates = matching_component_candidates(participant, component_data)
                 participant_recovered = candidates[:count]
                 if participant_recovered:
                     recovered_by_player.setdefault(participant.name, []).extend(
@@ -47200,8 +47265,16 @@ def apply_effect_immediate(
             if isinstance(component, dict)
         ]
         if recursion_components:
-            for index, component in enumerate(recursion_components):
-                resolve_recursion_component(component, component_index=index)
+            if effect_data.get("mode_selection") == "choose_one":
+                scored_components = [
+                    (component_score(component), -index, index, component)
+                    for index, component in enumerate(recursion_components)
+                ]
+                _, _, best_index, best_component = max(scored_components)
+                resolve_recursion_component(best_component, component_index=best_index)
+            else:
+                for index, component in enumerate(recursion_components):
+                    resolve_recursion_component(component, component_index=index)
         else:
             resolve_recursion_component(effect_data)
         emit_replay_event(

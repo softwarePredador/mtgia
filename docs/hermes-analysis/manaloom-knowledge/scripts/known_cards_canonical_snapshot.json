@@ -28027,6 +28027,51 @@
     "battle_rule_logical_key": "battle_rule_v1:f5a40566d057c8e235241cfa88fd35d4",
     "battle_rule_oracle_hash": "be79f523c3a5cd11de81a0dfdf0d1c2c"
   },
+  "Ghoulcaller's Chant": {
+    "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "choose_one",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 2,
+        "destination": "hand",
+        "target": "zombie_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "zombie"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ed71ecbf3fdf66b1cdb2d10aad9d3e65",
+    "battle_rule_oracle_hash": "4535ec92f19844162f8fe290541ca60e"
+  },
   "Giada, Font of Hope": {
     "cmc": 2.0,
     "effect": "ramp_permanent",
@@ -41375,6 +41420,51 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a5067af5281522b7c87ecbb96f067c00"
   },
+  "March of the Drowned": {
+    "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "choose_one",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 2,
+        "destination": "hand",
+        "target": "pirate_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "pirate"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f0469a979771629fdf4c130ecd40d7ec",
+    "battle_rule_oracle_hash": "b4c57cf5a15caa2681270c5be311e823"
+  },
   "March of the Returned": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 2,
@@ -51697,6 +51787,53 @@
     "battle_rule_logical_key": "battle_rule_v1:42ddefbe28afd052c7e8ff2513a41b59",
     "battle_rule_oracle_hash": "6618c9d70d67f78294d4ec096204ab43"
   },
+  "Raise the Draugr": {
+    "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "mode_selection": "choose_one",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 2,
+        "destination": "hand",
+        "shared_subtype_group": "creature_type",
+        "target": "shared_creature_type",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "shared_subtype_group": "creature_type",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": false,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:198e31e470f83b580481d825befa6ba0",
+    "battle_rule_oracle_hash": "73ce0d42ea21a297e8bd61883f32e49d"
+  },
   "Raise the Palisade": {
     "cmc": 5.0,
     "count": 1,
@@ -53969,6 +54106,53 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3fa2af734f9bfba0c4394af2a416f870",
     "battle_rule_oracle_hash": "99ea0cf39b2608fba87944153f661453"
+  },
+  "Return from Extinction": {
+    "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "choose_one",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 2,
+        "destination": "hand",
+        "shared_subtype_group": "creature_type",
+        "target": "shared_creature_type",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "shared_subtype_group": "creature_type",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:863ee7c378baeeb09ce204afdfa84d11",
+    "battle_rule_oracle_hash": "73ce0d42ea21a297e8bd61883f32e49d"
   },
   "Return of the Wildspeaker": {
     "cmc": 5.0,
@@ -72672,6 +72856,53 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e2f2aad6cdf9033c0bd320ff7ca47787"
+  },
+  "Unbury": {
+    "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "mode_selection": "choose_one",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 2,
+        "destination": "hand",
+        "shared_subtype_group": "creature_type",
+        "target": "shared_creature_type",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "shared_subtype_group": "creature_type",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": false,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:198e31e470f83b580481d825befa6ba0",
+    "battle_rule_oracle_hash": "73ce0d42ea21a297e8bd61883f32e49d"
   },
   "Uncaged Fury": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",

@@ -2698,6 +2698,67 @@ PG327 measured result:
 - Running the exact splitter after PG327 on supported units returns
   `proposal_count=0` over `7989` considered supported rows.
 
+PG328 evidence:
+
+- PG328 recursion choose-one package:
+  `docs/hermes-analysis/master_optimizer_reports/pg328_xmage_recursion_choose_one_wave_package.md`
+- PG328 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg328_xmage_recursion_choose_one_wave_pg_apply_evidence.md`
+- PG328 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg328_xmage_recursion_choose_one_wave_pg_to_sqlite_sync.json`
+- PG328 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg328_xmage_recursion_choose_one_wave_e2e_validation.md`
+- PG328 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg328_recursion_choose_one_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg328_recursion_choose_one_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg328_recursion_choose_one_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg328_recursion_choose_one_wave.md`
+- PG328 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg328_recursion_choose_one_wave.md`
+- post-PG328 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg328_recursion_choose_one_wave_commander_legal.md`
+- post-PG328 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg328_existing_supported_recheck.md`
+- post-PG328 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg328_recursion_choose_one_wave_recheck.md`
+
+PG328 measured result:
+
+- PG328 promoted `5` exact choose-one recursion spells with
+  `ReturnFromGraveyardToHandTargetEffect`, no additional ability class, XMage
+  `addMode` source agreement, and exact choose-one Oracle text. The promoted
+  cards are `Ghoulcaller's Chant`, `March of the Drowned`, `Raise the Draugr`,
+  `Return from Extinction`, and `Unbury`.
+- Runtime now handles `mode_selection=choose_one` by scoring recursion
+  components and resolving only the best mode. It supports subtype targets
+  `zombie_card` and `pirate_card`, plus `shared_creature_type` selection for
+  two creature cards sharing a subtype.
+- Focused tests pass for the exact splitter (`154` tests), runtime (`86`
+  tests), and package builder (`4` tests).
+- PostgreSQL precheck found `5/5` target rows, `0` existing expected rows, and
+  `0` stale shadow rows.
+- PostgreSQL apply evidence reports `5/5` promoted rows, `5/5` verified/auto
+  rows, `5/5` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7214` PostgreSQL rules,
+  inserted/updated `7008` SQLite rows, and exported `4805` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  no-override battle package gate.
+- Post-PG328 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG328 rows themselves have `5/5` matching Oracle hashes.
+- Global all-card readiness after PG328:
+  `battle_and_oracle_ready=2347`, `battle_family_mapper_required=30200`, and
+  `snapshot_has_verified_rule=3495`.
+- Global all-card authoritative queue after PG328:
+  `target_identity_count=27277`, `xmage_authoritative_source_count=26963`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26963`.
+- Running the exact splitter after PG328 on supported units returns
+  `proposal_count=0` over `7984` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3337,10 +3398,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG327 queue, the next exact runtime-backed work should be selected from
+post-PG328 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1964`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1959`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

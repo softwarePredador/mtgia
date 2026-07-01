@@ -2846,6 +2846,114 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_choose_one_picks_best_component(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Zombie A", "type_line": "Creature - Zombie"},
+                {"name": "Target Zombie B", "type_line": "Creature - Zombie Wizard"},
+                {"name": "Target Human", "type_line": "Creature - Human"},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+            "mode_selection": "choose_one",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "zombie_card",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "subtypes": ["zombie"]},
+                    "count": 2,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Ghoulcaller's Chant", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Zombie A", "Target Zombie B"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Human", "Fixture Ghoulcaller's Chant"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("mode_selection") == "choose_one"
+                and data.get("recovered_by_component", [{}])[0].get("index") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_hand_choose_one_shared_type_component(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Wizard A", "type_line": "Creature - Human Wizard"},
+                {"name": "Target Wizard B", "type_line": "Creature - Vedalken Wizard"},
+                {"name": "Target Soldier", "type_line": "Creature - Soldier"},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
+            "mode_selection": "choose_one",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "shared_creature_type",
+                    "target_constraints": {
+                        "zone": "graveyard",
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "shared_subtype_group": "creature_type",
+                    },
+                    "shared_subtype_group": "creature_type",
+                    "count": 2,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+            "destination": "hand",
+            "target_controller": "self",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Unbury", "type_line": "Instant"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Wizard A", "Target Wizard B"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Soldier", "Fixture Unbury"])
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
