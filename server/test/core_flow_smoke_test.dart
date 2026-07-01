@@ -15,10 +15,11 @@ void main() {
   final baseUrl =
       Platform.environment['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:8082';
 
-  const testUser = {
-    'email': 'test_core_flow_smoke@example.com',
+  final runSuffix = DateTime.now().millisecondsSinceEpoch;
+  late final Map<String, String> testUser = {
+    'email': 'test_core_flow_smoke_$runSuffix@example.com',
     'password': 'TestPassword123!',
-    'username': 'test_core_flow_smoke_user',
+    'username': 'test_core_flow_smoke_$runSuffix',
   };
 
   final createdDeckIds = <String>[];
@@ -35,25 +36,12 @@ void main() {
 
   Future<String> getAuthToken() async {
     var response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
+      Uri.parse('$baseUrl/auth/register'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': testUser['email'],
-        'password': testUser['password'],
-      }),
+      body: jsonEncode(testUser),
     );
 
-    if (response.statusCode != 200) {
-      response = await http.post(
-        Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(testUser),
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Failed to register test user: ${response.body}');
-      }
-
+    if (response.statusCode != 200 && response.statusCode != 201) {
       response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
@@ -64,8 +52,8 @@ void main() {
       );
     }
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to login test user: ${response.body}');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception('Failed to authenticate test user: ${response.body}');
     }
 
     final data = decodeJson(response);
