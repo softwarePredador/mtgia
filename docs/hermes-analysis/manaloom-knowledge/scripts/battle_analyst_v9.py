@@ -35578,7 +35578,7 @@ def _activated_rule_effects_for_permanent(permanent):
             "ability_kind": "activated",
             "activated_effect": "target_stat_modifier_until_eot",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -36351,6 +36351,8 @@ def can_activate_generic_target_boost_permanent(player, opponents, permanent, *,
     )
     if target_owner is None or target is None:
         return False
+    if effect_data.get("activation_requires_sacrifice") and target is permanent:
+        return False
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     if target_owner is player and int(float(target.get("toughness") or target.get("power") or 0)) + toughness_delta <= 0:
         return False
@@ -36387,11 +36389,20 @@ def activate_generic_target_boost_permanent(
     )
     if target is None or target_owner is None:
         return False
+    if effect_data.get("activation_requires_sacrifice") and target is permanent:
+        return False
     activation_cost = _target_boost_activation_cost(effect_data)
     if not player.spend_mana(activation_cost):
         return False
     if effect_data.get("activation_requires_tap"):
         permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     power_before = int(float(target.get("power") or 0))
@@ -36457,6 +36468,7 @@ def activate_generic_target_boost_permanent(
             "power_delta": power_delta,
             "toughness_delta": toughness_delta,
             "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -36470,11 +36482,13 @@ def activate_generic_target_boost_permanent(
             "power": power_delta,
             "toughness": toughness_delta,
             "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -1 if sacrificed_source else 0,
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
                 "temporary_boost": True,
                 "harmful_modifier": stat_modifier_is_harmful(effect_data),
             }.items()
@@ -36489,6 +36503,7 @@ def activate_generic_target_boost_permanent(
         activation_kind="simple_activated_target_boost",
         activation_cost=activation_cost,
         tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
         mana_paid=mana_paid,
         target=target.get("name", "?"),
         target_player=target_owner.name,

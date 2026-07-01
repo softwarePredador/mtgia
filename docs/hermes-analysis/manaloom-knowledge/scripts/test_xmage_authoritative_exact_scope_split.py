@@ -2061,6 +2061,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_colors"], ["R"])
         self.assertFalse(effect["activation_requires_tap"])
 
+    def test_activated_target_boost_accepts_source_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.TARGET_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Candle",
+                type_line="Artifact",
+                oracle_text="{6}, {T}, Sacrifice this artifact: Target creature gets -5/-5 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostTargetEffect(-5, -5, Duration.EndOfTurn), "
+                "new GenericManaCost(6));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{6}")
+        self.assertEqual(effect["activation_cost_generic"], 6)
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_source": True})
+        self.assertTrue(effect["_activated_rule_effects"][0]["activation_requires_sacrifice"])
+
     def test_activated_target_boost_blocks_sacrifice_target_cost(self) -> None:
         row = queue_row(
             split.TARGET_BOOST_ACTIVATED_UNIT,

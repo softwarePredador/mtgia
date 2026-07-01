@@ -6962,6 +6962,68 @@
     "battle_rule_logical_key": "battle_rule_v1:157975c852f269cdf3bc89dcae7dd03f",
     "battle_rule_oracle_hash": "612e3921fafd9adddd4f7abeb5387491"
   },
+  "Bloodtallow Candle": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 6,
+        "activation_cost_mana": "{6}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -5,
+        "power_delta": -5,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -5,
+        "toughness_delta": -5,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 6,
+    "activation_cost_mana": "{6}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "artifact",
+    "power_boost": -5,
+    "power_delta": -5,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": -5,
+    "toughness_delta": -5,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7233db54bdeafdc361ab5e7e88288d69",
+    "battle_rule_oracle_hash": "dd81efaea7d4d3291e3984f3f27a4ac6"
+  },
   "Bloodthirsty Blade": {
     "cmc": 2.0,
     "effect": "ramp_permanent",
@@ -8928,6 +8990,68 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Cabal Trainee": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": -2,
+    "power_delta": -2,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5094f3ef12c2d2ce3fff9a0be9c846dc",
+    "battle_rule_oracle_hash": "d5a55fd79c3bc17c7c17332dfec14fec"
+  },
   "Cabaretti Courtyard": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -10709,6 +10833,68 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "ec9843e6ec6cb36ed1d45f1d8448fb85"
+  },
+  "Child of Thorns": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": 1,
+    "power_delta": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": 1,
+    "toughness_delta": 1,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dbcf5b80815ea384d276c284597ecfc8",
+    "battle_rule_oracle_hash": "37133db66e9de739c68236e42e652a45"
   },
   "Chimil, the Inner Sun": {
     "cmc": 6.0,
@@ -18965,6 +19151,68 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c96ebc7f986b443b6bcee18b892caf07"
+  },
+  "Elven Lyre": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 2,
+        "power_delta": 2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": 2,
+        "toughness_delta": 2,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "artifact",
+    "power_boost": 2,
+    "power_delta": 2,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": 2,
+    "toughness_delta": 2,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:100edd0c160d4df11d5b110ef54984f6",
+    "battle_rule_oracle_hash": "293aa18f773a7988c5068843fad9e330"
   },
   "Elves of Deep Shadow": {
     "ability_kind": "activated",
@@ -43231,6 +43479,72 @@
     "battle_rule_logical_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
     "battle_rule_oracle_hash": "0386f0160bd05b6ff392414aaf23531d"
   },
+  "Nim Replica": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -1,
+        "toughness_delta": -1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{B}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": -1,
+    "power_delta": -1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": -1,
+    "toughness_delta": -1,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b3f848d22c567ec7b46a7506db27d783",
+    "battle_rule_oracle_hash": "71e4c58101894d61c81f55ae74b31ede"
+  },
   "Nimble Birdsticker": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -45906,6 +46220,130 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:166240c94a4f8ba33fc80549c236deb7",
     "battle_rule_oracle_hash": "deafed84b14f2008e85145ee17c162a7"
+  },
+  "Phyrexian Defiler": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -3,
+        "power_delta": -3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -3,
+        "toughness_delta": -3,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": -3,
+    "power_delta": -3,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": -3,
+    "toughness_delta": -3,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:809ba38e8e80a2995f1ef7c713a267d3",
+    "battle_rule_oracle_hash": "c137fb67f1d3e07f6f693ccc0852cebe"
+  },
+  "Phyrexian Denouncer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": -1,
+        "toughness_delta": -1,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": -1,
+    "power_delta": -1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": -1,
+    "toughness_delta": -1,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c417c677a4de7ab74cf0773f3f537879",
+    "battle_rule_oracle_hash": "f0d2ad0504907c02e3bf994a17c9b727"
   },
   "Phyrexian Metamorph": {
     "ability_kind": "replacement",
@@ -54912,6 +55350,68 @@
     "battle_rule_logical_key": "battle_rule_v1:bb89a03f7bba301581f6b3e65a46df96",
     "battle_rule_oracle_hash": "487c743fec96f43d2e18d90cd1432f22"
   },
+  "Seal of Strength": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "enchantment",
+    "power_boost": 3,
+    "power_delta": 3,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5694650017fe92e38da1a33cfc999537",
+    "battle_rule_oracle_hash": "c6bc104fa700ee833e893fd791ab6e61"
+  },
   "Sear": {
     "amount": 4,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -56402,6 +56902,68 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6817230e175fc1ddeabee7568a8ddca4",
     "battle_rule_oracle_hash": "aa42a20a22774fa00a01cc9a52c09a1b"
+  },
+  "Shield Mate": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_stat_modifier_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 0,
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_source": true
+        },
+        "target_controller": "any",
+        "toughness_boost": 4,
+        "toughness_delta": 4,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "BoostTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "activated_effect": "target_stat_modifier_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "power_boost": 0,
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_source": true
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9b7901013756d402d940fddd499770d6",
+    "battle_rule_oracle_hash": "8ef64c5662955843e452e5177f3522c2"
   },
   "Shifting Woodland": {
     "effect": "land",

@@ -1614,6 +1614,58 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_target_boost_sacrifices_source_and_excludes_self_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Child",
+            "type_line": "Creature - Spirit",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"], "exclude_source": True},
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "power_boost": 1,
+            "toughness_boost": 1,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "summoning_sick": False,
+        }
+        ally = {"name": "Ally Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.extend([source, ally])
+
+        activated = self.battle.activate_generic_target_boost_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=23,
+            rng=random.Random(23),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.battlefield, [ally])
+        self.assertEqual(active.graveyard, [source])
+        self.assertEqual(ally["power"], 3)
+        self.assertEqual(ally["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Child"
+                and data.get("sacrificed_source") is True
+                and data.get("target") == "Ally Bear"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_target_boost_blocks_summoning_sick_tap_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

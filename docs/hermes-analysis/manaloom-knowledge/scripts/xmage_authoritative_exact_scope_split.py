@@ -1539,19 +1539,32 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
     return generic, colors
 
 
-def activation_cost_from_oracle_prefix(cost_text: str) -> dict[str, Any] | str:
+def activation_cost_from_oracle_prefix(
+    cost_text: str,
+    *,
+    allow_source_sacrifice: bool = False,
+) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
+    requires_sacrifice = False
+    if allow_source_sacrifice and "sacrifice" in text:
+        sacrifice_pattern = r"(?:^|,\s*)sacrifice this (?:artifact|creature|enchantment|permanent)(?:\s*,?|$)"
+        sacrifice_matches = re.findall(sacrifice_pattern, text)
+        if len(sacrifice_matches) != 1:
+            return "activated_self_boost_oracle_cost_not_supported"
+        text = re.sub(sacrifice_pattern, ",", text).strip(" ,")
+        requires_sacrifice = True
     risky_tokens = [
         "/",
         "{q}",
         "discard",
-        "sacrifice",
         "pay ",
         "tap an untapped",
         "remove ",
         "exile ",
         "return ",
     ]
+    if "sacrifice" in text:
+        return "activated_self_boost_oracle_cost_not_supported"
     if any(token in text for token in risky_tokens):
         return "activated_self_boost_oracle_cost_not_supported"
     requires_tap = "{t}" in text
@@ -1574,7 +1587,7 @@ def activation_cost_from_oracle_prefix(cost_text: str) -> dict[str, Any] | str:
         "activation_cost_generic": generic,
         "activation_cost_colors": colors,
         "activation_requires_tap": requires_tap,
-        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice": requires_sacrifice,
     }
 
 
@@ -1688,7 +1701,7 @@ def activated_target_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     )
     if not match:
         return "activated_target_boost_oracle_not_simple"
-    activation = activation_cost_from_oracle_prefix(cost_text)
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_target_boost")
     return {
@@ -1712,7 +1725,6 @@ def activated_target_boost_cost_from_source(window: str) -> dict[str, Any] | str
         "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
-        "SacrificeSourceCost",
         "SacrificeTargetCost",
         "TapTargetCost",
         "UntapSourceCost",
@@ -1745,7 +1757,7 @@ def activated_target_boost_cost_from_source(window: str) -> dict[str, Any] | str
         "activation_cost_generic": generic,
         "activation_cost_colors": colors,
         "activation_requires_tap": "TapSourceCost" in window,
-        "activation_requires_sacrifice": False,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
     }
 
 
@@ -2847,14 +2859,19 @@ def split_row(
             int(parsed_activation["activation_cost_generic"]),
             list(parsed_activation["activation_cost_colors"]),
             bool(parsed_activation["activation_requires_tap"]),
+            bool(parsed_activation["activation_requires_sacrifice"]),
         )
         oracle_cost = (
             int(oracle_boost["activation_cost_generic"]),
             list(oracle_boost["activation_cost_colors"]),
             bool(oracle_boost["activation_requires_tap"]),
+            bool(oracle_boost["activation_requires_sacrifice"]),
         )
         if source_cost != oracle_cost:
             return None, "activated_target_boost_source_oracle_cost_mismatch"
+        target_constraints = {"card_types": ["creature"]}
+        if bool(parsed_activation["activation_requires_sacrifice"]):
+            target_constraints["exclude_source"] = True
         activated_effect = {
             "effect": "stat_modifier_until_eot",
             "battle_model_scope": TARGET_BOOST_ACTIVATED_SCOPE,
@@ -2862,7 +2879,7 @@ def split_row(
             "activated_effect": "target_stat_modifier_until_eot",
             "target": "creature",
             "target_controller": "any",
-            "target_constraints": {"card_types": ["creature"]},
+            "target_constraints": target_constraints,
             "power_delta": int(oracle_boost["power_delta"]),
             "toughness_delta": int(oracle_boost["toughness_delta"]),
             "power_boost": int(oracle_boost["power_delta"]),
@@ -2874,7 +2891,7 @@ def split_row(
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
         }
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
@@ -2894,7 +2911,7 @@ def split_row(
             "activated_battle_model_scope": TARGET_BOOST_ACTIVATED_SCOPE,
             "target": "creature",
             "target_controller": "any",
-            "target_constraints": {"card_types": ["creature"]},
+            "target_constraints": target_constraints,
             "power_delta": int(oracle_boost["power_delta"]),
             "toughness_delta": int(oracle_boost["toughness_delta"]),
             "power_boost": int(oracle_boost["power_delta"]),
@@ -2907,7 +2924,7 @@ def split_row(
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
-            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
         }
         return build_proposal(
             row,

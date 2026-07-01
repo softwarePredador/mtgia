@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27421`
-- XMage authoritative source resolved: `27107`
+- target all-card battle-gap identities: `27412`
+- XMage authoritative source resolved: `27098`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27107`
+- XMage authoritative adapter required: `27098`
 - ManaLoom adapter work-unit keys: `11429`
-- authoritative source coverage ratio: `0.9886`
+- authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27107` identities, card semantics are accepted from XMage; work is now
+- For `27098` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG315 Exact Adapter Waves
+## PG283-PG316 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG315 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG316 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -255,9 +255,9 @@ patterns:
   `xmage_permanent_simple_activated_target_keyword_until_eot_v1`
 - `xmage_signature::BoostTargetEffect::SimpleActivatedAbility::TargetCreaturePermanent::no_condition_class::targeting,activated_ability`
   with exact activated target-creature power/toughness modifier until end of
-  turn text, battlefield permanents, simple mana/tap source costs only, no
-  source or target sacrifice, no filtered targets, no dynamic modifiers, and no
-  compound activated text ->
+  turn text, battlefield permanents, simple mana/tap/source self-sacrifice costs
+  only, no sacrifice-target costs, no filtered targets, no dynamic modifiers,
+  no multi-target text, and no compound activated text ->
   `xmage_permanent_simple_activated_target_boost_until_eot_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
@@ -1884,6 +1884,81 @@ PG315 measured result:
   `proposal_count=0` over `7433` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern
   from the post-PG315 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1167`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `626`.
+
+PG316 evidence:
+
+- PG316 permanent activated target-boost source-sacrifice package:
+  `docs/hermes-analysis/master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_package.md`
+- PG316 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_pg_apply_evidence.md`
+- PG316 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_e2e_validation.md`
+- PG316 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_pg_to_sqlite_sync.json`
+- PG316 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG316 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`
+- post-PG316 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave_recheck.md`
+- post-PG316 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`
+- PG316 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_target_boost_source_sacrifice_wave.md`
+- post-PG316 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg316_existing_supported_recheck.md`
+
+PG316 measured result:
+
+- PG316 promoted `9` exact permanent simple activated target-boost rules whose
+  activation cost sacrifices the source itself: Bloodtallow Candle, Cabal
+  Trainee, Child of Thorns, Elven Lyre, Nim Replica, Phyrexian Defiler,
+  Phyrexian Denouncer, Seal of Strength, and Shield Mate.
+- Runtime now supports `activation_requires_sacrifice` for
+  `target_stat_modifier_until_eot`, moves the source permanent to graveyard
+  after cost payment, records sacrifice evidence, and uses
+  `target_constraints.exclude_source` so a sacrificed creature source is not
+  selected as its own target.
+- The splitter now accepts Oracle/XMage source-sacrifice costs only for the
+  exact "Sacrifice this artifact/creature/enchantment/permanent" source-cost
+  pattern. It still blocks sacrifice-target costs, discard costs, multi-ability
+  Oracle text, filtered targets, two-target text, and compound activated text.
+- PostgreSQL apply evidence reports `9/9` promoted rows, `9/9`
+  verified/auto rows, and `9/9` matching Oracle hash rows, with `0` backup
+  rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `3474` PostgreSQL rules,
+  inserted/updated `3473` SQLite rows, and exported `4676` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5692` PostgreSQL card rows,
+  wrote `5617` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references after one transient SQLite lock retry.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning; legacy
+  contamination `pass`.
+- Focused exact-scope tests cover source-sacrifice splitter mapping,
+  sacrifice-target blocking, runtime source sacrifice, exclude-source target
+  selection, replay evidence, and existing target-boost activation behavior;
+  `183` focused exact-scope tests pass.
+- Global all-card readiness after PG316:
+  `battle_and_oracle_ready=2212` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3360`.
+- Global all-card authoritative queue after PG316:
+  `target_identity_count=27412`, `xmage_authoritative_source_count=27098`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27098`.
+- Running the exact splitter after PG316 on supported units returns
+  `proposal_count=0` over `7424` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG316 queue. The largest current work units are `recursion`
   `1984`, `draw_engine` `1660`, `grant_protection` `1167`, `direct_damage`
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `626`.

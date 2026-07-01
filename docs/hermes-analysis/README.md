@@ -77,10 +77,10 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
     Evidencia corrente pos-PG297:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg297_creature_etb_destroy_wave.md`.
-    Resultado all-card: `27793` identidades ainda com gap, `27479` com fonte
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg316_permanent_activated_target_boost_source_sacrifice_wave.md`.
+    Resultado all-card: `27412` identidades ainda com gap, `27098` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
-    gaps e `11905` work units de adaptador ManaLoom por assinatura/effect
+    gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
     simples (`draw`, `direct_damage`, `destroy target`). O PG284 adicionou
     `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
@@ -102,9 +102,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     ativada `{T}` de dano fixo a alvo, criando a base runtime para
     `SimpleActivatedAbility` sem custo de mana/sacrificio. O PG297 adicionou
     `19` criaturas com destroy de alvo ao entrar no campo de batalha, bloqueando
-    textos restritos como power/toughness, subtipo e condicoes. Todos os pacotes PG285-PG297 passaram postcheck
-    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG297
-    retorna `proposal_count=0` sobre `7351` linhas suportadas consideradas; a
+    textos restritos como power/toughness, subtipo e condicoes. Do PG298 ao
+    PG316 foram adicionados ETB recursion, graveyard-to-battlefield recursion,
+    dies-draw, ETB damage, token spells/ETB tokens, boost+keyword, damage/destroy
+    com life gain, alvo restrito, permanentes ativados de draw/damage/recursion/
+    destroy/self-boost/target-keyword/target-boost e target-boost com sacrificio
+    da propria fonte. Todos os pacotes PG285-PG316 passaram postcheck PostgreSQL
+    e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG316 retorna
+    `proposal_count=0` sobre `7424` linhas suportadas consideradas; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
     reducao reutilizavel.
 
