@@ -82,6 +82,13 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_exile_destination": "exile",
             "graveyard_exile_up_to_count": True,
             "graveyard_exile_single_graveyard": True,
+            "graveyard_to_library_target": "creature",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_top",
+            "graveyard_to_library_up_to_count": False,
+            "graveyard_to_library_activation_cost_mana": "{B}",
+            "graveyard_to_library_activation_cost_generic": 0,
+            "graveyard_to_library_activation_cost_colors": ["B"],
             "recursion_components": [
                 {
                     "target": "creature",
@@ -127,6 +134,13 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "graveyard_exile_destination": "exile",
             "graveyard_exile_up_to_count": True,
             "graveyard_exile_single_graveyard": True,
+            "graveyard_to_library_target": "creature",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_top",
+            "graveyard_to_library_up_to_count": False,
+            "graveyard_to_library_activation_cost_mana": "{B}",
+            "graveyard_to_library_activation_cost_generic": 0,
+            "graveyard_to_library_activation_cost_colors": ["B"],
             "recursion_components": [
                 {
                     "target": "creature",

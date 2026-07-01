@@ -15,7 +15,7 @@ Execution contract:
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` freezes how to follow
   this flow day to day.
-- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG335
+- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG336
   all-card completion goal, current baseline, and stop criteria.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
@@ -123,23 +123,23 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg335_battlefield_counter_recursion_wave_commander_legal.md`
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg335_battlefield_counter_recursion_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg336_activated_graveyard_to_library_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg336_activated_graveyard_to_library_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27245`
-- XMage authoritative source resolved: `26931`
+- target all-card battle-gap identities: `27242`
+- XMage authoritative source resolved: `26928`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26931`
+- XMage authoritative adapter required: `26928`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26931` identities, card semantics are accepted from XMage; work is now
+- For `26928` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG335 Exact Adapter Waves
+## PG283-PG336 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG335 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG336 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -261,6 +261,13 @@ patterns:
   artifact creature, basic land, permanent, instant/sorcery, artifact or
   enchantment, and any card when source and Oracle agree ->
   `xmage_permanent_simple_activated_graveyard_to_hand_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `PutOnLibraryTargetEffect + SimpleActivatedAbility` on battlefield
+  permanents, exact Oracle activated graveyard-to-library text, mana/tap/source
+  self-sacrifice costs only, self graveyard only, self library only, and
+  supported targets `any card` or `creature card` with top/bottom destination
+  agreement between Oracle and XMage source ->
+  `xmage_permanent_simple_activated_graveyard_to_library_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnSourceFromGraveyardToHandEffect + SimpleActivatedAbility` in
   `Zone.GRAVEYARD`, mana-only activation cost, exact self-return Oracle/source
@@ -3183,6 +3190,66 @@ PG335 measured result:
 - Running the exact splitter after PG335 on supported units returns
   `proposal_count=0` over `7952` considered supported rows.
 
+PG336 evidence:
+
+- PG336 activated graveyard-to-library package:
+  `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`
+- PG336 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`
+- PG336 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_to_sqlite_sync.json`
+- PG336 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_e2e_validation.md`
+- PG336 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg336_activated_graveyard_to_library_wave.md`
+- post-PG336 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg336_activated_graveyard_to_library_wave_commander_legal.md`
+- post-PG336 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg336_supported_recheck.md`
+- post-PG336 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg336_activated_graveyard_to_library_wave_recheck.md`
+- PG336 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg336_activated_graveyard_to_library_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg336_activated_graveyard_to_library_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg336_activated_graveyard_to_library_wave_final_docs.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg336_activated_graveyard_to_library_wave_final_docs.md`
+
+PG336 measured result:
+
+- PG336 promoted `3` exact permanent activated graveyard-to-library rules:
+  `Epitaph Golem`, `Haunted Crossroads`, and `Tomb Trawler`.
+- The splitter now supports exact
+  `PutOnLibraryTargetEffect + SimpleActivatedAbility` rows on battlefield
+  permanents when Oracle and XMage agree on self graveyard, self library,
+  target type, count, destination, and simple mana/tap/source-sacrifice costs.
+- The residual any-graveyard/owner-library variants remain blocked under
+  `activated_graveyard_to_library_oracle_not_simple` until that separate
+  owner-library runtime contract exists.
+- Runtime now activates those permanents in main phases, pays the modeled cost,
+  respects tap/summoning-sickness/source-sacrifice gates, and moves the chosen
+  self-graveyard cards to library top or bottom.
+- Focused tests pass for the exact splitter (`178` tests), runtime (`107`
+  tests), and package builder (`4` tests).
+- PostgreSQL postcheck reports `3/3` promoted rows, `3/3` verified/auto rows,
+  and `3/3` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7249` PostgreSQL rows, inserted/updated
+  `7043` SQLite rows, and exported `4838` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Post-PG336 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The PG/Hermes/SQLite
+  audit has the inherited single warning for old trusted SQLite rules without
+  `oracle_hash`; PG336 rows themselves have `3/3` matching Oracle hashes.
+- Global all-card readiness after PG336:
+  `battle_and_oracle_ready=2382`, `battle_family_mapper_required=30165`, and
+  `snapshot_has_verified_rule=3530`.
+- Global all-card authoritative queue after PG336:
+  `target_identity_count=27242`, `xmage_authoritative_source_count=26928`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26928`.
+- Running the exact splitter after PG336 on supported units returns
+  `proposal_count=0` over `7949` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3822,10 +3889,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG335 queue, the next exact runtime-backed work should be selected from
+post-PG336 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1927`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1924`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

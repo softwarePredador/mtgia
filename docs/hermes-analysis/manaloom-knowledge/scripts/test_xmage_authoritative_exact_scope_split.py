@@ -2290,6 +2290,108 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "graveyard_to_library_source_oracle_destination_mismatch")
 
+    def test_permanent_activated_graveyard_to_library_maps_bottom_self_graveyard(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Epitaph Golem",
+                type_line="Artifact Creature - Golem",
+                oracle_text="{2}: Put target card from your graveyard on the bottom of your library.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new PutOnLibraryTargetEffect(false),
+                    new ManaCostsImpl<>("{2}"));
+                ability.addTarget(new TargetCardInYourGraveyard());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["activated_effect"], "graveyard_to_library")
+        self.assertEqual(effect["graveyard_to_library_target"], "any_card")
+        self.assertEqual(effect["graveyard_to_library_target_count"], 1)
+        self.assertEqual(effect["graveyard_to_library_destination"], "library_bottom")
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["destination"], "library_bottom")
+
+    def test_permanent_activated_graveyard_to_library_maps_top_creature(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Haunted Crossroads",
+                type_line="Enchantment",
+                oracle_text="{B}: Put target creature card from your graveyard on top of your library.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new PutOnLibraryTargetEffect(true),
+                    new ManaCostsImpl<>("{B}"));
+                ability.addTarget(new TargetCardInYourGraveyard(
+                    StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["graveyard_to_library_target"], "creature")
+        self.assertEqual(effect["graveyard_to_library_destination"], "library_top")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+        )
+
+    def test_permanent_activated_graveyard_to_library_blocks_any_graveyard_owner_library(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Reito Lantern",
+                type_line="Artifact",
+                oracle_text="{3}: Put target card from a graveyard on the bottom of its owner's library.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new PutOnLibraryTargetEffect(false),
+                    new GenericManaCost(3));
+                ability.addTarget(new TargetCardInGraveyard());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_graveyard_to_library_oracle_not_simple")
+
     def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
         proposal, reason = split.split_row(

@@ -21620,6 +21620,73 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
   },
+  "Epitaph Golem": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_to_library",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "count": 1,
+        "destination": "library_bottom",
+        "effect": "recursion",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "library_controller": "self",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "PutOnLibraryTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "activated_effect": "graveyard_to_library",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "effect": "creature",
+    "graveyard_to_library_activation_cost_colors": [],
+    "graveyard_to_library_activation_cost_generic": 2,
+    "graveyard_to_library_activation_cost_mana": "{2}",
+    "graveyard_to_library_activation_requires_sacrifice": false,
+    "graveyard_to_library_activation_requires_tap": false,
+    "graveyard_to_library_destination": "library_bottom",
+    "graveyard_to_library_target": "any_card",
+    "graveyard_to_library_target_count": 1,
+    "library_controller": "self",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:493e63e5af93822881635c2c597ea753",
+    "battle_rule_oracle_hash": "8b786a6d901653e9c31f0c3d7da6e812"
+  },
   "Erase": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
     "destination": "exile",
@@ -32272,6 +32339,83 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
+  },
+  "Haunted Crossroads": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_to_library",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "count": 1,
+        "destination": "library_top",
+        "effect": "recursion",
+        "graveyard_to_library_destination": "library_top",
+        "graveyard_to_library_target": "creature",
+        "graveyard_to_library_target_count": 1,
+        "library_controller": "self",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "PutOnLibraryTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "activated_effect": "graveyard_to_library",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{B}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "effect": "enchantment",
+    "graveyard_to_library_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_to_library_activation_cost_generic": 0,
+    "graveyard_to_library_activation_cost_mana": "{B}",
+    "graveyard_to_library_activation_requires_sacrifice": false,
+    "graveyard_to_library_activation_requires_tap": false,
+    "graveyard_to_library_destination": "library_top",
+    "graveyard_to_library_target": "creature",
+    "graveyard_to_library_target_count": 1,
+    "library_controller": "self",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c380241e14afce48d5993bac7d031ed3",
+    "battle_rule_oracle_hash": "33f1f1e4f399f70146823b06b45ec86f"
   },
   "Haunted Fengraf": {
     "effect": "land",
@@ -71882,6 +72026,73 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Tomb Trawler": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_to_library",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "count": 1,
+        "destination": "library_bottom",
+        "effect": "recursion",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "library_controller": "self",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "PutOnLibraryTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "activated_effect": "graveyard_to_library",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+    "effect": "creature",
+    "graveyard_to_library_activation_cost_colors": [],
+    "graveyard_to_library_activation_cost_generic": 2,
+    "graveyard_to_library_activation_cost_mana": "{2}",
+    "graveyard_to_library_activation_requires_sacrifice": false,
+    "graveyard_to_library_activation_requires_tap": false,
+    "graveyard_to_library_destination": "library_bottom",
+    "graveyard_to_library_target": "any_card",
+    "graveyard_to_library_target_count": 1,
+    "library_controller": "self",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:493e63e5af93822881635c2c597ea753",
+    "battle_rule_oracle_hash": "8b786a6d901653e9c31f0c3d7da6e812"
   },
   "Tome Blast": {
     "amount": 2,

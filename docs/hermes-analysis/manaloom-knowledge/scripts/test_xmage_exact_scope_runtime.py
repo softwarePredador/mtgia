@@ -4694,6 +4694,203 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.graveyard, [source])
         self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
 
+    def test_simple_activated_graveyard_to_library_bottom_pays_mana_and_moves_card(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Existing Top", "type_line": "Creature - Human", "cmc": 1}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        target = {"name": "Graveyard Memory", "type_line": "Sorcery", "cmc": 2}
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Epitaph Golem",
+            "type_line": "Artifact Creature - Golem",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "any_card",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_bottom",
+            "graveyard_to_library_activation_cost_mana": "{2}",
+            "graveyard_to_library_activation_cost_generic": 2,
+            "graveyard_to_library_activation_cost_colors": [],
+            "graveyard_to_library_activation_requires_tap": False,
+            "graveyard_to_library_activation_requires_sacrifice": False,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_epitaph_golem",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=20,
+            rng=random.Random(20),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual([card["name"] for card in active.library], ["Existing Top", "Graveyard Memory"])
+        self.assertIn(permanent, active.battlefield)
+        self.assertTrue(
+            any(
+                event == "graveyard_to_library_activated"
+                and data.get("card") == "Epitaph Golem"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_library"
+                and data.get("destination") == "library_bottom"
+                and data.get("moved") == ["Graveyard Memory"]
+                and data.get("mana_paid") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_graveyard_to_library_top_filters_creature(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Existing Top", "type_line": "Creature - Human", "cmc": 1}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        non_target = {"name": "Graveyard Bolt", "type_line": "Instant", "cmc": 1}
+        target = {"name": "Graveyard Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.extend([non_target, target])
+        permanent = {
+            "name": "Haunted Crossroads",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "creature",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_top",
+            "graveyard_to_library_activation_cost_mana": "{B}",
+            "graveyard_to_library_activation_cost_generic": 0,
+            "graveyard_to_library_activation_cost_colors": ["B"],
+            "graveyard_to_library_activation_requires_tap": False,
+            "graveyard_to_library_activation_requires_sacrifice": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_haunted_crossroads",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=21,
+            rng=random.Random(21),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual([card["name"] for card in active.library[:2]], ["Graveyard Bear", "Existing Top"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Graveyard Bolt"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Haunted Crossroads"
+                and data.get("destination") == "library_top"
+                and data.get("target_type") == "creature"
+                and data.get("recovered") == ["Graveyard Bear"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_graveyard_to_library_does_not_move_without_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Graveyard Memory", "type_line": "Sorcery", "cmc": 2}
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Tomb Trawler",
+            "type_line": "Artifact Creature - Golem",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "any_card",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_bottom",
+            "graveyard_to_library_activation_cost_mana": "{2}",
+            "graveyard_to_library_activation_cost_generic": 2,
+            "graveyard_to_library_activation_cost_colors": [],
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=22,
+            rng=random.Random(22),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.library, [])
+        self.assertEqual(active.graveyard, [target])
+        self.assertFalse(any(event == "graveyard_to_library_activated" for event, _ in self.events))
+
+    def test_enchantment_effect_enters_battlefield_with_activated_rule_effects(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "creature",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_top",
+            "_activated_rule_effects": [
+                {
+                    "effect": "recursion",
+                    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+                    "ability_kind": "activated",
+                    "activated_effect": "graveyard_to_library",
+                    "graveyard_to_library_target": "creature",
+                    "graveyard_to_library_target_count": 1,
+                    "graveyard_to_library_destination": "library_top",
+                    "activation_cost_mana": "{B}",
+                    "activation_cost_generic": 0,
+                    "activation_cost_colors": ["B"],
+                }
+            ],
+            "_rule_logical_key": "battle_rule_v1:fixture_haunted_crossroads",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Haunted Crossroads", "type_line": "Enchantment", "cmc": 3},
+            turn=23,
+            rng=random.Random(23),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Haunted Crossroads"])
+        permanent = active.battlefield[0]
+        self.assertEqual(permanent["effect"], "enchantment")
+        self.assertEqual(
+            permanent["_activated_rule_effects"][0]["battle_model_scope"],
+            "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        )
+        self.assertTrue(
+            any(
+                event == "permanent_to_battlefield"
+                and data.get("card") == "Haunted Crossroads"
+                and data.get("effect") == "enchantment"
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

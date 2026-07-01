@@ -112,6 +112,9 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
 )
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
+PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
+    "xmage_permanent_simple_activated_graveyard_to_library_v1"
+)
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
@@ -1215,6 +1218,14 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
             {"target": "any_card", "count": 1, "destination": "library_bottom", "up_to_count": False},
         ),
         (
+            r"^put target creature card from your graveyard on top of your library\.?$",
+            {"target": "creature", "count": 1, "destination": "library_top", "up_to_count": False},
+        ),
+        (
+            r"^put target creature card from your graveyard on the bottom of your library\.?$",
+            {"target": "creature", "count": 1, "destination": "library_bottom", "up_to_count": False},
+        ),
+        (
             r"^put up to three target creature cards from your graveyard on top of your library\.?$",
             {"target": "creature", "count": 3, "destination": "library_top", "up_to_count": True},
         ),
@@ -1258,6 +1269,76 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         "count": count,
         "destination": destination,
         "up_to_count": up_to,
+    }
+
+
+def activated_graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_graveyard_to_library_oracle_not_simple"
+    effect_text = text.rsplit(":", 1)[1].strip()
+    parsed = graveyard_to_library_from_oracle({"oracle_text": effect_text})
+    if parsed is None:
+        return "activated_graveyard_to_library_oracle_not_simple"
+    return parsed
+
+
+def activated_graveyard_to_library_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_graveyard_to_library_source_cost_not_supported"
+    if "Zone.GRAVEYARD" in text:
+        return "activated_graveyard_to_library_source_not_battlefield"
+    effect_matches = re.findall(r"PutOnLibraryTargetEffect\s*\(", text)
+    if len(effect_matches) != 1:
+        return "activated_graveyard_to_library_source_not_single_effect"
+    if len(re.findall(r"SimpleActivatedAbility\s*\(", text)) != 1:
+        return "activated_graveyard_to_library_source_multiple_abilities_not_supported"
+    effect_index = text.find("PutOnLibraryTargetEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_graveyard_to_library_source_not_simple_activated"
+    parsed_target = graveyard_to_library_from_source(text)
+    if isinstance(parsed_target, str):
+        return "activated_graveyard_to_library_" + parsed_target.removeprefix("graveyard_to_library_")
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_graveyard_to_library_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        **parsed_target,
+        "activation_cost_mana": canonical_mana_cost_text(cost_text),
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
     }
 
 
@@ -1815,6 +1896,16 @@ def is_permanent_activated_graveyard_exile_unit(row: dict[str, Any]) -> bool:
         return False
     return (
         effect_classes(row) == {"ExileTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
+def is_permanent_activated_graveyard_to_library_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"PutOnLibraryTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
     )
@@ -3889,6 +3980,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated fixed life-gain ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE:
         scope_kind = "permanent with a simple activated graveyard-exile ability"
+    elif scope == PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE:
+        scope_kind = "permanent with a simple activated graveyard-to-library ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
@@ -3968,6 +4061,7 @@ def split_row(
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     permanent_activated_graveyard_exile_unit = is_permanent_activated_graveyard_exile_unit(row)
+    permanent_activated_graveyard_to_library_unit = is_permanent_activated_graveyard_to_library_unit(row)
     graveyard_self_return_to_hand_unit = (
         unit == RECURSION_UNIT
         and effect_classes(row) == {"ReturnSourceFromGraveyardToHandEffect"}
@@ -4006,6 +4100,7 @@ def split_row(
         and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
+        and not permanent_activated_graveyard_to_library_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
     ):
@@ -4036,6 +4131,7 @@ def split_row(
         and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
+        and not permanent_activated_graveyard_to_library_unit
         and not graveyard_self_return_unit
     ):
         if not is_spell(metadata):
@@ -4616,6 +4712,108 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_graveyard_to_hand",
+        ), "selected_exact_scope"
+
+    if permanent_activated_graveyard_to_library_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_graveyard_to_library_not_permanent"
+        oracle_target = activated_graveyard_to_library_from_oracle(metadata)
+        if isinstance(oracle_target, str):
+            return None, oracle_target
+        parsed_activation = activated_graveyard_to_library_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in ("target", "count", "destination", "up_to_count"):
+            if parsed_activation.get(key) != oracle_target.get(key):
+                return None, f"activated_graveyard_to_library_source_oracle_{key}_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        target_type = str(oracle_target["target"])
+        target_count = int(oracle_target["count"])
+        destination = str(oracle_target["destination"])
+        target_constraints = recursion_target_constraints_for(target_type)
+        activated_effect = {
+            "effect": "recursion",
+            "battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "graveyard_to_library",
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "count": target_count,
+            "destination": destination,
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "library_controller": "self",
+            "graveyard_to_library_target": target_type,
+            "graveyard_to_library_target_count": target_count,
+            "graveyard_to_library_destination": destination,
+            "xmage_effect_class": "PutOnLibraryTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE,
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "graveyard_to_library_target": target_type,
+            "graveyard_to_library_target_count": target_count,
+            "graveyard_to_library_destination": destination,
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "library_controller": "self",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "PutOnLibraryTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+            "graveyard_to_library_activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "graveyard_to_library_activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "graveyard_to_library_activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "graveyard_to_library_activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "graveyard_to_library_activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
+        }
+        if oracle_target.get("up_to_count"):
+            activated_effect["up_to_count"] = True
+            activated_effect["graveyard_to_library_up_to_count"] = True
+            effect_json["up_to_count"] = True
+            effect_json["graveyard_to_library_up_to_count"] = True
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_graveyard_to_library"] = True
+            activated_effect["activated_self_sacrifice_graveyard_to_library"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_graveyard_to_library",
         ), "selected_exact_scope"
 
     if permanent_activated_graveyard_exile_unit:
