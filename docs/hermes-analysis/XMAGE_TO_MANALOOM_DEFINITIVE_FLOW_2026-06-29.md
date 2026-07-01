@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg303_fixed_token_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg304_creature_etb_token_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27704`
-- XMage authoritative source resolved: `27390`
+- target all-card battle-gap identities: `27677`
+- XMage authoritative source resolved: `27363`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27390`
+- XMage authoritative adapter required: `27363`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9887`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27390` identities, card semantics are accepted from XMage; work is now
+- For `27363` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG303 Exact Adapter Waves
+## PG283-PG304 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG303 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG304 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -237,6 +237,11 @@ patterns:
   additional token fanout, no custom effect text, and token keywords limited to
   `flying` or `haste` ->
   `xmage_fixed_create_creature_tokens_spell_v1`
+- `token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::no_target_class::no_condition_class::token,triggered_ability` with
+  one fixed ETB `CreateTokenEffect`, a literal token class constructor, no
+  additional token fanout, no custom effect text, and token keywords limited to
+  `flying` or `haste` ->
+  `xmage_creature_etb_create_tokens_v1`
 
 PG283 evidence:
 
@@ -1033,6 +1038,62 @@ PG303 measured result:
   `xmage_authoritative_adapter_required_count=27390`.
 - Running the exact splitter after PG303 on supported units returns
   `proposal_count=0` over `7353` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG304 evidence:
+
+- PG304 creature ETB token package:
+  `docs/hermes-analysis/master_optimizer_reports/pg304_xmage_creature_etb_token_wave_package.md`
+- PG304 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg304_xmage_creature_etb_token_wave_pg_apply_evidence.md`
+- PG304 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg304_xmage_creature_etb_token_wave_e2e_validation.md`
+- PG304 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg304_creature_etb_token_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg304_creature_etb_token_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg304_creature_etb_token_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg304_creature_etb_token_wave.md`
+- post-PG304 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg304_creature_etb_token_wave_recheck.md`
+- post-PG304 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg304_creature_etb_token_wave.md`
+- post-PG304 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg304_existing_supported_recheck.md`
+
+PG304 measured result:
+
+- PG304 promoted `27` exact creatures whose local XMage source is
+  `CreateTokenEffect` behind `EntersBattlefieldTriggeredAbility`, mapped to
+  `xmage_creature_etb_create_tokens_v1`.
+- Runtime ETB token creation now preserves token subtype, colors, artifact
+  status, and safe `flying`/`haste` token keywords instead of only creating a
+  generic name/power/toughness token.
+- The splitter blocks Treasure/non-creature tokens, dynamic token counts,
+  multiple token fanout, custom text, non-literal token descriptions, and
+  unsupported token keywords.
+- PostgreSQL postcheck: `27/27` promoted rows, `27/27` verified/auto, `27/27`
+  matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6814` PostgreSQL rows, inserted/updated
+  `6608` SQLite rows, and exported `4422` canonical snapshot rows.
+- E2E package validation: PostgreSQL `27/27`, SQLite `27/27`, canonical
+  snapshot `27/27`, and runtime `get_card_effect` `27/27`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover ETB token mapping, non-creature token
+  blocking, and runtime token creation with artifact/flying/subtype
+  preservation; `110` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG304:
+  `target_identity_count=27677`, `xmage_authoritative_source_count=27363`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27363`.
+- Running the exact splitter after PG304 on supported units returns
+  `proposal_count=0` over `7386` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

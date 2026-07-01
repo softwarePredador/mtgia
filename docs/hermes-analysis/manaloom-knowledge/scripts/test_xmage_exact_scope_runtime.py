@@ -109,6 +109,46 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_create_tokens_preserves_token_model(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Fixture Pioneer", "type_line": "Creature - Human Artificer"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_token_count": 1,
+            "etb_token_name": "Thopter Token",
+            "etb_token_subtype": "Thopter",
+            "etb_token_power": 1,
+            "etb_token_toughness": 1,
+            "etb_token_colors": [],
+            "etb_token_keywords": ["flying"],
+            "etb_token_flying": True,
+            "etb_artifact_tokens": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_token",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=3,
+            rng=random.Random(3),
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Thopter Token"]
+        self.assertEqual(len(tokens), 1)
+        token = tokens[0]
+        self.assertEqual(token.get("type_line"), "Artifact Creature Token — Thopter")
+        self.assertEqual(token.get("power"), 1)
+        self.assertEqual(token.get("toughness"), 1)
+        self.assertTrue(token.get("flying"))
+        self.assertIn("flying", token.get("keywords", []))
+
     def test_fixed_damage_target_spell_deals_numeric_damage_to_player(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

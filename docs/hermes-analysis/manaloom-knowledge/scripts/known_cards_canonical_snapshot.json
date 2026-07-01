@@ -1290,6 +1290,31 @@
     "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
     "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
   },
+  "Ambassador Oak": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "G"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Elf Warrior Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Elf Warrior",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 green Elf Warrior creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ElfWarriorToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+    "battle_rule_oracle_hash": "e5437547a6018bfc26aaeb197668d86e"
+  },
   "Ambush Party": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -3595,6 +3620,33 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "a1e3454c352a19daf24959df94eb5f9d"
   },
+  "Aviation Pioneer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_artifact_tokens": true,
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Thopter Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Thopter",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 colorless Thopter artifact creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ThopterColorlessToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+    "battle_rule_oracle_hash": "382efef2853c0d562b33916d68f57cad"
+  },
   "Avishkar Raceway": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -4481,6 +4533,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:148909635213079cb97344100615f5c2"
   },
+  "Bear's Companion": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "G"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Bear Token",
+    "etb_token_power": 4,
+    "etb_token_subtype": "Bear",
+    "etb_token_toughness": 4,
+    "token_description": "4/4 green Bear creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BearsCompanionBearToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b81e781464ec6ac39332cbcfecd86aca",
+    "battle_rule_oracle_hash": "63a5fad87d8d8f7017955b3486f06e84"
+  },
   "Bearer of the Heavens": {
     "cmc": 8.0,
     "effect": "creature",
@@ -4604,6 +4681,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:fcb8373fbec877c86339375e5d6be479",
     "battle_rule_oracle_hash": "37fdf1ceb5505a063e02bcc98b4e9f01"
+  },
+  "Beetleback Chief": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "R"
+    ],
+    "etb_token_count": 2,
+    "etb_token_name": "Goblin Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Goblin",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 red Goblin creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+    "battle_rule_oracle_hash": "bf996a39f91878599a8e5e6987fed632"
   },
   "Befoul": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -9085,6 +9187,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f119ebf954ce4843b21b58fdc207d117"
   },
+  "Clarion Cathars": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Human Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Human",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Human creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+    "battle_rule_oracle_hash": "2cc91262d192720f77b232c756c7af81"
+  },
   "Cleanfall": {
     "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
     "destination": "graveyard",
@@ -12188,6 +12315,31 @@
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "49b4ed3350f7cb5ffce32eff082cc5ba"
   },
+  "Daysquad Marshal": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Human Soldier Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Human Soldier",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Human Soldier creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanSoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+    "battle_rule_oracle_hash": "3618a81d429449f4bd19a54846b1144d"
+  },
   "Daze": {
     "effect": "counter",
     "instant": true,
@@ -14196,6 +14348,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8e7da3df51386d58c857a596433f73ea"
   },
+  "Dragon Trainer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "R"
+    ],
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Dragon Token",
+    "etb_token_power": 4,
+    "etb_token_subtype": "Dragon",
+    "etb_token_toughness": 4,
+    "token_description": "4/4 red Dragon creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "DragonToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:86afa6ee4debefead605b86c81a2d5ed",
+    "battle_rule_oracle_hash": "6e242b0a6ecf7bd80f9f9235c212299b"
+  },
   "Dragon's Approach": {
     "battle_model_scope": "fixed_damage_graveyard_dragon_tutor_ripple_v1",
     "copy_limit_exception": true,
@@ -14914,6 +15095,36 @@
     "battle_rule_logical_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
     "battle_rule_oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc"
   },
+  "Eager Glyphmage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W",
+      "B"
+    ],
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Inkling Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Inkling",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white and black Inkling creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "Inkling11Token",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3342f7881229aad895b7ffc4d2f0dbfd",
+    "battle_rule_oracle_hash": "888885c6e3a2e5d80bf3450675eea844"
+  },
   "Eagle of the Watch": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -15275,6 +15486,57 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6ef4e3fb06fb42f336d38ac6e724ccdd"
+  },
+  "Elder Auntie": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "B",
+      "R"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Goblin Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Goblin",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 black and red Goblin creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BlackAndRedGoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe",
+    "battle_rule_oracle_hash": "4a17580ac89c16ae7d3e5912030b1558"
+  },
+  "Elderleaf Mentor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "G"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Elf Warrior Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Elf Warrior",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 green Elf Warrior creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ElfWarriorToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+    "battle_rule_oracle_hash": "e5437547a6018bfc26aaeb197668d86e"
   },
   "Eldrazi Confluence": {
     "ability_kind": "one_shot",
@@ -16316,6 +16578,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
     "battle_rule_oracle_hash": "252062f82809fe39cb8675ece7128f7c"
+  },
+  "Enlightened Maniac": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_count": 1,
+    "etb_token_name": "Eldrazi Horror Token",
+    "etb_token_power": 3,
+    "etb_token_subtype": "Eldrazi Horror",
+    "etb_token_toughness": 2,
+    "token_description": "3/2 colorless Eldrazi Horror creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "EldraziHorrorToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9c40c7df4ef25b2c75a2d91ce9d2b425",
+    "battle_rule_oracle_hash": "8b1054c63d978782588111c49c22a412"
   },
   "Enlightened Tutor": {
     "battle_model_scope": "artifact_enchantment_tutor_to_library_top_v1",
@@ -18068,6 +18352,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Ferocious Pup": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "G"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Wolf Token",
+    "etb_token_power": 2,
+    "etb_token_subtype": "Wolf",
+    "etb_token_toughness": 2,
+    "token_description": "2/2 green Wolf creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "WolfToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f7e8c54fb37dae72d5f06f8c26c41592",
+    "battle_rule_oracle_hash": "1ff7f13fe5e87d109ac0aff22c147b7e"
   },
   "Ferrous Lake": {
     "effect": "land",
@@ -20867,6 +21176,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ec9c870dd58d78bc15537f68438a0f47"
   },
+  "Ghirapur Gearcrafter": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_artifact_tokens": true,
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Thopter Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Thopter",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 colorless Thopter artifact creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ThopterColorlessToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+    "battle_rule_oracle_hash": "ab41a6abe9de1bc95d12f11d4ea33bcf"
+  },
   "Ghirapur Osprey": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -21888,6 +22224,56 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e7ca044b13f0e41a3da66dd513dcbdf6"
+  },
+  "Goblin Gang Leader": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "R"
+    ],
+    "etb_token_count": 2,
+    "etb_token_name": "Goblin Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Goblin",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 red Goblin creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+    "battle_rule_oracle_hash": "bf996a39f91878599a8e5e6987fed632"
+  },
+  "Goblin Instigator": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "R"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Goblin Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Goblin",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 red Goblin creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df",
+    "battle_rule_oracle_hash": "dd5eab544bcdd29cd5f1297eb5d7e2bc"
   },
   "Goblin Matron": {
     "cmc": 3.0,
@@ -23904,6 +24290,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+  },
+  "Head of the Homestead": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 2,
+    "etb_token_name": "Rabbit Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Rabbit",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Rabbit creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "RabbitToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6282b92a8d553c68ac05bd076db2c1f0",
+    "battle_rule_oracle_hash": "9020cbd26475ee609ce0b39fe0db4b45"
   },
   "Healer of the Glade": {
     "ability_kind": "triggered",
@@ -28590,6 +29001,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Kyoshi Warriors": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Ally Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Ally",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Ally creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "AllyToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:faf466ae5b51f46836aaf67bc303430e",
+    "battle_rule_oracle_hash": "fafc7cb11e6b9ae6f9bf01b7ff5beaab"
+  },
   "Laboratory Maniac": {
     "cmc": 3.0,
     "effect": "finisher",
@@ -31700,6 +32136,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Mechanized Ninja Cavalry": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_artifact_tokens": true,
+    "etb_token_count": 1,
+    "etb_token_name": "Robot Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Robot",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 colorless Robot artifact creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "Robot11Token",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:33c601a5c295bb71acb23fc416117abe",
+    "battle_rule_oracle_hash": "5aea6c36f0e7eacff298f70c533f9362"
   },
   "Mechanized Production": {
     "cmc": 4.0,
@@ -35103,6 +35562,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
     "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
+  "Nimble Thopterist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_artifact_tokens": true,
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Thopter Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Thopter",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 colorless Thopter artifact creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "ThopterColorlessToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+    "battle_rule_oracle_hash": "382efef2853c0d562b33916d68f57cad"
   },
   "Nimbus Maze": {
     "effect": "land",
@@ -38887,6 +39373,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:faf0412d36f280c62b14904ec21807cc"
+  },
+  "Protector of Gondor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Human Soldier Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Human Soldier",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Human Soldier creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanSoldierToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+    "battle_rule_oracle_hash": "3618a81d429449f4bd19a54846b1144d"
   },
   "Protector of the Wastes": {
     "cmc": 6.0,
@@ -45476,6 +45987,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:435d9a5e2fbde6e6de50a2a573820221"
   },
+  "Seller of Songbirds": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Bird Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Bird",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Bird creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BirdToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f05967699fc0345e6d1afb953846df8e",
+    "battle_rule_oracle_hash": "76b4f70b284acbe3668fa080685aab03"
+  },
   "Selvala, Heart of the Wilds": {
     "ability_kind": "triggered",
     "activation_mana_cost": "{G}",
@@ -46918,6 +47458,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
     "battle_rule_oracle_hash": "cdedef666a078c7e40d101c144102bec"
+  },
+  "Silvergill Mentor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W",
+      "U"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Merfolk Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Merfolk",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white and blue Merfolk creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "MerfolkWhiteBlueToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42c282a912869bf37da15799963a1268",
+    "battle_rule_oracle_hash": "151795821857adf64100c218c67e64e6"
   },
   "Silverquill Campus": {
     "effect": "land",
@@ -48678,6 +49244,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sourbread Auntie": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "B",
+      "R"
+    ],
+    "etb_token_count": 2,
+    "etb_token_name": "Goblin Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Goblin",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 black and red Goblin creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "BlackAndRedGoblinToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9fb52134d5cb03189b7cecb574c668a",
+    "battle_rule_oracle_hash": "e3d16b8d1157c12fc825d19ecaa1d5d8"
   },
   "Soured Springs": {
     "effect": "land",
@@ -56416,6 +57008,31 @@
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "b7ff43d67eacb32bbbaf40e2c63c2448"
   },
+  "Tunnel Surveyor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Glimmer Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Glimmer",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Glimmer enchantment creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "GlimmerToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a4bbdcdb47378d5193c3996c4aeacdef",
+    "battle_rule_oracle_hash": "39e12a6e7027b7d2bbccc29df044c745"
+  },
   "Turbulent Fen": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -57546,6 +58163,35 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Urbis Protector": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_flying": true,
+    "etb_token_keywords": [
+      "flying"
+    ],
+    "etb_token_name": "Angel Token",
+    "etb_token_power": 4,
+    "etb_token_subtype": "Angel",
+    "etb_token_toughness": 4,
+    "token_description": "4/4 white Angel creature token with flying",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "AngelToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c94b64b16e013dc0107a259dfd962d76",
+    "battle_rule_oracle_hash": "03697d005f1a2819f3f617cfd19bdad1"
   },
   "Urborg": {
     "effect": "land",
@@ -60123,6 +60769,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Watchful Giant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Human Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Human",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Human creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "HumanToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+    "battle_rule_oracle_hash": "2cc91262d192720f77b232c756c7af81"
+  },
   "Waterfront District": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -61814,6 +62485,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Yavimaya Sapherd": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "G"
+    ],
+    "etb_token_count": 1,
+    "etb_token_name": "Saproling Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Saproling",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 green Saproling creature token",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SaprolingToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333",
+    "battle_rule_oracle_hash": "16b4d8fac0b34dbc4b9a65adee9aa171"
   },
   "Yavimaya Wurm": {
     "_keywords_are_self": true,

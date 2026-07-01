@@ -16365,7 +16365,12 @@ def resolve_generic_permanent_etb(
                     or effect_data.get("etb_token_power")
                     or 1
                 ),
+                haste=bool(effect_data.get("etb_token_haste")),
+                flying=bool(effect_data.get("etb_token_flying")),
+                keywords=list(effect_data.get("etb_token_keywords") or []),
                 artifact=bool(effect_data.get("etb_artifact_tokens")),
+                subtype=effect_data.get("etb_token_subtype"),
+                colors=list(effect_data.get("etb_token_colors") or []),
                 opponents=opponents,
                 turn=turn,
                 source_event="etb_token_created",

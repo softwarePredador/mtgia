@@ -142,6 +142,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_keyword_not_supported")
 
+    def test_creature_etb_create_tokens_is_package_safe(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Instigator",
+                type_line="Creature - Goblin Rogue",
+                oracle_text=(
+                    "When Fixture Instigator enters the battlefield, create "
+                    "two 1/1 red Goblin creature tokens."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new GoblinToken(), 2)));
+                class GoblinToken extends TokenImpl {
+                    public GoblinToken() {
+                        super("Goblin Token", "1/1 red Goblin creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.GOBLIN);
+                        color.setRed(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(effect["etb_token_count"], 2)
+        self.assertEqual(effect["etb_token_name"], "Goblin Token")
+        self.assertEqual(effect["etb_token_subtype"], "Goblin")
+        self.assertEqual(effect["etb_token_colors"], ["R"])
+
+    def test_creature_etb_create_tokens_blocks_non_creature_token(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Pirate",
+                type_line="Creature - Human Pirate",
+                oracle_text="When Fixture Pirate enters the battlefield, create a Treasure token.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new TreasureToken())));
+                class TreasureToken extends TokenImpl {
+                    public TreasureToken() {
+                        super("Treasure Token", "colorless Treasure artifact token");
+                        cardType.add(CardType.ARTIFACT);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_description_not_creature_token")
+
     def test_fixed_source_controller_draw_spell_is_package_safe(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(

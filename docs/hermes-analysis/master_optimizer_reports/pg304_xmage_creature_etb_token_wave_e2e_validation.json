@@ -1,0 +1,980 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T12:30:51.375637+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg304_xmage_creature_etb_token_wave_manifest.json",
+  "package_id": "pg304_xmage_creature_etb_token_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ambassador Oak",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+          "oracle_hash": "e5437547a6018bfc26aaeb197668d86e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Aviation Pioneer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "382efef2853c0d562b33916d68f57cad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Bear's Companion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b81e781464ec6ac39332cbcfecd86aca",
+          "oracle_hash": "63a5fad87d8d8f7017955b3486f06e84",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Beetleback Chief",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+          "oracle_hash": "bf996a39f91878599a8e5e6987fed632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Clarion Cathars",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+          "oracle_hash": "2cc91262d192720f77b232c756c7af81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Daysquad Marshal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+          "oracle_hash": "3618a81d429449f4bd19a54846b1144d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Dragon Trainer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86afa6ee4debefead605b86c81a2d5ed",
+          "oracle_hash": "6e242b0a6ecf7bd80f9f9235c212299b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Eager Glyphmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3342f7881229aad895b7ffc4d2f0dbfd",
+          "oracle_hash": "888885c6e3a2e5d80bf3450675eea844",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Elder Auntie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe",
+          "oracle_hash": "4a17580ac89c16ae7d3e5912030b1558",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Elderleaf Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+          "oracle_hash": "e5437547a6018bfc26aaeb197668d86e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Enlightened Maniac",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9c40c7df4ef25b2c75a2d91ce9d2b425",
+          "oracle_hash": "8b1054c63d978782588111c49c22a412",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ferocious Pup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7e8c54fb37dae72d5f06f8c26c41592",
+          "oracle_hash": "1ff7f13fe5e87d109ac0aff22c147b7e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ghirapur Gearcrafter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "ab41a6abe9de1bc95d12f11d4ea33bcf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Goblin Gang Leader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+          "oracle_hash": "bf996a39f91878599a8e5e6987fed632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Goblin Instigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df",
+          "oracle_hash": "dd5eab544bcdd29cd5f1297eb5d7e2bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Head of the Homestead",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6282b92a8d553c68ac05bd076db2c1f0",
+          "oracle_hash": "9020cbd26475ee609ce0b39fe0db4b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Kyoshi Warriors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:faf466ae5b51f46836aaf67bc303430e",
+          "oracle_hash": "fafc7cb11e6b9ae6f9bf01b7ff5beaab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Mechanized Ninja Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33c601a5c295bb71acb23fc416117abe",
+          "oracle_hash": "5aea6c36f0e7eacff298f70c533f9362",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Nimble Thopterist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "382efef2853c0d562b33916d68f57cad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Protector of Gondor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+          "oracle_hash": "3618a81d429449f4bd19a54846b1144d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Seller of Songbirds",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f05967699fc0345e6d1afb953846df8e",
+          "oracle_hash": "76b4f70b284acbe3668fa080685aab03",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Silvergill Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42c282a912869bf37da15799963a1268",
+          "oracle_hash": "151795821857adf64100c218c67e64e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Sourbread Auntie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9fb52134d5cb03189b7cecb574c668a",
+          "oracle_hash": "e3d16b8d1157c12fc825d19ecaa1d5d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Tunnel Surveyor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a4bbdcdb47378d5193c3996c4aeacdef",
+          "oracle_hash": "39e12a6e7027b7d2bbccc29df044c745",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Urbis Protector",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c94b64b16e013dc0107a259dfd962d76",
+          "oracle_hash": "03697d005f1a2819f3f617cfd19bdad1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Watchful Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+          "oracle_hash": "2cc91262d192720f77b232c756c7af81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Yavimaya Sapherd",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333",
+          "oracle_hash": "16b4d8fac0b34dbc4b9a65adee9aa171",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ambassador Oak",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+          "oracle_hash": "e5437547a6018bfc26aaeb197668d86e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Aviation Pioneer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "382efef2853c0d562b33916d68f57cad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Bear's Companion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b81e781464ec6ac39332cbcfecd86aca",
+          "oracle_hash": "63a5fad87d8d8f7017955b3486f06e84",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Beetleback Chief",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+          "oracle_hash": "bf996a39f91878599a8e5e6987fed632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Clarion Cathars",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+          "oracle_hash": "2cc91262d192720f77b232c756c7af81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Daysquad Marshal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+          "oracle_hash": "3618a81d429449f4bd19a54846b1144d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Dragon Trainer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:86afa6ee4debefead605b86c81a2d5ed",
+          "oracle_hash": "6e242b0a6ecf7bd80f9f9235c212299b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Eager Glyphmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3342f7881229aad895b7ffc4d2f0dbfd",
+          "oracle_hash": "888885c6e3a2e5d80bf3450675eea844",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Elder Auntie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe",
+          "oracle_hash": "4a17580ac89c16ae7d3e5912030b1558",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Elderleaf Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300",
+          "oracle_hash": "e5437547a6018bfc26aaeb197668d86e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Enlightened Maniac",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9c40c7df4ef25b2c75a2d91ce9d2b425",
+          "oracle_hash": "8b1054c63d978782588111c49c22a412",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ferocious Pup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f7e8c54fb37dae72d5f06f8c26c41592",
+          "oracle_hash": "1ff7f13fe5e87d109ac0aff22c147b7e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Ghirapur Gearcrafter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "ab41a6abe9de1bc95d12f11d4ea33bcf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Goblin Gang Leader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42",
+          "oracle_hash": "bf996a39f91878599a8e5e6987fed632",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Goblin Instigator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df",
+          "oracle_hash": "dd5eab544bcdd29cd5f1297eb5d7e2bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Head of the Homestead",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6282b92a8d553c68ac05bd076db2c1f0",
+          "oracle_hash": "9020cbd26475ee609ce0b39fe0db4b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Kyoshi Warriors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:faf466ae5b51f46836aaf67bc303430e",
+          "oracle_hash": "fafc7cb11e6b9ae6f9bf01b7ff5beaab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Mechanized Ninja Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33c601a5c295bb71acb23fc416117abe",
+          "oracle_hash": "5aea6c36f0e7eacff298f70c533f9362",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Nimble Thopterist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3",
+          "oracle_hash": "382efef2853c0d562b33916d68f57cad",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Protector of Gondor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce",
+          "oracle_hash": "3618a81d429449f4bd19a54846b1144d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Seller of Songbirds",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f05967699fc0345e6d1afb953846df8e",
+          "oracle_hash": "76b4f70b284acbe3668fa080685aab03",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Silvergill Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42c282a912869bf37da15799963a1268",
+          "oracle_hash": "151795821857adf64100c218c67e64e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Sourbread Auntie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b9fb52134d5cb03189b7cecb574c668a",
+          "oracle_hash": "e3d16b8d1157c12fc825d19ecaa1d5d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Tunnel Surveyor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a4bbdcdb47378d5193c3996c4aeacdef",
+          "oracle_hash": "39e12a6e7027b7d2bbccc29df044c745",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Urbis Protector",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c94b64b16e013dc0107a259dfd962d76",
+          "oracle_hash": "03697d005f1a2819f3f617cfd19bdad1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Watchful Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8",
+          "oracle_hash": "2cc91262d192720f77b232c756c7af81",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Yavimaya Sapherd",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333",
+          "oracle_hash": "16b4d8fac0b34dbc4b9a65adee9aa171",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ambassador Oak",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aviation Pioneer",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bear's Companion",
+          "logical_rule_key": "battle_rule_v1:b81e781464ec6ac39332cbcfecd86aca"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beetleback Chief",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Clarion Cathars",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Daysquad Marshal",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dragon Trainer",
+          "logical_rule_key": "battle_rule_v1:86afa6ee4debefead605b86c81a2d5ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eager Glyphmage",
+          "logical_rule_key": "battle_rule_v1:3342f7881229aad895b7ffc4d2f0dbfd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elder Auntie",
+          "logical_rule_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elderleaf Mentor",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Enlightened Maniac",
+          "logical_rule_key": "battle_rule_v1:9c40c7df4ef25b2c75a2d91ce9d2b425"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ferocious Pup",
+          "logical_rule_key": "battle_rule_v1:f7e8c54fb37dae72d5f06f8c26c41592"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ghirapur Gearcrafter",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Gang Leader",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Instigator",
+          "logical_rule_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Head of the Homestead",
+          "logical_rule_key": "battle_rule_v1:6282b92a8d553c68ac05bd076db2c1f0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kyoshi Warriors",
+          "logical_rule_key": "battle_rule_v1:faf466ae5b51f46836aaf67bc303430e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mechanized Ninja Cavalry",
+          "logical_rule_key": "battle_rule_v1:33c601a5c295bb71acb23fc416117abe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nimble Thopterist",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Protector of Gondor",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seller of Songbirds",
+          "logical_rule_key": "battle_rule_v1:f05967699fc0345e6d1afb953846df8e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Silvergill Mentor",
+          "logical_rule_key": "battle_rule_v1:42c282a912869bf37da15799963a1268"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sourbread Auntie",
+          "logical_rule_key": "battle_rule_v1:b9fb52134d5cb03189b7cecb574c668a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tunnel Surveyor",
+          "logical_rule_key": "battle_rule_v1:a4bbdcdb47378d5193c3996c4aeacdef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Urbis Protector",
+          "logical_rule_key": "battle_rule_v1:c94b64b16e013dc0107a259dfd962d76"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Watchful Giant",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Yavimaya Sapherd",
+          "logical_rule_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Ambassador Oak",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Aviation Pioneer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bear's Companion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b81e781464ec6ac39332cbcfecd86aca"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Beetleback Chief",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Clarion Cathars",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Daysquad Marshal",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dragon Trainer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:86afa6ee4debefead605b86c81a2d5ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eager Glyphmage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3342f7881229aad895b7ffc4d2f0dbfd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elder Auntie",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elderleaf Mentor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:745d3a7deb2368fb9ac056212d83b300"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Enlightened Maniac",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9c40c7df4ef25b2c75a2d91ce9d2b425"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ferocious Pup",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f7e8c54fb37dae72d5f06f8c26c41592"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ghirapur Gearcrafter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Gang Leader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8a5d180ae77e89bd78e36bac99a80c42"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Instigator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Head of the Homestead",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:6282b92a8d553c68ac05bd076db2c1f0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kyoshi Warriors",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:faf466ae5b51f46836aaf67bc303430e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mechanized Ninja Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:33c601a5c295bb71acb23fc416117abe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nimble Thopterist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:32a2e37e48d1c9938172c54e51343ac3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Protector of Gondor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:408666593df7f7a8633bbb329d0017ce"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seller of Songbirds",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f05967699fc0345e6d1afb953846df8e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Silvergill Mentor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:42c282a912869bf37da15799963a1268"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sourbread Auntie",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b9fb52134d5cb03189b7cecb574c668a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tunnel Surveyor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a4bbdcdb47378d5193c3996c4aeacdef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Urbis Protector",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c94b64b16e013dc0107a259dfd962d76"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Watchful Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9335b30414ebe3caebc312b8608472b8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Yavimaya Sapherd",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

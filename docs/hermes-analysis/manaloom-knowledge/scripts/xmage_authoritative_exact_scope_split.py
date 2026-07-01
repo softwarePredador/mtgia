@@ -43,6 +43,10 @@ TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
 )
+ETB_TOKEN_CREATURE_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
+    "no_target_class::no_condition_class::token,triggered_ability"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -84,6 +88,7 @@ ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
+ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -930,6 +935,15 @@ def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
+        and effect_classes(row) == {"CreateTokenEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
+    )
+
+
 def is_creature_tap_damage_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
         return False
@@ -1256,6 +1270,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
+        ETB_TOKEN_CREATURE_SCOPE,
     }:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
@@ -1321,6 +1336,7 @@ def split_row(
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
+    etb_token_creature_unit = is_creature_etb_token_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     if (
@@ -1332,6 +1348,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_token_creature_unit
         and not creature_tap_damage_unit
         and not fixed_token_spell_unit
     ):
@@ -1349,6 +1366,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_token_creature_unit
         and not creature_tap_damage_unit
     ):
         if not is_spell(metadata):
@@ -1385,6 +1403,51 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_create_creature_tokens_spell",
+        ), "selected_exact_scope"
+
+    if etb_token_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_token_not_creature"
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        if isinstance(parsed_effect, str):
+            return None, parsed_effect
+        token_class, token_count = parsed_effect
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TOKEN_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            "xmage_token_class": token_data["xmage_token_class"],
+            "token_description": token_data["token_description"],
+            "etb_token_name": token_data["token_name"],
+            "etb_token_power": token_data["token_power"],
+            "etb_token_toughness": token_data["token_toughness"],
+        }
+        optional_token_fields = {
+            "token_subtype": "etb_token_subtype",
+            "token_colors": "etb_token_colors",
+            "token_keywords": "etb_token_keywords",
+            "token_flying": "etb_token_flying",
+            "token_haste": "etb_token_haste",
+            "artifact_tokens": "etb_artifact_tokens",
+        }
+        for source_key, target_key in optional_token_fields.items():
+            if source_key in token_data:
+                effect_json[target_key] = token_data[source_key]
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_create_tokens",
         ), "selected_exact_scope"
 
     if keyword_creature_unit:
@@ -2005,6 +2068,7 @@ def build_exact_split_report(
             and not is_creature_dies_draw_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_tap_damage_unit(row)
+            and not is_creature_etb_token_unit(row)
         ):
             continue
         considered += 1
@@ -2044,6 +2108,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
+                "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,
