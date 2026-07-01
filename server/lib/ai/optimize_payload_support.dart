@@ -445,6 +445,8 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
   final action = type == 'add' ? 'entrada' : 'saída';
   final curveDelta = (cmcAfter - cmcBefore).toStringAsFixed(2);
   final isBasicLand = basic_lands.isBasicLandName(name);
+  final resolvedPriority = priority ?? (type == 'add' ? 'High' : 'Medium');
+  final resolvedRisk = risk ?? (keepTheme ? 'low' : 'medium');
   final resolvedRole = (functionalRole == null || functionalRole.trim().isEmpty)
       ? 'utility'
       : functionalRole.trim();
@@ -456,6 +458,21 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
           .toSet()
           .toList()
         ..sort());
+  final explanation = _buildOptimizeRecommendationExplanation(
+    type: type,
+    action: action,
+    name: name,
+    targetArchetype: targetArchetype,
+    confidenceLevel: confidenceLevel,
+    confidenceScore: confidenceScore,
+    curveDelta: curveDelta,
+    keepTheme: keepTheme,
+    role: resolvedRole,
+    roles: resolvedRoles,
+    priority: resolvedPriority,
+    risk: resolvedRisk,
+    isBasicLand: isBasicLand,
+  );
 
   return {
     'type': type,
@@ -467,10 +484,10 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
     'function': resolvedRole,
     'roles': resolvedRoles,
     'functions': resolvedRoles,
-    'priority': priority ?? (type == 'add' ? 'High' : 'Medium'),
-    'risk': risk ?? (keepTheme ? 'low' : 'medium'),
-    'reason':
-        'Sugestão de $action para alinhar o deck ao plano ${targetArchetype.toLowerCase()} e melhorar consistência geral.',
+    'priority': resolvedPriority,
+    'risk': resolvedRisk,
+    'reason': explanation['summary'],
+    'explanation': explanation,
     'confidence': {
       'level': confidenceLevel,
       'score': confidenceScore,
@@ -480,9 +497,68 @@ Map<String, dynamic> buildOptimizeRecommendationDetail({
       'consistency': keepTheme ? 'alta' : 'média',
       'synergy': type == 'add' ? 'melhora' : 'ajuste',
       'legality': 'mantida',
-      'risk': risk ?? (keepTheme ? 'low' : 'medium'),
+      'risk': resolvedRisk,
     },
   };
+}
+
+Map<String, dynamic> _buildOptimizeRecommendationExplanation({
+  required String type,
+  required String action,
+  required String name,
+  required String targetArchetype,
+  required String confidenceLevel,
+  required double confidenceScore,
+  required String curveDelta,
+  required bool keepTheme,
+  required String role,
+  required List<String> roles,
+  required String priority,
+  required String risk,
+  required bool isBasicLand,
+}) {
+  final archetype = targetArchetype.trim().isEmpty
+      ? 'plano escolhido'
+      : targetArchetype.trim();
+  final summary =
+      'Sugestão de $action para $archetype: ${_actionReason(type, role)}';
+  final evidence = <String>[
+    'Função principal: $role.',
+    if (roles.length > 1) 'Funções consideradas: ${roles.join(', ')}.',
+    'Impacto estimado na curva: ΔCMC $curveDelta.',
+    keepTheme
+        ? 'Preserva o tema declarado do deck.'
+        : 'Pode mudar o tema; revisar antes de aplicar.',
+    if (isBasicLand) 'Marcada como terreno básico para regras de cópia.',
+  ];
+
+  return {
+    'schema_version': 'optimize_recommendation_explanation_v1_2026-07-01',
+    'summary': summary,
+    'decision': type == 'add' ? 'add' : 'remove',
+    'card_name': name,
+    'target_archetype': archetype,
+    'why': evidence,
+    'confidence': {
+      'level': confidenceLevel,
+      'score': confidenceScore,
+    },
+    'safety': {
+      'priority': priority,
+      'risk': risk,
+      'theme_preserved': keepTheme,
+      'preview_required': true,
+      'legality': 'validated_by_optimize_route',
+    },
+  };
+}
+
+String _actionReason(String type, String role) {
+  final normalizedRole = role.trim().isEmpty ? 'utility' : role.trim();
+  if (type == 'add') {
+    return 'reforça a função $normalizedRole sem aplicar automaticamente.';
+  }
+  return 'abre espaço na função $normalizedRole para uma troca revisável.';
 }
 
 double _confidenceScoreFromLevel(String level) {
