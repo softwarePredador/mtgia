@@ -955,6 +955,92 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_graveyard_recursion_returns_matching_card_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Fixture Elementalist", "type_line": "Creature - Human Shaman"}
+        active.battlefield.append(permanent)
+        target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        non_target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "instant_or_sorcery",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=9,
+            rng=random.Random(9),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bolt"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bear"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Elementalist"])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Fixture Elementalist"
+                and data.get("recovered") == ["Target Bolt"]
+                and data.get("target_type") == "instant_or_sorcery"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_graveyard_recursion_returns_lands(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Fixture Treefolk", "type_line": "Creature - Treefolk Druid"}
+        active.battlefield.append(permanent)
+        active.graveyard.extend(
+            [
+                {"name": "Target Plains", "type_line": "Basic Land - Plains", "cmc": 0},
+                {"name": "Target Mountain", "type_line": "Basic Land - Mountain", "cmc": 0},
+                {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2},
+            ]
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "land",
+            "etb_recursion_count": 2,
+            "etb_recursion_destination": "hand",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=10,
+            rng=random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Plains", "Target Mountain"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bear"])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Fixture Treefolk"
+                and data.get("recovered") == ["Target Plains", "Target Mountain"]
+                and data.get("target_type") == "land"
+                for event, data in self.events
+            )
+        )
+
     def test_add_plus_one_counter_spell_buffs_own_best_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

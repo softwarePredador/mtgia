@@ -995,6 +995,89 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_destroy_target_not_supported")
 
+    def test_creature_etb_recursion_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Elementalist",
+                type_line="Creature - Human Shaman",
+                oracle_text="When this creature enters, return target instant or sorcery card from your graveyard to your hand.",
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect()));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_RECURSION_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "instant_or_sorcery")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertEqual(effect["etb_recursion_destination"], "hand")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+        )
+
+    def test_creature_etb_recursion_preserves_up_to_two_land_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Treefolk",
+                type_line="Creature - Treefolk Druid",
+                oracle_text="When this creature enters, you may return up to two target land cards from your graveyard to your hand.",
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect()));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "land")
+        self.assertEqual(effect["etb_recursion_count"], 2)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        )
+
+    def test_creature_etb_recursion_blocks_conditional_text(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Descender",
+                type_line="Creature - Scout",
+                oracle_text=(
+                    "Descend 4 - When this creature enters, if there are four or more permanent cards "
+                    "in your graveyard, return target permanent card from your graveyard to your hand."
+                ),
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect()));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_recursion_target_not_supported")
+
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",

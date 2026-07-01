@@ -74,6 +74,7 @@ STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
+ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -403,12 +404,21 @@ def recursion_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "graveyard", "controller": "self"}
     if target == "any_card":
         constraints["scope"] = "any_card"
-    elif target in {"creature", "artifact", "enchantment", "sorcery", "instant"}:
+    elif target in {"creature", "artifact", "enchantment", "sorcery", "instant", "land"}:
         constraints["card_types"] = [target]
     elif target == "instant_or_sorcery":
         constraints["card_types"] = ["instant", "sorcery"]
     elif target == "artifact_or_enchantment":
         constraints["card_types"] = ["artifact", "enchantment"]
+    elif target == "artifact_or_creature":
+        constraints["card_types"] = ["artifact", "creature"]
+    elif target == "creature_or_enchantment":
+        constraints["card_types"] = ["creature", "enchantment"]
+    elif target == "artifact_creature":
+        constraints["card_types"] = ["artifact", "creature"]
+        constraints["all_card_types_required"] = True
+    elif target == "noncreature_nonland":
+        constraints["exclude_card_types"] = ["creature", "land"]
     elif target == "permanent":
         constraints["card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"]
     else:
@@ -652,6 +662,16 @@ def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_tap_damage_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
         return False
@@ -821,6 +841,40 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
     return None
 
 
+def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    target_patterns: list[tuple[str, str]] = [
+        ("instant_or_sorcery", r"instant or sorcery"),
+        ("artifact_or_enchantment", r"artifact or enchantment"),
+        ("artifact_or_creature", r"artifact or creature"),
+        ("creature_or_enchantment", r"creature or enchantment"),
+        ("artifact_creature", r"artifact creature"),
+        ("noncreature_nonland", r"noncreature, nonland"),
+        ("permanent", r"permanent"),
+        ("creature", r"creature"),
+        ("artifact", r"artifact"),
+        ("enchantment", r"enchantment"),
+        ("instant", r"instant"),
+        ("sorcery", r"sorcery"),
+        ("land", r"land"),
+        ("any_card", r"card"),
+    ]
+    for target_type, target_phrase in target_patterns:
+        if re.match(
+            rf"^when this creature enters(?: the battlefield)?, (?:you may )?"
+            rf"return target {target_phrase} card from your graveyard to your hand\.?$",
+            text,
+        ):
+            return target_type, 1, False
+        if re.match(
+            rf"^when this creature enters(?: the battlefield)?, (?:you may )?"
+            rf"return up to two target {target_phrase} cards from your graveyard to your hand\.?$",
+            text,
+        ):
+            return target_type, 2, True
+    return None
+
+
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     text = oracle_text(metadata)
     if text == "{t}: add one mana of any color.":
@@ -865,6 +919,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
+        ETB_RECURSION_CREATURE_SCOPE,
     }:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
@@ -927,6 +982,7 @@ def split_row(
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
+    etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     if (
         unit not in SUPPORTED_UNITS
@@ -934,6 +990,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_destroy_creature_unit
+        and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
     ):
         return None, "unsupported_adapter_work_unit"
@@ -947,6 +1004,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_destroy_creature_unit
+        and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
     ):
         if not is_spell(metadata):
@@ -1081,6 +1139,34 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_destroy_target",
+        ), "selected_exact_scope"
+
+    if etb_recursion_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_recursion_not_creature"
+        target = etb_recursion_to_hand_from_oracle(metadata)
+        if target is None:
+            return None, "etb_recursion_target_not_supported"
+        target_type, count, up_to = target
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_RECURSION_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": target_type,
+            "etb_recursion_count": count,
+            "etb_recursion_destination": "hand",
+            "target_constraints": recursion_target_constraints_for(target_type),
+            "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if up_to:
+            effect_json["etb_recursion_up_to_count"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_graveyard_to_hand",
         ), "selected_exact_scope"
 
     if creature_tap_damage_unit:

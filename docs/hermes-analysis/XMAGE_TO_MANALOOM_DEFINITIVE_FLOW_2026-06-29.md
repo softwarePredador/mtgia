@@ -121,14 +121,15 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg297_creature_etb_destroy_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg298_creature_etb_recursion_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27793`
-- XMage authoritative source resolved: `27479`
+- target all-card battle-gap identities: `27771`
+- XMage authoritative source resolved: `27457`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `27457`
 - ManaLoom adapter work-unit keys: `11905`
 - authoritative source coverage ratio: `0.9887`
 
@@ -150,9 +151,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG297 Exact Adapter Waves
+## PG283-PG298 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG297 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG298 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -183,6 +184,10 @@ patterns:
   `DestroyTargetEffect + EntersBattlefieldTriggeredAbility` on creatures and
   exact unrestricted ETB destroy Oracle text ->
   `xmage_creature_etb_destroy_target_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnFromGraveyardToHandTargetEffect + EntersBattlefieldTriggeredAbility`
+  on creatures and exact unrestricted ETB graveyard-to-hand Oracle text ->
+  `xmage_creature_etb_return_graveyard_card_to_hand_v1`
 - `direct_damage::targeted_damage_variant_v1` with
   `DamageTargetEffect + SimpleActivatedAbility` on creatures, exact Oracle
   `{T}: ... deals N damage ...`, XMage `TapSourceCost` only, and no mana or
@@ -697,6 +702,58 @@ PG297 measured result:
   `xmage_authoritative_adapter_required_count=27479`.
 - Running the exact splitter after PG297 on supported units returns
   `proposal_count=0` over `7351` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with the largest
+  current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG298 evidence:
+
+- PG298 creature ETB recursion package:
+  `docs/hermes-analysis/master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_package.md`
+- PG298 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_pg_apply_evidence.md`
+- PG298 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_e2e_validation.md`
+- post-PG298 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg298_creature_etb_recursion_wave_recheck.md`
+- post-PG298 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg298_creature_etb_recursion_wave.md`
+- post-PG298 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg298_existing_supported_recheck.md`
+
+PG298 measured result:
+
+- PG298 promoted `22` exact creatures whose local XMage source is
+  `ReturnFromGraveyardToHandTargetEffect` behind
+  `EntersBattlefieldTriggeredAbility`, mapped to
+  `xmage_creature_etb_return_graveyard_card_to_hand_v1`.
+- Runtime uses the generic ETB graveyard-recursion executor and now has focused
+  tests for instant/sorcery recovery and land recovery from the controller's
+  graveyard to hand.
+- The splitter requires complete unrestricted ETB graveyard-to-hand Oracle text
+  and blocks subtype-only targets, mana-value limits, conditional descend-style
+  clauses, opponent-choice targets, multiple ETB triggers, and `and/or` target
+  wording until a narrower adapter exists.
+- PostgreSQL postcheck: `22/22` promoted rows, `22/22` verified/auto,
+  `22/22` matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6720` PostgreSQL rows, inserted/updated
+  `6491` SQLite rows, and exported `4333` canonical snapshot rows.
+- E2E package validation: PostgreSQL `22/22`, SQLite `22/22`, canonical
+  snapshot `22/22`, and runtime `get_card_effect` `22/22`.
+- Focused exact-scope tests cover strict ETB recursion mapping, dynamic/blocked
+  ETB recursion text, land target recursion, and runtime ETB recursion
+  resolution; `90` focused exact-scope tests pass.
+- Global all-card readiness after PG298:
+  `battle_and_oracle_ready=1853`, `battle_family_mapper_required=30694`, and
+  `snapshot_has_verified_rule=3001`.
+- Global all-card authoritative queue after PG298:
+  `target_identity_count=27771`, `xmage_authoritative_source_count=27457`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27457`.
+- Running the exact splitter after PG298 on supported units returns
+  `proposal_count=0` over `7329` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with the largest
   current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

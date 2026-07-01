@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG297. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG298. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -102,7 +102,8 @@ enter-the-battlefield draw and blocked proportional/dynamic draw variants;
 PG296 added 6 exact creatures with tap-only fixed activated damage and no
 mana/sacrifice activation costs; PG297 added 19 exact creatures with
 enter-the-battlefield destroy-target triggers and strict unrestricted Oracle
-matching.
+matching; PG298 added 22 exact creatures with enter-the-battlefield graveyard
+recursion-to-hand triggers.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -111,7 +112,8 @@ target-creature `+1/+1`/`-1/-1` counters, plus fixed target-creature
 power/toughness modifiers until end of turn, plus exact static self combat
 and safe defensive keywords on creatures, plus fixed ETB life gain on
 creatures, fixed ETB draw on creatures, creature tap-only activated fixed
-damage, and creature ETB destroy-target triggers. Evidence:
+damage, creature ETB destroy-target triggers, and creature ETB graveyard
+recursion-to-hand triggers. Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
@@ -154,11 +156,14 @@ damage, and creature ETB destroy-target triggers. Evidence:
 - `master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_package.md`
 - `master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg297_creature_etb_destroy_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg297_existing_supported_recheck.md`
+- `master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_package.md`
+- `master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg298_creature_etb_recursion_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg298_existing_supported_recheck.md`
 
-After PG297, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7351` considered supported rows; continue by adding a
+After PG298, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7329` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
 the current authoritative queue.
 

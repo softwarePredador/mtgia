@@ -1,0 +1,1741 @@
+{
+  "blocked_samples": {
+    "activated_tap_damage_not_creature": [
+      "Aeolipile",
+      "Aladdin's Ring",
+      "Explosive Apparatus",
+      "Flamecast Wheel",
+      "Fodder Cannon",
+      "Fodder Tosser",
+      "Font of Ire",
+      "Ghirapur Aether Grid",
+      "Granite Shard",
+      "Knollspine Invocation",
+      "Kyren Negotiations",
+      "Meteor Storm"
+    ],
+    "activated_tap_damage_oracle_not_simple": [
+      "Anaba Shaman",
+      "Arc-Slogger",
+      "Arms Dealer",
+      "Ballista Squad",
+      "Barbarian Lunatic",
+      "Barrage Ogre",
+      "Ben-Ben, Akki Hermit",
+      "Blazing Hellhound",
+      "Bloodshot Cyclops",
+      "Catapult Squad",
+      "Centaur Archer",
+      "Chandra's Magmutt"
+    ],
+    "add_counters_ability_class_not_simple": [
+      "Earthen Arms",
+      "Nature's Panoply",
+      "Stinging Shot",
+      "Travel Preparations"
+    ],
+    "add_counters_counter_not_fixed": [
+      "Common Bond",
+      "Gird for Battle",
+      "Incremental Blight",
+      "Incremental Growth",
+      "Reap What Is Sown",
+      "River Heralds' Boon",
+      "Stand Together",
+      "Strength of Solidarity"
+    ],
+    "add_counters_effect_class_not_pure": [
+      "Aggressive Negotiations",
+      "Ajani's Influence",
+      "Ancient Animus",
+      "Awakening of Vitu-Ghazi",
+      "Azula Always Lies",
+      "Biogenic Upgrade",
+      "Blur of Blades",
+      "Boon of Safety",
+      "Clash of the Eikons",
+      "Clockspinning",
+      "Courage in Crisis",
+      "Domri's Ambush"
+    ],
+    "add_counters_oracle_not_simple": [
+      "Protection Magic"
+    ],
+    "add_counters_target_not_supported": [
+      "Thrive",
+      "Unexpected Fangs"
+    ],
+    "additional_cost_detected": [
+      "Abjure",
+      "Acceptable Losses",
+      "Aether Tide",
+      "Altar's Reap",
+      "Angelic Purge",
+      "Annihilating Glare",
+      "Artillerize",
+      "Bankrupt in Blood",
+      "Betrayer's Bargain",
+      "Bitter Triumph",
+      "Blood Divination",
+      "Blood for Bones"
+    ],
+    "board_wipe_ability_class_not_simple": [
+      "Akroma's Vengeance",
+      "Artistic Process",
+      "Blasphemous Edict",
+      "Boiling Earth",
+      "Burn Down the House",
+      "Cinderclasm",
+      "Claws of Wirewood",
+      "Crush the Weak",
+      "Deafening Clarion",
+      "Devastating Mastery",
+      "Doomskar",
+      "Dusk // Dawn"
+    ],
+    "board_wipe_damage_amount_not_fixed": [
+      "Calamitous Cave-In",
+      "Chain Reaction",
+      "Corrosive Gale",
+      "Gates Ablaze",
+      "Immolating Gyre",
+      "Radiant Flames",
+      "Savage Twister",
+      "Skyreaping",
+      "Windstorm"
+    ],
+    "board_wipe_damage_scope_not_supported": [
+      "Breath Weapon",
+      "Evaporate",
+      "Fiery Cannonade",
+      "Gale Force",
+      "Incandescent Aria",
+      "Inflame",
+      "Kaervek's Hex",
+      "Marrow Shards",
+      "Rain of Blades",
+      "Sandstorm",
+      "Squall",
+      "Warpath"
+    ],
+    "board_wipe_destroy_scope_not_supported": [
+      "Acid Rain",
+      "Anarchy",
+      "Boil",
+      "Boiling Seas",
+      "Citywide Bust",
+      "Consume the Meek",
+      "Culling Sun",
+      "Damning Verdict",
+      "Extinguish All Hope",
+      "Fight to the Death",
+      "Flashfires",
+      "Forced March"
+    ],
+    "board_wipe_effect_class_not_supported": [
+      "Balancing Act",
+      "Barter in Blood",
+      "Bend or Break",
+      "Blood Money",
+      "Bontu's Last Reckoning",
+      "Burning of Xinye",
+      "By Invitation Only",
+      "Call to the Void",
+      "Cataclysm",
+      "Catastrophe",
+      "Ceaseless Conflict",
+      "Celestial Judgment"
+    ],
+    "board_wipe_oracle_not_simple": [
+      "Anger of the Gods",
+      "Barrage of Boulders",
+      "Blood on the Snow",
+      "Breaking Point",
+      "Brotherhood's End",
+      "Calming Verse",
+      "Cleansing Meditation",
+      "Cleansing Nova",
+      "Crisis of Conscience",
+      "Crux of Fate",
+      "Fated Retribution",
+      "Final Act"
+    ],
+    "boost_target_source_not_single_fixed": [
+      "Accelerated Mutation",
+      "Agony Warp",
+      "Allied Assault",
+      "Bloodcurdling Scream",
+      "Bounty of Might",
+      "Dauntless Onslaught",
+      "Death Wind",
+      "Defile",
+      "Desert's Due",
+      "Drag Down",
+      "Enrage",
+      "Feeding Frenzy"
+    ],
+    "bounce_ability_class_not_simple": [
+      "Alchemist's Retrieval",
+      "Capsize",
+      "Champion's Victory",
+      "Clutch of Currents",
+      "Command of Unsummoning",
+      "Consuming Vortex",
+      "Dematerialize",
+      "Deny Reality",
+      "Depart the Realm",
+      "Essence Fracture",
+      "Floodwaters",
+      "Into Thin Air"
+    ],
+    "bounce_effect_class_not_pure": [
+      "Absorb Identity",
+      "Alley Evasion",
+      "Applied Biomancy",
+      "Banishing Betrayal",
+      "Baral's Expertise",
+      "Barrin's Unmaking",
+      "Boing!",
+      "Brutal Expulsion",
+      "Callous Dismissal",
+      "Clutch of the Undercity",
+      "Consign // Oblivion",
+      "Dead // Gone"
+    ],
+    "bounce_target_not_supported": [
+      "Aether Gale",
+      "Aether Tradewinds",
+      "Bounce Off",
+      "Captivating Gyre",
+      "Churning Eddy",
+      "Counterintelligence",
+      "Cut the Earthly Bond",
+      "Distorting Wake",
+      "Hoodwink",
+      "Into the Void",
+      "Peel from Reality",
+      "Quicksilver Geyser"
+    ],
+    "counter_ability_class_not_simple": [
+      "Admiral's Order",
+      "Broken Concentration",
+      "Consign to Memory",
+      "Controvert",
+      "Fervent Denial",
+      "Forbid",
+      "Forceful Denial",
+      "Last Word",
+      "Long River's Pull",
+      "Muddle the Mixture",
+      "Neutralize",
+      "Out of Bounds"
+    ],
+    "counter_effect_class_not_pure": [
+      "Amazing Acrobatics",
+      "Bar the Gate",
+      "Bring the Ending",
+      "Confirm Suspicions",
+      "Countersquall",
+      "Dawn Charm",
+      "Deny the Witch",
+      "Didn't Say Please",
+      "Discombobulate",
+      "Dissolve",
+      "Ertai's Trickery",
+      "Essence Capture"
+    ],
+    "counter_oracle_not_simple": [
+      "Change the Equation",
+      "Spell Blast"
+    ],
+    "counter_target_not_supported": [
+      "Avoid Fate",
+      "Ceremonious Rejection",
+      "Disallow",
+      "Disdainful Stroke",
+      "Double Negative",
+      "Flashfreeze",
+      "Frazzle",
+      "Guttural Response",
+      "Hisoka's Defiance",
+      "Intervene",
+      "Minor Misstep",
+      "Mystic Denial"
+    ],
+    "damage_amount_not_fixed": [
+      "Armed Response",
+      "Artillery Blast",
+      "Blaze",
+      "Clan Defiance",
+      "Devil's Play",
+      "Divine Retribution",
+      "Dogpile",
+      "Earth Tremor",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Fanning the Flames",
+      "Feedback Bolt"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Bolt of Keranos",
+      "Bot Bashing Time",
+      "Brimstone Volley"
+    ],
+    "damage_target_not_supported": [
+      "Arrows of Justice",
+      "Burning Oil",
+      "Consuming Bonfire",
+      "Cosmium Blast",
+      "Divine Arrow",
+      "Dragon's Presence",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Gideon's Reproach",
+      "Hamato Ninp\u014d",
+      "Impeccable Timing",
+      "Iron Verdict"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Artisan's Sorrow",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle"
+    ],
+    "destroy_target_not_supported": [
+      "Asphyxiate",
+      "Assassin's Blade",
+      "Assassinate",
+      "Avalanche",
+      "Bramblecrush",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Crush",
+      "Curtains' Call"
+    ],
+    "draw_effect_class_not_pure": [
+      "Aang's Defense",
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afflict",
+      "Afterlife Insurance",
+      "Aggressive Urge",
+      "Airbending Lesson",
+      "Allied Strategies",
+      "Amass the Components",
+      "Ambition's Cost"
+    ],
+    "etb_destroy_target_not_supported": [
+      "Bala Ged Scorpion",
+      "Dakmor Lancer",
+      "Fathom Fleet Cutthroat",
+      "Fleshpulper Giant",
+      "Marshdrinker Giant",
+      "Myconid Spore Tender",
+      "Ravenous Baboons",
+      "Rock Soldiers",
+      "Rustspore Ram",
+      "Serpent Assassin",
+      "Setessan Starbreaker",
+      "Slayer of the Wicked"
+    ],
+    "etb_draw_count_not_fixed": [
+      "Armorcraft Judge",
+      "Discerning Peddler",
+      "Earthshaker Dreadmaw",
+      "Fissure Wizard",
+      "Immersturm Raider",
+      "Keldon Raider",
+      "Plundering Predator",
+      "Prophet of the Scarab",
+      "Regal Force",
+      "Shinestriker",
+      "Treetop Sentries",
+      "Viashino Racketeer"
+    ],
+    "etb_life_gain_amount_not_fixed": [
+      "Ancestor's Chosen",
+      "Angel of Renewal",
+      "Archway Angel",
+      "Aven Gagglemaster",
+      "Dwarven Priest",
+      "Flourishing Hunter",
+      "Goldnight Redeemer",
+      "Kraul Foragers",
+      "Luminollusk",
+      "Nylea's Disciple",
+      "Setessan Petitioner",
+      "Shepherd of Heroes"
+    ],
+    "etb_recursion_target_not_supported": [
+      "Barrow Witches",
+      "Leonin Squire",
+      "Master Skald",
+      "Mausoleum Turnkey",
+      "Nucklavee",
+      "Ragamuffin Raptor",
+      "Scholar of the Ages",
+      "Strongarm Thug"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Devout Decree",
+      "Dispatch"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_target_not_supported": [
+      "Blade Banish",
+      "Blazing Hope",
+      "Bring to Trial",
+      "Celestial Purge",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Epic Downfall",
+      "Excoriate",
+      "Exorcise",
+      "Expel"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Aerial Assault",
+      "Aerial Predation",
+      "Agonizing Syphon",
+      "Appetite for the Unnatural",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Abzan Banner",
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "All-Fates Scroll",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Animal Attendant",
+      "Arcum's Astrolabe",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Agent of Stromgald",
+      "Apprentice Wizard",
+      "Arc Reactor",
+      "Basal Thrull",
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Blood Pet",
+      "Blood Vassal",
+      "Bog Initiate",
+      "Bog Witch",
+      "Catalyst Elemental",
+      "Charcoal Diamond"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aang, A Lot to Learn",
+      "Abandoned Sarcophagus",
+      "Aberrant",
+      "Aberrant Mind Sorcerer",
+      "Abhorrent Oculus",
+      "Abiding Grace",
+      "Abigale, Poet Laureate // Heroic Stanza",
+      "Abomination",
+      "Abomination of Llanowar",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abu Ja'far"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "All Hallow's Eve",
+      "Anzrag's Rampage",
+      "Arm with Aether",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Back for More",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind"
+    ],
+    "recursion_ability_class_not_simple": [
+      "Blood Beckoning",
+      "Call to the Netherworld",
+      "Dead Revels",
+      "Disturbed Burial",
+      "Grim Harvest",
+      "Life from the Loam",
+      "Morgue Theft",
+      "Mystic Retrieval",
+      "Peerless Recycling",
+      "Sacred Excavation",
+      "Soulless Revival",
+      "Unmake the Graves"
+    ],
+    "recursion_effect_class_not_pure": [
+      "Aberrant Return",
+      "Abuelo's Awakening",
+      "Accumulate Wisdom",
+      "Aether Burst",
+      "Aether Helix",
+      "Afterlife from the Loam",
+      "Agonizing Remorse",
+      "All Suns' Dawn",
+      "Animal Magnetism",
+      "Animist's Awakening",
+      "Another Chance",
+      "Anticognition"
+    ],
+    "recursion_oracle_not_simple": [
+      "Aid the Fallen",
+      "Fortuitous Find",
+      "Ghoulcaller's Chant",
+      "Grim Discovery",
+      "March of the Drowned",
+      "Raise the Draugr",
+      "Remember the Fallen",
+      "Return from Extinction",
+      "Reviving Melody",
+      "Season of Renewal",
+      "Survivors' Bond",
+      "Unbury"
+    ],
+    "recursion_target_not_supported": [
+      "Aphetto Dredging",
+      "Boggart Birth Rite",
+      "Death Denied",
+      "Death's Duet",
+      "Reborn Hope",
+      "Revive",
+      "Rise from the Wreck",
+      "Rogues' Gallery"
+    ],
+    "static_keyword_not_creature": [
+      "Darksteel Relic"
+    ]
+  },
+  "generated_at": "2026-07-01T11:00:32+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
+    "supported_adapter_work_units": [
+      "add_counters::targeted_add_counters_variant_v1",
+      "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "bounce::targeted_return_to_hand_variant_v1",
+      "counter_spell::counter_target_stack_object_variant_v1",
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "recursion::xmage_graveyard_return_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1",
+      "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting"
+    ],
+    "supported_dynamic_adapter_work_units": [
+      "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "e22b5c2f-df92-4ba2-bca8-907c5e352e89",
+      "card_name": "Anarchist",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "sorcery",
+        "target_constraints": {
+          "card_types": [
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:d47330439c6f8beae39dac78a115fa1b",
+      "normalized_name": "anarchist",
+      "notes": "XMage authoritative exact-scope split: local class Anarchist translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "76c9ae09429f5451e54710e5640b7a04",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Anarchist",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/Anarchist.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "05c235a8-b2c4-436b-bbe3-fa24635f5dff",
+      "card_name": "Archaeomender",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+      "normalized_name": "archaeomender",
+      "notes": "XMage authoritative exact-scope split: local class Archaeomender translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Archaeomender",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/Archaeomender.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "23644d71-ebdf-4557-9efa-ee5c148a2298",
+      "card_name": "Ardent Elementalist",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+      "normalized_name": "ardent elementalist",
+      "notes": "XMage authoritative exact-scope split: local class ArdentElementalist translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ArdentElementalist",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/ArdentElementalist.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "dcfbcf3b-0902-438f-a30a-0930f613bae7",
+      "card_name": "Auramancer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+      "normalized_name": "auramancer",
+      "notes": "XMage authoritative exact-scope split: local class Auramancer translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "eccf9ab55e5470916f2d1edeff6ce2f2",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Auramancer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/Auramancer.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "53c759e4-2187-4038-9309-2c73604f3d85",
+      "card_name": "Baloth Null",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 2,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "creature",
+        "etb_recursion_up_to_count": true,
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:51c7074791298d308e01d22848224561",
+      "normalized_name": "baloth null",
+      "notes": "XMage authoritative exact-scope split: local class BalothNull translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "ab95ca020afabee425e128a905404c67",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BalothNull",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BalothNull.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "e012f3e5-826e-422e-a742-9a1f432917d1",
+      "card_name": "Cartographer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+      "normalized_name": "cartographer",
+      "notes": "XMage authoritative exact-scope split: local class Cartographer translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Cartographer",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/Cartographer.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "cf41b247-bee8-45c0-80c2-81e7b5630684",
+      "card_name": "Elvish Regrower",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+      "normalized_name": "elvish regrower",
+      "notes": "XMage authoritative exact-scope split: local class ElvishRegrower translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "105179d596870443cc13a419c0fd940c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ElvishRegrower",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/ElvishRegrower.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "45d89570-f593-40fe-9b72-2635b5418352",
+      "card_name": "Golgari Findbroker",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+      "normalized_name": "golgari findbroker",
+      "notes": "XMage authoritative exact-scope split: local class GolgariFindbroker translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "105179d596870443cc13a419c0fd940c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GolgariFindbroker",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GolgariFindbroker.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "5b044288-b6ab-45dd-9b96-edf5ce1b3375",
+      "card_name": "Gravedigger",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:a7094c42a671c1f3a4f55be114c0c5bf",
+      "normalized_name": "gravedigger",
+      "notes": "XMage authoritative exact-scope split: local class Gravedigger translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "30370cada0c191924c62d99f3e40e5b2",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Gravedigger",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/Gravedigger.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "b15e2af7-1e06-4ccc-b76d-268e3a5d29c6",
+      "card_name": "Izzet Chronarch",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+      "normalized_name": "izzet chronarch",
+      "notes": "XMage authoritative exact-scope split: local class IzzetChronarch translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "IzzetChronarch",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/i/IzzetChronarch.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "3f190902-91c6-47ad-ae0d-6fb72ce879b1",
+      "card_name": "Monk Idealist",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+      "normalized_name": "monk idealist",
+      "notes": "XMage authoritative exact-scope split: local class MonkIdealist translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "dcbdfb85648d5c0c8016cf2b051b2ecf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MonkIdealist",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MonkIdealist.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "d0509f85-1c00-4ffb-9525-fc3a9ff121ca",
+      "card_name": "Moriok Scavenger",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "artifact_creature",
+        "target_constraints": {
+          "all_card_types_required": true,
+          "card_types": [
+            "artifact",
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:c84d770ff2106983439bc7b50f70c0a0",
+      "normalized_name": "moriok scavenger",
+      "notes": "XMage authoritative exact-scope split: local class MoriokScavenger translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "90b7a1af94afd525e885b7636ee81baf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoriokScavenger",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoriokScavenger.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "51f8e03e-ffdd-4347-ba0f-031702cd9636",
+      "card_name": "Pharika's Mender",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "creature_or_enchantment",
+        "target_constraints": {
+          "card_types": [
+            "creature",
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:3d7b8d464884ca19562b7a66cad23824",
+      "normalized_name": "pharika's mender",
+      "notes": "XMage authoritative exact-scope split: local class PharikasMender translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "4bb26966aa63c8b26d9a1d2df73496f0",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PharikasMender",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PharikasMender.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "88b920b5-a7ae-4847-97c6-d48756934ff8",
+      "card_name": "Restoration Gearsmith",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "artifact_or_creature",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:c76bee968773a1654a9322c5befcb50b",
+      "normalized_name": "restoration gearsmith",
+      "notes": "XMage authoritative exact-scope split: local class RestorationGearsmith translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "70d84bc77bec9eb1e64a652438e6447a",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RestorationGearsmith",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RestorationGearsmith.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "985d0ca3-1f46-40fc-9fc8-a20ae8aa1e8a",
+      "card_name": "Salvager of Secrets",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+      "normalized_name": "salvager of secrets",
+      "notes": "XMage authoritative exact-scope split: local class SalvagerOfSecrets translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SalvagerOfSecrets",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SalvagerOfSecrets.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "22447faa-6ce6-4942-9863-2a7956cde6e4",
+      "card_name": "Scrivener",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "instant",
+        "target_constraints": {
+          "card_types": [
+            "instant"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:dedbfc58a84ee2ded2835d8fae7e4f4a",
+      "normalized_name": "scrivener",
+      "notes": "XMage authoritative exact-scope split: local class Scrivener translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "4bfb26bda8c7b74804b4b3f0f9c56f07",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Scrivener",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/Scrivener.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "09a15e7a-38b5-4c56-a011-0a4143919dac",
+      "card_name": "Stoic Builder",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+      "normalized_name": "stoic builder",
+      "notes": "XMage authoritative exact-scope split: local class StoicBuilder translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "StoicBuilder",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/StoicBuilder.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "f306bb32-485f-4291-9031-39a89ff0df8b",
+      "card_name": "Tilling Treefolk",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 2,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "land",
+        "etb_recursion_up_to_count": true,
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:a2359f24e9f7f01baee13092bf5d1455",
+      "normalized_name": "tilling treefolk",
+      "notes": "XMage authoritative exact-scope split: local class TillingTreefolk translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "28a6e9aec3dc1ecf4412bfc76f57a155",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TillingTreefolk",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TillingTreefolk.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "901f741b-d7f6-461e-99fb-de5a47a0ebf5",
+      "card_name": "Treasure Hunter",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+      "normalized_name": "treasure hunter",
+      "notes": "XMage authoritative exact-scope split: local class TreasureHunter translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "829c10b77cfbe750a0a891f923e0cec8",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TreasureHunter",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TreasureHunter.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "2ccde825-74ae-48fa-9dbe-c203ba4dc1f2",
+      "card_name": "Trusty Packbeast",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+      "normalized_name": "trusty packbeast",
+      "notes": "XMage authoritative exact-scope split: local class TrustyPackbeast translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TrustyPackbeast",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TrustyPackbeast.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "d92bd1e1-f2b2-44dd-8ea3-d3e430bba7eb",
+      "card_name": "Warden of the Eye",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "noncreature_nonland",
+        "target_constraints": {
+          "controller": "self",
+          "exclude_card_types": [
+            "creature",
+            "land"
+          ],
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:5bb03dca1c65729f792b3776a37bbcff",
+      "normalized_name": "warden of the eye",
+      "notes": "XMage authoritative exact-scope split: local class WardenOfTheEye translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "4f28df89ec9ed539381fb38a42652025",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WardenOfTheEye",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WardenOfTheEye.java"
+    },
+    {
+      "adapter_work_unit": "recursion::xmage_graveyard_return_variant_review_v1",
+      "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+      "card_id": "f13cb661-5f60-4a7b-aff1-8492be6c4b64",
+      "card_name": "Zealous Lorecaster",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "ability_kind": "triggered",
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield",
+        "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_creature_etb_graveyard_to_hand",
+      "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+      "normalized_name": "zealous lorecaster",
+      "notes": "XMage authoritative exact-scope split: local class ZealousLorecaster translated into ManaLoom runtime scope xmage_creature_etb_return_graveyard_card_to_hand_v1. This row is package-ready only because the source signature is a narrow creature enter-the-battlefield triggered ability with focused runtime coverage.",
+      "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ZealousLorecaster",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/z/ZealousLorecaster.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-01T10:48:52+00:00",
+    "queue_scope": "commander_legal_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "recursion::xmage_graveyard_return_variant_review_v1": 22
+    },
+    "blocked_reason_counts": {
+      "activated_tap_damage_not_creature": 29,
+      "activated_tap_damage_oracle_not_simple": 72,
+      "add_counters_ability_class_not_simple": 4,
+      "add_counters_counter_not_fixed": 8,
+      "add_counters_effect_class_not_pure": 63,
+      "add_counters_oracle_not_simple": 1,
+      "add_counters_target_not_supported": 2,
+      "additional_cost_detected": 144,
+      "board_wipe_ability_class_not_simple": 67,
+      "board_wipe_damage_amount_not_fixed": 9,
+      "board_wipe_damage_scope_not_supported": 13,
+      "board_wipe_destroy_scope_not_supported": 37,
+      "board_wipe_effect_class_not_supported": 81,
+      "board_wipe_oracle_not_simple": 37,
+      "boost_target_source_not_single_fixed": 34,
+      "bounce_ability_class_not_simple": 28,
+      "bounce_effect_class_not_pure": 44,
+      "bounce_target_not_supported": 20,
+      "counter_ability_class_not_simple": 19,
+      "counter_effect_class_not_pure": 35,
+      "counter_oracle_not_simple": 2,
+      "counter_target_not_supported": 23,
+      "damage_amount_not_fixed": 44,
+      "damage_effect_class_not_pure": 123,
+      "damage_target_not_supported": 24,
+      "destroy_effect_class_not_pure": 138,
+      "destroy_target_not_supported": 74,
+      "draw_effect_class_not_pure": 556,
+      "etb_destroy_target_not_supported": 13,
+      "etb_draw_count_not_fixed": 13,
+      "etb_life_gain_amount_not_fixed": 12,
+      "etb_recursion_target_not_supported": 8,
+      "exile_effect_class_not_pure": 42,
+      "exile_oracle_not_simple": 8,
+      "exile_target_not_supported": 30,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_effect_class_not_pure": 166,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_effect_class_not_simple": 303,
+      "mana_source_oracle_not_simple": 119,
+      "mana_source_safe_ability_missing": 132,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 133,
+      "not_instant_or_sorcery_spell": 3845,
+      "not_one_shot_spell_ability": 249,
+      "recursion_ability_class_not_simple": 13,
+      "recursion_effect_class_not_pure": 460,
+      "recursion_oracle_not_simple": 12,
+      "recursion_target_not_supported": 8,
+      "static_keyword_not_creature": 1
+    },
+    "considered_supported_work_unit_rows": 7351,
+    "family_counts": {
+      "xmage_creature_etb_graveyard_to_hand": 22
+    },
+    "proposal_count": 22,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 22
+    },
+    "safe_for_batch_pg_package_count": 22,
+    "scope_counts": {
+      "xmage_creature_etb_return_graveyard_card_to_hand_v1": 22
+    }
+  }
+}

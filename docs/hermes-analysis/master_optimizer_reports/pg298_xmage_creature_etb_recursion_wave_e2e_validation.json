@@ -1,0 +1,810 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T11:01:37.971307+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg298_xmage_creature_etb_recursion_wave_manifest.json",
+  "package_id": "pg298_xmage_creature_etb_recursion_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 22
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Anarchist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47330439c6f8beae39dac78a115fa1b",
+          "oracle_hash": "76c9ae09429f5451e54710e5640b7a04",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Archaeomender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Ardent Elementalist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Auramancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+          "oracle_hash": "eccf9ab55e5470916f2d1edeff6ce2f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Baloth Null",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51c7074791298d308e01d22848224561",
+          "oracle_hash": "ab95ca020afabee425e128a905404c67",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Cartographer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+          "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Elvish Regrower",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+          "oracle_hash": "105179d596870443cc13a419c0fd940c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Golgari Findbroker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+          "oracle_hash": "105179d596870443cc13a419c0fd940c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Gravedigger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a7094c42a671c1f3a4f55be114c0c5bf",
+          "oracle_hash": "30370cada0c191924c62d99f3e40e5b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Izzet Chronarch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Monk Idealist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+          "oracle_hash": "dcbdfb85648d5c0c8016cf2b051b2ecf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Moriok Scavenger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c84d770ff2106983439bc7b50f70c0a0",
+          "oracle_hash": "90b7a1af94afd525e885b7636ee81baf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Pharika's Mender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d7b8d464884ca19562b7a66cad23824",
+          "oracle_hash": "4bb26966aa63c8b26d9a1d2df73496f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Restoration Gearsmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c76bee968773a1654a9322c5befcb50b",
+          "oracle_hash": "70d84bc77bec9eb1e64a652438e6447a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Salvager of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Scrivener",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dedbfc58a84ee2ded2835d8fae7e4f4a",
+          "oracle_hash": "4bfb26bda8c7b74804b4b3f0f9c56f07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Stoic Builder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+          "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Tilling Treefolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a2359f24e9f7f01baee13092bf5d1455",
+          "oracle_hash": "28a6e9aec3dc1ecf4412bfc76f57a155",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Treasure Hunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "829c10b77cfbe750a0a891f923e0cec8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Trusty Packbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Warden of the Eye",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bb03dca1c65729f792b3776a37bbcff",
+          "oracle_hash": "4f28df89ec9ed539381fb38a42652025",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Zealous Lorecaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 22
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Anarchist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d47330439c6f8beae39dac78a115fa1b",
+          "oracle_hash": "76c9ae09429f5451e54710e5640b7a04",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Archaeomender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Ardent Elementalist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Auramancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+          "oracle_hash": "eccf9ab55e5470916f2d1edeff6ce2f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Baloth Null",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51c7074791298d308e01d22848224561",
+          "oracle_hash": "ab95ca020afabee425e128a905404c67",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Cartographer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+          "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Elvish Regrower",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+          "oracle_hash": "105179d596870443cc13a419c0fd940c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Golgari Findbroker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
+          "oracle_hash": "105179d596870443cc13a419c0fd940c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Gravedigger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a7094c42a671c1f3a4f55be114c0c5bf",
+          "oracle_hash": "30370cada0c191924c62d99f3e40e5b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Izzet Chronarch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Monk Idealist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb",
+          "oracle_hash": "dcbdfb85648d5c0c8016cf2b051b2ecf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Moriok Scavenger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c84d770ff2106983439bc7b50f70c0a0",
+          "oracle_hash": "90b7a1af94afd525e885b7636ee81baf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Pharika's Mender",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d7b8d464884ca19562b7a66cad23824",
+          "oracle_hash": "4bb26966aa63c8b26d9a1d2df73496f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Restoration Gearsmith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c76bee968773a1654a9322c5befcb50b",
+          "oracle_hash": "70d84bc77bec9eb1e64a652438e6447a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Salvager of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Scrivener",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dedbfc58a84ee2ded2835d8fae7e4f4a",
+          "oracle_hash": "4bfb26bda8c7b74804b4b3f0f9c56f07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Stoic Builder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0",
+          "oracle_hash": "d77217fcfd00f6ee0da9ac2fe50776bd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Tilling Treefolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a2359f24e9f7f01baee13092bf5d1455",
+          "oracle_hash": "28a6e9aec3dc1ecf4412bfc76f57a155",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Treasure Hunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "829c10b77cfbe750a0a891f923e0cec8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Trusty Packbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de",
+          "oracle_hash": "a9502f4a7f280da8508e3cdd3d59c0b2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Warden of the Eye",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5bb03dca1c65729f792b3776a37bbcff",
+          "oracle_hash": "4f28df89ec9ed539381fb38a42652025",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "card_name": "Zealous Lorecaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5",
+          "oracle_hash": "28f35dfc677531304df4382e7d3d926c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 22
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anarchist",
+          "logical_rule_key": "battle_rule_v1:d47330439c6f8beae39dac78a115fa1b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Archaeomender",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ardent Elementalist",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Auramancer",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Baloth Null",
+          "logical_rule_key": "battle_rule_v1:51c7074791298d308e01d22848224561"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cartographer",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elvish Regrower",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Golgari Findbroker",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gravedigger",
+          "logical_rule_key": "battle_rule_v1:a7094c42a671c1f3a4f55be114c0c5bf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Izzet Chronarch",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Monk Idealist",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Moriok Scavenger",
+          "logical_rule_key": "battle_rule_v1:c84d770ff2106983439bc7b50f70c0a0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pharika's Mender",
+          "logical_rule_key": "battle_rule_v1:3d7b8d464884ca19562b7a66cad23824"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Restoration Gearsmith",
+          "logical_rule_key": "battle_rule_v1:c76bee968773a1654a9322c5befcb50b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Salvager of Secrets",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scrivener",
+          "logical_rule_key": "battle_rule_v1:dedbfc58a84ee2ded2835d8fae7e4f4a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stoic Builder",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tilling Treefolk",
+          "logical_rule_key": "battle_rule_v1:a2359f24e9f7f01baee13092bf5d1455"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Treasure Hunter",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Trusty Packbeast",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warden of the Eye",
+          "logical_rule_key": "battle_rule_v1:5bb03dca1c65729f792b3776a37bbcff"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zealous Lorecaster",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 22
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Anarchist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d47330439c6f8beae39dac78a115fa1b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Archaeomender",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ardent Elementalist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Auramancer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Baloth Null",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:51c7074791298d308e01d22848224561"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cartographer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elvish Regrower",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Golgari Findbroker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gravedigger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a7094c42a671c1f3a4f55be114c0c5bf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Izzet Chronarch",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Monk Idealist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fea24e14ac94adcd3eeb3e19e75afcdb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Moriok Scavenger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c84d770ff2106983439bc7b50f70c0a0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pharika's Mender",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3d7b8d464884ca19562b7a66cad23824"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Restoration Gearsmith",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c76bee968773a1654a9322c5befcb50b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Salvager of Secrets",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scrivener",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dedbfc58a84ee2ded2835d8fae7e4f4a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stoic Builder",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:062e3b7f4119599dfe83d9daf73a05b0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tilling Treefolk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a2359f24e9f7f01baee13092bf5d1455"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Treasure Hunter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Trusty Packbeast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e2a9de01a5e3cd02ac3d783cad1621de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warden of the Eye",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5bb03dca1c65729f792b3776a37bbcff"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zealous Lorecaster",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:da4a8ad67c26152e6d493516803c98d5"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
