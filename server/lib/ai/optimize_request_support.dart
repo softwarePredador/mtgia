@@ -59,6 +59,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required String intensity,
   required int? bracket,
   required bool keepTheme,
+  String recommendationContextSignature = '',
   OptimizeStageTelemetry? telemetry,
 }) async {
   final deckResult = await (telemetry?.trackAsync(
@@ -181,6 +182,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     keepTheme: keepTheme,
     deckSignature: deckSignature,
     intensity: intensity,
+    recommendationContextSignature: recommendationContextSignature,
   );
 
   final commanders = <String>[];

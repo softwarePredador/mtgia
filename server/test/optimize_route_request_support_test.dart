@@ -64,4 +64,118 @@ void main() {
     expect(request.hasRequiredDeckFields, isFalse);
     expect(request.telemetryDeckId, 'unknown');
   });
+
+  test('parseOptimizeRouteRequest accepts recommendation context from app', () {
+    final request = parseOptimizeRouteRequest({
+      'deck_id': 'deck-3',
+      'archetype': 'spellslinger',
+      'recommendation_context': {
+        'prefer_collection': true,
+        'budget_limit_brl': 125.6,
+        'rebuild_intent': 'Upgraded',
+        'report': 'before_after_shareable',
+        'explain_swaps': true,
+        'include_price_risk_curve_bracket': true,
+        'future_toggle': 'ignored',
+      },
+    });
+
+    final context = request.recommendationContext;
+    expect(context.isPresent, isTrue);
+    expect(context.preferCollection, isTrue);
+    expect(context.budgetLimitBrl, 126);
+    expect(context.rebuildIntent, 'upgraded');
+    expect(context.report, 'before_after_shareable');
+    expect(context.explainSwaps, isTrue);
+    expect(context.includePriceRiskCurveBracket, isTrue);
+    expect(context.unknownKeys, ['future_toggle']);
+    expect(context.cacheSignature, contains('budget_limit_brl=126'));
+  });
+
+  test('recommendation context changes cache scope only when present', () {
+    const baseCacheKey = 'v7:base';
+    final withoutContext = parseOptimizeRouteRequest({
+      'deck_id': 'deck-4',
+      'archetype': 'control',
+    }).recommendationContext;
+    final withBudget = parseOptimizeRouteRequest({
+      'deck_id': 'deck-4',
+      'archetype': 'control',
+      'recommendation_context': {
+        'prefer_collection': true,
+        'budget_limit_brl': 100,
+        'rebuild_intent': 'casual',
+      },
+    }).recommendationContext;
+    final withDifferentBudget = parseOptimizeRouteRequest({
+      'deck_id': 'deck-4',
+      'archetype': 'control',
+      'recommendation_context': {
+        'prefer_collection': true,
+        'budget_limit_brl': 300,
+        'rebuild_intent': 'casual',
+      },
+    }).recommendationContext;
+
+    expect(
+      qualifyOptimizeCacheKeyWithRecommendationContext(
+        baseCacheKey,
+        withoutContext,
+      ),
+      baseCacheKey,
+    );
+    expect(
+      qualifyOptimizeCacheKeyWithRecommendationContext(
+        baseCacheKey,
+        withBudget,
+      ),
+      isNot(baseCacheKey),
+    );
+    expect(
+      qualifyOptimizeCacheKeyWithRecommendationContext(
+        baseCacheKey,
+        withDifferentBudget,
+      ),
+      isNot(
+        qualifyOptimizeCacheKeyWithRecommendationContext(
+          baseCacheKey,
+          withBudget,
+        ),
+      ),
+    );
+  });
+
+  test('attachRecommendationContextToOptimizeResponse exposes diagnostics', () {
+    final context = parseOptimizeRouteRequest({
+      'deck_id': 'deck-5',
+      'archetype': 'control',
+      'recommendation_context': {
+        'prefer_collection': true,
+        'budget_limit_brl': 100,
+        'rebuild_intent': 'optimized',
+        'report': 'before_after_shareable',
+        'explain_swaps': true,
+      },
+    }).recommendationContext;
+    final response = <String, dynamic>{
+      'constraints': {'keep_theme': true},
+      'optimize_diagnostics': {'existing': true},
+    };
+
+    attachRecommendationContextToOptimizeResponse(response, context);
+
+    expect(
+      (response['constraints'] as Map)['recommendation_context'],
+      containsPair('budget_limit_brl', 100),
+    );
+    final diagnostics = (response['optimize_diagnostics']
+        as Map)['recommendation_context'] as Map;
+    expect(diagnostics['requested'], isTrue);
+    expect((diagnostics['values'] as Map)['rebuild_intent'], 'optimized');
+    expect(
+      (diagnostics['server_support'] as Map)['prefer_collection'],
+      'pending_collection_inventory_join',
+    );
+    expect((response['optimize_diagnostics'] as Map)['existing'], isTrue);
+  });
 }

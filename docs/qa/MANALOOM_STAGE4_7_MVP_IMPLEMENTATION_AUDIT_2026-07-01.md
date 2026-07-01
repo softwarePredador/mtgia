@@ -9,12 +9,14 @@ do que ainda nao prova prontidao comercial completa.
 
 ## Veredito executivo
 
-O MVP das Etapas 4 a 7 esta funcional para validacao interna de produto.
+O MVP das Etapas 4 a 7 esta funcional para validacao interna de produto no
+device Android fisico contra o backend publico.
 
 Nao esta pronto como monetizacao comercial completa porque checkout, billing e
-limites ainda sao locais; o backend ainda nao honra o novo
-`recommendation_context`; comentarios/moderacao e match real entre usuarios
-seguem pendentes.
+limites ainda sao locais; o backend agora reconhece o novo
+`recommendation_context` para contrato/cache/diagnostico, mas colecao e preco
+real ainda nao sao aplicados na escolha das cartas; comentarios/moderacao e
+match real entre usuarios seguem pendentes.
 
 ## Evidencia executada
 
@@ -65,25 +67,35 @@ Riscos residuais:
 
 | Requisito | Status | Evidencia | Observacao |
 |---|---|---|---|
-| Otimizacao por colecao | PASS_UI_CONTRACT | `RecommendationContextSection`, `prefer_collection` | Backend ainda precisa aplicar esse criterio |
-| Otimizacao por orcamento | PASS_UI_CONTRACT | Slider `budget_limit_brl`; teste de payload | Default R$ 100, ajustavel ate R$ 500 |
+| Otimizacao por colecao | PARTIAL_BACKEND_CONTEXT_ACK | `RecommendationContextSection`, `prefer_collection`; diagnostics `/ai/optimize` | Backend reconhece o pedido, mas ainda nao cruza inventario real |
+| Otimizacao por orcamento | PARTIAL_BACKEND_CONTEXT_ACK | Slider `budget_limit_brl`; parser/cache scope backend | Backend separa cache por budget, mas ainda nao filtra preco real |
 | Explicacao de troca: funcao, risco, curva, preco, bracket | PASS_UI_IF_PAYLOAD | `deck_optimize_sheet_widgets.dart` | UI exibe campos quando o backend os envia |
 | Relatorio antes/depois compartilhavel | PASS_MVP | Botao `Compartilhar relatorio` no preview | Usa `share_plus` |
 | Sugestoes por bracket | PASS_EXISTING_PLUS_MVP | `selectedBracket`, payload `/ai/optimize` | Bracket ja era parte do optimize |
-| Rebuild guiado por intencao | PASS_UI_CONTRACT | `rebuild_intent` no `recommendation_context` | Backend ainda precisa honrar a intencao |
+| Rebuild guiado por intencao | PARTIAL_BACKEND_CONTEXT_ACK | `rebuild_intent` no `recommendation_context` | Backend reconhece/cacheia por intencao; estrategia fina ainda pendente |
 
 Evidencia adicional:
 
 - O smoke de `DeckDetailsScreen` registrou request de optimize com
   `recommendation_context`.
-- Busca no repo mostrou `recommendation_context` somente no app; nao ha
-  consumo server-side atual.
+- Atualizacao posterior: `server/lib/ai/optimize_route_request_support.dart`
+  agora parseia `recommendation_context`, separa cache por assinatura do
+  contexto e anexa diagnostics/constraints no retorno de `/ai/optimize`.
+- Testes: `dart test test/optimize_route_request_support_test.dart
+  test/optimize_cache_support_test.dart` passou com 11 casos.
+- Aceite Android live M2006: `deck_runtime_m2006_test.dart` passou em 1m45 no
+  device `R58T300SREH`; `POST /ai/optimize` retornou 200 em 11.008s, abriu
+  preview, aplicou selecao parcial e validou `10_complete_validated`.
+- Aceite Android live generate async: `deck_generate_async_runtime_test.dart`
+  passou em 1m22 no mesmo device; `POST /ai/generate` retornou 202 em 636ms,
+  job concluiu em 15.622s, salvou deck, abriu detalhes e retornou outcome seguro
+  `rebuild_guided_available` no optimize.
 
 Risco residual:
 
-- O diferencial competitivo ainda e contrato de app/UX. So vira diferencial
-  real quando o backend usar colecao, orcamento e intencao na selecao das
-  cartas.
+- O diferencial competitivo saiu de contrato apenas app/UX para contrato
+  backend rastreavel. Ainda so vira criterio real quando o backend cruzar
+  colecao do usuario e fonte de preco na selecao das cartas.
 
 ### Etapa 6 - Retencao e Uso Continuo
 
@@ -135,7 +147,10 @@ Nao pronto para venda publica completa:
 
 - Billing real ausente.
 - Limites e assinatura nao sao server-side.
-- Backend nao implementa `recommendation_context`.
+- Backend implementa reconhecimento/cache/diagnostico de
+  `recommendation_context`, mas ainda nao aplica colecao/preco real.
+- Os aceites live criam usuario/deck de QA no backend publico; qualquer limpeza
+  desses residuos exige aprovacao explicita antes de delete/admin write.
 - Comentarios/moderacao ausentes.
 - Alertas e timeline server-side ausentes.
 - Textos legais precisam revisao juridica.

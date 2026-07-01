@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 import '../logger.dart';
 import 'optimize_job.dart';
 import 'optimize_route_internal.dart';
+import 'optimize_route_request_support.dart';
 import 'optimize_runtime_support.dart';
 import 'optimize_stage_telemetry.dart';
 import 'optimize_state_support.dart' as optimize_state;
@@ -139,6 +140,7 @@ void startCompleteModeAsyncJob({
   required Map<String, dynamic> userPreferences,
   required bool hasBracketOverride,
   required bool hasKeepThemeOverride,
+  required OptimizeRecommendationContext recommendationContext,
 }) {
   unawaited(
     runZonedGuarded(
@@ -167,6 +169,7 @@ void startCompleteModeAsyncJob({
         userPreferences: userPreferences,
         hasBracketOverride: hasBracketOverride,
         hasKeepThemeOverride: hasKeepThemeOverride,
+        recommendationContext: recommendationContext,
       ),
       (error, stackTrace) {
         Log.e('Background optimize job $jobId crashed: $error\n$stackTrace');

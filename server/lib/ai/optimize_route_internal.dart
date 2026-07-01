@@ -12,9 +12,11 @@ import 'optimize_stage_telemetry.dart';
 import 'optimization_validator.dart';
 import 'otimizacao.dart';
 import 'optimize_state_support.dart' as optimize_state;
+import 'optimize_route_request_support.dart';
 import '../ai_generate_internal_url_support.dart';
 import '../internal_ai_request_token.dart';
 import '../logger.dart';
+
 Future<void> processOptimizeModeAsync({
   required Pool pool,
   required String jobId,
@@ -274,6 +276,7 @@ Future<void> processCompleteModeAsync({
   required Map<String, dynamic> userPreferences,
   required bool hasBracketOverride,
   required bool hasKeepThemeOverride,
+  required OptimizeRecommendationContext recommendationContext,
 }) async {
   try {
     final telemetry = OptimizeStageTelemetry(
@@ -417,6 +420,10 @@ Future<void> processCompleteModeAsync({
       }
       responseBody['timings'] = telemetry.snapshot();
       responseBody['stage_telemetry'] = responseBody['timings'];
+      attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
+      );
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(
@@ -445,6 +452,10 @@ Future<void> processCompleteModeAsync({
       );
       jsonResponse['timings'] = telemetry.snapshot();
       jsonResponse['stage_telemetry'] = jsonResponse['timings'];
+      attachRecommendationContextToOptimizeResponse(
+        jsonResponse,
+        recommendationContext,
+      );
       telemetry.logSummary();
       if (cacheKey != null && cacheKey.isNotEmpty) {
         await saveOptimizeCache(

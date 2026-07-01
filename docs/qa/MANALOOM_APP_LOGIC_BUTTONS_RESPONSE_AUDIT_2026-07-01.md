@@ -12,13 +12,14 @@ testes automatizados.
 
 ## Veredito
 
-O app esta coerente para QA interna com o servidor publico como alvo padrao.
+O app esta coerente para QA interna com o servidor publico como alvo padrao, e
+os fluxos Android live principais passaram em device fisico.
 
 Nao deve ser tratado como release comercial completo porque a camada comercial
 nova ainda e MVP local: plano, quota de IA e checkout usam estado local no
 app, sem billing real e sem controle server-side. Tambem seguem pendentes os
-bloqueios ja registrados de assinatura, Sentry mobile e aceite final em build
-assinado.
+bloqueios de assinatura e aceite final assinado ficam fora do escopo atual.
+Sentry mobile esta fechado para staging/device.
 
 ## Evidencia executada nesta passada
 
@@ -61,6 +62,33 @@ Probes via `/usr/bin/curl`:
 Observacao: `/cards/search?q=...` retornou 404 porque nao e o endpoint usado
 pelo app. O contrato atual do app usa `/cards?name=...`.
 
+### Aceites Android live
+
+Comandos executados no device `R58T300SREH` contra
+`https://evolution-cartinhas.8ktevp.easypanel.host`:
+
+```sh
+flutter test integration_test/deck_runtime_m2006_test.dart -d R58T300SREH \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --dart-define=RUNTIME_OPTIMIZE_INTENSITY_LABEL=Focado \
+  --no-version-check --reporter expanded
+
+flutter test integration_test/deck_generate_async_runtime_test.dart -d R58T300SREH \
+  --dart-define=API_BASE_URL=https://evolution-cartinhas.8ktevp.easypanel.host \
+  --no-version-check --reporter expanded
+```
+
+Resultados:
+
+- M2006: PASS em 1m45; cadastro/login, criacao de deck, importacao com
+  commander, importacao sem commander, preservacao do commander, optimize,
+  preview, aplicacao parcial e validacao final passaram. `POST /ai/optimize`
+  retornou 200 em 11.008s.
+- Generate async: PASS em 1m22; feedback inicial em 666ms; generate async
+  aceito em 636ms, job concluido em 15.622s, deck salvo e detalhes abertos.
+  Optimize retornou outcome seguro `rebuild_guided_available`, que e o retorno
+  esperado para deck que precisa reparo/rebuild.
+
 ## Botões e fluxos revisados
 
 | Area | Evidencia | Status |
@@ -70,7 +98,7 @@ pelo app. O contrato atual do app usa `/cards?name=...`.
 | Home quick actions | Corrigido teste para rolar a lista horizontal antes de exigir Colecao/Trocas | PASS |
 | Deck details | Entradas de pos-jogo, explicacao e otimizacao preservadas em testes da suite completa | PASS_TESTED |
 | Generate deck | Gate local de uso de IA e medidor de quota analisados/testados | PASS_MVP_LOCAL |
-| Optimize deck | Payload inclui `recommendation_context` e preview segue coberto por testes | PASS_UI_CONTRACT |
+| Optimize deck | Payload inclui `recommendation_context`; backend reconhece, separa cache e retorna diagnostics; aceite live M2006 passou com preview/aplicacao | PASS_SCOPE_WITH_BACKEND_CONTEXT_ACK |
 | Comercial Free/Pro | Provider testa plano Free/Pro, quota e rollover mensal | PASS_MVP_LOCAL |
 | Upgrade/checkout/legal | Rotas registradas e surfaces cobertas por analyze/testes | PASS_MVP_LOCAL |
 | Perfil | Entrada para planos e medidor de uso preservados | PASS_TESTED |
@@ -102,32 +130,35 @@ O app esta apontando para o backend publico por padrao quando `API_BASE_URL`
 nao e informado. A validacao de login, leitura de decks, cards, sets, market e
 community retornou HTTP 200 com tempos abaixo de 1s na amostra desta passada.
 
-O novo `recommendation_context` ja sai do app para otimizacao, mas ainda deve
-ser tratado como contrato de UI/app ate o backend usar explicitamente colecao,
-orcamento e intencao na selecao das recomendacoes.
+O novo `recommendation_context` ja sai do app para otimizacao e o backend agora
+parseia o payload, separa cache por assinatura do contexto e devolve
+`constraints.recommendation_context`/`optimize_diagnostics.recommendation_context`.
+Colecao e preco real ainda precisam de join/fonte propria para afetar a
+selecao das recomendacoes.
 
 ## Riscos restantes
 
 1. Plano, quota e checkout sao locais (`SharedPreferences`), nao controles de
    producao.
 2. Historico pos-jogo e local por dispositivo, sem sincronizacao por conta.
-3. `recommendation_context` ainda precisa aplicacao server-side para virar
-   diferencial real de recomendacao.
+3. `recommendation_context` ainda precisa colecao/preco real para virar
+   diferencial completo de recomendacao.
 4. Teste visual autenticado novo exige device/emulador e
    `MANALOOM_VISUAL_EMAIL`/`MANALOOM_VISUAL_PASSWORD`; ele nao foi executado
    nesta passada.
-5. Nao foi executada geracao/otimizacao real com IA contra producao nesta
-   passada para evitar custo e mutacoes desnecessarias.
-6. Release publico ainda depende dos bloqueios ja documentados em
-   `MANALOOM_RELEASE_READINESS_FINAL_PASS_2026-07-01.md`: Sentry mobile,
-   signing Android/iOS e aceite final de build.
+5. Geracao/otimizacao real com IA foi executada contra o backend publico nesta
+   continuidade; a limpeza de usuarios/decks QA criados exige aprovacao
+   explicita antes de qualquer delete/admin write.
+6. Release publico ainda depende dos bloqueios fora do escopo atual: signing
+   Android/iOS e aceite final de build assinado.
 
 ## Proxima etapa recomendada
 
 Antes de implementar novas funcionalidades grandes, fechar nesta ordem:
 
-1. Server-side para plano/quota/checkout.
-2. Backend consumindo `recommendation_context`.
-3. Sincronizacao server-side do pos-jogo.
+1. Obter aprovacao explicita para limpar residuos de QA, se desejar manter o
+   backend publico sem decks de teste.
+2. Sincronizacao server-side do pos-jogo.
+3. Colecao/preco real dentro de `recommendation_context`.
 4. Execucao do teste visual autenticado em device/emulador com credenciais de QA.
-5. Repeticao do aceite final em build assinado.
+5. Retomar signing/AAB/APK, iOS e billing server-side em goals separados.

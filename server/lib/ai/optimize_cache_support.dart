@@ -23,8 +23,9 @@ String buildOptimizeCacheKey({
   required bool keepTheme,
   required String deckSignature,
   String intensity = 'focused',
+  String recommendationContextSignature = '',
 }) {
-  final base = [
+  final parts = [
     'optimize',
     mode.toLowerCase().trim(),
     intensity.toLowerCase().trim(),
@@ -33,7 +34,12 @@ String buildOptimizeCacheKey({
     '${bracket ?? 'none'}',
     keepTheme ? 'keep' : 'free',
     deckSignature,
-  ].join('::');
+  ];
+  final contextSignature = recommendationContextSignature.trim();
+  if (contextSignature.isNotEmpty) {
+    parts.add('rc:$contextSignature');
+  }
+  final base = parts.join('::');
   return 'v7:${stableOptimizeHash(base)}';
 }
 

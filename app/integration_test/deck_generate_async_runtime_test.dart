@@ -263,16 +263,21 @@ void main() {
       await pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
       final applyCurrentStrategy = find.byKey(
         const Key('optimize-apply-current-strategy-button'),
+        skipOffstage: false,
       );
-      final strategyCards = find.byType(StrategyOptionCard);
+      final strategyCards = find.byType(
+        StrategyOptionCard,
+        skipOffstage: false,
+      );
       await pumpUntilAnyFound(tester, [
         strategyCards,
         applyCurrentStrategy,
       ], attempts: 240);
       await _capture(binding, tester, '09_optimize_sheet');
 
-      if (applyCurrentStrategy.evaluate().isNotEmpty) {
+      if (finderExists(applyCurrentStrategy)) {
         await tester.ensureVisible(applyCurrentStrategy.first);
+        await tester.pump();
         await tester.tap(applyCurrentStrategy.first);
       } else {
         final strategyCard = tester.widget<StrategyOptionCard>(
