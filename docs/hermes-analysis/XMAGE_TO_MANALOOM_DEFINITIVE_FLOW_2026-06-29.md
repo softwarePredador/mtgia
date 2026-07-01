@@ -144,6 +144,57 @@ Interpretation:
   class/effect/ability signatures; they are blocked only from executable PG
   promotion until ManaLoom has the matching runtime adapter.
 
+## PG283 Exact Spell Adapter Wave
+
+As of 2026-07-01, the first all-card exact adapter wave is applied and synced.
+
+Use
+`docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py`
+after building the authoritative queue. This splitter is the required bridge
+between broad XMage work units and PostgreSQL package candidates. It only
+selects one-shot instant/sorcery signatures with no additional cost and a
+runtime-backed exact scope:
+
+- `draw_cards::xmage_draw_card_variant_review_v1` ->
+  `xmage_fixed_source_controller_draw_spell_v1`
+- `direct_damage::targeted_damage_variant_v1` ->
+  `xmage_fixed_damage_target_spell_v1`
+- `removal_destroy::targeted_destroy_variant_v1` ->
+  `xmage_destroy_target_spell_v1`
+
+PG283 evidence:
+
+- exact split report:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_fixed_spell_wave.md`
+- package:
+  `docs/hermes-analysis/master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
+- E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
+- post-PG283 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg283_fixed_spell_wave_recheck.md`
+- post-PG283 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.md`
+
+Measured result:
+
+- `312` exact spell rules promoted to PostgreSQL and synced to Hermes SQLite.
+- PostgreSQL postcheck: `312/312` promoted rows, `312/312` verified/auto,
+  `312/312` matching Oracle hash, with `50` stale shadow rows backed up and
+  deprecated.
+- SQLite post-sync direct validation: `312/312` present, verified, and auto.
+- Global readiness moved from `battle_family_mapper_required=31772` to
+  `31460`, and `battle_and_oracle_ready=788` to `1100`.
+- Authoritative queue moved from `target_identity_count=28836` to `28524` and
+  `xmage_authoritative_adapter_required_count=28522` to `28210`.
+- Top affected work units moved:
+  `direct_damage::targeted_damage_variant_v1` `1085 -> 979`,
+  `removal_destroy::targeted_destroy_variant_v1` `839 -> 691`, and
+  `draw_cards::xmage_draw_card_variant_review_v1` `734 -> 676`.
+
+The blocked remainder is intentional, not refusal: it includes permanents,
+triggers, activated abilities, variable/X effects, additional costs, compound
+effects, and unsupported target patterns that require the next exact split.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -685,6 +736,9 @@ Rules:
   is split.
 - Do not implement runtime for a broad family label if the cards inside require
   different behavior.
+- For global XMage-authoritative batches, run
+  `xmage_authoritative_exact_scope_split.py` before package generation; broad
+  review scopes cannot skip this bridge.
 
 ### Gate 5 - Runtime Implementation
 

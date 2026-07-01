@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-30
+Updated: 2026-07-01
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -73,12 +73,17 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_demand_corrected.md`.
   - Para aplicar a decisao "XMage como verdade final" em massa, rode
     `manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`.
-    Evidencia corrente:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap.md`.
-    Resultado: `28836` identidades Commander-legais com gap, `28522` com fonte
-    XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
-    gaps e `11961` work units de adaptador ManaLoom por assinatura/effect
-    XMage.
+    Depois rode
+    `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
+    transformar apenas assinaturas exatas/runtime-backed em candidato PG.
+    Evidencia corrente pos-PG283:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.md`.
+    Resultado: `28524` identidades Commander-legais ainda com gap, `28210` com
+    fonte XMage autoritativa resolvida, `314` excecoes sem fonte local, `0`
+    parser gaps e `11961` work units de adaptador ManaLoom por assinatura/effect
+    XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
+    simples (`draw`, `direct_damage`, `destroy target`), reduzindo
+    `battle_family_mapper_required` de `31772` para `31460`.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

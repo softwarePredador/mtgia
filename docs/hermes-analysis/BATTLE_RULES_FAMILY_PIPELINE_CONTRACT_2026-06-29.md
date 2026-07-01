@@ -51,18 +51,22 @@ After the checkpoint passes, work in this order:
    `xmage_authoritative_adaptation_queue.py`.
 3. Treat resolved XMage classes as final card behavior source and implement the
    largest ManaLoom adapter work units first.
-4. Promote only exact package-ready lanes with focused runtime/test
+4. Split broad authoritative work units with
+   `xmage_authoritative_exact_scope_split.py` or an equivalent exact family
+   splitter; do not feed generic `xmage_*_review_v1` scopes directly into a
+   PostgreSQL package.
+5. Promote only exact package-ready lanes with focused runtime/test
    proof and approved PostgreSQL package evidence.
-5. Split `ramp_permanent` into exact executable subpatterns.
-6. Split `targeted_interaction` into exact executable subpatterns.
-7. Split `tutor` into exact executable subpatterns.
-8. Split `free_cast` into exact executable subpatterns.
-9. Continue with `passive`, `recursion`, `targeted_protection`,
+6. Split `ramp_permanent` into exact executable subpatterns.
+7. Split `targeted_interaction` into exact executable subpatterns.
+8. Split `tutor` into exact executable subpatterns.
+9. Split `free_cast` into exact executable subpatterns.
+10. Continue with `passive`, `recursion`, `targeted_protection`,
    `ramp_ritual`, and `life_total_change` unless replay/deck evidence changes
    priority.
-10. Treat `Hazel's Brewmaster` as an exact runtime exception, not as permission
+11. Treat `Hazel's Brewmaster` as an exact runtime exception, not as permission
    to implement generic token-maker behavior.
-11. Reduce the remaining `manual_model` backlog by improving XMage effect
+12. Reduce the remaining `manual_model` backlog by improving XMage effect
     hints/adapter classification, not by reviewing cards one by one.
 
 ## Required Evidence Per Family Wave

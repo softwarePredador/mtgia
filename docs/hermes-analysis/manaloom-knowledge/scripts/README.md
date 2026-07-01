@@ -69,6 +69,28 @@ This queue separates source truth from runtime execution: resolved XMage cards
 need ManaLoom adapter work by effect/signature; only missing XMage sources stay
 in the residual manual/external-source queue.
 
+Before building a PostgreSQL package from the global queue, split broad work
+units into exact runtime-backed scopes:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.json \
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
+```
+
+Only proposals marked `safe_for_batch_pg_package=true` may feed
+`xmage_batch_pg_package_builder.py`. Generic `xmage_*_review_v1` scopes must
+remain blocked until this split produces an exact `battle_model_scope` with
+focused runtime tests.
+
+Current applied checkpoint: PG283 promoted and synced 312 exact one-shot
+instant/sorcery rules for fixed draw, fixed direct damage, and destroy target
+spells. Evidence:
+
+- `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
+- `master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg283_fixed_spell_wave.md`
+
 ## Local Replay Audit
 
 For local Mac validation, do not trust a raw replay generated from an old

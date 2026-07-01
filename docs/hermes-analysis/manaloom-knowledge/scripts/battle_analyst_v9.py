@@ -10065,6 +10065,12 @@ def target_matches_type(target, target_type):
     target_type = str(target_type or "").lower()
     if not target_type:
         return True
+    if target_type == "any_target":
+        return (
+            is_battlefield_creature(target)
+            or is_planeswalker_permanent(target)
+            or is_battle_permanent(target)
+        )
     if target_type in ("creature", "target_creature"):
         return is_battlefield_creature(target)
     if target_type in ("artifact", "artifact_permanent"):
@@ -10218,6 +10224,8 @@ def _constraint_card_types(effect_data):
 
 def _target_type_from_constraints(effect_data):
     card_types = _constraint_card_types(effect_data)
+    if {"creature", "enchantment", "planeswalker"}.issubset(card_types):
+        return "creature_enchantment_or_planeswalker"
     if {"artifact", "enchantment"}.issubset(card_types):
         return "artifact_or_enchantment"
     if "artifact" in card_types and "creature" in card_types:
@@ -10226,8 +10234,6 @@ def _target_type_from_constraints(effect_data):
         return "creature_or_planeswalker"
     if "creature" in card_types and "enchantment" in card_types:
         return "creature_or_enchantment"
-    if {"creature", "enchantment", "planeswalker"}.issubset(card_types):
-        return "creature_enchantment_or_planeswalker"
     for candidate in ("creature", "artifact", "enchantment", "planeswalker", "land", "permanent"):
         if candidate in card_types:
             return candidate
@@ -34107,6 +34113,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
 
     for opp in opponents:
         target_options = []
+        player_target_allowed = direct_damage_targets_player(effect_data)
         for target in removal_target_candidates(
             opp,
             effect_data,
@@ -34124,11 +34131,52 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 phase="resolution",
                 emit=False,
             )
-            if int(target.get("toughness") or target.get("power") or 2) <= target_amount:
-                target_options.append((target, target_amount))
+            if is_battlefield_creature(target):
+                if int(target.get("toughness") or target.get("power") or 2) <= target_amount:
+                    target_options.append(
+                        {
+                            "target": target,
+                            "amount": target_amount,
+                            "kind": "creature",
+                            "lethal": True,
+                        }
+                    )
+                continue
+            if is_planeswalker_permanent(target):
+                loyalty = int(target.get("loyalty", target.get("starting_loyalty", 0)) or 0)
+                lethal = loyalty <= target_amount
+                if target_amount > 0 and (lethal or not player_target_allowed):
+                    target_options.append(
+                        {
+                            "target": target,
+                            "amount": target_amount,
+                            "kind": "planeswalker",
+                            "lethal": lethal,
+                        }
+                    )
+                continue
+            if is_battle_permanent(target):
+                defense = int(target.get("defense", target.get("starting_defense", 0)) or 0)
+                lethal = defense <= target_amount
+                if target_amount > 0 and (lethal or not player_target_allowed):
+                    target_options.append(
+                        {
+                            "target": target,
+                            "amount": target_amount,
+                            "kind": "battle",
+                            "lethal": lethal,
+                        }
+                    )
         if target_options:
-            target = choose_best_creature_target([item[0] for item in target_options])
-            target_amount = next(item[1] for item in target_options if item[0] is target)
+            target_option = max(
+                target_options,
+                key=lambda item: (
+                    int(bool(item["lethal"])),
+                    target_priority(item["target"]),
+                    {"creature": 3, "planeswalker": 2, "battle": 1}.get(item["kind"], 0),
+                ),
+            )
+            target = target_option["target"]
             target_amount = apply_static_damage_replacements(
                 player,
                 opp,
@@ -34139,32 +34187,60 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 turn=turn,
                 phase="resolution",
             )
-            trigger_creature_damage_controller_reflect(
-                [player, *list(opponents)],
-                player,
-                opp,
-                card,
-                target,
-                target_amount,
-                turn=turn,
-                phase="resolution",
-                damage_event="direct_damage",
-            )
-            process_taii_wakeen_noncombat_damage_to_creature(
-                player,
-                opp,
-                card,
-                target,
-                target_amount,
-                turn=turn,
-                phase="resolution",
-            )
-            destination = move_creature_from_battlefield(
-                opp,
-                target,
-                reason="damage",
-                source=card,
-            )
+            target_kind = target_option["kind"]
+            result = "damage_resolved"
+            destination = None
+            loyalty_before = None
+            loyalty_after = None
+            defense_before = None
+            defense_after = None
+            if target_kind == "creature":
+                trigger_creature_damage_controller_reflect(
+                    [player, *list(opponents)],
+                    player,
+                    opp,
+                    card,
+                    target,
+                    target_amount,
+                    turn=turn,
+                    phase="resolution",
+                    damage_event="direct_damage",
+                )
+                process_taii_wakeen_noncombat_damage_to_creature(
+                    player,
+                    opp,
+                    card,
+                    target,
+                    target_amount,
+                    turn=turn,
+                    phase="resolution",
+                )
+                destination = move_creature_from_battlefield(
+                    opp,
+                    target,
+                    reason="damage",
+                    source=card,
+                )
+                result = "creature_destroyed"
+            elif target_kind == "planeswalker":
+                loyalty_before = int(target.get("loyalty", 0) or 0)
+                damage_to_planeswalker(card, target, target_amount)
+                loyalty_after = int(target.get("loyalty", 0) or 0)
+                if loyalty_after <= 0:
+                    destination = move_permanent_from_battlefield(
+                        opp,
+                        target,
+                        reason="damage",
+                        source=card,
+                    )
+                    result = "planeswalker_destroyed"
+                else:
+                    result = "planeswalker_damage"
+            elif target_kind == "battle":
+                defense_before = int(target.get("defense", 0) or 0)
+                battle_takes_damage(target, target_amount)
+                defense_after = int(target.get("defense", 0) or 0)
+                result = "battle_damage"
             life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
                 apply_controller_lifegain(target_amount)
             )
@@ -34176,8 +34252,13 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 original_amount=amount,
                 target_player=opp.name,
                 target=target.get("name", "?"),
-                result="creature_destroyed",
+                result=result,
                 destination=destination,
+                permanent_type=target_kind,
+                loyalty_before=loyalty_before,
+                loyalty_after=loyalty_after,
+                defense_before=defense_before,
+                defense_after=defense_after,
                 life_gain_requested=life_gain_requested,
                 spell_lifelink_sources=lifelink_sources,
                 spell_lifelink_life_gained=spell_lifelink_gain,

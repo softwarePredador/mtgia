@@ -261,15 +261,10 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                 ), oracle_rule_counts AS (
                   SELECT
                     c.oracle_id::text AS oracle_id,
-                    count(*) FILTER (
-                      WHERE cbr.execution_status = ANY(%s)
-                        AND cbr.review_status = ANY(%s)
-                    )::int AS oracle_identity_trusted_rule_count,
-                    count(*) FILTER (
-                      WHERE cbr.execution_status <> 'disabled'
-                    )::int AS oracle_identity_active_rule_count
+                    COALESCE(sum(rc.trusted_rule_count), 0)::int AS oracle_identity_trusted_rule_count,
+                    COALESCE(sum(rc.active_rule_count), 0)::int AS oracle_identity_active_rule_count
                   FROM cards c
-                  JOIN card_battle_rules cbr ON cbr.card_id = c.id
+                  JOIN rule_counts rc ON rc.card_id = c.id
                   WHERE c.oracle_id IS NOT NULL
                   GROUP BY c.oracle_id
                 ), deck_usage AS (
@@ -337,8 +332,6 @@ def fetch_all_card_rows(deck_scope: dict[str, dict[str, Any]]) -> list[dict[str,
                 ORDER BY lower(c.name), c.id
                 """,
                 (
-                    list(TRUSTED_RULE_EXECUTION_STATUS),
-                    list(TRUSTED_RULE_REVIEW_STATUS),
                     list(TRUSTED_RULE_EXECUTION_STATUS),
                     list(TRUSTED_RULE_REVIEW_STATUS),
                     list(TRUSTED_RULE_EXECUTION_STATUS),
