@@ -265,6 +265,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_library_pick_moves_one_to_hand_and_rest_to_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Low Value Creature", "type_line": "Creature - Scout", "cmc": 1},
+                {"name": "High Value Creature", "type_line": "Creature - Giant", "cmc": 7},
+                {"name": "Medium Value Creature", "type_line": "Creature - Soldier", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Organ Hoarder",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_library_look_count": 3,
+            "etb_library_pick_count": 1,
+            "etb_library_pick_target": "any_card",
+            "etb_library_rest_destination": "graveyard",
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            permanent,
+            turn=5,
+            rng=random.Random(5),
+        )
+
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(len(active.graveyard), 2)
+        self.assertEqual(len(active.library), 0)
+        moved_names = {card["name"] for card in active.hand + active.graveyard}
+        self.assertEqual(
+            moved_names,
+            {"Low Value Creature", "High Value Creature", "Medium Value Creature"},
+        )
+        self.assertTrue(
+            any(
+                event == "dig_to_hand_resolved"
+                and data.get("card") == "Organ Hoarder"
+                and data.get("looked_count") == 3
+                and data.get("picked_count") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_library_tutor_to_battlefield_respects_tapped_flag(self) -> None:
         active = self.battle.Player(
             "Active",

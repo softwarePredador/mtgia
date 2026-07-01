@@ -16686,6 +16686,17 @@ def resolve_generic_permanent_etb(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+    if effect_data.get("etb_library_look_count"):
+        dig_effect = {
+            **effect_data,
+            "effect": "dig_to_hand",
+            "look_count": int(effect_data.get("etb_library_look_count") or 0),
+            "pick_count": int(effect_data.get("etb_library_pick_count") or 1),
+            "pick_target": effect_data.get("etb_library_pick_target") or "any_card",
+            "rest_destination": effect_data.get("etb_library_rest_destination") or "graveyard",
+            "pick_all_matching": bool(effect_data.get("etb_library_pick_all_matching")),
+        }
+        resolve_dig_to_hand(player, permanent, dig_effect, turn)
     if effect_data.get("etb_life_gain_amount"):
         amount = int(effect_data.get("etb_life_gain_amount") or 0)
         life_before = int(getattr(player, "life", 0))
@@ -16972,6 +16983,8 @@ def _harnessed_blink_target_score(permanent):
     score = 0
     if permanent.get("etb_draw_count"):
         score += 18 * int(permanent.get("etb_draw_count") or 1)
+    if permanent.get("etb_library_look_count"):
+        score += 16 * int(permanent.get("etb_library_pick_count") or 1)
     if permanent.get("etb_tutor_target"):
         score += 28
     if permanent.get("etb_land_ramp_count"):
@@ -45496,6 +45509,21 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     )
                 if eff.get("etb_draw_count"):
                     player.draw(int(eff.get("etb_draw_count") or 1), rng)
+                if eff.get("etb_library_look_count"):
+                    resolve_dig_to_hand(
+                        player,
+                        c_copy,
+                        {
+                            **eff,
+                            "effect": "dig_to_hand",
+                            "look_count": int(eff.get("etb_library_look_count") or 0),
+                            "pick_count": int(eff.get("etb_library_pick_count") or 1),
+                            "pick_target": eff.get("etb_library_pick_target") or "any_card",
+                            "rest_destination": eff.get("etb_library_rest_destination") or "graveyard",
+                            "pick_all_matching": bool(eff.get("etb_library_pick_all_matching")),
+                        },
+                        turn,
+                    )
                 resolve_etb_library_creature_tutor(player, c_copy, eff, turn)
                 if eff.get("etb_remove_target") or eff.get("etb_removal_target"):
                     resolve_etb_removal(player, opponents, c_copy, eff, turn, rng)

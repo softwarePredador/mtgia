@@ -136,6 +136,7 @@ ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
+ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
@@ -2072,6 +2073,19 @@ def is_creature_etb_graveyard_to_library_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_library_pick_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"LookLibraryAndPickControllerEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
+    )
+
+
 def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
@@ -3863,6 +3877,47 @@ def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any
     return None
 
 
+def etb_library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, "
+    match = re.match(
+        trigger_prefix
+        + r"look at the top (?P<look>\w+) cards of your library(?:, then|\.) "
+        + r"put one of (?:them|those cards) into your hand and "
+        + r"(?:the other|the rest) into your graveyard\.?$",
+        text,
+    )
+    if not match:
+        return "etb_library_pick_oracle_not_simple"
+    look_count = word_count_value(match.group("look"))
+    if look_count is None or look_count <= 0:
+        return "etb_library_pick_oracle_look_count_not_supported"
+    return {
+        "look_count": look_count,
+        "pick_count": 1,
+        "pick_target": "any_card",
+        "rest_destination": "graveyard",
+    }
+
+
+def etb_library_pick_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    match = re.search(
+        r"LookLibraryAndPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
+        r"(?P<pick>\d+)\s*,\s*PutCards\.HAND\s*,\s*PutCards\.GRAVEYARD",
+        text,
+        re.S,
+    )
+    if not match:
+        return "etb_library_pick_source_effect_not_found"
+    return {
+        "look_count": int(match.group("look")),
+        "pick_count": int(match.group("pick")),
+        "pick_target": "any_card",
+        "rest_destination": "graveyard",
+    }
+
+
 def dies_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text(metadata)
     match = re.match(
@@ -4187,6 +4242,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
+        ETB_LIBRARY_PICK_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
@@ -4276,6 +4332,7 @@ def split_row(
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
+    etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
@@ -4316,6 +4373,7 @@ def split_row(
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
+        and not etb_library_pick_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -4349,6 +4407,7 @@ def split_row(
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
+        and not etb_library_pick_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -5761,6 +5820,47 @@ def split_row(
             family_id="xmage_creature_etb_graveyard_to_library",
         ), "selected_exact_scope"
 
+    if etb_library_pick_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_library_pick_not_creature"
+        oracle_pick = etb_library_pick_from_oracle(metadata)
+        if isinstance(oracle_pick, str):
+            return None, oracle_pick
+        source_pick = etb_library_pick_from_source(source_text)
+        if isinstance(source_pick, str):
+            return None, source_pick
+        for key in ("look_count", "pick_count", "pick_target", "rest_destination"):
+            if source_pick.get(key) != oracle_pick.get(key):
+                return None, f"etb_library_pick_source_oracle_{key}_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_LIBRARY_PICK_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_library_look_count": int(oracle_pick["look_count"]),
+            "etb_library_pick_count": int(oracle_pick["pick_count"]),
+            "etb_library_pick_target": str(oracle_pick["pick_target"]),
+            "etb_library_rest_destination": str(oracle_pick["rest_destination"]),
+            "target": str(oracle_pick["pick_target"]),
+            "target_constraints": library_pick_target_constraints_for(str(oracle_pick["pick_target"])),
+            "destination": "hand",
+            "rest_destination": str(oracle_pick["rest_destination"]),
+            "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_look_library_pick_to_hand_rest_graveyard",
+        ), "selected_exact_scope"
+
     if creature_tap_damage_unit and is_creature_metadata(metadata):
         oracle_damage = activated_tap_damage_from_oracle(metadata)
         source_amount = activated_tap_damage_amount_from_source(source_text)
@@ -6632,6 +6732,7 @@ def build_exact_split_report(
             and not is_creature_dies_draw_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
+            and not is_creature_etb_library_pick_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_etb_add_counters_unit(row)
@@ -6691,6 +6792,7 @@ def build_exact_split_report(
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",

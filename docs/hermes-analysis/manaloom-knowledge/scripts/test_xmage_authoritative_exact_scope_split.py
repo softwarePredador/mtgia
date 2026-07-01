@@ -4515,6 +4515,102 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_recursion_target_not_supported")
 
+    def test_creature_etb_library_pick_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Organ Hoarder",
+                type_line="Creature - Zombie",
+                oracle_text=(
+                    "When Organ Hoarder enters the battlefield, look at the top three cards "
+                    "of your library, then put one of them into your hand and the rest into your graveyard."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new LookLibraryAndPickControllerEffect(
+                    3, 1, PutCards.HAND, PutCards.GRAVEYARD
+                )));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_LIBRARY_PICK_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_library_look_count"], 3)
+        self.assertEqual(effect["etb_library_pick_count"], 1)
+        self.assertEqual(effect["etb_library_pick_target"], "any_card")
+        self.assertEqual(effect["etb_library_rest_destination"], "graveyard")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_library_pick_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tower Geist",
+                type_line="Creature - Spirit",
+                oracle_text=(
+                    "Flying\n"
+                    "When Tower Geist enters the battlefield, look at the top two cards of your library. "
+                    "Put one of them into your hand and the other into your graveyard."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new LookLibraryAndPickControllerEffect(2, 1, PutCards.HAND, PutCards.GRAVEYARD)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["etb_library_look_count"], 2)
+
+    def test_creature_etb_library_pick_blocks_top_any_destination(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["LookLibraryAndPickControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sage of Days",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "When Sage of Days enters the battlefield, look at the top three cards of your library. "
+                    "You may put one of those cards back on top of your library. Put the rest into your graveyard."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(new LookLibraryAndPickControllerEffect(
+                    3, 1, PutCards.TOP_ANY, PutCards.GRAVEYARD, true
+                )));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_library_pick_oracle_not_simple")
+
     def test_creature_etb_graveyard_to_library_maps_artifact_or_creature_top(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

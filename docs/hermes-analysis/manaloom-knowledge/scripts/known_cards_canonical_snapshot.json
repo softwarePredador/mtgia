@@ -48150,6 +48150,33 @@
     "battle_rule_logical_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
     "battle_rule_oracle_hash": "3db8959a9384e0c35d17fe89ad50d2da"
   },
+  "Organ Hoarder": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_library_look_count": 3,
+    "etb_library_pick_count": 1,
+    "etb_library_pick_target": "any_card",
+    "etb_library_rest_destination": "graveyard",
+    "rest_destination": "graveyard",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c78db6f977f2c197ed392b09b6b27854",
+    "battle_rule_oracle_hash": "c2f297be9e3d0e06dae49b218bf06dc4"
+  },
   "Orim's Chant": {
     "battle_model_scope": "orims_chant_kicker_attack_prevention_v1",
     "effect": "silence_spell",
@@ -61989,6 +62016,33 @@
     "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
     "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
+  "Sibsig Appraiser": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_library_look_count": 2,
+    "etb_library_pick_count": 1,
+    "etb_library_pick_target": "any_card",
+    "etb_library_rest_destination": "graveyard",
+    "rest_destination": "graveyard",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9536bcbbd85f20b8378e7de12d75f0a",
+    "battle_rule_oracle_hash": "9d408a209761378f0e6775b2bc1ecaa8"
+  },
   "Siege-Gang Commander": {
     "cmc": 5.0,
     "effect": "remove_creature",
@@ -67190,6 +67244,33 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sultai Soothsayer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_library_look_count": 4,
+    "etb_library_pick_count": 1,
+    "etb_library_pick_target": "any_card",
+    "etb_library_rest_destination": "graveyard",
+    "rest_destination": "graveyard",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5527f31e2c1daa1ee88e56c071123e92",
+    "battle_rule_oracle_hash": "bb52caa787d5f836bd84a6ba9d3417ca"
   },
   "Summit Sentinel": {
     "ability_kind": "triggered",
@@ -72687,6 +72768,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Tower Geist": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1",
+    "destination": "hand",
+    "effect": "creature",
+    "etb_library_look_count": 2,
+    "etb_library_pick_count": 1,
+    "etb_library_pick_target": "any_card",
+    "etb_library_rest_destination": "graveyard",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "rest_destination": "graveyard",
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "library"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "LookLibraryAndPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ce47d20396337f2e63bd4298947f9873",
+    "battle_rule_oracle_hash": "9522ce486df1ae011dc33de1955e5094"
   },
   "Tower of Calamities": {
     "_activated_rule_effects": [
