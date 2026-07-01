@@ -2577,6 +2577,65 @@ PG325 measured result:
 - Running the exact splitter after PG325 on supported units returns
   `proposal_count=0` over `8000` considered supported rows.
 
+PG326 evidence:
+
+- PG326 recursion fixed-target package:
+  `docs/hermes-analysis/master_optimizer_reports/pg326_xmage_recursion_fixed_target_wave_package.md`
+- PG326 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg326_xmage_recursion_fixed_target_wave_pg_apply_evidence.md`
+- PG326 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg326_xmage_recursion_fixed_target_wave_pg_to_sqlite_sync.json`
+- PG326 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg326_xmage_recursion_fixed_target_wave_e2e_validation.md`
+- PG326 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg326_recursion_fixed_target_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg326_recursion_fixed_target_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg326_recursion_fixed_target_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg326_recursion_fixed_target_wave.md`
+- PG326 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg326_recursion_fixed_target_wave.md`
+- post-PG326 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg326_recursion_fixed_target_wave_commander_legal.md`
+- post-PG326 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg326_existing_supported_recheck.md`
+- post-PG326 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg326_recursion_fixed_target_wave_recheck.md`
+
+PG326 measured result:
+
+- PG326 promoted `4` exact recursion spells using
+  `ReturnFromGraveyardToHandTargetEffect`, no additional ability class, and
+  fixed graveyard target constraints. The promoted cards are `Boggart Birth
+  Rite`, `Death's Duet`, `Reborn Hope`, and `Revive`.
+- Runtime now recognizes `green_card`, `multicolored_card`, and `goblin_card`
+  graveyard recursion targets, in addition to the existing fixed creature
+  target count path.
+- Focused tests pass for the exact splitter (`150` tests), runtime (`83`
+  tests), and package builder (`4` tests).
+- PostgreSQL precheck found `4/4` target rows, `0` existing expected rows, and
+  `0` stale shadow rows.
+- PostgreSQL apply evidence reports `4/4` promoted rows, `4/4` verified/auto
+  rows, `4/4` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7202` PostgreSQL rules,
+  inserted/updated `6996` SQLite rows, and exported `4793` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  no-override battle package gate.
+- Post-PG326 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG326 rows themselves have `4/4` matching Oracle hashes.
+- Global all-card readiness after PG326:
+  `battle_and_oracle_ready=2335`, `battle_family_mapper_required=30212`, and
+  `snapshot_has_verified_rule=3483`.
+- Global all-card authoritative queue after PG326:
+  `target_identity_count=27289`, `xmage_authoritative_source_count=26975`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26975`.
+- Running the exact splitter after PG326 on supported units returns
+  `proposal_count=0` over `7996` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3216,10 +3275,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG325 queue, the next exact runtime-backed work should be selected from
+post-PG326 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1975`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1971`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

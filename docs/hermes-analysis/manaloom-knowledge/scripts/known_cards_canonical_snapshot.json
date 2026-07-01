@@ -7548,6 +7548,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Boggart Birth Rite": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "goblin_card",
+    "target_constraints": {
+      "controller": "self",
+      "subtypes": [
+        "goblin"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5fe8b55aaf40cc32c696da83b37d87e",
+    "battle_rule_oracle_hash": "433b473e3b4d788495487cdaccc58c3f"
+  },
   "Boggart Brute": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -15740,6 +15765,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
     "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
+  },
+  "Death's Duet": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0414220a4ec2f9a6997383d0b9b728e1",
+    "battle_rule_oracle_hash": "c37b16d6c2c8e0d993e7714a1625b70c"
   },
   "Deathbellow War Cry": {
     "ability_kind": "one_shot",
@@ -52345,6 +52395,29 @@
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "867bf2beccb79b310789f7cbdc7b2f4c"
   },
+  "Reborn Hope": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "multicolored_card",
+    "target_constraints": {
+      "controller": "self",
+      "min_colors": 2,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b00072fef2e36205039b03f21044f1d",
+    "battle_rule_oracle_hash": "3916a80af120b01782f70419b4334271"
+  },
   "Rebuff the Wicked": {
     "cmc": 1.0,
     "effect": "counter",
@@ -53954,6 +54027,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f7c3765a8a69fba19efc9b2ace7a7abc"
+  },
+  "Revive": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "green_card",
+    "target_constraints": {
+      "colors": [
+        "G"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bd174969a9568e932ead996951ee8ec8",
+    "battle_rule_oracle_hash": "19baafcc9f4b0da0129b72d41728a354"
   },
   "Revoke Existence": {
     "battle_model_scope": "xmage_exile_target_spell_v1",

@@ -764,6 +764,12 @@ def recursion_target_constraints_for(target: str) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "graveyard", "controller": "self"}
     if target == "any_card":
         constraints["scope"] = "any_card"
+    elif target == "green_card":
+        constraints["colors"] = ["G"]
+    elif target == "multicolored_card":
+        constraints["min_colors"] = 2
+    elif target == "goblin_card":
+        constraints["subtypes"] = ["goblin"]
     elif target in {"creature", "artifact", "enchantment", "sorcery", "instant", "land"}:
         constraints["card_types"] = [target]
     elif target == "basic_land":
@@ -795,6 +801,22 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
         (
             r"^return two target cards from your graveyard to your hand\.?$",
             ("any_card", 2, False),
+        ),
+        (
+            r"^return two target creature cards from your graveyard to your hand\.?$",
+            ("creature", 2, False),
+        ),
+        (
+            r"^return target green card from your graveyard to your hand\.?$",
+            ("green_card", 1, False),
+        ),
+        (
+            r"^return target multicolored card from your graveyard to your hand\.?$",
+            ("multicolored_card", 1, False),
+        ),
+        (
+            r"^return target goblin card from your graveyard to your hand\.?$",
+            ("goblin_card", 1, False),
         ),
         (
             r"^return target instant or sorcery card from your graveyard to your hand\.?$",

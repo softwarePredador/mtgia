@@ -1766,6 +1766,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(effect["up_to_count"])
 
+    def test_graveyard_to_hand_two_creatures_maps_exact_count(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(name="Death's Duet", oracle_text="Return two target creature cards from your graveyard to your hand."),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(2, StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 2)
+        self.assertNotIn("up_to_count", effect)
+
+    def test_graveyard_to_hand_color_and_subtype_targets_map(self) -> None:
+        cases = [
+            (
+                "Revive",
+                "Return target green card from your graveyard to your hand.",
+                "green_card",
+                {"zone": "graveyard", "controller": "self", "colors": ["G"]},
+            ),
+            (
+                "Reborn Hope",
+                "Return target multicolored card from your graveyard to your hand.",
+                "multicolored_card",
+                {"zone": "graveyard", "controller": "self", "min_colors": 2},
+            ),
+            (
+                "Boggart Birth Rite",
+                "Return target Goblin card from your graveyard to your hand.",
+                "goblin_card",
+                {"zone": "graveyard", "controller": "self", "subtypes": ["goblin"]},
+            ),
+        ]
+        for name, oracle, target, constraints in cases:
+            with self.subTest(name=name):
+                row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(name=name, oracle_text=oracle),
+                    source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+
     def test_graveyard_to_hand_exile_self_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

@@ -33977,6 +33977,12 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
     type_line = str(card.get("type_line") or "").lower()
     if target in ("any_card", "card", "target_card"):
         return True
+    if target in ("green_card", "green"):
+        return _spell_has_color(card, "G")
+    if target in ("multicolored_card", "multicolored"):
+        return len(_spell_color_symbols(card)) >= 2
+    if target in ("goblin_card", "goblin"):
+        return "goblin" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("permanent", "permanent_card"):
         return is_land(card) or any(
             kind in type_line

@@ -2730,6 +2730,66 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_recursion_matches_color_and_subtype_targets(self) -> None:
+        cases = [
+            (
+                "Fixture Revive",
+                "green_card",
+                {"zone": "graveyard", "controller": "self", "colors": ["G"]},
+                [
+                    {"name": "Colorless Rock", "type_line": "Artifact", "mana_cost": "{2}", "colors": []},
+                    {"name": "Green Bear", "type_line": "Creature - Bear", "mana_cost": "{1}{G}", "colors": ["G"]},
+                ],
+                ["Green Bear"],
+            ),
+            (
+                "Fixture Reborn Hope",
+                "multicolored_card",
+                {"zone": "graveyard", "controller": "self", "min_colors": 2},
+                [
+                    {"name": "Mono Green Bear", "type_line": "Creature - Bear", "colors": ["G"]},
+                    {"name": "Gold Bear", "type_line": "Creature - Bear", "colors": ["G", "W"]},
+                ],
+                ["Gold Bear"],
+            ),
+            (
+                "Fixture Boggart Birth Rite",
+                "goblin_card",
+                {"zone": "graveyard", "controller": "self", "subtypes": ["goblin"]},
+                [
+                    {"name": "Target Zombie", "type_line": "Creature - Zombie"},
+                    {"name": "Target Goblin", "type_line": "Creature - Goblin Warrior"},
+                ],
+                ["Target Goblin"],
+            ),
+        ]
+        for spell_name, target, constraints, graveyard, expected_names in cases:
+            with self.subTest(target=target):
+                active = self.battle.Player("Active", None, [])
+                opponent = self.battle.Player("Opponent", None, [])
+                active.graveyard.extend(graveyard)
+                effect = {
+                    "effect": "recursion",
+                    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+                    "target": target,
+                    "target_constraints": constraints,
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                    "sorcery": True,
+                }
+
+                self.battle.apply_effect_immediate(
+                    active,
+                    [opponent],
+                    {"name": spell_name, "type_line": "Sorcery"},
+                    turn=8,
+                    rng=random.Random(8),
+                    effect_data_override=effect,
+                )
+
+                self.assertEqual([card["name"] for card in active.hand], expected_names)
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
