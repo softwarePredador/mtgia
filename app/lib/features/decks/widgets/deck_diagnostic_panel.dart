@@ -194,6 +194,7 @@ class _LaunchReadinessStrip extends StatelessWidget {
     final readiness = analysis.readiness;
     final battle = analysis.battleReadiness;
     final understanding = analysis.understandingSummary;
+    final commanderContract = analysis.commanderContract;
 
     if (readiness != null) {
       final tone =
@@ -243,6 +244,20 @@ class _LaunchReadinessStrip extends StatelessWidget {
           footer: understanding.verifiedBattleLabel,
           icon: Icons.hub_outlined,
           tone: _understandingTone(understanding),
+        ),
+      );
+    }
+
+    if (commanderContract != null && commanderContract.shouldDisplay) {
+      cards.add(
+        _LaunchSignalCard(
+          key: const Key('deck-launch-commander-contract-card'),
+          label: 'Plano Commander',
+          value: commanderContract.safeStatusLabel,
+          detail: commanderContract.primaryDetail,
+          footer: commanderContract.footerLabel,
+          icon: Icons.account_tree_outlined,
+          tone: _commanderContractTone(commanderContract),
         ),
       );
     }
@@ -298,6 +313,20 @@ class _LaunchReadinessStrip extends StatelessWidget {
       return _DiagnosticTone.warn;
     }
     return _DiagnosticTone.neutral;
+  }
+
+  static _DiagnosticTone _commanderContractTone(
+    DeckCommanderContractSummary contract,
+  ) {
+    if (contract.hasBlockers) return _DiagnosticTone.danger;
+    switch (contract.status) {
+      case 'ready':
+        return _DiagnosticTone.good;
+      case 'ready_for_battle_gate':
+        return _DiagnosticTone.warn;
+      default:
+        return _DiagnosticTone.neutral;
+    }
   }
 }
 

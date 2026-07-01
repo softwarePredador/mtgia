@@ -7,6 +7,7 @@ class DeckAnalysisData {
     this.readiness,
     this.battleReadiness,
     this.understandingSummary,
+    this.commanderContract,
   });
 
   final String deckId;
@@ -16,6 +17,7 @@ class DeckAnalysisData {
   final DeckReadinessSummary? readiness;
   final DeckBattleReadinessSummary? battleReadiness;
   final DeckUnderstandingSummary? understandingSummary;
+  final DeckCommanderContractSummary? commanderContract;
 
   factory DeckAnalysisData.fromJson(Map<String, dynamic> json) {
     final stats = _asStringMap(json['stats']);
@@ -28,6 +30,7 @@ class DeckAnalysisData {
     final readinessPayload = _asStringMap(json['readiness']);
     final battleReadinessPayload = _asStringMap(json['battle_readiness']);
     final understandingPayload = _asStringMap(json['understanding_summary']);
+    final commanderContractPayload = _asStringMap(json['commander_contract']);
 
     return DeckAnalysisData(
       deckId: json['deck_id']?.toString() ?? '',
@@ -46,6 +49,10 @@ class DeckAnalysisData {
           understandingPayload.isEmpty
               ? null
               : DeckUnderstandingSummary.fromJson(understandingPayload),
+      commanderContract:
+          commanderContractPayload.isEmpty
+              ? null
+              : DeckCommanderContractSummary.fromJson(commanderContractPayload),
     );
   }
 
@@ -54,7 +61,8 @@ class DeckAnalysisData {
   bool get hasLaunchSignals =>
       readiness != null ||
       battleReadiness != null ||
-      understandingSummary != null;
+      understandingSummary != null ||
+      (commanderContract?.shouldDisplay ?? false);
 
   bool get hasAnyCounts {
     if (composition.values.any((value) => value > 0)) return true;
@@ -83,6 +91,192 @@ class DeckAnalysisData {
       return 'functional_tags do backend';
     }
     return 'functional_tags ($version)';
+  }
+}
+
+class DeckCommanderContractSummary {
+  const DeckCommanderContractSummary({
+    required this.schemaVersion,
+    required this.sourceVersion,
+    required this.status,
+    required this.statusLabel,
+    required this.isCommanderApplicable,
+    required this.commanderName,
+    required this.totalCards,
+    required this.commanderCount,
+    required this.summary,
+    required this.battleGate,
+    required this.gates,
+    required this.sourceLanes,
+    required this.planningFlow,
+    required this.overviewFields,
+    required this.blockers,
+    required this.warnings,
+    required this.nextActions,
+    this.disclaimer,
+  });
+
+  final String schemaVersion;
+  final String sourceVersion;
+  final String status;
+  final String statusLabel;
+  final bool isCommanderApplicable;
+  final String commanderName;
+  final int totalCards;
+  final int commanderCount;
+  final String summary;
+  final DeckCommanderBattleGate battleGate;
+  final DeckCommanderGateFlags gates;
+  final List<DeckCommanderSourceLane> sourceLanes;
+  final List<DeckCommanderLabelItem> planningFlow;
+  final List<DeckCommanderLabelItem> overviewFields;
+  final List<String> blockers;
+  final List<String> warnings;
+  final List<String> nextActions;
+  final String? disclaimer;
+
+  factory DeckCommanderContractSummary.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderContractSummary(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      sourceVersion: json['source_version']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      statusLabel: json['status_label']?.toString() ?? '',
+      isCommanderApplicable: _parseBool(json['is_commander_applicable']),
+      commanderName: json['commander_name']?.toString() ?? '',
+      totalCards: _parseInt(json['total_cards']),
+      commanderCount: _parseInt(json['commander_count']),
+      summary: json['summary']?.toString() ?? '',
+      battleGate: DeckCommanderBattleGate.fromJson(
+        _asStringMap(json['battle_gate']),
+      ),
+      gates: DeckCommanderGateFlags.fromJson(_asStringMap(json['gates'])),
+      sourceLanes: _parseMapList(
+        json['source_lanes'],
+      ).map(DeckCommanderSourceLane.fromJson).toList(growable: false),
+      planningFlow: _parseMapList(
+        json['planning_flow'],
+      ).map(DeckCommanderLabelItem.fromJson).toList(growable: false),
+      overviewFields: _parseMapList(
+        json['overview_fields'],
+      ).map(DeckCommanderLabelItem.fromJson).toList(growable: false),
+      blockers: _parseStringList(json['blockers']),
+      warnings: _parseStringList(json['warnings']),
+      nextActions: _parseStringList(json['next_actions']),
+      disclaimer: _optionalTrimmedString(json['disclaimer']),
+    );
+  }
+
+  bool get shouldDisplay => isCommanderApplicable;
+
+  bool get hasBlockers => status == 'blocked' || blockers.isNotEmpty;
+
+  String get safeStatusLabel {
+    final label = statusLabel.trim();
+    if (label.isNotEmpty) return label;
+    return status.trim().isEmpty ? 'Sem leitura' : status;
+  }
+
+  String get primaryDetail {
+    final text = summary.trim();
+    if (text.isNotEmpty) return text;
+    if (nextActions.isNotEmpty) return nextActions.first;
+    return 'Contrato Commander sem detalhes adicionais.';
+  }
+
+  String? get footerLabel {
+    final gate = battleGate.label.trim();
+    if (gate.isNotEmpty && gate != 'Sem leitura') return 'Battle gate: $gate';
+    if (sourceLanes.isEmpty) return null;
+    final available = sourceLanes.where((lane) => lane.available).length;
+    return '$available/${sourceLanes.length} fontes ativas';
+  }
+}
+
+class DeckCommanderBattleGate {
+  const DeckCommanderBattleGate({
+    required this.required,
+    required this.status,
+    required this.label,
+  });
+
+  final bool required;
+  final String status;
+  final String label;
+
+  factory DeckCommanderBattleGate.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderBattleGate(
+      required: _parseBool(json['required']),
+      status: json['status']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+    );
+  }
+}
+
+class DeckCommanderGateFlags {
+  const DeckCommanderGateFlags({
+    required this.commanderPresent,
+    required this.validationValid,
+    required this.unresolvedCardsZero,
+    required this.hasReferenceLane,
+    required this.deterministicReferenceReady,
+  });
+
+  final bool commanderPresent;
+  final bool validationValid;
+  final bool unresolvedCardsZero;
+  final bool hasReferenceLane;
+  final bool deterministicReferenceReady;
+
+  factory DeckCommanderGateFlags.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderGateFlags(
+      commanderPresent: _parseBool(json['commander_present']),
+      validationValid: _parseBool(json['validation_valid']),
+      unresolvedCardsZero: _parseBool(json['unresolved_cards_zero']),
+      hasReferenceLane: _parseBool(json['has_reference_lane']),
+      deterministicReferenceReady: _parseBool(
+        json['deterministic_reference_ready'],
+      ),
+    );
+  }
+}
+
+class DeckCommanderSourceLane {
+  const DeckCommanderSourceLane({
+    required this.key,
+    required this.label,
+    required this.available,
+    required this.count,
+    this.detail,
+  });
+
+  final String key;
+  final String label;
+  final bool available;
+  final int count;
+  final String? detail;
+
+  factory DeckCommanderSourceLane.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderSourceLane(
+      key: json['key']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      available: _parseBool(json['available']),
+      count: _parseInt(json['count']),
+      detail: _optionalTrimmedString(json['detail']),
+    );
+  }
+}
+
+class DeckCommanderLabelItem {
+  const DeckCommanderLabelItem({required this.key, required this.label});
+
+  final String key;
+  final String label;
+
+  factory DeckCommanderLabelItem.fromJson(Map<String, dynamic> json) {
+    return DeckCommanderLabelItem(
+      key: json['key']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+    );
   }
 }
 
@@ -509,6 +703,14 @@ Map<String, List<String>> _parseStringListMap(Map<String, dynamic> map) {
     parsed[entry.key] = _parseStringList(entry.value);
   }
   return Map.unmodifiable(parsed);
+}
+
+List<Map<String, dynamic>> _parseMapList(dynamic value) {
+  if (value is! List) return const <Map<String, dynamic>>[];
+  return value
+      .whereType<Map>()
+      .map((item) => item.cast<String, dynamic>())
+      .toList(growable: false);
 }
 
 List<String> _parseStringList(dynamic value) {

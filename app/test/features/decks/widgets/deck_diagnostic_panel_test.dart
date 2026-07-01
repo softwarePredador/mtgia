@@ -420,6 +420,50 @@ void main() {
           'functional_coverage_ratio': 0.82,
           'verified_battle_ratio': 0.72,
         },
+        'commander_contract': {
+          'schema_version': 'commander_contract_summary_v1_2026-07-01',
+          'source_version': 'commander_deckbuilding_contract_v2_2026-06-29',
+          'status': 'ready_for_battle_gate',
+          'status_label': 'Pronto para battle gate',
+          'is_commander_applicable': true,
+          'commander_name': 'Talrand, Sky Summoner',
+          'total_cards': 100,
+          'commander_count': 1,
+          'summary':
+              'Estrutura e fontes suficientes; falta validar em battle gate igualado.',
+          'battle_gate': {
+            'required': true,
+            'status': 'pending',
+            'label': 'Pendente',
+          },
+          'gates': {
+            'commander_present': true,
+            'validation_valid': true,
+            'unresolved_cards_zero': true,
+            'has_reference_lane': true,
+            'deterministic_reference_ready': true,
+          },
+          'source_lanes': [
+            {
+              'key': 'reference_card_stats',
+              'label': 'Estatísticas de cartas',
+              'available': true,
+              'count': 18,
+            },
+          ],
+          'planning_flow': [
+            {
+              'key': 'commander_intent_and_archetype',
+              'label': 'Plano do comandante',
+            },
+          ],
+          'overview_fields': [
+            {'key': 'commander_plan_sentence', 'label': 'Frase do plano'},
+          ],
+          'blockers': [],
+          'warnings': [],
+          'next_actions': ['Rodar battle gate igualado.'],
+        },
       });
 
       await tester.pumpWidget(createSubject(deck, analysis: analysis));
@@ -434,12 +478,19 @@ void main() {
         find.byKey(const Key('deck-launch-understanding-card')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const Key('deck-launch-commander-contract-card')),
+        findsOneWidget,
+      );
       expect(find.text('Prontidão'), findsOneWidget);
       expect(find.text('Commander válido'), findsOneWidget);
       expect(find.text('Inteligência avançada liberada.'), findsOneWidget);
       expect(find.text('Simulação parcial'), findsOneWidget);
       expect(find.text('72/100 cópias verificadas'), findsOneWidget);
       expect(find.text('82% classificado'), findsOneWidget);
+      expect(find.text('Plano Commander'), findsOneWidget);
+      expect(find.text('Pronto para battle gate'), findsOneWidget);
+      expect(find.text('Battle gate: Pendente'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

@@ -136,6 +136,51 @@ void main() {
           'functional_coverage_ratio': 0.74,
           'verified_battle_ratio': 0.62,
         },
+        'commander_contract': {
+          'schema_version': 'commander_contract_summary_v1_2026-07-01',
+          'source_version': 'commander_deckbuilding_contract_v2_2026-06-29',
+          'status': 'ready_for_battle_gate',
+          'status_label': 'Pronto para battle gate',
+          'is_commander_applicable': true,
+          'commander_name': 'Talrand, Sky Summoner',
+          'total_cards': 100,
+          'commander_count': 1,
+          'summary':
+              'Estrutura e fontes suficientes; falta validar em battle gate igualado.',
+          'battle_gate': {
+            'required': true,
+            'status': 'pending',
+            'label': 'Pendente',
+          },
+          'gates': {
+            'commander_present': true,
+            'validation_valid': true,
+            'unresolved_cards_zero': true,
+            'has_reference_lane': true,
+            'deterministic_reference_ready': true,
+          },
+          'source_lanes': [
+            {
+              'key': 'reference_card_stats',
+              'label': 'Estatísticas de cartas',
+              'available': true,
+              'count': '12',
+            },
+          ],
+          'planning_flow': [
+            {
+              'key': 'commander_intent_and_archetype',
+              'label': 'Plano do comandante',
+            },
+          ],
+          'overview_fields': [
+            {'key': 'commander_plan_sentence', 'label': 'Frase do plano'},
+          ],
+          'blockers': [],
+          'warnings': ['reference_profile_missing'],
+          'next_actions': ['Rodar battle gate igualado.'],
+          'disclaimer': 'Plano conservador.',
+        },
       });
 
       expect(analysis.hasLaunchSignals, isTrue);
@@ -154,6 +199,19 @@ void main() {
       expect(
         analysis.understandingSummary?.verifiedBattleLabel,
         '62% simulado',
+      );
+      expect(analysis.commanderContract?.shouldDisplay, isTrue);
+      expect(
+        analysis.commanderContract?.safeStatusLabel,
+        'Pronto para battle gate',
+      );
+      expect(analysis.commanderContract?.footerLabel, 'Battle gate: Pendente');
+      expect(analysis.commanderContract?.battleGate.required, isTrue);
+      expect(analysis.commanderContract?.gates.hasReferenceLane, isTrue);
+      expect(analysis.commanderContract?.sourceLanes.first.count, 12);
+      expect(
+        analysis.commanderContract?.planningFlow.first.label,
+        'Plano do comandante',
       );
     });
 
