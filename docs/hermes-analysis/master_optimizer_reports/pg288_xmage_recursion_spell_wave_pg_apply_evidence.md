@@ -1,0 +1,13 @@
+# PG288 PostgreSQL Apply Evidence
+
+- Generated at: `2026-07-01T08:36:17+00:00`
+- Database: `db_helper.connect() default PostgreSQL target`
+- Mutations performed: `["postgres_apply_pg288_xmage_recursion_spell_wave"]`
+
+## Precheck
+
+`{"cards": ["Argivian Find", "Auroral Procession", "Call to Mind", "D\u00e9j\u00e0 Vu", "Disentomb", "Dutiful Return", "Elven Cache", "Fight On!", "March of the Returned", "Morbid Plunder", "Nature's Spiral", "Raise Dead", "Recollect", "Reconstruction", "Regenesis", "Regrowth", "Relearn", "Return to Battle", "Ritual of Restoration", "Sage's Knowledge", "Soul Salvage", "Wildwood Rebirth"], "existing_expected_rows_before": 0, "missing_targets": [], "row_count": 22, "total_target_card_rows": 22, "would_deprecate_shadow_rows": 2}`
+
+## Postcheck
+
+`{"backup_rows": 2, "cards": ["Argivian Find", "Auroral Procession", "Call to Mind", "D\u00e9j\u00e0 Vu", "Disentomb", "Dutiful Return", "Elven Cache", "Fight On!", "March of the Returned", "Morbid Plunder", "Nature's Spiral", "Raise Dead", "Recollect", "Reconstruction", "Regenesis", "Regrowth", "Relearn", "Return to Battle", "Ritual of Restoration", "Sage's Knowledge", "Soul Salvage", "Wildwood Rebirth"], "failed_cards": [], "promoted_oracle_hash_rows": 22, "promoted_rule_rows": 22, "promoted_verified_auto_rows": 22, "row_count": 22}`

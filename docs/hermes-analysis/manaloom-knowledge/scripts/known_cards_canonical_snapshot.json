@@ -1791,6 +1791,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:1c39127d19d7e7334fbe1fc2d189b799"
   },
+  "Argivian Find": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e",
+    "battle_rule_oracle_hash": "1093e687c86515e54fbd4a00f8a70ed0"
+  },
   "Argoth, Sanctum of Nature // Titania, Gaea Incarnate": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -2215,6 +2241,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:49c775bf9accb1a7e247cdeb66db02de"
   },
+  "Auroral Procession": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:88eb859326f7c2ca056b23bbf2ee72e3",
+    "battle_rule_oracle_hash": "21aa7947c70c305b1def0e078943bf53"
+  },
   "Austere Command": {
     "battle_model_scope": "austere_command_choose_two_destroy_modes_v1",
     "choose_modes": 2,
@@ -2485,6 +2534,24 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Back to Nature": {
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "enchantment"
+    ],
+    "effect": "board_wipe",
+    "instant": true,
+    "sorcery": false,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+    "battle_rule_oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2"
   },
   "Backdraft Hellkite": {
     "cmc": 5.0,
@@ -3625,6 +3692,23 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Blazing Volley": {
+    "amount": 1,
+    "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+    "damage": 1,
+    "damage_scope": "each_creature_opponents_control",
+    "effect": "damage_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DamageAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca558b0667e6b7aace3c654850ad435a",
+    "battle_rule_oracle_hash": "0d444f6ad4a3d6586c4786af9ffe8d1f"
   },
   "Bleachbone Verge": {
     "effect": "land",
@@ -5429,6 +5513,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6ee70b87e4893f5465ae9fad90cb3063"
   },
+  "Call to Mind": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "instant_or_sorcery",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+    "battle_rule_oracle_hash": "7dc2505fff00a2cdcbe34336f545505b"
+  },
   "Campus Renovation": {
     "cmc": 5.0,
     "count": 2,
@@ -6657,6 +6767,24 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f119ebf954ce4843b21b58fdc207d117"
+  },
+  "Cleanfall": {
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "enchantment"
+    ],
+    "effect": "board_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+    "battle_rule_oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2"
   },
   "Cleansing Nova": {
     "cmc": 5.0,
@@ -8011,6 +8139,24 @@
     "battle_rule_logical_key": "battle_rule_v1:fcb6b63cf730c83aa99760cc53bf3dd9",
     "battle_rule_oracle_hash": "98c26337370ce75f10e3e529a94b8ef3"
   },
+  "Creeping Corrosion": {
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "artifact"
+    ],
+    "effect": "board_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+    "battle_rule_oracle_hash": "18445e3303e023a20571b11493748ce1"
+  },
   "Creeping Mold": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -8652,14 +8798,22 @@
     "battle_rule_oracle_hash": "99e64cf104772b0de72a94001d920f95"
   },
   "Damnation": {
-    "cmc": 4.0,
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "creature"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cf8f05433163f19c19ad60378af66b92"
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+    "battle_rule_oracle_hash": "fde8457ed00422f361bae1d0643f9b70"
   },
   "Damning Verdict": {
     "cmc": 5.0,
@@ -8999,14 +9153,22 @@
     "battle_rule_logical_key": "battle_rule_v1:45599a847c7127d51607bbbbb858d3b2"
   },
   "Day of Judgment": {
-    "cmc": 4.0,
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "creature"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cf8f05433163f19c19ad60378af66b92"
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+    "battle_rule_oracle_hash": "fc814de9bcaeed653872d6a95f46d3fd"
   },
   "Daze": {
     "effect": "counter",
@@ -9780,6 +9942,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Desert Sandstorm": {
+    "amount": 1,
+    "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+    "damage": 1,
+    "damage_scope": "each_creature",
+    "effect": "damage_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DamageAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5f4af83cbc23d0c5fb3930192282aaa8",
+    "battle_rule_oracle_hash": "27a771b4117f5def2f499ddc9171c8e3"
+  },
   "Desert Twister": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -9918,14 +10097,23 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Devastation": {
-    "cmc": 7.0,
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "creature",
+      "land"
+    ],
     "effect": "board_wipe",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5527e651c7538b95afe5c0f79ab9774a",
+    "battle_rule_oracle_hash": "1a1d1a4093ecfdd6c277826b81b123ac"
   },
   "Devils' Playground": {
     "cmc": 6.0,
@@ -10233,6 +10421,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ef2466b649b2dfd10755b79cf1c4df15",
     "battle_rule_oracle_hash": "286879c3da57e50091e368d58a29a605"
+  },
+  "Disentomb": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+    "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
   "Dismal Backwater": {
     "effect": "land",
@@ -11149,6 +11362,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Dutiful Return": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+    "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
+  },
   "Dwarven Hold": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -11196,6 +11435,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "D\u00e9j\u00e0 Vu": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "sorcery",
+    "target_constraints": {
+      "card_types": [
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+    "battle_rule_oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc"
   },
   "Eagle Vision": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -11842,6 +12106,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec"
+  },
+  "Elven Cache": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+    "battle_rule_oracle_hash": "21aa7947c70c305b1def0e078943bf53"
   },
   "Elven Chorus": {
     "cmc": 4.0,
@@ -14016,6 +14303,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0179c6cc3d20112655e43b1269bf2290",
     "battle_rule_oracle_hash": "3c45ce55e8958f785653e269adf9d82b"
+  },
+  "Fight On!": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:668fd8c565abb60114683bd434eaa5af",
+    "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
   },
   "Fighter Class": {
     "cmc": 2.0,
@@ -23845,6 +24158,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a5067af5281522b7c87ecbb96f067c00"
   },
+  "March of the Returned": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+    "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
+  },
   "Mardu Devotee": {
     "activation_cost_generic": 1,
     "battle_model_scope": "creature_etb_scry_two_and_one_mana_mardu_filter_v1",
@@ -25325,6 +25664,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
+  "Morbid Plunder": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+    "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
+  },
   "Morningtide's Light": {
     "cmc": 4.0,
     "duration": 1,
@@ -26213,6 +26578,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6763f8258c7027a341e182900af5e8fc",
     "battle_rule_oracle_hash": "109e64b1ea27da04b6266d4e86b52aad"
+  },
+  "Nature's Spiral": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d6d6fac158619d687cdd564ae1e57bdc",
+    "battle_rule_oracle_hash": "accff90ee52368fe7b4f54afaded62c9"
   },
   "Naya Panorama": {
     "effect": "land",
@@ -29584,6 +29979,25 @@
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "0f69f17e9a0aef6bd11a676d6848854d"
   },
+  "Purify": {
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "artifact",
+      "enchantment"
+    ],
+    "effect": "board_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb",
+    "battle_rule_oracle_hash": "ef96e1d39749b1410f22cc6e03e6a2e8"
+  },
   "Purphoros, God of the Forge": {
     "ability_kind": "triggered",
     "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
@@ -29668,6 +30082,23 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:141ff57f44bc4c229393f05f7daf667c",
     "battle_rule_oracle_hash": "ecf9ad1f393a664f16867aab8a6edf77"
+  },
+  "Pyroclasm": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+    "damage": 2,
+    "damage_scope": "each_creature",
+    "effect": "damage_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DamageAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32ba91fba4737f3432f05905d2845449",
+    "battle_rule_oracle_hash": "e38b6c9ea33bbe04ad1e7090d1ec2076"
   },
   "Pyrokinesis": {
     "cmc": 6.0,
@@ -30208,6 +30639,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Raise Dead": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+    "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
   "Raise the Palisade": {
     "cmc": 5.0,
@@ -30844,6 +31300,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
   },
+  "Recollect": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+    "battle_rule_oracle_hash": "21aa7947c70c305b1def0e078943bf53"
+  },
   "Reconnaissance": {
     "cmc": 1.0,
     "effect": "draw_engine",
@@ -30874,6 +31353,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:bae0bddaa64a2f72a2565a04a8680035"
+  },
+  "Reconstruction": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+    "battle_rule_oracle_hash": "36afa50945acd8fafbbd638c7f030966"
   },
   "Recruiter of the Guard": {
     "battle_model_scope": "recruiter_guard_etb_toughness2_creature_to_hand_v1",
@@ -31019,6 +31523,37 @@
     "battle_rule_logical_key": "battle_rule_v1:41a3506a6969888f362a122077db87cb",
     "battle_rule_oracle_hash": "08a27b0252c823f1a0d6532701925010"
   },
+  "Regenesis": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:074e4073cc18b1b40fa39a5201df2654",
+    "battle_rule_oracle_hash": "0b01a5d222ac87ef5f7ea53c3c393451"
+  },
   "Regress": {
     "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
     "destination": "hand",
@@ -31041,14 +31576,27 @@
     "battle_rule_oracle_hash": "ce97f55e49504ae77e37b12d347da4ed"
   },
   "Regrowth": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
     "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
+    "instant": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "self",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+    "battle_rule_oracle_hash": "21aa7947c70c305b1def0e078943bf53"
   },
   "Reiterate": {
     "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_buyback_runtime_v1",
@@ -31103,6 +31651,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Relearn": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "instant_or_sorcery",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+    "battle_rule_oracle_hash": "7dc2505fff00a2cdcbe34336f545505b"
   },
   "Relentless Assault": {
     "cmc": 4.0,
@@ -31647,6 +32221,31 @@
     "battle_rule_version": 4,
     "battle_rule_logical_key": "battle_rule_v1:fb3ee27205e34477fa9753b38433e9a2",
     "battle_rule_oracle_hash": "a24911b7ea2027ebba59bb6792eee776"
+  },
+  "Return to Battle": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+    "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
   "Return to Dust": {
     "cmc": 4.0,
@@ -32220,6 +32819,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Ritual of Restoration": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+    "battle_rule_oracle_hash": "36afa50945acd8fafbbd638c7f030966"
   },
   "Riven Turnbull": {
     "activation_requires_tap": true,
@@ -32903,6 +33527,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sage's Knowledge": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "sorcery",
+    "target_constraints": {
+      "card_types": [
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+    "battle_rule_oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc"
   },
   "Sage's Reverie": {
     "cmc": 4.0,
@@ -36459,6 +37108,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b4c60a038f87f7550bf5dcff0a16d939"
   },
+  "Soul Salvage": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+    "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
+  },
   "Soul Shatter": {
     "cmc": 3.0,
     "count": 1,
@@ -37560,6 +38235,23 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6f6965867e137adb2ab9ae3ff368c80c"
+  },
+  "Storm's Wrath": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+    "damage": 4,
+    "damage_scope": "each_creature_and_planeswalker",
+    "effect": "damage_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DamageAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:925a5a19163b3817fc87c4d00d111209",
+    "battle_rule_oracle_hash": "0e94f546b5088c4eee25463894cbdc26"
   },
   "Storm-Kiln Artist": {
     "artifact_power_bonus_status": "annotation_only",
@@ -39570,16 +40262,22 @@
     "battle_rule_oracle_hash": "ce0223742a8d4366cdc69c977caf472c"
   },
   "Tempest of Light": {
-    "cmc": 3.0,
-    "count": 1,
-    "effect": "draw_cards",
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "enchantment"
+    ],
+    "effect": "board_wipe",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a2c478eb91086987f990c46671af3084"
+    "sorcery": false,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+    "battle_rule_oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2"
   },
   "Temple Bell": {
     "cmc": 3.0,
@@ -42113,6 +42811,24 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Tranquility": {
+    "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+    "destination": "graveyard",
+    "destroy_card_types": [
+      "enchantment"
+    ],
+    "effect": "board_wipe",
+    "instant": false,
+    "sorcery": true,
+    "xmage_effect_class": "DestroyAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+    "battle_rule_oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2"
   },
   "Transcendent Message": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -45677,6 +46393,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec"
+  },
+  "Wildwood Rebirth": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f",
+    "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
   "Will of the Jeskai": {
     "cmc": 4.0,

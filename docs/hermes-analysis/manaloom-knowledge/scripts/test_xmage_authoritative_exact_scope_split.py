@@ -331,6 +331,147 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "bounce_effect_class_not_pure")
 
+    def test_graveyard_to_hand_spell_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target instant or sorcery card from your graveyard to your hand."),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "recursion")
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "instant_or_sorcery")
+        self.assertEqual(effect["count"], 1)
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+        )
+
+    def test_graveyard_to_hand_up_to_two_creatures_preserves_count(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return up to two target creature cards from your graveyard to your hand."),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 2)
+        self.assertTrue(effect["up_to_count"])
+
+    def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Choose one or both — Return target creature card from your graveyard to your hand. "
+                    "Return target artifact card from your graveyard to your hand."
+                )
+            ),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_oracle_not_simple")
+
+    def test_graveyard_to_hand_additional_cost_stays_blocked(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, discard a card. "
+                    "Return target creature card from your graveyard to your hand."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new DiscardCardCost());"
+                "this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "additional_cost_detected")
+
+    def test_destroy_all_creatures_maps_to_board_wipe_scope(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all creatures. They can't be regenerated."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "board_wipe")
+        self.assertEqual(effect["battle_model_scope"], split.BOARD_WIPE_SCOPE)
+        self.assertEqual(effect["destroy_card_types"], ["creature"])
+        self.assertEqual(effect["destination"], "graveyard")
+
+    def test_damage_all_creatures_maps_to_damage_wipe_scope(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Sweep deals 2 damage to each creature."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(2));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "damage_wipe")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_WIPE_SCOPE)
+        self.assertEqual(effect["damage"], 2)
+        self.assertEqual(effect["damage_scope"], "each_creature")
+
+    def test_storm_inside_card_name_does_not_count_as_complexity_keyword(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Storm's Wrath deals 4 damage to each creature and each planeswalker."),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(4));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["damage_scope"], "each_creature_and_planeswalker")
+
+    def test_storm_mechanic_word_still_blocks_simple_spell_package(self) -> None:
+        self.assertTrue(split.has_oracle_complexity(metadata(oracle_text="Draw a card. Storm")))
+
+    def test_board_wipe_with_conditional_replacement_stays_blocked(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DamageAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Fixture Sweep deals 3 damage to each creature. "
+                    "If a creature dealt damage this way would die this turn, exile it instead."
+                )
+            ),
+            source_text="this.getSpellAbility().addEffect(new DamageAllEffect(3));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_oracle_not_simple")
+
+    def test_board_wipe_selective_scope_stays_blocked(self) -> None:
+        row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy all creatures with toughness 4 or greater."),
+            source_text="this.getSpellAbility().addEffect(new DestroyAllEffect(filter));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "board_wipe_destroy_scope_not_supported")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

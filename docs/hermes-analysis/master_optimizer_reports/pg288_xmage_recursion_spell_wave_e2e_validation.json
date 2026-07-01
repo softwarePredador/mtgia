@@ -1,0 +1,810 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T08:36:59.312555+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg288_xmage_recursion_spell_wave_manifest.json",
+  "package_id": "pg288_xmage_recursion_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 22
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Argivian Find",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e",
+          "oracle_hash": "1093e687c86515e54fbd4a00f8a70ed0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Auroral Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88eb859326f7c2ca056b23bbf2ee72e3",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Call to Mind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+          "oracle_hash": "7dc2505fff00a2cdcbe34336f545505b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Disentomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Dutiful Return",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "D\u00e9j\u00e0 Vu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+          "oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Elven Cache",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Fight On!",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:668fd8c565abb60114683bd434eaa5af",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "March of the Returned",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Morbid Plunder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Nature's Spiral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d6d6fac158619d687cdd564ae1e57bdc",
+          "oracle_hash": "accff90ee52368fe7b4f54afaded62c9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Raise Dead",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Recollect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Reconstruction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+          "oracle_hash": "36afa50945acd8fafbbd638c7f030966",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Regenesis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:074e4073cc18b1b40fa39a5201df2654",
+          "oracle_hash": "0b01a5d222ac87ef5f7ea53c3c393451",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Regrowth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Relearn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+          "oracle_hash": "7dc2505fff00a2cdcbe34336f545505b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Return to Battle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Ritual of Restoration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+          "oracle_hash": "36afa50945acd8fafbbd638c7f030966",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Sage's Knowledge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+          "oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Soul Salvage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Wildwood Rebirth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 22
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Argivian Find",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e",
+          "oracle_hash": "1093e687c86515e54fbd4a00f8a70ed0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Auroral Procession",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:88eb859326f7c2ca056b23bbf2ee72e3",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Call to Mind",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+          "oracle_hash": "7dc2505fff00a2cdcbe34336f545505b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Disentomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Dutiful Return",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "D\u00e9j\u00e0 Vu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+          "oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Elven Cache",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Fight On!",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:668fd8c565abb60114683bd434eaa5af",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "March of the Returned",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Morbid Plunder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Nature's Spiral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d6d6fac158619d687cdd564ae1e57bdc",
+          "oracle_hash": "accff90ee52368fe7b4f54afaded62c9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Raise Dead",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Recollect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Reconstruction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+          "oracle_hash": "36afa50945acd8fafbbd638c7f030966",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Regenesis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:074e4073cc18b1b40fa39a5201df2654",
+          "oracle_hash": "0b01a5d222ac87ef5f7ea53c3c393451",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Regrowth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba",
+          "oracle_hash": "21aa7947c70c305b1def0e078943bf53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Relearn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
+          "oracle_hash": "7dc2505fff00a2cdcbe34336f545505b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Return to Battle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Ritual of Restoration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3",
+          "oracle_hash": "36afa50945acd8fafbbd638c7f030966",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Sage's Knowledge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e",
+          "oracle_hash": "5f4132f10d089eb7f54d47ca9f3fc4bc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Soul Salvage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
+          "oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Wildwood Rebirth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f",
+          "oracle_hash": "e37d143305cf0b027585c7ece4c1d380",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 22
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Argivian Find",
+          "logical_rule_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Auroral Procession",
+          "logical_rule_key": "battle_rule_v1:88eb859326f7c2ca056b23bbf2ee72e3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Call to Mind",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Disentomb",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dutiful Return",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "D\u00e9j\u00e0 Vu",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elven Cache",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fight On!",
+          "logical_rule_key": "battle_rule_v1:668fd8c565abb60114683bd434eaa5af"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "March of the Returned",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Morbid Plunder",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nature's Spiral",
+          "logical_rule_key": "battle_rule_v1:d6d6fac158619d687cdd564ae1e57bdc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raise Dead",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Recollect",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reconstruction",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Regenesis",
+          "logical_rule_key": "battle_rule_v1:074e4073cc18b1b40fa39a5201df2654"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Regrowth",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Relearn",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Return to Battle",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ritual of Restoration",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sage's Knowledge",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul Salvage",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wildwood Rebirth",
+          "logical_rule_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 22
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Argivian Find",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Auroral Procession",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:88eb859326f7c2ca056b23bbf2ee72e3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Call to Mind",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Disentomb",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dutiful Return",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "D\u00e9j\u00e0 Vu",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elven Cache",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fight On!",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:668fd8c565abb60114683bd434eaa5af"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "March of the Returned",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Morbid Plunder",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nature's Spiral",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:d6d6fac158619d687cdd564ae1e57bdc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Raise Dead",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Recollect",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reconstruction",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Regenesis",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:074e4073cc18b1b40fa39a5201df2654"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Regrowth",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:eb9293e87c407c24527dd473f0a97bba"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Relearn",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Return to Battle",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ritual of Restoration",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:125148735136c035c5f721fa216282c3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sage's Knowledge",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:00bde5102b35dfc8bedecd71f171db1e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul Salvage",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wildwood Rebirth",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

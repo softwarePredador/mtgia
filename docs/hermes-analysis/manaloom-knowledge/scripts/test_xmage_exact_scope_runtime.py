@@ -556,6 +556,133 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_recursion_returns_matching_card_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        non_target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "instant_or_sorcery",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+            "count": 1,
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Relearn",
+                "type_line": "Sorcery",
+                "oracle_text": "Return target instant or sorcery card from your graveyard to your hand.",
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bolt"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bear", "Fixture Relearn"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Relearn"
+                and data.get("recovered") == ["Target Bolt"]
+                and data.get("target_type") == "instant_or_sorcery"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
+    def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append({"name": "Own Aura", "type_line": "Enchantment"})
+        opponent.battlefield.extend(
+            [
+                {"name": "Target Oath", "type_line": "Enchantment"},
+                {"name": "Target Bear", "type_line": "Creature - Bear", "toughness": 2},
+            ]
+        )
+        effect = {
+            "effect": "board_wipe",
+            "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+            "destroy_card_types": ["enchantment"],
+            "destination": "graveyard",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Tranquility", "type_line": "Sorcery", "oracle_text": "Destroy all enchantments."},
+            turn=9,
+            rng=random.Random(9),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.battlefield, [])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Own Aura", "Fixture Tranquility"])
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Target Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Oath"])
+        self.assertTrue(
+            any(
+                event == "board_wipe_resolved"
+                and data.get("card") == "Fixture Tranquility"
+                and data.get("destroy_card_types") == ["enchantment"]
+                and data.get("enchantments_destroyed") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_damage_wipe_opponent_creatures_scope(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        own_creature = {"name": "Own Bear", "type_line": "Creature - Bear", "toughness": 1}
+        target_creature = {"name": "Target Goblin", "type_line": "Creature - Goblin", "toughness": 1}
+        active.battlefield.append(own_creature)
+        opponent.battlefield.append(target_creature)
+        effect = {
+            "effect": "damage_wipe",
+            "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+            "amount": 1,
+            "damage": 1,
+            "damage_scope": "each_creature_opponents_control",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Volley",
+                "type_line": "Sorcery",
+                "oracle_text": "Fixture Volley deals 1 damage to each creature your opponents control.",
+            },
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Own Bear"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Goblin"])
+        self.assertTrue(
+            any(
+                event == "damage_wipe_resolved"
+                and data.get("card") == "Fixture Volley"
+                and data.get("damage") == 1
+                and data.get("damage_scope") == "each_creature_opponents_control"
+                and data.get("opponent_creatures_destroyed") == 1
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,576 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg289_xmage_board_wipe_spell_wave_20260701_084207",
+  "deploy_id": "PG289",
+  "expected_rules": [
+    {
+      "card_name": "Back to Nature",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "min_rule_version": 2,
+      "normalized_name": "back to nature",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blazing Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca558b0667e6b7aace3c654850ad435a",
+      "min_rule_version": 2,
+      "normalized_name": "blazing volley",
+      "oracle_hash": "0d444f6ad4a3d6586c4786af9ffe8d1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cleanfall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "min_rule_version": 2,
+      "normalized_name": "cleanfall",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Creeping Corrosion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+      "min_rule_version": 2,
+      "normalized_name": "creeping corrosion",
+      "oracle_hash": "18445e3303e023a20571b11493748ce1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Damnation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "min_rule_version": 2,
+      "normalized_name": "damnation",
+      "oracle_hash": "fde8457ed00422f361bae1d0643f9b70",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Day of Judgment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "min_rule_version": 2,
+      "normalized_name": "day of judgment",
+      "oracle_hash": "fc814de9bcaeed653872d6a95f46d3fd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Desert Sandstorm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f4af83cbc23d0c5fb3930192282aaa8",
+      "min_rule_version": 2,
+      "normalized_name": "desert sandstorm",
+      "oracle_hash": "27a771b4117f5def2f499ddc9171c8e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Devastation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5527e651c7538b95afe5c0f79ab9774a",
+      "min_rule_version": 2,
+      "normalized_name": "devastation",
+      "oracle_hash": "1a1d1a4093ecfdd6c277826b81b123ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Purify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb",
+      "min_rule_version": 2,
+      "normalized_name": "purify",
+      "oracle_hash": "ef96e1d39749b1410f22cc6e03e6a2e8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyroclasm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ba91fba4737f3432f05905d2845449",
+      "min_rule_version": 2,
+      "normalized_name": "pyroclasm",
+      "oracle_hash": "e38b6c9ea33bbe04ad1e7090d1ec2076",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm's Wrath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:925a5a19163b3817fc87c4d00d111209",
+      "min_rule_version": 2,
+      "normalized_name": "storm's wrath",
+      "oracle_hash": "0e94f546b5088c4eee25463894cbdc26",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tempest of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "min_rule_version": 2,
+      "normalized_name": "tempest of light",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tranquility",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "min_rule_version": 2,
+      "normalized_name": "tranquility",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_damage_all_spell": 4,
+    "xmage_destroy_all_spell": 9
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-01T08:42:07+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Back to Nature"
+      },
+      "card_name": "Back to Nature",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "normalized_name": "back to nature",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Blazing Volley"
+      },
+      "card_name": "Blazing Volley",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca558b0667e6b7aace3c654850ad435a",
+      "normalized_name": "blazing volley",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Cleanfall"
+      },
+      "card_name": "Cleanfall",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "normalized_name": "cleanfall",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Creeping Corrosion"
+      },
+      "card_name": "Creeping Corrosion",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+      "normalized_name": "creeping corrosion",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Damnation"
+      },
+      "card_name": "Damnation",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "normalized_name": "damnation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Day of Judgment"
+      },
+      "card_name": "Day of Judgment",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "normalized_name": "day of judgment",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Desert Sandstorm"
+      },
+      "card_name": "Desert Sandstorm",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f4af83cbc23d0c5fb3930192282aaa8",
+      "normalized_name": "desert sandstorm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Devastation"
+      },
+      "card_name": "Devastation",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5527e651c7538b95afe5c0f79ab9774a",
+      "normalized_name": "devastation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Purify"
+      },
+      "card_name": "Purify",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb",
+      "normalized_name": "purify",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Pyroclasm"
+      },
+      "card_name": "Pyroclasm",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ba91fba4737f3432f05905d2845449",
+      "normalized_name": "pyroclasm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Storm's Wrath"
+      },
+      "card_name": "Storm's Wrath",
+      "effect": "damage_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:925a5a19163b3817fc87c4d00d111209",
+      "normalized_name": "storm's wrath",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1",
+        "effect": "damage_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Tempest of Light"
+      },
+      "card_name": "Tempest of Light",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "normalized_name": "tempest of light",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    },
+    {
+      "card": {
+        "name": "Tranquility"
+      },
+      "card_name": "Tranquility",
+      "effect": "board_wipe",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "normalized_name": "tranquility",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
+        "effect": "board_wipe"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Back to Nature",
+    "Blazing Volley",
+    "Cleanfall",
+    "Creeping Corrosion",
+    "Damnation",
+    "Day of Judgment",
+    "Desert Sandstorm",
+    "Devastation",
+    "Purify",
+    "Pyroclasm",
+    "Storm's Wrath",
+    "Tempest of Light",
+    "Tranquility"
+  ],
+  "selected_count": 13,
+  "slug": "xmage_board_wipe_spell_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Back to Nature",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "min_rule_version": 2,
+      "normalized_name": "back to nature",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blazing Volley",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ca558b0667e6b7aace3c654850ad435a",
+      "min_rule_version": 2,
+      "normalized_name": "blazing volley",
+      "oracle_hash": "0d444f6ad4a3d6586c4786af9ffe8d1f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cleanfall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "min_rule_version": 2,
+      "normalized_name": "cleanfall",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Creeping Corrosion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda",
+      "min_rule_version": 2,
+      "normalized_name": "creeping corrosion",
+      "oracle_hash": "18445e3303e023a20571b11493748ce1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Damnation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "min_rule_version": 2,
+      "normalized_name": "damnation",
+      "oracle_hash": "fde8457ed00422f361bae1d0643f9b70",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Day of Judgment",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af",
+      "min_rule_version": 2,
+      "normalized_name": "day of judgment",
+      "oracle_hash": "fc814de9bcaeed653872d6a95f46d3fd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Desert Sandstorm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5f4af83cbc23d0c5fb3930192282aaa8",
+      "min_rule_version": 2,
+      "normalized_name": "desert sandstorm",
+      "oracle_hash": "27a771b4117f5def2f499ddc9171c8e3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Devastation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5527e651c7538b95afe5c0f79ab9774a",
+      "min_rule_version": 2,
+      "normalized_name": "devastation",
+      "oracle_hash": "1a1d1a4093ecfdd6c277826b81b123ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Purify",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb",
+      "min_rule_version": 2,
+      "normalized_name": "purify",
+      "oracle_hash": "ef96e1d39749b1410f22cc6e03e6a2e8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pyroclasm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:32ba91fba4737f3432f05905d2845449",
+      "min_rule_version": 2,
+      "normalized_name": "pyroclasm",
+      "oracle_hash": "e38b6c9ea33bbe04ad1e7090d1ec2076",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Storm's Wrath",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:925a5a19163b3817fc87c4d00d111209",
+      "min_rule_version": 2,
+      "normalized_name": "storm's wrath",
+      "oracle_hash": "0e94f546b5088c4eee25463894cbdc26",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tempest of Light",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
+      "min_rule_version": 2,
+      "normalized_name": "tempest of light",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tranquility",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8cca937904da37d443131e25b0e866a5",
+      "min_rule_version": 2,
+      "normalized_name": "tranquility",
+      "oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

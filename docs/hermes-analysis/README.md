@@ -76,9 +76,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG287:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg287_bounce_spell_wave.md`.
-    Resultado all-card: `31333` identidades ainda com gap, `28397` com fonte
+    Evidencia corrente pos-PG289:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg289_board_wipe_spell_wave.md`.
+    Resultado all-card: `31298` identidades ainda com gap, `28362` com fonte
     XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
     gaps e `12093` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -86,9 +86,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
     target, `6` life gain). O PG285 fechou `8` residuos all-card ja suportados,
     o PG286 adicionou `12` counters puros com restricao real de alvo na stack,
-    e o PG287 adicionou `7` bounce spells com `destination=hand`. Todos os
-    pacotes PG285-PG287 passaram postcheck PostgreSQL e E2E em
-    PG/SQLite/snapshot/runtime. O splitter pos-PG287 retorna `proposal_count=0`
+    o PG287 adicionou `7` bounce spells com `destination=hand`, o PG288
+    adicionou `22` recursion spells graveyard-to-hand, e o PG289 adicionou
+    `13` mass-removal spells por destroy-all/fixed damage-all. Todos os
+    pacotes PG285-PG289 passaram postcheck PostgreSQL e E2E em
+    PG/SQLite/snapshot/runtime. O splitter pos-PG289 retorna `proposal_count=0`
     para os escopos ja implementados; a proxima etapa exige novo subpadrao
     runtime, nao rerun do mesmo splitter.
 

@@ -1,0 +1,67 @@
+# XMage Authoritative Exact Scope Split
+
+- Generated at: `2026-07-01T08:41:51+00:00`
+- Status: `ready`
+- Mutations performed: `[]`
+
+## Summary
+
+`{"adapter_work_unit_counts": {"board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1": 13}, "blocked_reason_counts": {"additional_cost_detected": 136, "board_wipe_ability_class_not_simple": 67, "board_wipe_damage_amount_not_fixed": 9, "board_wipe_damage_scope_not_supported": 13, "board_wipe_destroy_scope_not_supported": 38, "board_wipe_effect_class_not_supported": 83, "board_wipe_oracle_not_simple": 38, "bounce_ability_class_not_simple": 28, "bounce_effect_class_not_pure": 44, "bounce_target_not_supported": 20, "counter_ability_class_not_simple": 19, "counter_effect_class_not_pure": 35, "counter_oracle_not_simple": 2, "counter_target_not_supported": 23, "damage_amount_not_fixed": 45, "damage_effect_class_not_pure": 123, "damage_target_not_supported": 24, "destroy_effect_class_not_pure": 138, "destroy_target_not_supported": 74, "draw_effect_class_not_pure": 562, "exile_effect_class_not_pure": 42, "exile_oracle_not_simple": 8, "exile_target_not_supported": 30, "life_gain_amount_not_fixed": 19, "life_gain_effect_class_not_pure": 166, "life_gain_oracle_not_simple": 11, "mana_source_effect_class_not_simple": 307, "mana_source_oracle_not_simple": 121, "mana_source_safe_ability_missing": 133, "mana_source_spell_not_supported": 1, "mana_source_unsafe_ability_class": 135, "not_instant_or_sorcery_spell": 3706, "not_one_shot_spell_ability": 242, "recursion_ability_class_not_simple": 13, "recursion_effect_class_not_pure": 461, "recursion_oracle_not_simple": 12, "recursion_target_not_supported": 8}, "considered_supported_work_unit_rows": 6949, "family_counts": {"xmage_damage_all_spell": 4, "xmage_destroy_all_spell": 9}, "proposal_count": 13, "proposal_status_counts": {"batch_pg_candidate_after_precheck": 13}, "safe_for_batch_pg_package_count": 13, "scope_counts": {"xmage_destroy_all_matching_permanents_spell_v1": 9, "xmage_fixed_damage_all_matching_permanents_spell_v1": 4}}`
+
+## Selected Proposals
+
+| Card | Family | Scope | Effect | Logical rule key |
+| --- | --- | --- | --- | --- |
+| `Back to Nature` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8` |
+| `Blazing Volley` | `xmage_damage_all_spell` | `xmage_fixed_damage_all_matching_permanents_spell_v1` | `damage_wipe` | `battle_rule_v1:ca558b0667e6b7aace3c654850ad435a` |
+| `Cleanfall` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:8cca937904da37d443131e25b0e866a5` |
+| `Creeping Corrosion` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:8f5c34e1b9985fb3a0a991f08cad1cda` |
+| `Damnation` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af` |
+| `Day of Judgment` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:acf7a4c6829b305ea62cbdb81430e0af` |
+| `Desert Sandstorm` | `xmage_damage_all_spell` | `xmage_fixed_damage_all_matching_permanents_spell_v1` | `damage_wipe` | `battle_rule_v1:5f4af83cbc23d0c5fb3930192282aaa8` |
+| `Devastation` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:5527e651c7538b95afe5c0f79ab9774a` |
+| `Purify` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb` |
+| `Pyroclasm` | `xmage_damage_all_spell` | `xmage_fixed_damage_all_matching_permanents_spell_v1` | `damage_wipe` | `battle_rule_v1:32ba91fba4737f3432f05905d2845449` |
+| `Storm's Wrath` | `xmage_damage_all_spell` | `xmage_fixed_damage_all_matching_permanents_spell_v1` | `damage_wipe` | `battle_rule_v1:925a5a19163b3817fc87c4d00d111209` |
+| `Tempest of Light` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8` |
+| `Tranquility` | `xmage_destroy_all_spell` | `xmage_destroy_all_matching_permanents_spell_v1` | `board_wipe` | `battle_rule_v1:8cca937904da37d443131e25b0e866a5` |
+
+## Blocked Samples
+
+- `additional_cost_detected`: `["Abjure", "Acceptable Losses", "Aether Tide", "Altar's Reap", "Angelic Purge", "Annihilating Glare", "Artillerize", "Bankrupt in Blood", "Betrayer's Bargain", "Bitter Triumph", "Blood Divination", "Blood for Bones"]`
+- `board_wipe_ability_class_not_simple`: `["Akroma's Vengeance", "Artistic Process", "Blasphemous Edict", "Boiling Earth", "Burn Down the House", "Cinderclasm", "Claws of Wirewood", "Crush the Weak", "Deafening Clarion", "Devastating Mastery", "Doomskar", "Dusk // Dawn"]`
+- `board_wipe_damage_amount_not_fixed`: `["Calamitous Cave-In", "Chain Reaction", "Corrosive Gale", "Gates Ablaze", "Immolating Gyre", "Radiant Flames", "Savage Twister", "Skyreaping", "Windstorm"]`
+- `board_wipe_damage_scope_not_supported`: `["Breath Weapon", "Evaporate", "Fiery Cannonade", "Gale Force", "Incandescent Aria", "Inflame", "Kaervek's Hex", "Marrow Shards", "Rain of Blades", "Sandstorm", "Squall", "Warpath"]`
+- `board_wipe_destroy_scope_not_supported`: `["Acid Rain", "Anarchy", "Boil", "Boiling Seas", "Citywide Bust", "Cleanse", "Consume the Meek", "Culling Sun", "Damning Verdict", "Extinguish All Hope", "Fight to the Death", "Flashfires"]`
+- `board_wipe_effect_class_not_supported`: `["Balancing Act", "Barter in Blood", "Bend or Break", "Blood Money", "Bontu's Last Reckoning", "Burning of Xinye", "By Invitation Only", "Call to the Void", "Cataclysm", "Catastrophe", "Ceaseless Conflict", "Celestial Judgment"]`
+- `board_wipe_oracle_not_simple`: `["Anger of the Gods", "Barrage of Boulders", "Blood on the Snow", "Breaking Point", "Brotherhood's End", "Calming Verse", "Cleansing Meditation", "Cleansing Nova", "Crisis of Conscience", "Crux of Fate", "Fated Retribution", "Final Act"]`
+- `bounce_ability_class_not_simple`: `["Alchemist's Retrieval", "Capsize", "Champion's Victory", "Clutch of Currents", "Command of Unsummoning", "Consuming Vortex", "Dematerialize", "Deny Reality", "Depart the Realm", "Essence Fracture", "Floodwaters", "Into Thin Air"]`
+- `bounce_effect_class_not_pure`: `["Absorb Identity", "Alley Evasion", "Applied Biomancy", "Banishing Betrayal", "Baral's Expertise", "Barrin's Unmaking", "Boing!", "Brutal Expulsion", "Callous Dismissal", "Clutch of the Undercity", "Consign // Oblivion", "Dead // Gone"]`
+- `bounce_target_not_supported`: `["Aether Gale", "Aether Tradewinds", "Bounce Off", "Captivating Gyre", "Churning Eddy", "Counterintelligence", "Cut the Earthly Bond", "Distorting Wake", "Hoodwink", "Into the Void", "Peel from Reality", "Quicksilver Geyser"]`
+- `counter_ability_class_not_simple`: `["Admiral's Order", "Broken Concentration", "Consign to Memory", "Controvert", "Fervent Denial", "Forbid", "Forceful Denial", "Last Word", "Long River's Pull", "Muddle the Mixture", "Neutralize", "Out of Bounds"]`
+- `counter_effect_class_not_pure`: `["Amazing Acrobatics", "Bar the Gate", "Bring the Ending", "Confirm Suspicions", "Countersquall", "Dawn Charm", "Deny the Witch", "Didn't Say Please", "Discombobulate", "Dissolve", "Ertai's Trickery", "Essence Capture"]`
+- `counter_oracle_not_simple`: `["Change the Equation", "Spell Blast"]`
+- `counter_target_not_supported`: `["Avoid Fate", "Ceremonious Rejection", "Disallow", "Disdainful Stroke", "Double Negative", "Flashfreeze", "Frazzle", "Guttural Response", "Hisoka's Defiance", "Intervene", "Minor Misstep", "Mystic Denial"]`
+- `damage_amount_not_fixed`: `["Armed Response", "Artillery Blast", "Blaze", "Clan Defiance", "Devil's Play", "Divine Retribution", "Dogpile", "Earth Tremor", "Electrostatic Bolt", "Fall of the Titans", "Fanning the Flames", "Feedback Bolt"]`
+- `damage_effect_class_not_pure`: `["Aggressive Sabotage", "Arc Blade", "Arrow Storm", "Barrel Down Sokenzan", "Beacon of Destruction", "Bedeck // Bedazzle", "Blastfire Bolt", "Blightning", "Blooming Blast", "Bolt of Keranos", "Bot Bashing Time", "Brimstone Volley"]`
+- `damage_target_not_supported`: `["Arrows of Justice", "Burning Oil", "Consuming Bonfire", "Cosmium Blast", "Divine Arrow", "Dragon's Presence", "Dual Shot", "Furious Reprisal", "Gideon's Reproach", "Hamato Ninp\u014d", "Impeccable Timing", "Iron Verdict"]`
+- `destroy_effect_class_not_pure`: `["Active Volcano", "Afterlife", "Aftershock", "Agonizing Demise", "Airbender's Reversal", "Artisan's Sorrow", "Assassin's Strike", "Atomize", "Bant Charm", "Beast Within", "Blight Grenade", "Blood Curdle"]`
+- `destroy_target_not_supported`: `["Asphyxiate", "Assassin's Blade", "Assassinate", "Avalanche", "Bramblecrush", "By Force", "Cast Down", "Chill to the Bone", "Consign to Dust", "Cradle to Grave", "Crush", "Curtains' Call"]`
+- `draw_effect_class_not_pure`: `["Aang's Defense", "Abeyance", "Abzan Charm", "Accelerate", "Adventure Awaits", "Afflict", "Afterlife Insurance", "Aggressive Urge", "Airbending Lesson", "Allied Strategies", "Amass the Components", "Ambition's Cost"]`
+- `exile_effect_class_not_pure`: `["Agate Assault", "Aim for the Head", "Angelic Ascension", "Anguished Unmaking", "Ashes to Ashes", "Break Down the Door", "Buy Your Silence", "Cast into the Fire", "Consuming Sinkhole", "Crib Swap", "Devout Decree", "Dispatch"]`
+- `exile_oracle_not_simple`: `["Barrier Breach", "Crush Contraband", "Devouring Light", "Forsake the Worldly", "Repel the Vile", "Tear Asunder", "Topple", "Wipe Clean"]`
+- `exile_target_not_supported`: `["Blade Banish", "Blazing Hope", "Bring to Trial", "Celestial Purge", "Complete Disregard", "Death in the Family", "Despark", "Dust to Dust", "Epic Downfall", "Excoriate", "Exorcise", "Expel"]`
+- `life_gain_amount_not_fixed`: `["Blessed Reversal", "Bountiful Harvest", "Festival of Trokin", "Fruition", "Gerrard's Wisdom", "Invigorating Falls", "Joyous Respite", "Landbind Ritual", "Nourishing Shoal", "Peach Garden Oath", "Predator's Rapport", "Presence of the Wise"]`
+- `life_gain_effect_class_not_pure`: `["Aang's Journey", "Absorb", "Abuna's Chant", "Aerial Assault", "Aerial Predation", "Agonizing Syphon", "Appetite for the Unnatural", "Archangel's Light", "Bargain", "Basic Conjuration", "Battle at the Bridge", "Battlefield Promotion"]`
+- `life_gain_oracle_not_simple`: `["Ancestral Tribute", "Benediction of Moons", "Captured Sunlight", "Folk Medicine", "Gnaw to the Bone", "Meditation Puzzle", "Reaping the Rewards", "Rejuvenate", "Sun's Bounty", "Vital Surge", "Weather the Storm"]`
+- `mana_source_effect_class_not_simple`: `["Abzan Banner", "Aetheric Amplifier", "Agility Bobblehead", "All-Fates Scroll", "Altar of the Pantheon", "Ancient Cornucopia", "Animal Attendant", "Arcum's Astrolabe", "Arixmethes, Slumbering Isle", "Armored Scrapgorger", "Ashaya, Soul of the Wild", "Astral Cornucopia"]`
+- `mana_source_oracle_not_simple`: `["Agent of Stromgald", "Apprentice Wizard", "Arc Reactor", "Basal Thrull", "Black Lotus", "Blightsoil Druid", "Blood Celebrant", "Blood Pet", "Blood Vassal", "Bog Initiate", "Bog Witch", "Catalyst Elemental"]`
+- `mana_source_safe_ability_missing`: `["Abstract Paintmage", "Aetherflux Conduit", "Akki Rockspeaker", "Alluring Suitor // Deadly Dancer", "Ardent Electromancer", "Arvinox, the Mind Flail", "Azula, Cunning Usurper", "Barbflare Gremlin", "Benthic Explorers", "Berta, Wise Extrapolator", "Blazing Firesinger // Seething Song", "Boommobile"]`
+- `mana_source_spell_not_supported`: `["Esper Origins // Summon: Esper Maduin"]`
+- `mana_source_unsafe_ability_class`: `["Abzan Devotee", "Accomplished Alchemist", "Adarkar Unicorn", "Alena, Kessig Trapper", "Altar of the Lost", "Arbor Adherent", "Automated Artificer", "Axebane Guardian", "Barrels of Blasting Jelly", "Battery Bearer", "Beastcaller Savant", "Bighorner Rancher"]`
+- `not_instant_or_sorcery_spell`: `["Aang, A Lot to Learn", "Abandoned Sarcophagus", "Aberrant", "Aberrant Mind Sorcerer", "Abhorrent Oculus", "Abiding Grace", "Abomination", "Abomination of Llanowar", "Absolver Thrull", "Absolving Lammasu", "Abu Ja'far", "Abyssal Gatekeeper"]`
+- `not_one_shot_spell_ability`: `["Ajani's Response", "Aleatory", "All Hallow's Eve", "Anzrag's Rampage", "Arm with Aether", "Arwen's Gift", "Astral Confrontation", "Back for More", "Balduvian Rage", "Banish from Edoras", "Benefactor's Draught", "Bind"]`
+- `recursion_ability_class_not_simple`: `["Blood Beckoning", "Call to the Netherworld", "Dead Revels", "Disturbed Burial", "Grim Harvest", "Life from the Loam", "Morgue Theft", "Mystic Retrieval", "Peerless Recycling", "Sacred Excavation", "Soulless Revival", "Unmake the Graves"]`
+- `recursion_effect_class_not_pure`: `["Aberrant Return", "Abuelo's Awakening", "Accumulate Wisdom", "Aether Burst", "Aether Helix", "Afterlife from the Loam", "Agonizing Remorse", "All Suns' Dawn", "Animal Magnetism", "Animist's Awakening", "Another Chance", "Anticognition"]`
+- `recursion_oracle_not_simple`: `["Aid the Fallen", "Fortuitous Find", "Ghoulcaller's Chant", "Grim Discovery", "March of the Drowned", "Raise the Draugr", "Remember the Fallen", "Return from Extinction", "Reviving Melody", "Season of Renewal", "Survivors' Bond", "Unbury"]`
+- `recursion_target_not_supported`: `["Aphetto Dredging", "Boggart Birth Rite", "Death Denied", "Death's Duet", "Reborn Hope", "Revive", "Rise from the Wreck", "Rogues' Gallery"]`

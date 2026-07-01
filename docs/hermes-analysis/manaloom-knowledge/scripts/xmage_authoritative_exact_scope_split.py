@@ -31,6 +31,8 @@ RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
+RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
+BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -41,6 +43,8 @@ SUPPORTED_UNITS = {
     RAMP_CREATURE_UNIT,
     COUNTER_UNIT,
     BOUNCE_UNIT,
+    RECURSION_UNIT,
+    BOARD_WIPE_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -51,8 +55,21 @@ EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
+RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
+BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
+DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 
-SPELL_UNITS = {DRAW_UNIT, DAMAGE_UNIT, DESTROY_UNIT, LIFE_UNIT, EXILE_UNIT, COUNTER_UNIT, BOUNCE_UNIT}
+SPELL_UNITS = {
+    DRAW_UNIT,
+    DAMAGE_UNIT,
+    DESTROY_UNIT,
+    LIFE_UNIT,
+    EXILE_UNIT,
+    COUNTER_UNIT,
+    BOUNCE_UNIT,
+    RECURSION_UNIT,
+    BOARD_WIPE_UNIT,
+}
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
 SPELL_COMPLEXITY_TOKENS = {
@@ -183,7 +200,14 @@ def oracle_text(metadata: dict[str, Any]) -> str:
 
 def has_oracle_complexity(metadata: dict[str, Any], tokens: set[str] = SPELL_COMPLEXITY_TOKENS) -> bool:
     text = oracle_text(metadata)
-    return any(token in text for token in tokens)
+    for token in tokens:
+        if re.fullmatch(r"[a-z]+", token):
+            if re.search(rf"\b{re.escape(token)}\b(?!['’]s\b)", text):
+                return True
+            continue
+        if token in text:
+            return True
+    return False
 
 
 def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
@@ -307,6 +331,107 @@ def counter_target_constraints_for(target: str) -> dict[str, Any]:
         }
         constraints["spell_colors"] = [color_symbols[target]]
     return constraints
+
+
+def recursion_target_constraints_for(target: str) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "graveyard", "controller": "self"}
+    if target == "any_card":
+        constraints["scope"] = "any_card"
+    elif target in {"creature", "artifact", "enchantment", "sorcery", "instant"}:
+        constraints["card_types"] = [target]
+    elif target == "instant_or_sorcery":
+        constraints["card_types"] = ["instant", "sorcery"]
+    elif target == "artifact_or_enchantment":
+        constraints["card_types"] = ["artifact", "enchantment"]
+    elif target == "permanent":
+        constraints["card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"]
+    else:
+        constraints["target"] = target
+    return constraints
+
+
+def recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, tuple[str, int, bool]]] = [
+        (
+            r"^return target instant or sorcery card from your graveyard to your hand\.?$",
+            ("instant_or_sorcery", 1, False),
+        ),
+        (
+            r"^return target artifact or enchantment card from your graveyard to your hand\.?$",
+            ("artifact_or_enchantment", 1, False),
+        ),
+        (
+            r"^return target permanent card from your graveyard to your hand\.?$",
+            ("permanent", 1, False),
+        ),
+        (
+            r"^return target creature card from your graveyard to your hand\.?$",
+            ("creature", 1, False),
+        ),
+        (
+            r"^return target artifact card from your graveyard to your hand\.?$",
+            ("artifact", 1, False),
+        ),
+        (
+            r"^return target enchantment card from your graveyard to your hand\.?$",
+            ("enchantment", 1, False),
+        ),
+        (
+            r"^return target instant card from your graveyard to your hand\.?$",
+            ("instant", 1, False),
+        ),
+        (
+            r"^return target sorcery card from your graveyard to your hand\.?$",
+            ("sorcery", 1, False),
+        ),
+        (
+            r"^return target card from your graveyard to your hand\.?$",
+            ("any_card", 1, False),
+        ),
+        (
+            r"^return up to two target creature cards from your graveyard to your hand\.?$",
+            ("creature", 2, True),
+        ),
+        (
+            r"^return up to two target permanent cards from your graveyard to your hand\.?$",
+            ("permanent", 2, True),
+        ),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return result
+    return None
+
+
+def destroy_all_types_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, list[str]]] = [
+        (r"^destroy all creatures(?:\. they can't be regenerated\.)?\.?$", ["creature"]),
+        (r"^destroy all artifacts\.?$", ["artifact"]),
+        (r"^destroy all enchantments\.?$", ["enchantment"]),
+        (r"^destroy all artifacts and enchantments\.?$", ["artifact", "enchantment"]),
+        (r"^destroy all creatures and lands\.?$", ["creature", "land"]),
+        (
+            r"^destroy all artifacts, creatures, and enchantments\.?$",
+            ["artifact", "creature", "enchantment"],
+        ),
+    ]
+    for pattern, card_types in patterns:
+        if re.match(pattern, text):
+            return card_types
+    return None
+
+
+def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    if re.match(r"^.+ deals? \d+ damage to each creature\.?$", text):
+        return "each_creature"
+    if re.match(r"^.+ deals? \d+ damage to each creature and each planeswalker\.?$", text):
+        return "each_creature_and_planeswalker"
+    if re.match(r"^.+ deals? \d+ damage to each creature your opponents control\.?$", text):
+        return "each_creature_opponents_control"
+    return None
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -581,6 +706,69 @@ def split_row(
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
+
+    if unit == RECURSION_UNIT:
+        if classes != {"ReturnFromGraveyardToHandTargetEffect"}:
+            return None, "recursion_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "recursion_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "recursion_oracle_not_simple"
+        target = recursion_to_hand_from_oracle(metadata)
+        if target is None:
+            return None, "recursion_target_not_supported"
+        target_type, count, up_to = target
+        effect_json = {
+            "effect": "recursion",
+            "battle_model_scope": RECURSION_SCOPE,
+            "target": target_type,
+            "target_constraints": recursion_target_constraints_for(target_type),
+            "count": count,
+            "destination": "hand",
+            "target_controller": "self",
+            "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+            **flags,
+        }
+        if up_to:
+            effect_json["up_to_count"] = True
+        return build_proposal(row, metadata, effect_json, family_id="xmage_graveyard_to_hand_spell"), "selected_exact_scope"
+
+    if unit == BOARD_WIPE_UNIT:
+        if ability_classes(row):
+            return None, "board_wipe_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "board_wipe_oracle_not_simple"
+        if classes == {"DestroyAllEffect"}:
+            destroy_card_types = destroy_all_types_from_oracle(metadata)
+            if destroy_card_types is None:
+                return None, "board_wipe_destroy_scope_not_supported"
+            effect_json = {
+                "effect": "board_wipe",
+                "battle_model_scope": BOARD_WIPE_SCOPE,
+                "destroy_card_types": destroy_card_types,
+                "destination": "graveyard",
+                "xmage_effect_class": "DestroyAllEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_all_spell"), "selected_exact_scope"
+        if classes == {"DamageAllEffect"}:
+            amount = java_constructor_int(source_text, "DamageAllEffect")
+            if amount is None or amount <= 0:
+                return None, "board_wipe_damage_amount_not_fixed"
+            damage_scope = damage_all_scope_from_oracle(metadata)
+            if damage_scope is None:
+                return None, "board_wipe_damage_scope_not_supported"
+            effect_json = {
+                "effect": "damage_wipe",
+                "battle_model_scope": DAMAGE_WIPE_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                "damage_scope": damage_scope,
+                "xmage_effect_class": "DamageAllEffect",
+                **flags,
+            }
+            return build_proposal(row, metadata, effect_json, family_id="xmage_damage_all_spell"), "selected_exact_scope"
+        return None, "board_wipe_effect_class_not_supported"
 
     if unit in RAMP_UNITS:
         if is_spell(metadata):
