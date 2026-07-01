@@ -23,6 +23,7 @@ VARIANT_GATE = SCRIPT_DIR / "lorehold_variant_battle_gate.py"
 ARTIFACT_CONTRACT_AUDIT = SCRIPT_DIR / "lorehold_artifact_contract_audit.py"
 PROMOTION_DECISION_AUDIT = SCRIPT_DIR / "lorehold_promotion_gate_decision_audit.py"
 GLOBAL_COMMANDER_AUDIT = SCRIPT_DIR / "global_commander_deck_contract_audit.py"
+GLOBAL_COMMANDER_MATRIX = SCRIPT_DIR / "global_commander_strategy_matrix.py"
 README = REPO_ROOT / "docs/hermes-analysis/README.md"
 
 CONTRACT_MATRIX_JSON = (
@@ -47,7 +48,11 @@ CUT_METHODOLOGY_REPORT = (
 )
 GLOBAL_COMMANDER_REPORT = (
     REPO_ROOT
-    / "docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md"
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md"
+)
+GLOBAL_COMMANDER_MATRIX_REPORT = (
+    REPO_ROOT
+    / "docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md"
 )
 
 REQUIRED_FOCUS_CARDS = {
@@ -106,6 +111,7 @@ def build_audit() -> dict[str, Any]:
                 "candidate_607_v615_mana_engine_v1",
                 "Global Commander Rollout - 2026-07-01",
                 "global_commander_deck_contract_audit.py",
+                "global_commander_strategy_matrix.py",
             ],
         )
     )
@@ -188,7 +194,9 @@ def build_audit() -> dict[str, Any]:
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
                 "global_commander_deck_contract_audit.py",
-                "global_commander_deck_contract_audit_20260701_post_legalities.md",
+                "global_commander_strategy_matrix.py",
+                "global_commander_deck_contract_audit_20260701_post_scope_legalities.md",
+                "global_commander_strategy_matrix_20260701_current.md",
             ],
         )
     )
@@ -248,11 +256,31 @@ def build_audit() -> dict[str, Any]:
         )
     )
     checks.append(
+        check_contains(
+            GLOBAL_COMMANDER_MATRIX,
+            [
+                "global_commander_deck_contract_audit.py",
+                "postgres_is_product_truth",
+                "hermes_is_lab_cache",
+                "ready_for_strategy_matrix",
+                "structure_ready_source_missing",
+            ],
+        )
+    )
+    checks.append(
         {
             "path": rel(GLOBAL_COMMANDER_REPORT),
             "exists": GLOBAL_COMMANDER_REPORT.exists(),
             "status": "pass" if GLOBAL_COMMANDER_REPORT.exists() else "fail",
             "missing": [] if GLOBAL_COMMANDER_REPORT.exists() else ["global_commander_report"],
+        }
+    )
+    checks.append(
+        {
+            "path": rel(GLOBAL_COMMANDER_MATRIX_REPORT),
+            "exists": GLOBAL_COMMANDER_MATRIX_REPORT.exists(),
+            "status": "pass" if GLOBAL_COMMANDER_MATRIX_REPORT.exists() else "fail",
+            "missing": [] if GLOBAL_COMMANDER_MATRIX_REPORT.exists() else ["global_commander_matrix_report"],
         }
     )
 

@@ -140,25 +140,38 @@ path. Before applying the Commander contract to all decks, run:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_strategy_matrix.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current
 ```
 
 Current global audit evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md`
 - PostgreSQL registered variants: `13/13` are `structure_ready`.
 - Hermes local lab decks: Lorehold baseline `6`, Lorehold variants `606-616`,
   and non-Lorehold variants `617-621` are structurally ready.
-- Product/user Commander scope: `27` likely user decks; `5` are
-  `structure_ready`, `6` are ready except missing legality rows, and `16` need
-  repair before entering global promotion gates.
+- Product/user Commander scope after fixture/probe refinement: `16` likely user
+  decks; `6` are `structure_ready`, `10` need repair or exclusion before
+  entering global promotion gates.
+- The remaining product repair queue is shape/legality, not unknown legality:
+  `9` decks are incomplete or missing commander data, and `goblins` is blocked
+  by `Auntie Flint` as `not_legal` in Commander.
 - Test/fixture decks are explicitly excluded from product promotion decisions.
 - Deck `607` materialized for `rafaelhalder@gmail.com` is structurally ready
   after legalities sync: `100` cards, `1` commander, `0` missing legalities,
   and `0` illegal rows.
 - Legalities syncs applied on 2026-07-01:
   `msh` upserted `2921` `card_legalities` rows; `tdc,tle,blc,drc` upserted
-  `207` rows. These syncs updated legalities only, not cards or deck contents.
+  `207` rows; `eoc,sld,soc,unk` upserted `12604` rows. These syncs updated
+  legalities only, not cards or deck contents.
+- Global Commander strategy matrix status: `10` commanders considered, `36`
+  ready deck candidates, `19` product-ready decks, `8` blocked product decks;
+  `Lorehold`, `Kaalia`, `Kefka`, and `Y'shtola` are ready for commander-specific
+  strategy matrix, while `Sauron`, `Valgavoth`, `Animar`, and `Jin-Gitaxias //
+  The Great Synthesis` need a reference/profile/learned source lane before
+  strategy-matrix promotion.
 
 Global promotion rules:
 
@@ -174,6 +187,9 @@ Global promotion rules:
 - The global audit is a readiness and prioritization gate. It does not replace
   commander intent profiles, source corpus, strategy matrix, or battle gate
   evidence.
+- The global strategy matrix is a routing gate. It can say which commander
+  should receive a commander-specific strategy matrix next, but it cannot
+  promote a deck without equal battle gate evidence.
 
 ## Source Hierarchy
 

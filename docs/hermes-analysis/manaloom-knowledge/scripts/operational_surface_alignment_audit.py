@@ -210,6 +210,7 @@ def build_checks() -> list[Check]:
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
                 "global_commander_deck_contract_audit.py",
+                "global_commander_strategy_matrix.py",
             ],
             "scripts.deckbuilding_surface_audit_blocks_legacy",
         ),

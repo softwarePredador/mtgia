@@ -80,14 +80,21 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     metodo, nao pelo conteudo do Lorehold: rode
     `manaloom-knowledge/scripts/global_commander_deck_contract_audit.py` para
     separar `user_product`, `registered_pg_variant`, Hermes/lab e fixtures
-    antes de qualquer promocao.
+    antes de qualquer promocao, e depois rode
+    `manaloom-knowledge/scripts/global_commander_strategy_matrix.py` para
+    decidir quais comandantes entram em matriz estrategica especifica.
   - Evidencia global atual:
-    `master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md`.
+    `master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md`
+    e
+    `master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md`.
     Resultado: 13 variantes PostgreSQL registradas `structure_ready`; Hermes
     local 6/606-621 estruturalmente pronto; deck 607 do usuario
     `rafaelhalder@gmail.com` com 100 cartas, 1 comandante e legalidades
-    Commander completas. Ainda ha decks `user_product` incompletos que devem
-    ser reparados ou excluidos do gate global antes de promocao ampla.
+    Commander completas. A matriz global considera 10 comandantes, 36 decks
+    prontos, 19 decks de produto prontos e 8 decks de produto bloqueados;
+    `Lorehold`, `Kaalia`, `Kefka` e `Y'shtola` ja podem seguir para matriz
+    estrategica especifica, enquanto comandantes sem fonte/perfil ficam
+    bloqueados antes de battle/otimizacao.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

@@ -18,7 +18,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
         row = DeckRow(
             source="postgres",
             deck_id="deck-1",
-            user_email="real.player@example.com",
+            user_email="real.player@gmail.com",
             name="Miirym Commander",
             format="commander",
             row_count=65,
@@ -71,7 +71,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
         row = DeckRow(
             source="postgres",
             deck_id="deck-4",
-            user_email="real.player@example.com",
+            user_email="real.player@gmail.com",
             name="Wilson Background",
             format="commander",
             total_quantity=100,
@@ -87,7 +87,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
         row = DeckRow(
             source="postgres",
             deck_id="deck-duplicate",
-            user_email="real.player@example.com",
+            user_email="real.player@gmail.com",
             name="Duplicate Nonbasic",
             format="commander",
             total_quantity=100,
@@ -106,7 +106,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
                 DeckRow(
                     source="postgres",
                     deck_id="ready",
-                    user_email="real.player@example.com",
+                    user_email="real.player@gmail.com",
                     name="Ready",
                     format="commander",
                     total_quantity=100,
@@ -115,7 +115,7 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
                 DeckRow(
                     source="postgres",
                     deck_id="bad",
-                    user_email="real.player@example.com",
+                    user_email="real.player@gmail.com",
                     name="Incomplete",
                     format="commander",
                     total_quantity=1,
@@ -130,6 +130,50 @@ class GlobalCommanderDeckContractAuditTests(unittest.TestCase):
             "repair_or_exclude_product_user_decks_before_global_promotion",
             payload["action_items"],
         )
+
+    def test_example_domain_and_probe_names_are_not_product_scope(self) -> None:
+        fixtures = [
+            DeckRow(
+                source="postgres",
+                deck_id="flow",
+                user_email="flow_19dcf0c78f8@example.com",
+                name="Flow Talrand 19dcf0c78f8",
+                format="commander",
+                total_quantity=100,
+                commander_count=1,
+            ),
+            DeckRow(
+                source="postgres",
+                deck_id="probe",
+                user_email="probe_19dcf0c78f8@example.com",
+                name="Probe Talrand 19dcf0c78f8",
+                format="commander",
+                total_quantity=100,
+                commander_count=1,
+            ),
+            DeckRow(
+                source="postgres",
+                deck_id="ml-test",
+                user_email="real.player@gmail.com",
+                name="ML Test Deck",
+                format="commander",
+                total_quantity=2,
+                commander_count=1,
+            ),
+            DeckRow(
+                source="postgres",
+                deck_id="example-domain",
+                user_email="haalder@example.com",
+                name="Meu Deck Commander",
+                format="commander",
+                total_quantity=91,
+                commander_count=1,
+            ),
+        ]
+
+        for row in fixtures:
+            with self.subTest(row=row.deck_id):
+                self.assertEqual(classify_deck(row), "test_or_fixture")
 
 
 if __name__ == "__main__":

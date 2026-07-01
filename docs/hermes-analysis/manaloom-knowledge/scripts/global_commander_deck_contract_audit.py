@@ -35,20 +35,20 @@ if str(SCRIPT_DIR) not in sys.path:
 TEST_EMAIL_RE = re.compile(
     r"("
     r"(^|[._+-])qa|(^|[._+-])test|runtime|fixture|smoke|e2e|"
-    r"example\.invalid|test\.local|@t\.com|mltest|decktest|"
+    r"example\.(com|net|org|invalid)|test\.local|@t\.com|mltest|decktest|"
     r"functional_tags|semantic_v2|iphone15|sm_a135m|m2006_|poll_|inc_|"
     r"copilot\.audit|corpus\.builder|optimization\.validation\.bot|"
-    r"profile_community|learned_lorehold|audit_|gen_"
+    r"profile_community|learned_lorehold|audit_|gen_|flow_|probe_"
     r")",
     re.IGNORECASE,
 )
 
 TEST_NAME_RE = re.compile(
     r"^("
-    r"QA|Test|Runtime|Semantic v2|Deck incremental|AI Generated|"
+    r"QA|Test|Runtime|Semantic v2|Deck incremental|AI Generated|ML Test Deck|"
     r"Optimize Flow|Debate Test|Private Deck|Imported Deck|Updated Deck|"
     r"Cop?ia de Test|Cópia de Test|Commander Only Validation|"
-    r"Resolution Validation|Profile Community Runtime|Incomplete "
+    r"Resolution Validation|Profile Community Runtime|Incomplete |Flow |Probe "
     r")",
     re.IGNORECASE,
 )

@@ -1,6 +1,6 @@
 # Deckbuilding Contract Surface Audit
 
-- Generated at: `2026-07-01T00:39:09.452207+00:00`
+- Generated at: `2026-07-01T00:52:33.506061+00:00`
 - Status: `pass`
 - Contract: `docs/hermes-analysis/COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
 
@@ -23,7 +23,9 @@
 | pass | `docs/hermes-analysis/master_optimizer_reports/lorehold_ideal_candidate_decision_audit_20260629_v615_mana_engine_v1.md` |  |
 | pass | `docs/hermes-analysis/master_optimizer_reports/lorehold_cut_methodology_reaudit_20260629.md` |  |
 | pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py` |  |
-| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_legalities.md` |  |
+| pass | `docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_strategy_matrix.py` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md` |  |
+| pass | `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md` |  |
 
 ## Historical Blocked Surfaces
 
