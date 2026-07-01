@@ -10753,6 +10753,11 @@ def removal_annotation_replay_fields(effect_data):
 def removal_life_gain_requested(effect_data, target):
     if not isinstance(effect_data, dict):
         return 0
+    if effect_data.get("controller_gains_life"):
+        try:
+            return max(0, int(effect_data.get("controller_gains_life") or 0))
+        except Exception:
+            return 0
     if effect_data.get("target_controller_life_gain_equal_target_power"):
         try:
             return max(0, int((target or {}).get("power") or 0))
@@ -10766,13 +10771,20 @@ def removal_life_gain_requested(effect_data, target):
     return 0
 
 
-def apply_removal_life_gain(effect_data, target_controller, target):
+def removal_life_gain_recipient(effect_data, source_controller, target_controller):
+    if isinstance(effect_data, dict) and effect_data.get("controller_gains_life"):
+        return source_controller
+    return target_controller
+
+
+def apply_removal_life_gain(effect_data, target_controller, target, source_controller=None):
     requested = removal_life_gain_requested(effect_data, target)
-    if requested <= 0 or target_controller is None:
+    recipient = removal_life_gain_recipient(effect_data, source_controller, target_controller)
+    if requested <= 0 or recipient is None:
         return requested, 0
-    before = int(getattr(target_controller, "life", 0) or 0)
-    gain_life(target_controller, requested)
-    after = int(getattr(target_controller, "life", 0) or 0)
+    before = int(getattr(recipient, "life", 0) or 0)
+    gain_life(recipient, requested)
+    after = int(getattr(recipient, "life", 0) or 0)
     return requested, max(0, after - before)
 
 
@@ -10780,7 +10792,12 @@ def removal_life_gain_replay_fields(effect_data, requested, gained):
     fields = {}
     if not isinstance(effect_data, dict):
         return fields
-    if effect_data.get("target_controller_life_gain_equal_target_power"):
+    if effect_data.get("controller_gains_life"):
+        fields["controller_gains_life"] = int(
+            effect_data.get("controller_gains_life") or 0
+        )
+        fields["life_gain_recipient"] = "controller"
+    elif effect_data.get("target_controller_life_gain_equal_target_power"):
         fields["target_controller_life_gain_equal_target_power"] = True
         fields["life_gain_status"] = effect_data.get(
             "life_gain_status",
@@ -10790,6 +10807,7 @@ def removal_life_gain_replay_fields(effect_data, requested, gained):
         fields["target_controller_gains_life"] = int(
             effect_data.get("target_controller_gains_life") or 0
         )
+        fields["life_gain_recipient"] = "target_controller"
     if fields:
         fields["life_gain_requested"] = int(requested or 0)
         fields["life_gained"] = int(gained or 0)
@@ -11639,6 +11657,7 @@ def resolve_declared_single_removal(player, opponents, card, effect_data, turn, 
         effect_data,
         target_controller,
         target,
+        source_controller=player,
     )
 
     if effect_data.get("uses_stat_modifier_removal"):
@@ -43752,6 +43771,7 @@ def apply_effect_immediate(
                     effect_data,
                     opp,
                     t,
+                    source_controller=player,
                 )
                 if effect_data.get("uses_stat_modifier_removal"):
                     try:

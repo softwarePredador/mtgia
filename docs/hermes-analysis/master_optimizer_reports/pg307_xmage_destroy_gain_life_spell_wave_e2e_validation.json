@@ -1,0 +1,504 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T13:13:57.922210+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg307_xmage_destroy_gain_life_spell_wave_manifest.json",
+  "package_id": "pg307_xmage_destroy_gain_life_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Appetite for the Unnatural",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108",
+          "oracle_hash": "ff2701341e046cdb32db1fd2d24193f3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Cursebreak",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac90831bff0a6d7d8cc7f79c84dc684",
+          "oracle_hash": "e8b18bd9c5e41964bd056a95a9599ba6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Drain the Well",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c113d532b53977905ddd6205d20b76b",
+          "oracle_hash": "a83cde4e874b76b73ec6952b980c5a5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Grapple with Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ae5bf64faa291c0d09c85d28201a2c2",
+          "oracle_hash": "2b0b7a6ae97fc371def1be151b9f5a9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Invoke the Divine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Lich's Caress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2151b4f927db86b6035cda9e8968a760",
+          "oracle_hash": "1f0834667ff74af400f80cd6af6f6f50",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Maw of the Mire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6",
+          "oracle_hash": "af7b53f165c85d1baa6e0670e600763d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Natural End",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1497fb65812c46c78c5b669ff4989524",
+          "oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Ray of Dissolution",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:762898b040728ef22fc560e8c079ec0d",
+          "oracle_hash": "3595f82ef93062fd242ae9dc886164c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sanctify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bf2d3a044f5bd1745cbac8a72622f30",
+          "oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sephiroth's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eeb274765267ef2873eb0b196c027df8",
+          "oracle_hash": "2dffcc424019a833cb2851580aa3694b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Solemn Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3ed89e31c22fb41043599139d0632cd",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Springsage Ritual",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Appetite for the Unnatural",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108",
+          "oracle_hash": "ff2701341e046cdb32db1fd2d24193f3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Cursebreak",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eac90831bff0a6d7d8cc7f79c84dc684",
+          "oracle_hash": "e8b18bd9c5e41964bd056a95a9599ba6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Drain the Well",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c113d532b53977905ddd6205d20b76b",
+          "oracle_hash": "a83cde4e874b76b73ec6952b980c5a5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Grapple with Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ae5bf64faa291c0d09c85d28201a2c2",
+          "oracle_hash": "2b0b7a6ae97fc371def1be151b9f5a9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Invoke the Divine",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Lich's Caress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2151b4f927db86b6035cda9e8968a760",
+          "oracle_hash": "1f0834667ff74af400f80cd6af6f6f50",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Maw of the Mire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6",
+          "oracle_hash": "af7b53f165c85d1baa6e0670e600763d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Natural End",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1497fb65812c46c78c5b669ff4989524",
+          "oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Ray of Dissolution",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:762898b040728ef22fc560e8c079ec0d",
+          "oracle_hash": "3595f82ef93062fd242ae9dc886164c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sanctify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bf2d3a044f5bd1745cbac8a72622f30",
+          "oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sephiroth's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eeb274765267ef2873eb0b196c027df8",
+          "oracle_hash": "2dffcc424019a833cb2851580aa3694b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Solemn Offering",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3ed89e31c22fb41043599139d0632cd",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "card_name": "Springsage Ritual",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+          "oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Appetite for the Unnatural",
+          "logical_rule_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cursebreak",
+          "logical_rule_key": "battle_rule_v1:eac90831bff0a6d7d8cc7f79c84dc684"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drain the Well",
+          "logical_rule_key": "battle_rule_v1:8c113d532b53977905ddd6205d20b76b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grapple with Death",
+          "logical_rule_key": "battle_rule_v1:5ae5bf64faa291c0d09c85d28201a2c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Invoke the Divine",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lich's Caress",
+          "logical_rule_key": "battle_rule_v1:2151b4f927db86b6035cda9e8968a760"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Maw of the Mire",
+          "logical_rule_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Natural End",
+          "logical_rule_key": "battle_rule_v1:1497fb65812c46c78c5b669ff4989524"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ray of Dissolution",
+          "logical_rule_key": "battle_rule_v1:762898b040728ef22fc560e8c079ec0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sanctify",
+          "logical_rule_key": "battle_rule_v1:2bf2d3a044f5bd1745cbac8a72622f30"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sephiroth's Intervention",
+          "logical_rule_key": "battle_rule_v1:eeb274765267ef2873eb0b196c027df8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Solemn Offering",
+          "logical_rule_key": "battle_rule_v1:a3ed89e31c22fb41043599139d0632cd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Springsage Ritual",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Appetite for the Unnatural",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cursebreak",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:eac90831bff0a6d7d8cc7f79c84dc684"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drain the Well",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:8c113d532b53977905ddd6205d20b76b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grapple with Death",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:5ae5bf64faa291c0d09c85d28201a2c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Invoke the Divine",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lich's Caress",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:2151b4f927db86b6035cda9e8968a760"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Maw of the Mire",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Natural End",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:1497fb65812c46c78c5b669ff4989524"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ray of Dissolution",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:762898b040728ef22fc560e8c079ec0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sanctify",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:2bf2d3a044f5bd1745cbac8a72622f30"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sephiroth's Intervention",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:eeb274765267ef2873eb0b196c027df8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Solemn Offering",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:a3ed89e31c22fb41043599139d0632cd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Springsage Ritual",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

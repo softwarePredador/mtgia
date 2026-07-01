@@ -68,6 +68,7 @@ SUPPORTED_UNITS = {
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
+DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
@@ -550,6 +551,64 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
         return "remove_permanent", "land"
     if re.search(r"destroy target permanent\b", text):
         return "remove_permanent", "permanent"
+    return None
+
+
+def simple_destroy_gain_life_from_source(source: str) -> tuple[str, int] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return None
+    life_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    if len(life_matches) != 1:
+        return None
+    target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
+    if len(target_classes) != 1:
+        return None
+    target_patterns = [
+        (
+            "artifact_or_enchantment",
+            r"new\s+TargetPermanent\s*\(\s*StaticFilters\.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT\s*\)",
+        ),
+        (
+            "artifact_or_creature",
+            r"new\s+TargetPermanent\s*\(\s*StaticFilters\.FILTER_PERMANENT_ARTIFACT_OR_CREATURE\s*\)",
+        ),
+        ("artifact", r"new\s+TargetArtifactPermanent\s*\(\s*\)"),
+        ("enchantment", r"new\s+TargetEnchantmentPermanent\s*\(\s*\)"),
+        ("creature", r"new\s+TargetCreaturePermanent\s*\(\s*\)"),
+        ("land", r"new\s+TargetLandPermanent\s*\(\s*\)"),
+    ]
+    matched_targets = [
+        target
+        for target, pattern in target_patterns
+        if re.search(pattern, text, re.S)
+    ]
+    if len(matched_targets) != 1:
+        return None
+    return matched_targets[0], int(life_matches[0])
+
+
+def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    target_patterns = [
+        ("artifact_or_enchantment", r"artifact or enchantment"),
+        ("artifact_or_creature", r"artifact or creature"),
+        ("artifact", r"artifact"),
+        ("enchantment", r"enchantment"),
+        ("creature", r"creature"),
+        ("land", r"land"),
+    ]
+    for target, target_phrase in target_patterns:
+        match = re.match(
+            rf"^destroy target {target_phrase}\. you gain (\d+) life\.?$",
+            text,
+        )
+        if match:
+            return target, int(match.group(1))
     return None
 
 
@@ -1407,6 +1466,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": [target]}
     if target == "artifact_or_enchantment":
         return {"card_types": ["artifact", "enchantment"]}
+    if target == "artifact_or_creature":
+        return {"card_types": ["artifact", "creature"]}
     if target == "creature_or_enchantment":
         return {"card_types": ["creature", "enchantment"]}
     if target == "creature_enchantment_or_planeswalker":
@@ -1422,6 +1483,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed spell-resolution creature-token maker"
     elif scope == DAMAGE_GAIN_LIFE_SCOPE:
         scope_kind = "fixed damage plus controller life-gain spell"
+    elif scope == DESTROY_GAIN_LIFE_SCOPE:
+        scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope in {
@@ -1969,6 +2032,38 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_fixed_damage_gain_life_spell",
+        ), "selected_exact_scope"
+
+    if unit == LIFE_UNIT and classes == {"DestroyTargetEffect", "GainLifeEffect"}:
+        if ability_classes(row):
+            return None, "destroy_life_gain_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "destroy_life_gain_oracle_not_simple"
+        source_destroy = simple_destroy_gain_life_from_source(source_text)
+        if source_destroy is None:
+            return None, "destroy_life_gain_source_not_fixed"
+        oracle_destroy = simple_destroy_gain_life_from_oracle(metadata)
+        if oracle_destroy is None:
+            return None, "destroy_life_gain_oracle_not_exact_fixed"
+        if source_destroy != oracle_destroy:
+            return None, "destroy_life_gain_source_oracle_mismatch"
+        target, life_gain = oracle_destroy
+        effect = "remove_creature" if target == "creature" else "remove_permanent"
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": DESTROY_GAIN_LIFE_SCOPE,
+            "target": target,
+            "target_constraints": target_constraints_for(target),
+            "destination": "graveyard",
+            "controller_gains_life": life_gain,
+            "xmage_effect_classes": ["DestroyTargetEffect", "GainLifeEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_destroy_target_gain_life_spell",
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT:

@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg306_damage_gain_life_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg307_destroy_gain_life_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27637`
-- XMage authoritative source resolved: `27323`
+- target all-card battle-gap identities: `27624`
+- XMage authoritative source resolved: `27310`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27323`
+- XMage authoritative adapter required: `27310`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27323` identities, card semantics are accepted from XMage; work is now
+- For `27310` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG306 Exact Adapter Waves
+## PG283-PG307 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG306 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG307 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -180,6 +180,10 @@ patterns:
   `DamageTargetEffect + GainLifeEffect` and exact fixed damage/life-gain
   Oracle/source text ->
   `xmage_fixed_damage_target_and_controller_gain_life_spell_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` with
+  `DestroyTargetEffect + GainLifeEffect`, one supported simple target, fixed
+  controller life-gain amount, and exact destroy/gain-life Oracle text ->
+  `xmage_destroy_target_and_controller_gain_life_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
@@ -1217,6 +1221,65 @@ PG306 measured result:
   `xmage_authoritative_adapter_required_count=27323`.
 - Running the exact splitter after PG306 on supported units returns
   `proposal_count=0` over `7416` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG307 evidence:
+
+- PG307 destroy target plus controller life-gain package:
+  `docs/hermes-analysis/master_optimizer_reports/pg307_xmage_destroy_gain_life_spell_wave_package.md`
+- PG307 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg307_xmage_destroy_gain_life_spell_wave_pg_apply_evidence.md`
+- PG307 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg307_xmage_destroy_gain_life_spell_wave_e2e_validation.md`
+- PG307 PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg307_xmage_destroy_gain_life_spell_wave_pg_to_sqlite_sync.json`
+- PG307 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg307_destroy_gain_life_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg307_destroy_gain_life_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg307_destroy_gain_life_spell_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg307_destroy_gain_life_spell_wave.md`
+- post-PG307 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg307_destroy_gain_life_spell_wave_recheck.md`
+- post-PG307 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg307_destroy_gain_life_spell_wave.md`
+- PG307 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_destroy_gain_life_spell_wave.md`
+- post-PG307 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg307_existing_supported_recheck.md`
+
+PG307 measured result:
+
+- PG307 promoted `13` exact one-shot spells whose local XMage source is one
+  fixed `DestroyTargetEffect`, one fixed `GainLifeEffect`, and one supported
+  target class, mapped to
+  `xmage_destroy_target_and_controller_gain_life_spell_v1`.
+- PostgreSQL apply evidence reports `13/13` promoted rows, `13/13`
+  verified/auto rows, and `13/13` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `6867` PostgreSQL rows, inserted/updated
+  `6661` SQLite rows, and exported `4475` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover strict destroy-plus-life-gain mapping,
+  dynamic/unsupported target blocking, target destruction, and controller life
+  gain; `121` focused exact-scope tests pass.
+- Global all-card readiness after PG307:
+  `battle_and_oracle_ready=2000` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `ready_product_qa_unique_cards=818`.
+- Global all-card authoritative queue after PG307:
+  `target_identity_count=27624`, `xmage_authoritative_source_count=27310`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27310`.
+- Running the exact splitter after PG307 on supported units returns
+  `proposal_count=0` over `7403` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

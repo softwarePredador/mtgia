@@ -2066,6 +2066,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
   },
+  "Appetite for the Unnatural": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 2,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108",
+    "battle_rule_oracle_hash": "ff2701341e046cdb32db1fd2d24193f3"
+  },
   "Approach of the Second Sun": {
     "battle_model_scope": "approach_second_cast_win_v2",
     "cmc": 7.0,
@@ -11669,6 +11695,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
   },
+  "Cursebreak": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 2,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eac90831bff0a6d7d8cc7f79c84dc684",
+    "battle_rule_oracle_hash": "e8b18bd9c5e41964bd056a95a9599ba6"
+  },
   "Cursed Minotaur": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -14757,6 +14808,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d01f9db522798a9292667da589d7d7f4"
+  },
+  "Drain the Well": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 2,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8c113d532b53977905ddd6205d20b76b",
+    "battle_rule_oracle_hash": "a83cde4e874b76b73ec6952b980c5a5d"
   },
   "Drake-Skull Cameo": {
     "activation_requires_tap": true,
@@ -23421,6 +23497,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:83d788e284eff30eb6ff8d2aa9686035"
   },
+  "Grapple with Death": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 1,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact_or_creature",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5ae5bf64faa291c0d09c85d28201a2c2",
+    "battle_rule_oracle_hash": "2b0b7a6ae97fc371def1be151b9f5a9f"
+  },
   "Grapple with the Past": {
     "cmc": 2.0,
     "effect": "recursion",
@@ -27483,6 +27585,32 @@
     "battle_rule_logical_key": "battle_rule_v1:13150949864474c123d5a02a7a007722",
     "battle_rule_oracle_hash": "a98214114b5acd853842ac7590854785"
   },
+  "Invoke the Divine": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 4,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+    "battle_rule_oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5"
+  },
   "Iona's Judgment": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
     "destination": "exile",
@@ -30456,6 +30584,31 @@
     "battle_rule_logical_key": "battle_rule_v1:b6491cf6f7d7df9a3fb0d91abd3d31c3",
     "battle_rule_oracle_hash": "575aef3cc2523831e440ea7dcd55fa6e"
   },
+  "Lich's Caress": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 3,
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2151b4f927db86b6035cda9e8968a760",
+    "battle_rule_oracle_hash": "1f0834667ff74af400f80cd6af6f6f50"
+  },
   "Lich-Knights' Conquest": {
     "cmc": 5.0,
     "effect": "recursion",
@@ -32683,6 +32836,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+  },
+  "Maw of the Mire": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 4,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6",
+    "battle_rule_oracle_hash": "af7b53f165c85d1baa6e0670e600763d"
   },
   "Mayhem Devil": {
     "cmc": 3.0,
@@ -35576,6 +35754,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d811721bcdb12b12c44e7437c0e5b66"
+  },
+  "Natural End": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 3,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1497fb65812c46c78c5b669ff4989524",
+    "battle_rule_oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2"
   },
   "Natural Order": {
     "battle_model_scope": "green_creature_pod_tutor_v1",
@@ -41602,6 +41806,31 @@
     "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
     "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
+  "Ray of Dissolution": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 3,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:762898b040728ef22fc560e8c079ec0d",
+    "battle_rule_oracle_hash": "3595f82ef93062fd242ae9dc886164c8"
+  },
   "Ray of Distortion": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -45132,6 +45361,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b411c1b26599c890aeef40da1a43d162"
   },
+  "Sanctify": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 3,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2bf2d3a044f5bd1745cbac8a72622f30",
+    "battle_rule_oracle_hash": "e2ec7d476fb36a631e6ead5c573d45a2"
+  },
   "Sanctum Gargoyle": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -46983,6 +47238,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:40ba2c9d0af48e10e62fd480d18fdb43"
+  },
+  "Sephiroth's Intervention": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 2,
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eeb274765267ef2873eb0b196c027df8",
+    "battle_rule_oracle_hash": "2dffcc424019a833cb2851580aa3694b"
   },
   "Sephiroth, Fabled SOLDIER // Sephiroth, One-Winged Angel": {
     "cmc": 3.0,
@@ -49880,6 +50160,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Solemn Offering": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 4,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a3ed89e31c22fb41043599139d0632cd",
+    "battle_rule_oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5"
+  },
   "Solemn Simulacrum": {
     "basic_only": true,
     "effect": "creature",
@@ -50988,6 +51294,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
     "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
+  "Springsage Ritual": {
+    "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+    "controller_gains_life": 4,
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DestroyTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5d06c51d4005a36bd990d87851d9383c",
+    "battle_rule_oracle_hash": "1a2e40995c4f7d6463ae7b5ce96cbfe5"
   },
   "Sprout": {
     "ability_kind": "one_shot",

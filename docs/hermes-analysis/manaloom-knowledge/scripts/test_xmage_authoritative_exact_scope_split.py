@@ -299,6 +299,57 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "damage_life_gain_source_not_fixed")
 
+    def test_destroy_gain_life_spell_maps_to_controller_life_gain(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target artifact or enchantment. You gain 4 life."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPermanent("
+                "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(4));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(effect["controller_gains_life"], 4)
+        self.assertEqual(effect["target_constraints"], {"card_types": ["artifact", "enchantment"]})
+
+    def test_destroy_gain_life_spell_blocks_dynamic_life_gain(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target artifact. You gain life equal to its mana value."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetArtifactPermanent());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(TargetManaValue.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_life_gain_source_not_fixed")
+
+    def test_destroy_gain_life_spell_blocks_restricted_target_filter(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DestroyTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target tapped creature. You gain 2 life."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_life_gain_source_not_fixed")
+
     def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

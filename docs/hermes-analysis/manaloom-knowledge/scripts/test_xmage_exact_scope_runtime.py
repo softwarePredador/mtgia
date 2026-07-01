@@ -370,6 +370,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_destroy_gain_life_spell_destroys_target_and_gains_life_for_controller(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 10
+        opponent.life = 20
+        target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
+            "target": "artifact_or_enchantment",
+            "target_constraints": {"card_types": ["artifact", "enchantment"]},
+            "destination": "graveyard",
+            "controller_gains_life": 4,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Offering",
+                "type_line": "Instant",
+                "oracle_text": "Destroy target artifact or enchantment. You gain 4 life.",
+            },
+            turn=3,
+            rng=random.Random(31),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 14)
+        self.assertEqual(opponent.life, 20)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Relic"])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Offering"
+                and data.get("target") == "Target Relic"
+                and data.get("destination") == "graveyard"
+                and data.get("controller_gains_life") == 4
+                and data.get("life_gain_recipient") == "controller"
+                and data.get("life_gain_requested") == 4
+                and data.get("life_gained") == 4
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_life_gain_spell_uses_gain_life_runtime(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
