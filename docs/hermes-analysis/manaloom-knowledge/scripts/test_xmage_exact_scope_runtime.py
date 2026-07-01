@@ -798,6 +798,34 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_combat_keyword_creature_effect_enriches_permanent_keywords(self) -> None:
+        card = {
+            "name": "Fixture Keyword Creature",
+            "type_line": "Creature - Bird",
+            "oracle_text": "Flying, vigilance, haste",
+            "power": 2,
+            "toughness": 2,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+            "keywords": ["flying", "vigilance", "haste"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "vigilance": True,
+            "haste": True,
+        }
+
+        permanent = self.battle.enrich_card({**card, **effect})
+        permanent["effect"] = "creature"
+        permanent["haste"] = self.battle.has_haste(permanent)
+        permanent["summoning_sick"] = not permanent["haste"]
+
+        self.assertTrue(permanent["flying"])
+        self.assertTrue(self.battle.has_vigilance(permanent))
+        self.assertTrue(permanent["haste"])
+        self.assertFalse(permanent["summoning_sick"])
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

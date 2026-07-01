@@ -67,6 +67,7 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
+STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -123,6 +124,34 @@ UNSAFE_MANA_ABILITY_CLASSES = {
     "DynamicManaAbility",
     "LimitedTimesPerTurnActivatedManaAbility",
 }
+
+COMBAT_KEYWORD_ABILITY_CLASSES = {
+    "DeathtouchAbility": "deathtouch",
+    "DefenderAbility": "defender",
+    "DoubleStrikeAbility": "double_strike",
+    "FirstStrikeAbility": "first_strike",
+    "FlyingAbility": "flying",
+    "HasteAbility": "haste",
+    "LifelinkAbility": "lifelink",
+    "MenaceAbility": "menace",
+    "ReachAbility": "reach",
+    "TrampleAbility": "trample",
+    "VigilanceAbility": "vigilance",
+}
+
+COMBAT_KEYWORD_ORDER = [
+    "flying",
+    "first_strike",
+    "double_strike",
+    "deathtouch",
+    "lifelink",
+    "menace",
+    "reach",
+    "trample",
+    "vigilance",
+    "haste",
+    "defender",
+]
 
 
 def utc_now() -> str:
@@ -547,6 +576,60 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     return power, toughness
 
 
+def is_creature_metadata(metadata: dict[str, Any]) -> bool:
+    return "creature" in str(metadata.get("type_line") or "").lower()
+
+
+def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
+    unit = str(row.get("adapter_work_unit") or "")
+    abilities = ability_classes(row)
+    return (
+        unit.startswith("xmage_signature::no_effect_class::")
+        and unit.endswith("::no_target_class::no_condition_class::no_signal")
+        and bool(abilities)
+        and not effect_classes(row)
+        and not (row.get("xmage_signals") or [])
+        and abilities.issubset(COMBAT_KEYWORD_ABILITY_CLASSES)
+    )
+
+
+def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
+    return {
+        COMBAT_KEYWORD_ABILITY_CLASSES[ability]
+        for ability in ability_classes(row)
+        if ability in COMBAT_KEYWORD_ABILITY_CLASSES
+    }
+
+
+def normalize_keyword_phrase(value: str) -> str:
+    return re.sub(r"\s+", "_", str(value or "").strip().lower())
+
+
+def ordered_keywords(keywords: set[str]) -> list[str]:
+    return [keyword for keyword in COMBAT_KEYWORD_ORDER if keyword in keywords]
+
+
+def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    first_line = raw.splitlines()[0]
+    first_line = re.sub(r"\([^)]*\)", "", first_line).strip().rstrip(".")
+    if not first_line:
+        return None
+    parts = [
+        normalize_keyword_phrase(part)
+        for part in re.split(r"[,;]", first_line)
+        if str(part or "").strip()
+    ]
+    if not parts:
+        return None
+    allowed = set(COMBAT_KEYWORD_ABILITY_CLASSES.values())
+    if any(part not in allowed for part in parts):
+        return None
+    return set(parts)
+
+
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
     if "any target" in text:
@@ -663,7 +746,8 @@ def split_row(
     source_text: str,
 ) -> tuple[dict[str, Any] | None, str]:
     unit = str(row.get("adapter_work_unit") or "")
-    if unit not in SUPPORTED_UNITS:
+    keyword_creature_unit = is_static_keyword_creature_unit(row)
+    if unit not in SUPPORTED_UNITS and not keyword_creature_unit:
         return None, "unsupported_adapter_work_unit"
     if not metadata:
         return None, "postgres_card_metadata_missing"
@@ -680,6 +764,34 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if keyword_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_keyword_not_creature"
+        keywords = keywords_from_ability_classes(row)
+        oracle_keywords = static_keywords_from_oracle(metadata)
+        if not keywords:
+            return None, "static_keyword_ability_not_supported"
+        if oracle_keywords is None:
+            return None, "static_keyword_oracle_not_exact"
+        if keywords != oracle_keywords:
+            return None, "static_keyword_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords)
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_KEYWORD_CREATURE_SCOPE,
+            "keywords": keyword_list,
+            "_keywords_are_self": True,
+            "xmage_ability_classes": sorted(ability_classes(row)),
+        }
+        for keyword in keyword_list:
+            effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_combat_keyword_creature",
+        ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
         if classes != {"DrawCardSourceControllerEffect"}:
@@ -991,7 +1103,7 @@ def build_exact_split_report(
     for row in queue_payload.get("queue") or []:
         if str(row.get("translation_lane") or "") != "xmage_authoritative_adapter_required":
             continue
-        if str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS:
+        if str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS and not is_static_keyword_creature_unit(row):
             continue
         considered += 1
         metadata = card_metadata_by_id.get(str(row.get("card_id") or ""), {})
@@ -1020,8 +1132,11 @@ def build_exact_split_report(
         },
         "method": {
             "xmage_is_authoritative_for_resolved_sources": True,
-            "promotion_boundary": "exact runtime-backed one-shot spell scopes only",
+            "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
+            "supported_dynamic_adapter_work_units": [
+                "xmage_signature::no_effect_class::<combat keyword abilities>::no_target_class::no_condition_class::no_signal",
+            ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,
         },

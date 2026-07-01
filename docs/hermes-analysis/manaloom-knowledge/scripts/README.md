@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg292_static_keyword_creature_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,20 +85,22 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG291. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG292. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
 PG288 added 22 graveyard-to-hand recursion spells; PG289 added 13 mass-removal
 spells across destroy-all and fixed damage-all scopes; PG290 added 3 fixed
 target-creature add-counters spells; PG291 added 42 fixed target-creature
-boost/debuff spells until end of turn.
+boost/debuff spells until end of turn; PG292 added 409 static self
+combat-keyword creatures.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
 recursion to hand, simple board wipes, fixed damage wipes, and fixed
 target-creature `+1/+1`/`-1/-1` counters, plus fixed target-creature
-power/toughness modifiers until end of turn. Evidence:
+power/toughness modifiers until end of turn, plus exact static self combat
+keywords on creatures. Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
@@ -123,11 +125,14 @@ power/toughness modifiers until end of turn. Evidence:
 - `master_optimizer_reports/pg291_xmage_boost_target_spell_wave_package.md`
 - `master_optimizer_reports/pg291_xmage_boost_target_spell_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg291_xmage_boost_target_spell_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg291_existing_supported_recheck.md`
+- `master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_package.md`
+- `master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg292_static_keyword_creature_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg292_existing_supported_recheck.md`
 
-After PG291, rerunning the exact splitter on supported units returns
-`proposal_count=0` over `7449` considered supported rows; continue by adding a
+After PG292, rerunning the exact splitter on supported units returns
+`proposal_count=0` over `7495` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the

@@ -121,21 +121,21 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg292_static_keyword_creature_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `31253`
-- XMage authoritative source resolved: `28317`
+- target all-card battle-gap identities: `30844`
+- XMage authoritative source resolved: `27908`
 - local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
-- ManaLoom adapter work-unit keys: `12093`
-- authoritative source coverage ratio: `0.9061`
+- ManaLoom adapter work-unit keys: `12065`
+- authoritative source coverage ratio: `0.9048`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `28317` identities, card semantics are accepted from XMage; work is now
+- For `27908` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `2936` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG291 Exact Adapter Waves
+## PG283-PG292 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG291 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG292 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -189,6 +189,8 @@ patterns:
   `xmage_fixed_add_counters_target_creature_spell_v1`
 - `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting` ->
   `xmage_fixed_boost_target_creature_until_eot_spell_v1`
+- `xmage_signature::no_effect_class::<combat keyword ability classes>::no_target_class::no_condition_class::no_signal` ->
+  `xmage_static_self_combat_keyword_creature_v1`
 
 PG283 evidence:
 
@@ -396,6 +398,50 @@ PG291 measured result:
   `xmage_authoritative_adapter_required_count=28317`.
 - Running the exact splitter after PG291 on supported units returns
   `proposal_count=0` over `7449` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with likely first
+  candidates from the largest remaining XMage work units: `recursion`,
+  `draw_engine`, `grant_protection_from_chosen_color`, residual
+  `direct_damage`, `life_gain`, `source_add_counters`, `removal_destroy`, and
+  `tutor`.
+
+PG292 evidence:
+
+- PG292 static keyword creature package:
+  `docs/hermes-analysis/master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_package.md`
+- PG292 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_pg_apply_evidence.md`
+- PG292 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg292_xmage_static_keyword_creature_wave_e2e_validation.md`
+- post-PG292 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg292_static_keyword_creature_wave_recheck.md`
+- post-PG292 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg292_static_keyword_creature_wave.md`
+- post-PG292 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg292_existing_supported_recheck.md`
+
+PG292 measured result:
+
+- PG292 promoted `409` exact static self combat-keyword creatures with
+  keyword-only Oracle first lines, excluding `ProtectionAbility` and any
+  creature whose Oracle text did not exactly match the resolved XMage keyword
+  set.
+- Runtime now enriches cast creatures with the exact static keyword set,
+  including haste clearing summoning sickness through the focused runtime test.
+- PostgreSQL postcheck: `409/409` promoted rows, `409/409` verified/auto,
+  `409/409` matching Oracle hash, with `2` backup rows.
+- PG -> Hermes/SQLite sync loaded `409` PostgreSQL rows, inserted/updated
+  `411` SQLite rows including deprecated shadow rows, and exported `4135`
+  canonical snapshot rows.
+- E2E package validation: PostgreSQL `409/409`, SQLite `409/409`, canonical
+  snapshot `409/409`, and runtime `get_card_effect` `409/409`.
+- Focused runtime tests cover static keyword enrichment on a permanent and
+  haste clearing summoning sickness; `62` focused tests pass.
+- Global all-card authoritative queue after PG292:
+  `target_identity_count=30844`, `xmage_authoritative_source_count=27908`,
+  `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27908`.
+- Running the exact splitter after PG292 on supported units returns
+  `proposal_count=0` over `7495` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with likely first
   candidates from the largest remaining XMage work units: `recursion`,
   `draw_engine`, `grant_protection_from_chosen_color`, residual

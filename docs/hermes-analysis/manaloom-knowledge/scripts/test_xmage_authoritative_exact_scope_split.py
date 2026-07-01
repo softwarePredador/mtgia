@@ -578,6 +578,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_target_source_not_single_fixed")
 
+    def test_static_combat_keyword_creature_maps_to_creature_with_keywords(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "VigilanceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Creature - Bird",
+                oracle_text="Flying, vigilance",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(VigilanceAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_KEYWORD_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["flying", "vigilance"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["vigilance"])
+        self.assertTrue(effect["_keywords_are_self"])
+
+    def test_static_keyword_creature_requires_oracle_keyword_match(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "VigilanceAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Creature - Bird",
+                oracle_text="Flying",
+            ),
+            source_text="",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_keyword_oracle_mismatch")
+
+    def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Creature - Cleric",
+                oracle_text="Protection from black",
+            ),
+            source_text="this.addAbility(new ProtectionAbility(filter));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
+    def test_static_keyword_creature_requires_creature_type(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Artifact - Vehicle",
+                oracle_text="Flying",
+            ),
+            source_text="this.addAbility(FlyingAbility.getInstance());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_keyword_not_creature")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),
