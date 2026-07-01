@@ -73,6 +73,7 @@ BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
+ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -641,6 +642,16 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DestroyTargetEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_tap_damage_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
         return False
@@ -776,6 +787,40 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    patterns: list[tuple[str, tuple[str, str]]] = [
+        (
+            r"^when this creature enters, (?:you may )?destroy target artifact\.?$",
+            ("remove_permanent", "artifact"),
+        ),
+        (
+            r"^when this creature enters, (?:you may )?destroy target enchantment\.?$",
+            ("remove_permanent", "enchantment"),
+        ),
+        (
+            r"^when this creature enters, (?:you may )?destroy target artifact or enchantment(?: an opponent controls)?\.?$",
+            ("remove_permanent", "artifact_or_enchantment"),
+        ),
+        (
+            r"^when this creature enters, (?:you may )?destroy target land\.?$",
+            ("remove_permanent", "land"),
+        ),
+        (
+            r"^when this creature enters, (?:you may )?destroy target nonland permanent an opponent controls\.?$",
+            ("remove_permanent", "nonland_permanent"),
+        ),
+        (
+            r"^when this creature enters, (?:you may )?destroy target creature an opponent controls\.?$",
+            ("remove_creature", "creature"),
+        ),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return result
+    return None
+
+
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
     text = oracle_text(metadata)
     if text == "{t}: add one mana of any color.":
@@ -816,7 +861,11 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "instant/sorcery spell"
     if str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
-    elif scope in {ETB_LIFE_GAIN_CREATURE_SCOPE, ETB_DRAW_CREATURE_SCOPE}:
+    elif scope in {
+        ETB_LIFE_GAIN_CREATURE_SCOPE,
+        ETB_DRAW_CREATURE_SCOPE,
+        ETB_DESTROY_CREATURE_SCOPE,
+    }:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
         scope_kind = "creature with tap-only activated damage ability"
@@ -877,12 +926,14 @@ def split_row(
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_destroy_creature_unit
         and not creature_tap_damage_unit
     ):
         return None, "unsupported_adapter_work_unit"
@@ -895,6 +946,7 @@ def split_row(
         unit in SPELL_UNITS
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_destroy_creature_unit
         and not creature_tap_damage_unit
     ):
         if not is_spell(metadata):
@@ -1003,6 +1055,32 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_draw_cards",
+        ), "selected_exact_scope"
+
+    if etb_destroy_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_destroy_not_creature"
+        target = etb_destroy_target_from_oracle(metadata)
+        if target is None:
+            return None, "etb_destroy_target_not_supported"
+        effect, target_type = target
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_DESTROY_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_remove_effect": effect,
+            "etb_remove_target": target_type,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "xmage_effect_class": "DestroyTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_destroy_target",
         ), "selected_exact_scope"
 
     if creature_tap_damage_unit:
@@ -1401,6 +1479,7 @@ def build_exact_split_report(
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
             ],
             "blocked_generic_review_scopes_from_pg": True,

@@ -402,6 +402,60 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_destroy_resolves_after_entering_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_remove_effect": "remove_permanent",
+            "etb_remove_target": "artifact",
+            "target_constraints": {"card_types": ["artifact"]},
+            "destination": "graveyard",
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_destroy",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Vandal",
+                "type_line": "Creature - Human Warrior",
+                "oracle_text": "When this creature enters, destroy target artifact.",
+                "power": 2,
+                "toughness": 2,
+            },
+            turn=4,
+            rng=random.Random(47),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Vandal"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Relic"])
+        self.assertTrue(
+            any(
+                event == "etb_removal_resolved"
+                and data.get("card") == "Fixture Vandal"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_etb_destroy"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Vandal"
+                and data.get("target") == "Target Relic"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_tap_damage_enters_without_damage_then_activates(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

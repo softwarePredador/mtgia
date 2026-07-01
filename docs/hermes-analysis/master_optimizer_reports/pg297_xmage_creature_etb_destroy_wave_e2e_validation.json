@@ -1,0 +1,708 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T10:48:08.617198+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_manifest.json",
+  "package_id": "pg297_xmage_creature_etb_destroy_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 19
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Batterhorn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Conclave Naturalists",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Enlightened Ascetic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Goblin Settler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Indrik Stomphowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "1e719709ca45024f36d34ec5a233da26",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Manic Vandal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Meteor Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788",
+          "oracle_hash": "f3f5296e8dedf7e22e53a41b88499441",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Monk Realist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "3c69b5ae9db2a002f580948d6c404924",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ogre Arsonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Oxidda Scrapmelter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rambunctious Mutt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "cd5355a1a3cd44df9237726d9e3006c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravaging Horde",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravenous Chupacabra",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69",
+          "oracle_hash": "a90a1e9d9b1e841e57679764f618d21b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Reclamation Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Uktabi Orangutan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Viridian Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Vithian Renegades",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "War Priest of Thune",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Wild Celebrants",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 19
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Batterhorn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Conclave Naturalists",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Enlightened Ascetic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Goblin Settler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Indrik Stomphowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "1e719709ca45024f36d34ec5a233da26",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Manic Vandal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Meteor Golem",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788",
+          "oracle_hash": "f3f5296e8dedf7e22e53a41b88499441",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Monk Realist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "3c69b5ae9db2a002f580948d6c404924",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ogre Arsonist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Oxidda Scrapmelter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Rambunctious Mutt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "cd5355a1a3cd44df9237726d9e3006c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravaging Horde",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+          "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Ravenous Chupacabra",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69",
+          "oracle_hash": "a90a1e9d9b1e841e57679764f618d21b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Reclamation Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+          "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Uktabi Orangutan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Viridian Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Vithian Renegades",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "War Priest of Thune",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+          "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "card_name": "Wild Celebrants",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+          "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 19
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Batterhorn",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Conclave Naturalists",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Enlightened Ascetic",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Settler",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Indrik Stomphowler",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Manic Vandal",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Meteor Golem",
+          "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Monk Realist",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ogre Arsonist",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Oxidda Scrapmelter",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rambunctious Mutt",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravaging Horde",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravenous Chupacabra",
+          "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Reclamation Sage",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Uktabi Orangutan",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Viridian Shaman",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vithian Renegades",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "War Priest of Thune",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wild Celebrants",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 19
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Batterhorn",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Conclave Naturalists",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Enlightened Ascetic",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Settler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Indrik Stomphowler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Manic Vandal",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Meteor Golem",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Monk Realist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ogre Arsonist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Oxidda Scrapmelter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rambunctious Mutt",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravaging Horde",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravenous Chupacabra",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Reclamation Sage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Uktabi Orangutan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Viridian Shaman",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vithian Renegades",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "War Priest of Thune",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wild Celebrants",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

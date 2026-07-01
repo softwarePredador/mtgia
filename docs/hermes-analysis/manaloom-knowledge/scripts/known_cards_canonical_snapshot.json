@@ -4047,6 +4047,29 @@
     "battle_rule_logical_key": "battle_rule_v1:f679f436d97fee9e3c5008da40f24bea",
     "battle_rule_oracle_hash": "5ec017c3518a83eaa25e6f10b8b5fb6c"
   },
+  "Batterhorn": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "81d61ebb0e15fd522aa2a5090800b074"
+  },
   "Battle Angels of Tyr": {
     "cmc": 4.0,
     "effect": "ramp_engine",
@@ -9596,6 +9619,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d2dc74e8eb2fcccc13dddd3f37535320"
+  },
+  "Conclave Naturalists": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+    "battle_rule_oracle_hash": "d4889497abc9d4c08cf92b75f686396f"
   },
   "Concordant Crossroads": {
     "cmc": 1.0,
@@ -15738,6 +15785,29 @@
     "battle_rule_logical_key": "battle_rule_v1:3c27aba62bd3c07635eee2ed0231e769",
     "battle_rule_oracle_hash": "10b3ef63e6f980b3d0e26bc00631ac42"
   },
+  "Enlightened Ascetic": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+    "battle_rule_oracle_hash": "252062f82809fe39cb8675ece7128f7c"
+  },
   "Enlightened Tutor": {
     "battle_model_scope": "artifact_enchantment_tutor_to_library_top_v1",
     "cmc": 1.0,
@@ -21195,6 +21265,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
   },
+  "Goblin Settler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+    "battle_rule_oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1"
+  },
   "Goblin Sky Raider": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -25024,6 +25117,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
+  },
+  "Indrik Stomphowler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+    "battle_rule_oracle_hash": "1e719709ca45024f36d34ec5a233da26"
   },
   "Inescapable Blaze": {
     "amount": 6,
@@ -30076,6 +30193,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
   },
+  "Manic Vandal": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c"
+  },
   "Manifold Key": {
     "effect": "ramp_engine",
     "battle_rule_source": "curated",
@@ -30795,6 +30935,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Meteor Golem": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "nonland_permanent"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788",
+    "battle_rule_oracle_hash": "f3f5296e8dedf7e22e53a41b88499441"
   },
   "Meticulous Archive": {
     "effect": "land",
@@ -31871,6 +32034,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8453093ba13d27b12638c7002a93f1c2"
+  },
+  "Monk Realist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+    "battle_rule_oracle_hash": "3c69b5ae9db2a002f580948d6c404924"
   },
   "Monoist Sentry": {
     "_keywords_are_self": true,
@@ -34232,6 +34418,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cddd177eac9b084e9366e1448a48974c"
   },
+  "Ogre Arsonist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+    "battle_rule_oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1"
+  },
   "Ogre Berserker": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -35064,6 +35273,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7",
     "battle_rule_oracle_hash": "4a3a180810a71f899d639e689a5033a4"
+  },
+  "Oxidda Scrapmelter": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c"
   },
   "Oxidize": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -38507,6 +38739,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eb04bb80a47324c44cea5835eba5bea7"
   },
+  "Rambunctious Mutt": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+    "battle_rule_oracle_hash": "cd5355a1a3cd44df9237726d9e3006c5"
+  },
   "Ramirez DePietro": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -38680,6 +38936,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cf8f05433163f19c19ad60378af66b92"
   },
+  "Ravaging Horde": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+    "battle_rule_oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1"
+  },
   "Ravenform": {
     "cmc": 3.0,
     "effect": "remove_permanent",
@@ -38691,15 +38970,27 @@
     "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
   },
   "Ravenous Chupacabra": {
-    "cmc": 4.0,
-    "effect": "remove_creature",
-    "target": "creature",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:c3ae24798733d664f25235b529f57968"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_creature",
+    "etb_remove_target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69",
+    "battle_rule_oracle_hash": "a90a1e9d9b1e841e57679764f618d21b"
   },
   "Ravenous Lindwurm": {
     "ability_kind": "triggered",
@@ -39153,15 +39444,28 @@
     "battle_rule_oracle_hash": "3f57765750332ffab1162f3955307eb9"
   },
   "Reclamation Sage": {
-    "cmc": 3.0,
-    "effect": "remove_permanent",
-    "target": "artifact_or_enchantment",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+    "battle_rule_oracle_hash": "d4889497abc9d4c08cf92b75f686396f"
   },
   "Recollect": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -54486,6 +54790,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:19ad0372de50828fc4420ac8e9872820"
   },
+  "Uktabi Orangutan": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c"
+  },
   "Ukud Cobra": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -56370,6 +56697,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Viridian Shaman": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c"
+  },
   "Virtue of Knowledge // Vantress Visions": {
     "cmc": 5.0,
     "effect": "draw_engine",
@@ -56409,6 +56759,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eaa27d98bb13d1caeabde36eb8fa8a0b"
+  },
+  "Vithian Renegades": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c"
   },
   "Vitu-Ghazi, the City-Tree": {
     "effect": "land",
@@ -57404,6 +57777,29 @@
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
   },
+  "War Priest of Thune": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+    "battle_rule_oracle_hash": "252062f82809fe39cb8675ece7128f7c"
+  },
   "War Room": {
     "activated_draw": 1,
     "effect": "land",
@@ -58146,6 +58542,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+  },
+  "Wild Celebrants": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "etb_remove_effect": "remove_permanent",
+    "etb_remove_target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+    "battle_rule_oracle_hash": "81d61ebb0e15fd522aa2a5090800b074"
   },
   "Wild Colos": {
     "_keywords_are_self": true,

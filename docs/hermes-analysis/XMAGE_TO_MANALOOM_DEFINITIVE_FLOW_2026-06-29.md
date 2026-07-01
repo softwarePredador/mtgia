@@ -121,12 +121,12 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg296_creature_tap_damage_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg297_creature_etb_destroy_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27812`
-- XMage authoritative source resolved: `27498`
+- target all-card battle-gap identities: `27793`
+- XMage authoritative source resolved: `27479`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
 - ManaLoom adapter work-unit keys: `11905`
@@ -135,7 +135,7 @@ Current measured queue:
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27498` identities, card semantics are accepted from XMage; work is now
+- For `27479` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG296 Exact Adapter Waves
+## PG283-PG297 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG296 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG297 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -179,6 +179,10 @@ patterns:
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
   `xmage_creature_etb_draw_cards_v1`
+- `removal_destroy::targeted_destroy_variant_v1` with
+  `DestroyTargetEffect + EntersBattlefieldTriggeredAbility` on creatures and
+  exact unrestricted ETB destroy Oracle text ->
+  `xmage_creature_etb_destroy_target_v1`
 - `direct_damage::targeted_damage_variant_v1` with
   `DamageTargetEffect + SimpleActivatedAbility` on creatures, exact Oracle
   `{T}: ... deals N damage ...`, XMage `TapSourceCost` only, and no mana or
@@ -648,6 +652,55 @@ PG296 measured result:
   current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,
   `source_add_counters`, `life_gain`, `removal_destroy`, `draw_cards`, and
+  `tutor`.
+
+PG297 evidence:
+
+- PG297 creature ETB destroy package:
+  `docs/hermes-analysis/master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_package.md`
+- PG297 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_pg_apply_evidence.md`
+- PG297 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_e2e_validation.md`
+- post-PG297 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg297_creature_etb_destroy_wave_recheck.md`
+- post-PG297 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg297_creature_etb_destroy_wave.md`
+- post-PG297 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg297_existing_supported_recheck.md`
+
+PG297 measured result:
+
+- PG297 promoted `19` exact creatures whose local XMage source is
+  `DestroyTargetEffect` behind `EntersBattlefieldTriggeredAbility`, mapped to
+  `xmage_creature_etb_destroy_target_v1`.
+- Runtime already had the generic ETB removal executor; the focused runtime
+  test now proves the creature remains on battlefield while the ETB trigger
+  destroys a legal opponent permanent and moves it to graveyard.
+- The splitter requires complete unrestricted ETB destroy Oracle text and
+  blocks restricted clauses such as power/toughness limits, subtype filters,
+  nonblack filters, Equipment/Aura-only filters, and dealt-damage-this-turn
+  conditions.
+- PostgreSQL postcheck: `19/19` promoted rows, `19/19` verified/auto,
+  `19/19` matching Oracle hash, with `4` backup rows.
+- PG -> Hermes/SQLite sync loaded `19` PostgreSQL rows, inserted/updated `23`
+  SQLite rows including deprecated shadow rows, and exported `4303` canonical
+  snapshot rows.
+- E2E package validation: PostgreSQL `19/19`, SQLite `19/19`, canonical
+  snapshot `19/19`, and runtime `get_card_effect` `19/19`.
+- Focused exact-scope tests cover strict ETB destroy mapping, restricted-target
+  blocking, and runtime ETB removal resolution; `85` focused exact-scope tests
+  pass.
+- Global all-card authoritative queue after PG297:
+  `target_identity_count=27793`, `xmage_authoritative_source_count=27479`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27479`.
+- Running the exact splitter after PG297 on supported units returns
+  `proposal_count=0` over `7351` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with the largest
+  current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
   `tutor`.
 
 ## Why This Is The Best Current Flow

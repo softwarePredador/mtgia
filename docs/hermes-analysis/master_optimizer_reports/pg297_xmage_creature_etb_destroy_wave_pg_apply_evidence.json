@@ -1,0 +1,470 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG297",
+  "generated_at": "2026-07-01T10:47:42.519878+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg297_xmage_creature_etb_destroy_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg297_xmage_creature_etb_destroy_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 4,
+    "cards": [
+      "Batterhorn",
+      "Conclave Naturalists",
+      "Enlightened Ascetic",
+      "Goblin Settler",
+      "Indrik Stomphowler",
+      "Manic Vandal",
+      "Meteor Golem",
+      "Monk Realist",
+      "Ogre Arsonist",
+      "Oxidda Scrapmelter",
+      "Rambunctious Mutt",
+      "Ravaging Horde",
+      "Ravenous Chupacabra",
+      "Reclamation Sage",
+      "Uktabi Orangutan",
+      "Viridian Shaman",
+      "Vithian Renegades",
+      "War Priest of Thune",
+      "Wild Celebrants"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 19,
+    "promoted_rule_rows": 19,
+    "promoted_verified_auto_rows": 19,
+    "row_count": 19
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 4,
+      "card_name": "Batterhorn",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "batterhorn",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Conclave Naturalists",
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "conclave naturalists",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Enlightened Ascetic",
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "enlightened ascetic",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Goblin Settler",
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "goblin settler",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Indrik Stomphowler",
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "indrik stomphowler",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Manic Vandal",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "manic vandal",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Meteor Golem",
+      "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788",
+      "normalized_name": "meteor golem",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Monk Realist",
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "monk realist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Ogre Arsonist",
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "ogre arsonist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Oxidda Scrapmelter",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "oxidda scrapmelter",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Rambunctious Mutt",
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "rambunctious mutt",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Ravaging Horde",
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "ravaging horde",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Ravenous Chupacabra",
+      "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69",
+      "normalized_name": "ravenous chupacabra",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Reclamation Sage",
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "reclamation sage",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Uktabi Orangutan",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "uktabi orangutan",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Viridian Shaman",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "viridian shaman",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Vithian Renegades",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "vithian renegades",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "War Priest of Thune",
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "war priest of thune",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 4,
+      "card_name": "Wild Celebrants",
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "wild celebrants",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Batterhorn",
+      "Conclave Naturalists",
+      "Enlightened Ascetic",
+      "Goblin Settler",
+      "Indrik Stomphowler",
+      "Manic Vandal",
+      "Meteor Golem",
+      "Monk Realist",
+      "Ogre Arsonist",
+      "Oxidda Scrapmelter",
+      "Rambunctious Mutt",
+      "Ravaging Horde",
+      "Ravenous Chupacabra",
+      "Reclamation Sage",
+      "Uktabi Orangutan",
+      "Viridian Shaman",
+      "Vithian Renegades",
+      "War Priest of Thune",
+      "Wild Celebrants"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 19,
+    "total_target_card_rows": 19,
+    "would_deprecate_shadow_rows": 4
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "d8bd741f-c0ce-44c5-9e70-dbd3e2ff4951",
+      "card_name": "Batterhorn",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "batterhorn",
+      "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "cbb8e080-5a43-4ca0-a400-9d2d6ffae4f7",
+      "card_name": "Conclave Naturalists",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "conclave naturalists",
+      "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "796a6e09-bf01-4fa9-a4a4-c1d741660ecb",
+      "card_name": "Enlightened Ascetic",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "enlightened ascetic",
+      "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "270e30fc-8901-447d-9e23-4e998d1e02f0",
+      "card_name": "Goblin Settler",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "goblin settler",
+      "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4da686f7-1bec-4917-abea-5141bd385abf",
+      "card_name": "Indrik Stomphowler",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "indrik stomphowler",
+      "oracle_hash": "1e719709ca45024f36d34ec5a233da26",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8b6acd1a-c370-4c03-bfb6-8bc1b08647f1",
+      "card_name": "Manic Vandal",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "manic vandal",
+      "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "17a49e74-4ad4-435d-b0f7-06e4d7e7f582",
+      "card_name": "Meteor Golem",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3ef472ed2c6e3dc52017f6d0333b7788",
+      "normalized_name": "meteor golem",
+      "oracle_hash": "f3f5296e8dedf7e22e53a41b88499441",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "6c8b12ba-7b3c-42e2-89cc-149629e9d82f",
+      "card_name": "Monk Realist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "monk realist",
+      "oracle_hash": "3c69b5ae9db2a002f580948d6c404924",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5363e4ab-1712-471a-94ae-4cd0911ab886",
+      "card_name": "Ogre Arsonist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "ogre arsonist",
+      "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c410a94c-1850-4028-95d6-49e85d89d679",
+      "card_name": "Oxidda Scrapmelter",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "oxidda scrapmelter",
+      "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "649367f1-90d9-465b-b6e7-46b832760058",
+      "card_name": "Rambunctious Mutt",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "rambunctious mutt",
+      "oracle_hash": "cd5355a1a3cd44df9237726d9e3006c5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2f55b531-8ea4-4401-8ed9-c9332ebbc672",
+      "card_name": "Ravaging Horde",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:e6468e36efd749364bff45b33904fcd2",
+      "normalized_name": "ravaging horde",
+      "oracle_hash": "c7e68159aa0040ba05c5b5ccb1fd47e1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "845e26e7-9cec-4798-8a23-f1a41f03c024",
+      "card_name": "Ravenous Chupacabra",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:317d9853de365f8a8f047219cfb1ec69",
+      "normalized_name": "ravenous chupacabra",
+      "oracle_hash": "a90a1e9d9b1e841e57679764f618d21b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "ed8da0b3-20d8-4ca6-a4d9-97a356a69da9",
+      "card_name": "Reclamation Sage",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:7f6df953eba86870a1d793785e332a20",
+      "normalized_name": "reclamation sage",
+      "oracle_hash": "d4889497abc9d4c08cf92b75f686396f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "7197bc42-889f-4b04-a243-d920e6015c95",
+      "card_name": "Uktabi Orangutan",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "uktabi orangutan",
+      "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "ba362e42-2433-47bb-af59-490c602674d3",
+      "card_name": "Viridian Shaman",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "viridian shaman",
+      "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2bbbdd95-6791-4978-a5a5-838ad7e7f2c0",
+      "card_name": "Vithian Renegades",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "vithian renegades",
+      "oracle_hash": "289e5839b5c07a99e89444aa61d7ec2c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "806dee13-ae82-4a05-b2f6-9e7921da32ed",
+      "card_name": "War Priest of Thune",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ca716a5916d8702b6ac8eee3ecc8f63b",
+      "normalized_name": "war priest of thune",
+      "oracle_hash": "252062f82809fe39cb8675ece7128f7c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "f3f3f025-a39f-40ae-8b54-f87a15492a17",
+      "card_name": "Wild Celebrants",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:290af3f5a22f7b91df6b885f58aeb6de",
+      "normalized_name": "wild celebrants",
+      "oracle_hash": "81d61ebb0e15fd522aa2a5090800b074",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_creature_etb_destroy_wave"
+}

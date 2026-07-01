@@ -945,6 +945,56 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_count_not_fixed")
 
+    def test_creature_etb_destroy_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Sage",
+                type_line="Creature - Elf Shaman",
+                oracle_text="When this creature enters, you may destroy target artifact or enchantment.",
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true);"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DESTROY_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_remove_effect"], "remove_permanent")
+        self.assertEqual(effect["etb_remove_target"], "artifact_or_enchantment")
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_destroy_blocks_restricted_target_text(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Scorpion",
+                type_line="Creature - Scorpion",
+                oracle_text="When this creature enters, you may destroy target creature with power 1 or less.",
+            ),
+            source_text="new EntersBattlefieldTriggeredAbility(new DestroyTargetEffect(), true)",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_destroy_target_not_supported")
+
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",
