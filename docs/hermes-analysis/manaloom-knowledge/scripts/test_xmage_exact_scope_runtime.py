@@ -2150,6 +2150,203 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_recursion_permanent_pays_colored_taps_and_returns_matching_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        active.mana_pool.add("red", 1)
+        active.mana_pool.add("green", 1)
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        non_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        active.graveyard.extend([non_target, target])
+        permanent = {
+            "name": "Adun Oakenshield",
+            "type_line": "Legendary Creature - Human Knight",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{B}{R}{G}",
+            "graveyard_to_hand_activation_cost_generic": 0,
+            "graveyard_to_hand_activation_cost_colors": ["B", "R", "G"],
+            "graveyard_to_hand_activation_requires_tap": True,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_adun",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=11,
+            rng=random.Random(11),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertIn(permanent, active.battlefield)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bear"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bolt"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Adun Oakenshield"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_hand"
+                and data.get("activation_cost") == "{B}{R}{G}"
+                and data.get("mana_paid") == 3
+                and data.get("recovered") == ["Target Bear"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_recursion_self_sacrifice_selects_target_before_sacrificing_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("black", 1)
+        target = {"name": "Old Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Corpse Hauler",
+            "type_line": "Creature - Human Rogue",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{2}{B}",
+            "graveyard_to_hand_activation_cost_generic": 2,
+            "graveyard_to_hand_activation_cost_colors": ["B"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": True,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_corpse_hauler",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=12,
+            rng=random.Random(12),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertEqual([card["name"] for card in active.hand], ["Old Bear"])
+        self.assertNotIn("Corpse Hauler", [card["name"] for card in active.hand])
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("card") == "Corpse Hauler"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_hand"
+                and data.get("sacrificed_self") is True
+                and data.get("mana_paid") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_recursion_blocks_summoning_sick_tap_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        active.mana_pool.add("red", 1)
+        active.mana_pool.add("green", 1)
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Adun Oakenshield",
+            "type_line": "Legendary Creature - Human Knight",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{B}{R}{G}",
+            "graveyard_to_hand_activation_cost_generic": 0,
+            "graveyard_to_hand_activation_cost_colors": ["B", "R", "G"],
+            "graveyard_to_hand_activation_requires_tap": True,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=13,
+            rng=random.Random(13),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bear"])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
+    def test_simple_activated_recursion_basic_land_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("green", 1)
+        basic = {"name": "Forest", "type_line": "Basic Land - Forest", "cmc": 0, "effect": "land"}
+        nonbasic = {"name": "Command Tower", "type_line": "Land", "cmc": 0, "effect": "land"}
+        active.graveyard.extend([nonbasic, basic])
+        permanent = {
+            "name": "Groundskeeper",
+            "type_line": "Creature - Human Druid",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "basic_land",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{1}{G}",
+            "graveyard_to_hand_activation_cost_generic": 1,
+            "graveyard_to_hand_activation_cost_colors": ["G"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=14,
+            rng=random.Random(14),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertIn(permanent, active.battlefield)
+        self.assertEqual([card["name"] for card in active.hand], ["Forest"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Command Tower"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("target_type") == "basic_land"
+                and data.get("recovered") == ["Forest"]
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

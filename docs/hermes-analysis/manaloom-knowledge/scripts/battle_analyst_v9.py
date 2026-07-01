@@ -25406,7 +25406,7 @@ def activate_graveyard_recycling_artifacts(
             continue
         graveyard_to_hand_count = int(permanent.get("graveyard_to_hand_target_count") or 0)
         if graveyard_to_hand_count > 0:
-            activation_cost = adjusted_activated_ability_generic_cost(
+            activation_cost_generic = adjusted_activated_ability_generic_cost(
                 player,
                 permanent,
                 int(
@@ -25415,18 +25415,61 @@ def activate_graveyard_recycling_artifacts(
                     or 0
                 ),
             )
-            activation_cost_text = _activation_cost_text(activation_cost)
+            activation_cost_colors = list(
+                permanent.get("graveyard_to_hand_activation_cost_colors")
+                or permanent.get("activation_cost_colors")
+                or []
+            )
+            activation_cost_text = (
+                permanent.get("graveyard_to_hand_activation_cost_mana")
+                or permanent.get("activation_cost_mana")
+                or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+            )
+            mana_paid = activation_cost_generic + len(activation_cost_colors)
+            requires_tap = bool(
+                permanent.get(
+                    "graveyard_to_hand_activation_requires_tap",
+                    permanent.get("activation_requires_tap", True),
+                )
+            )
+            requires_sacrifice = bool(
+                permanent.get(
+                    "graveyard_to_hand_activation_requires_sacrifice",
+                    permanent.get("activation_requires_sacrifice", True),
+                )
+            )
+            simple_activated_scope = (
+                permanent.get("battle_model_scope") == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
+                or permanent.get("activated_battle_model_scope")
+                == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
+            )
+            activation_kind = (
+                "simple_activated_graveyard_to_hand"
+                if simple_activated_scope
+                else "tap_sacrifice_return_graveyard_to_hand"
+            )
             targets = graveyard_to_hand_targets(player, permanent, all_players, turn)
             if targets:
+                if requires_tap and permanent.get("tapped"):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "permanent_already_tapped_for_graveyard_to_hand",
+                        phase=phase,
+                    )
+                    continue
                 if (
-                    permanent.get("graveyard_to_hand_activation_requires_tap", True)
-                    and permanent.get("tapped")
+                    requires_tap
+                    and is_battlefield_creature(permanent)
+                    and permanent.get("summoning_sick")
+                    and not has_haste(permanent)
                 ):
                     _utility_artifact_skip_event(
                         player,
                         permanent,
                         turn,
-                        "artifact_already_tapped_for_graveyard_to_hand",
+                        "creature_summoning_sick_for_graveyard_to_hand_activation",
                         phase=phase,
                     )
                     continue
@@ -25439,10 +25482,10 @@ def activate_graveyard_recycling_artifacts(
                         phase=phase,
                     )
                     continue
-                if permanent.get("graveyard_to_hand_activation_requires_tap", True):
+                if requires_tap:
                     permanent["tapped"] = True
                 permanent["utility_artifact_used_this_turn"] = True
-                if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True):
+                if requires_sacrifice:
                     if permanent in player.battlefield:
                         player.battlefield.remove(permanent)
                     player.graveyard.append(permanent)
@@ -25452,7 +25495,7 @@ def activate_graveyard_recycling_artifacts(
                     player,
                     targets,
                     turn=turn,
-                    source_event="graveyard_to_hand_artifact",
+                    source_event="graveyard_to_hand_permanent" if simple_activated_scope else "graveyard_to_hand_artifact",
                 ):
                     player.hand.append(recovered_card)
                     recovered.append(recovered_card)
@@ -25480,19 +25523,26 @@ def activate_graveyard_recycling_artifacts(
                         score=graveyard_recycle_candidate_score(recovered[0], player, all_players, turn)
                         if recovered
                         else 0,
-                        action="activate_graveyard_to_hand_artifact",
-                        target_type=target_type,
-                        destination=destination,
-                    ),
+                            action="activate_graveyard_to_hand_permanent"
+                            if simple_activated_scope
+                            else "activate_graveyard_to_hand_artifact",
+                            target_type=target_type,
+                            destination=destination,
+                        ),
                     score_components={
-                        "activation_cost_generic": activation_cost,
+                        "activation_cost": activation_cost_text,
+                        "activation_cost_generic": activation_cost_generic,
+                        "activation_cost_colors": activation_cost_colors,
                         "target_type": target_type,
                         "recovered_count": len(recovered),
-                        "sacrificed_source": bool(
-                            permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
-                        ),
+                        "requires_tap": requires_tap,
+                        "sacrificed_source": requires_sacrifice,
                     },
-                    rule_source="utility_artifact_activation_v1",
+                    rule_source=(
+                        "simple_activated_graveyard_to_hand_permanent_v1"
+                        if simple_activated_scope
+                        else "utility_artifact_activation_v1"
+                    ),
                     rule_status=permanent.get("_rule_review_status", "active"),
                     confidence="medium",
                     expected_benefit_score=(
@@ -25503,34 +25553,40 @@ def activate_graveyard_recycling_artifacts(
                         )
                     ),
                     reason="cash_in_graveyard_artifact_for_best_recovery_target",
-                    strategic_principle="convert a spent utility artifact and spare mana into the highest-value graveyard card",
+                    strategic_principle="convert a permanent activation and spare mana into the highest-value graveyard card",
                     heuristic_version=DECISION_STRATEGY_VERSION,
                     resource_delta={
-                        "mana": -activation_cost,
+                        "mana": -mana_paid,
                         "cards_to_hand": len(recovered),
-                        "artifacts": -1
-                        if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
-                        else 0,
-                        "graveyard": -len(recovered)
-                        + (
-                            1
-                            if permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
-                            else 0
-                        ),
+                        "permanents": -1 if requires_sacrifice else 0,
+                        "graveyard": -len(recovered) + (1 if requires_sacrifice else 0),
                         "returned": [card.get("name", "?") for card in recovered],
                     },
-                    risk_flags=["tap_artifact", "sacrifice_artifact", "graveyard_to_hand"],
+                    risk_flags=[
+                        flag
+                        for flag, active in {
+                            "tap_artifact": requires_tap and not simple_activated_scope,
+                            "sacrifice_artifact": requires_sacrifice and not simple_activated_scope,
+                            "tap_ability": requires_tap and simple_activated_scope,
+                            "sacrifice_source": requires_sacrifice and simple_activated_scope,
+                            "graveyard_to_hand": True,
+                        }.items()
+                        if active
+                    ],
                 )
                 recursion_payload = {
                     "player": player.name,
                     "card": permanent.get("name", "?"),
                     "trigger": "activated_ability",
-                    "activation_kind": "tap_sacrifice_return_graveyard_to_hand",
+                    "activation_kind": activation_kind,
+                    "activation_cost": activation_cost_text,
                     "target_type": target_type,
                     "destination": destination,
                     "recovered": [card.get("name", "?") for card in recovered],
                     "recovered_count": len(recovered),
-                    "mana_paid": activation_cost,
+                    "mana_paid": mana_paid,
+                    "tapped": bool(permanent.get("tapped")),
+                    "sacrificed_self": requires_sacrifice,
                     "turn": turn,
                     "phase": phase,
                     **replay_rule_fields(permanent),
@@ -25540,15 +25596,15 @@ def activate_graveyard_recycling_artifacts(
                     "utility_artifact_activated",
                     player=player.name,
                     card=permanent.get("name", "?"),
-                    activation_kind="tap_sacrifice_return_graveyard_to_hand",
-                    mana_paid=activation_cost,
+                    activation_kind=activation_kind,
+                    activation_cost=activation_cost_text,
+                    mana_paid=mana_paid,
                     recovered=[card.get("name", "?") for card in recovered],
                     recovered_count=len(recovered),
                     target_type=target_type,
                     destination=destination,
-                    sacrificed_self=bool(
-                        permanent.get("graveyard_to_hand_activation_requires_sacrifice", True)
-                    ),
+                    tapped=bool(permanent.get("tapped")),
+                    sacrificed_self=requires_sacrifice,
                     phase=phase,
                     turn=turn,
                     **replay_rule_fields(permanent),
@@ -33099,6 +33155,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         )
     if target in ("land", "land_card"):
         return is_land(card)
+    if target in ("basic_land", "basic_land_card"):
+        return is_land(card) and _is_basic_land_card(card)
     if is_land(card):
         return False
     if target in ("any", "nonland", "nonland_card"):

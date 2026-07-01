@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27545`
-- XMage authoritative source resolved: `27231`
+- target all-card battle-gap identities: `27534`
+- XMage authoritative source resolved: `27220`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27231`
+- XMage authoritative adapter required: `27220`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27231` identities, card semantics are accepted from XMage; work is now
+- For `27220` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG310 Exact Adapter Waves
+## PG283-PG311 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG310 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG311 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -226,6 +226,14 @@ patterns:
   activated damage Oracle text, mana/tap/self-sacrifice source costs only, and
   simple `any target` or `target creature` targets ->
   `xmage_permanent_simple_activated_damage_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnFromGraveyardToHandTargetEffect + SimpleActivatedAbility` on
+  permanents, exact Oracle activated graveyard-to-hand text, mana/tap/source
+  self-sacrifice costs only, no discard/exile/OrCost/CompositeCost, and
+  supported graveyard targets including creature, artifact, enchantment,
+  artifact creature, basic land, permanent, instant/sorcery, artifact or
+  enchantment, and any card when source and Oracle agree ->
+  `xmage_permanent_simple_activated_graveyard_to_hand_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - fixed damage, destroy and exile target spells with XMage/Oracle-matched
@@ -1490,6 +1498,78 @@ PG310 measured result:
   `grant_protection_from_chosen_color`, residual `direct_damage`,
   `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
   `tutor`.
+
+PG311 evidence:
+
+- PG311 permanent activated graveyard-to-hand recursion package:
+  `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_package.md`
+- PG311 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_pg_apply_evidence.md`
+- PG311 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_e2e_validation.md`
+- PG311 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_pg_to_sqlite_sync.json`
+- PG311 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG311 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
+- post-PG311 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg311_permanent_activated_recursion_to_hand_wave_recheck.md`
+- post-PG311 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
+- PG311 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_recursion_to_hand_wave.md`
+- post-PG311 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg311_existing_supported_recheck.md`
+
+PG311 measured result:
+
+- PG311 promoted `11` exact permanent simple activated graveyard-to-hand
+  recursion rules: Adun Oakenshield, Argivian Archaeologist, Corpse Hauler,
+  Dowsing Shaman, Font of Return, Groundskeeper, Hanna, Ship's Navigator,
+  Rootwater Diver, Salvage Scout, Skull of Orm, and Spellkeeper Weird.
+- Runtime now supports colored, generic, and no-mana activation costs; optional
+  tap; optional source self-sacrifice; summoning-sickness blocking for
+  tap-creature activations; `basic_land` graveyard targets; and legacy Codex
+  Shredder event-kind preservation.
+- The splitter blocks unsafe neighbors such as discard/exile/OrCost/CompositeCost
+  costs, graveyard-source activations, multi-target simple Oracle mismatches,
+  watcher conditions, and unsupported subtype restrictions.
+- PostgreSQL apply evidence reports `11/11` promoted rows, `11/11`
+  verified/auto rows, and `11/11` matching Oracle hash rows, with `0` backup
+  rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `6957` PostgreSQL rules,
+  inserted/updated `6751` SQLite rows, and exported `4564` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover Adun Oakenshield, Font of Return, Rootwater
+  Diver, Groundskeeper, discard-cost blocking, OrCost blocking, unsupported
+  Restoration Specialist multi-target behavior, and runtime activation
+  positives/negatives; `154` focused exact-scope tests pass. The legacy PG273
+  Codex Shredder card-specific test also passes.
+- Global all-card readiness after PG311:
+  `battle_and_oracle_ready=2090` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3238`.
+- Global all-card authoritative queue after PG311:
+  `target_identity_count=27534`, `xmage_authoritative_source_count=27220`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27220`.
+- Running the exact splitter after PG311 on supported units returns
+  `proposal_count=0` over `7362` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG311 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `655`, and `tutor` `626`.
 
 ## Why This Is The Best Current Flow
 

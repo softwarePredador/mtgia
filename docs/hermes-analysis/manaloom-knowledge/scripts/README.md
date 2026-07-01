@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG310. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG311. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -118,7 +118,10 @@ added 13 exact one-shot destroy-target plus controller life-gain spells; PG308
 added 38 exact restricted target spells; PG309 added 18 exact permanent
 activated draw rules with mana/tap/self-sacrifice activation handling; PG310
 added 23 exact permanent activated damage rules with mana/tap/self-sacrifice
-activation handling.
+activation handling; PG311 added 11 exact permanent activated graveyard-to-hand
+recursion rules with mana/tap/self-sacrifice activation handling and supported
+graveyard targets including creature, artifact, enchantment, artifact creature,
+basic land, permanent, instant/sorcery, artifact or enchantment, and any card.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -145,7 +148,13 @@ abilities with mana/tap/self-sacrifice costs and focused blocking for unsafe
 costs or dynamic counts; PG310 added permanent simple activated damage support
 for fixed any-target or target-creature damage abilities with mana/tap/source
 sacrifice costs and focused blocking for target-sacrifice costs, dynamic
-amounts, and unsupported player-or-planeswalker targets.
+amounts, and unsupported player-or-planeswalker targets; PG311 added permanent
+simple activated graveyard-to-hand recursion support for exact simple activated
+abilities with mana/tap/source self-sacrifice costs, summoning-sickness checks
+for tap-creature activations, `basic_land` graveyard target matching, and
+focused blocking for discard/exile/OrCost/CompositeCost costs, graveyard-source
+activations, watcher conditions, multi-target mismatches, and unsupported
+subtype restrictions.
 Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
@@ -230,15 +239,20 @@ Evidence:
 - `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_e2e_validation.md`
 - `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_to_sqlite_sync.json`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg310_existing_supported_recheck.md`
+- `master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_package.md`
+- `master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_e2e_validation.md`
+- `master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_battle_rules_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg311_existing_supported_recheck.md`
 
-After PG310, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7373` considered supported rows; continue by adding a
+After PG311, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7362` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG310 queue is the current scheduling
-source: `target_identity_count=27545`, `xmage_authoritative_source_count=27231`,
-`xmage_authoritative_adapter_required_count=27231`, `parser_gap=0`, and
+the current authoritative queue. The post-PG311 queue is the current scheduling
+source: `target_identity_count=27534`, `xmage_authoritative_source_count=27220`,
+`xmage_authoritative_adapter_required_count=27220`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
