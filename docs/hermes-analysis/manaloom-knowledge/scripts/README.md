@@ -62,7 +62,9 @@ current global queue with:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap
+  --xmage-root /Users/desenvolvimentomobile/Downloads/mage-master \
+  --scope all_battle_gap \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d)_current_all_battle_gap
 ```
 
 This queue separates source truth from runtime execution: resolved XMage cards
@@ -74,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg287_bounce_spell_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -83,17 +85,30 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG284 promoted and synced 53 exact utility rules
-after PG283's 312 exact one-shot spell rules. The current splitter supports
-fixed draw, fixed direct damage, destroy target, fixed controller life gain,
-exile target, and simple tap mana-source permanents. Evidence:
+Current applied checkpoint: PG287. PG283 promoted and synced 312 exact one-shot
+spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
+supported residuals; PG286 added 12 pure counterspells with stack target
+constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`.
+The current splitter supports fixed draw, fixed direct damage, destroy target,
+fixed controller life gain, exile target, simple tap mana-source permanents,
+counter target spell, and return target permanent/creature to hand. Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_e2e_validation.md`
 - `master_optimizer_reports/pg284_xmage_utility_wave_package.md`
 - `master_optimizer_reports/pg284_xmage_utility_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg284_xmage_utility_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg284_utility_wave.md`
+- `master_optimizer_reports/pg285_xmage_all_scope_supported_residual_package.md`
+- `master_optimizer_reports/pg285_xmage_all_scope_supported_residual_e2e_validation.md`
+- `master_optimizer_reports/pg286_xmage_counter_spell_wave_package.md`
+- `master_optimizer_reports/pg286_xmage_counter_spell_wave_e2e_validation.md`
+- `master_optimizer_reports/pg287_xmage_bounce_spell_wave_package.md`
+- `master_optimizer_reports/pg287_xmage_bounce_spell_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg287_bounce_spell_wave.md`
+
+After PG287, rerunning the exact splitter on supported units returns
+`proposal_count=0`; continue by adding a new exact subpattern/runtime adapter
+for a remaining high-volume family.
 
 ## Local Replay Audit
 

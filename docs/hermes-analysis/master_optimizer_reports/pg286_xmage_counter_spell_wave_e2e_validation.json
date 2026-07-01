@@ -1,0 +1,470 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T08:14:10.845890+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg286_xmage_counter_spell_wave_manifest.json",
+  "package_id": "pg286_xmage_counter_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Annul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef",
+          "oracle_hash": "e0b49a2eb44d5186ab12e8a7e2c3cfaa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Artifact Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a1d2fb58efab0d5edcd6a1e06a3c66e",
+          "oracle_hash": "86e09cdce01726fdb0368355bb3bb098",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Cancel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "d748ee6dd8f8a81c2f3f28ac38dd895a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Dispel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+          "oracle_hash": "6db9533f63d7d41a56e586b27e46ae52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Envelop",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+          "oracle_hash": "b5a5cbb8782f56430eb30d5717308adc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Essence Scatter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Extinguish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+          "oracle_hash": "b5a5cbb8782f56430eb30d5717308adc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "False Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Flash Counter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+          "oracle_hash": "6db9533f63d7d41a56e586b27e46ae52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Gainsay",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d03d84edda7e25cde871fb06d09359b",
+          "oracle_hash": "1f354875bf01a22a1561303e2c16588e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Preemptive Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Remove Soul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Annul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef",
+          "oracle_hash": "e0b49a2eb44d5186ab12e8a7e2c3cfaa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Artifact Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5a1d2fb58efab0d5edcd6a1e06a3c66e",
+          "oracle_hash": "86e09cdce01726fdb0368355bb3bb098",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Cancel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+          "oracle_hash": "d748ee6dd8f8a81c2f3f28ac38dd895a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Dispel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+          "oracle_hash": "6db9533f63d7d41a56e586b27e46ae52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Envelop",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+          "oracle_hash": "b5a5cbb8782f56430eb30d5717308adc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Essence Scatter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Extinguish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+          "oracle_hash": "b5a5cbb8782f56430eb30d5717308adc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "False Summoning",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Flash Counter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+          "oracle_hash": "6db9533f63d7d41a56e586b27e46ae52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Gainsay",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8d03d84edda7e25cde871fb06d09359b",
+          "oracle_hash": "1f354875bf01a22a1561303e2c16588e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Preemptive Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "card_name": "Remove Soul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+          "oracle_hash": "e759ab086a019bc274394a4df42984f5",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Annul",
+          "logical_rule_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Artifact Blast",
+          "logical_rule_key": "battle_rule_v1:5a1d2fb58efab0d5edcd6a1e06a3c66e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cancel",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dispel",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Envelop",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Essence Scatter",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Extinguish",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "False Summoning",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flash Counter",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gainsay",
+          "logical_rule_key": "battle_rule_v1:8d03d84edda7e25cde871fb06d09359b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Preemptive Strike",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_counter_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Remove Soul",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Annul",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Artifact Blast",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:5a1d2fb58efab0d5edcd6a1e06a3c66e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cancel",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dispel",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Envelop",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Essence Scatter",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Extinguish",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "False Summoning",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flash Counter",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gainsay",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:8d03d84edda7e25cde871fb06d09359b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Preemptive Strike",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Remove Soul",
+          "component_keys": [],
+          "effect": "counter",
+          "logical_rule_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -29,6 +29,8 @@ LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
 EXILE_UNIT = "removal_exile::targeted_exile_variant_v1"
 RAMP_ARTIFACT_UNIT = "ramp_permanent::xmage_artifact_mana_source_variant_review_v1"
 RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_v1"
+COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
+BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -37,6 +39,8 @@ SUPPORTED_UNITS = {
     EXILE_UNIT,
     RAMP_ARTIFACT_UNIT,
     RAMP_CREATURE_UNIT,
+    COUNTER_UNIT,
+    BOUNCE_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -45,8 +49,10 @@ DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+COUNTER_SCOPE = "xmage_counter_target_spell_v1"
+BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 
-SPELL_UNITS = {DRAW_UNIT, DAMAGE_UNIT, DESTROY_UNIT, LIFE_UNIT, EXILE_UNIT}
+SPELL_UNITS = {DRAW_UNIT, DAMAGE_UNIT, DESTROY_UNIT, LIFE_UNIT, EXILE_UNIT, COUNTER_UNIT, BOUNCE_UNIT}
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
 SPELL_COMPLEXITY_TOKENS = {
@@ -222,6 +228,85 @@ def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None
         if re.match(pattern, text):
             return result
     return None
+
+
+def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, tuple[str, str]]] = [
+        (
+            r"^return target artifact or enchantment to its owner's hand\.?$",
+            ("remove_permanent", "artifact_or_enchantment"),
+        ),
+        (
+            r"^return target creature or enchantment to its owner's hand\.?$",
+            ("remove_permanent", "creature_or_enchantment"),
+        ),
+        (
+            r"^return target creature or planeswalker to its owner's hand\.?$",
+            ("remove_permanent", "creature_or_planeswalker"),
+        ),
+        (
+            r"^return target nonland permanent to its owner's hand\.?$",
+            ("remove_permanent", "nonland_permanent"),
+        ),
+        (r"^return target permanent to its owner's hand\.?$", ("remove_permanent", "permanent")),
+        (r"^return target creature to its owner's hand\.?$", ("remove_creature", "creature")),
+        (r"^return target artifact to its owner's hand\.?$", ("remove_permanent", "artifact")),
+        (r"^return target enchantment to its owner's hand\.?$", ("remove_permanent", "enchantment")),
+        (r"^return target land to its owner's hand\.?$", ("remove_permanent", "land")),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return result
+    return None
+
+
+def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, str]] = [
+        (r"^counter target artifact or enchantment spell\.?$", "artifact_or_enchantment_spell"),
+        (r"^counter target instant or sorcery spell\.?$", "instant_or_sorcery_spell"),
+        (r"^counter target noncreature spell\.?$", "noncreature_spell"),
+        (r"^counter target creature spell\.?$", "creature_spell"),
+        (r"^counter target artifact spell\.?$", "artifact_spell"),
+        (r"^counter target enchantment spell\.?$", "enchantment_spell"),
+        (r"^counter target instant spell\.?$", "instant_spell"),
+        (r"^counter target sorcery spell\.?$", "sorcery_spell"),
+        (r"^counter target blue spell\.?$", "blue_spell"),
+        (r"^counter target white spell\.?$", "white_spell"),
+        (r"^counter target black spell\.?$", "black_spell"),
+        (r"^counter target red spell\.?$", "red_spell"),
+        (r"^counter target green spell\.?$", "green_spell"),
+        (r"^counter target spell\.?$", "spell"),
+    ]
+    for pattern, target in patterns:
+        if re.match(pattern, text):
+            return target
+    return None
+
+
+def counter_target_constraints_for(target: str) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "stack", "stack_object": "spell"}
+    if target == "artifact_or_enchantment_spell":
+        constraints["card_types"] = ["artifact", "enchantment"]
+    elif target == "instant_or_sorcery_spell":
+        constraints["spell_types"] = ["instant", "sorcery"]
+    elif target == "noncreature_spell":
+        constraints["exclude_card_types"] = ["creature"]
+    elif target in {"creature_spell", "artifact_spell", "enchantment_spell"}:
+        constraints["card_types"] = [target.removesuffix("_spell")]
+    elif target in {"instant_spell", "sorcery_spell"}:
+        constraints["spell_types"] = [target.removesuffix("_spell")]
+    elif target in {"blue_spell", "white_spell", "black_spell", "red_spell", "green_spell"}:
+        color_symbols = {
+            "blue_spell": "U",
+            "white_spell": "W",
+            "black_spell": "B",
+            "red_spell": "R",
+            "green_spell": "G",
+        }
+        constraints["spell_colors"] = [color_symbols[target]]
+    return constraints
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -452,6 +537,50 @@ def split_row(
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_exile_target_spell"), "selected_exact_scope"
+
+    if unit == COUNTER_UNIT:
+        if classes != {"CounterTargetEffect"}:
+            return None, "counter_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "counter_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "counter_oracle_not_simple"
+        target = counter_target_from_oracle(metadata)
+        if target is None:
+            return None, "counter_target_not_supported"
+        effect_json = {
+            "effect": "counter",
+            "battle_model_scope": COUNTER_SCOPE,
+            "target": target,
+            "target_constraints": counter_target_constraints_for(target),
+            "xmage_effect_class": "CounterTargetEffect",
+            **flags,
+        }
+        if target == "blue_spell":
+            effect_json["requires_blue_target"] = True
+        return build_proposal(row, metadata, effect_json, family_id="xmage_counter_target_spell"), "selected_exact_scope"
+
+    if unit == BOUNCE_UNIT:
+        if classes != {"ReturnToHandTargetEffect"}:
+            return None, "bounce_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "bounce_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "bounce_oracle_not_simple"
+        target = bounce_target_from_oracle(metadata)
+        if target is None:
+            return None, "bounce_target_not_supported"
+        effect, target_type = target
+        effect_json = {
+            "effect": effect,
+            "battle_model_scope": BOUNCE_SCOPE,
+            "target": target_type,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "hand",
+            "xmage_effect_class": "ReturnToHandTargetEffect",
+            **flags,
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit in RAMP_UNITS:
         if is_spell(metadata):

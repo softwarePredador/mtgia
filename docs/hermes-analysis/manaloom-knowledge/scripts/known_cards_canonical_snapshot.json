@@ -1336,6 +1336,29 @@
     "battle_rule_logical_key": "battle_rule_v1:0179c6cc3d20112655e43b1269bf2290",
     "battle_rule_oracle_hash": "75552ebfb68809483e067d650ddcbf88"
   },
+  "Annul": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_or_enchantment_spell",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "enchantment"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef",
+    "battle_rule_oracle_hash": "e0b49a2eb44d5186ab12e8a7e2c3cfaa"
+  },
   "Anointed Procession // Anointed Procession": {
     "cmc": 4.0,
     "effect": "token_maker",
@@ -1851,6 +1874,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f76c31f292e38a97eda06f33f0ef130b"
+  },
+  "Artifact Blast": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact_spell",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5a1d2fb58efab0d5edcd6a1e06a3c66e",
+    "battle_rule_oracle_hash": "86e09cdce01726fdb0368355bb3bb098"
   },
   "Artifact Unknown Shores": {
     "effect": "land",
@@ -4167,6 +4212,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ca1583d8853b1a90229e8795a5644b0e"
   },
+  "Boomerang": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+    "battle_rule_oracle_hash": "ce97f55e49504ae77e37b12d347da4ed"
+  },
   "Boon of the Wish-Giver": {
     "count": 4,
     "effect": "draw_cards",
@@ -5375,15 +5441,23 @@
     "battle_rule_logical_key": "battle_rule_v1:b88baa723b80ab2a7462f905801ddf84"
   },
   "Cancel": {
-    "cmc": 3.0,
+    "battle_model_scope": "xmage_counter_target_spell_v1",
     "effect": "counter",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:58cf40a9a929b66bca25048353cb1498"
+    "sorcery": false,
+    "target": "spell",
+    "target_constraints": {
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7e29c853e44945f99da7e36251341d47",
+    "battle_rule_oracle_hash": "d748ee6dd8f8a81c2f3f28ac38dd895a"
   },
   "Candelabra of Tawnos": {
     "ability_kind": "activated",
@@ -8064,6 +8138,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
   },
+  "Cruel Cut": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
+    "battle_rule_oracle_hash": "046f8028c16d78949015f208616ed254"
+  },
   "Crumbling Necropolis": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -10178,16 +10273,47 @@
     "battle_rule_logical_key": "battle_rule_v1:fb9b2b633a4842d42599c293e0de4d68"
   },
   "Dispel": {
-    "cmc": 1.0,
-    "count": 1,
+    "battle_model_scope": "xmage_counter_target_spell_v1",
     "effect": "counter",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:9abd49da9f89f15db3b9cb372a15b266"
+    "sorcery": false,
+    "target": "instant_spell",
+    "target_constraints": {
+      "spell_types": [
+        "instant"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+    "battle_rule_oracle_hash": "6db9533f63d7d41a56e586b27e46ae52"
+  },
+  "Disperse": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "nonland_permanent"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+    "battle_rule_oracle_hash": "4051670871d0fa08e186d4dcdc7fe854"
   },
   "Displace": {
     "effect": "phase_creatures",
@@ -10827,6 +10953,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+  },
+  "Drown in Shapelessness": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+    "battle_rule_oracle_hash": "e273efeb41fba4daf066d9df143c8522"
   },
   "Drown in the Loch": {
     "cmc": 2.0,
@@ -12232,6 +12379,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d61021fe4fa1357803be53fa0d1d915a"
   },
+  "Envelop": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "sorcery_spell",
+    "target_constraints": {
+      "spell_types": [
+        "sorcery"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+    "battle_rule_oracle_hash": "b5a5cbb8782f56430eb30d5717308adc"
+  },
   "Ephemerate": {
     "battle_model_scope": "exile_then_return_target_creature_you_control_rebound_v1",
     "blink_target_scope": "creature_you_control",
@@ -12377,6 +12546,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6d605e71cab499f7d5f6da75903de044"
+  },
+  "Essence Scatter": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+    "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
   },
   "Etched Cornfield": {
     "effect": "land",
@@ -12862,6 +13053,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
   },
+  "Extinguish": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "sorcery_spell",
+    "target_constraints": {
+      "spell_types": [
+        "sorcery"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4d75d79719bc4abcc79832e5129f5ff2",
+    "battle_rule_oracle_hash": "b5a5cbb8782f56430eb30d5717308adc"
+  },
   "Extraplanar Lens": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -12882,6 +13095,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f30c522a9f02fff8ee918471a4c698ef"
+  },
+  "Eye of Nowhere": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+    "battle_rule_oracle_hash": "ce97f55e49504ae77e37b12d347da4ed"
   },
   "Eye of Ugin": {
     "effect": "land",
@@ -13123,6 +13357,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:1e5bcf3b45fcae347879976d74d2ef84"
+  },
+  "False Summoning": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+    "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
   },
   "Fanatic of Rhonas": {
     "cmc": 2.0,
@@ -14355,6 +14611,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e21a09af20904932ce575966774b7905"
   },
+  "Flash Counter": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "instant_spell",
+    "target_constraints": {
+      "spell_types": [
+        "instant"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:da19782039253e55b3e3029cb5d2012a",
+    "battle_rule_oracle_hash": "6db9533f63d7d41a56e586b27e46ae52"
+  },
   "Flash Photography": {
     "ability_kind": "one_shot",
     "battle_model_scope": "copy_target_permanent_v1",
@@ -15312,6 +15590,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3962fa5937b9b37311d110e5c30a29cb"
+  },
+  "Gainsay": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "requires_blue_target": true,
+    "sorcery": false,
+    "target": "blue_spell",
+    "target_constraints": {
+      "spell_colors": [
+        "U"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d03d84edda7e25cde871fb06d09359b",
+    "battle_rule_oracle_hash": "1f354875bf01a22a1561303e2c16588e"
   },
   "Gala Greeters": {
     "cmc": 2.0,
@@ -21572,6 +21873,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Lava, Axe": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": false,
+    "sorcery": true,
+    "target": "player",
+    "target_constraints": {
+      "scope": "player"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
+    "battle_rule_oracle_hash": "55f1a536b05a2518d850264d6f23c06c"
+  },
   "Lavaball Trap": {
     "cmc": 8.0,
     "effect": "damage_wipe",
@@ -25186,6 +25507,27 @@
     "battle_rule_logical_key": "battle_rule_v1:0a78dec9b9b2b0b5218b7d0a64a9afb3",
     "battle_rule_oracle_hash": "517f664e6c81ce9c204c09a20e14be2d"
   },
+  "Mox Emerald": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "GreenManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:67a13c2942deb94c165ddbd40ade1ca2",
+    "battle_rule_oracle_hash": "fa07d150550fe544837233efd56086ac"
+  },
   "Mox Jasper": {
     "cmc": 0.0,
     "effect": "ramp_permanent",
@@ -25196,6 +25538,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5112a61521124fd47e89c61029e7d3fe"
+  },
+  "Mox Jet": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "B",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlackManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bf48dcd904ae87c0b9b07818733dbb58",
+    "battle_rule_oracle_hash": "4219c44c33071ac8fd7def138b1defe3"
   },
   "Mox Opal": {
     "battle_model_scope": "metalcraft_three_artifacts_any_color_mana_rock_v1",
@@ -25213,6 +25576,69 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b236b60de8fac9e692f1442119330f34",
     "battle_rule_oracle_hash": "24b582b5091c110d1da08fec15ad07a1"
+  },
+  "Mox Pearl": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "W",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "WhiteManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f21040df4d9b8d2e716c387e72022fee",
+    "battle_rule_oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf"
+  },
+  "Mox Ruby": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "R",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "RedManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eed311739a23e5d72322f9bf25fe6ed5",
+    "battle_rule_oracle_hash": "ed6887f502cae452812d5f5d0a0c5792"
+  },
+  "Mox Sapphire": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 1,
+    "permanent_type": "artifact",
+    "produces": "U",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "BlueManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
+    "battle_rule_oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3"
   },
   "Muddle the Mixture": {
     "cmc": 2.0,
@@ -28590,6 +29016,28 @@
     "battle_rule_logical_key": "battle_rule_v1:305c6defa16afe96c20667ebabde4177",
     "battle_rule_oracle_hash": "95473f10b534e58920549f533277c3d2"
   },
+  "Preemptive Strike": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+    "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
+  },
   "Preordain": {
     "cmc": 1.0,
     "effect": "draw_cards",
@@ -30571,6 +31019,27 @@
     "battle_rule_logical_key": "battle_rule_v1:41a3506a6969888f362a122077db87cb",
     "battle_rule_oracle_hash": "08a27b0252c823f1a0d6532701925010"
   },
+  "Regress": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+    "battle_rule_oracle_hash": "ce97f55e49504ae77e37b12d347da4ed"
+  },
   "Regrowth": {
     "cmc": 2.0,
     "effect": "recursion",
@@ -30755,6 +31224,28 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Remove Soul": {
+    "battle_model_scope": "xmage_counter_target_spell_v1",
+    "effect": "counter",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_spell",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "stack_object": "spell",
+      "zone": "stack"
+    },
+    "xmage_effect_class": "CounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
+    "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
   },
   "Rending Volley": {
     "cmc": 1.0,
@@ -35446,6 +35937,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Smelt": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
+    "battle_rule_oracle_hash": "401469c416682300489c020bef626efd"
+  },
+  "Smelt // Herd // Saw": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
     "effect": "remove_permanent",
@@ -42794,6 +43306,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
   },
+  "Unsummon": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+    "battle_rule_oracle_hash": "e273efeb41fba4daf066d9df143c8522"
+  },
   "Untaidake, the Cloud Keeper": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -43971,6 +44504,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c52e6fe3b54d906bc6f85e1f7277a3f1",
     "battle_rule_oracle_hash": "b0618c0110dbf4c04c077f91a5898feb"
+  },
+  "Void Snare": {
+    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "remove_permanent",
+    "instant": false,
+    "sorcery": true,
+    "target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "nonland_permanent"
+      ]
+    },
+    "xmage_effect_class": "ReturnToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+    "battle_rule_oracle_hash": "4051670871d0fa08e186d4dcdc7fe854"
   },
   "Volatile Fault": {
     "effect": "land",

@@ -1,0 +1,323 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg287_xmage_bounce_spell_wave_20260701_081902",
+  "deploy_id": "PG287",
+  "expected_rules": [
+    {
+      "card_name": "Boomerang",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "boomerang",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Disperse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+      "min_rule_version": 2,
+      "normalized_name": "disperse",
+      "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drown in Shapelessness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "min_rule_version": 2,
+      "normalized_name": "drown in shapelessness",
+      "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eye of Nowhere",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+      "min_rule_version": 2,
+      "normalized_name": "eye of nowhere",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Regress",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "regress",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unsummon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "min_rule_version": 2,
+      "normalized_name": "unsummon",
+      "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Void Snare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+      "min_rule_version": 2,
+      "normalized_name": "void snare",
+      "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_return_target_to_hand_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-01T08:19:02+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Boomerang"
+      },
+      "card_name": "Boomerang",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "normalized_name": "boomerang",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Disperse"
+      },
+      "card_name": "Disperse",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+      "normalized_name": "disperse",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Drown in Shapelessness"
+      },
+      "card_name": "Drown in Shapelessness",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "normalized_name": "drown in shapelessness",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Eye of Nowhere"
+      },
+      "card_name": "Eye of Nowhere",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+      "normalized_name": "eye of nowhere",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Regress"
+      },
+      "card_name": "Regress",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "normalized_name": "regress",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Unsummon"
+      },
+      "card_name": "Unsummon",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "normalized_name": "unsummon",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Void Snare"
+      },
+      "card_name": "Void Snare",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+      "normalized_name": "void snare",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "effect": "remove_permanent"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Boomerang",
+    "Disperse",
+    "Drown in Shapelessness",
+    "Eye of Nowhere",
+    "Regress",
+    "Unsummon",
+    "Void Snare"
+  ],
+  "selected_count": 7,
+  "slug": "xmage_bounce_spell_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Boomerang",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "boomerang",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Disperse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+      "min_rule_version": 2,
+      "normalized_name": "disperse",
+      "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Drown in Shapelessness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "min_rule_version": 2,
+      "normalized_name": "drown in shapelessness",
+      "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Eye of Nowhere",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+      "min_rule_version": 2,
+      "normalized_name": "eye of nowhere",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Regress",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+      "min_rule_version": 2,
+      "normalized_name": "regress",
+      "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Unsummon",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+      "min_rule_version": 2,
+      "normalized_name": "unsummon",
+      "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Void Snare",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+      "min_rule_version": 2,
+      "normalized_name": "void snare",
+      "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

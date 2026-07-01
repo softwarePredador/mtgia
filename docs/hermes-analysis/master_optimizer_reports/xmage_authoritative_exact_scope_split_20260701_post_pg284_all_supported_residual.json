@@ -1,0 +1,671 @@
+{
+  "blocked_samples": {
+    "additional_cost_detected": [
+      "Acceptable Losses",
+      "Altar's Reap",
+      "Angelic Purge",
+      "Annihilating Glare",
+      "Artillerize",
+      "Bankrupt in Blood",
+      "Betrayer's Bargain",
+      "Bitter Triumph",
+      "Blood Divination",
+      "Bogslither's Embrace",
+      "Bone Shards",
+      "Bone Splinters"
+    ],
+    "damage_amount_not_fixed": [
+      "Armed Response",
+      "Artillery Blast",
+      "Blaze",
+      "Clan Defiance",
+      "Devil's Play",
+      "Divine Retribution",
+      "Dogpile",
+      "Earth Tremor",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Fanning the Flames",
+      "Feedback Bolt"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Bolt of Keranos",
+      "Bot Bashing Time",
+      "Brimstone Volley"
+    ],
+    "damage_target_not_supported": [
+      "Arrows of Justice",
+      "Burning Oil",
+      "Consuming Bonfire",
+      "Cosmium Blast",
+      "Divine Arrow",
+      "Dragon's Presence",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Gideon's Reproach",
+      "Hamato Ninp\u014d",
+      "Impeccable Timing",
+      "Iron Verdict"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Artisan's Sorrow",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle"
+    ],
+    "destroy_target_not_supported": [
+      "Asphyxiate",
+      "Assassin's Blade",
+      "Assassinate",
+      "Avalanche",
+      "Bramblecrush",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Crush",
+      "Curtains' Call"
+    ],
+    "draw_effect_class_not_pure": [
+      "Aang's Defense",
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afflict",
+      "Afterlife Insurance",
+      "Aggressive Urge",
+      "Airbending Lesson",
+      "Allied Strategies",
+      "Amass the Components",
+      "Ambition's Cost"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Devout Decree",
+      "Dispatch"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Sylvan Reclamation",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_target_not_supported": [
+      "Blade Banish",
+      "Blazing Hope",
+      "Bring to Trial",
+      "Celestial Purge",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Epic Downfall",
+      "Excoriate",
+      "Exorcise",
+      "Expel"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Aerial Assault",
+      "Aerial Predation",
+      "Agonizing Syphon",
+      "Appetite for the Unnatural",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Abzan Banner",
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "All-Fates Scroll",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Animal Attendant",
+      "Arcum's Astrolabe",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Agent of Stromgald",
+      "Apprentice Wizard",
+      "Arc Reactor",
+      "Basal Thrull",
+      "Black Lotus",
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Blood Pet",
+      "Blood Vassal",
+      "Bog Initiate",
+      "Bog Witch",
+      "Catalyst Elemental"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aberrant",
+      "Abiding Grace",
+      "Abomination",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abyssal Hunter",
+      "Acid Web Spider",
+      "Acidic Dagger",
+      "Acidic Slime",
+      "Acidic Sliver",
+      "Acolyte of the Inferno",
+      "Acorn Catapult"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind",
+      "Bind // Liberate",
+      "Blessed Wine",
+      "Bone Harvest",
+      "Bouncer's Beatdown"
+    ]
+  },
+  "generated_at": "2026-07-01T08:02:28+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed one-shot spell scopes only",
+    "supported_adapter_work_units": [
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "removal_destroy::targeted_destroy_variant_v1",
+      "battle_model_scope": "xmage_destroy_target_spell_v1",
+      "card_id": "0521ccb9-cf5d-4dc3-afd2-9cb07fcced3e",
+      "card_name": "Cruel Cut",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_creature",
+        "target": "creature",
+        "timing": "instant"
+      },
+      "effect": "remove_creature",
+      "effect_json": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "instant": true,
+        "sorcery": false,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_destroy_target_spell",
+      "logical_rule_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
+      "normalized_name": "cruel cut",
+      "notes": "XMage authoritative exact-scope split: local class CruelCut translated into ManaLoom runtime scope xmage_destroy_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "046f8028c16d78949015f208616ed254",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CruelCut",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CruelCut.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+      "card_id": "703a6e14-c5d9-4c6c-9419-91c2ecfb3b49",
+      "card_name": "Lava, Axe",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "direct_damage",
+        "target": "player"
+      },
+      "effect": "direct_damage",
+      "effect_json": {
+        "amount": 5,
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "damage": 5,
+        "effect": "direct_damage",
+        "instant": false,
+        "sorcery": true,
+        "target": "player",
+        "target_constraints": {
+          "scope": "player"
+        },
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_fixed_damage_spell",
+      "logical_rule_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
+      "normalized_name": "lava, axe",
+      "notes": "XMage authoritative exact-scope split: local class LavaAxe translated into ManaLoom runtime scope xmage_fixed_damage_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "55f1a536b05a2518d850264d6f23c06c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LavaAxe",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LavaAxe.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "fef25c7c-0673-41c3-84d1-d0ec60484f04",
+      "card_name": "Mox Emerald",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "G",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "GreenManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:67a13c2942deb94c165ddbd40ade1ca2",
+      "normalized_name": "mox emerald",
+      "notes": "XMage authoritative exact-scope split: local class MoxEmerald translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoxEmerald",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoxEmerald.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "730c7dd2-bd6d-46d1-b50c-d97487a5868a",
+      "card_name": "Mox Jet",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "B",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlackManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:bf48dcd904ae87c0b9b07818733dbb58",
+      "normalized_name": "mox jet",
+      "notes": "XMage authoritative exact-scope split: local class MoxJet translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoxJet",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoxJet.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "a1521e40-b3a2-4f5f-bb17-858149913234",
+      "card_name": "Mox Pearl",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "W",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "WhiteManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:f21040df4d9b8d2e716c387e72022fee",
+      "normalized_name": "mox pearl",
+      "notes": "XMage authoritative exact-scope split: local class MoxPearl translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoxPearl",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoxPearl.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "c6209c5d-59d5-4d63-b039-deda21058adb",
+      "card_name": "Mox Ruby",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "R",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "RedManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:eed311739a23e5d72322f9bf25fe6ed5",
+      "normalized_name": "mox ruby",
+      "notes": "XMage authoritative exact-scope split: local class MoxRuby translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoxRuby",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoxRuby.java"
+    },
+    {
+      "adapter_work_unit": "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+      "card_id": "bf03a7ef-81de-4cba-a6a0-af3af9877bff",
+      "card_name": "Mox Sapphire",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "ramp",
+        "effect": "ramp_permanent"
+      },
+      "effect": "ramp_permanent",
+      "effect_json": {
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "U",
+        "xmage_effect_classes": [],
+        "xmage_mana_ability_classes": [
+          "BlueManaAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_simple_mana_source_permanent",
+      "logical_rule_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
+      "normalized_name": "mox sapphire",
+      "notes": "XMage authoritative exact-scope split: local class MoxSapphire translated into ManaLoom runtime scope xmage_simple_tap_mana_source_permanent_v1. This row is package-ready only because the source signature is a narrow activated mana-source permanent with focused runtime coverage.",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoxSapphire",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoxSapphire.java"
+    },
+    {
+      "adapter_work_unit": "removal_destroy::targeted_destroy_variant_v1",
+      "battle_model_scope": "xmage_destroy_target_spell_v1",
+      "card_id": "df11b600-bd8e-451b-b2b5-c52e486ed128",
+      "card_name": "Smelt // Herd // Saw",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "removal",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "timing": "instant"
+      },
+      "effect": "remove_permanent",
+      "effect_json": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "instant": true,
+        "sorcery": false,
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_effect_class": "DestroyTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_destroy_target_spell",
+      "logical_rule_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
+      "normalized_name": "smelt // herd // saw",
+      "notes": "XMage authoritative exact-scope split: local class Smelt translated into ManaLoom runtime scope xmage_destroy_target_spell_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "401469c416682300489c020bef626efd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Smelt",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/Smelt.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-01T08:02:07+00:00",
+    "queue_scope": "all_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "direct_damage::targeted_damage_variant_v1": 1,
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1": 5,
+      "removal_destroy::targeted_destroy_variant_v1": 2
+    },
+    "blocked_reason_counts": {
+      "additional_cost_detected": 97,
+      "damage_amount_not_fixed": 45,
+      "damage_effect_class_not_pure": 123,
+      "damage_target_not_supported": 24,
+      "destroy_effect_class_not_pure": 138,
+      "destroy_target_not_supported": 74,
+      "draw_effect_class_not_pure": 562,
+      "exile_effect_class_not_pure": 42,
+      "exile_oracle_not_simple": 9,
+      "exile_target_not_supported": 29,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_effect_class_not_pure": 166,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_effect_class_not_simple": 307,
+      "mana_source_oracle_not_simple": 121,
+      "mana_source_safe_ability_missing": 133,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 135,
+      "not_instant_or_sorcery_spell": 1833,
+      "not_one_shot_spell_ability": 163
+    },
+    "considered_supported_work_unit_rows": 4040,
+    "family_counts": {
+      "xmage_destroy_target_spell": 2,
+      "xmage_fixed_damage_spell": 1,
+      "xmage_simple_mana_source_permanent": 5
+    },
+    "proposal_count": 8,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 8
+    },
+    "safe_for_batch_pg_package_count": 8,
+    "scope_counts": {
+      "xmage_destroy_target_spell_v1": 2,
+      "xmage_fixed_damage_target_spell_v1": 1,
+      "xmage_simple_tap_mana_source_permanent_v1": 5
+    }
+  }
+}

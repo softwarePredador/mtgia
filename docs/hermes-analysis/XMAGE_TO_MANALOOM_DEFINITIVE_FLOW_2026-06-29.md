@@ -121,32 +121,34 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg287_bounce_spell_wave.md`
 
 Current measured queue:
 
-- target Commander-legal battle-gap identities: `28836`
-- XMage authoritative source resolved: `28522`
-- local XMage missing-source exceptions: `314`
+- target all-card battle-gap identities: `31333`
+- XMage authoritative source resolved: `28397`
+- local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
-- ManaLoom adapter work units: `11961`
-- authoritative source coverage ratio: `0.9891`
+- ManaLoom adapter work units: `12093`
+- authoritative source coverage ratio: `0.9063`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `28522` identities, card semantics are accepted from XMage; work is now
+- For `28397` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
-- Only `314` identities remain true residual exceptions because the local
-  XMage checkout did not resolve a source class.
+- `2936` identities remain residual exceptions because the local XMage checkout
+  did not resolve a source class in the all-card scope. These are a separate
+  official/Forge/manual-model or product-exclusion lane, not a reason to slow
+  the XMage-resolved adapter queue.
 - Generic `xmage_*_review_v1` scopes and fallback manual-model hints are
   adapter work-unit names. Fallback hints must be split by real XMage Java
   class/effect/ability signatures; they are blocked only from executable PG
   promotion until ManaLoom has the matching runtime adapter.
 
-## PG283/PG284 Exact Adapter Waves
+## PG283-PG287 Exact Adapter Waves
 
-As of 2026-07-01, the first two all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG287 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -170,6 +172,10 @@ patterns:
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
   `ramp_permanent::xmage_creature_mana_source_variant_review_v1` ->
   `xmage_simple_tap_mana_source_permanent_v1`
+- `counter_spell::counter_target_stack_object_variant_v1` ->
+  `xmage_counter_target_spell_v1`
+- `bounce::targeted_return_to_hand_variant_v1` ->
+  `xmage_return_target_to_hand_spell_v1`
 
 PG283 evidence:
 
@@ -238,6 +244,56 @@ PG284 measured result:
   `ramp_permanent::xmage_creature_mana_source_variant_review_v1` `390 -> 373`,
   `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` `327 -> 315`,
   and `removal_exile::targeted_exile_variant_v1` `174 -> 156`.
+
+PG285-PG287 evidence:
+
+- PG285 all-scope supported residual package:
+  `docs/hermes-analysis/master_optimizer_reports/pg285_xmage_all_scope_supported_residual_package.md`
+- PG285 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg285_xmage_all_scope_supported_residual_e2e_validation.md`
+- PG286 counter spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg286_xmage_counter_spell_wave_package.md`
+- PG286 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg286_xmage_counter_spell_wave_e2e_validation.md`
+- PG287 bounce spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_package.md`
+- PG287 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_e2e_validation.md`
+- post-PG287 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg287_bounce_spell_wave_recheck.md`
+- post-PG287 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg287_bounce_spell_wave.md`
+
+PG285-PG287 measured result:
+
+- PG285 promoted `8` all-card residual exact rules left outside the
+  Commander-legal PG283/PG284 path: `5` simple Mox mana sources, `2` destroy
+  target spells, and `1` fixed damage-to-player spell.
+- PG286 promoted `12` pure `CounterTargetEffect` spells with exact stack target
+  constraints for generic, creature, artifact, instant/sorcery, and blue spell
+  targets. Runtime now preserves `target_constraints` from card-effect fallback
+  data and validates stack target type/color before allowing a counterspell.
+- PG287 promoted `7` pure `ReturnToHandTargetEffect` spells. Runtime now
+  supports `destination=hand` for targeted removal/bounce by moving the
+  permanent from battlefield to its controller's hand instead of falling through
+  to graveyard removal.
+- PG285 PostgreSQL postcheck: `8/8` promoted rows, `8/8` verified/auto,
+  `8/8` matching Oracle hash; E2E: PostgreSQL, SQLite, canonical snapshot, and
+  runtime all `8/8`.
+- PG286 PostgreSQL postcheck: `12/12` promoted rows, `12/12` verified/auto,
+  `12/12` matching Oracle hash, with `48` backup rows; E2E: PostgreSQL,
+  SQLite, canonical snapshot, and runtime all `12/12`.
+- PG287 PostgreSQL postcheck: `7/7` promoted rows, `7/7` verified/auto,
+  `7/7` matching Oracle hash; E2E: PostgreSQL, SQLite, canonical snapshot, and
+  runtime all `7/7`.
+- Global all-card authoritative queue after PG287:
+  `target_identity_count=31333`, `xmage_authoritative_source_count=28397`,
+  `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=28397`.
+- Running the exact splitter after PG287 on the supported units returns
+  `proposal_count=0`; all currently implemented exact adapters are exhausted
+  against the current all-card gap. The next work must add a new exact
+  subpattern/runtime adapter, not rerun the existing splitter.
 
 ## Why This Is The Best Current Flow
 

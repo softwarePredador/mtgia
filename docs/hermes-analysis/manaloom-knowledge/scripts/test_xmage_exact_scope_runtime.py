@@ -387,6 +387,175 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "creature_spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell", "card_types": ["creature"]},
+            "instant": True,
+        }
+        counter = {
+            "name": "Fixture Essence Scatter",
+            "type_line": "Instant",
+            "mana_cost": "{1}{U}",
+            "cmc": 2,
+            **counter_effect,
+        }
+        creature_spell = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        sorcery_spell = {"name": "Target Draw", "type_line": "Sorcery", "cmc": 2}
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                counter,
+                counter_effect,
+                creature_spell,
+                stack_item=self.battle.StackItem(creature_spell, opponent, {"effect": "creature"}),
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                counter,
+                counter_effect,
+                sorcery_spell,
+                stack_item=self.battle.StackItem(sorcery_spell, opponent, {"effect": "draw_cards"}),
+            )
+        )
+
+    def test_counter_target_blue_spell_filters_by_target_color(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        counter_effect = {
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "blue_spell",
+            "requires_blue_target": True,
+            "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_colors": ["U"]},
+            "instant": True,
+        }
+        blue_spell = {
+            "name": "Target Blue",
+            "type_line": "Instant",
+            "mana_cost": "{1}{U}",
+            "colors": ["U"],
+            "cmc": 2,
+        }
+        red_spell = {
+            "name": "Target Red",
+            "type_line": "Instant",
+            "mana_cost": "{1}{R}",
+            "colors": ["R"],
+            "cmc": 2,
+        }
+
+        self.assertTrue(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                blue_spell,
+                stack_item=self.battle.StackItem(blue_spell, opponent, {"effect": "draw_cards"}),
+            )
+        )
+        self.assertFalse(
+            self.battle.counter_can_target(
+                {},
+                counter_effect,
+                red_spell,
+                stack_item=self.battle.StackItem(red_spell, opponent, {"effect": "direct_damage"}),
+            )
+        )
+
+    def test_counterspell_cards_uses_exact_stack_target_constraints(self) -> None:
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.mana_pool.add_generic(1)
+        opponent.mana_pool.add("blue", 1)
+        counter = {
+            "name": "Fixture Dispel",
+            "type_line": "Instant",
+            "mana_cost": "{U}",
+            "cmc": 1,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_spell_v1",
+            "target": "instant_spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell", "spell_types": ["instant"]},
+            "instant": True,
+        }
+        opponent.hand.append(counter)
+        instant_spell = {"name": "Target Instant", "type_line": "Instant", "cmc": 2}
+        sorcery_spell = {"name": "Target Sorcery", "type_line": "Sorcery", "cmc": 2}
+
+        self.assertEqual(
+            opponent.counterspell_cards(
+                castable_only=True,
+                target_card=instant_spell,
+                stack_item=self.battle.StackItem(instant_spell, opponent, {"effect": "direct_damage"}),
+            ),
+            [counter],
+        )
+        self.assertEqual(
+            opponent.counterspell_cards(
+                castable_only=True,
+                target_card=sorcery_spell,
+                stack_item=self.battle.StackItem(sorcery_spell, opponent, {"effect": "draw_cards"}),
+            ),
+            [],
+        )
+
+    def test_return_target_creature_to_owner_hand_moves_from_battlefield_to_hand(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+            "tapped": True,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "hand",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Bounce",
+                "type_line": "Instant",
+                "oracle_text": "Return target creature to its owner's hand.",
+            },
+            turn=7,
+            rng=random.Random(7),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.hand], ["Target Bear"])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertNotIn("tapped", opponent.hand[0])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Bounce"
+                and data.get("target") == "Target Bear"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "permanent_moved_from_battlefield"
+                and data.get("card") == "Target Bear"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

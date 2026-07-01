@@ -7316,6 +7316,51 @@ if _canonical_snapshot_path.exists():
         bucket=CANONICAL_FALLBACK_KNOWN_CARDS,
     )
 
+
+CARD_EFFECT_FIELD_RULE_KEYS = (
+    "battle_model_scope",
+    "target",
+    "target_type",
+    "target_constraints",
+    "destination",
+    "amount",
+    "damage",
+    "count",
+    "life_gain_amount",
+    "mana_produced",
+    "produces",
+    "activation_requires_tap",
+    "mana_activation_requires_tap",
+    "instant",
+    "sorcery",
+    "requires_blue_target",
+    "counter_target_cmc",
+    "counter_target_mana_value",
+    "counter_target_cmc_max",
+    "counter_target_mana_value_max",
+    "counter_target_cmc_min",
+    "counter_target_mana_value_min",
+    "draw_on_counter",
+    "countered_spell_to_top_library",
+    "counter_own_approach_to_top",
+    "xmage_effect_class",
+    "xmage_effect_classes",
+    "xmage_mana_ability_classes",
+)
+
+
+def card_effect_field_payload(card, mapped_effect, defaults=None):
+    payload = {
+        key: copy.deepcopy(card[key])
+        for key in CARD_EFFECT_FIELD_RULE_KEYS
+        if isinstance(card, dict) and key in card
+    }
+    payload["effect"] = mapped_effect
+    for key, value in (defaults or {}).items():
+        payload.setdefault(key, value)
+    return payload
+
+
 def get_card_effect(card):
     name = card.get("name", "")
     lookup_names = [name]
@@ -7407,11 +7452,14 @@ def get_card_effect(card):
             return normalize_effect_by_oracle(
                 card,
                 with_rule_metadata(
-                    {
-                        "effect": "extra_combat",
-                        "combats": card.get("combats", card.get("extra_combats", 1)),
-                        "untap_creatures": card.get("untap_creatures", True),
-                    },
+                    card_effect_field_payload(
+                        card,
+                        "extra_combat",
+                        {
+                            "combats": card.get("combats", card.get("extra_combats", 1)),
+                            "untap_creatures": card.get("untap_creatures", True),
+                        },
+                    ),
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -7421,7 +7469,7 @@ def get_card_effect(card):
             return normalize_effect_by_oracle(
                 card,
                 with_rule_metadata(
-                    {"effect": "ramp_permanent", "mana_produced": 1},
+                    card_effect_field_payload(card, "ramp_permanent", {"mana_produced": 1}),
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -7431,7 +7479,7 @@ def get_card_effect(card):
             return normalize_effect_by_oracle(
                 card,
                 with_rule_metadata(
-                    {"effect": "finisher"},
+                    card_effect_field_payload(card, "finisher"),
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -7441,7 +7489,7 @@ def get_card_effect(card):
             return normalize_effect_by_oracle(
                 card,
                 with_rule_metadata(
-                    {"effect": "draw_cards", "count": 2},
+                    card_effect_field_payload(card, "draw_cards", {"count": 2}),
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -7451,10 +7499,11 @@ def get_card_effect(card):
             return normalize_effect_by_oracle(
                 card,
                 with_rule_metadata(
-                    {
-                        "effect": "damage_each_opponent",
-                        "amount": card.get("amount", 1),
-                    },
+                    card_effect_field_payload(
+                        card,
+                        "damage_each_opponent",
+                        {"amount": card.get("amount", 1)},
+                    ),
                     source="card_effect_field",
                     review_status="heuristic",
                     confidence=0.25,
@@ -7463,7 +7512,7 @@ def get_card_effect(card):
         return normalize_effect_by_oracle(
             card,
             with_rule_metadata(
-                {"effect": effect_map[effect]},
+                card_effect_field_payload(card, effect_map[effect]),
                 source="card_effect_field",
                 review_status="heuristic",
                 confidence=0.25,
@@ -7704,6 +7753,96 @@ def spell_cant_be_countered(target_card, stack_item=None):
     return False
 
 
+def _counter_target_label_constraints(target_label):
+    target = str(target_label or "").strip().lower()
+    constraints = {"zone": "stack", "stack_object": "spell"} if target.endswith("spell") else {}
+    if target == "artifact_or_enchantment_spell":
+        constraints["card_types"] = ["artifact", "enchantment"]
+    elif target == "instant_or_sorcery_spell":
+        constraints["spell_types"] = ["instant", "sorcery"]
+    elif target == "noncreature_spell":
+        constraints["exclude_card_types"] = ["creature"]
+    elif target in {"creature_spell", "artifact_spell", "enchantment_spell"}:
+        constraints["card_types"] = [target.removesuffix("_spell")]
+    elif target in {"instant_spell", "sorcery_spell"}:
+        constraints["spell_types"] = [target.removesuffix("_spell")]
+    elif target in {"blue_spell", "white_spell", "black_spell", "red_spell", "green_spell"}:
+        constraints["spell_colors"] = [{
+            "blue_spell": "U",
+            "white_spell": "W",
+            "black_spell": "B",
+            "red_spell": "R",
+            "green_spell": "G",
+        }[target]]
+    return constraints
+
+
+def _counter_effect_constraints(counter_effect):
+    constraints = _target_constraints_dict(counter_effect)
+    if constraints:
+        return constraints
+    return _counter_target_label_constraints((counter_effect or {}).get("target"))
+
+
+def _counter_target_is_spell_object(target_card, stack_item=None):
+    effect_data = getattr(stack_item, "effect_data", None) or {}
+    if str(effect_data.get("effect") or "").lower() == "triggered_ability":
+        return False
+    type_line = str((target_card or {}).get("type_line") or "").lower()
+    if "triggered ability" in type_line or "activated ability" in type_line:
+        return False
+    return True
+
+
+def _counter_target_matches_constraints(counter_effect, target_card, stack_item=None):
+    constraints = _counter_effect_constraints(counter_effect)
+    if not constraints:
+        return True
+    expected_stack_object = str(
+        constraints.get("stack_object") or constraints.get("stack_object_type") or ""
+    ).lower()
+    if expected_stack_object == "spell" and not _counter_target_is_spell_object(target_card, stack_item):
+        return False
+
+    type_line = str((target_card or {}).get("type_line") or "").lower()
+    allowed_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("card_types") or constraints.get("target_card_types"))
+        if str(value or "").strip()
+    }
+    if allowed_types and not any(card_type in type_line for card_type in allowed_types):
+        return False
+
+    excluded_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("exclude_card_types"))
+        if str(value or "").strip()
+    }
+    if excluded_types and any(card_type in type_line for card_type in excluded_types):
+        return False
+
+    spell_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("spell_types") or constraints.get("target_spell_types"))
+        if str(value or "").strip()
+    }
+    if spell_types and not any(spell_type in type_line for spell_type in spell_types):
+        return False
+
+    spell_colors = [
+        value
+        for value in _as_list(
+            constraints.get("spell_colors")
+            or constraints.get("target_spell_colors")
+            or constraints.get("colors")
+        )
+        if str(value or "").strip()
+    ]
+    if spell_colors and not any(_spell_has_color(target_card, color) for color in spell_colors):
+        return False
+    return True
+
+
 def counter_can_target(counter_card, counter_effect, target_card, stack_item=None):
     if not isinstance(target_card, dict):
         return True
@@ -7715,6 +7854,8 @@ def counter_can_target(counter_card, counter_effect, target_card, stack_item=Non
     ):
         if not card_is_blue(target_card):
             return False
+    if not _counter_target_matches_constraints(counter_effect, target_card, stack_item=stack_item):
+        return False
     target_value = card_mana_value(target_card)
     exact_value = first_present_value(
         counter_effect,
@@ -10718,6 +10859,116 @@ def resolve_basic_land_compensation(effect_data, target_controller, source_card,
     return moved
 
 
+def _remove_battlefield_object(owner, permanent):
+    battlefield = getattr(owner, "battlefield", None)
+    if not isinstance(battlefield, list):
+        return None
+    for index, candidate in enumerate(battlefield):
+        if candidate is permanent:
+            return battlefield.pop(index)
+    for index, candidate in enumerate(battlefield):
+        if candidate == permanent:
+            return battlefield.pop(index)
+    if isinstance(permanent, dict):
+        target_name = permanent.get("name") or permanent.get("card_name")
+        if target_name:
+            matches = [
+                (index, candidate)
+                for index, candidate in enumerate(battlefield)
+                if isinstance(candidate, dict)
+                and (candidate.get("name") or candidate.get("card_name")) == target_name
+            ]
+            if len(matches) == 1:
+                index, candidate = matches[0]
+                del battlefield[index]
+                return candidate
+    return None
+
+
+def _clear_battlefield_only_state(permanent):
+    if not isinstance(permanent, dict):
+        return
+    for key in (
+        "attacking",
+        "blocking",
+        "blocked",
+        "blockers",
+        "damage_marked",
+        "summoning_sick",
+        "tapped",
+        "until_eot",
+    ):
+        permanent.pop(key, None)
+
+
+def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, source=None, turn=None):
+    if not isinstance(permanent, dict):
+        return "none"
+    permanent = battlefield_object_for_target(owner, permanent) or permanent
+    moved = _remove_battlefield_object(owner, permanent)
+    if moved is None:
+        return "none"
+    moved["_lki_snapshot"] = {
+        "name": moved.get("name", moved.get("card_name", "")),
+        "power": moved.get("power", 0),
+        "toughness": moved.get("toughness", 0),
+        "cmc": moved.get("cmc", 0),
+        "type_line": moved.get("type_line", ""),
+        "is_commander": moved.get("is_commander", False),
+        "owner": moved.get("owner", moved.get("controller", "")),
+    }
+    moved["_zone_id"] = moved.get("_zone_id", 0) + 1
+    moved["_last_zone"] = "battlefield"
+    destination = "hand"
+    if moved.get("is_commander"):
+        event = ReplacementRegistry.process_event(
+            ReplacementEvent(
+                "zone_change",
+                affected_player=owner,
+                card=moved,
+                from_zone="battlefield",
+                to_zone="hand",
+                source=source,
+                reason=reason,
+            )
+        )
+        destination = event.to_zone
+    if moved.get("tag") == "token" or "token" in str(moved.get("type_line") or "").lower():
+        destination = "vanished_token"
+    elif destination == "command_zone":
+        owner.command_zone.append(moved)
+    else:
+        _clear_battlefield_only_state(moved)
+        owner.hand.append(moved)
+        destination = "hand"
+    emit_replay_event(
+        "permanent_moved_from_battlefield",
+        player=getattr(owner, "name", "?"),
+        card=moved.get("name", "?"),
+        permanent_type="permanent",
+        from_zone="battlefield",
+        to_zone=destination,
+        destination=destination,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+    )
+    resolve_leave_battlefield_treasure_trigger(
+        owner,
+        moved,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    refresh_controlled_static_indestructible(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    return destination
+
+
 def move_removed_permanent_to_destination(
     target_controller,
     target,
@@ -10747,6 +10998,14 @@ def move_removed_permanent_to_destination(
             turn,
             rng,
             all_players=all_players,
+        )
+    elif destination == "hand":
+        move_permanent_from_battlefield_to_hand(
+            target_controller,
+            target,
+            reason="bounce",
+            source=source_card,
+            turn=turn,
         )
     else:
         if isinstance(target, dict) and target.get("indestructible"):

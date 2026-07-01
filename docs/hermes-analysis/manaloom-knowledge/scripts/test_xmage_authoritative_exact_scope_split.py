@@ -224,6 +224,113 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_source_unsafe_ability_class")
 
+    def test_counter_target_creature_spell_maps_to_stack_constraints(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target creature spell."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "creature_spell")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell", "card_types": ["creature"]},
+        )
+
+    def test_counter_target_blue_spell_preserves_color_constraint(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target blue spell."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "blue_spell")
+        self.assertEqual(effect["target_constraints"]["spell_colors"], ["U"])
+        self.assertTrue(effect["requires_blue_target"])
+
+    def test_counter_spell_with_unless_clause_stays_blocked(self) -> None:
+        row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell unless its controller pays {1}."),
+            source_text="this.getSpellAbility().addEffect(new CounterTargetEffect());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_oracle_not_simple")
+
+    def test_counter_spell_with_compound_effect_stays_blocked(self) -> None:
+        row = queue_row(
+            split.COUNTER_UNIT,
+            effect_classes=["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target spell. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_effect_class_not_pure")
+
+    def test_return_target_creature_to_hand_maps_to_bounce_runtime_destination(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target creature to its owner's hand."),
+            source_text="this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+
+    def test_return_target_nonland_permanent_to_hand_maps_to_permanent_bounce(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target nonland permanent to its owner's hand."),
+            source_text="this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_bounce_spell_with_compound_effect_stays_blocked(self) -> None:
+        row = queue_row(
+            split.BOUNCE_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target creature to its owner's hand. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "bounce_effect_class_not_pure")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

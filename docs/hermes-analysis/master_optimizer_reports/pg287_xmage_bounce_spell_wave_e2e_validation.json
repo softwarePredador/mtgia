@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T08:19:56.332859+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg287_xmage_bounce_spell_wave_manifest.json",
+  "package_id": "pg287_xmage_bounce_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Boomerang",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Disperse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+          "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Drown in Shapelessness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+          "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Eye of Nowhere",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Regress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Unsummon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+          "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Void Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+          "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Boomerang",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Disperse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2",
+          "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Drown in Shapelessness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+          "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Eye of Nowhere",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Regress",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db",
+          "oracle_hash": "ce97f55e49504ae77e37b12d347da4ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Unsummon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76",
+          "oracle_hash": "e273efeb41fba4daf066d9df143c8522",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "card_name": "Void Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330",
+          "oracle_hash": "4051670871d0fa08e186d4dcdc7fe854",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boomerang",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Disperse",
+          "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drown in Shapelessness",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eye of Nowhere",
+          "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Regress",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Unsummon",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Void Snare",
+          "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Boomerang",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Disperse",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:e0cd5a647871ffed2ebf25c3b0fa4ab2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drown in Shapelessness",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eye of Nowhere",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:3bf436b016651becbbdb0d7d2fb400dc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Regress",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:2048333401c1ae3096acb4d43a4c83db"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Unsummon",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:92639258e9e2b1aa134f47b808061c76"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Void Snare",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:45be913b2a550d0ade45b3d034532330"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

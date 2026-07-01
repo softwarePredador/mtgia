@@ -1,0 +1,24 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG285",
+  "generated_at": "2026-07-01T08:03:10+00:00",
+  "mutations_performed": [
+    "postgres_card_battle_rules_apply"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 8,
+    "promoted_rule_rows": 8,
+    "promoted_verified_auto_rows": 8,
+    "row_count": 8
+  },
+  "precheck": {
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 8,
+    "total_target_card_rows": 8,
+    "would_deprecate_shadow_rows": 0
+  },
+  "slug": "xmage_all_scope_supported_residual"
+}

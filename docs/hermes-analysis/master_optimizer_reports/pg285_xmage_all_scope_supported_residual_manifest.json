@@ -1,0 +1,367 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg285_xmage_all_scope_supported_residual_20260701_080240",
+  "deploy_id": "PG285",
+  "expected_rules": [
+    {
+      "card_name": "Cruel Cut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
+      "min_rule_version": 2,
+      "normalized_name": "cruel cut",
+      "oracle_hash": "046f8028c16d78949015f208616ed254",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "effect": "remove_creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lava, Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
+      "min_rule_version": 2,
+      "normalized_name": "lava, axe",
+      "oracle_hash": "55f1a536b05a2518d850264d6f23c06c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "effect": "direct_damage"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Emerald",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67a13c2942deb94c165ddbd40ade1ca2",
+      "min_rule_version": 2,
+      "normalized_name": "mox emerald",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Jet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf48dcd904ae87c0b9b07818733dbb58",
+      "min_rule_version": 2,
+      "normalized_name": "mox jet",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Pearl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f21040df4d9b8d2e716c387e72022fee",
+      "min_rule_version": 2,
+      "normalized_name": "mox pearl",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Ruby",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eed311739a23e5d72322f9bf25fe6ed5",
+      "min_rule_version": 2,
+      "normalized_name": "mox ruby",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Sapphire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
+      "min_rule_version": 2,
+      "normalized_name": "mox sapphire",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Smelt // Herd // Saw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
+      "min_rule_version": 2,
+      "normalized_name": "smelt // herd // saw",
+      "oracle_hash": "401469c416682300489c020bef626efd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "effect": "remove_permanent"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_spell": 2,
+    "xmage_fixed_damage_spell": 1,
+    "xmage_simple_mana_source_permanent": 5
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_manifest.json",
+    "package": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_package.md",
+    "postcheck": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg285_xmage_all_scope_supported_residual_rollback.sql"
+  },
+  "generated_at": "2026-07-01T08:02:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cruel Cut"
+      },
+      "card_name": "Cruel Cut",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
+      "normalized_name": "cruel cut",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "effect": "remove_creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Lava, Axe"
+      },
+      "card_name": "Lava, Axe",
+      "effect": "direct_damage",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
+      "normalized_name": "lava, axe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+        "effect": "direct_damage"
+      }
+    },
+    {
+      "card": {
+        "name": "Mox Emerald"
+      },
+      "card_name": "Mox Emerald",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67a13c2942deb94c165ddbd40ade1ca2",
+      "normalized_name": "mox emerald",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Mox Jet"
+      },
+      "card_name": "Mox Jet",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf48dcd904ae87c0b9b07818733dbb58",
+      "normalized_name": "mox jet",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Mox Pearl"
+      },
+      "card_name": "Mox Pearl",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f21040df4d9b8d2e716c387e72022fee",
+      "normalized_name": "mox pearl",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Mox Ruby"
+      },
+      "card_name": "Mox Ruby",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eed311739a23e5d72322f9bf25fe6ed5",
+      "normalized_name": "mox ruby",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Mox Sapphire"
+      },
+      "card_name": "Mox Sapphire",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
+      "normalized_name": "mox sapphire",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent"
+      }
+    },
+    {
+      "card": {
+        "name": "Smelt // Herd // Saw"
+      },
+      "card_name": "Smelt // Herd // Saw",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
+      "normalized_name": "smelt // herd // saw",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "effect": "remove_permanent"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cruel Cut",
+    "Lava, Axe",
+    "Mox Emerald",
+    "Mox Jet",
+    "Mox Pearl",
+    "Mox Ruby",
+    "Mox Sapphire",
+    "Smelt // Herd // Saw"
+  ],
+  "selected_count": 8,
+  "slug": "xmage_all_scope_supported_residual",
+  "snapshot_checks": [
+    {
+      "card_name": "Cruel Cut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
+      "min_rule_version": 2,
+      "normalized_name": "cruel cut",
+      "oracle_hash": "046f8028c16d78949015f208616ed254",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lava, Axe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
+      "min_rule_version": 2,
+      "normalized_name": "lava, axe",
+      "oracle_hash": "55f1a536b05a2518d850264d6f23c06c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_damage_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Emerald",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:67a13c2942deb94c165ddbd40ade1ca2",
+      "min_rule_version": 2,
+      "normalized_name": "mox emerald",
+      "oracle_hash": "fa07d150550fe544837233efd56086ac",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Jet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf48dcd904ae87c0b9b07818733dbb58",
+      "min_rule_version": 2,
+      "normalized_name": "mox jet",
+      "oracle_hash": "4219c44c33071ac8fd7def138b1defe3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Pearl",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f21040df4d9b8d2e716c387e72022fee",
+      "min_rule_version": 2,
+      "normalized_name": "mox pearl",
+      "oracle_hash": "c7264c311c98ff99b293a96ad9ab2daf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Ruby",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:eed311739a23e5d72322f9bf25fe6ed5",
+      "min_rule_version": 2,
+      "normalized_name": "mox ruby",
+      "oracle_hash": "ed6887f502cae452812d5f5d0a0c5792",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mox Sapphire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7fa008d8a221f35fec32658e8e76ee6a",
+      "min_rule_version": 2,
+      "normalized_name": "mox sapphire",
+      "oracle_hash": "1f83035c18ab3f8d29bf4dfe2dcb6ee3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Smelt // Herd // Saw",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
+      "min_rule_version": 2,
+      "normalized_name": "smelt // herd // saw",
+      "oracle_hash": "401469c416682300489c020bef626efd",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
