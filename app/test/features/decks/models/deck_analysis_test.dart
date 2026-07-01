@@ -92,6 +92,71 @@ void main() {
       expect(analysis.sourceLabel, contains('999'));
     });
 
+    test('parses launch readiness and battle coverage contract', () {
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': 'deck-launch',
+        'format': 'commander',
+        'stats': {
+          'composition': {'ramp': 10},
+        },
+        'readiness': {
+          'schema_version': 'deck_readiness_v1_2026-07-01',
+          'status': 'ready_with_warnings',
+          'is_commander': true,
+          'commander_count': '1',
+          'total_cards': 100,
+          'error_count': 0,
+          'warning_count': 2,
+          'blockers': [],
+          'next_actions': ['Revisar avisos antes da simulação.'],
+          'advanced_intelligence_enabled': 'true',
+        },
+        'battle_readiness': {
+          'schema_version': 'deck_battle_readiness_v1_2026-07-01',
+          'status': 'partial_simulation',
+          'total_copies': 100,
+          'verified_simulation_copies': 62,
+          'partial_simulation_copies': 8,
+          'pending_adapter_copies': 30,
+          'rules_text_only_copies': 0,
+          'verified_ratio': '0.62',
+          'samples': {
+            'verified_simulation': ['Sol Ring'],
+            'pending_adapter': ['Complex Card', null],
+          },
+          'disclaimer': 'Runtime verificado quando existe.',
+        },
+        'understanding_summary': {
+          'schema_version': 'deck_understanding_summary_v1_2026-07-01',
+          'source': 'card_intelligence_snapshot',
+          'total_copies': 100,
+          'functional_tagged_copies': 74,
+          'semantic_tagged_copies': 68,
+          'verified_battle_rule_copies': 62,
+          'functional_coverage_ratio': 0.74,
+          'verified_battle_ratio': 0.62,
+        },
+      });
+
+      expect(analysis.hasLaunchSignals, isTrue);
+      expect(analysis.readiness?.statusLabel, 'Pronto com avisos');
+      expect(analysis.readiness?.primaryAction, contains('Revisar avisos'));
+      expect(analysis.readiness?.advancedIntelligenceEnabled, isTrue);
+      expect(analysis.battleReadiness?.statusLabel, 'Simulação parcial');
+      expect(analysis.battleReadiness?.verifiedPercentLabel, '62% verificado');
+      expect(analysis.battleReadiness?.samples['pending_adapter'], [
+        'Complex Card',
+      ]);
+      expect(
+        analysis.understandingSummary?.functionalCoverageLabel,
+        '74% classificado',
+      );
+      expect(
+        analysis.understandingSummary?.verifiedBattleLabel,
+        '62% simulado',
+      );
+    });
+
     test(
       'falls back to legacy stats.composition when functional_tags is absent',
       () {

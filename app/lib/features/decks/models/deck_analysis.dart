@@ -4,12 +4,18 @@ class DeckAnalysisData {
     required this.format,
     required this.composition,
     this.functionalTags,
+    this.readiness,
+    this.battleReadiness,
+    this.understandingSummary,
   });
 
   final String deckId;
   final String? format;
   final Map<String, int> composition;
   final DeckFunctionalTags? functionalTags;
+  final DeckReadinessSummary? readiness;
+  final DeckBattleReadinessSummary? battleReadiness;
+  final DeckUnderstandingSummary? understandingSummary;
 
   factory DeckAnalysisData.fromJson(Map<String, dynamic> json) {
     final stats = _asStringMap(json['stats']);
@@ -19,16 +25,36 @@ class DeckAnalysisData {
         functionalTagsPayload.isEmpty
             ? null
             : DeckFunctionalTags.fromJson(functionalTagsPayload);
+    final readinessPayload = _asStringMap(json['readiness']);
+    final battleReadinessPayload = _asStringMap(json['battle_readiness']);
+    final understandingPayload = _asStringMap(json['understanding_summary']);
 
     return DeckAnalysisData(
       deckId: json['deck_id']?.toString() ?? '',
       format: json['format']?.toString(),
       composition: composition,
       functionalTags: functionalTags,
+      readiness:
+          readinessPayload.isEmpty
+              ? null
+              : DeckReadinessSummary.fromJson(readinessPayload),
+      battleReadiness:
+          battleReadinessPayload.isEmpty
+              ? null
+              : DeckBattleReadinessSummary.fromJson(battleReadinessPayload),
+      understandingSummary:
+          understandingPayload.isEmpty
+              ? null
+              : DeckUnderstandingSummary.fromJson(understandingPayload),
     );
   }
 
   bool get hasFunctionalTags => functionalTags != null;
+
+  bool get hasLaunchSignals =>
+      readiness != null ||
+      battleReadiness != null ||
+      understandingSummary != null;
 
   bool get hasAnyCounts {
     if (composition.values.any((value) => value > 0)) return true;
@@ -57,6 +83,187 @@ class DeckAnalysisData {
       return 'functional_tags do backend';
     }
     return 'functional_tags ($version)';
+  }
+}
+
+class DeckReadinessSummary {
+  const DeckReadinessSummary({
+    required this.schemaVersion,
+    required this.status,
+    required this.isCommander,
+    required this.commanderCount,
+    required this.totalCards,
+    required this.errorCount,
+    required this.warningCount,
+    required this.blockers,
+    required this.nextActions,
+    required this.advancedIntelligenceEnabled,
+  });
+
+  final String schemaVersion;
+  final String status;
+  final bool isCommander;
+  final int commanderCount;
+  final int totalCards;
+  final int errorCount;
+  final int warningCount;
+  final List<String> blockers;
+  final List<String> nextActions;
+  final bool advancedIntelligenceEnabled;
+
+  factory DeckReadinessSummary.fromJson(Map<String, dynamic> json) {
+    return DeckReadinessSummary(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      isCommander: _parseBool(json['is_commander']),
+      commanderCount: _parseInt(json['commander_count']),
+      totalCards: _parseInt(json['total_cards']),
+      errorCount: _parseInt(json['error_count']),
+      warningCount: _parseInt(json['warning_count']),
+      blockers: _parseStringList(json['blockers']),
+      nextActions: _parseStringList(json['next_actions']),
+      advancedIntelligenceEnabled: _parseBool(
+        json['advanced_intelligence_enabled'],
+      ),
+    );
+  }
+
+  bool get hasBlockers => blockers.isNotEmpty || errorCount > 0;
+
+  String get statusLabel {
+    switch (status) {
+      case 'needs_commander':
+        return 'Comandante pendente';
+      case 'incomplete_deck':
+        return 'Lista incompleta';
+      case 'too_many_cards':
+        return 'Cartas demais';
+      case 'legality_or_structure_errors':
+        return 'Corrigir lista';
+      case 'ready_with_warnings':
+        return 'Pronto com avisos';
+      case 'valid_commander_deck':
+        return 'Commander válido';
+      case 'valid_deck':
+        return 'Deck válido';
+      default:
+        return status.trim().isEmpty ? 'Sem leitura' : status;
+    }
+  }
+
+  String get primaryAction {
+    if (nextActions.isNotEmpty) return nextActions.first;
+    if (hasBlockers) return 'Resolver bloqueios antes de avançar.';
+    if (warningCount > 0) return 'Revisar avisos antes da simulação.';
+    return 'Inteligência avançada liberada.';
+  }
+}
+
+class DeckBattleReadinessSummary {
+  const DeckBattleReadinessSummary({
+    required this.schemaVersion,
+    required this.status,
+    required this.totalCopies,
+    required this.verifiedSimulationCopies,
+    required this.partialSimulationCopies,
+    required this.pendingAdapterCopies,
+    required this.rulesTextOnlyCopies,
+    required this.verifiedRatio,
+    required this.samples,
+    this.disclaimer,
+  });
+
+  final String schemaVersion;
+  final String status;
+  final int totalCopies;
+  final int verifiedSimulationCopies;
+  final int partialSimulationCopies;
+  final int pendingAdapterCopies;
+  final int rulesTextOnlyCopies;
+  final double verifiedRatio;
+  final Map<String, List<String>> samples;
+  final String? disclaimer;
+
+  factory DeckBattleReadinessSummary.fromJson(Map<String, dynamic> json) {
+    return DeckBattleReadinessSummary(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      totalCopies: _parseInt(json['total_copies']),
+      verifiedSimulationCopies: _parseInt(json['verified_simulation_copies']),
+      partialSimulationCopies: _parseInt(json['partial_simulation_copies']),
+      pendingAdapterCopies: _parseInt(json['pending_adapter_copies']),
+      rulesTextOnlyCopies: _parseInt(json['rules_text_only_copies']),
+      verifiedRatio: _parseDouble(json['verified_ratio']),
+      samples: _parseStringListMap(_asStringMap(json['samples'])),
+      disclaimer: _optionalTrimmedString(json['disclaimer']),
+    );
+  }
+
+  String get statusLabel {
+    switch (status) {
+      case 'verified_simulation':
+        return 'Simulação verificada';
+      case 'partial_simulation':
+        return 'Simulação parcial';
+      case 'pending_adapter':
+        return 'Adaptador pendente';
+      case 'rules_text_only':
+        return 'Texto de regra';
+      case 'not_available':
+        return 'Sem leitura';
+      default:
+        return status.trim().isEmpty ? 'Sem leitura' : status;
+    }
+  }
+
+  String get verifiedPercentLabel {
+    final percent = (verifiedRatio * 100).clamp(0, 100).round();
+    return '$percent% verificado';
+  }
+}
+
+class DeckUnderstandingSummary {
+  const DeckUnderstandingSummary({
+    required this.schemaVersion,
+    required this.source,
+    required this.totalCopies,
+    required this.functionalTaggedCopies,
+    required this.semanticTaggedCopies,
+    required this.verifiedBattleRuleCopies,
+    required this.functionalCoverageRatio,
+    required this.verifiedBattleRatio,
+  });
+
+  final String schemaVersion;
+  final String source;
+  final int totalCopies;
+  final int functionalTaggedCopies;
+  final int semanticTaggedCopies;
+  final int verifiedBattleRuleCopies;
+  final double functionalCoverageRatio;
+  final double verifiedBattleRatio;
+
+  factory DeckUnderstandingSummary.fromJson(Map<String, dynamic> json) {
+    return DeckUnderstandingSummary(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      source: json['source']?.toString() ?? '',
+      totalCopies: _parseInt(json['total_copies']),
+      functionalTaggedCopies: _parseInt(json['functional_tagged_copies']),
+      semanticTaggedCopies: _parseInt(json['semantic_tagged_copies']),
+      verifiedBattleRuleCopies: _parseInt(json['verified_battle_rule_copies']),
+      functionalCoverageRatio: _parseDouble(json['functional_coverage_ratio']),
+      verifiedBattleRatio: _parseDouble(json['verified_battle_ratio']),
+    );
+  }
+
+  String get functionalCoverageLabel {
+    final percent = (functionalCoverageRatio * 100).clamp(0, 100).round();
+    return '$percent% classificado';
+  }
+
+  String get verifiedBattleLabel {
+    final percent = (verifiedBattleRatio * 100).clamp(0, 100).round();
+    return '$percent% simulado';
   }
 }
 
@@ -296,11 +503,44 @@ Map<String, int> _parseIntMap(Map<String, dynamic> map) {
   return Map.unmodifiable(parsed);
 }
 
+Map<String, List<String>> _parseStringListMap(Map<String, dynamic> map) {
+  final parsed = <String, List<String>>{};
+  for (final entry in map.entries) {
+    parsed[entry.key] = _parseStringList(entry.value);
+  }
+  return Map.unmodifiable(parsed);
+}
+
+List<String> _parseStringList(dynamic value) {
+  if (value is! List) return const <String>[];
+  return value
+      .map((item) => item?.toString().trim())
+      .whereType<String>()
+      .where((item) => item.isNotEmpty)
+      .toList(growable: false);
+}
+
 int _parseInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.round();
   if (value is String) return int.tryParse(value) ?? 0;
   return 0;
+}
+
+double _parseDouble(dynamic value) {
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0;
+  return 0;
+}
+
+bool _parseBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'true' || normalized == '1' || normalized == 'yes';
+  }
+  return false;
 }
 
 String? _optionalTrimmedString(dynamic value) {

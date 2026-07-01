@@ -109,6 +109,10 @@ class DeckDiagnosticPanel extends StatelessWidget {
               );
             },
           ),
+          if (analysis?.hasLaunchSignals ?? false) ...[
+            const SizedBox(height: 14),
+            _LaunchReadinessStrip(analysis: analysis!),
+          ],
           const SizedBox(height: 16),
           Text(
             'Indicadores principais',
@@ -172,6 +176,220 @@ class DeckDiagnosticPanel extends StatelessWidget {
           const SizedBox(height: 10),
           ...snapshot.insights.asMap().entries.map(
             (entry) => _DiagnosticInsightRow(entry.value, index: entry.key),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LaunchReadinessStrip extends StatelessWidget {
+  final DeckAnalysisData analysis;
+
+  const _LaunchReadinessStrip({required this.analysis});
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = <Widget>[];
+    final readiness = analysis.readiness;
+    final battle = analysis.battleReadiness;
+    final understanding = analysis.understandingSummary;
+
+    if (readiness != null) {
+      final tone =
+          readiness.hasBlockers
+              ? _DiagnosticTone.danger
+              : readiness.warningCount > 0
+              ? _DiagnosticTone.warn
+              : _DiagnosticTone.good;
+      cards.add(
+        _LaunchSignalCard(
+          key: const Key('deck-launch-readiness-card'),
+          label: 'Prontidão',
+          value: readiness.statusLabel,
+          detail: readiness.primaryAction,
+          icon:
+              readiness.hasBlockers
+                  ? Icons.report_problem_outlined
+                  : Icons.verified_user_outlined,
+          tone: tone,
+        ),
+      );
+    }
+
+    if (battle != null) {
+      cards.add(
+        _LaunchSignalCard(
+          key: const Key('deck-launch-battle-card'),
+          label: 'Simulação',
+          value: battle.statusLabel,
+          detail:
+              '${battle.verifiedSimulationCopies}/${battle.totalCopies} cópias verificadas',
+          footer: battle.verifiedPercentLabel,
+          icon: Icons.psychology_alt_outlined,
+          tone: _battleTone(battle.status),
+        ),
+      );
+    }
+
+    if (understanding != null) {
+      cards.add(
+        _LaunchSignalCard(
+          key: const Key('deck-launch-understanding-card'),
+          label: 'Cobertura',
+          value: understanding.functionalCoverageLabel,
+          detail:
+              '${understanding.functionalTaggedCopies}/${understanding.totalCopies} cópias com função',
+          footer: understanding.verifiedBattleLabel,
+          icon: Icons.hub_outlined,
+          tone: _understandingTone(understanding),
+        ),
+      );
+    }
+
+    if (cards.isEmpty) return const SizedBox.shrink();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns =
+            constraints.maxWidth < 420
+                ? 1
+                : (constraints.maxWidth < 760 ? 2 : 3);
+        final spacing = 10.0;
+        final itemWidth =
+            (constraints.maxWidth - ((columns - 1) * spacing)) / columns;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: cards
+              .map((card) => SizedBox(width: itemWidth, child: card))
+              .toList(growable: false),
+        );
+      },
+    );
+  }
+
+  static _DiagnosticTone _battleTone(String status) {
+    switch (status) {
+      case 'verified_simulation':
+        return _DiagnosticTone.good;
+      case 'partial_simulation':
+      case 'pending_adapter':
+        return _DiagnosticTone.warn;
+      case 'rules_text_only':
+      case 'not_available':
+        return _DiagnosticTone.neutral;
+      default:
+        return _DiagnosticTone.neutral;
+    }
+  }
+
+  static _DiagnosticTone _understandingTone(
+    DeckUnderstandingSummary understanding,
+  ) {
+    if (understanding.totalCopies <= 0) return _DiagnosticTone.neutral;
+    if (understanding.functionalCoverageRatio >= 0.8 &&
+        understanding.verifiedBattleRatio >= 0.8) {
+      return _DiagnosticTone.good;
+    }
+    if (understanding.functionalCoverageRatio >= 0.5 ||
+        understanding.verifiedBattleRatio >= 0.5) {
+      return _DiagnosticTone.warn;
+    }
+    return _DiagnosticTone.neutral;
+  }
+}
+
+class _LaunchSignalCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final String detail;
+  final String? footer;
+  final IconData icon;
+  final _DiagnosticTone tone;
+
+  const _LaunchSignalCard({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.detail,
+    this.footer,
+    required this.icon,
+    required this.tone,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: tone.border.withValues(alpha: 0.68)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: tone.background,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            ),
+            child: Icon(icon, color: tone.foreground, size: 17),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  detail,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppTheme.textSecondary,
+                    height: 1.25,
+                  ),
+                ),
+                if (footer != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    footer!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: tone.foreground,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
       ),

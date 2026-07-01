@@ -128,9 +128,29 @@ void main() {
 
         expect(body['deck_id'], equals(deckId));
         expect(body['stats'], isA<Map<String, dynamic>>());
+        expect(body['functional_tags'], isA<Map<String, dynamic>>());
+        expect(body['readiness'], isA<Map<String, dynamic>>());
+        expect(body['battle_readiness'], isA<Map<String, dynamic>>());
+        expect(body['understanding_summary'], isA<Map<String, dynamic>>());
         expect(body['mana_curve'], isA<Map<String, dynamic>>());
         expect(body['color_distribution'], isA<Map<String, dynamic>>());
         expect(body['legality'], isA<Map<String, dynamic>>());
+
+        final readiness = body['readiness'] as Map<String, dynamic>;
+        final battleReadiness =
+            body['battle_readiness'] as Map<String, dynamic>;
+        final understanding =
+            body['understanding_summary'] as Map<String, dynamic>;
+
+        expect(readiness['schema_version'], isA<String>());
+        expect(readiness['status'], isA<String>());
+        expect(readiness['advanced_intelligence_enabled'], isA<bool>());
+        expect(battleReadiness['schema_version'], isA<String>());
+        expect(battleReadiness['status'], isA<String>());
+        expect(battleReadiness['samples'], isA<Map<String, dynamic>>());
+        expect(understanding['schema_version'], isA<String>());
+        expect(understanding['source'], isA<String>());
+        expect(understanding['total_copies'], isA<int>());
       },
       skip: skipIntegration,
     );

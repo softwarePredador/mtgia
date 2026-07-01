@@ -369,6 +369,80 @@ void main() {
       expect(find.text('Análise completa'), findsOneWidget);
     });
 
+    testWidgets('renders backend launch readiness signals when available', (
+      tester,
+    ) async {
+      final deck = makeHealthyCommanderDeck();
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': deck.id,
+        'format': 'commander',
+        'stats': {
+          'composition': {
+            'ramp': 10,
+            'draw': 10,
+            'removal': 9,
+            'board_wipes': 2,
+          },
+        },
+        'readiness': {
+          'schema_version': 'deck_readiness_v1_2026-07-01',
+          'status': 'valid_commander_deck',
+          'is_commander': true,
+          'commander_count': 1,
+          'total_cards': 100,
+          'error_count': 0,
+          'warning_count': 0,
+          'blockers': [],
+          'next_actions': [],
+          'advanced_intelligence_enabled': true,
+        },
+        'battle_readiness': {
+          'schema_version': 'deck_battle_readiness_v1_2026-07-01',
+          'status': 'partial_simulation',
+          'total_copies': 100,
+          'verified_simulation_copies': 72,
+          'partial_simulation_copies': 8,
+          'pending_adapter_copies': 20,
+          'rules_text_only_copies': 0,
+          'verified_ratio': 0.72,
+          'samples': {
+            'verified_simulation': ['Counterspell'],
+            'pending_adapter': ['Pteramander'],
+          },
+        },
+        'understanding_summary': {
+          'schema_version': 'deck_understanding_summary_v1_2026-07-01',
+          'source': 'card_intelligence_snapshot',
+          'total_copies': 100,
+          'functional_tagged_copies': 82,
+          'semantic_tagged_copies': 77,
+          'verified_battle_rule_copies': 72,
+          'functional_coverage_ratio': 0.82,
+          'verified_battle_ratio': 0.72,
+        },
+      });
+
+      await tester.pumpWidget(createSubject(deck, analysis: analysis));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-launch-readiness-card')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('deck-launch-battle-card')), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-launch-understanding-card')),
+        findsOneWidget,
+      );
+      expect(find.text('Prontidão'), findsOneWidget);
+      expect(find.text('Commander válido'), findsOneWidget);
+      expect(find.text('Inteligência avançada liberada.'), findsOneWidget);
+      expect(find.text('Simulação parcial'), findsOneWidget);
+      expect(find.text('72/100 cópias verificadas'), findsOneWidget);
+      expect(find.text('82% classificado'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('avoids overflow and surfaces warnings for a greedy deck', (
       tester,
     ) async {
