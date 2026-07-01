@@ -149,8 +149,10 @@ Nao pronto para venda publica completa:
 - Limites e assinatura nao sao server-side.
 - Backend implementa reconhecimento/cache/diagnostico de
   `recommendation_context`, mas ainda nao aplica colecao/preco real.
-- Os aceites live criam usuario/deck de QA no backend publico; qualquer limpeza
-  desses residuos exige aprovacao explicita antes de delete/admin write.
+- Os residuos dos aceites live desta continuidade foram removidos com filtro
+  restrito por IDs/nome/usuario QA e validados no PostgreSQL com contagem zero
+  para usuarios, decks, deck_cards, job generate, cache optimize e telemetry
+  fallback alvos.
 - Comentarios/moderacao ausentes.
 - Alertas e timeline server-side ausentes.
 - Textos legais precisam revisao juridica.

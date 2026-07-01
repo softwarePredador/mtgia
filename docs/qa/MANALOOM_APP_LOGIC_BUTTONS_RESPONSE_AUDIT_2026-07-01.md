@@ -88,6 +88,9 @@ Resultados:
   aceito em 636ms, job concluido em 15.622s, deck salvo e detalhes abertos.
   Optimize retornou outcome seguro `rebuild_guided_available`, que e o retorno
   esperado para deck que precisa reparo/rebuild.
+- Cleanup dos residuos desses aceites: removidos os dois decks, os dois usuarios
+  descartaveis e as tres linhas auxiliares anonimizadas de generate/cache/
+  telemetry; validacao PostgreSQL retornou `0` para todos os alvos.
 
 ## Botões e fluxos revisados
 
@@ -147,8 +150,8 @@ selecao das recomendacoes.
    `MANALOOM_VISUAL_EMAIL`/`MANALOOM_VISUAL_PASSWORD`; ele nao foi executado
    nesta passada.
 5. Geracao/otimizacao real com IA foi executada contra o backend publico nesta
-   continuidade; a limpeza de usuarios/decks QA criados exige aprovacao
-   explicita antes de qualquer delete/admin write.
+   continuidade; os residuos QA conhecidos desta rodada foram removidos e
+   validados.
 6. Release publico ainda depende dos bloqueios fora do escopo atual: signing
    Android/iOS e aceite final de build assinado.
 
@@ -156,9 +159,7 @@ selecao das recomendacoes.
 
 Antes de implementar novas funcionalidades grandes, fechar nesta ordem:
 
-1. Obter aprovacao explicita para limpar residuos de QA, se desejar manter o
-   backend publico sem decks de teste.
-2. Sincronizacao server-side do pos-jogo.
-3. Colecao/preco real dentro de `recommendation_context`.
-4. Execucao do teste visual autenticado em device/emulador com credenciais de QA.
-5. Retomar signing/AAB/APK, iOS e billing server-side em goals separados.
+1. Sincronizacao server-side do pos-jogo.
+2. Colecao/preco real dentro de `recommendation_context`.
+3. Execucao do teste visual autenticado em device/emulador com credenciais de QA.
+4. Retomar signing/AAB/APK, iOS e billing server-side em goals separados.

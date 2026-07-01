@@ -21,8 +21,7 @@ configurar signing/AAB/APK, sem iOS e sem billing server-side por enquanto.
 
 1. Fechar reprise do aceite Android live apos correcoes locais. `DONE`
 2. Fechar backend/app para `recommendation_context` dentro do contrato atual. `DONE`
-3. Registrar cleanup de residuos QA sem executar write destrutivo sem aprovacao
-   explicita.
+3. Registrar cleanup de residuos QA. `DONE`
 4. Atualizar docs/checks e commitar o pacote funcional atual.
 5. Retomar signing Android/AAB/APK, iOS e billing server-side em goal separado.
 
@@ -32,7 +31,7 @@ configurar signing/AAB/APK, sem iOS e sem billing server-side por enquanto.
 |---|---|---|---|---|---|
 | P0-01 | Repetir aceite Android fisico apos correcoes locais | `CLOSED_LIVE_DEVICE` | Nenhum no escopo atual | Manter logs em `/tmp/manaloom_runtime_m2006_acceptance.log` e `/tmp/manaloom_generate_async_acceptance.log` ate o proximo ciclo | `deck_runtime_m2006_test.dart`: PASS em 1m45; `POST /ai/optimize` 200 em 11.008s; `deck_generate_async_runtime_test.dart`: PASS em 1m22; generate async aceito em 636ms, concluido em 15.622s, optimize retornou outcome seguro rebuild |
 | P0-02 | Sentry mobile com ingestao real | `CLOSED_DEVICE_STAGING` | Nenhum para staging/device | Manter DSN validado fora do git e reutilizar quando signing voltar ao escopo | `SENTRY_MOBILE_EVENT_ID=6f2080bf844d471588c1cc3dc852fc83`; `SENTRY_RELEASE_SMOKE_RESULT=captured` |
-| P0-03 | Limpar decks residuais de QA | `PENDING_EXPLICIT_DATA_WRITE_APPROVAL` | Requer delete/admin write em backend/PostgreSQL | Nao remover automaticamente; pedir aprovacao explicita antes de qualquer delete | `GET /decks` ou consulta admin confirma ausencia |
+| P0-03 | Limpar decks/usuarios residuais de QA | `CLOSED_DB_VERIFIED` | Nenhum para os residuos conhecidos desta continuidade | Manter deletes restritos a IDs de aceite; nao usar limpeza ampla | PostgreSQL confirma `users=0`, `decks=0`, `deck_cards=0`, `ai_generate_jobs=0`, `ai_optimize_cache=0`, `ai_optimize_fallback_telemetry=0` para os IDs QA removidos |
 
 ## P0 pago - Bloqueia oferta comercial
 
@@ -52,7 +51,7 @@ configurar signing/AAB/APK, sem iOS e sem billing server-side por enquanto.
 | P1-03 | Otimizacao por orcamento/preco real | `UI_READY_BACKEND_PENDING` | Usar fonte de preco confiavel e limite `budget_limit_brl` | Sugestoes ficam dentro do budget e exibem fonte/estimativa |
 | P1-04 | Explicacao completa de trocas | `UI_IF_PAYLOAD` | Backend enviar funcao, risco, curva, preco e bracket por troca | Preview mostra explicacao estruturada em sugestoes reais |
 | P1-05 | Teste visual autenticado | `PENDING_CREDENTIALS_RUN` | Exige `MANALOOM_VISUAL_EMAIL` e `MANALOOM_VISUAL_PASSWORD` | `app_existing_user_visual_audit_test.dart` passa em device/emulador |
-| P1-06 | Smoke real de IA controlado | `CLOSED_WITH_QA_RESIDUE_PENDING_CLEANUP` | Gera custo/decks reais | Nao apagar residuos sem aprovacao explicita | Logs mostram request, outcome seguro; cleanup fica em P0-03 |
+| P1-06 | Smoke real de IA controlado | `CLOSED_WITH_QA_CLEANUP` | Gera custo/decks reais | Manter logs de aceite ate proximo ciclo | Logs mostram request, outcome seguro; cleanup P0-03 fechado |
 
 ## P1 - Retencao
 
@@ -124,3 +123,17 @@ Resultados:
 - Generate async live: PASS em 1m22; feedback inicial 666ms; `POST
   /ai/generate` 202 em 636ms; job concluido em 15.622s; deck salvo; detalhe
   aberto; optimize retornou 422 com outcome seguro `rebuild_guided_available`.
+
+Cleanup aplicado e validado:
+
+- Removidos os decks QA
+  `41f1eccb-61c0-4288-8f93-1baf137eda17` e
+  `f42476b8-1e33-4a04-9141-0ca0301190dc`, ambos comprovados por nome
+  `iPhone15 ... Talrand ...` e usuario descartavel correspondente.
+- Removidos os usuarios descartaveis `iphone15_19f1ef6fa3a` e
+  `iphone15_async_19f1ef9f1ae`.
+- Removidas as linhas auxiliares anonimizadas do aceite:
+  `ai_generate_jobs.id=bb8b8b515e4e4da60681af6a3045d394`,
+  `ai_optimize_cache.id=60d65148-af3c-4101-acfc-1426d3164b59`,
+  `ai_optimize_fallback_telemetry.id=ccc266ab-ff58-4119-a987-003f53f256fa`.
+- Validacao final PostgreSQL: todos esses alvos retornaram contagem `0`.
