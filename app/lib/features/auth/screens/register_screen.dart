@@ -102,7 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             title: 'Criar Conta',
             subtitle: 'Comece sua jornada no ManaLoom',
             eyebrow: 'Comece no ManaLoom',
-            logoSize: 92,
+            logoSize: 84,
           ),
           const SizedBox(height: 20),
           AuthFormSurface(
@@ -118,8 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     decoration: InputDecoration(
                       labelText: 'Nome de Usuário',
                       hintText: 'ex: mage42',
-                      helperText:
-                          'Único e permanente — será seu @ no app. Depois você pode escolher um nick no perfil.',
+                      helperText: 'Seu @ único no app. Escolha um nick depois.',
                       helperMaxLines: 2,
                       prefixIcon: const Icon(Icons.alternate_email),
                       border: OutlineInputBorder(

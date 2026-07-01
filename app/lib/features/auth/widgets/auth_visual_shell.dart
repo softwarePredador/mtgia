@@ -25,13 +25,13 @@ class AuthVisualShell extends StatelessWidget {
             decoration: BoxDecoration(gradient: AppTheme.scaffoldGradient),
           ),
           Positioned(
-            top: -178,
-            left: -126,
-            right: -126,
-            height: 520,
+            top: -164,
+            left: -96,
+            right: -96,
+            height: 468,
             child: IgnorePointer(
               child: Opacity(
-                opacity: 0.56,
+                opacity: 0.42,
                 child: Image.asset(
                   'assets/branding/home_hero.png',
                   fit: BoxFit.contain,
@@ -68,7 +68,7 @@ class AuthVisualShell extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.frost600.withValues(alpha: 0.2),
+                      AppTheme.frost600.withValues(alpha: 0.14),
                       AppTheme.transparent,
                     ],
                   ),
