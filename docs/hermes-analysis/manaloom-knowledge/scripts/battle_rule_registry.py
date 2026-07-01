@@ -286,6 +286,12 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     if effect == "creature" and effect_json.get("is_mana_source"):
         category = "ramp"
         subtype = "mana_dork"
+    elif effect == "creature" and (
+        effect_json.get("graveyard_self_return_to_hand")
+        or effect_json.get("graveyard_self_return_to_battlefield")
+    ):
+        category = "engine"
+        subtype = "recursive_threat"
     elif (
         effect == "creature"
         and effect_json.get("battle_model_scope")

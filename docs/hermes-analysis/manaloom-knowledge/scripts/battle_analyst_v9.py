@@ -25995,10 +25995,16 @@ def activate_graveyard_self_return_cards(
         if not isinstance(card, dict):
             continue
         effect_data = card if card.get("battle_model_scope") else get_card_effect(card)
-        if not (
-            effect_data.get("battle_model_scope") == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE
-            and effect_data.get("graveyard_self_return_to_hand")
-        ):
+        destination = str(effect_data.get("graveyard_self_return_destination") or "").lower()
+        if not destination:
+            if effect_data.get("graveyard_self_return_to_battlefield"):
+                destination = "battlefield"
+            elif effect_data.get("graveyard_self_return_to_hand"):
+                destination = "hand"
+        if effect_data.get("battle_model_scope") not in {
+            GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE,
+            GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE,
+        } or destination not in {"hand", "battlefield"}:
             continue
         activation_cost_generic = int(
             effect_data.get("graveyard_self_return_activation_cost_generic")
@@ -26022,6 +26028,7 @@ def activate_graveyard_self_return_cards(
             {
                 "card": card,
                 "effect_data": effect_data,
+                "destination": destination,
                 "activation_cost_text": activation_cost_text,
                 "activation_cost_generic": activation_cost_generic,
                 "activation_cost_colors": activation_cost_colors,
@@ -26040,6 +26047,7 @@ def activate_graveyard_self_return_cards(
     selected = candidates[0]
     card = selected["card"]
     effect_data = selected["effect_data"]
+    destination = selected["destination"]
     activation_cost_text = selected["activation_cost_text"]
     activation_cost_generic = selected["activation_cost_generic"]
     activation_cost_colors = selected["activation_cost_colors"]
@@ -26050,12 +26058,31 @@ def activate_graveyard_self_return_cards(
         player,
         [card],
         turn=turn,
-        source_event="graveyard_self_return_to_hand",
+        source_event=f"graveyard_self_return_to_{destination}",
     )
     if not moved:
         return 0
     returned_card = moved[0]
-    player.hand.append(returned_card)
+    if destination == "battlefield":
+        permanent_effect = get_card_effect(returned_card)
+        permanent_payload = {**returned_card, **permanent_effect}
+        if effect_data.get("enters_tapped"):
+            permanent_payload["enters_tapped"] = True
+        permanent = prepare_entering_permanent(
+            enrich_card(permanent_payload),
+            controller=player,
+            all_players=all_players,
+            turn=turn,
+        )
+        if is_creature_card(returned_card):
+            permanent["effect"] = "creature"
+            permanent["haste"] = has_haste(permanent)
+            permanent["summoning_sick"] = not permanent["haste"]
+            permanent["tapped"] = bool(permanent.get("tapped") or effect_data.get("enters_tapped"))
+        player.battlefield.append(permanent)
+    else:
+        player.hand.append(returned_card)
+        permanent = None
     emit_decision_trace(
         decision_type="graveyard_activation",
         player=player,
@@ -26066,8 +26093,8 @@ def activate_graveyard_self_return_cards(
                 item["card"],
                 item["effect_data"],
                 score=item["score"],
-                action="return_self_from_graveyard_to_hand",
-                destination="hand",
+                action=f"return_self_from_graveyard_to_{item['destination']}",
+                destination=item["destination"],
             )
             for item in candidates[:8]
         ],
@@ -26075,24 +26102,25 @@ def activate_graveyard_self_return_cards(
             returned_card,
             effect_data,
             score=selected["score"],
-            action="return_self_from_graveyard_to_hand",
-            destination="hand",
+            action=f"return_self_from_graveyard_to_{destination}",
+            destination=destination,
         ),
         score_components={
             "activation_cost": activation_cost_text,
             "activation_cost_generic": activation_cost_generic,
             "activation_cost_colors": activation_cost_colors,
         },
-        rule_source="graveyard_self_return_to_hand_v1",
+        rule_source=f"graveyard_self_return_to_{destination}_v1",
         rule_status=effect_data.get("_rule_review_status", "active"),
         confidence="medium",
         expected_benefit_score=selected["score"],
-        reason="convert spare mana into recurring graveyard card access",
+        reason=f"convert spare mana into recurring graveyard card access to {destination}",
         strategic_principle="recover reusable graveyard threats when the mana cost is payable",
         heuristic_version=DECISION_STRATEGY_VERSION,
         resource_delta={
             "mana": -mana_paid,
-            "cards_to_hand": 1,
+            "cards_to_hand": 1 if destination == "hand" else 0,
+            "permanents_to_battlefield": 1 if destination == "battlefield" else 0,
             "graveyard": -1,
             "returned": [returned_card.get("name", "?")],
         },
@@ -26102,10 +26130,11 @@ def activate_graveyard_self_return_cards(
         "recursion_resolved",
         player=player.name,
         card=returned_card.get("name", "?"),
-        activation_kind="graveyard_self_return_to_hand",
+        activation_kind=f"graveyard_self_return_to_{destination}",
         activation_cost=activation_cost_text,
         source_zone="graveyard",
-        destination="hand",
+        destination=destination,
+        enters_tapped=bool(effect_data.get("enters_tapped")) if destination == "battlefield" else False,
         returned=[returned_card.get("name", "?")],
         returned_count=1,
         mana_paid=mana_paid,
@@ -36626,6 +36655,9 @@ SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
+GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
+    "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
+)
 
 
 def _activated_rule_effects_for_permanent(permanent):

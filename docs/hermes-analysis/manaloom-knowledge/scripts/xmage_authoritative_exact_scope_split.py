@@ -97,6 +97,9 @@ PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_
 PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
+GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
+    "xmage_graveyard_simple_activated_self_return_to_battlefield_v1"
+)
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
@@ -2096,6 +2099,27 @@ def graveyard_self_return_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[
     }
 
 
+def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    match = re.fullmatch(
+        r"(?P<cost>(?:\{[0-9wubrg]\})+): return this card from your graveyard to the battlefield(?P<tapped> tapped)?\.?",
+        text,
+    )
+    if not match:
+        return "graveyard_self_return_battlefield_oracle_not_simple"
+    cost_text = canonical_mana_cost_text(match.group("cost"))
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "graveyard_self_return_battlefield_oracle_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "enters_tapped": bool(match.group("tapped")),
+    }
+
+
 def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     effect_matches = list(re.finditer(r"new\s+ReturnSourceFromGraveyardToHandEffect\s*\(", text))
@@ -2145,6 +2169,61 @@ def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | s
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
+    }
+
+
+def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    effect_matches = list(re.finditer(r"new\s+ReturnSourceFromGraveyardToBattlefieldEffect\s*\(", text))
+    if len(effect_matches) != 1:
+        return "graveyard_self_return_battlefield_source_not_single_effect"
+    effect_index = effect_matches[0].start()
+    ability_index = text.rfind("new SimpleActivatedAbility", 0, effect_index)
+    if ability_index < 0:
+        return "graveyard_self_return_battlefield_source_not_simple_activated"
+    window = text[ability_index : effect_index + 1400]
+    if "Zone.GRAVEYARD" not in window:
+        return "graveyard_self_return_battlefield_source_not_graveyard_zone"
+    if not re.search(r"ReturnSourceFromGraveyardToBattlefieldEffect\s*\(\s*true\b", window):
+        return "graveyard_self_return_battlefield_source_tapped_mismatch"
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "ReturnToHandTargetCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapSourceCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "graveyard_self_return_battlefield_source_cost_not_supported"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if len(mana_matches) + len(generic_matches) != 1:
+        return "graveyard_self_return_battlefield_source_cost_not_supported"
+    cost_text = canonical_mana_cost_text(
+        mana_matches[0] if mana_matches else "{" + generic_matches[0] + "}"
+    )
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "graveyard_self_return_battlefield_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "enters_tapped": True,
     }
 
 
@@ -3649,6 +3728,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated graveyard-exile ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
+    elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
+        scope_kind = "graveyard simple activated self-return-to-battlefield ability"
     return (
         "XMage authoritative exact-scope split: local class "
         f"{row.get('xmage_class')} translated into ManaLoom runtime scope {scope}. "
@@ -3724,10 +3805,18 @@ def split_row(
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     permanent_activated_graveyard_exile_unit = is_permanent_activated_graveyard_exile_unit(row)
-    graveyard_self_return_unit = (
+    graveyard_self_return_to_hand_unit = (
         unit == RECURSION_UNIT
         and effect_classes(row) == {"ReturnSourceFromGraveyardToHandEffect"}
         and "SimpleActivatedAbility" in ability_classes(row)
+    )
+    graveyard_self_return_to_battlefield_unit = (
+        unit == RECURSION_UNIT
+        and effect_classes(row) == {"ReturnSourceFromGraveyardToBattlefieldEffect"}
+        and "SimpleActivatedAbility" in ability_classes(row)
+    )
+    graveyard_self_return_unit = (
+        graveyard_self_return_to_hand_unit or graveyard_self_return_to_battlefield_unit
     )
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
@@ -4466,6 +4555,70 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_graveyard_exile",
+        ), "selected_exact_scope"
+
+    if unit == RECURSION_UNIT and classes == {"ReturnSourceFromGraveyardToBattlefieldEffect"}:
+        abilities = ability_classes(row)
+        allowed_abilities = {"SimpleActivatedAbility"} | set(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        if "SimpleActivatedAbility" not in abilities or abilities - allowed_abilities:
+            return None, "graveyard_self_return_battlefield_ability_class_not_simple"
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "graveyard_self_return_battlefield_not_permanent"
+        oracle_activation = graveyard_self_return_to_battlefield_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
+        source_activation = graveyard_self_return_to_battlefield_from_source(source_text)
+        if isinstance(source_activation, str):
+            return None, source_activation
+        for key in (
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "enters_tapped",
+        ):
+            if source_activation[key] != oracle_activation[key]:
+                return None, "graveyard_self_return_battlefield_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        keywords = keywords_from_ability_classes(row)
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE,
+            "ability_kind": "graveyard_activated",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE,
+            "target": "self",
+            "target_controller": "self",
+            "source_zone": "graveyard",
+            "destination": "battlefield",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": oracle_activation["activation_cost_mana"],
+            "graveyard_self_return_activation_cost_generic": oracle_activation["activation_cost_generic"],
+            "graveyard_self_return_activation_cost_colors": oracle_activation["activation_cost_colors"],
+            "activation_cost_mana": oracle_activation["activation_cost_mana"],
+            "activation_cost_generic": oracle_activation["activation_cost_generic"],
+            "activation_cost_colors": oracle_activation["activation_cost_colors"],
+            "enters_tapped": True,
+            "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+        }
+        if keywords:
+            effect_json["keywords"] = ordered_keywords(keywords)
+            effect_json["_keywords_are_self"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_graveyard_simple_activated_self_return_to_battlefield",
         ), "selected_exact_scope"
 
     if unit == RECURSION_UNIT and classes == {"ReturnSourceFromGraveyardToHandEffect"}:

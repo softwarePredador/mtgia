@@ -49040,6 +49040,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4d539456ce3026ca5a85fbadc3e7b339"
   },
+  "Persistent Specimen": {
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{B}",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_self_return_activation_cost_generic": 2,
+    "graveyard_self_return_activation_cost_mana": "{2}{B}",
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3f611ef8d950cfec46ece705e28b35d7",
+    "battle_rule_oracle_hash": "b7b6b35ceb79293c72516357fc7af788"
+  },
   "Personal Tutor": {
     "battle_model_scope": "xmage_library_search_to_library_top_spell_v1",
     "count": 1,
@@ -53354,14 +53387,37 @@
     "battle_rule_oracle_hash": "841661373f20a267e7353ef19c6a8c9d"
   },
   "Reassembling Skeleton": {
-    "cmc": 2.0,
-    "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_self_return_activation_cost_generic": 1,
+    "graveyard_self_return_activation_cost_mana": "{1}{B}",
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb6635305ee81608a6a6452825ac29a2",
+    "battle_rule_oracle_hash": "e510c62d4e3ef4f4af2616e415ab475d"
   },
   "Reave Soul": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -73043,6 +73099,39 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "b7ff43d67eacb32bbbaf40e2c63c2448"
+  },
+  "Tunnel Rats": {
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 4,
+    "activation_cost_mana": "{4}{B}",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_self_return_activation_cost_generic": 4,
+    "graveyard_self_return_activation_cost_mana": "{4}{B}",
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dc0e1764f6583aa360c3cd80f0aac7ea",
+    "battle_rule_oracle_hash": "6d61ffe3eae65c9720d3d317fa55184e"
   },
   "Tunnel Surveyor": {
     "ability_kind": "triggered",

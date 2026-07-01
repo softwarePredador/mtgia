@@ -3,8 +3,12 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG332
+thread goal remains active, but execution must use the current post-PG333
 baseline and the stop criteria below.
+
+This is the global control plane for the remaining card-rule work. Individual
+PG waves are implementation cycles inside this goal; they are not separate
+goals and they do not redefine the stopping point.
 
 ## Objective
 
@@ -24,18 +28,20 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg331_creature_dies_recursion_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg332_graveyard_exile_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg332_graveyard_exile_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg333_graveyard_self_return_battlefield_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg333_graveyard_self_return_battlefield_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG332 counts:
+Post-PG333 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2369`
-- all-card readiness `battle_family_mapper_required`: `30178`
-- target battle-gap identities in authoritative queue: `27255`
-- XMage authoritative source resolved: `26941`
+- all-card readiness `battle_and_oracle_ready`: `2372`
+- all-card readiness `battle_family_mapper_required`: `30175`
+- target battle-gap identities in authoritative queue: `27252`
+- XMage authoritative source resolved: `26938`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26941`
+- XMage authoritative adapter required: `26938`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -64,6 +70,45 @@ The goal is not complete just because a deck runs, a family looks broadly
 mapped, or a generated `xmage_*_review_v1` scope exists. Broad review scopes are
 planning lanes, not executable rules.
 
+## Terminal Stop Definition
+
+The final stop is reached only after the last cycle produces a fresh global
+readiness report and authoritative XMage queue where every remaining card
+identity is in exactly one closed state:
+
+1. `battle_and_oracle_ready` through a reviewed PostgreSQL rule synced to
+   Hermes/SQLite and visible in the canonical snapshot.
+2. Generic/no-runtime-needed because the card has no Oracle rules text or no
+   battle-executable behavior needed by ManaLoom.
+3. Documented product exclusion or unsupported runtime lane with source
+   evidence, owner-visible reason, and no silent fallback into deck/battle
+   execution.
+4. Manual/official/Forge exception lane for cards with no resolvable local
+   XMage class, with the exception recorded separately from the XMage-resolved
+   adapter backlog.
+
+Any identity left as broad `xmage_*_review_v1`, parser gap, unresolved
+missing-source exception, stale SQLite-only rule, or PostgreSQL/Hermes mismatch
+means the global goal is still open.
+
+## Work-Control Rule
+
+Each working session must choose one of the following measurable outcomes before
+it is considered useful progress:
+
+1. Promote an exact runtime-backed PostgreSQL package and prove the refreshed
+   queue decreased.
+2. Add a reusable exact subpattern/runtime adapter with focused tests, then
+   produce a package from it.
+3. Exhaust a candidate family with blocker counts that change the next queue
+   selection.
+4. Classify a missing-source exception lane with source evidence and no
+   executable ambiguity.
+
+If a session does none of these, it is not allowed to claim progress. The next
+action must be to rebuild the queue, inspect the largest remaining work units,
+and select a different exact subpattern.
+
 ## Required Cycle
 
 Repeat this cycle until the completion criteria are met:
@@ -82,6 +127,10 @@ Repeat this cycle until the completion criteria are met:
 9. Run E2E validation and final alignment audits.
 10. Rebuild readiness/queue and record the actual queue reduction.
 
+The cycle is recursive: after each commit/push, immediately start again from
+the newly generated queue instead of returning to deck-specific intuition or
+historical artifacts.
+
 If a selected family produces no safe package candidates, record blocker counts
 and continue to the next highest reusable work unit in the same goal. Do not
 fall back to per-card implementation unless all reusable subpatterns for that
@@ -89,9 +138,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG332 authoritative queue unless a newer queue exists:
+Use the post-PG333 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1937`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1934`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -102,16 +151,17 @@ Use the post-PG332 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG332:
+Immediate checkpoint after PG333:
 
-1. PG332 is applied, synced, E2E validated, and audited with evidence in
-   `docs/hermes-analysis/master_optimizer_reports/pg332_xmage_graveyard_exile_wave_pg_apply_evidence.md`.
-2. Continue splitting the highest reusable work unit,
-   `recursion::xmage_graveyard_return_variant_review_v1`, into another exact
-   runtime-backed subpattern.
-3. If the post-PG332 supported splitter recheck has `proposal_count=0`, the next
+1. PG333 is applied, synced, E2E validated, and audited with evidence in
+   `docs/hermes-analysis/master_optimizer_reports/pg333_xmage_graveyard_self_return_battlefield_wave_pg_apply_evidence.md`.
+2. The post-PG333 supported splitter recheck has `proposal_count=0`; the next
    package must add a new exact subpattern rather than rerunning the current
    splitter unchanged.
+3. Continue from the fresh post-PG333 queue. The top reusable work unit remains
+   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1934`, so
+   the next cycle should split another exact recursion subpattern unless a
+   fresher queue changes the ranking.
 
 ## Non-Goals
 

@@ -4278,6 +4278,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_self_return_to_battlefield_pays_mana_and_enters_tapped(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        source = {
+            "name": "Reassembling Skeleton",
+            "type_line": "Creature - Skeleton Warrior",
+            "cmc": 2,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{1}{B}",
+            "graveyard_self_return_activation_cost_generic": 1,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "enters_tapped": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_reassembling_skeleton",
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Reassembling Skeleton"])
+        self.assertTrue(active.battlefield[0].get("tapped"))
+        self.assertTrue(active.battlefield[0].get("summoning_sick"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Reassembling Skeleton"
+                and data.get("activation_kind") == "graveyard_self_return_to_battlefield"
+                and data.get("activation_cost") == "{1}{B}"
+                and data.get("source_zone") == "graveyard"
+                and data.get("destination") == "battlefield"
+                and data.get("enters_tapped") is True
+                and data.get("returned") == ["Reassembling Skeleton"]
+                and data.get("mana_paid") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_graveyard_exile_single_graveyard_exiles_multiple_and_sacrifices_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -4407,6 +4458,38 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
 
         self.assertEqual(activated, 0)
         self.assertEqual(active.hand, [])
+        self.assertEqual(active.graveyard, [source])
+
+    def test_graveyard_self_return_to_battlefield_does_not_move_without_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Persistent Specimen",
+            "type_line": "Creature - Skeleton",
+            "cmc": 3,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{2}{B}",
+            "graveyard_self_return_activation_cost_generic": 2,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "enters_tapped": True,
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=19,
+            rng=random.Random(19),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.hand, [])
+        self.assertEqual(active.battlefield, [])
         self.assertEqual(active.graveyard, [source])
         self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
 

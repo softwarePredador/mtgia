@@ -2569,6 +2569,70 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(reason, "selected_exact_scope")
         self.assertTrue(proposal["effect_json"]["enters_tapped"])
 
+    def test_graveyard_self_return_to_battlefield_mana_only_creature_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Reassembling Skeleton",
+                type_line="Creature - Skeleton Warrior",
+                oracle_text="{1}{B}: Return this card from your graveyard to the battlefield tapped.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToBattlefieldEffect(true, false),
+                    new ManaCostsImpl<>("{1}{B}")
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE)
+        self.assertTrue(effect["graveyard_self_return_to_battlefield"])
+        self.assertEqual(effect["graveyard_self_return_destination"], "battlefield")
+        self.assertEqual(effect["activation_cost_mana"], "{1}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(effect["source_zone"], "graveyard")
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertTrue(effect["enters_tapped"])
+
+    def test_graveyard_self_return_to_battlefield_blocks_source_tapped_mismatch(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Skeleton",
+                type_line="Creature - Skeleton",
+                oracle_text="{1}{B}: Return this card from your graveyard to the battlefield tapped.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToBattlefieldEffect(false, false),
+                    new ManaCostsImpl<>("{1}{B}")
+                ));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_self_return_battlefield_source_tapped_mismatch")
+
     def test_graveyard_self_return_blocks_additional_cost(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

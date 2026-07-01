@@ -15,7 +15,7 @@ Execution contract:
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` freezes how to follow
   this flow day to day.
-- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG332
+- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG333
   all-card completion goal, current baseline, and stop criteria.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
@@ -123,23 +123,23 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg332_graveyard_exile_wave_commander_legal.md`
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg332_graveyard_exile_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg333_graveyard_self_return_battlefield_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg333_graveyard_self_return_battlefield_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27255`
-- XMage authoritative source resolved: `26941`
+- target all-card battle-gap identities: `27252`
+- XMage authoritative source resolved: `26938`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26941`
+- XMage authoritative adapter required: `26938`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26948` identities, card semantics are accepted from XMage; work is now
+- For `26938` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG324 Exact Adapter Waves
+## PG283-PG333 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG324 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG333 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -266,6 +266,11 @@ patterns:
   `Zone.GRAVEYARD`, mana-only activation cost, exact self-return Oracle/source
   text, and only optional static self keywords or enters-tapped text ->
   `xmage_graveyard_simple_activated_self_return_to_hand_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnSourceFromGraveyardToBattlefieldEffect + SimpleActivatedAbility` in
+  `Zone.GRAVEYARD`, mana-only activation cost, exact self-return Oracle/source
+  text, and tapped battlefield entry ->
+  `xmage_graveyard_simple_activated_self_return_to_battlefield_v1`
 - `xmage_signature::BoostSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability`
   with exact activated self power/toughness boost text, battlefield permanents,
   simple mana/tap source costs only, no life/discard/sacrifice-target/untap or
@@ -3004,6 +3009,67 @@ PG332 measured result:
 - Running the exact splitter after PG332 on supported units returns
   `proposal_count=0` over `7962` considered supported rows.
 
+PG333 evidence:
+
+- PG333 graveyard self-return battlefield package:
+  `docs/hermes-analysis/master_optimizer_reports/pg333_xmage_graveyard_self_return_battlefield_wave_package.md`
+- PG333 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg333_xmage_graveyard_self_return_battlefield_wave_pg_apply_evidence.md`
+- PG333 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg333_xmage_graveyard_self_return_battlefield_wave_pg_to_sqlite_sync.json`
+- PG333 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg333_xmage_graveyard_self_return_battlefield_wave_e2e_validation.md`
+- PG333 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg333_graveyard_self_return_battlefield_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg333_graveyard_self_return_battlefield_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg333_graveyard_self_return_battlefield_wave_final_docs.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg333_graveyard_self_return_battlefield_wave_final_docs.md`
+- PG333 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg333_graveyard_self_return_battlefield_wave.md`
+- post-PG333 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg333_graveyard_self_return_battlefield_wave_commander_legal.md`
+- post-PG333 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg333_supported_recheck.md`
+- post-PG333 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg333_graveyard_self_return_battlefield_wave_recheck.md`
+
+PG333 measured result:
+
+- PG333 promoted `3` exact simple activated graveyard self-return-to-battlefield
+  rules: `Persistent Specimen`, `Reassembling Skeleton`, and `Tunnel Rats`.
+- The splitter now supports exact `ReturnSourceFromGraveyardToBattlefieldEffect`
+  cards with `SimpleActivatedAbility` in `Zone.GRAVEYARD`, mana-only activation
+  costs, exact self-return Oracle/source agreement, and tapped battlefield
+  entry.
+- Runtime now evaluates graveyard self-return activations to either hand or
+  battlefield depending on `graveyard_self_return_destination`, pays the
+  activation cost, moves battlefield-returned cards from graveyard to battlefield
+  tapped, applies summoning sickness, and emits destination-specific recursion
+  replay evidence.
+- Focused tests pass for the exact splitter (`168` tests), runtime (`98`
+  tests), and package builder (`4` tests).
+- PostgreSQL apply evidence reports `3/3` promoted rows, `3/3` verified/auto
+  rows, `3/3` matching Oracle hash rows, and `2` stale shadow rows deprecated.
+- PG battle-rules -> Hermes/SQLite sync loaded `7239` PostgreSQL rules,
+  inserted/updated `7033` SQLite rows, and exported `4828` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  no-override battle package gate.
+- Post-PG333 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG333 rows themselves have `3/3` matching Oracle hashes.
+- Global all-card readiness after PG333:
+  `battle_and_oracle_ready=2372`, `battle_family_mapper_required=30175`, and
+  `snapshot_has_verified_rule=3520`.
+- Global all-card authoritative queue after PG333:
+  `target_identity_count=27252`, `xmage_authoritative_source_count=26938`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26938`.
+- Running the exact splitter after PG333 on supported units returns
+  `proposal_count=0` over `7959` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3643,10 +3709,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG332 queue, the next exact runtime-backed work should be selected from
+post-PG333 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1937`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1934`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
