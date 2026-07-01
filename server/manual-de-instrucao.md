@@ -53,6 +53,13 @@ Cobertura pos-sync:
   vanilla/no-rules.
 - `oracle_identity_rule_link_or_copy=2` depois de considerar cobertura por
   `normalized_name`; antes a auditoria inflava esse bloco para `199`.
+- Modelo de aceleracao all-card:
+  - `battle_gap.row_count=31772`;
+  - `used_deck_unique_names=1511`;
+  - `ready_product_unique_names=232`;
+  - `template_first.matched_rows=10285`;
+  - `template_first.matched_used_deck_unique_names=644`;
+  - `template_plus_residual_family_units=28`.
 
 Comandos globais:
 
@@ -60,8 +67,12 @@ Comandos globais:
 python3 server/bin/sync_card_legalities_from_scryfall.py --sets ""
 python3 server/bin/sync_card_legalities_from_scryfall.py --sets "" --apply
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py \
-  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3 \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v4 \
   --xmage-limit 250
+
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_current \
+  --xmage-limit 0
 ```
 
 ## 2026-06-18 — Sync focado de legalidades para fechar `needs_legality_sync`

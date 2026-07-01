@@ -45,7 +45,7 @@ Use
 to route the all-card inventory before creating a battle-family batch. The
 current report is:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v4.md`
 
 Current routing rules:
 
@@ -60,6 +60,39 @@ Current routing rules:
   create duplicate work for reprints already covered by normalized name.
 - Use `oracle_id` rule propagation only for true alias/double-face gaps where
   neither `card_id` nor normalized name already has trusted coverage.
+
+## All-Card Acceleration Model
+
+Do not schedule all-card adaptation as 33k card-row tickets. Use
+`docs/hermes-analysis/manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py`
+to convert the backlog into product-priority identities, templates, and
+residual families.
+
+Current evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_current.md`
+
+Current measured compression:
+
+- all card rows: `34331`
+- battle-gap rows: `31772`
+- current used-deck battle-gap identities: `1511`
+- ready-product battle-gap identities: `232`
+- template-first matched rows: `10285`
+- template-first matched used-deck identities: `644`
+- template + residual family planning units: `28`
+
+Interpretation:
+
+- The immediate product queue is the `1511` used-deck identities, not all
+  `31772` battle-gap rows.
+- The first implementation wave should target generic templates that hit used
+  cards: fixed draw, fixed token creation, mana production, targeted
+  destroy/exile, counter target spell, fixed direct damage, scry/surveil, land
+  tutor, graveyard return, and protection-until-end-of-turn.
+- Residual high-volume families still require XMage split/scope review, but
+  they should be scheduled as family/subpattern units, never as a card-by-card
+  backlog.
 
 ## Why This Is The Best Current Flow
 

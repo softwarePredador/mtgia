@@ -59,7 +59,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     separar sync Oracle/legalities, blank Oracle text esperado, cobertura por
     `card_id`/`normalized_name`, propagacao real por `oracle_id` e familias
     XMage. Evidencia corrente:
-    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3.md`.
+    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v4.md`.
+  - Para acelerar a adaptacao de todas as cartas, rode tambem
+    `manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py`.
+    Ele prova a fila no grao correto: `31772` rows com gap viram `1511`
+    identidades usadas em decks, `232` em ready-product, e `28` unidades de
+    planejamento por template/familia. Evidencia corrente:
+    `master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_current.md`.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
