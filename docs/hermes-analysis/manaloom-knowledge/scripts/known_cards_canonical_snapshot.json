@@ -2885,6 +2885,29 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Arrows of Justice": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "97c1b7af669ce8fa7a62ed9e318dfbce"
+  },
   "Artifact Blast": {
     "battle_model_scope": "xmage_counter_target_spell_v1",
     "effect": "counter",
@@ -3047,6 +3070,28 @@
     "battle_rule_logical_key": "battle_rule_v1:5fd05007191c6e481e8371724035031c",
     "battle_rule_oracle_hash": "dd3e1f004f2b178f31b638fad9cad591"
   },
+  "Asphyxiate": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "untapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0a872bdcc0aa8db49c68eac97405dd4",
+    "battle_rule_oracle_hash": "08959c701fcb4230ee2502a24494bffe"
+  },
   "Assassin's Trophy": {
     "effect": "remove_permanent",
     "instant": true,
@@ -3057,6 +3102,28 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f6d96db6081c2fd3f48828c7594f4fcf"
+  },
+  "Assassinate": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+    "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
   },
   "Assault Griffin": {
     "_keywords_are_self": true,
@@ -5317,6 +5384,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
   },
+  "Blade Banish": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_min": 4
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2e504ad4858888caa4d2ede529e78726",
+    "battle_rule_oracle_hash": "e4d20c96b23fe95319cd2187569b00a5"
+  },
   "Blade of Selves": {
     "cmc": 2.0,
     "effect": "token_maker",
@@ -7091,6 +7180,28 @@
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "052e84edb994655942a2ae9741af0bfb"
   },
+  "Bring to Trial": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "power_min": 4
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e388c36f21cd6654513389d89409c2df",
+    "battle_rule_oracle_hash": "e4d20c96b23fe95319cd2187569b00a5"
+  },
   "Bristling Backwoods": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -7402,6 +7513,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c53012353efbf26120a657b3d0db3226",
     "battle_rule_oracle_hash": "34167f65655c4a79532902b2b6bc986d"
+  },
+  "Burning Oil": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+    "battle_rule_oracle_hash": "20d8edecf04d7027170b6a52954d370c"
   },
   "Burning Prophet": {
     "cmc": 2.0,
@@ -8351,6 +8485,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Celestial Purge": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_permanent",
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ],
+      "target_colors": [
+        "B",
+        "R"
+      ]
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd",
+    "battle_rule_oracle_hash": "698aaa7e96078c00d799f92943f8dab4"
   },
   "Cemetery Reaper": {
     "cmc": 3.0,
@@ -10802,6 +10961,29 @@
     "battle_rule_logical_key": "battle_rule_v1:1dc787546713b8ba46fd75acf55c2668",
     "battle_rule_oracle_hash": "449e2dfa4828be80b78b5d3e3a99e757"
   },
+  "Cosmium Blast": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "ca056d9a5491b2166098dfb6b919558e"
+  },
   "Cosmos Elixir": {
     "cmc": 4.0,
     "count": 1,
@@ -12697,6 +12879,28 @@
     "battle_rule_logical_key": "battle_rule_v1:3acd8f1cd0385cea4d18af84cb76b7bf",
     "battle_rule_oracle_hash": "7ee68f02b4a79a4c3e00fbe14caceda1"
   },
+  "Death Stroke": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+    "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
+  },
   "Deathbellow War Cry": {
     "ability_kind": "one_shot",
     "battle_model_scope": "up_to_four_different_name_minotaur_creatures_to_battlefield_v1",
@@ -14312,6 +14516,29 @@
     "battle_rule_logical_key": "battle_rule_v1:01bef09139cdcf340bcd15bb6d3cf6c8",
     "battle_rule_oracle_hash": "30534abd47113fbc910b9edf5fefd0bc"
   },
+  "Divine Arrow": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "b05a916d4c12a20b12e4f98ae548c598"
+  },
   "Divine Resilience": {
     "cmc": 1.0,
     "duration": 1,
@@ -14323,6 +14550,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
+  },
+  "Divine Verdict": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+    "battle_rule_oracle_hash": "558c8b8ff92c618ea30b16737033c237"
   },
   "Divine Visitation": {
     "cmc": 5.0,
@@ -14410,15 +14659,28 @@
     "battle_rule_oracle_hash": "079606405f85c58e19cc0c825030f809"
   },
   "Doom Blade": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
     "effect": "remove_permanent",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:8b297552724d5caee8f0cac7f8e26426"
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+    "battle_rule_oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3"
   },
   "Doom Whisperer": {
     "cmc": 5.0,
@@ -14715,6 +14977,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2f76bad97175d8bd361b3fd37840ffee"
+  },
+  "Dragon's Presence": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+    "battle_rule_oracle_hash": "b1eefbe8212e33cb9e6e340ad6b259f2"
   },
   "Dragon's Rage Channeler": {
     "battle_model_scope": "noncreature_spell_cast_surveil_one_delirium_plus2_plus2_flying_must_attack_v1",
@@ -17038,6 +17323,28 @@
     "battle_rule_logical_key": "battle_rule_v1:8e1b9773684b97c3d24b091de88a5517",
     "battle_rule_oracle_hash": "4671452857f7b532c0c9cc6088b3e25c"
   },
+  "Epic Downfall": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "mana_value_min": 3
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8c9bf6276f34398ae34d6fba4b2c75e9",
+    "battle_rule_oracle_hash": "575f082bbea122e95ef4e0991c13cdef"
+  },
   "Epicenter": {
     "cmc": 5.0,
     "effect": "board_wipe",
@@ -17515,6 +17822,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:bae0bddaa64a2f72a2565a04a8680035"
   },
+  "Excoriate": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6",
+    "battle_rule_oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2"
+  },
   "Exemplar of Light": {
     "cmc": 4.0,
     "effect": "draw_cards",
@@ -17566,6 +17895,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e6e3f483c5eb366bcd6109b743518c40",
     "battle_rule_oracle_hash": "03a510edd2cc7011492c1c7f4a73a0c8"
+  },
+  "Expel": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ebc578d5466e95ade22c70eedd2dfc64",
+    "battle_rule_oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2"
   },
   "Experimental Augury": {
     "cmc": 2.0,
@@ -21801,6 +22152,30 @@
     "battle_rule_logical_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
     "battle_rule_oracle_hash": "e1528476f4465cfb54a103159363cabe"
   },
+  "Ghostly Visit": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+    "battle_rule_oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3"
+  },
   "Ghoulcaller's Bell": {
     "ability_kind": "activated",
     "activation_requires_tap": true,
@@ -21967,6 +22342,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:be33b2c2a49fcddf0d08f08ab6d0d30e"
+  },
+  "Gideon's Reproach": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "f9e3c22bfaed89e5357f96e1c27e634a"
   },
   "Gift of Immortality": {
     "cmc": 3.0,
@@ -24571,6 +24969,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:802683f320c420eff2f09721ebefad4d"
   },
+  "Hamato Ninp\u014d": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "9a86f42c4b79590dd87acc3d01e20f3a"
+  },
   "Hammer of Nazahn": {
     "cmc": 4.0,
     "effect": "ramp_permanent",
@@ -24590,6 +25011,30 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Hand of Death": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+    "battle_rule_oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3"
   },
   "Hand of Silumgar": {
     "_keywords_are_self": true,
@@ -26623,6 +27068,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Immolating Glare": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+    "battle_rule_oracle_hash": "480908df14808dc5226a241cd01506a6"
+  },
   "Immolating Gyre": {
     "cmc": 6.0,
     "effect": "board_wipe",
@@ -26685,6 +27152,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "3ffba0a9c66dca6066627634d531dc1e"
+  },
+  "Impeccable Timing": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+    "battle_rule_oracle_hash": "f8ab183e8c917e2ff0a87e0840645fee"
   },
   "Impending Disaster": {
     "cmc": 2.0,
@@ -27745,6 +28235,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
+  },
+  "Iron Verdict": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713",
+    "battle_rule_oracle_hash": "02d7bae0e60dfddbf0919ff8bd26801b"
   },
   "Ironwright's Cleansing": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -28951,6 +29464,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8150b442466da53a812627c24f820e4d"
+  },
+  "Kill Shot": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+    "battle_rule_oracle_hash": "480908df14808dc5226a241cd01506a6"
   },
   "Killing Glare": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -30415,6 +30950,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a6cead2efc176db343e9420c47d02310"
+  },
+  "Lens Flare": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+    "battle_rule_oracle_hash": "574168ea5cfa3334d906e7ca8dd763e6"
   },
   "Lens of Clarity": {
     "ability_kind": "static",
@@ -35973,6 +36531,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Neck Snap": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+    "battle_rule_oracle_hash": "558c8b8ff92c618ea30b16737033c237"
+  },
   "Necroblossom Snarl": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -36645,6 +37225,28 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:88e921a08e4e0a374efdd36395520db8"
+  },
+  "Not on My Watch": {
+    "battle_model_scope": "xmage_exile_target_spell_v1",
+    "destination": "exile",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fea108669007815a2e5f2713fb7a2c87",
+    "battle_rule_oracle_hash": "b1a55491ae1ff5c131e46e437ee10e64"
   },
   "Notion Thief": {
     "effect": "creature",
@@ -42187,6 +42789,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d47cbde8d1dc5678060e25ea1b620a82"
   },
+  "Rebuke": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+    "battle_rule_oracle_hash": "480908df14808dc5226a241cd01506a6"
+  },
   "Reckless Barbarian": {
     "battle_model_scope": "creature_sacrifice_add_two_red_mana_v1",
     "effect": "creature",
@@ -43778,6 +44402,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Righteous Blow": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 2,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+    "battle_rule_oracle_hash": "d26672e06cb7b0cd8ecd135122028a7f"
   },
   "Righteous Fury": {
     "cmc": 6.0,
@@ -45484,6 +46131,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sandblast": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+    "battle_rule_oracle_hash": "afd8e00e497b2748c18c7c3f7eb67a28"
   },
   "Sandsteppe Citadel": {
     "effect": "land",
@@ -49536,6 +50206,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Slash of Talons": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 2,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+    "battle_rule_oracle_hash": "1413c114198c3c21173739d3ea170790"
+  },
   "Slash Panther": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -52665,6 +53358,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:47c452cdbc781b53fb8f27623cc44748"
   },
+  "Sudden Strike": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+    "battle_rule_oracle_hash": "558c8b8ff92c618ea30b16737033c237"
+  },
   "Sulfur Falls": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -53484,6 +54199,28 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "d5cc14ff169d2df588868b0ecd895d42"
   },
+  "Swift Response": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e",
+    "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
+  },
   "Swiftblade Vindicator": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -53982,6 +54719,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f0687c13175469591c4ad64cc9f569a4",
     "battle_rule_oracle_hash": "7b31b4e584f811786f9dc6aa7ae82547"
+  },
+  "Take Vengeance": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+    "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
   },
   "Takenuma, Abandoned Mire": {
     "effect": "land",
@@ -60146,6 +60905,28 @@
     "battle_rule_logical_key": "battle_rule_v1:96c08a0582c9ddf638096214e8d1b198",
     "battle_rule_oracle_hash": "8739769bf465a67cf81b8d940bf9d9e2"
   },
+  "Vanquish": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "blocking"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c",
+    "battle_rule_oracle_hash": "7fa651e04d0a369d0586bfb83bd2fdc7"
+  },
   "Vanquish the Horde": {
     "ability_kind": "static",
     "battle_model_scope": "destroy_all_creatures_cost_reduced_by_creatures_on_battlefield_v1",
@@ -60401,6 +61182,28 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
     "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
+  "Vengeance": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+    "battle_rule_oracle_hash": "a2011900444fa6f89be7c9a6d46a5956"
   },
   "Venomthrope": {
     "_keywords_are_self": true,
@@ -61838,6 +62641,34 @@
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "5c9312a9432775bc6a4073c667c0407e"
   },
+  "Wallop": {
+    "battle_model_scope": "xmage_destroy_target_spell_v1",
+    "destination": "graveyard",
+    "effect": "remove_creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "required_keywords": [
+        "flying"
+      ],
+      "target_colors": [
+        "U",
+        "B"
+      ]
+    },
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:81d8e406b9229bfb8d0f6659f27a91cb",
+    "battle_rule_oracle_hash": "22ed2a47f0b80c8d15f863e58f1a9af5"
+  },
   "Wan Shi Tong, Librarian": {
     "ability_kind": "triggered",
     "battle_model_scope": "flash_flying_vigilance_etb_x_counters_draw_half_x_opponent_search_growth_v1",
@@ -61904,6 +62735,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cb6917973f2f9a0cd7955b9a6682866c",
     "battle_rule_oracle_hash": "fd9f823347bc1af8d128deb10d562b9f"
+  },
+  "Wanderer's Intervention": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+    "battle_rule_oracle_hash": "a3caa11b6d588c8ec9f412146c0c13fc"
   },
   "Wandering Fumarole": {
     "effect": "land",

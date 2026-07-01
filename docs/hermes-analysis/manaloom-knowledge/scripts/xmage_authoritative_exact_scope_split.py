@@ -533,6 +533,9 @@ def destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | No
     text = oracle_text(metadata)
     if "destroy target" not in text:
         return None
+    restricted = restricted_battlefield_target_from_oracle(metadata, "destroy")
+    if restricted is not None:
+        return ("remove_creature" if restricted_target_base(restricted) == "creature" else "remove_permanent"), restricted
     if re.search(r"destroy target artifact or enchantment\b", text):
         return "remove_permanent", "artifact_or_enchantment"
     if re.search(r"destroy target artifact\b", text):
@@ -614,6 +617,9 @@ def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str,
 
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = oracle_text(metadata)
+    restricted = restricted_battlefield_target_from_oracle(metadata, "exile")
+    if restricted is not None:
+        return ("remove_creature" if restricted_target_base(restricted) == "creature" else "remove_permanent"), restricted
     patterns: list[tuple[str, tuple[str, str]]] = [
         (r"^exile target artifact or enchantment\.?$", ("remove_permanent", "artifact_or_enchantment")),
         (r"^exile target creature or planeswalker\.?$", ("remove_permanent", "creature_or_planeswalker")),
@@ -1186,6 +1192,9 @@ def oracle_text_after_leading_static_keywords(metadata: dict[str, Any]) -> str:
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
+    restricted = restricted_battlefield_target_from_oracle(metadata, "damage")
+    if restricted is not None:
+        return restricted
     if "any target" in text:
         return "any_target"
     if re.search(r"target opponent\b", text):
@@ -1197,6 +1206,99 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if re.search(r"target creature\b", text):
         return "creature"
     return None
+
+
+def restricted_target_base(target: str) -> str:
+    if target in {
+        "attacking_creature",
+        "blocking_creature",
+        "attacking_or_blocking_creature",
+        "tapped_creature",
+        "untapped_creature",
+        "flying_creature",
+        "nonblack_creature",
+        "blue_or_black_flying_creature",
+        "creature_power_4_or_greater",
+        "creature_mana_value_3_or_greater",
+    }:
+        return "creature"
+    if target == "black_or_red_permanent":
+        return "permanent"
+    return target
+
+
+def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: str) -> str | None:
+    text = oracle_text(metadata)
+    if action == "damage":
+        prefix = r"^.+ deals \d+ damage to "
+        suffix = r"(?:\.|$)"
+    elif action == "destroy":
+        prefix = r"^destroy "
+        suffix = r"\.?$"
+    elif action == "exile":
+        prefix = r"^exile "
+        suffix = r"\.?$"
+    else:
+        return None
+    patterns: list[tuple[str, str]] = [
+        (r"target attacking or blocking creature", "attacking_or_blocking_creature"),
+        (r"target attacking creature", "attacking_creature"),
+        (r"target blocking creature", "blocking_creature"),
+        (r"target tapped creature", "tapped_creature"),
+        (r"target untapped creature", "untapped_creature"),
+        (r"target creature with flying", "flying_creature"),
+        (r"target nonblack creature", "nonblack_creature"),
+        (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
+        (r"target black or red permanent", "black_or_red_permanent"),
+        (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
+        (r"target creature with (?:mana value|converted mana cost) 3 or greater", "creature_mana_value_3_or_greater"),
+    ]
+    for target_pattern, target in patterns:
+        if re.match(prefix + target_pattern + suffix, text):
+            return target
+    return None
+
+
+def restricted_battlefield_target_from_source(source: str) -> str | None:
+    text = source or ""
+    if re.search(r"new\s+TargetAttackingOrBlockingCreature\s*\(", text) or "FilterAttackingOrBlockingCreature" in text:
+        return "attacking_or_blocking_creature"
+    if re.search(r"new\s+TargetAttackingCreature\s*\(", text) or "FilterAttackingCreature" in text:
+        return "attacking_creature"
+    if re.search(r"new\s+TargetBlockingCreature\s*\(", text) or "FilterBlockingCreature" in text:
+        return "blocking_creature"
+    if "TappedPredicate.TAPPED" in text:
+        return "tapped_creature"
+    if "TappedPredicate.UNTAPPED" in text:
+        return "untapped_creature"
+    if (
+        "FILTER_PERMANENT_CREATURE_NON_BLACK" in text
+        or "FILTER_CREATURE_NON_BLACK" in text
+        or 'FilterCreaturePermanent("nonblack creature")' in text
+    ):
+        return "nonblack_creature"
+    if (
+        "ObjectColor.BLUE" in text
+        and "ObjectColor.BLACK" in text
+        and "AbilityPredicate(FlyingAbility.class)" in text
+    ):
+        return "blue_or_black_flying_creature"
+    if "FILTER_CREATURE_FLYING" in text or "AbilityPredicate(FlyingAbility.class)" in text:
+        return "flying_creature"
+    if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
+        return "black_or_red_permanent"
+    if "PowerPredicate(ComparisonType.MORE_THAN, 3)" in text:
+        return "creature_power_4_or_greater"
+    if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
+        return "creature_mana_value_3_or_greater"
+    return None
+
+
+def source_matches_target_constraint(source: str, target: str) -> bool:
+    base = restricted_target_base(target)
+    if base == target:
+        return True
+    return restricted_battlefield_target_from_source(source) == target
 
 
 def fixed_damage_gain_life_from_source(source: str) -> tuple[int, int, str] | None:
@@ -1454,6 +1556,28 @@ def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
 def target_constraints_for(target: str) -> dict[str, Any]:
     if target == "any_target":
         return {"scope": "any_target"}
+    if target == "attacking_creature":
+        return {"card_types": ["creature"], "combat_state": "attacking"}
+    if target == "blocking_creature":
+        return {"card_types": ["creature"], "combat_state": "blocking"}
+    if target == "attacking_or_blocking_creature":
+        return {"card_types": ["creature"], "combat_state": "attacking_or_blocking"}
+    if target == "tapped_creature":
+        return {"card_types": ["creature"], "tapped_state": "tapped"}
+    if target == "untapped_creature":
+        return {"card_types": ["creature"], "tapped_state": "untapped"}
+    if target == "flying_creature":
+        return {"card_types": ["creature"], "required_keywords": ["flying"]}
+    if target == "nonblack_creature":
+        return {"card_types": ["creature"], "exclude_colors": ["B"]}
+    if target == "blue_or_black_flying_creature":
+        return {"card_types": ["creature"], "target_colors": ["U", "B"], "required_keywords": ["flying"]}
+    if target == "black_or_red_permanent":
+        return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "creature_power_4_or_greater":
+        return {"card_types": ["creature"], "power_min": 4}
+    if target == "creature_mana_value_3_or_greater":
+        return {"card_types": ["creature"], "mana_value_min": 3}
     if target == "creature":
         return {"card_types": ["creature"]}
     if target == "creature_or_planeswalker":
@@ -1973,12 +2097,15 @@ def split_row(
         target = damage_target_from_oracle(metadata)
         if target is None:
             return None, "damage_target_not_supported"
+        if not source_matches_target_constraint(source_text, target):
+            return None, "damage_target_source_mismatch"
+        target_base = restricted_target_base(target)
         effect_json = {
             "effect": "direct_damage",
             "battle_model_scope": DAMAGE_SCOPE,
             "amount": amount,
             "damage": amount,
-            "target": target,
+            "target": target_base,
             "target_constraints": target_constraints_for(target),
             "xmage_effect_class": "DamageTargetEffect",
             **flags,
@@ -1992,10 +2119,13 @@ def split_row(
         if target is None:
             return None, "destroy_target_not_supported"
         effect, target_type = target
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "destroy_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
         effect_json = {
             "effect": effect,
             "battle_model_scope": DESTROY_SCOPE,
-            "target": target_type,
+            "target": target_base,
             "target_constraints": target_constraints_for(target_type),
             "destination": "graveyard",
             "xmage_effect_class": "DestroyTargetEffect",
@@ -2096,10 +2226,13 @@ def split_row(
         if target is None:
             return None, "exile_target_not_supported"
         effect, target_type = target
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
         effect_json = {
             "effect": effect,
             "battle_model_scope": EXILE_SCOPE,
-            "target": target_type,
+            "target": target_base,
             "target_constraints": target_constraints_for(target_type),
             "destination": "exile",
             "xmage_effect_class": "ExileTargetEffect",

@@ -361,6 +361,115 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "damage_amount_not_fixed")
 
+    def test_damage_spell_maps_attacking_or_blocking_creature_constraint(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Volley deals 4 damage to target attacking or blocking creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetAttackingOrBlockingCreature());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+        )
+
+    def test_damage_spell_blocks_restricted_oracle_source_mismatch(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Volley deals 4 damage to target attacking or blocking creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(4));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_target_source_mismatch")
+
+    def test_destroy_spell_maps_untapped_creature_constraint(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target untapped creature."),
+            source_text=(
+                "filter.add(TappedPredicate.UNTAPPED);"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"card_types": ["creature"], "tapped_state": "untapped"},
+        )
+
+    def test_destroy_spell_maps_filter_blocking_creature_constraint(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target blocking creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(new FilterBlockingCreature()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(
+            proposal["effect_json"]["target_constraints"],
+            {"card_types": ["creature"], "combat_state": "blocking"},
+        )
+
+    def test_exile_spell_maps_power_restricted_creature_constraint(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target creature with power 4 or greater."),
+            source_text=(
+                "filter.add(new PowerPredicate(ComparisonType.MORE_THAN, 3));"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "power_min": 4})
+
+    def test_exile_spell_maps_black_or_red_permanent_constraint(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target black or red permanent."),
+            source_text=(
+                "new ColorPredicate(ObjectColor.BLACK);"
+                "new ColorPredicate(ObjectColor.RED);"
+                "FilterPermanent(\"black or red permanent\");"
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "remove_permanent")
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["permanent"], "target_colors": ["B", "R"]})
+
     def test_creature_tap_damage_maps_to_creature_with_activated_damage(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

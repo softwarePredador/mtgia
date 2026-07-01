@@ -10539,6 +10539,45 @@ def card_is_blue(card):
     return "{U}" in mana_cost or "{U/" in mana_cost or "/U}" in mana_cost
 
 
+def card_has_color(card, color):
+    if not isinstance(card, dict):
+        return False
+    wanted = _normalize_color_symbol(color)
+    if not wanted:
+        return False
+    colors = card.get("colors") or card.get("color_identity") or []
+    if isinstance(colors, str):
+        colors = read_json_list(colors) or [colors]
+    normalized = {_normalize_color_symbol(value) for value in colors if str(value).strip()}
+    if wanted in normalized:
+        return True
+    mana_cost = str(card.get("mana_cost") or "").upper()
+    symbol = {
+        "white": "W",
+        "blue": "U",
+        "black": "B",
+        "red": "R",
+        "green": "G",
+        "w": "W",
+        "u": "U",
+        "b": "B",
+        "r": "R",
+        "g": "G",
+    }.get(wanted, str(color or "").upper())
+    return bool(symbol) and (f"{{{symbol}}}" in mana_cost or f"{{{symbol}/" in mana_cost or f"/{symbol}}}" in mana_cost)
+
+
+def target_constraint_source(source, effect_data):
+    if not isinstance(effect_data, dict):
+        return source
+    merged = dict(effect_data)
+    if isinstance(source, dict):
+        for key in ("name", "colors", "color_identity", "mana_cost", "oracle_text", "type_line"):
+            if merged.get(key) in (None, "", [], {}):
+                merged[key] = source.get(key)
+    return merged
+
+
 def is_legal_target(spell, target, controller, all_players=None, target_type=None, target_controller=None):
     """v9: Check if a target is still legal for a spell/ability (CR 608.2b)."""
     if not isinstance(target, dict):
@@ -10574,6 +10613,17 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     if any(c in protections for c in source_colors):
         return False
     constraints = _target_constraints_dict(spell)
+    allowed_types = _constraint_card_types(spell)
+    if allowed_types and "permanent" not in allowed_types:
+        if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
+            return False
+    excluded_types = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("exclude_card_types"))
+        if str(value or "").strip()
+    }
+    if excluded_types and any(target_matches_type(target, excluded_type) for excluded_type in excluded_types):
+        return False
     combat_state = str(constraints.get("combat_state") or "").lower()
     if combat_state == "attacking" and not bool(target.get("attacking")):
         return False
@@ -10583,6 +10633,74 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         bool(target.get("attacking")) or bool(target.get("blocking"))
     ):
         return False
+    tapped_state = str(constraints.get("tapped_state") or constraints.get("tap_state") or "").lower()
+    if tapped_state == "tapped" and not bool(target.get("tapped")):
+        return False
+    if tapped_state == "untapped" and bool(target.get("tapped")):
+        return False
+    required_keywords = [
+        str(value or "").strip().lower().replace(" ", "_")
+        for value in _as_list(constraints.get("required_keywords") or constraints.get("target_keywords"))
+        if str(value or "").strip()
+    ]
+    if required_keywords and not all(card_has_keyword(target, keyword) for keyword in required_keywords):
+        return False
+    target_colors = [
+        value
+        for value in _as_list(constraints.get("target_colors") or constraints.get("colors"))
+        if str(value or "").strip()
+    ]
+    if target_colors and not any(card_has_color(target, color) for color in target_colors):
+        return False
+    excluded_colors = [
+        value
+        for value in _as_list(constraints.get("exclude_colors") or constraints.get("excluded_colors"))
+        if str(value or "").strip()
+    ]
+    if excluded_colors and any(card_has_color(target, color) for color in excluded_colors):
+        return False
+    power_min = first_present_value(constraints, ("power_min", "target_power_min"))
+    if power_min is not None:
+        try:
+            if int(target.get("power") or 0) < int(float(power_min)):
+                return False
+        except Exception:
+            return False
+    power_max = first_present_value(constraints, ("power_max", "target_power_max"))
+    if power_max is not None:
+        try:
+            if int(target.get("power") or 0) > int(float(power_max)):
+                return False
+        except Exception:
+            return False
+    toughness_min = first_present_value(constraints, ("toughness_min", "target_toughness_min"))
+    if toughness_min is not None:
+        try:
+            if int(target.get("toughness") or 0) < int(float(toughness_min)):
+                return False
+        except Exception:
+            return False
+    toughness_max = first_present_value(constraints, ("toughness_max", "target_toughness_max"))
+    if toughness_max is not None:
+        try:
+            if int(target.get("toughness") or 0) > int(float(toughness_max)):
+                return False
+        except Exception:
+            return False
+    mana_value_min = first_present_value(constraints, ("mana_value_min", "target_mana_value_min", "cmc_min", "target_cmc_min"))
+    if mana_value_min is not None:
+        try:
+            if card_mana_value(target) < int(float(mana_value_min)):
+                return False
+        except Exception:
+            return False
+    mana_value_max = first_present_value(constraints, ("mana_value_max", "target_mana_value_max", "cmc_max", "target_cmc_max"))
+    if mana_value_max is not None:
+        try:
+            if card_mana_value(target) > int(float(mana_value_max)):
+                return False
+        except Exception:
+            return False
     # Ward: doesn't affect legality, only triggers on cast
     return True
 
@@ -17267,6 +17385,7 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
     for card in player.battlefield:
         if not isinstance(card, dict):
             continue
+        targeting_source = target_constraint_source(source, effect_data)
         if (
             destroy_to_graveyard
             and card.get("indestructible")
@@ -17274,7 +17393,7 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
         ):
             continue
         if not is_legal_target(
-            source or effect_data,
+            targeting_source,
             card,
             controller or player,
             target_type=target_type,
@@ -17296,6 +17415,21 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
         if max_value is not None:
             try:
                 if card_mana_value(card) > int(float(max_value)):
+                    continue
+            except Exception:
+                continue
+        min_value = first_present_value(
+            effect_data,
+            (
+                "target_cmc_min",
+                "target_mana_value_min",
+                "min_target_cmc",
+                "min_target_mana_value",
+            ),
+        )
+        if min_value is not None:
+            try:
+                if card_mana_value(card) < int(float(min_value)):
                     continue
             except Exception:
                 continue

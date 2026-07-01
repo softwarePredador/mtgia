@@ -1,0 +1,1354 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T13:35:05.712581+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg308_xmage_restricted_target_spell_wave_manifest.json",
+  "package_id": "pg308_xmage_restricted_target_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 38
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Arrows of Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "97c1b7af669ce8fa7a62ed9e318dfbce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Asphyxiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0a872bdcc0aa8db49c68eac97405dd4",
+          "oracle_hash": "08959c701fcb4230ee2502a24494bffe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Assassinate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Blade Banish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e504ad4858888caa4d2ede529e78726",
+          "oracle_hash": "e4d20c96b23fe95319cd2187569b00a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Bring to Trial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e388c36f21cd6654513389d89409c2df",
+          "oracle_hash": "e4d20c96b23fe95319cd2187569b00a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Burning Oil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+          "oracle_hash": "20d8edecf04d7027170b6a52954d370c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Celestial Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd",
+          "oracle_hash": "698aaa7e96078c00d799f92943f8dab4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Cosmium Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "ca056d9a5491b2166098dfb6b919558e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Death Stroke",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Divine Arrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "b05a916d4c12a20b12e4f98ae548c598",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Divine Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Doom Blade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Dragon's Presence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "b1eefbe8212e33cb9e6e340ad6b259f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Epic Downfall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c9bf6276f34398ae34d6fba4b2c75e9",
+          "oracle_hash": "575f082bbea122e95ef4e0991c13cdef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Excoriate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6",
+          "oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Expel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ebc578d5466e95ade22c70eedd2dfc64",
+          "oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Ghostly Visit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Gideon's Reproach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "f9e3c22bfaed89e5357f96e1c27e634a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Hamato Ninp\u014d",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "9a86f42c4b79590dd87acc3d01e20f3a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Hand of Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Immolating Glare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Impeccable Timing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+          "oracle_hash": "f8ab183e8c917e2ff0a87e0840645fee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Iron Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713",
+          "oracle_hash": "02d7bae0e60dfddbf0919ff8bd26801b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Kill Shot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Lens Flare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "574168ea5cfa3334d906e7ca8dd763e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Neck Snap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Not on My Watch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea108669007815a2e5f2713fb7a2c87",
+          "oracle_hash": "b1a55491ae1ff5c131e46e437ee10e64",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rebuke",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Righteous Blow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+          "oracle_hash": "d26672e06cb7b0cd8ecd135122028a7f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Sandblast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "afd8e00e497b2748c18c7c3f7eb67a28",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Slash of Talons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+          "oracle_hash": "1413c114198c3c21173739d3ea170790",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Sudden Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Swift Response",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Take Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Vanquish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c",
+          "oracle_hash": "7fa651e04d0a369d0586bfb83bd2fdc7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Wallop",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:81d8e406b9229bfb8d0f6659f27a91cb",
+          "oracle_hash": "22ed2a47f0b80c8d15f863e58f1a9af5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Wanderer's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "a3caa11b6d588c8ec9f412146c0c13fc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 38
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Arrows of Justice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "97c1b7af669ce8fa7a62ed9e318dfbce",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Asphyxiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0a872bdcc0aa8db49c68eac97405dd4",
+          "oracle_hash": "08959c701fcb4230ee2502a24494bffe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Assassinate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Blade Banish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e504ad4858888caa4d2ede529e78726",
+          "oracle_hash": "e4d20c96b23fe95319cd2187569b00a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Bring to Trial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e388c36f21cd6654513389d89409c2df",
+          "oracle_hash": "e4d20c96b23fe95319cd2187569b00a5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Burning Oil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+          "oracle_hash": "20d8edecf04d7027170b6a52954d370c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Celestial Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd",
+          "oracle_hash": "698aaa7e96078c00d799f92943f8dab4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Cosmium Blast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "ca056d9a5491b2166098dfb6b919558e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Death Stroke",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Divine Arrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "b05a916d4c12a20b12e4f98ae548c598",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Divine Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Doom Blade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Dragon's Presence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "b1eefbe8212e33cb9e6e340ad6b259f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Epic Downfall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8c9bf6276f34398ae34d6fba4b2c75e9",
+          "oracle_hash": "575f082bbea122e95ef4e0991c13cdef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Excoriate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6",
+          "oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Expel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ebc578d5466e95ade22c70eedd2dfc64",
+          "oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Ghostly Visit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Gideon's Reproach",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "f9e3c22bfaed89e5357f96e1c27e634a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Hamato Ninp\u014d",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "9a86f42c4b79590dd87acc3d01e20f3a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Hand of Death",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf",
+          "oracle_hash": "9313d8a5001a2fa8e32f752a812e5ff3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Immolating Glare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Impeccable Timing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
+          "oracle_hash": "f8ab183e8c917e2ff0a87e0840645fee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Iron Verdict",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713",
+          "oracle_hash": "02d7bae0e60dfddbf0919ff8bd26801b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Kill Shot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Lens Flare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "574168ea5cfa3334d906e7ca8dd763e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Neck Snap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "card_name": "Not on My Watch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fea108669007815a2e5f2713fb7a2c87",
+          "oracle_hash": "b1a55491ae1ff5c131e46e437ee10e64",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Rebuke",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c",
+          "oracle_hash": "480908df14808dc5226a241cd01506a6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Righteous Blow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+          "oracle_hash": "d26672e06cb7b0cd8ecd135122028a7f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Sandblast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d",
+          "oracle_hash": "afd8e00e497b2748c18c7c3f7eb67a28",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Slash of Talons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
+          "oracle_hash": "1413c114198c3c21173739d3ea170790",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Sudden Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
+          "oracle_hash": "558c8b8ff92c618ea30b16737033c237",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Swift Response",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Take Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Vanquish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c",
+          "oracle_hash": "7fa651e04d0a369d0586bfb83bd2fdc7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Vengeance",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97",
+          "oracle_hash": "a2011900444fa6f89be7c9a6d46a5956",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Wallop",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:81d8e406b9229bfb8d0f6659f27a91cb",
+          "oracle_hash": "22ed2a47f0b80c8d15f863e58f1a9af5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "card_name": "Wanderer's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f",
+          "oracle_hash": "a3caa11b6d588c8ec9f412146c0c13fc",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 38
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arrows of Justice",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Asphyxiate",
+          "logical_rule_key": "battle_rule_v1:b0a872bdcc0aa8db49c68eac97405dd4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Assassinate",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blade Banish",
+          "logical_rule_key": "battle_rule_v1:2e504ad4858888caa4d2ede529e78726"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bring to Trial",
+          "logical_rule_key": "battle_rule_v1:e388c36f21cd6654513389d89409c2df"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Burning Oil",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Celestial Purge",
+          "logical_rule_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cosmium Blast",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Death Stroke",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Divine Arrow",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Divine Verdict",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Doom Blade",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dragon's Presence",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Epic Downfall",
+          "logical_rule_key": "battle_rule_v1:8c9bf6276f34398ae34d6fba4b2c75e9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Excoriate",
+          "logical_rule_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Expel",
+          "logical_rule_key": "battle_rule_v1:ebc578d5466e95ade22c70eedd2dfc64"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ghostly Visit",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gideon's Reproach",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hamato Ninp\u014d",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hand of Death",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Immolating Glare",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Impeccable Timing",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Iron Verdict",
+          "logical_rule_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kill Shot",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lens Flare",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Neck Snap",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Not on My Watch",
+          "logical_rule_key": "battle_rule_v1:fea108669007815a2e5f2713fb7a2c87"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rebuke",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Righteous Blow",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sandblast",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slash of Talons",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sudden Strike",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Swift Response",
+          "logical_rule_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Take Vengeance",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vanquish",
+          "logical_rule_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vengeance",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wallop",
+          "logical_rule_key": "battle_rule_v1:81d8e406b9229bfb8d0f6659f27a91cb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wanderer's Intervention",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 38
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Arrows of Justice",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Asphyxiate",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b0a872bdcc0aa8db49c68eac97405dd4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Assassinate",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blade Banish",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:2e504ad4858888caa4d2ede529e78726"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bring to Trial",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:e388c36f21cd6654513389d89409c2df"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Burning Oil",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Celestial Purge",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:8743cd6be80a842556c1a0be143ab4fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cosmium Blast",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Death Stroke",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Divine Arrow",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Divine Verdict",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Doom Blade",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dragon's Presence",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Epic Downfall",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:8c9bf6276f34398ae34d6fba4b2c75e9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Excoriate",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Expel",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:ebc578d5466e95ade22c70eedd2dfc64"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ghostly Visit",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gideon's Reproach",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hamato Ninp\u014d",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hand of Death",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:201a5f337d5e9210d5d75123f33dd8bf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Immolating Glare",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Impeccable Timing",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Iron Verdict",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kill Shot",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lens Flare",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Neck Snap",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Not on My Watch",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:fea108669007815a2e5f2713fb7a2c87"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rebuke",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:ae301b41d5999917d4bab570b5be6e4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Righteous Blow",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sandblast",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:a600cccdf54657009ab319626e92ff0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slash of Talons",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sudden Strike",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Swift Response",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:fab8ffbbd808fe4ee9128f5f3b83148e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Take Vengeance",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vanquish",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:df7f405115435a17a15ffc3a809aa14c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vengeance",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:97607a657274b25a6d4734d2bc4cbf97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wallop",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:81d8e406b9229bfb8d0f6659f27a91cb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wanderer's Intervention",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:020df383222ebebb21913986d06bb26f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

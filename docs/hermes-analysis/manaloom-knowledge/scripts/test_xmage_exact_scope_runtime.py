@@ -331,6 +331,139 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             "creature_enchantment_or_planeswalker",
         )
 
+    def test_restricted_damage_targets_only_attacking_or_blocking_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        idle = {"name": "Idle Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        attacker = {
+            "name": "Attacking Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+            "attacking": True,
+        }
+        opponent.battlefield.extend([idle, attacker])
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 4,
+            "damage": 4,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "attacking_or_blocking"},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Arrows",
+                "type_line": "Instant",
+                "oracle_text": "Fixture Arrows deals 4 damage to target attacking or blocking creature.",
+            },
+            turn=3,
+            rng=random.Random(32),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Idle Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Attacking Bear"])
+
+    def test_destroy_target_spell_respects_untapped_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        tapped = {"name": "Tapped Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5, "tapped": True}
+        untapped = {"name": "Untapped Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield.extend([tapped, untapped])
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "tapped_state": "untapped"},
+            "destination": "graveyard",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Asphyxiate", "type_line": "Sorcery", "oracle_text": "Destroy target untapped creature."},
+            turn=3,
+            rng=random.Random(33),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Tapped Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Untapped Bear"])
+
+    def test_exile_target_spell_respects_power_and_color_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        small_black = {
+            "name": "Small Black Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        large_green = {
+            "name": "Large Green Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["G"],
+            "power": 4,
+            "toughness": 4,
+        }
+        opponent.battlefield.extend([small_black, large_green])
+        power_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "power_min": 4},
+            "destination": "exile",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Blade",
+                "type_line": "Instant",
+                "oracle_text": "Exile target creature with power 4 or greater.",
+            },
+            turn=4,
+            rng=random.Random(34),
+            effect_data_override=power_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Small Black Bear"])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Large Green Bear"])
+
+        color_effect = {
+            "effect": "remove_permanent",
+            "battle_model_scope": "xmage_exile_target_spell_v1",
+            "target": "permanent",
+            "target_constraints": {"card_types": ["permanent"], "target_colors": ["B", "R"]},
+            "destination": "exile",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Purge",
+                "type_line": "Instant",
+                "oracle_text": "Exile target black or red permanent.",
+            },
+            turn=5,
+            rng=random.Random(35),
+            effect_data_override=color_effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Large Green Bear", "Small Black Bear"])
+
     def test_destroy_target_spell_moves_creature_to_graveyard(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
