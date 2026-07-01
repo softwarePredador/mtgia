@@ -85,6 +85,7 @@ ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
+PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
@@ -491,6 +492,14 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
 def is_spell(metadata: dict[str, Any]) -> bool:
     type_line = str(metadata.get("type_line") or "").lower()
     return "instant" in type_line or "sorcery" in type_line
+
+
+def is_permanent_metadata(metadata: dict[str, Any]) -> bool:
+    type_line = str(metadata.get("type_line") or "").lower()
+    return any(
+        card_type in type_line
+        for card_type in ("artifact", "creature", "enchantment", "planeswalker", "battle", "land")
+    )
 
 
 def spell_flags(metadata: dict[str, Any]) -> dict[str, bool]:
@@ -1050,6 +1059,16 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -1384,6 +1403,87 @@ def activated_tap_damage_amount_from_source(source: str) -> int | None:
     return int(match.group(1))
 
 
+def activated_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if ":" not in text:
+        return None
+    effect_text = text.rsplit(":", 1)[1].strip()
+    match = re.match(r"^draw (a|one|two|three|four|five|\d+) cards?\.?$", effect_text)
+    if not match:
+        return None
+    value = match.group(1)
+    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    if value in words:
+        return words[value]
+    return int(value)
+
+
+def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
+    generic = 0
+    colors: list[str] = []
+    for symbol in re.findall(r"\{([^}]+)\}", cost_text or ""):
+        if symbol.isdigit():
+            generic += int(symbol)
+        elif symbol in {"W", "U", "B", "R", "G"}:
+            colors.append(symbol)
+        else:
+            return None
+    return generic, colors
+
+
+def activated_draw_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_draw_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_draw_source_cost_not_supported"
+    draw_matches = re.findall(r"DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)", text)
+    if len(draw_matches) != 1:
+        return "activated_draw_source_count_not_fixed"
+    count = int(draw_matches[0] or "1")
+    if count <= 0:
+        return "activated_draw_source_count_not_fixed"
+    draw_index = text.find("DrawCardSourceControllerEffect")
+    window = text[max(0, draw_index - 300) : draw_index + 1400]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_draw_source_not_simple_activated"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_draw_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    requires_tap = "TapSourceCost" in window
+    requires_sacrifice = "SacrificeSourceCost" in window
+    return {
+        "count": count,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": requires_tap,
+        "activation_requires_sacrifice": requires_sacrifice,
+    }
+
+
 def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     match = re.match(r"^you gain (\d+) life\.?$", oracle_text(metadata))
     if not match:
@@ -1622,6 +1722,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
         scope_kind = "creature with tap-only activated damage ability"
+    elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
+        scope_kind = "permanent with a simple activated draw ability"
     return (
         "XMage authoritative exact-scope split: local class "
         f"{row.get('xmage_class')} translated into ManaLoom runtime scope {scope}. "
@@ -1685,6 +1787,7 @@ def split_row(
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
+    permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     if (
@@ -1698,6 +1801,7 @@ def split_row(
         and not etb_recursion_creature_unit
         and not etb_token_creature_unit
         and not creature_tap_damage_unit
+        and not permanent_activated_draw_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
     ):
@@ -1717,6 +1821,7 @@ def split_row(
         and not etb_recursion_creature_unit
         and not etb_token_creature_unit
         and not creature_tap_damage_unit
+        and not permanent_activated_draw_unit
     ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
@@ -1727,6 +1832,51 @@ def split_row(
 
     flags = spell_flags(metadata)
     classes = effect_classes(row)
+
+    if permanent_activated_draw_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_draw_not_permanent"
+        oracle_count = activated_draw_count_from_oracle(metadata)
+        if oracle_count is None:
+            return None, "activated_draw_oracle_not_simple"
+        parsed_activation = activated_draw_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        if int(parsed_activation["count"]) != int(oracle_count):
+            return None, "activated_draw_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": "draw_engine",
+            "battle_model_scope": PERMANENT_ACTIVATED_DRAW_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "draw_cards",
+            "activated_draw": True,
+            "activated_draw_count": oracle_count,
+            "count": oracle_count,
+            "permanent_type": permanent_type,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **parsed_activation,
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_draw"] = True
+            effect_json["activated_draw_on_self_sacrifice"] = True
+            effect_json["draw_on_self_sacrifice"] = oracle_count
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_draw",
+        ), "selected_exact_scope"
 
     if fixed_token_spell_unit:
         parsed_effect = fixed_create_token_effect_from_source(source_text)
@@ -2539,6 +2689,7 @@ def build_exact_split_report(
             and not is_creature_etb_damage_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
+            and not is_permanent_activated_draw_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
             continue

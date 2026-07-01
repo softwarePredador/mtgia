@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg308_restricted_target_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg309_permanent_activated_draw_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27586`
-- XMage authoritative source resolved: `27272`
+- target all-card battle-gap identities: `27568`
+- XMage authoritative source resolved: `27254`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27272`
+- XMage authoritative adapter required: `27254`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27272` identities, card semantics are accepted from XMage; work is now
+- For `27254` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG308 Exact Adapter Waves
+## PG283-PG309 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG308 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG309 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -197,6 +197,11 @@ patterns:
   optional static self keywords, and exact fixed "When/Whenever this creature
   dies, draw N cards" Oracle text ->
   `xmage_creature_dies_draw_cards_v1`
+- `draw_engine::xmage_draw_card_variant_review_v1` with
+  `DrawCardSourceControllerEffect + SimpleActivatedAbility` on permanents,
+  exact fixed Oracle activated draw text, mana/tap/self-sacrifice costs only,
+  and no discard, target-tap, life, graveyard, or dynamic "for each" costs ->
+  `xmage_permanent_simple_activated_draw_v1`
 - `direct_damage::targeted_damage_variant_v1` with `DamageTargetEffect +
   EntersBattlefieldTriggeredAbility` on creatures and exact fixed ETB damage
   Oracle text ->
@@ -1349,6 +1354,68 @@ PG308 measured result:
   `xmage_authoritative_adapter_required_count=27272`.
 - Running the exact splitter after PG308 on supported units returns
   `proposal_count=0` over `7365` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG309 evidence:
+
+- PG309 permanent activated draw package:
+  `docs/hermes-analysis/master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_package.md`
+- PG309 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_pg_apply_evidence.md`
+- PG309 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_e2e_validation.md`
+- PG309 PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_pg_to_sqlite_sync.json`
+- PG309 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg309_permanent_activated_draw_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg309_permanent_activated_draw_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg309_permanent_activated_draw_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg309_permanent_activated_draw_wave.md`
+- post-PG309 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg309_permanent_activated_draw_wave_recheck.md`
+- post-PG309 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg309_permanent_activated_draw_wave.md`
+- PG309 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_draw_wave.md`
+- post-PG309 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg309_existing_supported_recheck.md`
+
+PG309 measured result:
+
+- PG309 promoted `18` exact permanent activated draw rules whose local XMage
+  source and Oracle text agree on fixed activated card draw.
+- Runtime now supports simple permanent activated draw abilities in
+  postcombat main, including mana costs, tap costs, colored activation costs,
+  self-sacrifice draw costs, library exhaustion checks, hand-size throttling,
+  and summoning-sickness blocking for tap-based creature activations.
+- PostgreSQL apply evidence reports `18/18` promoted rows, `18/18`
+  verified/auto rows, and `18/18` matching Oracle hash rows, with `0` stale
+  shadow rows backed up.
+- PG -> Hermes/SQLite sync loaded `18` PostgreSQL rows, inserted/updated `18`
+  SQLite rows, and exported `4530` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover extraction and runtime execution for simple
+  mana/tap activated draw, self-sacrifice draw, discard-cost blocking, and
+  dynamic-count blocking; `136` focused exact-scope tests pass.
+- Global all-card readiness after PG309:
+  `battle_and_oracle_ready=2056` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `ready_product_qa_unique_cards=818`.
+- Global all-card authoritative queue after PG309:
+  `target_identity_count=27568`, `xmage_authoritative_source_count=27254`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27254`.
+- Running the exact splitter after PG309 on supported units returns
+  `proposal_count=0` over `7396` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

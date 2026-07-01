@@ -1,0 +1,447 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG309",
+  "generated_at": "2026-07-01T13:57:01.207441+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg309_xmage_permanent_activated_draw_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Alchemist's Apprentice",
+      "Arcane Encyclopedia",
+      "Archivist",
+      "Azure Mage",
+      "Benalish Heralds",
+      "Brass Secretary",
+      "Courier's Capsule",
+      "Eidolon of Philosophy",
+      "Font of Fortunes",
+      "Jayemdae Tome",
+      "Mystic Archaeologist",
+      "Oscorp Research Team",
+      "Scepter of Insight",
+      "Shore Keeper",
+      "Third Path Savant",
+      "Tower of Fortunes",
+      "Treasure Trove",
+      "Tymora's Invoker"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 18,
+    "promoted_rule_rows": 18,
+    "promoted_verified_auto_rows": 18,
+    "row_count": 18
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Alchemist's Apprentice",
+      "logical_rule_key": "battle_rule_v1:0f4e9dafa15405f1852de8425014b577",
+      "normalized_name": "alchemist's apprentice",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Arcane Encyclopedia",
+      "logical_rule_key": "battle_rule_v1:ba94540dfd0f59b238cecc710a9789aa",
+      "normalized_name": "arcane encyclopedia",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Archivist",
+      "logical_rule_key": "battle_rule_v1:aaea86161be817e03b11530e871ab769",
+      "normalized_name": "archivist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Azure Mage",
+      "logical_rule_key": "battle_rule_v1:2ed0ce2790a2e967163f2ab8d6cc87c1",
+      "normalized_name": "azure mage",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Benalish Heralds",
+      "logical_rule_key": "battle_rule_v1:abd1c0f34c739ff646806725283ab285",
+      "normalized_name": "benalish heralds",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Brass Secretary",
+      "logical_rule_key": "battle_rule_v1:28a7cd7002ca9aa3fe630b8ec2e2048e",
+      "normalized_name": "brass secretary",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Courier's Capsule",
+      "logical_rule_key": "battle_rule_v1:5df4f469f7fac9df6829018aeef3dc25",
+      "normalized_name": "courier's capsule",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Eidolon of Philosophy",
+      "logical_rule_key": "battle_rule_v1:f30f3647a1de209932e3f0f33798b6b1",
+      "normalized_name": "eidolon of philosophy",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Font of Fortunes",
+      "logical_rule_key": "battle_rule_v1:f61215643c97cdb929842f18b788da40",
+      "normalized_name": "font of fortunes",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Jayemdae Tome",
+      "logical_rule_key": "battle_rule_v1:12556dcec0ca3166cf1f52835a740a36",
+      "normalized_name": "jayemdae tome",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Mystic Archaeologist",
+      "logical_rule_key": "battle_rule_v1:3c4db60dba5c37274fb77c3905514ca6",
+      "normalized_name": "mystic archaeologist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Oscorp Research Team",
+      "logical_rule_key": "battle_rule_v1:ecda6bfc60502b13ee8f4ad0ccad351b",
+      "normalized_name": "oscorp research team",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Scepter of Insight",
+      "logical_rule_key": "battle_rule_v1:4b6716e6945934a79a86d232bc36617d",
+      "normalized_name": "scepter of insight",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Shore Keeper",
+      "logical_rule_key": "battle_rule_v1:4df39c03086c2d4dea112101d116ae75",
+      "normalized_name": "shore keeper",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Third Path Savant",
+      "logical_rule_key": "battle_rule_v1:5b29442ca9f82ae1b3f4083df3955d93",
+      "normalized_name": "third path savant",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Tower of Fortunes",
+      "logical_rule_key": "battle_rule_v1:9a7bcabc5bca9aa104bb0a3f5ea10236",
+      "normalized_name": "tower of fortunes",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Treasure Trove",
+      "logical_rule_key": "battle_rule_v1:48c0a85f68e460bedab990f4bb7bb1d0",
+      "normalized_name": "treasure trove",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Tymora's Invoker",
+      "logical_rule_key": "battle_rule_v1:920a51315055df5f62bd25da436b160c",
+      "normalized_name": "tymora's invoker",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Alchemist's Apprentice",
+      "Arcane Encyclopedia",
+      "Archivist",
+      "Azure Mage",
+      "Benalish Heralds",
+      "Brass Secretary",
+      "Courier's Capsule",
+      "Eidolon of Philosophy",
+      "Font of Fortunes",
+      "Jayemdae Tome",
+      "Mystic Archaeologist",
+      "Oscorp Research Team",
+      "Scepter of Insight",
+      "Shore Keeper",
+      "Third Path Savant",
+      "Tower of Fortunes",
+      "Treasure Trove",
+      "Tymora's Invoker"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 18,
+    "total_target_card_rows": 18,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "48ab454b-f097-4c44-af1b-15c9b5e8ea4a",
+      "card_name": "Alchemist's Apprentice",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0f4e9dafa15405f1852de8425014b577",
+      "normalized_name": "alchemist's apprentice",
+      "oracle_hash": "dd3ca95027c843f456632af1084b25c0",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4d8b2042-dc74-4082-9d01-c5f46cac6ee4",
+      "card_name": "Arcane Encyclopedia",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ba94540dfd0f59b238cecc710a9789aa",
+      "normalized_name": "arcane encyclopedia",
+      "oracle_hash": "03d77a0f9756d8b399787045e5b6a07c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "d3a5621c-4fe5-4f8c-b6bd-a7b156e0f1e1",
+      "card_name": "Archivist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:aaea86161be817e03b11530e871ab769",
+      "normalized_name": "archivist",
+      "oracle_hash": "6ad25b0b8eb792cbf56daf5db3a324dc",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8bc7442f-7355-4510-bc7e-570ef315f6d9",
+      "card_name": "Azure Mage",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:2ed0ce2790a2e967163f2ab8d6cc87c1",
+      "normalized_name": "azure mage",
+      "oracle_hash": "eaa371b46ce50bcca207b3ab1aaee145",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4a9c83df-7ca9-46c8-b9d4-98a3d3166be7",
+      "card_name": "Benalish Heralds",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:abd1c0f34c739ff646806725283ab285",
+      "normalized_name": "benalish heralds",
+      "oracle_hash": "8c4b52de0b3d7a4a30116a40dcc51dd1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b993285d-40ba-4217-9814-80b90ed791fd",
+      "card_name": "Brass Secretary",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:28a7cd7002ca9aa3fe630b8ec2e2048e",
+      "normalized_name": "brass secretary",
+      "oracle_hash": "58b3ab5fcb26ea97fa4002c0f6801f2a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "fdb477df-70f6-415c-8986-ce188fbaa5fd",
+      "card_name": "Courier's Capsule",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:5df4f469f7fac9df6829018aeef3dc25",
+      "normalized_name": "courier's capsule",
+      "oracle_hash": "a83cb69e9d965c51c86d20a3cf71000f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "034746d4-9660-40df-9c54-44e6e4a693b0",
+      "card_name": "Eidolon of Philosophy",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f30f3647a1de209932e3f0f33798b6b1",
+      "normalized_name": "eidolon of philosophy",
+      "oracle_hash": "2e06f4a3fea3da4778a15be301d46a82",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "f04159a4-580a-4b47-8fcc-4f629039f3f1",
+      "card_name": "Font of Fortunes",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f61215643c97cdb929842f18b788da40",
+      "normalized_name": "font of fortunes",
+      "oracle_hash": "31f33bd82c8619556f32f5743936f5e5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1d33e5a9-8a63-4cdd-8bf9-8d2a958405e7",
+      "card_name": "Jayemdae Tome",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:12556dcec0ca3166cf1f52835a740a36",
+      "normalized_name": "jayemdae tome",
+      "oracle_hash": "b11a3becdc3a4b54b17853edf19d01a3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "77d11dcc-2ba8-450d-9398-bfcc36278883",
+      "card_name": "Mystic Archaeologist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3c4db60dba5c37274fb77c3905514ca6",
+      "normalized_name": "mystic archaeologist",
+      "oracle_hash": "0aea80511565148ed65fe30ed2e392b3",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "22b2f66f-dfec-45a3-a077-0d764b7db452",
+      "card_name": "Oscorp Research Team",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:ecda6bfc60502b13ee8f4ad0ccad351b",
+      "normalized_name": "oscorp research team",
+      "oracle_hash": "8d24b3d8144258d6e7637b1f848efb1e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "fc796a3c-81f5-4e76-bad5-9e23ed44f08a",
+      "card_name": "Scepter of Insight",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4b6716e6945934a79a86d232bc36617d",
+      "normalized_name": "scepter of insight",
+      "oracle_hash": "8c4b52de0b3d7a4a30116a40dcc51dd1",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "a0cea38e-1835-4ddd-829a-fa6113eb7b12",
+      "card_name": "Shore Keeper",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4df39c03086c2d4dea112101d116ae75",
+      "normalized_name": "shore keeper",
+      "oracle_hash": "abe02ad0b441587d7d87b3bed9425bcf",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "bf7d8142-a776-4839-9ee2-8b80192b01e0",
+      "card_name": "Third Path Savant",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:5b29442ca9f82ae1b3f4083df3955d93",
+      "normalized_name": "third path savant",
+      "oracle_hash": "8f1ba066b47db6b1d5cd92a5f78f475c",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "210eebf9-37c4-4cad-a4c8-7a93c3c3f36c",
+      "card_name": "Tower of Fortunes",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9a7bcabc5bca9aa104bb0a3f5ea10236",
+      "normalized_name": "tower of fortunes",
+      "oracle_hash": "d49110ff7a58107c66b921c87689f07e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "57a9f225-0162-4e5d-ac24-f7779c3137c4",
+      "card_name": "Treasure Trove",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:48c0a85f68e460bedab990f4bb7bb1d0",
+      "normalized_name": "treasure trove",
+      "oracle_hash": "2df113733c295948ebbeb16a586d9361",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "cc77326a-906e-43f0-9459-03ccd7f111d4",
+      "card_name": "Tymora's Invoker",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:920a51315055df5f62bd25da436b160c",
+      "normalized_name": "tymora's invoker",
+      "oracle_hash": "76dda8e747513aa2809e24dd42e4077b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_permanent_activated_draw_wave"
+}

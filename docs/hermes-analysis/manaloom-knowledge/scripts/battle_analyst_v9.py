@@ -27270,6 +27270,146 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             )
             return 1
 
+    simple_activated_draw_permanents = [
+        permanent
+        for permanent in player.battlefield
+        if isinstance(permanent, dict)
+        and permanent.get("activated_draw")
+        and not (
+            permanent.get("activated_self_sacrifice_draw")
+            or permanent.get("activated_draw_on_self_sacrifice")
+            or permanent.get("activation_requires_sacrifice")
+        )
+        and not permanent.get("utility_artifact_used_this_turn")
+    ]
+    if phase == "postcombat_main":
+        for permanent in simple_activated_draw_permanents:
+            activation_cost = adjusted_activated_ability_generic_cost(
+                player,
+                permanent,
+                int(permanent.get("activation_cost_generic") or 0),
+            )
+            activation_cost_text = permanent.get("activation_cost_mana") or _activation_cost_text(
+                activation_cost,
+                permanent.get("activation_cost_colors") or [],
+            )
+            if permanent.get("activation_requires_tap") and permanent.get("tapped"):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "permanent_already_tapped_for_activated_draw",
+                    phase=phase,
+                )
+                continue
+            if (
+                permanent.get("activation_requires_tap")
+                and is_battlefield_creature(permanent)
+                and permanent.get("summoning_sick")
+            ):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "creature_summoning_sick_for_activated_draw",
+                    phase=phase,
+                )
+                continue
+            if not player.library:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "no_library_for_activated_draw",
+                    phase=phase,
+                )
+                continue
+            max_hand_size = int(permanent.get("activated_draw_max_hand_size") or 2)
+            if hand_size > max_hand_size:
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "hand_not_low_enough_for_activated_draw",
+                    phase=phase,
+                )
+                continue
+            if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "failed_to_pay_activated_draw_cost",
+                    phase=phase,
+                )
+                continue
+            if permanent.get("activation_requires_tap"):
+                permanent["tapped"] = True
+            permanent["utility_artifact_used_this_turn"] = True
+            draw_count = int(
+                permanent.get("activated_draw_count")
+                or permanent.get("draw_count")
+                or permanent.get("count")
+                or 1
+            )
+            drawn = player.draw(draw_count, rng)
+            emit_decision_trace(
+                decision_type="utility_permanent_activation",
+                player=player,
+                turn=turn,
+                phase=phase,
+                available_options=[
+                    decision_card_option(
+                        permanent,
+                        action="activate_draw",
+                        effect=permanent.get("effect", "draw_engine"),
+                        score=22 + len(drawn) * 4,
+                    )
+                ],
+                chosen_option=decision_card_option(
+                    permanent,
+                    action="activate_draw",
+                    effect=permanent.get("effect", "draw_engine"),
+                    score=22 + len(drawn) * 4,
+                ),
+                score_components={
+                    "activation_cost": activation_cost_text,
+                    "cards_drawn": len(drawn),
+                    "hand_before": hand_size,
+                    "hand_after": len(player.hand),
+                    "tapped": bool(permanent.get("activation_requires_tap")),
+                },
+                rule_source="simple_activated_draw_permanent_v1",
+                rule_status=permanent.get("_rule_review_status", "active"),
+                confidence="medium",
+                expected_benefit_score=22 + len(drawn) * 4,
+                reason="convert_idle_permanent_activation_into_card_flow",
+                strategic_principle="use a safe activated draw permanent when hand size is low",
+                heuristic_version=DECISION_STRATEGY_VERSION,
+                resource_delta={
+                    "cards": len(drawn),
+                    "mana": -activation_cost,
+                    "tapped": 1 if permanent.get("activation_requires_tap") else 0,
+                },
+                risk_flags=["activated_draw"],
+            )
+            emit_replay_event(
+                "utility_artifact_activated",
+                player=player.name,
+                card=permanent.get("name", "?"),
+                activation_kind="simple_activated_draw",
+                mana_paid=activation_cost,
+                activation_cost=activation_cost_text,
+                cards_drawn=len(drawn),
+                hand_before=hand_size,
+                hand_after=len(player.hand),
+                tapped=bool(permanent.get("tapped")),
+                phase=phase,
+                turn=turn,
+                **replay_rule_fields(permanent),
+            )
+            return 1
+
     self_sacrifice_draw_artifacts = [
         permanent
         for permanent in player.battlefield
@@ -27290,12 +27430,29 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             permanent,
             int(permanent.get("activation_cost_generic") or 1),
         )
+        activation_cost_text = permanent.get("activation_cost_mana") or _activation_cost_text(
+            activation_cost,
+            permanent.get("activation_cost_colors") or [],
+        )
         if permanent.get("activation_requires_tap") and permanent.get("tapped"):
             _utility_artifact_skip_event(
                 player,
                 permanent,
                 turn,
                 "artifact_already_tapped_for_self_sacrifice_draw",
+                phase=phase,
+            )
+            continue
+        if (
+            permanent.get("activation_requires_tap")
+            and is_battlefield_creature(permanent)
+            and permanent.get("summoning_sick")
+        ):
+            _utility_artifact_skip_event(
+                player,
+                permanent,
+                turn,
+                "creature_summoning_sick_for_self_sacrifice_draw",
                 phase=phase,
             )
             continue
@@ -27317,7 +27474,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 phase=phase,
             )
             continue
-        if player.available_mana() < activation_cost:
+        if not player.can_pay(activation_cost_text):
             _utility_artifact_skip_event(
                 player,
                 permanent,
@@ -27326,7 +27483,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 phase=phase,
             )
             continue
-        if not player.spend_mana("{%d}" % activation_cost):
+        if not player.spend_mana(activation_cost_text):
             _utility_artifact_skip_event(
                 player,
                 permanent,
@@ -27368,6 +27525,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             ),
             score_components={
                 "activation_cost_generic": activation_cost,
+                "activation_cost": activation_cost_text,
                 "cards_drawn": len(drawn),
                 "hand_before": hand_size,
                 "hand_after": len(player.hand),
@@ -27393,6 +27551,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             card=permanent.get("name", "?"),
             activation_kind="self_sacrifice_draw",
             mana_paid=activation_cost,
+            activation_cost=activation_cost_text,
             cards_drawn=len(drawn),
             hand_before=hand_size,
             hand_after=len(player.hand),
