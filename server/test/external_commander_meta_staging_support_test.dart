@@ -6,6 +6,11 @@ import 'package:test/test.dart';
 import '../lib/meta/external_commander_meta_candidate_support.dart';
 import '../lib/meta/external_commander_meta_staging_support.dart';
 
+const _stage2ExpansionArtifactPath =
+    'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json';
+const _stage2ValidationArtifactPath =
+    'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json';
+
 void main() {
   group('ExternalCommanderMetaStagingConfig.parse', () {
     test('usa dry-run por padrao', () {
@@ -56,12 +61,8 @@ void main() {
 
   group('buildExternalCommanderMetaStagingPlan', () {
     test('converte fixture stage2 em candidatos staged', () {
-      final expansionArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-      );
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final expansionArtifact = _readArtifact(_stage2ExpansionArtifactPath);
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
       final plan = buildExternalCommanderMetaStagingPlan(
         expansionArtifact: expansionArtifact,
         validationArtifact: validationArtifact,
@@ -117,16 +118,12 @@ void main() {
     });
 
     test('bloqueia validation_profile fora do stage2', () {
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
       validationArtifact['validation_profile'] = 'generic';
 
       expect(
         () => buildExternalCommanderMetaStagingPlan(
-          expansionArtifact: _readArtifact(
-            'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-          ),
+          expansionArtifact: _readArtifact(_stage2ExpansionArtifactPath),
           validationArtifact: validationArtifact,
           importedBy: 'fixture_stage2',
         ),
@@ -141,16 +138,12 @@ void main() {
     });
 
     test('bloqueia validation artifact com rejected_count > 0', () {
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
       validationArtifact['rejected_count'] = 1;
 
       expect(
         () => buildExternalCommanderMetaStagingPlan(
-          expansionArtifact: _readArtifact(
-            'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-          ),
+          expansionArtifact: _readArtifact(_stage2ExpansionArtifactPath),
           validationArtifact: validationArtifact,
           importedBy: 'fixture_stage2',
         ),
@@ -165,12 +158,8 @@ void main() {
     });
 
     test('bloqueia collection_method e source_context ausentes', () {
-      final expansionArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-      );
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final expansionArtifact = _readArtifact(_stage2ExpansionArtifactPath);
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
       final candidate = (expansionArtifact['candidates'] as List<dynamic>).first
           as Map<String, dynamic>;
       candidate['research_payload'] = <String, dynamic>{};
@@ -192,12 +181,8 @@ void main() {
     });
 
     test('bloqueia is_commander_legal=false', () {
-      final expansionArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-      );
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final expansionArtifact = _readArtifact(_stage2ExpansionArtifactPath);
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
       final candidate = (expansionArtifact['candidates'] as List<dynamic>).first
           as Map<String, dynamic>;
       candidate['is_commander_legal'] = false;
@@ -219,12 +204,8 @@ void main() {
     });
 
     test('deduplica por source_url mantendo o ultimo resultado aceito', () {
-      final expansionArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-      );
-      final validationArtifact = _readArtifact(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      );
+      final expansionArtifact = _readArtifact(_stage2ExpansionArtifactPath);
+      final validationArtifact = _readArtifact(_stage2ValidationArtifactPath);
 
       final duplicateCandidate = jsonDecode(
         jsonEncode((expansionArtifact['candidates'] as List<dynamic>).first),
@@ -262,9 +243,21 @@ void main() {
         'Duplicate Winner',
       );
     });
-  });
+  },
+      skip: _missingArtifactsSkip(
+        const <String>[
+          _stage2ExpansionArtifactPath,
+          _stage2ValidationArtifactPath,
+        ],
+      ));
 }
 
 Map<String, dynamic> _readArtifact(String path) {
   return decodeExternalCommanderMetaArtifact(File(path).readAsStringSync());
+}
+
+String? _missingArtifactsSkip(List<String> paths) {
+  final missing = paths.where((path) => !File(path).existsSync()).toList();
+  if (missing.isEmpty) return null;
+  return 'Fixture artifact absent: ${missing.join(', ')}';
 }
