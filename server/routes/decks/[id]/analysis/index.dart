@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
@@ -473,6 +474,12 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         functionalSummary: functionalSummary,
         hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
       ),
+      'commander_contract': _buildCommanderContractSummary(
+        format: format,
+        totalCards: totalCards,
+        cards: cards,
+        issues: issues,
+      ),
       'meta_analysis': metaAnalysis,
       'mana_curve':
           manaCurve.map((key, value) => MapEntry(key.toString(), value)),
@@ -489,6 +496,96 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       body: {'error': 'Failed to analyze deck'},
     );
   }
+}
+
+Map<String, dynamic> _buildCommanderContractSummary({
+  required String format,
+  required int totalCards,
+  required List<Map<String, dynamic>> cards,
+  required List<Map<String, dynamic>> issues,
+}) {
+  final normalizedFormat = format.toLowerCase().trim();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+
+  if (!isCommander) {
+    final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+      format: format,
+      generatedDeck: const {
+        'commander': '',
+        'cards': <Map<String, dynamic>>[],
+      },
+      validationSummary: const {
+        'is_valid': true,
+        'invalid_cards': <String>[],
+        'errors': <String>[],
+        'warnings': <String>[],
+      },
+      battleGateRequired: false,
+    );
+    return buildCommanderDeckbuildingAppSummary(
+      diagnostics,
+      totalCards: totalCards,
+      commanderCount: 0,
+    );
+  }
+
+  final commanderCards =
+      cards.where((card) => card['is_commander'] == true).toList();
+  final commanderCount = commanderCards.fold<int>(
+    0,
+    (sum, card) => sum + _quantity(card),
+  );
+  final commanderName = commanderCards.isEmpty
+      ? ''
+      : commanderCards.first['name']?.toString().trim() ?? '';
+  final errors = issues
+      .where((issue) => issue['type']?.toString() == 'error')
+      .map((issue) => issue['message']?.toString().trim() ?? '')
+      .where((message) => message.isNotEmpty)
+      .toList();
+  final warnings = issues
+      .where((issue) => issue['type']?.toString() == 'warning')
+      .map((issue) => issue['message']?.toString().trim() ?? '')
+      .where((message) => message.isNotEmpty)
+      .toList();
+
+  if (commanderCount <= 0) errors.add('Commander missing.');
+  if (totalCards != 100) {
+    errors.add('Commander decks must have exactly 100 cards.');
+  }
+
+  final generatedCards = cards
+      .where((card) => card['is_commander'] != true)
+      .map(
+        (card) => {
+          'name': card['name']?.toString() ?? '',
+          'quantity': _quantity(card),
+        },
+      )
+      .where((card) => card['name']?.toString().trim().isNotEmpty == true)
+      .toList(growable: false);
+
+  final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+    format: format,
+    generatedDeck: {
+      'commander': {'name': commanderName},
+      'cards': generatedCards,
+    },
+    validationSummary: {
+      'is_valid': errors.isEmpty,
+      'invalid_cards': const <String>[],
+      'errors': errors,
+      'warnings': warnings,
+    },
+    battleGateRequired: true,
+  );
+
+  return buildCommanderDeckbuildingAppSummary(
+    diagnostics,
+    totalCards: totalCards,
+    commanderCount: commanderCount,
+  );
 }
 
 Map<String, dynamic> _buildDeckReadinessSummary({

@@ -175,6 +175,32 @@ void main() {
           'reference_corpus_packages',
         ]),
       );
+
+      final appSummary = buildCommanderDeckbuildingAppSummary(
+        diagnostics,
+        totalCards: 100,
+        commanderCount: 1,
+      );
+      expect(
+        appSummary['schema_version'],
+        commanderDeckbuildingAppSummaryVersion,
+      );
+      expect(appSummary['status_label'], 'Pronto para battle gate');
+      expect(appSummary['commander_name'], 'Lorehold, the Historian');
+      expect((appSummary['battle_gate'] as Map)['status'], 'pending');
+      expect((appSummary['gates'] as Map)['has_reference_lane'], isTrue);
+
+      final appSourceLanes = appSummary['source_lanes'] as List;
+      final referenceStats = appSourceLanes.cast<Map>().firstWhere(
+            (lane) => lane['key'] == 'reference_card_stats',
+          );
+      expect(referenceStats['available'], isTrue);
+      expect(referenceStats['count'], 2);
+      expect(appSummary['planning_flow'], isA<List>());
+      expect(
+        (appSummary['planning_flow'] as List).cast<Map>().first['label'],
+        'Legalidade e faixa de poder',
+      );
     });
 
     test('blocks invalid commander output without reference lanes', () {
@@ -198,6 +224,22 @@ void main() {
       expect(diagnostics['blockers'], contains('validation_failed'));
       expect(diagnostics['blockers'], contains('unresolved_cards_present'));
       expect(diagnostics['blockers'], contains('reference_lanes_missing'));
+
+      final appSummary = buildCommanderDeckbuildingAppSummary(diagnostics);
+      expect(appSummary['status'], 'blocked');
+      expect(
+        appSummary['summary'],
+        'Faltam fontes do comandante antes de chamar o deck de ideal.',
+      );
+      expect((appSummary['gates'] as Map)['has_reference_lane'], isFalse);
+      expect(
+        appSummary['blockers'],
+        containsAll([
+          'commander_missing',
+          'reference_lanes_missing',
+          'validation_failed',
+        ]),
+      );
     });
   });
 }

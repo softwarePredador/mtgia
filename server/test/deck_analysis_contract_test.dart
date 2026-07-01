@@ -132,6 +132,7 @@ void main() {
         expect(body['readiness'], isA<Map<String, dynamic>>());
         expect(body['battle_readiness'], isA<Map<String, dynamic>>());
         expect(body['understanding_summary'], isA<Map<String, dynamic>>());
+        expect(body['commander_contract'], isA<Map<String, dynamic>>());
         expect(body['mana_curve'], isA<Map<String, dynamic>>());
         expect(body['color_distribution'], isA<Map<String, dynamic>>());
         expect(body['legality'], isA<Map<String, dynamic>>());
@@ -141,6 +142,8 @@ void main() {
             body['battle_readiness'] as Map<String, dynamic>;
         final understanding =
             body['understanding_summary'] as Map<String, dynamic>;
+        final commanderContract =
+            body['commander_contract'] as Map<String, dynamic>;
 
         expect(readiness['schema_version'], isA<String>());
         expect(readiness['status'], isA<String>());
@@ -151,6 +154,11 @@ void main() {
         expect(understanding['schema_version'], isA<String>());
         expect(understanding['source'], isA<String>());
         expect(understanding['total_copies'], isA<int>());
+        expect(commanderContract['schema_version'], isA<String>());
+        expect(commanderContract['status'], isA<String>());
+        expect(commanderContract['is_commander_applicable'], isA<bool>());
+        expect(commanderContract['battle_gate'], isA<Map<String, dynamic>>());
+        expect(commanderContract['planning_flow'], isA<List>());
       },
       skip: skipIntegration,
     );

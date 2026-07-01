@@ -61,6 +61,36 @@ const commanderDeckOverviewRequiredFields = [
   'known_risks_and_validation_status',
 ];
 
+const commanderDeckbuildingAppSummaryVersion =
+    'commander_contract_summary_v1_2026-07-01';
+
+const _planningFlowLabels = <String, String>{
+  'format_legality_and_power_bracket': 'Legalidade e faixa de poder',
+  'commander_intent_and_archetype': 'Plano do comandante',
+  'primary_and_backup_win_plan': 'Plano principal e reserva',
+  'mana_foundation_and_curve': 'Base de mana e curva',
+  'card_flow_and_resource_engine': 'Compra e motor de recursos',
+  'interaction_protection_and_resilience': 'Interação e proteção',
+  'commander_specific_packages': 'Pacotes específicos',
+  'combo_synergy_and_finishers': 'Combos e finalizadores',
+  'reference_corpus_and_learned_usage': 'Fontes e decks aprendidos',
+  'lane_balanced_cuts_and_anchor_protection': 'Cortes por função',
+  'goldfish_battle_replay_iteration': 'Battle gate e iteração',
+};
+
+const _overviewFieldLabels = <String, String>{
+  'commander_plan_sentence': 'Frase do plano',
+  'power_bracket_target': 'Faixa de poder',
+  'primary_win_lines': 'Linhas de vitória',
+  'backup_win_lines': 'Plano reserva',
+  'role_counts_vs_targets': 'Funções versus alvo',
+  'mana_curve_and_sources': 'Curva e fontes de mana',
+  'package_lanes_with_key_cards': 'Pacotes e cartas-chave',
+  'source_provenance_by_anchor': 'Origem dos pilares',
+  'protected_anchors_and_cut_rules': 'Pilares protegidos',
+  'known_risks_and_validation_status': 'Riscos e validação',
+};
+
 Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   required String format,
   required Map<String, dynamic> generatedDeck,
@@ -259,6 +289,70 @@ Map<String, dynamic> buildCommanderDeckbuildingContractDiagnostics({
   };
 }
 
+Map<String, dynamic> buildCommanderDeckbuildingAppSummary(
+  Map<String, dynamic> diagnostics, {
+  int? totalCards,
+  int? commanderCount,
+}) {
+  final status = diagnostics['status']?.toString() ?? 'unknown';
+  final gates = _mapValue(diagnostics['gates']);
+  final sourceLanes = _mapValue(diagnostics['source_lanes']);
+  final planningFlow = _stringList(diagnostics['planning_flow']);
+  final overviewFields =
+      _stringList(diagnostics['deck_overview_required_fields']);
+  final blockers = _stringList(diagnostics['blockers']);
+  final warnings = _stringList(diagnostics['warnings']);
+  final nextActions = _stringList(diagnostics['next_actions']);
+  final isApplicable = status != 'not_applicable';
+
+  return {
+    'schema_version': commanderDeckbuildingAppSummaryVersion,
+    'source_version': diagnostics['version']?.toString() ?? '',
+    'status': status,
+    'status_label': _contractStatusLabel(status),
+    'is_commander_applicable': isApplicable,
+    'commander_name': diagnostics['commander_name']?.toString() ?? '',
+    if (totalCards != null) 'total_cards': totalCards,
+    if (commanderCount != null) 'commander_count': commanderCount,
+    'summary': _contractSummaryText(status, blockers),
+    'battle_gate': {
+      'required': gates['battle_gate_required'] == true,
+      'status': gates['battle_gate_status']?.toString() ?? 'unknown',
+      'label': _battleGateLabel(gates['battle_gate_status']?.toString()),
+    },
+    'gates': {
+      'commander_present': gates['commander_present'] == true,
+      'validation_valid': gates['validation_valid'] == true,
+      'unresolved_cards_zero': gates['unresolved_cards_zero'] == true,
+      'has_reference_lane': gates['has_any_reference_lane'] == true,
+      'deterministic_reference_ready':
+          gates['deterministic_reference_ready'] == true,
+    },
+    'source_lanes': _sourceLaneSummaries(sourceLanes),
+    'planning_flow': planningFlow
+        .map(
+          (step) => {
+            'key': step,
+            'label': _planningFlowLabels[step] ?? step,
+          },
+        )
+        .toList(growable: false),
+    'overview_fields': overviewFields
+        .map(
+          (field) => {
+            'key': field,
+            'label': _overviewFieldLabels[field] ?? field,
+          },
+        )
+        .toList(growable: false),
+    'blockers': blockers,
+    'warnings': warnings,
+    'next_actions': nextActions,
+    'disclaimer':
+        'Plano do comandante indica prontidao de deckbuilding; nao promove deck sem battle gate e evidencia de uso.',
+  };
+}
+
 Map<String, Set<String>> _buildSourceSets({
   required Map<String, dynamic>? referenceProfile,
   required List<CommanderReferenceCardStat> referenceCardStats,
@@ -372,6 +466,115 @@ List<Map<String, dynamic>> _cardSourceSample(
     });
   }
   return sample;
+}
+
+List<Map<String, dynamic>> _sourceLaneSummaries(Map<String, dynamic> lanes) {
+  return [
+    {
+      'key': 'reference_profile',
+      'label': 'Perfil do comandante',
+      'available': lanes['reference_profile_used'] == true,
+      if (lanes['reference_profile_confidence'] != null)
+        'detail': 'Confiança ${lanes['reference_profile_confidence']}',
+    },
+    {
+      'key': 'reference_card_stats',
+      'label': 'Estatísticas de cartas',
+      'available': _intValue(lanes['reference_card_stats_resolved_count']) > 0,
+      'count': _intValue(lanes['reference_card_stats_resolved_count']),
+    },
+    {
+      'key': 'reference_corpus',
+      'label': 'Corpus público',
+      'available': lanes['reference_corpus_used'] == true,
+      if (lanes['reference_corpus_accepted_deck_count'] != null)
+        'count': _intValue(lanes['reference_corpus_accepted_deck_count']),
+    },
+    {
+      'key': 'active_learned_deck',
+      'label': 'Deck aprendido',
+      'available': lanes['active_learned_deck_used'] == true,
+    },
+    {
+      'key': 'usage_hot_cards',
+      'label': 'Uso local',
+      'available': _intValue(lanes['usage_hot_cards_count']) > 0,
+      'count': _intValue(lanes['usage_hot_cards_count']),
+    },
+  ];
+}
+
+String _contractStatusLabel(String status) {
+  switch (status) {
+    case 'ready_for_battle_gate':
+      return 'Pronto para battle gate';
+    case 'ready':
+      return 'Plano pronto';
+    case 'blocked':
+      return 'Plano bloqueado';
+    case 'not_applicable':
+      return 'Fora de Commander';
+    default:
+      return 'Plano sem leitura';
+  }
+}
+
+String _contractSummaryText(String status, List<String> blockers) {
+  if (status == 'ready_for_battle_gate') {
+    return 'Estrutura e fontes suficientes; falta validar em battle gate igualado.';
+  }
+  if (status == 'ready') {
+    return 'Plano do comandante pronto para revisão.';
+  }
+  if (status == 'not_applicable') {
+    return 'Este contrato se aplica apenas a decks Commander.';
+  }
+  if (blockers.contains('reference_lanes_missing')) {
+    return 'Faltam fontes do comandante antes de chamar o deck de ideal.';
+  }
+  if (blockers.contains('validation_failed')) {
+    return 'Corrija estrutura, legalidade e resolução antes do plano avançado.';
+  }
+  if (blockers.contains('commander_missing')) {
+    return 'Defina o comandante antes de avaliar o plano.';
+  }
+  return 'Plano bloqueado por gates pendentes.';
+}
+
+String _battleGateLabel(String? status) {
+  switch (status) {
+    case 'pending':
+      return 'Pendente';
+    case 'not_required':
+      return 'Não requerido';
+    case 'passed':
+      return 'Aprovado';
+    case 'failed':
+      return 'Reprovado';
+    default:
+      return 'Sem leitura';
+  }
+}
+
+Map<String, dynamic> _mapValue(Object? value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return value.cast<String, dynamic>();
+  return const <String, dynamic>{};
+}
+
+List<String> _stringList(Object? value) {
+  if (value is! Iterable) return const <String>[];
+  return value
+      .map((item) => item?.toString().trim())
+      .whereType<String>()
+      .where((item) => item.isNotEmpty)
+      .toList(growable: false);
+}
+
+int _intValue(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
 }
 
 String _commanderName(Map<String, dynamic> generatedDeck) {
