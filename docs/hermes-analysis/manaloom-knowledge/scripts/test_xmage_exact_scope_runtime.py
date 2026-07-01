@@ -3261,6 +3261,118 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_graveyard_recursion_returns_subtype_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Barrow Witches", "type_line": "Creature - Human Warlock"}
+        active.battlefield.append(permanent)
+        active.graveyard.extend(
+            [
+                {"name": "Target Soldier", "type_line": "Creature - Human Soldier", "cmc": 2},
+                {"name": "Target Knight", "type_line": "Creature - Human Knight", "cmc": 3},
+            ]
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "knight_card",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "subtypes": ["knight"]},
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=11,
+            rng=random.Random(11),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Knight"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Soldier"])
+
+    def test_creature_etb_graveyard_recursion_respects_artifact_mana_value_limit(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Leonin Squire", "type_line": "Creature - Cat Soldier"}
+        active.battlefield.append(permanent)
+        active.graveyard.extend(
+            [
+                {"name": "Large Relic", "type_line": "Artifact", "cmc": 2},
+                {"name": "Small Relic", "type_line": "Artifact", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "artifact",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "etb_recursion_mana_value_max": 1,
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact"],
+                "mana_value_max": 1,
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=12,
+            rng=random.Random(12),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Small Relic"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Large Relic"])
+
+    def test_creature_etb_graveyard_recursion_returns_food_or_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Ragamuffin Raptor", "type_line": "Creature - Dinosaur"}
+        active.battlefield.append(permanent)
+        active.graveyard.extend(
+            [
+                {"name": "Target Food", "type_line": "Artifact - Food", "cmc": 1},
+                {"name": "Target Spell", "type_line": "Instant", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "creature_or_food",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "any_of": [{"card_types": ["creature"]}, {"subtypes": ["food"]}],
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=13,
+            rng=random.Random(13),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Food"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Spell"])
+
     def test_add_plus_one_counter_spell_buffs_own_best_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -33987,6 +33987,10 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "zombie" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("pirate_card", "pirate"):
         return "pirate" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("knight_card", "knight"):
+        return "knight" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("mercenary_card", "mercenary"):
+        return "mercenary" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("human_creature", "human"):
         return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
@@ -34028,6 +34032,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "artifact" in type_line or is_creature_card(card)
     if target in ("creature_or_enchantment", "creature_enchantment", "creature_or_enchantment_card"):
         return is_creature_card(card) or "enchantment" in type_line
+    if target in ("creature_or_food", "creature_food", "creature_or_food_card"):
+        return is_creature_card(card) or "food" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("artifact_creature", "artifact_creature_card"):
         return "artifact" in type_line and is_creature_card(card)
     if target in ("noncreature_nonland", "noncreature_nonland_card"):

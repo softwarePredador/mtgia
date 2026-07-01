@@ -68,6 +68,11 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "exiles_self": False,
             "mode_selection": "one_or_both",
             "recursion_mana_value_max": 3,
+            "etb_recursion_target": "artifact",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "etb_recursion_up_to_count": False,
+            "etb_recursion_mana_value_max": 1,
             "recursion_components": [
                 {
                     "target": "creature",
@@ -99,6 +104,11 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "exiles_self": False,
             "mode_selection": "one_or_both",
             "recursion_mana_value_max": 3,
+            "etb_recursion_target": "artifact",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "etb_recursion_up_to_count": False,
+            "etb_recursion_mana_value_max": 1,
             "recursion_components": [
                 {
                     "target": "creature",

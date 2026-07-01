@@ -779,6 +779,10 @@ def recursion_target_constraints_for(
         constraints["subtypes"] = ["zombie"]
     elif target == "pirate_card":
         constraints["subtypes"] = ["pirate"]
+    elif target == "knight_card":
+        constraints["subtypes"] = ["knight"]
+    elif target == "mercenary_card":
+        constraints["subtypes"] = ["mercenary"]
     elif target == "shared_creature_type":
         constraints["card_types"] = ["creature"]
         constraints["shared_subtype_group"] = "creature_type"
@@ -803,6 +807,11 @@ def recursion_target_constraints_for(
         constraints["card_types"] = ["artifact", "creature"]
     elif target == "creature_or_enchantment":
         constraints["card_types"] = ["creature", "enchantment"]
+    elif target == "creature_or_food":
+        constraints["any_of"] = [
+            {"card_types": ["creature"]},
+            {"subtypes": ["food"]},
+        ]
     elif target == "artifact_creature":
         constraints["card_types"] = ["artifact", "creature"]
         constraints["all_card_types_required"] = True
@@ -3041,15 +3050,18 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
     return None
 
 
-def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
-    text = oracle_text_after_leading_static_keywords(metadata)
+def etb_recursion_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     target_patterns: list[tuple[str, str]] = [
-        ("instant_or_sorcery", r"instant or sorcery"),
+        ("instant_or_sorcery", r"instant (?:or|and/or) sorcery"),
         ("artifact_or_enchantment", r"artifact or enchantment"),
         ("artifact_or_creature", r"artifact or creature"),
         ("creature_or_enchantment", r"creature or enchantment"),
+        ("creature_or_food", r"creature or food"),
         ("artifact_creature", r"artifact creature"),
         ("noncreature_nonland", r"noncreature, nonland"),
+        ("knight_card", r"knight"),
+        ("mercenary_card", r"mercenary"),
         ("permanent", r"permanent"),
         ("creature", r"creature"),
         ("artifact", r"artifact"),
@@ -3059,19 +3071,62 @@ def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, in
         ("land", r"land"),
         ("any_card", r"card"),
     ]
-    for target_type, target_phrase in target_patterns:
-        if re.match(
-            rf"^when this creature enters(?: the battlefield)?, (?:you may )?"
-            rf"return target {target_phrase} card from your graveyard to your hand\.?$",
-            text,
-        ):
-            return target_type, 1, False
-        if re.match(
-            rf"^when this creature enters(?: the battlefield)?, (?:you may )?"
-            rf"return up to two target {target_phrase} cards from your graveyard to your hand\.?$",
-            text,
-        ):
-            return target_type, 2, True
+    for target_type, pattern in target_patterns:
+        if re.fullmatch(pattern, normalized):
+            return target_type
+    return None
+
+
+def word_count_value(value: str) -> int | None:
+    normalized = str(value or "").strip().lower()
+    if normalized == "one":
+        return 1
+    if normalized == "two":
+        return 2
+    if normalized.isdigit():
+        return int(normalized)
+    return None
+
+
+def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, (?:you may )?"
+    mana_value_match = re.match(
+        trigger_prefix
+        + r"return target (?P<phrase>.+?) card with (?:mana value|converted mana cost) "
+        r"(?P<mana_value_max>\d+) or less from your graveyard to your hand\.?$",
+        text,
+    )
+    if mana_value_match:
+        target_type = etb_recursion_target_from_phrase(mana_value_match.group("phrase"))
+        if target_type is None:
+            return None
+        return {
+            "target": target_type,
+            "count": 1,
+            "up_to_count": False,
+            "mana_value_max": int(mana_value_match.group("mana_value_max")),
+        }
+    single_match = re.match(
+        trigger_prefix
+        + r"return target (?P<phrase>.+?) card from your graveyard to your hand\.?$",
+        text,
+    )
+    if single_match:
+        target_type = etb_recursion_target_from_phrase(single_match.group("phrase"))
+        if target_type is not None:
+            return {"target": target_type, "count": 1, "up_to_count": False}
+    up_to_match = re.match(
+        trigger_prefix
+        + r"return up to (?P<count>one|two|\d+) target (?P<phrase>.+?) cards? "
+        r"from your graveyard to your hand\.?$",
+        text,
+    )
+    if up_to_match:
+        target_type = etb_recursion_target_from_phrase(up_to_match.group("phrase"))
+        count = word_count_value(up_to_match.group("count"))
+        if target_type is not None and count is not None:
+            return {"target": target_type, "count": count, "up_to_count": True}
     return None
 
 
@@ -4538,7 +4593,9 @@ def split_row(
         target = etb_recursion_to_hand_from_oracle(metadata)
         if target is None:
             return None, "etb_recursion_target_not_supported"
-        target_type, count, up_to = target
+        target_type = str(target["target"])
+        count = int(target["count"])
+        mana_value_max = target.get("mana_value_max")
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_RECURSION_CREATURE_SCOPE,
@@ -4547,17 +4604,22 @@ def split_row(
             "etb_recursion_target": target_type,
             "etb_recursion_count": count,
             "etb_recursion_destination": "hand",
-            "target_constraints": recursion_target_constraints_for(target_type),
+            "target_constraints": recursion_target_constraints_for(
+                target_type,
+                mana_value_max=mana_value_max,
+            ),
             "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        if mana_value_max is not None:
+            effect_json["etb_recursion_mana_value_max"] = mana_value_max
         keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         if keyword_list:
             effect_json["keywords"] = keyword_list
             effect_json["_keywords_are_self"] = True
             for keyword in keyword_list:
                 effect_json[keyword] = True
-        if up_to:
+        if target.get("up_to_count"):
             effect_json["etb_recursion_up_to_count"] = True
         return build_proposal(
             row,

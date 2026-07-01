@@ -3745,6 +3745,144 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
         )
 
+    def test_creature_etb_recursion_maps_subtype_card_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Barrow Witches",
+                type_line="Creature - Human Warlock",
+                oracle_text="When Barrow Witches enters the battlefield, return target Knight card from your graveyard to your hand.",
+            ),
+            source_text="""
+                filter.add(SubType.KNIGHT.getPredicate());
+                Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect());
+                ability.addTarget(new TargetCardInYourGraveyard(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "knight_card")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "subtypes": ["knight"]},
+        )
+
+    def test_creature_etb_recursion_maps_artifact_mana_value_limit(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Leonin Squire",
+                type_line="Creature - Cat Soldier",
+                oracle_text=(
+                    "When Leonin Squire enters the battlefield, return target artifact card "
+                    "with converted mana cost 1 or less from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 2));
+                Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect());
+                ability.addTarget(new TargetCardInYourGraveyard(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "artifact")
+        self.assertEqual(effect["etb_recursion_mana_value_max"], 1)
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact"],
+                "mana_value_max": 1,
+            },
+        )
+
+    def test_creature_etb_recursion_maps_instant_and_or_sorcery_up_to_two(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Scholar of the Ages",
+                type_line="Creature - Human Wizard",
+                oracle_text=(
+                    "When Scholar of the Ages enters the battlefield, return up to two target "
+                    "instant and/or sorcery cards from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect());
+                ability.addTarget(new TargetCardInYourGraveyard(0, 2, filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "instant_or_sorcery")
+        self.assertEqual(effect["etb_recursion_count"], 2)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+
+    def test_creature_etb_recursion_maps_creature_or_food_up_to_one(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ragamuffin Raptor",
+                type_line="Creature - Dinosaur",
+                oracle_text="When this creature enters, return up to one target creature or Food card from your graveyard to your hand.",
+            ),
+            source_text="""
+                filter.add(Predicates.or(CardType.CREATURE.getPredicate(), SubType.FOOD.getPredicate()));
+                Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect());
+                ability.addTarget(new TargetCardInYourGraveyard(0, 1, filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "creature_or_food")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "any_of": [
+                    {"card_types": ["creature"]},
+                    {"subtypes": ["food"]},
+                ],
+            },
+        )
+
     def test_creature_etb_recursion_preserves_static_keywords(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
