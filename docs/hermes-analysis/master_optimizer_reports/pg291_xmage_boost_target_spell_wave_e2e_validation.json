@@ -1,0 +1,1490 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T09:21:57.865274+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg291_xmage_boost_target_spell_wave_manifest.json",
+  "package_id": "pg291_xmage_boost_target_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 42
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Aegis of the Heavens",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3626c8f019c888b932001f7d19dbd360",
+          "oracle_hash": "ded1059e4357288e90ad9eb4edbbc976",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Antagonize",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e",
+          "oracle_hash": "536d078a076180a38cf3f87e757e67b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Auger Spree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:359b5c5feb2fbef7c7b7bd2a182514fd",
+          "oracle_hash": "7340faa8e0bbbb47ec4432513c0d5a1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Brute Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+          "oracle_hash": "0b8eb31e232445888db4bfea87b919d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Bull Rush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02",
+          "oracle_hash": "bd41752c77cacf1d6cd6efa811a45cb8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Dark Deed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Dark Remedy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:075fc4adb6e05e9d41f5598acd1b88fe",
+          "oracle_hash": "f448a7794aea7d3dbf1a391edc9cb089",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Demon's Grasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ab924787bbb2f0fa3e5dea858eefd2b",
+          "oracle_hash": "5821e858fce67fcc5fca95b54ec6627b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Disfigure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+          "oracle_hash": "60256c4367fae9881f1f577b634fac3b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Disorient",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ad1092de9a066aa1a0b795663bcb2be",
+          "oracle_hash": "d84b269b087d38b2e4c97b9844f22c38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Eyes of the Beholder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49f6106c783196df050e7f80372eae87",
+          "oracle_hash": "465076373f12bb82421443841f24da02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Fatal Fumes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6940f544c8d8cc34b752b43292e5cde7",
+          "oracle_hash": "dcf137318f208ba6647c6472e342a1f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Feral Roar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Fists of the Anvil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d314687bd4e273c6d0c846d53127c97",
+          "oracle_hash": "148b4a249e421fe7df6b87153b695553",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Flatten",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Flowstone Infusion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+          "oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Giant Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+          "oracle_hash": "0b8eb31e232445888db4bfea87b919d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Grasp of Darkness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Howling Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4c3f4748f15bdd7188a8cb66cfc682fe",
+          "oracle_hash": "148b4a249e421fe7df6b87153b695553",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Hydrosurge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+          "oracle_hash": "3221cbc8b99391337488bb0a4d40175d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Infuriate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb",
+          "oracle_hash": "f952302fb288a6663f8c5356e2a92d8d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of Malice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+          "oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of the Whip",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Last Gasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of Oaks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51",
+          "oracle_hash": "662716716731e5e185b77e89756dbc08",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Monstrous Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Mutagenic Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+          "oracle_hash": "4bfe7978e25ff1cc759a8398ab8cc4ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Overkill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ea9ad853d79cd74067de5ec6857bd5d3",
+          "oracle_hash": "152077c4259f8fc6c5de29ae1dda6fe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Phytoburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7",
+          "oracle_hash": "3322e3f0f2cb6f3b2bf19fbe3bc370e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Pull Under",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8640a56f0626f1a00da4358b1feb457",
+          "oracle_hash": "5821e858fce67fcc5fca95b54ec6627b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Qilin's Blessing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+          "oracle_hash": "af57cc7842ca150e2b9d56ccaf724836",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Scorpion's Sting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Show of Valor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98b898c114ec6063d8e5f8b202fd0619",
+          "oracle_hash": "f7d4a6f9f7b3a666844127e533be7acc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Shrink",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+          "oracle_hash": "3221cbc8b99391337488bb0a4d40175d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Spatial Contortion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dfaea4fb86ebb4286736036e4dd194e0",
+          "oracle_hash": "852090a364f1c9697814b334139f56ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Stab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+          "oracle_hash": "60256c4367fae9881f1f577b634fac3b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Strangling Spores",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Tar Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f115c45d90753969112b82d76cdc015",
+          "oracle_hash": "ec5c2de623937016f8b99c67fedb59da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Throttle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Titanic Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wielding the Green Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wring Flesh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742",
+          "oracle_hash": "c3701dd9ec054ecd4ce778a6f9b5b7c6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 42
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Aegis of the Heavens",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3626c8f019c888b932001f7d19dbd360",
+          "oracle_hash": "ded1059e4357288e90ad9eb4edbbc976",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Antagonize",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e",
+          "oracle_hash": "536d078a076180a38cf3f87e757e67b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Auger Spree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:359b5c5feb2fbef7c7b7bd2a182514fd",
+          "oracle_hash": "7340faa8e0bbbb47ec4432513c0d5a1c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Brute Force",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+          "oracle_hash": "0b8eb31e232445888db4bfea87b919d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Bull Rush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02",
+          "oracle_hash": "bd41752c77cacf1d6cd6efa811a45cb8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Dark Deed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Dark Remedy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:075fc4adb6e05e9d41f5598acd1b88fe",
+          "oracle_hash": "f448a7794aea7d3dbf1a391edc9cb089",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Demon's Grasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ab924787bbb2f0fa3e5dea858eefd2b",
+          "oracle_hash": "5821e858fce67fcc5fca95b54ec6627b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Disfigure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+          "oracle_hash": "60256c4367fae9881f1f577b634fac3b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Disorient",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1ad1092de9a066aa1a0b795663bcb2be",
+          "oracle_hash": "d84b269b087d38b2e4c97b9844f22c38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Eyes of the Beholder",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49f6106c783196df050e7f80372eae87",
+          "oracle_hash": "465076373f12bb82421443841f24da02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Fatal Fumes",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6940f544c8d8cc34b752b43292e5cde7",
+          "oracle_hash": "dcf137318f208ba6647c6472e342a1f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Feral Roar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Fists of the Anvil",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4d314687bd4e273c6d0c846d53127c97",
+          "oracle_hash": "148b4a249e421fe7df6b87153b695553",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Flatten",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Flowstone Infusion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+          "oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Giant Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+          "oracle_hash": "0b8eb31e232445888db4bfea87b919d0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Grasp of Darkness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Howling Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4c3f4748f15bdd7188a8cb66cfc682fe",
+          "oracle_hash": "148b4a249e421fe7df6b87153b695553",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Hydrosurge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+          "oracle_hash": "3221cbc8b99391337488bb0a4d40175d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Infuriate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb",
+          "oracle_hash": "f952302fb288a6663f8c5356e2a92d8d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of Malice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+          "oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of the Whip",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Last Gasp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of Oaks",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51",
+          "oracle_hash": "662716716731e5e185b77e89756dbc08",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Monstrous Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Mutagenic Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+          "oracle_hash": "4bfe7978e25ff1cc759a8398ab8cc4ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Overkill",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ea9ad853d79cd74067de5ec6857bd5d3",
+          "oracle_hash": "152077c4259f8fc6c5de29ae1dda6fe5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Phytoburst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7",
+          "oracle_hash": "3322e3f0f2cb6f3b2bf19fbe3bc370e2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Pull Under",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8640a56f0626f1a00da4358b1feb457",
+          "oracle_hash": "5821e858fce67fcc5fca95b54ec6627b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Qilin's Blessing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+          "oracle_hash": "af57cc7842ca150e2b9d56ccaf724836",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Scorpion's Sting",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Show of Valor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:98b898c114ec6063d8e5f8b202fd0619",
+          "oracle_hash": "f7d4a6f9f7b3a666844127e533be7acc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Shrink",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+          "oracle_hash": "3221cbc8b99391337488bb0a4d40175d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Spatial Contortion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dfaea4fb86ebb4286736036e4dd194e0",
+          "oracle_hash": "852090a364f1c9697814b334139f56ae",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Stab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+          "oracle_hash": "60256c4367fae9881f1f577b634fac3b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Strangling Spores",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+          "oracle_hash": "c5ef5760409d5c5315e84d96621eebd2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Tar Snare",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0f115c45d90753969112b82d76cdc015",
+          "oracle_hash": "ec5c2de623937016f8b99c67fedb59da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Throttle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+          "oracle_hash": "44189175cc79a0d13dcd1a7d589e7507",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Titanic Growth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wielding the Green Dragon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+          "oracle_hash": "c1af8913a641802fe90d30bb8c866365",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wring Flesh",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742",
+          "oracle_hash": "c3701dd9ec054ecd4ce778a6f9b5b7c6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 42
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aegis of the Heavens",
+          "logical_rule_key": "battle_rule_v1:3626c8f019c888b932001f7d19dbd360"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Antagonize",
+          "logical_rule_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Auger Spree",
+          "logical_rule_key": "battle_rule_v1:359b5c5feb2fbef7c7b7bd2a182514fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brute Force",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bull Rush",
+          "logical_rule_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Deed",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Remedy",
+          "logical_rule_key": "battle_rule_v1:075fc4adb6e05e9d41f5598acd1b88fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Demon's Grasp",
+          "logical_rule_key": "battle_rule_v1:6ab924787bbb2f0fa3e5dea858eefd2b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Disfigure",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Disorient",
+          "logical_rule_key": "battle_rule_v1:1ad1092de9a066aa1a0b795663bcb2be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eyes of the Beholder",
+          "logical_rule_key": "battle_rule_v1:49f6106c783196df050e7f80372eae87"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fatal Fumes",
+          "logical_rule_key": "battle_rule_v1:6940f544c8d8cc34b752b43292e5cde7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Feral Roar",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fists of the Anvil",
+          "logical_rule_key": "battle_rule_v1:4d314687bd4e273c6d0c846d53127c97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flatten",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flowstone Infusion",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Giant Growth",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grasp of Darkness",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Howling Fury",
+          "logical_rule_key": "battle_rule_v1:4c3f4748f15bdd7188a8cb66cfc682fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hydrosurge",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Infuriate",
+          "logical_rule_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lash of Malice",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lash of the Whip",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Last Gasp",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Might of Oaks",
+          "logical_rule_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Monstrous Growth",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mutagenic Growth",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Overkill",
+          "logical_rule_key": "battle_rule_v1:ea9ad853d79cd74067de5ec6857bd5d3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Phytoburst",
+          "logical_rule_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pull Under",
+          "logical_rule_key": "battle_rule_v1:f8640a56f0626f1a00da4358b1feb457"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Qilin's Blessing",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scorpion's Sting",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Show of Valor",
+          "logical_rule_key": "battle_rule_v1:98b898c114ec6063d8e5f8b202fd0619"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shrink",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spatial Contortion",
+          "logical_rule_key": "battle_rule_v1:dfaea4fb86ebb4286736036e4dd194e0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stab",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Strangling Spores",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tar Snare",
+          "logical_rule_key": "battle_rule_v1:0f115c45d90753969112b82d76cdc015"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Throttle",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Titanic Growth",
+          "logical_rule_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wielding the Green Dragon",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wring Flesh",
+          "logical_rule_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 42
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aegis of the Heavens",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:3626c8f019c888b932001f7d19dbd360"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Antagonize",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Auger Spree",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:359b5c5feb2fbef7c7b7bd2a182514fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brute Force",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bull Rush",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Deed",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Remedy",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:075fc4adb6e05e9d41f5598acd1b88fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Demon's Grasp",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ab924787bbb2f0fa3e5dea858eefd2b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Disfigure",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Disorient",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:1ad1092de9a066aa1a0b795663bcb2be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Eyes of the Beholder",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:49f6106c783196df050e7f80372eae87"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fatal Fumes",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6940f544c8d8cc34b752b43292e5cde7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Feral Roar",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fists of the Anvil",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:4d314687bd4e273c6d0c846d53127c97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flatten",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flowstone Infusion",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Giant Growth",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grasp of Darkness",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Howling Fury",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:4c3f4748f15bdd7188a8cb66cfc682fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hydrosurge",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Infuriate",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lash of Malice",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lash of the Whip",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Last Gasp",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Might of Oaks",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Monstrous Growth",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mutagenic Growth",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Overkill",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ea9ad853d79cd74067de5ec6857bd5d3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Phytoburst",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pull Under",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:f8640a56f0626f1a00da4358b1feb457"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Qilin's Blessing",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scorpion's Sting",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Show of Valor",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:98b898c114ec6063d8e5f8b202fd0619"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shrink",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spatial Contortion",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:dfaea4fb86ebb4286736036e4dd194e0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stab",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Strangling Spores",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tar Snare",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:0f115c45d90753969112b82d76cdc015"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Throttle",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Titanic Growth",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wielding the Green Dragon",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wring Flesh",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -121,21 +121,21 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg290_add_counters_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `31295`
-- XMage authoritative source resolved: `28359`
+- target all-card battle-gap identities: `31253`
+- XMage authoritative source resolved: `28317`
 - local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
 - ManaLoom adapter work-unit keys: `12093`
-- authoritative source coverage ratio: `0.9062`
+- authoritative source coverage ratio: `0.9061`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `28359` identities, card semantics are accepted from XMage; work is now
+- For `28317` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `2936` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG290 Exact Adapter Waves
+## PG283-PG291 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG290 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG291 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -187,6 +187,8 @@ patterns:
   `xmage_fixed_damage_all_matching_permanents_spell_v1`
 - `add_counters::targeted_add_counters_variant_v1` ->
   `xmage_fixed_add_counters_target_creature_spell_v1`
+- `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting` ->
+  `xmage_fixed_boost_target_creature_until_eot_spell_v1`
 
 PG283 evidence:
 
@@ -357,13 +359,48 @@ PG288-PG290 measured result:
   `target_identity_count=31295`, `xmage_authoritative_source_count=28359`,
   `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=28359`.
-- Running the exact splitter after PG290 on supported units returns
-  `proposal_count=0` over `7409` considered supported rows. The next work must
+- Running the exact splitter after PG290 on supported units returned
+  `proposal_count=0` over `7409` considered supported rows. The next work added
+  the fixed target-creature boost/debuff until end of turn subpattern.
+
+PG291 evidence:
+
+- PG291 boost/debuff target spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg291_xmage_boost_target_spell_wave_package.md`
+- PG291 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg291_xmage_boost_target_spell_wave_pg_apply_evidence.md`
+- PG291 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg291_xmage_boost_target_spell_wave_e2e_validation.md`
+- post-PG291 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg291_boost_target_spell_wave_recheck.md`
+- post-PG291 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.md`
+- post-PG291 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg291_existing_supported_recheck.md`
+
+PG291 measured result:
+
+- PG291 promoted `42` exact `BoostTargetEffect` one-shot spells over target
+  creatures, mapped to `stat_modifier_until_eot`. Runtime now chooses own
+  creatures for pump effects, opponent creatures for harmful debuffs, records
+  power/toughness until-end-of-turn cleanup, and handles zero-toughness death.
+- PostgreSQL postcheck: `42/42` promoted rows, `42/42` verified/auto,
+  `42/42` matching Oracle hash, with `0` backup rows.
+- E2E package validation: PostgreSQL `42/42`, SQLite `42/42`, canonical
+  snapshot `42/42`, and runtime `get_card_effect` `42/42`.
+- Focused runtime tests cover both positive pump and negative debuff/zero
+  toughness cleanup; `57` focused tests pass.
+- Global all-card authoritative queue after PG291:
+  `target_identity_count=31253`, `xmage_authoritative_source_count=28317`,
+  `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=28317`.
+- Running the exact splitter after PG291 on supported units returns
+  `proposal_count=0` over `7449` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with likely first
-  candidates from the largest remaining XMage work units: `draw_engine`,
-  residual `add_counters`, residual `recursion`, residual `board_wipe`,
-  `grant_protection_from_chosen_color`, and richer targeted removal/damage
-  variants.
+  candidates from the largest remaining XMage work units: `recursion`,
+  `draw_engine`, `grant_protection_from_chosen_color`, residual
+  `direct_damage`, `life_gain`, `source_add_counters`, `removal_destroy`, and
+  `tutor`.
 
 ## Why This Is The Best Current Flow
 

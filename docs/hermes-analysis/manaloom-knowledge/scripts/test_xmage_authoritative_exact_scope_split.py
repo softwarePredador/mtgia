@@ -524,6 +524,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "add_counters_counter_not_fixed")
 
+    def test_fixed_boost_target_creature_maps_to_stat_modifier_until_eot(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gets +3/+3 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().getEffects().add(new BoostTargetEffect("
+                "3, 3, Duration.EndOfTurn));"
+                "this.getSpellAbility().getTargets().add(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_TARGET_SCOPE)
+        self.assertEqual(effect["power_delta"], 3)
+        self.assertEqual(effect["toughness_delta"], 3)
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+
+    def test_fixed_boost_allows_leading_mana_reminder_text(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text="({G/P} can be paid with either {G} or 2 life.)\n"
+                "Target creature gets +2/+2 until end of turn."
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["power_delta"], 2)
+        self.assertEqual(proposal["effect_json"]["toughness_delta"], 2)
+
+    def test_boost_multi_target_spell_stays_blocked(self) -> None:
+        row = queue_row(split.BOOST_TARGET_UNIT, effect_classes=["BoostTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gets +3/+3 until end of turn.\nTarget creature gets +3/+3 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(3, 3));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(3, 3).setTargetPointer(new SecondTargetPointer()));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_target_source_not_single_fixed")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),

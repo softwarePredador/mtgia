@@ -76,9 +76,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG290:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg290_add_counters_spell_wave.md`.
-    Resultado all-card: `31295` identidades ainda com gap, `28359` com fonte
+    Evidencia corrente pos-PG291:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg291_boost_target_spell_wave.md`.
+    Resultado all-card: `31253` identidades ainda com gap, `28317` com fonte
     XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
     gaps e `12093` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -90,11 +90,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     adicionou `22` recursion spells graveyard-to-hand, e o PG289 adicionou
     `13` mass-removal spells por destroy-all/fixed damage-all. O PG290
     adicionou `3` add-counters spells de alvo criatura (`Battlegrowth`,
-    `Blight Rot`, `Scar`). Todos os pacotes PG285-PG290 passaram postcheck
-    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG290
-    retorna `proposal_count=0` para os escopos ja implementados; a proxima
-    etapa exige novo subpadrao
-    runtime, nao rerun do mesmo splitter.
+    `Blight Rot`, `Scar`). O PG291 adicionou `42` boost/debuff spells de alvo
+    criatura com modificador de poder/resistencia ate o fim do turno. Todos os
+    pacotes PG285-PG291 passaram postcheck PostgreSQL e E2E em
+    PG/SQLite/snapshot/runtime. O splitter pos-PG291 retorna
+    `proposal_count=0` para os escopos ja implementados; a proxima etapa exige
+    novo subpadrao runtime, nao rerun do mesmo splitter.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

@@ -697,6 +697,107 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_stat_modifier_until_eot_spell_buffs_own_best_creature_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        small = {"name": "Small Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        best = {"name": "Best Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        active.battlefield.extend([small, best])
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": 3,
+            "toughness_delta": 3,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Giant Growth",
+                "type_line": "Instant",
+                "oracle_text": "Target creature gets +3/+3 until end of turn.",
+            },
+            turn=11,
+            rng=random.Random(11),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(best["power"], 7)
+        self.assertEqual(best["toughness"], 7)
+        self.assertEqual(small["power"], 2)
+        self.assertEqual(enemy["power"], 5)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Giant Growth"])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Giant Growth"
+                and data.get("target") == "Best Bear"
+                and data.get("power_delta") == 3
+                and data.get("toughness_delta") == 3
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(best["power"], 4)
+        self.assertEqual(best["toughness"], 4)
+
+    def test_stat_modifier_until_eot_spell_can_kill_opponent_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(own)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": -4,
+            "toughness_delta": -4,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Grasp of Darkness",
+                "type_line": "Instant",
+                "oracle_text": "Target creature gets -4/-4 until end of turn.",
+            },
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Bear"])
+        self.assertEqual(active.battlefield, [own])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Grasp of Darkness"])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Grasp of Darkness"
+                and data.get("target") == "Enemy Bear"
+                and data.get("power_delta") == -4
+                and data.get("toughness_delta") == -4
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

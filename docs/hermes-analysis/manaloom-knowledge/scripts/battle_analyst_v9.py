@@ -4099,6 +4099,129 @@ def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn
     return target
 
 
+def stat_modifier_is_harmful(effect_data):
+    power_delta = int((effect_data or {}).get("power_delta") or (effect_data or {}).get("power_boost") or 0)
+    toughness_delta = int((effect_data or {}).get("toughness_delta") or (effect_data or {}).get("toughness_boost") or 0)
+    return toughness_delta < 0 or (power_delta < 0 and toughness_delta <= 0)
+
+
+def stat_modifier_candidate_targets(player, opponents, card, effect_data):
+    target_type = str((effect_data or {}).get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    participants = []
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        participants = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        participants = list(opponents or [])
+    else:
+        participants = [player] + list(opponents or [])
+    candidates = []
+    for owner in participants:
+        for permanent in list(getattr(owner, "battlefield", []) or []):
+            if not is_battlefield_creature(permanent):
+                continue
+            if not is_legal_target(
+                card if isinstance(card, dict) else effect_data,
+                permanent,
+                player,
+                target_type=target_type,
+                target_controller=owner,
+            ):
+                continue
+            candidates.append((owner, permanent))
+    return candidates
+
+
+def choose_stat_modifier_target(player, opponents, card, effect_data):
+    candidates = stat_modifier_candidate_targets(player, opponents, card, effect_data)
+    if not candidates:
+        return None, None, []
+    harmful = stat_modifier_is_harmful(effect_data)
+    preferred = [
+        (owner, target)
+        for owner, target in candidates
+        if (owner is not player if harmful else owner is player)
+    ]
+    if not preferred:
+        preferred = candidates
+    owner, target = max(preferred, key=lambda item: target_priority(item[1]))
+    return owner, target, [target for _owner, target in candidates]
+
+
+def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    target_owner, target, target_options = choose_stat_modifier_target(
+        player,
+        opponents,
+        card,
+        effect_data,
+    )
+    target_type = str(effect_data.get("target") or "").lower() or _target_type_from_constraints(effect_data) or "creature"
+    if target is None or target_owner is None:
+        emit_replay_event(
+            "stat_modifier_until_eot_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            power_delta=power_delta,
+            toughness_delta=toughness_delta,
+            target_type=target_type,
+            result="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return None
+
+    power_before = int(float(target.get("power") or 0))
+    toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+    remember_until_eot(target, "power")
+    remember_until_eot(target, "toughness")
+    target["power"] = power_before + power_delta
+    target["toughness"] = toughness_before + toughness_delta
+    power_after = int(float(target.get("power") or 0))
+    toughness_after = int(float(target.get("toughness") or target.get("power") or 0))
+    destination = None
+    result = "stat_modifier_until_eot_applied"
+    if toughness_after <= 0 and is_battlefield_creature(target):
+        destination = move_creature_from_battlefield(
+            target_owner,
+            target,
+            reason="zero_toughness",
+            source=card,
+        )
+        result = "creature_put_into_graveyard_zero_toughness"
+    decision = targeting_decision(
+        card if isinstance(card, dict) else effect_data,
+        target,
+        player,
+        target_controller=target_owner,
+        target_type=target_type,
+    )
+    emit_replay_event(
+        "stat_modifier_until_eot_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=target_owner.name,
+        target=target.get("name", "?"),
+        target_power_before=power_before,
+        target_power_after=power_after,
+        target_toughness_before=toughness_before,
+        target_toughness_after=toughness_after,
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        result=result,
+        destination=destination,
+        available_targets=len(target_options),
+        **target_selection_replay_fields(target, target_options),
+        turn=turn,
+        **decision,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return target
+
+
 def transform_permanent_to_face(
     player,
     permanent,
@@ -43365,6 +43488,8 @@ def apply_effect_immediate(
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
     elif effect == "add_counters":
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
+    elif effect == "stat_modifier_until_eot":
+        resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent":
         apply_damage_each_opponent(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent_and_opponent_creatures":

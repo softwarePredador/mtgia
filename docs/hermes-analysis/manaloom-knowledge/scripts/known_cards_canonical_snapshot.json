@@ -414,6 +414,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Aegis of the Heavens": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 1,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 7,
+    "toughness_delta": 7,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3626c8f019c888b932001f7d19dbd360",
+    "battle_rule_oracle_hash": "ded1059e4357288e90ad9eb4edbbc976"
+  },
   "Aesi, Tyrant of Gyre Strait // Aesi, Tyrant of Gyre Strait": {
     "cmc": 6.0,
     "effect": "draw_cards",
@@ -1369,6 +1395,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
   },
+  "Antagonize": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e",
+    "battle_rule_oracle_hash": "536d078a076180a38cf3f87e757e67b8"
+  },
   "Anvil of Bogardan": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -2185,6 +2237,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eaa27d98bb13d1caeabde36eb8fa8a0b"
+  },
+  "Auger Spree": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:359b5c5feb2fbef7c7b7bd2a182514fd",
+    "battle_rule_oracle_hash": "7340faa8e0bbbb47ec4432513c0d5a1c"
   },
   "Augur of Autumn": {
     "cmc": 3.0,
@@ -5212,6 +5290,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Brute Force": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+    "battle_rule_oracle_hash": "0b8eb31e232445888db4bfea87b919d0"
+  },
   "Bucolic Ranch": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -5231,6 +5335,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f82f300b6a2f6b1792ea8debcdece54a"
+  },
+  "Bull Rush": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02",
+    "battle_rule_oracle_hash": "bd41752c77cacf1d6cd6efa811a45cb8"
   },
   "Burgeoning": {
     "effect": "ramp_engine",
@@ -8973,6 +9103,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
+  "Dark Deed": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+    "battle_rule_oracle_hash": "44189175cc79a0d13dcd1a7d589e7507"
+  },
   "Dark Depths": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -8990,6 +9146,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Dark Remedy": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 1,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:075fc4adb6e05e9d41f5598acd1b88fe",
+    "battle_rule_oracle_hash": "f448a7794aea7d3dbf1a391edc9cb089"
   },
   "Dark Ritual": {
     "ability_kind": "one_shot",
@@ -9776,6 +9958,32 @@
     "battle_rule_logical_key": "battle_rule_v1:f17c3a0d837930a609172beaf0d232ec",
     "battle_rule_oracle_hash": "0760d9b94b12a7f6748566b61fcb288b"
   },
+  "Demon's Grasp": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": -5,
+    "power_delta": -5,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -5,
+    "toughness_delta": -5,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ab924787bbb2f0fa3e5dea858eefd2b",
+    "battle_rule_oracle_hash": "5821e858fce67fcc5fca95b54ec6627b"
+  },
   "Demonic Collusion": {
     "effect": "tutor",
     "target": "any",
@@ -10495,6 +10703,32 @@
     "battle_rule_logical_key": "battle_rule_v1:a3505b26aba1e7ec386ea80a4e04a8ef",
     "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
   },
+  "Disfigure": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -2,
+    "power_delta": -2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+    "battle_rule_oracle_hash": "60256c4367fae9881f1f577b634fac3b"
+  },
   "Dismal Backwater": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -10520,6 +10754,32 @@
     "battle_rule_confidence": 0.98,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2f513570333d9f48be476602a7ce1593"
+  },
+  "Disorient": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -7,
+    "power_delta": -7,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1ad1092de9a066aa1a0b795663bcb2be",
+    "battle_rule_oracle_hash": "d84b269b087d38b2e4c97b9844f22c38"
   },
   "Dispatch": {
     "cmc": 1.0,
@@ -13461,6 +13721,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Eyes of the Beholder": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -11,
+    "power_delta": -11,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -11,
+    "toughness_delta": -11,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49f6106c783196df050e7f80372eae87",
+    "battle_rule_oracle_hash": "465076373f12bb82421443841f24da02"
+  },
   "Ezuri's Predation": {
     "cmc": 8.0,
     "effect": "token_maker",
@@ -13807,6 +14093,32 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "d6af4bbe3bca1731512db4e9768a3f5a"
   },
+  "Fatal Fumes": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6940f544c8d8cc34b752b43292e5cde7",
+    "battle_rule_oracle_hash": "dcf137318f208ba6647c6472e342a1f2"
+  },
   "Fate Forgotten": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
     "destination": "exile",
@@ -14063,6 +14375,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3906ffa3cbf7d3437d68e44e13e10bba",
     "battle_rule_oracle_hash": "d63befc8ac40d9a38732f9b5c1a7414a"
+  },
+  "Feral Roar": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+    "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
   },
   "Ferrous Lake": {
     "effect": "land",
@@ -14764,6 +15102,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d811721bcdb12b12c44e7437c0e5b66"
   },
+  "Fists of the Anvil": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4d314687bd4e273c6d0c846d53127c97",
+    "battle_rule_oracle_hash": "148b4a249e421fe7df6b87153b695553"
+  },
   "Flagstones of Trokair": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -15023,6 +15387,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:90fe9d4c0a3fda3e98eff00432392fe6"
   },
+  "Flatten": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+    "battle_rule_oracle_hash": "44189175cc79a0d13dcd1a7d589e7507"
+  },
   "Flawless Maneuver": {
     "alternative_cost": "{0}",
     "alternative_cost_condition": "control_commander",
@@ -15181,6 +15571,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eef2e30d6f8673ad547f28231192ba12"
+  },
+  "Flowstone Infusion": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+    "battle_rule_oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d"
   },
   "Flurry of Horns": {
     "cmc": 5.0,
@@ -16546,6 +16962,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
   },
+  "Giant Growth": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e197afbf5b875ba67b407a6258a9686d",
+    "battle_rule_oracle_hash": "0b8eb31e232445888db4bfea87b919d0"
+  },
   "Gideon's Phalanx": {
     "cmc": 7.0,
     "duration": 1,
@@ -17562,6 +18004,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f82f300b6a2f6b1792ea8debcdece54a"
+  },
+  "Grasp of Darkness": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+    "battle_rule_oracle_hash": "44189175cc79a0d13dcd1a7d589e7507"
   },
   "Grasp of Fate": {
     "cmc": 3.0,
@@ -19273,6 +19741,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
   },
+  "Howling Fury": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4c3f4748f15bdd7188a8cb66cfc682fe",
+    "battle_rule_oracle_hash": "148b4a249e421fe7df6b87153b695553"
+  },
   "Howling Mine": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -19411,6 +19905,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:88c8f7a7f18d2171c1d200c61f47e6d4",
     "battle_rule_oracle_hash": "cf4c27ee44a0aa04dad441569e4c9203"
+  },
+  "Hydrosurge": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -5,
+    "power_delta": -5,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+    "battle_rule_oracle_hash": "3221cbc8b99391337488bb0a4d40175d"
   },
   "Hypothesizzle": {
     "battle_model_scope": "draw_two_optional_discard_damage_v1",
@@ -20155,6 +20675,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2eb093a58537802466ff92c4713d5896",
     "battle_rule_oracle_hash": "730b2f1b26c49825e41f57766548e686"
+  },
+  "Infuriate": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 2,
+    "toughness_delta": 2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2154633111809d9e270c3d39e9042cbb",
+    "battle_rule_oracle_hash": "f952302fb288a6663f8c5356e2a92d8d"
   },
   "Inkmoth Nexus": {
     "effect": "land",
@@ -22087,6 +22633,58 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6fdd6fb58048bac3f91bcd0e0fda2a0e"
   },
+  "Lash of Malice": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ab3895a246a6124f70fd2b120794ed2b",
+    "battle_rule_oracle_hash": "09e85a23277f1ad72aff8ff24e166f5d"
+  },
+  "Lash of the Whip": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+    "battle_rule_oracle_hash": "44189175cc79a0d13dcd1a7d589e7507"
+  },
   "Last Chance": {
     "ability_kind": "one_shot",
     "battle_model_scope": "single_extra_turn_then_lose_game_v1",
@@ -22101,6 +22699,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9f5103721cb05db1501499eb5f49de56",
     "battle_rule_oracle_hash": "059f0f01430a2d44ac0d143bf8e40ed6"
+  },
+  "Last Gasp": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -3,
+    "toughness_delta": -3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+    "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
   },
   "Last March of the Ents": {
     "cmc": 8.0,
@@ -24742,6 +25366,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
+  "Might of Oaks": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 7,
+    "power_delta": 7,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 7,
+    "toughness_delta": 7,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51",
+    "battle_rule_oracle_hash": "662716716731e5e185b77e89756dbc08"
+  },
   "Might of the Meek": {
     "count": 1,
     "effect": "draw_cards",
@@ -25603,6 +26253,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:811c80bc18bed7f59874a4ce17c11cd3"
   },
+  "Monstrous Growth": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+    "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
+  },
   "Monstrous Vortex": {
     "cmc": 4.0,
     "effect": "draw_engine",
@@ -26198,6 +26874,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c2736795c0d2c41d771b8a87319618bc"
+  },
+  "Mutagenic Growth": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 2,
+    "toughness_delta": 2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+    "battle_rule_oracle_hash": "4bfe7978e25ff1cc759a8398ab8cc4ea"
   },
   "Mutant Town": {
     "effect": "land",
@@ -27976,6 +28678,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Overkill": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 0,
+    "power_delta": 0,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -9999,
+    "toughness_delta": -9999,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ea9ad853d79cd74067de5ec6857bd5d3",
+    "battle_rule_oracle_hash": "152077c4259f8fc6c5de29ae1dda6fe5"
+  },
   "Overlord of the Balemurk": {
     "cmc": 5.0,
     "effect": "recursion",
@@ -28820,6 +29548,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Phytoburst": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": 5,
+    "power_delta": 5,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 5,
+    "toughness_delta": 5,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7",
+    "battle_rule_oracle_hash": "3322e3f0f2cb6f3b2bf19fbe3bc370e2"
   },
   "Pierce the Sky": {
     "amount": 7,
@@ -29965,6 +30719,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eb04bb80a47324c44cea5835eba5bea7"
   },
+  "Pull Under": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -5,
+    "power_delta": -5,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -5,
+    "toughness_delta": -5,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f8640a56f0626f1a00da4358b1feb457",
+    "battle_rule_oracle_hash": "5821e858fce67fcc5fca95b54ec6627b"
+  },
   "Puncture Blast": {
     "amount": 3,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -30270,6 +31050,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b232f0d7c82204280509251715881187",
     "battle_rule_oracle_hash": "2cb0261a10477dc1aa31d444646d248f"
+  },
+  "Qilin's Blessing": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 2,
+    "toughness_delta": 2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0e713d8a86448cb7f537135da88f84c2",
+    "battle_rule_oracle_hash": "af57cc7842ca150e2b9d56ccaf724836"
   },
   "Quandrix Campus": {
     "effect": "land",
@@ -34289,6 +35095,32 @@
     "battle_rule_logical_key": "battle_rule_v1:e1e2f2f2c340bd000faf9ec8501492fe",
     "battle_rule_oracle_hash": "821d054bc2827d9d2311ea1213be9311"
   },
+  "Scorpion's Sting": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -3,
+    "toughness_delta": -3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+    "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
+  },
   "Scour for Scrap": {
     "ability_kind": "one_shot",
     "battle_model_scope": "modal_artifact_tutor_or_artifact_graveyard_to_hand_v1",
@@ -35827,6 +36659,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
   },
+  "Show of Valor": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 2,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:98b898c114ec6063d8e5f8b202fd0619",
+    "battle_rule_oracle_hash": "f7d4a6f9f7b3a666844127e533be7acc"
+  },
   "Shredding Winds": {
     "amount": 7,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -35867,6 +36725,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Shrink": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -5,
+    "power_delta": -5,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
+    "battle_rule_oracle_hash": "3221cbc8b99391337488bb0a4d40175d"
   },
   "Siege-Gang Commander": {
     "cmc": 5.0,
@@ -37327,6 +38211,32 @@
     "battle_rule_logical_key": "battle_rule_v1:febd37997bb3683614d20454522b342f",
     "battle_rule_oracle_hash": "8d6835d5e6db53462b419f309fb2501f"
   },
+  "Spatial Contortion": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -3,
+    "toughness_delta": -3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dfaea4fb86ebb4286736036e4dd194e0",
+    "battle_rule_oracle_hash": "852090a364f1c9697814b334139f56ae"
+  },
   "Spawning Bed": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -37834,6 +38744,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+  },
+  "Stab": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -2,
+    "power_delta": -2,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cc1c18644706eced185d34d5b3871ce9",
+    "battle_rule_oracle_hash": "60256c4367fae9881f1f577b634fac3b"
   },
   "Staff of Compleation": {
     "effect": "ramp_permanent",
@@ -38415,6 +39351,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "1078e4bff451d43b2f60ecdf2038a5ca"
+  },
+  "Strangling Spores": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -3,
+    "toughness_delta": -3,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
+    "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
   },
   "Stream of Acid": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -39932,6 +40894,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5d19ac0ece1a2310ec1df0f807f84b8d"
+  },
+  "Tar Snare": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -2,
+    "toughness_delta": -2,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f115c45d90753969112b82d76cdc015",
+    "battle_rule_oracle_hash": "ec5c2de623937016f8b99c67fedb59da"
   },
   "Tarfire": {
     "amount": 2,
@@ -42011,6 +42999,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Throttle": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -4,
+    "toughness_delta": -4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6ed12c13af9ad1fc60bf2916d4aeeeeb",
+    "battle_rule_oracle_hash": "44189175cc79a0d13dcd1a7d589e7507"
+  },
   "Thrumming Stone": {
     "battle_model_scope": "static_spell_ripple_4_same_name_runtime_v1",
     "cmc": 5.0,
@@ -42370,6 +43384,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f1a99e76647a37f9bc0f202822a2c126"
+  },
+  "Titanic Growth": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d6396ebcb807d107b59cd66a6efb80ef",
+    "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
   },
   "Tithe": {
     "cmc": 1.0,
@@ -46355,6 +47395,32 @@
     "battle_rule_logical_key": "battle_rule_v1:3deac22371fed5334c1541219c6c639d",
     "battle_rule_oracle_hash": "588d09494c785ee10f8d9a5d640db691"
   },
+  "Wielding the Green Dragon": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_boost": 4,
+    "power_delta": 4,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": 4,
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
+    "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
+  },
   "Wight of the Reliquary": {
     "cmc": 2.0,
     "effect": "ramp_permanent",
@@ -47214,6 +48280,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
+  },
+  "Wring Flesh": {
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_boost": -1,
+    "toughness_delta": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:37ec6c176f6d2af36efe4276b05ce742",
+    "battle_rule_oracle_hash": "c3701dd9ec054ecd4ce778a6f9b5b7c6"
   },
   "Wurmcoil Engine": {
     "cmc": 6.0,

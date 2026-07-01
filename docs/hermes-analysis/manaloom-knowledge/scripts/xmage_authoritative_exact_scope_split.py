@@ -34,6 +34,10 @@ BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
 ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
+BOOST_TARGET_UNIT = (
+    "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
+    "no_condition_class::targeting"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -47,6 +51,7 @@ SUPPORTED_UNITS = {
     RECURSION_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
+    BOOST_TARGET_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -61,6 +66,7 @@ RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
+BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -73,6 +79,7 @@ SPELL_UNITS = {
     RECURSION_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
+    BOOST_TARGET_UNIT,
 }
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
@@ -492,6 +499,54 @@ def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int
     return match.group(2), count
 
 
+def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
+    matches = re.findall(
+        r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
+        r"(?:,\s*Duration\.EndOfTurn\s*)?\)",
+        source or "",
+    )
+    if len(matches) != 1:
+        return None
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(", source or "")) != 1:
+        return None
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", source or ""):
+        return None
+    if "TargetPointer" in (source or "") or ".setTargetPointer" in (source or ""):
+        return None
+    return int(matches[0][0]), int(matches[0][1])
+
+
+def strip_leading_parenthetical_reminders(text: str) -> str:
+    cleaned = str(text or "").strip()
+    while True:
+        match = re.match(r"^\([^)]*\)\s*", cleaned)
+        if not match:
+            return cleaned
+        cleaned = cleaned[match.end() :].strip()
+
+
+def signed_int_from_oracle(value: str) -> int | None:
+    token = str(value or "").strip()
+    if not re.fullmatch(r"[+-]?\d+", token):
+        return None
+    return int(token)
+
+
+def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    match = re.match(
+        r"^target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(1))
+    toughness = signed_int_from_oracle(match.group(2))
+    if power is None or toughness is None:
+        return None
+    return power, toughness
+
+
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
     if "any target" in text:
@@ -857,6 +912,36 @@ def split_row(
             **flags,
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
+
+    if unit == BOOST_TARGET_UNIT:
+        if classes != {"BoostTargetEffect"}:
+            return None, "boost_target_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "boost_target_ability_class_not_simple"
+        source_boost = fixed_boost_target_from_source(source_text)
+        if source_boost is None:
+            return None, "boost_target_source_not_single_fixed"
+        oracle_boost = fixed_boost_target_from_oracle(metadata)
+        if oracle_boost is None:
+            return None, "boost_target_oracle_not_exact_fixed"
+        if source_boost != oracle_boost:
+            return None, "boost_target_source_oracle_mismatch"
+        power_delta, toughness_delta = oracle_boost
+        effect_json = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": BOOST_TARGET_SCOPE,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "power_boost": power_delta,
+            "toughness_boost": toughness_delta,
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "BoostTargetEffect",
+            **flags,
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_boost_target_creature_until_eot_spell"), "selected_exact_scope"
 
     if unit in RAMP_UNITS:
         if is_spell(metadata):
