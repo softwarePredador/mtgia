@@ -267,3 +267,11 @@ As etapas remanescentes foram avancadas e evidenciadas. O que depende apenas do
 ambiente local foi concluido; o que depende de segredo/signing ficou bloqueado
 com comando exato de retomada. O aceite mobile descobriu dois blockers reais de
 release que devem ser tratados antes de oferta publica.
+
+Atualizacao posterior nesta data:
+
+- Correcoes locais aplicadas para os dois blockers de aceite em
+  `docs/qa/MANALOOM_ACCEPTANCE_BLOCKER_FIXES_2026-07-01.md`.
+- Status: `FIXED_LOCALLY_PENDING_ANDROID_RERUN`.
+- Ainda falta repetir os testes Android fisicos live antes de reclassificar o
+  aceite como fechado.

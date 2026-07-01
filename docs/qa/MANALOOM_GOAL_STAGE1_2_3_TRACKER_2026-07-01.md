@@ -339,6 +339,12 @@ Blockers descobertos:
 - `ACCEPTANCE_BLOCKER_IMPORT_MODAL_CLOSE`: segunda importacao `replace_all` retornou `POST /import/to-deck -> 200`, mas o modal `Importar Lista` nao fechou no timeout do aceite.
 - `ACCEPTANCE_BLOCKER_OPTIMIZE_NEEDS_REPAIR_UX`: generate async salvou deck e abriu details, mas optimize retornou `422 OPTIMIZE_NEEDS_REPAIR` e o harness ficou preso em vez de concluir com rebuild guided/outcome seguro.
 
+Atualizacao posterior:
+
+- Correcoes locais aplicadas em
+  `docs/qa/MANALOOM_ACCEPTANCE_BLOCKER_FIXES_2026-07-01.md`.
+- Status dos dois blockers: `FIXED_LOCALLY_PENDING_ANDROID_RERUN`.
+
 Decks de QA possivelmente residuais:
 
 - `9b263ee1-f8ce-46e3-b1d0-b6cc4bf4a598`

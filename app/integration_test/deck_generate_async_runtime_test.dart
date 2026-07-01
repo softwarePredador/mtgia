@@ -310,12 +310,21 @@ void main() {
       }
 
       if (optimizeRebuild.evaluate().isNotEmpty) {
-        await _capture(binding, tester, '10_rebuild_guided_blocker');
+        await _capture(binding, tester, '10_rebuild_guided_safe_outcome');
+        // ignore: avoid_print
+        print('OPTIMIZE_NEEDS_REPAIR_SAFE_OUTCOME rebuild_guided_available');
+        await tester.tap(
+          find.byKey(const Key('optimize-rebuild-guided-cancel-button')),
+        );
+        await tester.pumpAndSettle();
+        expect(optimizeRebuild, findsNothing);
         return;
       }
 
       if (optimizeOutcome.evaluate().isNotEmpty) {
         await _capture(binding, tester, '10_safe_noop');
+        // ignore: avoid_print
+        print('OPTIMIZE_SAFE_OUTCOME no_changes_or_near_peak');
         return;
       }
 

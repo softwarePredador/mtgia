@@ -637,12 +637,19 @@ void main() {
       }
 
       if (optimizeRebuild.evaluate().isNotEmpty) {
-        await _capture(binding, tester, '09_rebuild_guided_blocker');
+        await _capture(binding, tester, '09_rebuild_guided_safe_outcome');
         if (_runtimeOptimizeRequireApply) {
           fail(
             'Runtime optimize returned rebuild_guided, but apply proof was required.',
           );
         }
+        // ignore: avoid_print
+        print('RUNTIME_OPTIMIZE_SAFE_OUTCOME rebuild_guided_available');
+        await tester.tap(
+          find.byKey(const Key('optimize-rebuild-guided-cancel-button')),
+        );
+        await tester.pumpAndSettle();
+        expect(optimizeRebuild, findsNothing);
         return;
       }
 
@@ -687,12 +694,14 @@ void main() {
           findsNothing,
         );
         expect(find.textContaining('quality_gate_rejected'), findsNothing);
-        await _capture(binding, tester, '09_quality_rejected_blocker');
+        await _capture(binding, tester, '09_safe_noop_quality_gate');
         if (_runtimeOptimizeRequireApply) {
           fail(
             'Runtime optimize returned safe no-op, but apply proof was required.',
           );
         }
+        // ignore: avoid_print
+        print('RUNTIME_OPTIMIZE_SAFE_OUTCOME no_safe_swap');
         return;
       }
 

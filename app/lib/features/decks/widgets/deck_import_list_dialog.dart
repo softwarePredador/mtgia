@@ -423,8 +423,7 @@ Future<void> showDeckImportListDialog({
                                 final hasReviewDetails =
                                     resultNotFoundLines.isNotEmpty ||
                                     resultWarnings.isNotEmpty ||
-                                    resultMissingCommander ||
-                                    resultCommanderPreserved;
+                                    resultMissingCommander;
 
                                 setDialogState(() {
                                   isImporting = false;
@@ -450,6 +449,8 @@ Future<void> showDeckImportListDialog({
                                       localizedMatchesCount:
                                           resultLocalizedMatchesCount,
                                       hasReviewDetails: hasReviewDetails,
+                                      commanderPreserved:
+                                          resultCommanderPreserved,
                                     ),
                                     backgroundColor:
                                         resultNotFoundLines.isEmpty &&
@@ -521,6 +522,7 @@ String _buildImportToDeckSnackMessage({
   required int notFoundCount,
   required int localizedMatchesCount,
   required bool hasReviewDetails,
+  required bool commanderPreserved,
 }) {
   if (hasReviewDetails) {
     if (notFoundCount > 0) {
@@ -530,7 +532,13 @@ String _buildImportToDeckSnackMessage({
   }
 
   if (localizedMatchesCount > 0) {
-    return '$imported cartas importadas ($localizedMatchesCount traduzidas)';
+    final base =
+        '$imported cartas importadas ($localizedMatchesCount traduzidas)';
+    return commanderPreserved ? '$base; comandante preservado' : base;
+  }
+
+  if (commanderPreserved) {
+    return '$imported cartas importadas; comandante preservado';
   }
 
   return '$imported cartas importadas!';

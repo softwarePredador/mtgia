@@ -182,6 +182,13 @@ Resultado:
 7. `BLOCKED_BY_COMMERCIAL_POLICY`: finalizar monetizacao, paywall/limites de IA
    e revisao de Fan Content Policy antes de oferta paga.
 
+Mitigacao local posterior:
+
+- `ACCEPTANCE_BLOCKER_IMPORT_MODAL_CLOSE` e
+  `ACCEPTANCE_BLOCKER_OPTIMIZE_NEEDS_REPAIR_UX` receberam correcoes locais em
+  `docs/qa/MANALOOM_ACCEPTANCE_BLOCKER_FIXES_2026-07-01.md`.
+- Status desses dois itens: `FIXED_LOCALLY_PENDING_ANDROID_RERUN`.
+
 ## Etapas remanescentes avancadas
 
 Documento de saida:
