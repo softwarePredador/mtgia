@@ -76,9 +76,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG294:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg294_creature_etb_life_gain_wave.md`.
-    Resultado all-card: `30722` identidades ainda com gap, `27786` com fonte
+    Evidencia corrente pos-PG295:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg295_creature_etb_draw_wave.md`.
+    Resultado all-card: `30694` identidades ainda com gap, `27758` com fonte
     XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
     gaps e `12038` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -96,11 +96,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     adicionou `85` criaturas com keyword estatica propria, incluindo multiline
     Oracle e `hexproof`/`shroud`/`indestructible` seguros. O PG294 adicionou
     `37` criaturas com ganho de vida fixo ao entrar no campo de batalha,
-    bloqueando casos proporcionais como "for each". Todos os pacotes
-    PG285-PG294 passaram postcheck PostgreSQL e E2E em
-    PG/SQLite/snapshot/runtime. O splitter pos-PG294 retorna
-    `proposal_count=0` para os escopos ja implementados; a proxima etapa exige
-    novo subpadrao runtime, nao rerun do mesmo splitter.
+    bloqueando casos proporcionais como "for each". O PG295 adicionou `28`
+    criaturas com draw fixo ao entrar no campo de batalha, bloqueando draw
+    proporcional/dinamico. Todos os pacotes PG285-PG295 passaram postcheck
+    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG295
+    retorna `proposal_count=0` para os escopos ja implementados; a proxima
+    etapa exige novo subpadrao runtime, com maior reaproveitamento em
+    `SimpleActivatedAbility` antes dos lotes ativados.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

@@ -121,21 +121,21 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg294_creature_etb_life_gain_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg295_creature_etb_draw_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `30722`
-- XMage authoritative source resolved: `27786`
+- target all-card battle-gap identities: `30694`
+- XMage authoritative source resolved: `27758`
 - local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
 - ManaLoom adapter work-unit keys: `12038`
-- authoritative source coverage ratio: `0.9044`
+- authoritative source coverage ratio: `0.9043`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27786` identities, card semantics are accepted from XMage; work is now
+- For `27758` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `2936` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG294 Exact Adapter Waves
+## PG283-PG295 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG294 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG295 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -175,6 +175,10 @@ patterns:
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
   `xmage_creature_etb_gain_life_v1`
+- `draw_engine::xmage_draw_card_variant_review_v1` with
+  `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
+  creatures and fixed Oracle/source draw count ->
+  `xmage_creature_etb_draw_cards_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
@@ -544,6 +548,52 @@ PG294 measured result:
   `draw_engine`, `grant_protection_from_chosen_color`, residual
   `direct_damage`, `source_add_counters`, `life_gain`, `removal_destroy`, and
   `tutor`.
+
+PG295 evidence:
+
+- PG295 creature ETB draw package:
+  `docs/hermes-analysis/master_optimizer_reports/pg295_xmage_creature_etb_draw_wave_package.md`
+- PG295 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg295_xmage_creature_etb_draw_wave_pg_apply_evidence.md`
+- PG295 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg295_xmage_creature_etb_draw_wave_e2e_validation.md`
+- post-PG295 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg295_creature_etb_draw_wave_recheck.md`
+- post-PG295 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg295_creature_etb_draw_wave.md`
+- post-PG295 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg295_existing_supported_recheck.md`
+
+PG295 measured result:
+
+- PG295 promoted `28` exact creatures whose local XMage source is
+  `DrawCardSourceControllerEffect` behind `EntersBattlefieldTriggeredAbility`,
+  mapped to `xmage_creature_etb_draw_cards_v1`.
+- Runtime now resolves `etb_draw_count` after the creature enters the
+  battlefield and emits a `trigger_resolved` replay event with requested and
+  actual cards drawn.
+- The splitter blocks dynamic ETB draw amounts such as "draw a card for each"
+  by requiring a fixed Oracle draw count and a fixed/no-argument XMage draw
+  effect.
+- PostgreSQL postcheck: `28/28` promoted rows, `28/28` verified/auto,
+  `28/28` matching Oracle hash, with `10` stale shadow rows backed up.
+- PG -> Hermes/SQLite sync loaded `28` PostgreSQL rows, inserted/updated `38`
+  SQLite rows including deprecated shadow rows, and exported `4280` canonical
+  snapshot rows.
+- E2E package validation: PostgreSQL `28/28`, SQLite `28/28`, canonical
+  snapshot `28/28`, and runtime `get_card_effect` `28/28`.
+- Focused runtime tests cover creature ETB draw after battlefield entry and
+  `trigger_resolved` evidence; `75` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG295:
+  `target_identity_count=30694`, `xmage_authoritative_source_count=27758`,
+  `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27758`.
+- Running the exact splitter after PG295 on supported units returns
+  `proposal_count=0` over `7427` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with the highest
+  reuse signal coming from `SimpleActivatedAbility` signatures across
+  `direct_damage`, `removal_destroy`, `draw_engine`, `tutor`, `life_gain`, and
+  boost effects.
 
 ## Why This Is The Best Current Flow
 

@@ -1,0 +1,1014 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T10:13:44.658680+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg295_xmage_creature_etb_draw_wave_manifest.json",
+  "package_id": "pg295_xmage_creature_etb_draw_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 28
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Baleful Strix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0790f7ac47d9086d6df56c127961707f",
+          "oracle_hash": "df987d0d2d5e1fc8b47934ef72955055",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Carven Caryatid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "d9639c5a7b7371b622583819bbb07532",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Cloudkin Seer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Council of Advisors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Elvish Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Gallant Citizen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Generous Stray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Gryff Vanguard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Helpful Hunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Joraga Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Jungle Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "d9639c5a7b7371b622583819bbb07532",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Kavu Climber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Kindly Customer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Merchant of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Messenger Falcons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Muse Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Nimble Innovator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Owlbear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7",
+          "oracle_hash": "4a3a180810a71f899d639e689a5033a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Pond Prophet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Rhox Oracle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Roving Harper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Shaman of Spring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Skyscanner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Spirited Companion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Striped Bears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Tome Raider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Wall of Blossoms",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "755be179e545f27507f78b6a79a34485",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Wistful Selkie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 28
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Baleful Strix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0790f7ac47d9086d6df56c127961707f",
+          "oracle_hash": "df987d0d2d5e1fc8b47934ef72955055",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Carven Caryatid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "d9639c5a7b7371b622583819bbb07532",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Cloudkin Seer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Council of Advisors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Elvish Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Gallant Citizen",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Generous Stray",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Gryff Vanguard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Helpful Hunter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Joraga Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Jungle Barrier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "d9639c5a7b7371b622583819bbb07532",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Kavu Climber",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Kindly Customer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Merchant of Secrets",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Messenger Falcons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Muse Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Nimble Innovator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Owlbear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7",
+          "oracle_hash": "4a3a180810a71f899d639e689a5033a4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Pond Prophet",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Rhox Oracle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Roving Harper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Shaman of Spring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Skyscanner",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Spirited Companion",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Striped Bears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Tome Raider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+          "oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Wall of Blossoms",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+          "oracle_hash": "755be179e545f27507f78b6a79a34485",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "card_name": "Wistful Selkie",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+          "oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 28
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Baleful Strix",
+          "logical_rule_key": "battle_rule_v1:0790f7ac47d9086d6df56c127961707f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Carven Caryatid",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cloudkin Seer",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Council of Advisors",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elvish Visionary",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gallant Citizen",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Generous Stray",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gryff Vanguard",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Helpful Hunter",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Joraga Visionary",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jungle Barrier",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kavu Climber",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kindly Customer",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Merchant of Secrets",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Messenger Falcons",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Muse Drake",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nimble Innovator",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Owlbear",
+          "logical_rule_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pond Prophet",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rhox Oracle",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Roving Harper",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shaman of Spring",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skyscanner",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spirited Companion",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Striped Bears",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tome Raider",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Blossoms",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wistful Selkie",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 28
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Baleful Strix",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0790f7ac47d9086d6df56c127961707f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Carven Caryatid",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cloudkin Seer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Council of Advisors",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elvish Visionary",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gallant Citizen",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Generous Stray",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gryff Vanguard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Helpful Hunter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Joraga Visionary",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jungle Barrier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kavu Climber",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kindly Customer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Merchant of Secrets",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Messenger Falcons",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Muse Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nimble Innovator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Owlbear",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pond Prophet",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rhox Oracle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Roving Harper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shaman of Spring",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skyscanner",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spirited Companion",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Striped Bears",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tome Raider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Blossoms",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wistful Selkie",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -16271,7 +16271,10 @@ def resolve_generic_permanent_etb(
             **replay_rule_fields(effect_data),
         )
     if effect_data.get("etb_draw_count"):
-        drawn = player.draw(int(effect_data.get("etb_draw_count") or 1), rng)
+        requested = int(effect_data.get("etb_draw_count") or 1)
+        hand_before = len(player.hand)
+        library_before = len(player.library)
+        drawn = player.draw(requested, rng)
         if all_players is not None:
             process_player_draw_triggers(
                 player,
@@ -16282,6 +16285,21 @@ def resolve_generic_permanent_etb(
                 stack=stack,
                 turn_player=player,
             )
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="draw_cards",
+            cards_requested=requested,
+            cards_drawn=len(drawn),
+            hand_before=hand_before,
+            hand_after=len(player.hand),
+            library_before=library_before,
+            library_after=len(player.library),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     if effect_data.get("etb_life_gain_amount"):
         amount = int(effect_data.get("etb_life_gain_amount") or 0)
         life_before = int(getattr(player, "life", 0))

@@ -356,6 +356,52 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_draw_resolves_after_entering_battlefield(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Drawn A"}, {"name": "Drawn B"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Visionary",
+                "type_line": "Creature - Elf Shaman",
+                "oracle_text": "When Fixture Visionary enters, draw a card.",
+                "power": 1,
+                "toughness": 1,
+            },
+            turn=4,
+            rng=random.Random(46),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Visionary"])
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A"])
+        self.assertEqual([card["name"] for card in active.library], ["Drawn B"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Visionary"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_requested") == 1
+                and data.get("cards_drawn") == 1
+                and data.get("hand_after") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_exile_target_spell_moves_permanent_to_exile(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

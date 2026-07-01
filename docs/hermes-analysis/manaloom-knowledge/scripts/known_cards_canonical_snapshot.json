@@ -3690,14 +3690,27 @@
     "battle_rule_logical_key": "battle_rule_v1:dfad90ea3d1b8c336de2d7bbf25442b4"
   },
   "Baleful Strix": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "deathtouch": true,
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying",
+      "deathtouch"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0790f7ac47d9086d6df56c127961707f",
+    "battle_rule_oracle_hash": "df987d0d2d5e1fc8b47934ef72955055"
   },
   "Ballroom": {
     "effect": "land",
@@ -7383,6 +7396,27 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Carven Caryatid": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "defender": true,
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "keywords": [
+      "defender"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+    "battle_rule_oracle_hash": "d9639c5a7b7371b622583819bbb07532"
+  },
   "Cascade Bluffs": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -9007,6 +9041,27 @@
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
   },
+  "Cloudkin Seer": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
+  },
   "Cloudpost": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -10012,6 +10067,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cf02bd166a0ffd1d5e60e5ffd1201c07"
+  },
+  "Council of Advisors": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Counsel of the Soratami": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -15298,14 +15369,20 @@
     "battle_rule_oracle_hash": "75a6071aad90d25b26b269458f953bb0"
   },
   "Elvish Visionary": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Elvish Warmaster": {
     "cmc": 2.0,
@@ -19541,6 +19618,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e378617268163d419f2f6fa1a9d10f00"
   },
+  "Gallant Citizen": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
   "Gallant Strike": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -19930,6 +20023,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:faf0412d36f280c62b14904ec21807cc"
+  },
+  "Generous Stray": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Genesis Wave": {
     "cmc": 3.0,
@@ -22261,6 +22370,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Gryff Vanguard": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
+  },
   "Guadosalam, Farplane Gateway": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -23164,14 +23294,20 @@
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
   },
   "Helpful Hunter": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Henge Guardian": {
     "cmc": 5.0,
@@ -26041,6 +26177,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec"
   },
+  "Joraga Visionary": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
   "Judgment of Alexander": {
     "cmc": 3.0,
     "duration": 1,
@@ -26061,6 +26213,27 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Jungle Barrier": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "defender": true,
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "keywords": [
+      "defender"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+    "battle_rule_oracle_hash": "d9639c5a7b7371b622583819bbb07532"
   },
   "Jungle Basin": {
     "effect": "land",
@@ -26304,6 +26477,22 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Kavu Climber": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Kaya's Ghostform": {
     "cmc": 1.0,
@@ -26676,6 +26865,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9848e8b1ad7b2614ad42014b999a2f24",
     "battle_rule_oracle_hash": "b4cf1d743f674aafb6cc8f81303f28ce"
+  },
+  "Kindly Customer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Kindred Discovery": {
     "cmc": 5.0,
@@ -30458,6 +30663,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Merchant of Secrets": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
   "Mesa Cavalier": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -30518,6 +30739,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+  },
+  "Messenger Falcons": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
   },
   "Metalworker": {
     "effect": "creature",
@@ -32512,6 +32754,27 @@
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "ee90445284a3f5eb04b08417e16ecb95"
   },
+  "Muse Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
+  },
   "Muse Seeker": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -33449,6 +33712,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
+  },
+  "Nimble Innovator": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Nimbus Maze": {
     "effect": "land",
@@ -34764,6 +35043,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676"
+  },
+  "Owlbear": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "keywords": [
+      "trample"
+    ],
+    "trample": true,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0038699bc4ef5d7f9310514f6bdbfcd7",
+    "battle_rule_oracle_hash": "4a3a180810a71f899d639e689a5033a4"
   },
   "Oxidize": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -36286,6 +36586,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
+  },
+  "Pond Prophet": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Ponder": {
     "cmc": 1.0,
@@ -39941,6 +40257,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f29d2ecc795a6845ed61a66604a3958b"
   },
+  "Rhox Oracle": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
   "Rhox War Monk": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -40838,6 +41170,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e09fb5ff3a2468fd9036a38c37667d30"
+  },
+  "Roving Harper": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Royal Assassin": {
     "cmc": 3.0,
@@ -43435,6 +43783,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cddd177eac9b084e9366e1448a48974c"
   },
+  "Shaman of Spring": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
+  },
   "Shamanic Revelation": {
     "cmc": 5.0,
     "effect": "draw_cards",
@@ -45109,6 +45473,27 @@
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
   },
+  "Skyscanner": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
+  },
   "Skyshroud Claim": {
     "cmc": 4.0,
     "count": 1,
@@ -46559,14 +46944,20 @@
     "battle_rule_logical_key": "battle_rule_v1:435d9a5e2fbde6e6de50a2a573820221"
   },
   "Spirited Companion": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Spiritual Guardian": {
     "ability_kind": "triggered",
@@ -47858,6 +48249,22 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Striped Bears": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Strix Serenade": {
     "cmc": 1.0,
@@ -52542,6 +52949,27 @@
     "battle_rule_logical_key": "battle_rule_v1:fcb8373fbec877c86339375e5d6be479",
     "battle_rule_oracle_hash": "3a0050a0167feba6082a3dd597e3ab0b"
   },
+  "Tome Raider": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7855ca82bae5f996be6c4b51ebb09245",
+    "battle_rule_oracle_hash": "3b6288f38aeeab26d002ff8cc965b8e8"
+  },
   "Topiary Stomper": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -56380,14 +56808,25 @@
     "battle_rule_oracle_hash": "ce515e061d3fb0d898a323e439073a83"
   },
   "Wall of Blossoms": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "defender": true,
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "keywords": [
+      "defender"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e3a09021614ea7db95f25b2e8126482",
+    "battle_rule_oracle_hash": "755be179e545f27507f78b6a79a34485"
   },
   "Wall of Denial": {
     "_keywords_are_self": true,
@@ -58202,6 +58641,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d2e55f1da98136c31c7e1bd095059bd4",
     "battle_rule_oracle_hash": "75b25a03a19396aae83550040b2d76a3"
+  },
+  "Wistful Selkie": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
+    "effect": "creature",
+    "etb_draw_count": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50ef87a68c15784e7bc1b1e31085c03d",
+    "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Witch Enchanter // Witch-Blessed Meadow": {
     "battle_model_scope": "creature_etb_destroy_opponent_artifact_or_enchantment_v1",

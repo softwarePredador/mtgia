@@ -793,6 +793,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
 
+    def test_creature_etb_draw_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Visionary",
+                type_line="Creature - Elf Shaman",
+                oracle_text="When Fixture Visionary enters, draw a card.",
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect()));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_draw_count"], 1)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_draw_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Drake",
+                type_line="Creature - Drake",
+                oracle_text="Flying\nWhen Fixture Drake enters the battlefield, draw two cards.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(2)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["etb_draw_count"], 2)
+
+    def test_creature_etb_draw_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Judge",
+                type_line="Creature - Elf",
+                oracle_text="When Fixture Judge enters the battlefield, draw a card for each creature you control with a counter on it.",
+            ),
+            source_text="new DrawCardSourceControllerEffect(new PermanentsOnBattlefieldCount(filter))",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_draw_count_not_fixed")
+
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",

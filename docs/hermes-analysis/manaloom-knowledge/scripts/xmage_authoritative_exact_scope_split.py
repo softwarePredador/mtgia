@@ -23,6 +23,7 @@ from battle_rule_registry import deck_role_from_effect, logical_rule_key
 REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
 
 DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
+DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
 DESTROY_UNIT = "removal_destroy::targeted_destroy_variant_v1"
 LIFE_UNIT = "life_gain::xmage_life_gain_variant_review_v1"
@@ -69,6 +70,7 @@ ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
+ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -210,6 +212,20 @@ def java_constructor_int(source: str, class_name: str, *, default: int | None = 
     if match:
         return int(match.group(1))
     return default
+
+
+def java_constructor_int_or_noarg_default(
+    source: str,
+    class_name: str,
+    *,
+    noarg_default: int,
+) -> int | None:
+    amount = java_constructor_int(source, class_name)
+    if amount is not None:
+        return amount
+    if re.search(rf"\b{re.escape(class_name)}\s*\(\s*\)", source or ""):
+        return noarg_default
+    return None
 
 
 def has_additional_cost(source: str) -> bool:
@@ -610,6 +626,19 @@ def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -684,6 +713,21 @@ def etb_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     if not match:
         return None
     return int(match.group(1))
+
+
+def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    match = re.search(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+draw (a|one|two|three|four|five|\d+) cards?(?:\.|$)",
+        text,
+    )
+    if not match:
+        return None
+    value = match.group(1)
+    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    if value in words:
+        return words[value]
+    return int(value)
 
 
 def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -782,14 +826,20 @@ def split_row(
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
-    if unit not in SUPPORTED_UNITS and not keyword_creature_unit and not etb_life_gain_creature_unit:
+    etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    if (
+        unit not in SUPPORTED_UNITS
+        and not keyword_creature_unit
+        and not etb_life_gain_creature_unit
+        and not etb_draw_creature_unit
+    ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
         return None, "postgres_card_metadata_missing"
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
 
-    if unit in SPELL_UNITS and not etb_life_gain_creature_unit:
+    if unit in SPELL_UNITS and not etb_life_gain_creature_unit and not etb_draw_creature_unit:
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
         if ability_kind(row) != "one_shot":
@@ -859,6 +909,43 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_gain_life",
+        ), "selected_exact_scope"
+
+    if etb_draw_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_draw_not_creature"
+        count = etb_draw_count_from_oracle(metadata)
+        constructor_count = java_constructor_int_or_noarg_default(
+            source_text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if count is None or count <= 0:
+            return None, "etb_draw_count_not_fixed"
+        if constructor_count is None:
+            return None, "etb_draw_count_source_not_fixed"
+        if constructor_count != count:
+            return None, "etb_draw_count_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_DRAW_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": count,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_draw_cards",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
@@ -1171,7 +1258,12 @@ def build_exact_split_report(
     for row in queue_payload.get("queue") or []:
         if str(row.get("translation_lane") or "") != "xmage_authoritative_adapter_required":
             continue
-        if str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS and not is_static_keyword_creature_unit(row):
+        if (
+            str(row.get("adapter_work_unit") or "") not in SUPPORTED_UNITS
+            and not is_static_keyword_creature_unit(row)
+            and not is_creature_etb_life_gain_unit(row)
+            and not is_creature_etb_draw_unit(row)
+        ):
             continue
         considered += 1
         metadata = card_metadata_by_id.get(str(row.get("card_id") or ""), {})
@@ -1205,6 +1297,7 @@ def build_exact_split_report(
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,

@@ -1,0 +1,13 @@
+# PG295 PostgreSQL Apply Evidence
+
+- Generated at: `2026-07-01T10:13:24.498562+00:00`
+- Database: `143.198.230.247:5433/halder`
+- Mutations performed: `["postgres_apply_pg295_xmage_creature_etb_draw_wave"]`
+
+## Precheck
+
+`{"cards": ["Baleful Strix", "Carven Caryatid", "Cloudkin Seer", "Council of Advisors", "Elvish Visionary", "Gallant Citizen", "Generous Stray", "Gryff Vanguard", "Helpful Hunter", "Joraga Visionary", "Jungle Barrier", "Kavu Climber", "Kindly Customer", "Merchant of Secrets", "Messenger Falcons", "Muse Drake", "Nimble Innovator", "Owlbear", "Pond Prophet", "Rhox Oracle", "Roving Harper", "Shaman of Spring", "Skyscanner", "Spirited Companion", "Striped Bears", "Tome Raider", "Wall of Blossoms", "Wistful Selkie"], "existing_expected_rows_before": 0, "missing_targets": [], "row_count": 28, "total_target_card_rows": 28, "would_deprecate_shadow_rows": 10}`
+
+## Postcheck
+
+`{"backup_rows": 10, "cards": ["Baleful Strix", "Carven Caryatid", "Cloudkin Seer", "Council of Advisors", "Elvish Visionary", "Gallant Citizen", "Generous Stray", "Gryff Vanguard", "Helpful Hunter", "Joraga Visionary", "Jungle Barrier", "Kavu Climber", "Kindly Customer", "Merchant of Secrets", "Messenger Falcons", "Muse Drake", "Nimble Innovator", "Owlbear", "Pond Prophet", "Rhox Oracle", "Roving Harper", "Shaman of Spring", "Skyscanner", "Spirited Companion", "Striped Bears", "Tome Raider", "Wall of Blossoms", "Wistful Selkie"], "failed_cards": [], "promoted_oracle_hash_rows": 28, "promoted_rule_rows": 28, "promoted_verified_auto_rows": 28, "row_count": 28}`
