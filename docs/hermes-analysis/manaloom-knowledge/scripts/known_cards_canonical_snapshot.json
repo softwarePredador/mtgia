@@ -19170,6 +19170,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Dutiful Attendant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_exclude_self": true,
+    "dies_recursion_target": "creature",
+    "effect": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ac4691be75a5b00ae0e0be9a325705da",
+    "battle_rule_oracle_hash": "1577a7542791cf72d3e107b851620556"
+  },
   "Dutiful Return": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 2,
@@ -19783,6 +19809,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1c725fadd1305ca79a54309fd23d9cfe",
     "battle_rule_oracle_hash": "4a17580ac89c16ae7d3e5912030b1558"
+  },
+  "Elderfang Ritualist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_exclude_self": true,
+    "dies_recursion_target": "elf_card",
+    "effect": "creature",
+    "target_constraints": {
+      "controller": "self",
+      "subtypes": [
+        "elf"
+      ],
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3306f4d5219e782160daf1385d92f499",
+    "battle_rule_oracle_hash": "4bbafbe06b30d21e09a9a41d7c4a2bf0"
   },
   "Elderleaf Mentor": {
     "ability_kind": "triggered",
@@ -39923,6 +39975,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f56f3819b7773777b293a363b5cf432a"
   },
+  "Living Lightning": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_target": "instant_or_sorcery",
+    "effect": "creature",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:28eac3740a610b2b39f04e52527943c0",
+    "battle_rule_oracle_hash": "49cf6ad10d1f7f69263bd280ce851120"
+  },
   "Llanowar Dead": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -44950,14 +45028,30 @@
     "battle_rule_logical_key": "battle_rule_v1:df6a6474bff11a9935c51c0fad8da312"
   },
   "Myr Retriever": {
-    "cmc": 2.0,
-    "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_exclude_self": true,
+    "dies_recursion_target": "artifact",
+    "effect": "creature",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4437ef138e8d93691f9e19eac9dc08f5",
+    "battle_rule_oracle_hash": "29d416587cbec9bf97bdd4d20b730802"
   },
   "Myrel, Shield of Argive": {
     "cmc": 4.0,
@@ -79026,6 +79120,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Workshop Assistant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_exclude_self": true,
+    "dies_recursion_target": "artifact",
+    "effect": "creature",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4437ef138e8d93691f9e19eac9dc08f5",
+    "battle_rule_oracle_hash": "29d416587cbec9bf97bdd4d20b730802"
   },
   "World Shaper": {
     "cmc": 4.0,

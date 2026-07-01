@@ -124,6 +124,7 @@ ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
+DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
@@ -783,6 +784,8 @@ def recursion_target_constraints_for(
         constraints["subtypes"] = ["knight"]
     elif target == "mercenary_card":
         constraints["subtypes"] = ["mercenary"]
+    elif target == "elf_card":
+        constraints["subtypes"] = ["elf"]
     elif target == "shared_creature_type":
         constraints["card_types"] = ["creature"]
         constraints["shared_subtype_group"] = "creature_type"
@@ -1650,6 +1653,19 @@ def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
         and "DiesSourceTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
+def is_creature_dies_recursion_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"DiesSourceTriggeredAbility"}
+    return (
+        effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and "DiesSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
 
 
@@ -3062,6 +3078,7 @@ def etb_recursion_target_from_phrase(phrase: str) -> str | None:
         ("noncreature_nonland", r"noncreature, nonland"),
         ("knight_card", r"knight"),
         ("mercenary_card", r"mercenary"),
+        ("elf_card", r"elf"),
         ("permanent", r"permanent"),
         ("creature", r"creature"),
         ("artifact", r"artifact"),
@@ -3128,6 +3145,25 @@ def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any
         if target_type is not None and count is not None:
             return {"target": target_type, "count": count, "up_to_count": True}
     return None
+
+
+def dies_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^when [^,]+ dies, return (?P<another>another )?target (?P<phrase>.+?) "
+        r"cards? from your graveyard to your hand\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target_type = etb_recursion_target_from_phrase(match.group("phrase"))
+    if target_type is None:
+        return None
+    return {
+        "target": target_type,
+        "count": 1,
+        "exclude_self": bool(match.group("another")),
+    }
 
 
 UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS = {
@@ -3438,6 +3474,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
         scope_kind = "creature enter-the-battlefield triggered ability"
+    elif scope == DIES_RECURSION_CREATURE_SCOPE:
+        scope_kind = "creature dies triggered graveyard-to-hand ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
         scope_kind = "creature with tap-only activated damage ability"
     elif scope == PERMANENT_ACTIVATED_DAMAGE_SCOPE:
@@ -3508,6 +3546,7 @@ def split_row(
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
+    dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
@@ -3536,6 +3575,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
@@ -3565,6 +3605,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
@@ -4528,6 +4569,43 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_dies_draw_cards",
+        ), "selected_exact_scope"
+
+    if dies_recursion_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_recursion_not_creature"
+        if "DoIfCostPaid" in source_text or "GenericManaCost" in source_text:
+            return None, "dies_recursion_optional_cost_not_supported"
+        target = dies_recursion_to_hand_from_oracle(metadata)
+        if target is None:
+            return None, "dies_recursion_target_not_supported"
+        target_type = str(target["target"])
+        count = int(target["count"])
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_RECURSION_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "dies_recursion_target": target_type,
+            "dies_recursion_count": count,
+            "dies_recursion_destination": "hand",
+            "target_constraints": recursion_target_constraints_for(target_type),
+            "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+        }
+        if target.get("exclude_self"):
+            effect_json["dies_recursion_exclude_self"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_graveyard_to_hand",
         ), "selected_exact_scope"
 
     if etb_damage_creature_unit:

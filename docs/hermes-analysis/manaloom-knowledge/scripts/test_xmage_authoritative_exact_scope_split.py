@@ -3938,6 +3938,71 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_recursion_target_not_supported")
 
+    def test_creature_dies_recursion_maps_artifact_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Myr Retriever",
+                type_line="Artifact Creature - Myr",
+                oracle_text=(
+                    "When Myr Retriever dies, return another target artifact card "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "Effect effect = new ReturnFromGraveyardToHandTargetEffect();"
+                "Ability ability = new DiesSourceTriggeredAbility(effect);"
+                "ability.addTarget(new TargetCardInYourGraveyard(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_RECURSION_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_recursion_target"], "artifact")
+        self.assertEqual(effect["dies_recursion_count"], 1)
+        self.assertEqual(effect["dies_recursion_destination"], "hand")
+        self.assertTrue(effect["dies_recursion_exclude_self"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["artifact"]},
+        )
+
+    def test_creature_dies_recursion_blocks_optional_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carrion Thrash",
+                type_line="Creature - Lizard Warrior",
+                oracle_text=(
+                    "When Carrion Thrash dies, you may pay {2}. If you do, return another target "
+                    "creature card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "DiesSourceTriggeredAbility ability = new DiesSourceTriggeredAbility("
+                "new DoIfCostPaid(new ReturnFromGraveyardToHandTargetEffect(), "
+                "new GenericManaCost(2)), false);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_recursion_optional_cost_not_supported")
+
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",

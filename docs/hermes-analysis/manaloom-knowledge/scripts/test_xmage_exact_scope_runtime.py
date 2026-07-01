@@ -408,6 +408,44 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_recursion_returns_artifact_card_to_hand_excluding_self(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        retriever = {
+            "name": "Myr Retriever",
+            "type_line": "Artifact Creature - Myr",
+            "power": 1,
+            "toughness": 1,
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+            "dies_recursion_target": "artifact",
+            "dies_recursion_count": 1,
+            "dies_recursion_destination": "hand",
+            "dies_recursion_exclude_self": True,
+        }
+        bauble = {"name": "Mishra's Bauble", "type_line": "Artifact", "cmc": 0}
+        active.battlefield.append(retriever)
+        active.graveyard.append(bauble)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            retriever,
+            reason="test_destroy",
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual([card["name"] for card in active.hand], ["Mishra's Bauble"])
+        self.assertIn(retriever, active.graveyard)
+        self.assertNotIn(bauble, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "dies_recursion_resolved"
+                and data.get("card") == "Myr Retriever"
+                and data.get("recovered") == ["Mishra's Bauble"]
+                and data.get("exclude_self") is True
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_permanent_pays_mana_taps_and_draws(self) -> None:
         active = self.battle.Player(
             "Active",

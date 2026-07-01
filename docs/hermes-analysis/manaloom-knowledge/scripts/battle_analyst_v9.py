@@ -17382,6 +17382,45 @@ def resolve_permanent_dies_draw(owner, permanent, *, destination=None, reason=No
     return drawn
 
 
+def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reason=None, source=None):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return []
+    target_type = permanent.get("dies_recursion_target")
+    if not target_type:
+        return []
+    count = max(1, int(permanent.get("dies_recursion_count") or 1))
+    exclude_self = bool(permanent.get("dies_recursion_exclude_self"))
+    candidates = []
+    for grave_card in list(getattr(owner, "graveyard", []) or []):
+        if exclude_self and grave_card is permanent:
+            continue
+        if graveyard_card_matches_recursion_target(grave_card, target_type):
+            candidates.append(grave_card)
+    recovered = remove_cards_from_graveyard(
+        owner,
+        candidates[:count],
+        turn=CURRENT_REPLAY_TURN,
+        source_event="dies_recursion",
+    )
+    for recovered_card in recovered:
+        owner.hand.append(recovered_card)
+    emit_replay_event(
+        "dies_recursion_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        target_type=target_type,
+        recovered=[card.get("name", "?") for card in recovered if isinstance(card, dict)],
+        recovered_count=len(recovered),
+        destination="hand",
+        exclude_self=exclude_self,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return recovered
+
+
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
     destination = _move_creature_from_battlefield(
         owner,
@@ -17406,6 +17445,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
             turn=CURRENT_REPLAY_TURN,
         )
     resolve_permanent_dies_draw(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    resolve_permanent_dies_recursion(
         owner,
         creature,
         destination=destination,
@@ -17460,6 +17506,13 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             turn=CURRENT_REPLAY_TURN,
         )
     resolve_permanent_dies_draw(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    resolve_permanent_dies_recursion(
         owner,
         permanent,
         destination=destination,
@@ -33991,6 +34044,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "knight" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("mercenary_card", "mercenary"):
         return "mercenary" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("elf_card", "elf"):
+        return "elf" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("human_creature", "human"):
         return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
