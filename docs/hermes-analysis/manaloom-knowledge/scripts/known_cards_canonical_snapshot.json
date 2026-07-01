@@ -13244,6 +13244,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Commune with the Gods": {
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature_or_enchantment",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature_or_enchantment",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "enchantment"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dee33e0d21b42f1d5133090250212c7f",
+    "battle_rule_oracle_hash": "6d7ce4016bfce500247badd42e1fbf9a"
+  },
   "Concealed Courtyard": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -29110,6 +29143,46 @@
     "battle_rule_logical_key": "battle_rule_v1:3993c1ad477db947e50c1070410cd487",
     "battle_rule_oracle_hash": "7a8313dabc059f7c76cb5078eec2baea"
   },
+  "Glacial Revelation": {
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+    "count": 6,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 6,
+    "max_count": 6,
+    "pick_all_matching": true,
+    "pick_count": 6,
+    "pick_target": "snow_permanent",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": true,
+    "target": "snow_permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "supertypes": [
+        "snow"
+      ],
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:96532e985cb2d1a3673024caef9269b3",
+    "battle_rule_oracle_hash": "a52b48afaaa84dbc14c2e0ab196edb78"
+  },
   "Glacial Wall": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -31313,16 +31386,37 @@
     "battle_rule_oracle_hash": "288857f5e91e9574eff7a561f5d6708e"
   },
   "Grisly Salvage": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
     "count": 1,
-    "effect": "draw_cards",
+    "destination": "hand",
+    "effect": "dig_to_hand",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:eb04bb80a47324c44cea5835eba5bea7"
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": false,
+    "target": "creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2ca4973baa031b2e1d7c68c1a7a8b7cc",
+    "battle_rule_oracle_hash": "522a2aca336e4812e880cb700b936c4c"
   },
   "Grist, the Hunger Tide": {
     "effect": "commander",
@@ -38919,6 +39013,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "5558455640911ad277a679fa0c1c7897"
+  },
+  "Kruphix's Insight": {
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 6,
+    "max_count": 3,
+    "pick_all_matching": false,
+    "pick_count": 3,
+    "pick_target": "enchantment",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": true,
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:732b2144450d7b4be404ba0f023e3465",
+    "battle_rule_oracle_hash": "84bc958dbae0f32d686301e44ad75930"
   },
   "Kuldotha Forgemaster": {
     "cmc": 5.0,
@@ -49774,6 +49900,39 @@
     "battle_rule_logical_key": "battle_rule_v1:a7212570d89fe07fc414e2d80f4bb9e7",
     "battle_rule_oracle_hash": "3322e3f0f2cb6f3b2bf19fbe3bc370e2"
   },
+  "Pieces of the Puzzle": {
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+    "count": 2,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 5,
+    "max_count": 2,
+    "pick_all_matching": false,
+    "pick_count": 2,
+    "pick_target": "instant_or_sorcery",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": true,
+    "target": "instant_or_sorcery",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:17c94b3a53e5d4898d2bae7e0270fb00",
+    "battle_rule_oracle_hash": "268daefa60fcde1c979fd668541d8970"
+  },
   "Pierce the Sky": {
     "amount": 7,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -59179,6 +59338,39 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a68b5a577888a8eb123ac91d18ad8981"
+  },
+  "Scout the Borders": {
+    "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "dig_to_hand",
+    "instant": false,
+    "look_count": 5,
+    "max_count": 1,
+    "pick_all_matching": false,
+    "pick_count": 1,
+    "pick_target": "creature_or_land",
+    "pick_up_to_count": true,
+    "rest_destination": "graveyard",
+    "reveal": true,
+    "sorcery": true,
+    "target": "creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "library"
+    },
+    "xmage_effect_class": "RevealLibraryPickControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:edbce89b4e5ec35359ceb44c67366492",
+    "battle_rule_oracle_hash": "522a2aca336e4812e880cb700b936c4c"
   },
   "Scrambleverse": {
     "cmc": 8.0,

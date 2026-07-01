@@ -35952,9 +35952,36 @@ def resolve_hand_filter(player, card, effect_data, turn, rng):
     finish_resolved_spell(player, card, turn=turn)
 
 
+def library_dig_card_matches_pick_target(candidate, pick_target):
+    if not isinstance(candidate, dict):
+        return False
+    target = str(pick_target or "any_card").lower()
+    if target in {"any", "any_card", "card"}:
+        return True
+    type_line = str(candidate.get("type_line") or "").lower().replace("—", " ").replace("-", " ")
+
+    def has_type(card_type):
+        return bool(re.search(rf"\b{re.escape(str(card_type).lower())}\b", type_line))
+
+    if target in {"creature", "land", "enchantment", "artifact", "instant", "sorcery", "planeswalker", "battle"}:
+        return has_type(target)
+    if target == "creature_or_land":
+        return has_type("creature") or has_type("land")
+    if target == "creature_or_enchantment":
+        return has_type("creature") or has_type("enchantment")
+    if target == "instant_or_sorcery":
+        return has_type("instant") or has_type("sorcery")
+    if target == "snow_permanent":
+        permanent_types = ("artifact", "creature", "enchantment", "planeswalker", "battle", "land")
+        return has_type("snow") and any(has_type(card_type) for card_type in permanent_types)
+    return _card_type_matches(candidate, [target])
+
+
 def resolve_dig_to_hand(player, card, effect_data, turn):
     look_count = int(effect_data.get("look_count") or 0)
     pick_count = int(effect_data.get("pick_count") or 0)
+    pick_target = str(effect_data.get("pick_target") or effect_data.get("target") or "any_card")
+    pick_all_matching = bool(effect_data.get("pick_all_matching"))
     if look_count <= 0 or pick_count <= 0:
         emit_replay_event(
             "dig_to_hand_resolved",
@@ -35964,6 +35991,8 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
             picked_count=0,
             picked=[],
             moved_to_graveyard=[],
+            pick_target=pick_target,
+            pick_all_matching=pick_all_matching,
             library_remaining=len(player.library),
             hand_size=len(player.hand),
             graveyard_size=len(player.graveyard),
@@ -35976,15 +36005,21 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
     for _ in range(min(look_count, len(player.library))):
         looked.append(player.library.pop(0))
 
+    eligible = [
+        candidate
+        for candidate in looked
+        if library_dig_card_matches_pick_target(candidate, pick_target)
+    ]
+    effective_pick_count = len(eligible) if pick_all_matching else pick_count
     ranked = sorted(
-        [candidate for candidate in looked if isinstance(candidate, dict)],
+        eligible,
         key=lambda candidate: (
             -discard_replacement_priority(candidate, player),
             -int(_opening_hand_card_cmc(candidate) or 0),
             candidate.get("name", "?"),
         ),
     )
-    picked = ranked[: min(pick_count, len(ranked))]
+    picked = ranked[: min(effective_pick_count, len(ranked))]
     picked_ids = {id(candidate) for candidate in picked}
     moved_to_graveyard = [candidate for candidate in looked if id(candidate) not in picked_ids]
 
@@ -35998,6 +36033,9 @@ def resolve_dig_to_hand(player, card, effect_data, turn):
         looked_count=len(looked),
         picked_count=len(picked),
         picked=[candidate.get("name", "?") for candidate in picked if isinstance(candidate, dict)],
+        eligible_count=len(eligible),
+        pick_target=pick_target,
+        pick_all_matching=pick_all_matching,
         moved_to_graveyard=[
             candidate.get("name", "?")
             for candidate in moved_to_graveyard

@@ -112,6 +112,7 @@ RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
 )
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
+LIBRARY_PICK_SPELL_SCOPE = "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1"
 PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
     "xmage_permanent_simple_activated_graveyard_to_library_v1"
 )
@@ -838,6 +839,26 @@ def recursion_target_constraints_for(
         constraints["target"] = target
     if mana_value_max is not None:
         constraints["mana_value_max"] = mana_value_max
+    return constraints
+
+
+def library_pick_target_constraints_for(target: str) -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "library", "controller": "self"}
+    if target == "any_card":
+        constraints["scope"] = "any_card"
+    elif target in {"creature", "land", "enchantment", "artifact", "instant", "sorcery"}:
+        constraints["card_types"] = [target]
+    elif target == "creature_or_land":
+        constraints["card_types"] = ["creature", "land"]
+    elif target == "creature_or_enchantment":
+        constraints["card_types"] = ["creature", "enchantment"]
+    elif target == "instant_or_sorcery":
+        constraints["card_types"] = ["instant", "sorcery"]
+    elif target == "snow_permanent":
+        constraints["card_types"] = ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"]
+        constraints["supertypes"] = ["snow"]
+    else:
+        constraints["target"] = target
     return constraints
 
 
@@ -3669,13 +3690,135 @@ def etb_recursion_target_from_phrase(phrase: str) -> str | None:
 
 def word_count_value(value: str) -> int | None:
     normalized = str(value or "").strip().lower()
-    if normalized == "one":
-        return 1
-    if normalized == "two":
-        return 2
+    words = {
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+        "ten": 10,
+    }
+    if normalized in words:
+        return words[normalized]
     if normalized.isdigit():
         return int(normalized)
     return None
+
+
+def library_pick_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.removeprefix("a ").removeprefix("an ")
+    normalized = normalized.removesuffix(".")
+    normalized = normalized.removesuffix(" cards").removesuffix(" card")
+    mapping = {
+        "creature or enchantment": "creature_or_enchantment",
+        "creature or land": "creature_or_land",
+        "instant and/or sorcery": "instant_or_sorcery",
+        "instant or sorcery": "instant_or_sorcery",
+        "snow permanent": "snow_permanent",
+        "enchantment": "enchantment",
+        "creature": "creature",
+        "land": "land",
+        "artifact": "artifact",
+        "card": "any_card",
+    }
+    return mapping.get(normalized)
+
+
+def library_pick_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    prefix = r"^reveal the top (?P<look>\w+) cards of your library\. "
+    up_to_match = re.match(
+        prefix
+        + r"put up to (?P<count>\w+) (?P<phrase>.+?) cards? from among them into your hand "
+        + r"and (?:the )?rest(?: of the revealed cards)? into your graveyard\.?$",
+        text,
+    )
+    may_match = re.match(
+        prefix
+        + r"you may put (?P<count>a|an|one|two|three|any number of) (?P<phrase>.+?) cards? "
+        + r"from among them into your hand\. put the rest into your graveyard\.?$",
+        text,
+    )
+    match = up_to_match or may_match
+    if not match:
+        return "library_pick_oracle_not_simple"
+    look_count = word_count_value(match.group("look"))
+    if look_count is None or look_count <= 0:
+        return "library_pick_oracle_look_count_not_supported"
+    count_token = str(match.group("count") or "").strip().lower()
+    pick_all_matching = count_token == "any number of"
+    if pick_all_matching:
+        pick_count = look_count
+    elif count_token in {"a", "an"}:
+        pick_count = 1
+    else:
+        pick_count = word_count_value(count_token)
+    if pick_count is None or pick_count <= 0:
+        return "library_pick_oracle_pick_count_not_supported"
+    target = library_pick_target_from_phrase(match.group("phrase"))
+    if target is None:
+        return "library_pick_oracle_target_not_supported"
+    return {
+        "look_count": look_count,
+        "pick_count": pick_count,
+        "pick_target": target,
+        "pick_up_to_count": True,
+        "pick_all_matching": pick_all_matching,
+        "rest_destination": "graveyard",
+    }
+
+
+def library_pick_target_from_source(source: str, filter_arg: str) -> str | None:
+    text = source or ""
+    filter_ref = str(filter_arg or "").strip()
+    if "FILTER_CARD_CREATURE_OR_LAND" in filter_ref or "FILTER_CARD_CREATURE_OR_LAND" in text:
+        return "creature_or_land"
+    if "FILTER_CARD_ENCHANTMENTS" in filter_ref or "FILTER_CARD_ENCHANTMENTS" in text:
+        return "enchantment"
+    if "SuperType.SNOW.getPredicate" in text and "FilterPermanentCard" in text:
+        return "snow_permanent"
+    filter_match = re.search(r'new\s+Filter(?:Permanent)?Card\s*\(\s*"([^"]+)"\s*\)', text)
+    if filter_match:
+        target = library_pick_target_from_phrase(filter_match.group(1))
+        if target is not None:
+            return target
+    if "CardType.CREATURE.getPredicate()" in text and "CardType.ENCHANTMENT.getPredicate()" in text:
+        return "creature_or_enchantment"
+    if "CardType.INSTANT.getPredicate()" in text and "CardType.SORCERY.getPredicate()" in text:
+        return "instant_or_sorcery"
+    return None
+
+
+def library_pick_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    match = re.search(
+        r"RevealLibraryPickControllerEffect\s*\(\s*(?P<look>\d+)\s*,\s*"
+        r"(?P<pick>\d+|Integer\.MAX_VALUE)\s*,\s*(?P<filter>[^,]+)\s*,\s*"
+        r"PutCards\.HAND\s*,\s*PutCards\.GRAVEYARD",
+        text,
+        re.S,
+    )
+    if not match:
+        return "library_pick_source_effect_not_found"
+    look_count = int(match.group("look"))
+    pick_raw = match.group("pick")
+    pick_all_matching = pick_raw == "Integer.MAX_VALUE"
+    pick_count = look_count if pick_all_matching else int(pick_raw)
+    target = library_pick_target_from_source(text, match.group("filter"))
+    if target is None:
+        return "library_pick_source_target_not_supported"
+    return {
+        "look_count": look_count,
+        "pick_count": pick_count,
+        "pick_target": target,
+        "pick_all_matching": pick_all_matching,
+        "rest_destination": "graveyard",
+    }
 
 
 def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -4064,6 +4207,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated graveyard-exile ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE:
         scope_kind = "permanent with a simple activated graveyard-to-library ability"
+    elif scope == LIBRARY_PICK_SPELL_SCOPE:
+        scope_kind = "fixed reveal-top-library pick-to-hand spell"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE:
@@ -5935,6 +6080,45 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit == RECURSION_UNIT:
+        if classes == {"RevealLibraryPickControllerEffect"}:
+            if ability_classes(row):
+                return None, "library_pick_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "library_pick_oracle_not_simple"
+            oracle_pick = library_pick_from_oracle(metadata)
+            if isinstance(oracle_pick, str):
+                return None, oracle_pick
+            source_pick = library_pick_from_source(source_text)
+            if isinstance(source_pick, str):
+                return None, source_pick
+            for key in ("look_count", "pick_count", "pick_target", "pick_all_matching", "rest_destination"):
+                if source_pick.get(key) != oracle_pick.get(key):
+                    return None, f"library_pick_source_oracle_{key}_mismatch"
+            pick_target = str(oracle_pick["pick_target"])
+            effect_json = {
+                "effect": "dig_to_hand",
+                "battle_model_scope": LIBRARY_PICK_SPELL_SCOPE,
+                "look_count": int(oracle_pick["look_count"]),
+                "pick_count": int(oracle_pick["pick_count"]),
+                "count": int(oracle_pick["pick_count"]),
+                "max_count": int(oracle_pick["pick_count"]),
+                "pick_target": pick_target,
+                "target": pick_target,
+                "target_constraints": library_pick_target_constraints_for(pick_target),
+                "destination": "hand",
+                "rest_destination": "graveyard",
+                "reveal": True,
+                "pick_up_to_count": True,
+                "pick_all_matching": bool(oracle_pick.get("pick_all_matching")),
+                "xmage_effect_class": "RevealLibraryPickControllerEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell",
+            ), "selected_exact_scope"
         if classes == {"PutOnLibraryTargetEffect"}:
             if ability_classes(row):
                 return None, "graveyard_to_library_ability_class_not_simple"
@@ -6522,6 +6706,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",

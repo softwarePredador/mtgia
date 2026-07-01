@@ -366,6 +366,91 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_reveal_library_pick_spell_creature_or_land_is_package_safe(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["RevealLibraryPickControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Grisly Salvage",
+                type_line="Instant",
+                oracle_text=(
+                    "Reveal the top five cards of your library. "
+                    "You may put a creature or land card from among them into your hand. "
+                    "Put the rest into your graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new RevealLibraryPickControllerEffect(
+                    5, 1, StaticFilters.FILTER_CARD_CREATURE_OR_LAND, PutCards.HAND, PutCards.GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "dig_to_hand")
+        self.assertEqual(effect["battle_model_scope"], split.LIBRARY_PICK_SPELL_SCOPE)
+        self.assertEqual(effect["look_count"], 5)
+        self.assertEqual(effect["pick_count"], 1)
+        self.assertEqual(effect["pick_target"], "creature_or_land")
+        self.assertEqual(effect["target_constraints"]["card_types"], ["creature", "land"])
+        self.assertEqual(effect["rest_destination"], "graveyard")
+        self.assertTrue(effect["pick_up_to_count"])
+        self.assertFalse(effect["pick_all_matching"])
+
+    def test_reveal_library_pick_spell_snow_all_matching_is_package_safe(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["RevealLibraryPickControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Glacial Revelation",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Reveal the top six cards of your library. "
+                    "You may put any number of snow permanent cards from among them into your hand. "
+                    "Put the rest into your graveyard."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterPermanentCard("snow permanent cards");
+                static {
+                    filter.add(SuperType.SNOW.getPredicate());
+                }
+                this.getSpellAbility().addEffect(new RevealLibraryPickControllerEffect(
+                    6, Integer.MAX_VALUE, filter, PutCards.HAND, PutCards.GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["look_count"], 6)
+        self.assertEqual(effect["pick_count"], 6)
+        self.assertEqual(effect["pick_target"], "snow_permanent")
+        self.assertTrue(effect["pick_all_matching"])
+        self.assertEqual(effect["target_constraints"]["supertypes"], ["snow"])
+
+    def test_reveal_library_pick_spell_blocks_flashback_ability(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["RevealLibraryPickControllerEffect"],
+            ability_classes=["FlashbackAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Tracker's Instincts",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Reveal the top four cards of your library. "
+                    "You may put a creature card from among them into your hand. "
+                    "Put the rest into your graveyard. Flashback {2}{U}"
+                ),
+            ),
+            source_text="this.getSpellAbility().addEffect(new RevealLibraryPickControllerEffect(4, 1, filter, PutCards.HAND, PutCards.GRAVEYARD));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "library_pick_ability_class_not_simple")
+
     def test_library_tutor_land_to_battlefield_spell_is_package_safe(self) -> None:
         row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutInPlayEffect"])
         proposal, reason = split.split_row(

@@ -15,7 +15,7 @@ Execution contract:
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` freezes how to follow
   this flow day to day.
-- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG337
+- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG338
   all-card completion goal, current baseline, and stop criteria.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG337 Exact Adapter Waves
+## PG283-PG338 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG337 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG338 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -3307,6 +3307,68 @@ PG337 measured result:
 - Running the exact splitter after PG337 on supported units returns
   `proposal_count=0` over `7947` considered supported rows.
 
+PG338 evidence:
+
+- PG338 reveal-library-pick package:
+  `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_package.md`
+- PG338 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_pg_apply_evidence.md`
+- PG338 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_pg_to_sqlite_sync.json`
+- PG338 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_e2e_validation.md`
+- PG338 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg338_reveal_library_pick_wave.md`
+- post-PG338 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg338_reveal_library_pick_wave_commander_legal.md`
+- post-PG338 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg338_supported_recheck.md`
+- post-PG338 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg338_reveal_library_pick_wave_recheck.md`
+- post-PG338 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg338_reveal_library_pick_wave.md`
+- post-PG338 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg338_reveal_library_pick_wave.md`
+
+PG338 measured result:
+
+- PG338 promoted `6` exact reveal-top-library pick-to-hand rules:
+  `Commune with the Gods`, `Glacial Revelation`, `Grisly Salvage`,
+  `Kruphix's Insight`, `Pieces of the Puzzle`, and `Scout the Borders`.
+- The splitter now supports exact
+  `RevealLibraryPickControllerEffect` one-shot spell rows when Oracle and
+  XMage agree on `look_count`, `pick_count` or all-matching mode, pick target,
+  hand destination, and graveyard rest destination.
+- Runtime `dig_to_hand` now respects `pick_target` filters including
+  `creature_or_enchantment`, `creature_or_land`, `instant_or_sorcery`,
+  `enchantment`, and `snow_permanent`; nonmatching revealed cards go to the
+  graveyard even when the ranking heuristic would otherwise prefer them.
+- Similar rows with flashback, ETB, activated, or other ability classes remain
+  blocked from this exact scope under reasons such as
+  `library_pick_ability_class_not_simple`.
+- Focused tests pass for the exact splitter (`184` tests), runtime (`111`
+  tests), and package builder (`4` tests).
+- PostgreSQL postcheck reports `6/6` promoted rows, `6/6` verified/auto rows,
+  and `6/6` matching Oracle hash rows, with `2` stale `Grisly Salvage` shadow
+  rows backed up and deprecated.
+- PG -> Hermes/SQLite sync loaded `7257` PostgreSQL rows, inserted/updated
+  `7051` SQLite rows, and exported `4845` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- XMage strategy consistency audit reports `26/26` pass.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` warning for the
+  pre-existing residual `trusted_executable_rules_missing_oracle_hash=1418`;
+  PG338 rows all carry matching Oracle hashes.
+- Global all-card readiness after PG338:
+  `battle_and_oracle_ready=2390`, `battle_family_mapper_required=30157`, and
+  `snapshot_has_verified_rule=3538`.
+- Global all-card authoritative queue after PG338:
+  `target_identity_count=27234`, `xmage_authoritative_source_count=26920`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26920`.
+- Running the exact splitter after PG338 on supported units returns
+  `proposal_count=0` over `7941` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3946,10 +4008,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG337 queue, the next exact runtime-backed work should be selected from
+post-PG338 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1922`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1916`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

@@ -188,6 +188,83 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dig_to_hand_respects_instant_or_sorcery_filter(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Large Creature", "type_line": "Creature - Giant", "cmc": 8},
+                {"name": "Useful Instant", "type_line": "Instant", "cmc": 2},
+                {"name": "Basic Land", "type_line": "Basic Land - Island", "cmc": 0},
+                {"name": "Big Sorcery", "type_line": "Sorcery", "cmc": 6},
+            ],
+        )
+        effect = {
+            "effect": "dig_to_hand",
+            "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+            "look_count": 4,
+            "pick_count": 2,
+            "pick_target": "instant_or_sorcery",
+            "rest_destination": "graveyard",
+        }
+
+        self.battle.resolve_dig_to_hand(
+            active,
+            {"name": "Pieces of the Puzzle", "type_line": "Sorcery"},
+            effect,
+            turn=3,
+        )
+
+        self.assertEqual({card["name"] for card in active.hand}, {"Useful Instant", "Big Sorcery"})
+        self.assertEqual({card["name"] for card in active.graveyard}, {"Large Creature", "Basic Land"})
+        self.assertTrue(
+            any(
+                event == "dig_to_hand_resolved"
+                and data.get("pick_target") == "instant_or_sorcery"
+                and data.get("eligible_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_dig_to_hand_all_matching_snow_permanent_filter(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Snow-Covered Plains", "type_line": "Basic Snow Land - Plains", "cmc": 0},
+                {"name": "Snow Relic", "type_line": "Snow Artifact", "cmc": 2},
+                {"name": "Snow Instant", "type_line": "Snow Instant", "cmc": 1},
+                {"name": "Regular Creature", "type_line": "Creature - Bear", "cmc": 2},
+            ],
+        )
+        effect = {
+            "effect": "dig_to_hand",
+            "battle_model_scope": "xmage_reveal_top_library_pick_to_hand_rest_graveyard_spell_v1",
+            "look_count": 4,
+            "pick_count": 4,
+            "pick_target": "snow_permanent",
+            "pick_all_matching": True,
+            "rest_destination": "graveyard",
+        }
+
+        self.battle.resolve_dig_to_hand(
+            active,
+            {"name": "Glacial Revelation", "type_line": "Sorcery"},
+            effect,
+            turn=4,
+        )
+
+        self.assertEqual({card["name"] for card in active.hand}, {"Snow-Covered Plains", "Snow Relic"})
+        self.assertEqual({card["name"] for card in active.graveyard}, {"Snow Instant", "Regular Creature"})
+        self.assertTrue(
+            any(
+                event == "dig_to_hand_resolved"
+                and data.get("pick_all_matching") is True
+                and data.get("eligible_count") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_library_tutor_to_battlefield_respects_tapped_flag(self) -> None:
         active = self.battle.Player(
             "Active",
