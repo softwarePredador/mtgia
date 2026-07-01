@@ -669,6 +669,79 @@
     "battle_rule_logical_key": "battle_rule_v1:9dfb3fbe439202150278210bbf0beadc",
     "battle_rule_oracle_hash": "8138b7b2bbea07be1edcec0a46fff595"
   },
+  "Advance Scout": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "first_strike"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "FirstStrikeAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [
+      "W"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{W}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "first_strike": true,
+    "granted_keywords_until_eot": [
+      "first_strike"
+    ],
+    "keywords": [
+      "first_strike"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "FirstStrikeAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b8cc41f870a0cf26097717df50bf66e9",
+    "battle_rule_oracle_hash": "148a03732a37709ae78d4bac0c347a8f"
+  },
   "Adventurer's Inn": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -29915,6 +29988,81 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf"
   },
+  "Harmattan Efreet": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [
+          "U",
+          "U"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{U}{U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "FlyingAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [
+      "U",
+      "U"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{U}{U}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2cf7e89007b76b45977da2016ce49b04",
+    "battle_rule_oracle_hash": "80310c614004ebd42c3f1a3cddbfeb0b"
+  },
   "Harmonize": {
     "count": 3,
     "effect": "draw_cards",
@@ -46681,6 +46829,83 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eaa27d98bb13d1caeabde36eb8fa8a0b"
   },
+  "Pixie Queen": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [
+          "G",
+          "G",
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}{G}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "FlyingAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [
+      "G",
+      "G",
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}{G}{G}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:92da53168ad3c7175c351d4bf984fa6c",
+    "battle_rule_oracle_hash": "d81188656267840c4a9d890bf8f1b62c"
+  },
   "Plague Myr": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -48004,6 +48229,79 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d816a3ec5c9c24e763abaccb27b2a2b3"
+  },
+  "Pseudodragon Familiar": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "FlyingAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [
+      "U"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{U}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bef17c67f4b265b08dc05b8a8f21e99f",
+    "battle_rule_oracle_hash": "d5632d2c7d70261dfa6b0f1f6c5261c8"
   },
   "Psychic Corrosion": {
     "cmc": 3.0,
@@ -73824,6 +74122,75 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
+  },
+  "Wind Dancer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "target_keyword_until_eot",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "granted_keywords_until_eot": [
+          "flying"
+        ],
+        "power_delta": 0,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_delta": 0,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "GainAbilityTargetEffect",
+        "xmage_keyword_ability_class": "FlyingAbility"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "activated_effect": "target_keyword_until_eot",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+    "duration": "until_end_of_turn",
+    "effect": "creature",
+    "flying": true,
+    "granted_keywords_until_eot": [
+      "flying"
+    ],
+    "keywords": [
+      "flying"
+    ],
+    "power_delta": 0,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_delta": 0,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "GainAbilityTargetEffect",
+    "xmage_keyword_ability_class": "FlyingAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:80758af47186a7fb0aba91d2480de042",
+    "battle_rule_oracle_hash": "f50ae434e6eddebfe53279e641bdaecc"
   },
   "Wind Drake": {
     "_keywords_are_self": true,

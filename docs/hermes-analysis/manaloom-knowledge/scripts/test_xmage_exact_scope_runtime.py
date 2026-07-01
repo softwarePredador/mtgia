@@ -1770,6 +1770,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertNotIn("flying", target)
         self.assertNotIn("keywords", target)
 
+    def test_simple_activated_target_keyword_preserves_source_static_keyword(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Efreet",
+            "type_line": "Creature - Efreet",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["creature"]},
+            "granted_keywords_until_eot": ["flying"],
+            "keywords": ["flying"],
+            "_keywords_are_self": True,
+            "flying": True,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "summoning_sick": False,
+        }
+        target = {"name": "Ground Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        active.battlefield.extend([source, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=22,
+            rng=random.Random(22),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(source["flying"])
+        self.assertEqual(source["keywords"], ["flying"])
+        self.assertTrue(target["flying"])
+        self.assertEqual(target["keywords"], ["flying"])
+
+        self.battle.clear_until_eot(active)
+        self.assertTrue(source["flying"])
+        self.assertEqual(source["keywords"], ["flying"])
+        self.assertNotIn("flying", target)
+        self.assertNotIn("keywords", target)
+
     def test_simple_activated_target_keyword_blocks_summoning_sick_tap_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

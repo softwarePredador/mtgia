@@ -2209,6 +2209,39 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["activation_cost_colors"], ["U"])
         self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
 
+    def test_activated_target_keyword_preserves_leading_static_keyword(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Efreet",
+                type_line="Creature - Efreet",
+                oracle_text="Flying\n{1}{U}{U}: Target creature gains flying until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{1}{U}{U}"));'
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flying"])
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["U", "U"])
+
     def test_activated_target_keyword_blocks_subtype_filter_target(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

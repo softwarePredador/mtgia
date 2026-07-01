@@ -1797,7 +1797,7 @@ def activated_target_boost_from_source(source: str) -> dict[str, Any] | str:
 
 
 def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
     if text.count(":") != 1:
         return "activated_target_keyword_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
@@ -2964,6 +2964,13 @@ def split_row(
         target_constraints = {"card_types": ["creature"]}
         if bool(oracle_keyword.get("exclude_source")):
             target_constraints["exclude_source"] = True
+        self_keywords = static_keywords_from_oracle(metadata)
+        self_keyword_list: list[str] = []
+        if self_keywords:
+            ability_keywords = keywords_from_ability_classes(row)
+            if not self_keywords.issubset(ability_keywords):
+                return None, "activated_target_keyword_static_keyword_mismatch"
+            self_keyword_list = ordered_keywords(self_keywords)
         activated_effect = {
             "effect": "stat_modifier_until_eot",
             "battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
@@ -3018,6 +3025,11 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": False,
         }
+        if self_keyword_list:
+            effect_json["keywords"] = self_keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in self_keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
