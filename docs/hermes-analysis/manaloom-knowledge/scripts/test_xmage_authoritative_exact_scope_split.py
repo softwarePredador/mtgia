@@ -2094,6 +2094,131 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
+    def test_graveyard_to_battlefield_with_plus_one_counters_maps_to_counter_scope(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Evil Reawakened",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card from your graveyard to the battlefield "
+                    "with two additional +1/+1 counters on it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(
+                    new ReturnFromGraveyardToBattlefieldWithCounterTargetEffect(
+                        true, CounterType.P1P1.createInstance(2)));
+                this.getSpellAbility().addTarget(
+                    new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_COUNTER_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertEqual(effect["target_graveyard_controller"], "self")
+        self.assertEqual(effect["battlefield_controller"], "self")
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_amount"], 2)
+        self.assertTrue(effect["additional_counter"])
+
+    def test_graveyard_to_battlefield_with_lifelink_counter_preserves_keyword(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unbreakable Bond",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card from your graveyard to the battlefield "
+                    "with a lifelink counter on it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(
+                    new ReturnFromGraveyardToBattlefieldWithCounterTargetEffect(
+                        CounterType.LIFELINK.createInstance()));
+                this.getSpellAbility().addTarget(
+                    new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["counter_type"], "lifelink")
+        self.assertEqual(effect["counter_amount"], 1)
+        self.assertEqual(effect["keywords"], ["lifelink"])
+        self.assertEqual(effect["counter_grants_keywords"], ["lifelink"])
+
+    def test_graveyard_to_battlefield_with_counter_any_graveyard_preserves_count(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aberrant Return",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Put one, two, or three target creature cards from graveyards onto the battlefield "
+                    "under your control. Each of them enters with an additional -1/-1 counter on it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(
+                    new ReturnFromGraveyardToBattlefieldWithCounterTargetEffect(
+                        CounterType.M1M1.createInstance()));
+                this.getSpellAbility().addTarget(
+                    new TargetCardInGraveyard(1, 3, StaticFilters.FILTER_CARD_CREATURES));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["count"], 3)
+        self.assertEqual(effect["target_count_min"], 1)
+        self.assertEqual(effect["target_graveyard_controller"], "any_player")
+        self.assertEqual(effect["counter_type"], "-1/-1")
+        self.assertEqual(effect["counter_amount"], 1)
+
+    def test_graveyard_to_battlefield_with_counter_blocks_unmodeled_counter(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Return",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card from your graveyard to the battlefield "
+                    "with a lifelink counter on it."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(
+                    new ReturnFromGraveyardToBattlefieldWithCounterTargetEffect(
+                        CounterType.FINALITY.createInstance()));
+                this.getSpellAbility().addTarget(
+                    new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_battlefield_counter_source_counter_not_supported")
+
     def test_graveyard_to_library_spell_maps_to_library_top_recursion(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["PutOnLibraryTargetEffect"])
         proposal, reason = split.split_row(

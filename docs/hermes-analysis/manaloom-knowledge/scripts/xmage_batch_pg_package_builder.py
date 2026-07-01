@@ -29,6 +29,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "library_controller",
     "target_constraints",
     "count",
+    "target_count_min",
     "up_to_count",
     "destination",
     "enters_tapped",
@@ -60,6 +61,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "life_gain",
     "counter_type",
     "counter_amount",
+    "additional_counter",
+    "counter_grants_keywords",
     "keywords",
 )
 

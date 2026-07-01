@@ -15,7 +15,7 @@ Execution contract:
 
 - `BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md` freezes how to follow
   this flow day to day.
-- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG334
+- `XMAGE_GLOBAL_ALL_CARD_COMPLETION_GOAL_2026-07-01.md` freezes the post-PG335
   all-card completion goal, current baseline, and stop criteria.
 - If the contract checkpoint passes, do not revalidate the full strategy again;
   rebuild the queue and continue family/subpattern work.
@@ -123,23 +123,23 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg334_graveyard_to_library_spell_wave_commander_legal.md`
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg334_graveyard_to_library_spell_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg335_battlefield_counter_recursion_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg335_battlefield_counter_recursion_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27248`
-- XMage authoritative source resolved: `26934`
+- target all-card battle-gap identities: `27245`
+- XMage authoritative source resolved: `26931`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26934`
+- XMage authoritative adapter required: `26931`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26934` identities, card semantics are accepted from XMage; work is now
+- For `26931` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG334 Exact Adapter Waves
+## PG283-PG335 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG334 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG335 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -310,6 +310,12 @@ patterns:
   `ReturnFromGraveyardToBattlefieldTargetEffect`, no ability class, no
   additional cost, and exact self-graveyard single-target Oracle text ->
   `xmage_return_target_graveyard_card_to_battlefield_spell_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnFromGraveyardToBattlefieldWithCounterTargetEffect`, no ability class,
+  no additional cost, exact graveyard-to-battlefield Oracle/source agreement,
+  and supported fixed counters (`+1/+1`, `-1/-1`, or keyword-granting
+  `lifelink`) ->
+  `xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `PutOnLibraryTargetEffect`, no ability class, exact self-graveyard
   top/bottom library Oracle/source agreement, and no additional cost ->
@@ -3123,6 +3129,60 @@ PG334 measured result:
 - Running the exact splitter after PG334 on supported units returns
   `proposal_count=0` over `7955` considered supported rows.
 
+PG335 evidence:
+
+- PG335 battlefield-counter recursion package:
+  `docs/hermes-analysis/master_optimizer_reports/pg335_xmage_battlefield_counter_recursion_wave_package.md`
+- PG335 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg335_xmage_battlefield_counter_recursion_wave_pg_to_sqlite_sync.json`
+- PG335 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg335_xmage_battlefield_counter_recursion_wave_e2e_validation.md`
+- PG335 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg335_battlefield_counter_recursion_wave.md`
+- post-PG335 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg335_battlefield_counter_recursion_wave_commander_legal.md`
+- post-PG335 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg335_supported_recheck.md`
+- post-PG335 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg335_battlefield_counter_recursion_wave_recheck.md`
+- PG335 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg335_battlefield_counter_recursion_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg335_battlefield_counter_recursion_wave_final_docs.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg335_battlefield_counter_recursion_wave_final_docs.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg335_battlefield_counter_recursion_wave_final_docs.md`
+
+PG335 measured result:
+
+- PG335 promoted `3` exact graveyard-to-battlefield-with-counter recursion
+  spells: `Aberrant Return`, `Evil Reawakened`, and `Unbreakable Bond`.
+- The splitter now supports exact spell-only
+  `ReturnFromGraveyardToBattlefieldWithCounterTargetEffect` rows with
+  supported fixed counters: `+1/+1`, `-1/-1`, and lifelink counters.
+- Runtime recursion now applies counters to returned battlefield permanents,
+  grants keyword counters where modeled, and performs zero-toughness cleanup
+  after `-1/-1` counters.
+- Focused tests pass for the exact splitter (`175` tests), runtime (`103`
+  tests), and package builder (`4` tests).
+- PostgreSQL postcheck reports `3/3` promoted rows, `3/3` verified/auto rows,
+  and `3/3` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7246` PostgreSQL rows, inserted/updated
+  `7040` SQLite rows, and exported `4835` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Post-PG335 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The PG/Hermes/SQLite
+  audit has the inherited single warning for old trusted SQLite rules without
+  `oracle_hash`; PG335 rows themselves have `3/3` matching Oracle hashes.
+- Global all-card readiness after PG335:
+  `battle_and_oracle_ready=2379`, `battle_family_mapper_required=30168`, and
+  `snapshot_has_verified_rule=3527`.
+- Global all-card authoritative queue after PG335:
+  `target_identity_count=27245`, `xmage_authoritative_source_count=26931`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26931`.
+- Running the exact splitter after PG335 on supported units returns
+  `proposal_count=0` over `7952` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3762,10 +3822,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG334 queue, the next exact runtime-backed work should be selected from
+post-PG335 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1930`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1927`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

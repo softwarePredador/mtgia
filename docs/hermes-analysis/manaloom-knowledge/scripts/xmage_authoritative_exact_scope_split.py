@@ -108,6 +108,9 @@ COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
+    "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
+)
 GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
@@ -1085,6 +1088,107 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
             result["mana_value_max"] = int(match.group("mana_value_max"))
         return result
     return None
+
+
+def recursion_to_battlefield_with_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (
+            r"^return target creature card from your graveyard to the battlefield "
+            r"with two additional \+1/\+1 counters on it\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+                "counter_type": "+1/+1",
+                "counter_amount": 2,
+                "additional_counter": True,
+            },
+        ),
+        (
+            r"^return target creature card from your graveyard to the battlefield "
+            r"with a lifelink counter on it\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+                "counter_type": "lifelink",
+                "counter_amount": 1,
+                "keywords": ["lifelink"],
+            },
+        ),
+        (
+            r"^put one, two, or three target creature cards from graveyards onto the battlefield "
+            r"under your control\. each of them enters with an additional -1/-1 counter on it\.?$",
+            {
+                "target": "creature",
+                "count": 3,
+                "target_count_min": 1,
+                "target_graveyard_controller": "any_player",
+                "battlefield_controller": "self",
+                "counter_type": "-1/-1",
+                "counter_amount": 1,
+                "additional_counter": True,
+            },
+        ),
+    ]
+    for pattern, spec in patterns:
+        if re.match(pattern, text):
+            return dict(spec)
+    return None
+
+
+def recursion_battlefield_counter_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    effect_constructors = re.findall(
+        r"new\s+ReturnFromGraveyardToBattlefieldWithCounterTargetEffect\s*\(",
+        text,
+    )
+    if len(effect_constructors) != 1:
+        return "recursion_battlefield_counter_source_not_single_effect"
+    if "TargetCardInYourGraveyard" in text:
+        target_graveyard_controller = "self"
+    elif "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text:
+        target_graveyard_controller = "any_player"
+    else:
+        return "recursion_battlefield_counter_source_target_not_supported"
+    if "FILTER_CARD_CREATURE" not in text and "FilterCreatureCard" not in text:
+        return "recursion_battlefield_counter_source_target_not_supported"
+
+    counter_matches = re.findall(
+        r"CounterType\.(P1P1|M1M1|LIFELINK)\.createInstance\s*\(\s*(\d*)\s*\)",
+        text,
+    )
+    if len(counter_matches) != 1:
+        return "recursion_battlefield_counter_source_counter_not_supported"
+    counter_symbol, raw_count = counter_matches[0]
+    counter_type = {
+        "P1P1": "+1/+1",
+        "M1M1": "-1/-1",
+        "LIFELINK": "lifelink",
+    }[counter_symbol]
+    counter_amount = int(raw_count or "1")
+
+    count = 1
+    target_count_min: int | None = None
+    count_match = re.search(r"TargetCardInGraveyard\s*\(\s*(\d+)\s*,\s*(\d+)\s*,", text, re.S)
+    if count_match:
+        target_count_min = int(count_match.group(1))
+        count = int(count_match.group(2))
+    elif re.search(r"TargetCardInYourGraveyard\s*\(\s*0\s*,\s*(\d+)\s*,", text, re.S):
+        return "recursion_battlefield_counter_source_target_not_supported"
+
+    return {
+        "target": "creature",
+        "count": count,
+        "target_count_min": target_count_min,
+        "target_graveyard_controller": target_graveyard_controller,
+        "battlefield_controller": "self",
+        "counter_type": counter_type,
+        "counter_amount": counter_amount,
+    }
 
 
 def source_supports_battlefield_recursion_target(source_text: str, target_graveyard_controller: str) -> bool:
@@ -5538,6 +5642,61 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_library_spell",
+            ), "selected_exact_scope"
+        if classes == {"ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"}:
+            if ability_classes(row):
+                return None, "recursion_battlefield_counter_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "recursion_battlefield_counter_oracle_not_simple"
+            oracle_target = recursion_to_battlefield_with_counter_from_oracle(metadata)
+            if oracle_target is None:
+                return None, "recursion_battlefield_counter_target_not_supported"
+            source_target = recursion_battlefield_counter_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in (
+                "target",
+                "count",
+                "target_graveyard_controller",
+                "battlefield_controller",
+                "counter_type",
+                "counter_amount",
+            ):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"recursion_battlefield_counter_source_oracle_{key}_mismatch"
+            target_type = str(oracle_target["target"])
+            count = int(oracle_target["count"])
+            target_graveyard_controller = str(oracle_target.get("target_graveyard_controller") or "self")
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_BATTLEFIELD_COUNTER_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    controller=target_graveyard_controller,
+                ),
+                "count": count,
+                "destination": "battlefield",
+                "target_controller": target_graveyard_controller,
+                "target_graveyard_controller": target_graveyard_controller,
+                "battlefield_controller": str(oracle_target.get("battlefield_controller") or "self"),
+                "counter_type": str(oracle_target["counter_type"]),
+                "counter_amount": int(oracle_target["counter_amount"]),
+                "xmage_effect_class": "ReturnFromGraveyardToBattlefieldWithCounterTargetEffect",
+                **flags,
+            }
+            if oracle_target.get("target_count_min") is not None:
+                effect_json["target_count_min"] = int(oracle_target["target_count_min"])
+            if oracle_target.get("additional_counter"):
+                effect_json["additional_counter"] = True
+            if oracle_target.get("keywords"):
+                effect_json["keywords"] = list(oracle_target["keywords"])
+                effect_json["counter_grants_keywords"] = list(oracle_target["keywords"])
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_battlefield_with_counter_spell",
             ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
             if ability_classes(row):

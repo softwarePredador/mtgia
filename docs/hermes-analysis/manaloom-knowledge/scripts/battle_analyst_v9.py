@@ -47738,6 +47738,38 @@ def apply_effect_immediate(
                             permanent["summoning_sick"] = not permanent["haste"]
                             permanent["tapped"] = bool(permanent.get("tapped") or enters_tapped)
                         destination_controller.battlefield.append(permanent)
+                        counter_type = str(
+                            component_data.get("counter_type")
+                            or effect_data.get("counter_type")
+                            or ""
+                        )
+                        counter_amount = int(
+                            component_data.get("counter_amount")
+                            or effect_data.get("counter_amount")
+                            or 0
+                        )
+                        if counter_type and counter_amount > 0:
+                            if counter_type == "+1/+1":
+                                add_plus_one_counters(permanent, counter_amount)
+                            elif counter_type == "-1/-1":
+                                add_minus_one_counters(permanent, counter_amount)
+                                try:
+                                    current_toughness = int(float(permanent.get("toughness") or 0))
+                                except (TypeError, ValueError):
+                                    current_toughness = 0
+                                if current_toughness <= 0 and permanent in destination_controller.battlefield:
+                                    move_creature_from_battlefield(
+                                        destination_controller,
+                                        permanent,
+                                        reason="zero_toughness_after_recursion_counter",
+                                        all_players=all_players,
+                                    )
+                            else:
+                                add_named_counters(permanent, counter_type, counter_amount)
+                                for keyword in component_data.get("counter_grants_keywords") or effect_data.get(
+                                    "counter_grants_keywords"
+                                ) or []:
+                                    permanent[str(keyword)] = True
                     elif component_destination == "library_top":
                         participant.library.insert(0, recovered_card)
                     elif component_destination == "library_bottom":
@@ -47799,6 +47831,8 @@ def apply_effect_immediate(
             destination=destination,
             mana_value_max=mana_value_max,
             enters_tapped=bool(effect_data.get("enters_tapped")),
+            counter_type=effect_data.get("counter_type"),
+            counter_amount=effect_data.get("counter_amount"),
             return_all_matching=return_all_matching,
             mode_selection=effect_data.get("mode_selection"),
             grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),

@@ -231,6 +231,37 @@
     "battle_rule_logical_key": "battle_rule_v1:42c8d04b248c93ad98a122f714a76848",
     "battle_rule_oracle_hash": "c8f2cbb5d7cbdbebb7b2725095f5231e"
   },
+  "Aberrant Return": {
+    "additional_counter": true,
+    "battle_model_scope": "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1",
+    "battlefield_controller": "self",
+    "count": 3,
+    "counter_amount": 1,
+    "counter_type": "-1/-1",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "any_player",
+      "zone": "graveyard"
+    },
+    "target_controller": "any_player",
+    "target_count_min": 1,
+    "target_graveyard_controller": "any_player",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldWithCounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42745b0cb7d5187b475dffddde020a44",
+    "battle_rule_oracle_hash": "efe3ccf1e525a5312589b212ee754280"
+  },
   "Abigale, Eloquent First-Year": {
     "ability_kind": "triggered",
     "battle_model_scope": "etb_strip_other_creature_abilities_and_grant_keyword_counters_v1",
@@ -22016,6 +22047,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:42d629a9ccceff95dbed01e2226291a7",
     "battle_rule_oracle_hash": "1d823f07340ed6833c15a9c6065a1742"
+  },
+  "Evil Reawakened": {
+    "additional_counter": true,
+    "battle_model_scope": "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "counter_amount": 2,
+    "counter_type": "+1/+1",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldWithCounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e55d06ea39357c597a59f0f55563dbba",
+    "battle_rule_oracle_hash": "293caf5db856fc4ee566fd1a8bc2fc83"
   },
   "Eviscerate": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -73873,6 +73934,41 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Unbreakable Bond": {
+    "battle_model_scope": "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "counter_amount": 1,
+    "counter_grants_keywords": [
+      "lifelink"
+    ],
+    "counter_type": "lifelink",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "keywords": [
+      "lifelink"
+    ],
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldWithCounterTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ef5fffa2825b1b0e56b2b630f8b483ec",
+    "battle_rule_oracle_hash": "0247c39c83582e4c135501beeabd2799"
   },
   "Unbreakable Formation": {
     "cmc": 3.0,
