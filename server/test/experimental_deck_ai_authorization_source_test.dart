@@ -413,5 +413,50 @@ void main() {
       expect(dynamicRoute, contains("if (id == 'following')"));
       expect(dynamicRoute, contains('getFollowingFeed(context)'));
     });
+
+    test('deck-card intelligence queries avoid multi-row tag fanout', () {
+      final violations = <String>[];
+      final sourceFiles = [
+        ...Directory('routes')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart')),
+        ...Directory('lib')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart')),
+      ];
+
+      final blockedJoin = RegExp(
+        r'\b(?:left\s+)?join\s+'
+        r'(?:card_battle_rules|card_function_tags|card_semantic_tags_v2)\b',
+        caseSensitive: false,
+      );
+      final deckCardsFrom = RegExp(
+        r'\bfrom\s+deck_cards\b',
+        caseSensitive: false,
+      );
+
+      for (final file in sourceFiles) {
+        final lines = file.readAsLinesSync();
+        for (var i = 0; i < lines.length; i += 1) {
+          if (!deckCardsFrom.hasMatch(lines[i])) continue;
+
+          final windowEnd = (i + 30).clamp(0, lines.length);
+          final queryWindow = lines.sublist(i, windowEnd).join('\n');
+          if (blockedJoin.hasMatch(queryWindow)) {
+            violations.add('${file.path}:${i + 1}');
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason: 'Deck-card reads must use card_intelligence_snapshot or '
+            'explicit aggregation before joining multi-row card rule/tag '
+            'tables; direct joins inflate counts and role metrics.',
+      );
+    });
   });
 }
