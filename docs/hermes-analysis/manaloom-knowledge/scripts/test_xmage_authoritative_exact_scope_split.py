@@ -1994,6 +1994,121 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_self_boost_oracle_not_simple")
 
+    def test_activated_target_keyword_maps_to_keyword_until_eot(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["HasteAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Drillmaster",
+                type_line="Creature - Goblin Shaman",
+                oracle_text="{T}: Target creature gains haste until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn), "
+                "new TapSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_KEYWORD_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "target_keyword_until_eot")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["haste"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["granted_keywords_until_eot"], ["haste"])
+
+    def test_activated_target_keyword_accepts_controlled_creature_target(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Glidemaster",
+                type_line="Creature - Human Wizard",
+                oracle_text="{2}{U}: Target creature you control gains flying until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(FlyingAbility.getInstance(), Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{2}{U}"));'
+                "ability.addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+
+    def test_activated_target_keyword_blocks_subtype_filter_target(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Marshal",
+                type_line="Creature - Human Soldier",
+                oracle_text="{3}: Target Soldier gains flying until end of turn.",
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterPermanent(SubType.SOLDIER, \"Soldier\");"
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(FlyingAbility.getInstance()), new GenericManaCost(3));"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_target_keyword_oracle_not_simple")
+
+    def test_activated_target_keyword_blocks_source_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["IndestructibleAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Savior",
+                type_line="Creature - Dog",
+                oracle_text="Sacrifice Fixture Savior: Another target creature you control gains indestructible until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(IndestructibleAbility.getInstance(), Duration.EndOfTurn), "
+                "new SacrificeSourceCost());"
+                "ability.addTarget(new TargetPermanent(StaticFilters.FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_target_keyword_oracle_cost_not_supported")
+
     def test_static_keyword_creature_allows_multiline_keyword_oracle(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",

@@ -8,7 +8,7 @@ Fonte operacional:
 
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 - `docs/hermes-analysis/BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg313_permanent_activated_self_boost_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
 
 ## Objetivo
 
@@ -23,21 +23,21 @@ fila global de cartas conhecidas pelo ManaLoom.
 
 ## Estado atual
 
-Checkpoint: pos-PG313, `xmage_permanent_simple_activated_self_boost_until_eot_v1`.
+Checkpoint: pos-PG314, `xmage_permanent_simple_activated_target_keyword_until_eot_v1`.
 
 | Metrica | Valor |
 | --- | ---: |
-| `target_identity_count` | 27452 |
-| `xmage_authoritative_source_count` | 27138 |
+| `target_identity_count` | 27440 |
+| `xmage_authoritative_source_count` | 27126 |
 | `xmage_missing_source_exception_count` | 314 |
 | `xmage_authoritative_parser_gap_count` | 0 |
-| `xmage_authoritative_adapter_required_count` | 27138 |
+| `xmage_authoritative_adapter_required_count` | 27126 |
 | `manual_semantic_decision_units_remaining` | 314 |
 | `adapter_work_unit_count` | 11429 |
 
 Leitura correta:
 
-- `27138` identidades ja tem verdade comportamental no XMage local.
+- `27126` identidades ja tem verdade comportamental no XMage local.
 - O trabalho restante nelas e traduzir XMage para adapters/runtime ManaLoom por
   familia/subpadrao, nao revisar semanticamente carta por carta.
 - `314` identidades nao resolveram classe local no XMage e ficam em trilha
@@ -101,28 +101,28 @@ Prioridade secundaria:
 
 ## Proxima etapa concreta
 
-PG313 fechou o subpadrao de permanente com habilidade ativada simples que aplica
-boost de poder/resistencia na propria fonte ate o fim do turno. Foram promovidas
-63 cartas com custos de ativacao simples suportados e efeitos
-`self_stat_modifier_until_eot`.
+PG314 fechou o subpadrao de permanente com habilidade ativada simples que da
+keyword temporaria a uma criatura alvo ate o fim do turno. Foram promovidas 12
+cartas com custos de ativacao simples suportados e efeito
+`target_keyword_until_eot`.
 
-Evidencias PG313:
+Evidencias PG314:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_package.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_pg_apply_evidence.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_e2e_validation.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg313_existing_supported_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_pg_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg314_existing_supported_recheck.md`
 
-O splitter exato pos-PG313 retorna `proposal_count=0` sobre `7366` linhas
+O splitter exato pos-PG314 retorna `proposal_count=0` sobre `7406` linhas
 suportadas consideradas. Portanto, a proxima etapa nao e repetir os subpadroes
 ja cobertos, e sim escolher outro subpadrao runtime-backed a partir da fila
-pos-PG313.
+pos-PG314.
 
 Maiores work units atuais para priorizacao:
 
 - `recursion`: 1984
 - `draw_engine`: 1660
-- `grant_protection`: 1179
+- `grant_protection`: 1167
 - `direct_damage`: 928
 - `add_counters` por fonte: 795
 - `life_gain`: 754
@@ -162,6 +162,20 @@ PG313:
 Nome:
 
 - `xmage_permanent_simple_activated_self_boost_until_eot_v1`
+
+PG314:
+
+- `GainAbilityTargetEffect`
+- `SimpleActivatedAbility`
+- permanente no campo de batalha
+- efeito aplicado a criatura alvo ate o fim do turno
+- custos suportados: mana simples e tap da propria fonte
+- keywords iniciais promovidas: `haste`, `flying`, `trample`, `first_strike`
+- limpeza obrigatoria via `until_end_of_turn`
+
+Nome:
+
+- `xmage_permanent_simple_activated_target_keyword_until_eot_v1`
 
 Bloqueios reais deixados para sublotes posteriores:
 

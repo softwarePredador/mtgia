@@ -10588,6 +10588,9 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         return False
     if target.get("eliminated"):
         return False
+    constraints = _target_constraints_dict(spell)
+    if constraints.get("exclude_source") and target is spell:
+        return False
     # Hexproof: can't be targeted by opponents
     target_controller_name = (
         target.get("controller")
@@ -10612,7 +10615,6 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
         source_colors = set(protection_colors_for_source(spell))
     if any(c in protections for c in source_colors):
         return False
-    constraints = _target_constraints_dict(spell)
     allowed_types = _constraint_card_types(spell)
     if allowed_types and "permanent" not in allowed_types:
         if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):
@@ -13120,6 +13122,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 return True
             if activate_best_generic_self_boost_permanent(
                 active_player,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
+            if activate_best_generic_target_keyword_permanent(
+                active_player,
+                opponents,
                 all_players,
                 turn,
                 rng,
@@ -35395,6 +35408,7 @@ GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ab
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 
 
 def _activated_rule_effects_for_permanent(permanent):
@@ -35509,6 +35523,39 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             boost_effect[key] = permanent.get(key)
         effects.append(boost_effect)
+    if (
+        permanent.get("activated_effect") == "target_keyword_until_eot"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE
+    ):
+        keyword_effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "target_keyword_until_eot",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": False,
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("target") or "creature",
+            "target_controller": permanent.get("target_controller") or "any",
+            "target_constraints": permanent.get("target_constraints") or {"card_types": ["creature"]},
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": list(permanent.get("granted_keywords_until_eot") or []),
+            "duration": permanent.get("duration") or "until_end_of_turn",
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            keyword_effect[key] = permanent.get(key)
+        effects.append(keyword_effect)
     return effects
 
 
@@ -36181,6 +36228,317 @@ def activate_best_generic_self_boost_permanent(player, all_players, turn, rng, *
     )
     return activate_generic_self_boost_permanent(
         player,
+        all_players,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+        auto_only=True,
+    )
+
+
+AUTO_TARGET_KEYWORD_UNTIL_EOT = {
+    "deathtouch",
+    "double_strike",
+    "first_strike",
+    "flying",
+    "haste",
+    "lifelink",
+    "menace",
+    "trample",
+    "vigilance",
+}
+
+
+def activated_target_keyword_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "target_keyword_until_eot"
+        ):
+            keywords = [
+                str(keyword or "").strip().lower().replace(" ", "_")
+                for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+                if str(keyword or "").strip()
+            ]
+            if len(keywords) == 1:
+                effect_data["granted_keywords_until_eot"] = keywords
+                return effect_data
+    return None
+
+
+def _target_keyword_activation_cost(effect_data):
+    return _self_boost_activation_cost(effect_data)
+
+
+def _target_keyword_target_candidates(player, opponents, permanent, effect_data, *, auto_only=False):
+    target_type = str((effect_data or {}).get("target") or "creature").lower()
+    target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    if target_controller in {"self", "you", "controller", "controlled", "any"}:
+        participants = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        participants = list(opponents or [])
+    else:
+        participants = [player]
+    keywords = list((effect_data or {}).get("granted_keywords_until_eot") or [])
+    keyword = str(keywords[0] if keywords else "").strip().lower().replace(" ", "_")
+    candidates = []
+    for owner in participants:
+        for target in list(getattr(owner, "battlefield", []) or []):
+            if not is_battlefield_creature(target):
+                continue
+            if card_has_keyword(target, keyword):
+                continue
+            if auto_only and keyword not in AUTO_TARGET_KEYWORD_UNTIL_EOT:
+                continue
+            if not is_legal_target(
+                permanent,
+                target,
+                player,
+                target_type=target_type,
+                target_controller=owner,
+            ):
+                continue
+            candidates.append((owner, target))
+    return candidates
+
+
+def _choose_activated_target_keyword_target(player, opponents, permanent, effect_data, *, auto_only=False):
+    candidates = _target_keyword_target_candidates(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        auto_only=auto_only,
+    )
+    if not candidates:
+        return None, None, []
+    owner, target = max(
+        candidates,
+        key=lambda item: (
+            target_priority(item[1]),
+            int(item[1].get("summoning_sick") or 0),
+            str(item[1].get("name") or ""),
+        ),
+    )
+    return owner, target, [target for _owner, target in candidates]
+
+
+def can_activate_generic_target_keyword_permanent(player, opponents, permanent, *, effect_data=None, auto_only=False):
+    effect_data = effect_data or activated_target_keyword_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = _target_keyword_activation_cost(effect_data)
+    if not player.can_pay(activation_cost):
+        return False
+    target_owner, target, _targets = _choose_activated_target_keyword_target(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        auto_only=auto_only,
+    )
+    return target_owner is not None and target is not None
+
+
+def activate_generic_target_keyword_permanent(
+    player,
+    opponents,
+    all_players,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase=None,
+    auto_only=False,
+):
+    effect_data = activated_target_keyword_effect_for_permanent(permanent)
+    if not can_activate_generic_target_keyword_permanent(
+        player,
+        opponents,
+        permanent,
+        effect_data=effect_data,
+        auto_only=auto_only,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    target_owner, target, target_options = _choose_activated_target_keyword_target(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        auto_only=auto_only,
+    )
+    if target is None or target_owner is None:
+        return False
+    activation_cost = _target_keyword_activation_cost(effect_data)
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    keywords = [
+        str(keyword or "").strip().lower().replace(" ", "_")
+        for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    current_keywords = list(target.get("keywords") or [])
+    merged_keywords = list(dict.fromkeys([*current_keywords, *keywords]))
+    set_until_eot(target, "keywords", merged_keywords)
+    for keyword in keywords:
+        set_until_eot(target, keyword, True)
+    fields = replay_rule_fields(effect_data)
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    target_type = str(effect_data.get("target") or "creature").lower()
+    decision = targeting_decision(
+        permanent,
+        target,
+        player,
+        target_controller=target_owner,
+        target_type=target_type,
+    )
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                candidate,
+                effect_data,
+                action="activate_target_keyword",
+                score=sum(target_priority(candidate)),
+                target_controller=owner.name,
+            )
+            for owner, candidate in _target_keyword_target_candidates(
+                player,
+                opponents,
+                permanent,
+                effect_data,
+                auto_only=auto_only,
+            )[:8]
+        ],
+        chosen_option=decision_card_option(
+            target,
+            effect_data,
+            action="activate_target_keyword",
+            target_controller=target_owner.name,
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost": activation_cost,
+            "target": target.get("name", "?"),
+            "keywords": keywords,
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(6, sum(target_priority(target)) * 3),
+        actual_outcome="activated_target_keyword_used",
+        reason="use_target_keyword_until_eot_when_profitable",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "temporary_keywords": len(keywords),
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "temporary_keyword": bool(keywords),
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="stat_modifier_until_eot",
+        activation_kind="simple_activated_target_keyword",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        mana_paid=mana_paid,
+        target=target.get("name", "?"),
+        target_player=target_owner.name,
+        granted_keywords_until_eot=keywords,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "stat_modifier_until_eot_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target_player=target_owner.name,
+        target=target.get("name", "?"),
+        target_power_before=target.get("power"),
+        target_power_after=target.get("power"),
+        target_toughness_before=target.get("toughness"),
+        target_toughness_after=target.get("toughness"),
+        power_delta=0,
+        toughness_delta=0,
+        granted_keywords_until_eot=keywords,
+        result="stat_modifier_until_eot_applied",
+        available_targets=len(target_options),
+        **target_selection_replay_fields(target, target_options),
+        turn=turn,
+        phase=phase,
+        **decision,
+        **fields,
+    )
+    check_sbas_until_stable(all_players)
+    return True
+
+
+def activate_best_generic_target_keyword_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_target_keyword_effect_for_permanent(permanent)
+        if not can_activate_generic_target_keyword_permanent(
+            player,
+            opponents,
+            permanent,
+            effect_data=effect_data,
+            auto_only=True,
+        ):
+            continue
+        target_owner, target, _targets = _choose_activated_target_keyword_target(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            auto_only=True,
+        )
+        if target is None or target_owner is None:
+            continue
+        activation_cost = int(effect_data.get("activation_cost_generic") or 0) + len(
+            effect_data.get("activation_cost_colors") or []
+        )
+        options.append((sum(target_priority(target)) - activation_cost, str(permanent.get("name") or ""), permanent))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return activate_generic_target_keyword_permanent(
+        player,
+        opponents,
         all_players,
         options[0][2],
         turn,

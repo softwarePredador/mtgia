@@ -92,6 +92,7 @@ ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
+TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
@@ -1216,6 +1217,19 @@ def is_boost_keyword_spell_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_target_keyword_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    keyword_abilities = abilities.intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
+    return (
+        str(row.get("adapter_work_unit") or "") == BOOST_KEYWORD_UNIT
+        and effect_classes(row) == {"GainAbilityTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+        and "SimpleActivatedAbility" in abilities
+        and len(keyword_abilities) == 1
+        and len(abilities - {"SimpleActivatedAbility"} - keyword_abilities) == 0
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -1644,6 +1658,137 @@ def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
     return {
         "power_delta": int(boost_matches[0][0]),
         "toughness_delta": int(boost_matches[0][1]),
+        **activation,
+    }
+
+
+def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_target_keyword_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    keyword_words = "|".join(
+        re.escape(word)
+        for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True)
+    )
+    match = re.match(
+        rf"^(another )?target creature( you control)? gains ({keyword_words}) until end of turn\.?$",
+        effect_text,
+    )
+    if not match:
+        return "activated_target_keyword_oracle_not_simple"
+    if match.group(1) and not match.group(2):
+        return "activated_target_keyword_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_target_keyword")
+    return {
+        "keyword": TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(3)],
+        "target": "creature",
+        "target_controller": "self" if match.group(2) else "any",
+        "exclude_source": bool(match.group(1)),
+        **activation,
+    }
+
+
+def activated_target_keyword_cost_from_source(window: str) -> dict[str, Any] | str:
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_target_keyword_source_cost_not_supported"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_target_keyword_source_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_target_keyword_source_cost_not_supported"
+    if mana_matches:
+        cost_text = mana_matches[0]
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_target_keyword_source_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+    }
+
+
+def activated_target_keyword_target_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
+        return "activated_target_keyword_source_target_not_supported"
+    target_constructors = re.findall(r"new\s+(Target\w+)\s*\(", text)
+    if len(target_constructors) != 1:
+        return "activated_target_keyword_source_target_not_supported"
+    if re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text, re.S):
+        return {"target": "creature", "target_controller": "any", "exclude_source": False}
+    if re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text, re.S):
+        return {"target": "creature", "target_controller": "self", "exclude_source": False}
+    if "FILTER_ANOTHER_TARGET_CREATURE_YOU_CONTROL" in text:
+        return {"target": "creature", "target_controller": "self", "exclude_source": True}
+    if re.search(r"FILTER_CONTROLLED_CREATURE|FILTER_TARGET_CREATURE_YOU_CONTROL", text, re.S):
+        return {"target": "creature", "target_controller": "self", "exclude_source": False}
+    return "activated_target_keyword_source_target_not_supported"
+
+
+def activated_target_keyword_from_source(source: str, keyword_ability_class: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "Zone.GRAVEYARD" in text:
+        return "activated_target_keyword_source_not_battlefield"
+    gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(gain_matches) != 1:
+        return "activated_target_keyword_source_not_single_effect"
+    ability_expr = (
+        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
+        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
+    )
+    if not re.search(
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}"
+        rf"(?:\s*,\s*Duration\.EndOfTurn\s*)?\)",
+        text,
+        re.S,
+    ):
+        return "activated_target_keyword_source_keyword_not_supported"
+    gain_index = text.find("GainAbilityTargetEffect")
+    window = text[max(0, gain_index - 500) : gain_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_target_keyword_source_not_simple_activated"
+    activation = activated_target_keyword_cost_from_source(window)
+    if isinstance(activation, str):
+        return activation
+    target_data = activated_target_keyword_target_from_source(text)
+    if isinstance(target_data, str):
+        return target_data
+    return {
+        "keyword": TARGET_GRANT_KEYWORD_ABILITY_CLASSES[keyword_ability_class],
+        **target_data,
         **activation,
     }
 
@@ -2214,6 +2359,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
+    elif scope == TARGET_KEYWORD_ACTIVATED_SCOPE:
+        scope_kind = "permanent simple activated target-creature keyword until end of turn"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -2298,6 +2445,7 @@ def split_row(
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
+    permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
@@ -2316,6 +2464,7 @@ def split_row(
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
         and not permanent_activated_self_boost_unit
+        and not permanent_activated_target_keyword_unit
         and not permanent_activated_recursion_to_hand_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
@@ -2340,6 +2489,7 @@ def split_row(
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
         and not permanent_activated_self_boost_unit
+        and not permanent_activated_target_keyword_unit
         and not permanent_activated_recursion_to_hand_unit
     ):
         if not is_spell(metadata):
@@ -2553,6 +2703,98 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_self_boost_until_eot",
+        ), "selected_exact_scope"
+
+    if permanent_activated_target_keyword_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_target_keyword_not_permanent"
+        keyword_abilities = ability_classes(row).intersection(TARGET_GRANT_KEYWORD_ABILITY_CLASSES)
+        if len(keyword_abilities) != 1:
+            return None, "activated_target_keyword_ability_not_supported"
+        keyword_ability_class = next(iter(keyword_abilities))
+        oracle_keyword = activated_target_keyword_from_oracle(metadata)
+        if isinstance(oracle_keyword, str):
+            return None, oracle_keyword
+        parsed_activation = activated_target_keyword_from_source(source_text, keyword_ability_class)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in ("keyword", "target", "target_controller", "exclude_source"):
+            if parsed_activation.get(key) != oracle_keyword.get(key):
+                return None, f"activated_target_keyword_source_oracle_{key}_mismatch"
+        source_cost = (
+            int(parsed_activation["activation_cost_generic"]),
+            list(parsed_activation["activation_cost_colors"]),
+            bool(parsed_activation["activation_requires_tap"]),
+        )
+        oracle_cost = (
+            int(oracle_keyword["activation_cost_generic"]),
+            list(oracle_keyword["activation_cost_colors"]),
+            bool(oracle_keyword["activation_requires_tap"]),
+        )
+        if source_cost != oracle_cost:
+            return None, "activated_target_keyword_source_oracle_cost_mismatch"
+        target_constraints = {"card_types": ["creature"]}
+        if bool(oracle_keyword.get("exclude_source")):
+            target_constraints["exclude_source"] = True
+        activated_effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "target_keyword_until_eot",
+            "target": "creature",
+            "target_controller": oracle_keyword["target_controller"],
+            "target_constraints": target_constraints,
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": [oracle_keyword["keyword"]],
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "GainAbilityTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_keyword_ability_class": keyword_ability_class,
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": TARGET_KEYWORD_ACTIVATED_SCOPE,
+            "target": "creature",
+            "target_controller": oracle_keyword["target_controller"],
+            "target_constraints": target_constraints,
+            "power_delta": 0,
+            "toughness_delta": 0,
+            "granted_keywords_until_eot": [oracle_keyword["keyword"]],
+            "duration": "until_end_of_turn",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "GainAbilityTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_keyword_ability_class": keyword_ability_class,
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_target_keyword_until_eot",
         ), "selected_exact_scope"
 
     if permanent_activated_recursion_to_hand_unit:
@@ -3530,6 +3772,7 @@ def build_exact_split_report(
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
             and not is_permanent_activated_self_boost_unit(row)
+            and not is_permanent_activated_target_keyword_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
@@ -3574,6 +3817,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
+                "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",

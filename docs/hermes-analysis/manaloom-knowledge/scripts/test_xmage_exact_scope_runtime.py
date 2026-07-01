@@ -1489,6 +1489,108 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(tap_only["toughness"], 1)
         self.assertFalse(tap_only.get("tapped", False))
 
+    def test_simple_activated_target_keyword_pays_taps_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("blue", 1)
+        active.mana_pool.add("colorless", 1)
+        source = {
+            "name": "Fixture Glidemaster",
+            "type_line": "Creature - Human Wizard",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "self",
+            "target_constraints": {"card_types": ["creature"]},
+            "granted_keywords_until_eot": ["flying"],
+            "activation_cost_mana": "{1}{U}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["U"],
+            "activation_requires_tap": True,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_glidemaster",
+        }
+        target = {"name": "Ground Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        active.battlefield.extend([source, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=21,
+            rng=random.Random(21),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(source["tapped"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(target["flying"])
+        self.assertEqual(target["keywords"], ["flying"])
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("activation_kind") == "simple_activated_target_keyword"
+                and data.get("target") == "Ground Bear"
+                and data.get("granted_keywords_until_eot") == ["flying"]
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_glidemaster"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Glidemaster"
+                and data.get("target") == "Ground Bear"
+                and data.get("granted_keywords_until_eot") == ["flying"]
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertNotIn("flying", target)
+        self.assertNotIn("keywords", target)
+
+    def test_simple_activated_target_keyword_blocks_summoning_sick_tap_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Drillmaster",
+            "type_line": "Creature - Goblin Shaman",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "activated_effect": "target_keyword_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_keyword_until_eot_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "granted_keywords_until_eot": ["haste"],
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "summoning_sick": True,
+        }
+        target = {"name": "Fresh Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.extend([source, target])
+
+        activated = self.battle.activate_generic_target_keyword_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=22,
+            rng=random.Random(22),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertFalse(source.get("tapped", False))
+        self.assertNotIn("haste", target)
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

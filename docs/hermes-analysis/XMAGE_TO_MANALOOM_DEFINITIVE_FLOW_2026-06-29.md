@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg313_permanent_activated_self_boost_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27452`
-- XMage authoritative source resolved: `27138`
+- target all-card battle-gap identities: `27440`
+- XMage authoritative source resolved: `27126`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27138`
+- XMage authoritative adapter required: `27126`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27138` identities, card semantics are accepted from XMage; work is now
+- For `27126` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG313 Exact Adapter Waves
+## PG283-PG314 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG313 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG314 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -246,6 +246,13 @@ patterns:
   target-tap costs, no hybrid/Phyrexian/untap-symbol costs, no dynamic X boost,
   and no modal/compound text ->
   `xmage_permanent_simple_activated_self_boost_until_eot_v1`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+  with `GainAbilityTargetEffect + SimpleActivatedAbility`, exact activated
+  target-creature gains keyword until end of turn text, battlefield permanents,
+  simple mana/tap source costs only, no source sacrifice, no subtype-filtered
+  targets, and supported keywords `haste`, `flying`, `trample`, and
+  `first_strike` ->
+  `xmage_permanent_simple_activated_target_keyword_until_eot_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - fixed damage, destroy and exile target spells with XMage/Oracle-matched
@@ -1726,6 +1733,78 @@ PG313 measured result:
 - The next work must implement another exact runtime-backed family/subpattern
   from the post-PG313 queue. The largest current work units are `recursion`
   `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `626`.
+
+PG314 evidence:
+
+- PG314 permanent activated target-keyword package:
+  `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_package.md`
+- PG314 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_pg_apply_evidence.md`
+- PG314 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_e2e_validation.md`
+- PG314 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_pg_to_sqlite_sync.json`
+- PG314 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG314 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg314_permanent_activated_target_keyword_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg314_permanent_activated_target_keyword_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
+- post-PG314 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg314_permanent_activated_target_keyword_wave_recheck.md`
+- post-PG314 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
+- PG314 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_target_keyword_wave.md`
+- post-PG314 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg314_existing_supported_recheck.md`
+
+PG314 measured result:
+
+- PG314 promoted `12` exact permanent simple activated target-keyword rules.
+  The promoted runtime effect is `target_keyword_until_eot`, with target
+  creature selection, activation cost metadata, tap handling, supported
+  keywords `haste`, `flying`, `trample`, and `first_strike`, and cleanup at end
+  of turn.
+- Runtime now supports simple activated keyword-grant permanents with mana/tap
+  payment, summoning-sickness blocking for tap-creature activations, target
+  legality through `target_constraints`, and temporary keyword cleanup.
+- The splitter blocks unsafe neighbors such as source sacrifice, subtype-only
+  target filters, unsupported Oracle text, hybrid/Phyrexian/untap symbols
+  inherited from activation cost parsing, target-tap costs, discard, life costs,
+  and compound activated text.
+- PostgreSQL apply evidence reports `12/12` promoted rows, `12/12`
+  verified/auto rows, and `12/12` matching Oracle hash rows, with `0` backup
+  rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `3446` PostgreSQL rules,
+  inserted/updated `4383` SQLite rows, and exported `4648` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5653` PostgreSQL card rows,
+  wrote `5579` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning.
+- Focused exact-scope tests cover mapping, controlled target selection,
+  blocking subtype-filtered targets, blocking source sacrifice, runtime
+  activation payment, until-end-of-turn keyword cleanup, and summoning-sickness
+  blocking; `174` focused exact-scope tests pass.
+- Global all-card readiness after PG314:
+  `battle_and_oracle_ready=2184` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3332`.
+- Global all-card authoritative queue after PG314:
+  `target_identity_count=27440`, `xmage_authoritative_source_count=27126`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27126`.
+- Running the exact splitter after PG314 on supported units returns
+  `proposal_count=0` over `7406` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG314 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1167`, `direct_damage`
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `626`.
 
