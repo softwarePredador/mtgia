@@ -20,6 +20,8 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(find.text('mobile-sentry-smoke'), findsOneWidget);
+    expect(AppObservability.instance.isEnabled, isTrue);
+    expect(await _waitForSentryReady(tester), isTrue);
 
     final eventId = await AppObservability.instance.captureException(
       Exception('MTGIA mobile sentry smoke'),
@@ -35,9 +37,20 @@ void main() {
 
     // O próprio teste não consegue consultar o Sentry; o script externo usa o smoke_id.
     // Mantemos o id no log da execução para o runbook.
+    expect(eventId, isNotNull);
     // ignore: avoid_print
     print('SENTRY_MOBILE_EVENT_ID=$eventId');
     // ignore: avoid_print
     print('SENTRY_MOBILE_SMOKE_TAG=smoke_id:$smokeId');
   });
+}
+
+Future<bool> _waitForSentryReady(WidgetTester tester) async {
+  for (var attempt = 0; attempt < 30; attempt++) {
+    if (AppObservability.instance.isReadyForTesting) {
+      return true;
+    }
+    await tester.pump(const Duration(milliseconds: 500));
+  }
+  return AppObservability.instance.isReadyForTesting;
 }

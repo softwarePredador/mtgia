@@ -9,12 +9,12 @@ Goal: organizar o plano de produto e release do ManaLoom com evidencia objetiva 
 |---|---|---|---|
 | Produto | 1 | Diagnostico final do estado atual | Concluida | Produto mapeado por funcionalidade, disponibilidade, atratividade, riscos e lacunas |
 | Produto | 2 | Fechar o core para lancamento | Concluida para teste interno | Core local/offline, smokes publicos controlados, smoke mobile Android e APK release instalado/aberto |
-| Produto | 3 | Confiabilidade tecnica e observabilidade | Concluida para teste interno com bloqueios de release publico | Firebase Performance e device smoke validados; Sentry DSN, signing Android/iOS e aceite final seguem pendentes |
+| Produto | 3 | Confiabilidade tecnica e observabilidade | Concluida para teste interno com bloqueios de release publico | Firebase Performance e Sentry mobile validados; signing Android/iOS e aceite final seguem pendentes |
 | Produto comercial | 4 | Produto Comercial e Monetizacao | MVP_IMPLEMENTADO_AUDITADO | Free/Pro, medidor de IA, limites, paywall, upgrade, checkout interno e textos legais |
 | Produto comercial | 5 | Diferencial Principal | MVP_IMPLEMENTADO_AUDITADO_COM_LACUNA_BACKEND | Otimizacao por colecao/orcamento, explicacao de trocas e relatorio antes/depois compartilhavel |
 | Produto comercial | 6 | Retencao e Uso Continuo | MVP_IMPLEMENTADO_AUDITADO_LOCAL | Historico local de partidas, notas pos-jogo, evolucao do deck e sugestoes automaticas |
 | Produto comercial | 7 | Comunidade, Trade e Crescimento | MVP_IMPLEMENTADO_AUDITADO_PARCIAL | Decks publicos existentes, perfil, seguir, binder publico, trade match MVP e compartilhamento |
-| Release tecnico | R4 | Observabilidade/Sentry | Concluida com bloqueio de credencial | Sentry integrado por codigo; DSN ausente bloqueia ingestao real |
+| Release tecnico | R4 | Observabilidade/Sentry | Concluida para staging/device | Projeto Sentry criado e ingestao mobile real confirmada |
 | Release tecnico | R5 | Signing e distribuicao | Concluida com bloqueio de credencial | Android/iOS compilam; Android usa debug fallback e iOS esta sem codesign |
 | Release tecnico | R6 | Aceite final em build | Concluida com blockers de UX | Android release instala/abre; aceite completo revelou blockers de import modal e optimize quality gate |
 
@@ -107,7 +107,7 @@ Garantir que o produto seja operavel com usuarios reais: quando algo falhar, dev
 | `x-request-id` manual preservado no backend | PASS | `/ready` preservou `stage3-observability-ready-20260701` |
 | `x-request-id` do app aparece em response/log/breadcrumb | PASS_LOCAL_DEVICE_EVIDENCE | Testes unitarios cobrem envio/eco/erro e smoke mobile emitiu request-id/breadcrumb |
 | Sentry backend com ingestao real confirmada | PASS_CODE_HISTORICAL | Documentado historicamente; nao reexecutado nesta etapa |
-| Sentry mobile com ingestao real confirmada | BLOCKED_BY_DSN | Smoke Android retornou `not_configured`; exige DSN segura |
+| Sentry mobile com ingestao real confirmada | PASS_DEVICE_STAGING | Projeto `manaloom` criado; evento mobile confirmado na API Sentry |
 | Firebase Performance mobile | PASS_DEVICE | Smoke Android retornou `initialized` e `collection_enabled=true` |
 | Release/internal build smoke com API publica | PASS_INTERNAL_UNSIGNED | APK release instalado/aberto em `R58T300SREH`; falta assinatura de distribuicao |
 | Rate limit/paywall de IA nao quebra UX | NOT_STAGE3_CORE | Validar resposta `402`/headers/plano ou registrar como fora do release |
@@ -285,21 +285,23 @@ Limite:
 
 ## Release tecnico R4 - Observabilidade/Sentry
 
-Status: `CONCLUIDA_COM_BLOQUEIO_DE_CREDENCIAL`
+Status: `CONCLUIDA_PARA_STAGING_DEVICE`
 
 Documento de saida:
 
 - `docs/qa/MANALOOM_REMAINING_RELEASE_STAGES_GOAL_2026-07-01.md`
+- `docs/qa/MANALOOM_SENTRY_PROJECT_SETUP_2026-07-01.md`
 
 Resultado:
 
 - Sentry mobile/backend esta integrado por codigo.
-- Ambiente atual nao possui `SENTRY_DSN`, `SENTRY_MOBILE_DSN` ou `SENTRY_AUTH_TOKEN`.
-- Smoke Android confirmou Firebase Performance ativo e Sentry `not_configured`.
+- Projeto Sentry `manaloom` foi criado na org `rafa-pz`.
+- `server/.env` local recebeu token, slugs e DSN sem versionar segredo.
+- Smoke Android confirmou ingestao real no Sentry e Firebase Performance ativo.
 
 Proxima acao:
 
-- Injetar DSN segura por `--dart-define=SENTRY_DSN=...` e repetir `release_observability_smoke_test.dart`.
+- Injetar o DSN validado no build assinado de distribuicao.
 
 ## Release tecnico R5 - Signing e distribuicao
 
@@ -363,7 +365,7 @@ Proxima acao:
 |---|---|---|
 | Worktree ja estava suja antes deste tracker | Operacional | Evitar reverter ou misturar mudancas preexistentes |
 | Scanner/OCR deferred | Produto | Deve ficar fora do marketing ate prova fisica |
-| Sentry mobile sem DSN | Observabilidade | Bloqueia release publico confiavel ate configurar e confirmar ingestao |
+| Sentry mobile sem DSN | Observabilidade | Fechado para staging/device; ainda precisa entrar no build assinado |
 | Keystore Android ausente | Release | Artefatos Android compilam/instalam, mas assinatura atual e Android Debug |
 | iOS sem provisioning/signing | Release | Build iOS sem codesign passou, mas nao e distribuivel |
 | Import modal nao fecha no aceite | UX | Bloqueia aceite completo do fluxo de importacao em build |
@@ -380,7 +382,7 @@ Fonte canonica:
 Top 10 atual:
 
 1. Repetir aceite Android fisico apos correcoes locais.
-2. Injetar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` seguro e repetir smoke de observabilidade.
+2. Propagar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` validado para o build assinado.
 3. Configurar signing Android real e rebuildar AAB/APK distribuivel.
 4. Decidir se iOS entra no primeiro release; se sim, configurar signing/TestFlight.
 5. Rodar aceite final em build assinado.

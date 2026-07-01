@@ -169,8 +169,9 @@ Backlog canonico:
 
 - `docs/qa/MANALOOM_PENDING_BACKLOG_2026-07-01.md`
 
-1. `BLOCKED_BY_DSN`: configurar `SENTRY_DSN` ou `SENTRY_MOBILE_DSN` por canal
-   seguro e confirmar ingestao real de evento mobile.
+1. `SENTRY_MOBILE_INGESTION_CONFIRMED`: projeto `manaloom` criado na org
+   `rafa-pz`; ingestao real confirmada no Android fisico. Para distribuicao,
+   o DSN validado ainda deve ser injetado no build assinado.
 2. `BLOCKED_BY_SIGNING`: criar `app/android/key.properties` com keystore real
    fora do git e rebuildar AAB/APK de distribuicao.
 3. `BLOCKED_BY_IOS_SIGNING`: executar build iOS/TestFlight assinado se iOS for
@@ -192,6 +193,8 @@ Mitigacao local posterior:
   `ACCEPTANCE_BLOCKER_OPTIMIZE_NEEDS_REPAIR_UX` receberam correcoes locais em
   `docs/qa/MANALOOM_ACCEPTANCE_BLOCKER_FIXES_2026-07-01.md`.
 - Status desses dois itens: `FIXED_LOCALLY_PENDING_ANDROID_RERUN`.
+- `BLOCKED_BY_DSN` foi fechado para staging/device em
+  `docs/qa/MANALOOM_SENTRY_PROJECT_SETUP_2026-07-01.md`.
 
 ## Etapas remanescentes avancadas
 

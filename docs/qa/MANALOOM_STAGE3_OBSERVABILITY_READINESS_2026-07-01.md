@@ -26,7 +26,7 @@ Classificacao:
 - Build Android tecnico: `PASS_INTERNAL_UNSIGNED`.
 - Smoke Android instalado/executado: `PASS_PARTIAL_DEVICE`.
 - Firebase Performance mobile: `PASS_DEVICE`.
-- Sentry mobile: `BLOCKED_BY_DSN`.
+- Sentry mobile: `PASS_DEVICE_STAGING`.
 - Release publico: `NO-GO`.
 
 ## 2. Evidencias executadas
@@ -164,8 +164,11 @@ flutter test integration_test/release_observability_smoke_test.dart \
 Resultado:
 
 - `All tests passed`.
-- `SENTRY_RELEASE_SMOKE_RESULT=not_configured`.
-- `SENTRY_RELEASE_DSN_CONFIGURED=false`.
+- Historico anterior: `SENTRY_RELEASE_SMOKE_RESULT=not_configured` e
+  `SENTRY_RELEASE_DSN_CONFIGURED=false` antes da criacao do projeto.
+- Atualizacao posterior em 2026-07-01: projeto Sentry `manaloom` criado na org
+  `rafa-pz`; ingestao mobile real confirmada no device `R58T300SREH`.
+- Evidencia: `docs/qa/MANALOOM_SENTRY_PROJECT_SETUP_2026-07-01.md`.
 - `FIREBASE_PERFORMANCE_SMOKE_RESULT=initialized`.
 - `FIREBASE_PERFORMANCE_COLLECTION_ENABLED=true`.
 
@@ -238,7 +241,7 @@ Firebase:
 | Request-id manual preservado no backend | PASS | `/ready` preservou header manual | Usar em incidentes/smokes futuros |
 | Request-id do app rastreavel | PASS_LOCAL | `api_client_request_id_test.dart` e logs do smoke mobile mostram `request_id`/breadcrumb em chamada lenta | Falta reconciliar com log backend em ambiente de observabilidade completo |
 | Sentry backend | PARTIAL_HISTORICAL | Caminhos historicos documentados; codigo existe | Confirmar ingestao atual se for release publico |
-| Sentry mobile | BLOCKED_BY_DSN | Smoke Android retornou `not_configured` e `DSN_CONFIGURED=false` | Exige DSN/config segura e evento real do build |
+| Sentry mobile | PASS_DEVICE_STAGING | Evento mobile confirmado por API Sentry | Propagar DSN validado para build assinado |
 | Firebase Performance mobile | PASS_DEVICE | Smoke Android retornou `initialized` e `collection_enabled=true` | Monitorar ingestao no console Firebase quando houver acesso |
 | Build Android | PASS_INTERNAL_UNSIGNED | APK release/AAB release compilam; APK release instala e abre | Falta keystore real |
 | Build iOS/TestFlight | PENDING | Nao executado nesta etapa | Exige signing/provisioning iOS |
@@ -250,7 +253,7 @@ Firebase:
 ## 4. Proximas acoes para fechar Stage 3
 
 1. Criar ou apontar `app/android/key.properties` para keystore real fora do git e rebuildar AAB release.
-2. Injetar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` por canal seguro e repetir `release_observability_smoke_test.dart`.
+2. Propagar `SENTRY_DSN`/`SENTRY_MOBILE_DSN` validado para o build assinado.
 3. Confirmar ingestao do evento Sentry mobile no projeto correto.
 4. Executar aceite final em build assinado: abrir app, registrar/logar, buscar carta, criar/importar deck, abrir detalhes.
 5. Capturar um request-id real do app e reconciliar com backend/log.

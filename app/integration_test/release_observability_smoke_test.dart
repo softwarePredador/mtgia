@@ -26,6 +26,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('release-observability'), findsOneWidget);
     final sentryDsnConfigured = AppObservability.instance.isEnabled;
+    final sentryReady =
+        sentryDsnConfigured ? await _waitForSentryReady(tester) : false;
 
     final eventId = await AppObservability.instance.captureException(
       Exception('MTGIA release observability smoke'),
@@ -39,10 +41,12 @@ void main() {
     // ignore: avoid_print
     print(
       'SENTRY_RELEASE_SMOKE_RESULT='
-      '${sentryDsnConfigured && eventId != null ? 'captured' : 'not_configured'}',
+      '${sentryDsnConfigured && sentryReady && eventId != null ? 'captured' : 'not_configured'}',
     );
     // ignore: avoid_print
     print('SENTRY_RELEASE_DSN_CONFIGURED=$sentryDsnConfigured');
+    // ignore: avoid_print
+    print('SENTRY_RELEASE_READY=$sentryReady');
 
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -64,4 +68,14 @@ void main() {
       '${PerformanceService.instance.isEnabledForTesting}',
     );
   });
+}
+
+Future<bool> _waitForSentryReady(WidgetTester tester) async {
+  for (var attempt = 0; attempt < 30; attempt++) {
+    if (AppObservability.instance.isReadyForTesting) {
+      return true;
+    }
+    await tester.pump(const Duration(milliseconds: 500));
+  }
+  return AppObservability.instance.isReadyForTesting;
 }

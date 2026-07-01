@@ -16,7 +16,7 @@ necessarias para lancamento.
 ## Ordem de execucao
 
 1. Fechar reprise do aceite Android apos correcoes locais.
-2. Configurar Sentry mobile e confirmar ingestao real.
+2. Propagar o DSN Sentry ja validado para o build assinado.
 3. Configurar signing Android e gerar AAB/APK distribuivel.
 4. Decidir se iOS entra no primeiro release; se sim, configurar signing/TestFlight.
 5. Rodar aceite final em build assinado.
@@ -29,7 +29,7 @@ necessarias para lancamento.
 | ID | Pendencia | Status | Bloqueio | Proxima acao | Evidencia para fechar |
 |---|---|---|---|---|---|
 | P0-01 | Repetir aceite Android fisico apos correcoes locais | `PENDING_RERUN` | Teste live cria usuario/deck e pode consumir IA | Rodar `deck_runtime_m2006_test.dart` e `deck_generate_async_runtime_test.dart` no `R58T300SREH` | Ambos passam ou terminam com outcome seguro documentado |
-| P0-02 | Sentry mobile com ingestao real | `BLOCKED_BY_DSN` | Falta `SENTRY_DSN` ou `SENTRY_MOBILE_DSN` seguro | Injetar DSN por `--dart-define` e repetir `release_observability_smoke_test.dart` | Smoke reporta DSN configurado e evento/breadcrumb real aparece no Sentry |
+| P0-02 | Sentry mobile com ingestao real | `CLOSED_DEVICE_STAGING` | Nenhum para staging/device; falta propagar no build assinado | Usar o DSN validado no build de distribuicao | `SENTRY_MOBILE_EVENT_ID=6f2080bf844d471588c1cc3dc852fc83`; `SENTRY_RELEASE_SMOKE_RESULT=captured` |
 | P0-03 | Signing Android real | `BLOCKED_BY_SIGNING` | Falta keystore/key.properties fora do git | Criar `app/android/key.properties`, rebuildar APK/AAB release | `apksigner verify --print-certs` mostra certificado real, nao Android Debug |
 | P0-04 | Aceite final em build assinado | `WAITING_P0_01_P0_03` | Depende de reteste e signing | Instalar build assinado no Android fisico e repetir fluxo core | Login/import/generate/details/optimize/share sem blocker |
 | P0-05 | Decisao iOS do primeiro release | `DECISION_NEEDED` | iOS build existe sem codesign | Se iOS entra no release, configurar Team/provisioning/TestFlight; se nao, registrar fora do corte | Archive/TestFlight aceito ou decisao formal de excluir iOS do primeiro corte |
