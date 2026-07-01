@@ -1,0 +1,2624 @@
+{
+  "blocked_samples": {
+    "activated_damage_oracle_not_simple": [
+      "Ballista Squad",
+      "Ben-Ben, Akki Hermit",
+      "Bloodshot Cyclops",
+      "Catapult Squad",
+      "Centaur Archer",
+      "Chandra's Magmutt",
+      "Cinder Elemental",
+      "Coalborn Entity",
+      "Crossbow Infantry",
+      "Cuombajj Witches",
+      "D'Avenant Archer",
+      "Duergar Assailant"
+    ],
+    "activated_damage_source_cost_not_supported": [
+      "Arc-Slogger",
+      "Arms Dealer",
+      "Barrage Ogre",
+      "Blazing Hellhound",
+      "Bolrac-Clan Crusher",
+      "Fodder Cannon",
+      "Ghirapur Aether Grid",
+      "Hurler Cyclops",
+      "Ion Storm",
+      "Kris Mage",
+      "Mage il-Vec",
+      "Magmaw"
+    ],
+    "activated_draw_oracle_not_simple": [
+      "Gristle Glutton",
+      "Riptide Director",
+      "Sea Gate Loremaster",
+      "Slate of Ancestry"
+    ],
+    "activated_draw_source_cost_not_supported": [
+      "Akki Scrapchomper",
+      "Azami, Lady of Scrolls",
+      "Book of Rass",
+      "Carnage Altar",
+      "Compulsion",
+      "Destructive Digger",
+      "Dockside Chef",
+      "Goblin Picker",
+      "Greed",
+      "Hardened Tactician",
+      "Illuminated Folio",
+      "Infernal Tribute"
+    ],
+    "activated_draw_source_not_battlefield": [
+      "Cobbled Lancer"
+    ],
+    "add_counters_ability_class_not_simple": [
+      "Earthen Arms",
+      "Nature's Panoply",
+      "Stinging Shot",
+      "Travel Preparations"
+    ],
+    "add_counters_counter_not_fixed": [
+      "Common Bond",
+      "Gird for Battle",
+      "Incremental Blight",
+      "Incremental Growth",
+      "Reap What Is Sown",
+      "River Heralds' Boon",
+      "Stand Together",
+      "Strength of Solidarity"
+    ],
+    "add_counters_effect_class_not_pure": [
+      "Aggressive Negotiations",
+      "Ajani's Influence",
+      "Ancient Animus",
+      "Awakening of Vitu-Ghazi",
+      "Azula Always Lies",
+      "Biogenic Upgrade",
+      "Blur of Blades",
+      "Boon of Safety",
+      "Clash of the Eikons",
+      "Clockspinning",
+      "Courage in Crisis",
+      "Domri's Ambush"
+    ],
+    "add_counters_oracle_not_simple": [
+      "Protection Magic"
+    ],
+    "add_counters_target_not_supported": [
+      "Thrive",
+      "Unexpected Fangs"
+    ],
+    "additional_cost_detected": [
+      "Abjure",
+      "Acceptable Losses",
+      "Aether Tide",
+      "Altar's Reap",
+      "Angelic Purge",
+      "Annihilating Glare",
+      "Artillerize",
+      "Bankrupt in Blood",
+      "Betrayer's Bargain",
+      "Bitter Triumph",
+      "Blood Divination",
+      "Blood for Bones"
+    ],
+    "board_wipe_ability_class_not_simple": [
+      "Akroma's Vengeance",
+      "Artistic Process",
+      "Blasphemous Edict",
+      "Boiling Earth",
+      "Burn Down the House",
+      "Cinderclasm",
+      "Claws of Wirewood",
+      "Crush the Weak",
+      "Deafening Clarion",
+      "Devastating Mastery",
+      "Doomskar",
+      "Dusk // Dawn"
+    ],
+    "board_wipe_damage_amount_not_fixed": [
+      "Calamitous Cave-In",
+      "Chain Reaction",
+      "Corrosive Gale",
+      "Gates Ablaze",
+      "Immolating Gyre",
+      "Radiant Flames",
+      "Savage Twister",
+      "Skyreaping",
+      "Windstorm"
+    ],
+    "board_wipe_damage_scope_not_supported": [
+      "Breath Weapon",
+      "Evaporate",
+      "Fiery Cannonade",
+      "Gale Force",
+      "Incandescent Aria",
+      "Inflame",
+      "Kaervek's Hex",
+      "Marrow Shards",
+      "Rain of Blades",
+      "Sandstorm",
+      "Squall",
+      "Warpath"
+    ],
+    "board_wipe_destroy_scope_not_supported": [
+      "Acid Rain",
+      "Anarchy",
+      "Boil",
+      "Boiling Seas",
+      "Citywide Bust",
+      "Consume the Meek",
+      "Culling Sun",
+      "Damning Verdict",
+      "Extinguish All Hope",
+      "Fight to the Death",
+      "Flashfires",
+      "Forced March"
+    ],
+    "board_wipe_effect_class_not_supported": [
+      "Balancing Act",
+      "Barter in Blood",
+      "Bend or Break",
+      "Blood Money",
+      "Bontu's Last Reckoning",
+      "Burning of Xinye",
+      "By Invitation Only",
+      "Call to the Void",
+      "Cataclysm",
+      "Catastrophe",
+      "Ceaseless Conflict",
+      "Celestial Judgment"
+    ],
+    "board_wipe_oracle_not_simple": [
+      "Anger of the Gods",
+      "Barrage of Boulders",
+      "Blood on the Snow",
+      "Breaking Point",
+      "Brotherhood's End",
+      "Calming Verse",
+      "Cleansing Meditation",
+      "Cleansing Nova",
+      "Crisis of Conscience",
+      "Crux of Fate",
+      "Fated Retribution",
+      "Final Act"
+    ],
+    "boost_keyword_oracle_not_exact_fixed": [
+      "Adamant Will",
+      "Angelic Blessing",
+      "Beaming Defiance",
+      "Blossoming Defense",
+      "Brute Strength",
+      "Chase Inspiration",
+      "Coat with Venom",
+      "Confidence from Strength",
+      "Dive Down",
+      "Glint",
+      "Grotesque Mutation",
+      "Kindled Fury"
+    ],
+    "boost_keyword_oracle_not_simple": [
+      "Fight as One",
+      "Invigorated Rampage"
+    ],
+    "boost_keyword_source_not_single_fixed": [
+      "Arm the Cathars",
+      "Armor of Shadows",
+      "Blitzball Shot",
+      "Chorus of Might",
+      "Coordinated Assault",
+      "Cutthroat Maneuver",
+      "Get a Leg Up",
+      "Massive Might",
+      "Masterful Flourish",
+      "Pedal to the Metal",
+      "Press the Advantage",
+      "Run Amok"
+    ],
+    "boost_target_source_not_single_fixed": [
+      "Accelerated Mutation",
+      "Agony Warp",
+      "Allied Assault",
+      "Bloodcurdling Scream",
+      "Bounty of Might",
+      "Dauntless Onslaught",
+      "Death Wind",
+      "Defile",
+      "Desert's Due",
+      "Drag Down",
+      "Enrage",
+      "Feeding Frenzy"
+    ],
+    "bounce_ability_class_not_simple": [
+      "Alchemist's Retrieval",
+      "Capsize",
+      "Champion's Victory",
+      "Clutch of Currents",
+      "Command of Unsummoning",
+      "Consuming Vortex",
+      "Dematerialize",
+      "Deny Reality",
+      "Depart the Realm",
+      "Essence Fracture",
+      "Floodwaters",
+      "Into Thin Air"
+    ],
+    "bounce_effect_class_not_pure": [
+      "Absorb Identity",
+      "Alley Evasion",
+      "Applied Biomancy",
+      "Banishing Betrayal",
+      "Baral's Expertise",
+      "Barrin's Unmaking",
+      "Boing!",
+      "Brutal Expulsion",
+      "Callous Dismissal",
+      "Clutch of the Undercity",
+      "Consign // Oblivion",
+      "Dead // Gone"
+    ],
+    "bounce_target_not_supported": [
+      "Aether Gale",
+      "Aether Tradewinds",
+      "Bounce Off",
+      "Captivating Gyre",
+      "Churning Eddy",
+      "Counterintelligence",
+      "Cut the Earthly Bond",
+      "Distorting Wake",
+      "Hoodwink",
+      "Into the Void",
+      "Peel from Reality",
+      "Quicksilver Geyser"
+    ],
+    "counter_ability_class_not_simple": [
+      "Admiral's Order",
+      "Broken Concentration",
+      "Consign to Memory",
+      "Controvert",
+      "Fervent Denial",
+      "Forbid",
+      "Forceful Denial",
+      "Last Word",
+      "Long River's Pull",
+      "Muddle the Mixture",
+      "Neutralize",
+      "Out of Bounds"
+    ],
+    "counter_effect_class_not_pure": [
+      "Amazing Acrobatics",
+      "Bar the Gate",
+      "Bring the Ending",
+      "Confirm Suspicions",
+      "Countersquall",
+      "Dawn Charm",
+      "Deny the Witch",
+      "Didn't Say Please",
+      "Discombobulate",
+      "Dissolve",
+      "Ertai's Trickery",
+      "Essence Capture"
+    ],
+    "counter_oracle_not_simple": [
+      "Change the Equation",
+      "Spell Blast"
+    ],
+    "counter_target_not_supported": [
+      "Avoid Fate",
+      "Ceremonious Rejection",
+      "Disallow",
+      "Disdainful Stroke",
+      "Double Negative",
+      "Flashfreeze",
+      "Frazzle",
+      "Guttural Response",
+      "Hisoka's Defiance",
+      "Intervene",
+      "Minor Misstep",
+      "Mystic Denial"
+    ],
+    "damage_amount_not_fixed": [
+      "Armed Response",
+      "Artillery Blast",
+      "Blaze",
+      "Clan Defiance",
+      "Devil's Play",
+      "Divine Retribution",
+      "Dogpile",
+      "Earth Tremor",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Fanning the Flames",
+      "Feedback Bolt"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Bolt of Keranos",
+      "Bot Bashing Time",
+      "Brimstone Volley"
+    ],
+    "damage_life_gain_oracle_not_simple": [
+      "Covenant of Blood",
+      "Lantern Flare",
+      "Morbid Hunger",
+      "Parasitic Grasp",
+      "Sacred Fire",
+      "Smiting Helix",
+      "Zenith Flare"
+    ],
+    "damage_life_gain_source_not_fixed": [
+      "Consuming Corruption",
+      "Deadly Riposte",
+      "Death Grasp",
+      "Feast of Flesh",
+      "Harsh Sustenance",
+      "Joust Through",
+      "Kiss of Death",
+      "Profane Prayers",
+      "Simulacrum",
+      "Sorin's Vengeance",
+      "Soul Shred",
+      "Soul Spike"
+    ],
+    "damage_target_not_supported": [
+      "Consuming Bonfire",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Jagged Lightning",
+      "Meteor Blast",
+      "Pinnacle of Rage",
+      "Storm of Steel",
+      "Strafe",
+      "Sunlance",
+      "Swelter"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Artisan's Sorrow",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle"
+    ],
+    "destroy_life_gain_ability_class_not_simple": [
+      "Aerial Assault",
+      "Feast of Blood"
+    ],
+    "destroy_life_gain_source_not_fixed": [
+      "Aerial Predation",
+      "Dark Offering",
+      "Divine Offering",
+      "Eriette's Lullaby",
+      "Lucky Offering",
+      "Molder",
+      "Noxious Grasp",
+      "Poison Arrow",
+      "Radiant Strike",
+      "Serene Offering",
+      "Silverstrike",
+      "Surge of Righteousness"
+    ],
+    "destroy_target_not_supported": [
+      "Assassin's Blade",
+      "Avalanche",
+      "Bramblecrush",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Crush",
+      "Curtains' Call",
+      "Cut Short",
+      "Dark Banishing"
+    ],
+    "dies_draw_count_not_fixed": [
+      "Floating-Dream Zubera",
+      "Merfolk Seer"
+    ],
+    "draw_effect_class_not_pure": [
+      "Aang's Defense",
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afflict",
+      "Afterlife Insurance",
+      "Aggressive Urge",
+      "Airbending Lesson",
+      "Allied Strategies",
+      "Amass the Components",
+      "Ambition's Cost"
+    ],
+    "etb_damage_target_not_supported": [
+      "Basalt Ravager",
+      "Explosive Prodigy",
+      "Firefist Adept",
+      "Geistcatcher's Rig",
+      "Goretusk Firebeast",
+      "Gruesome Scourger",
+      "Kessig Malcontents",
+      "Outrage Shaman",
+      "Thundering Sparkmage",
+      "Unsparing Boltcaster",
+      "Viashino Pyromancer",
+      "Volley Veteran"
+    ],
+    "etb_destroy_target_not_supported": [
+      "Bala Ged Scorpion",
+      "Dakmor Lancer",
+      "Fathom Fleet Cutthroat",
+      "Fleshpulper Giant",
+      "Marshdrinker Giant",
+      "Myconid Spore Tender",
+      "Ravenous Baboons",
+      "Rock Soldiers",
+      "Rustspore Ram",
+      "Serpent Assassin",
+      "Setessan Starbreaker",
+      "Slayer of the Wicked"
+    ],
+    "etb_draw_count_not_fixed": [
+      "Armorcraft Judge",
+      "Discerning Peddler",
+      "Earthshaker Dreadmaw",
+      "Fissure Wizard",
+      "Immersturm Raider",
+      "Keldon Raider",
+      "Plundering Predator",
+      "Prophet of the Scarab",
+      "Regal Force",
+      "Shinestriker",
+      "Treetop Sentries",
+      "Viashino Racketeer"
+    ],
+    "etb_life_gain_amount_not_fixed": [
+      "Ancestor's Chosen",
+      "Angel of Renewal",
+      "Archway Angel",
+      "Aven Gagglemaster",
+      "Dwarven Priest",
+      "Flourishing Hunter",
+      "Goldnight Redeemer",
+      "Kraul Foragers",
+      "Luminollusk",
+      "Nylea's Disciple",
+      "Setessan Petitioner",
+      "Shepherd of Heroes"
+    ],
+    "etb_recursion_target_not_supported": [
+      "Barrow Witches",
+      "Disciple of the Sun",
+      "Leonin Squire",
+      "Master Skald",
+      "Mausoleum Turnkey",
+      "Nucklavee",
+      "Pillardrop Rescuer",
+      "Ragamuffin Raptor",
+      "Returned Pastcaller",
+      "Scholar of the Ages",
+      "Strongarm Thug"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Devout Decree",
+      "Dispatch"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_target_not_supported": [
+      "Blazing Hope",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Exorcise",
+      "Glare of Heresy",
+      "Gravkill",
+      "Grip of Desolation",
+      "Grotesque Demise",
+      "Into the Core",
+      "Isolate"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion",
+      "Blossoming Calm",
+      "Blunt the Assault",
+      "Bond of Flourishing",
+      "Commune with Evil"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Abzan Banner",
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "All-Fates Scroll",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Animal Attendant",
+      "Arcum's Astrolabe",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Agent of Stromgald",
+      "Apprentice Wizard",
+      "Arc Reactor",
+      "Basal Thrull",
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Blood Pet",
+      "Blood Vassal",
+      "Bog Initiate",
+      "Bog Witch",
+      "Catalyst Elemental",
+      "Charcoal Diamond"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aang, A Lot to Learn",
+      "Abandoned Sarcophagus",
+      "Aberrant",
+      "Aberrant Mind Sorcerer",
+      "Abhorrent Oculus",
+      "Abiding Grace",
+      "Abigale, Poet Laureate // Heroic Stanza",
+      "Abomination",
+      "Abomination of Llanowar",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abu Ja'far"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "All Hallow's Eve",
+      "Anzrag's Rampage",
+      "Arm with Aether",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Back for More",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind"
+    ],
+    "recursion_ability_class_not_simple": [
+      "Blood Beckoning",
+      "Call to the Netherworld",
+      "Dead Revels",
+      "Disturbed Burial",
+      "Grim Harvest",
+      "Life from the Loam",
+      "Morgue Theft",
+      "Mystic Retrieval",
+      "Peerless Recycling",
+      "Sacred Excavation",
+      "Soulless Revival",
+      "Unmake the Graves"
+    ],
+    "recursion_battlefield_ability_class_not_simple": [
+      "Dread Return",
+      "Endless Obedience",
+      "Entreat the Dead",
+      "Leonardo's Technique",
+      "Proclamation of Rebirth",
+      "Restart Sequence",
+      "Return to the Ranks",
+      "Unburial Rites",
+      "Unearth"
+    ],
+    "recursion_battlefield_oracle_not_simple": [
+      "Rise to Glory"
+    ],
+    "recursion_battlefield_target_not_supported": [
+      "Ashen Powder",
+      "Back in Town",
+      "Behold the Sinister Six!",
+      "Brought Back",
+      "Continue?",
+      "Grim Return",
+      "Helping Hand",
+      "Hymn of Rebirth",
+      "March from the Tomb",
+      "Patch Up",
+      "Squirming Emergence",
+      "Stir the Grave"
+    ],
+    "recursion_effect_class_not_pure": [
+      "Aberrant Return",
+      "Abuelo's Awakening",
+      "Accumulate Wisdom",
+      "Aether Burst",
+      "Aether Helix",
+      "Afterlife from the Loam",
+      "Agonizing Remorse",
+      "All Suns' Dawn",
+      "Animal Magnetism",
+      "Animist's Awakening",
+      "Another Chance",
+      "Anticognition"
+    ],
+    "recursion_oracle_not_simple": [
+      "Aid the Fallen",
+      "Fortuitous Find",
+      "Ghoulcaller's Chant",
+      "Grim Discovery",
+      "March of the Drowned",
+      "Raise the Draugr",
+      "Remember the Fallen",
+      "Return from Extinction",
+      "Reviving Melody",
+      "Season of Renewal",
+      "Survivors' Bond",
+      "Unbury"
+    ],
+    "recursion_target_not_supported": [
+      "Aphetto Dredging",
+      "Boggart Birth Rite",
+      "Death Denied",
+      "Death's Duet",
+      "Reborn Hope",
+      "Revive",
+      "Rise from the Wreck",
+      "Rogues' Gallery"
+    ],
+    "static_keyword_not_creature": [
+      "Darksteel Relic"
+    ],
+    "token_description_keyword_not_supported": [
+      "Advent of the Wurm",
+      "Call the Cavalry",
+      "Call to the Feast",
+      "Carrion Call",
+      "Errand of Duty",
+      "Goblin Scouts",
+      "Goblin Wizardry",
+      "Jungleborn Pioneer",
+      "Knight Watch",
+      "Paladin of the Bloodstained",
+      "Queen's Commission",
+      "Sworn Companions"
+    ],
+    "token_description_not_creature_token": [
+      "Blood Servitor",
+      "Brazen Freebooter",
+      "Cartographer's Companion",
+      "Crustacean Commando",
+      "Forecasting Fortune Teller",
+      "Galactic Wayfarer",
+      "Plundering Pirate",
+      "Prosperous Pirates",
+      "Redcap Thief",
+      "Sailor of Means",
+      "Slithering Cryptid",
+      "Wily Goblin"
+    ],
+    "token_literal_description_missing": [
+      "Dance with Devils",
+      "Devils' Playground",
+      "Dread Drone",
+      "Emrakul's Hatcher",
+      "Kozilek's Predator",
+      "Mage's Attendant",
+      "Mysidian Elder",
+      "Nest Invader",
+      "Pest Summoning",
+      "Prickly Pair",
+      "Professor of Zoomancy",
+      "Skittering Invasion"
+    ],
+    "token_source_additional_tokens_not_supported": [
+      "Bestial Menace",
+      "Farmer Cotton",
+      "Forbidden Friendship",
+      "Mascot Exhibition",
+      "Trostani's Summoner"
+    ],
+    "token_source_create_token_not_fixed": [
+      "Argothian Opportunist",
+      "Awaken the Woods",
+      "Crash the Party",
+      "Elven Ambush",
+      "Elvish Promenade",
+      "Flurry of Wings",
+      "Form a Posse",
+      "Fresh Meat",
+      "Fungal Sprouting",
+      "Goblin Gathering",
+      "Goblin Offensive",
+      "Great Desert Prospector"
+    ],
+    "token_source_custom_text_not_supported": [
+      "Deploy to the Front",
+      "Evangel of Heliod",
+      "Reverent Hoplite",
+      "Servo Exhibition",
+      "Springjack Shepherd",
+      "Sweep the Skies",
+      "Underworld Hermit",
+      "Unified Front"
+    ],
+    "token_source_not_single_create_token_effect": [
+      "Exhibition Magician"
+    ]
+  },
+  "generated_at": "2026-07-01T14:19:26+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
+    "supported_adapter_work_units": [
+      "add_counters::targeted_add_counters_variant_v1",
+      "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "bounce::targeted_return_to_hand_variant_v1",
+      "counter_spell::counter_target_stack_object_variant_v1",
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "recursion::xmage_graveyard_return_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1",
+      "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token",
+      "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting"
+    ],
+    "supported_dynamic_adapter_work_units": [
+      "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
+      "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
+      "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
+      "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "7e410194-09d2-489c-bb31-bde619e9b7c4",
+      "card_name": "Aeolipile",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e",
+      "normalized_name": "aeolipile",
+      "notes": "XMage authoritative exact-scope split: local class Aeolipile translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "42a63959fe9b8333f26fa224e63b8401",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Aeolipile",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/Aeolipile.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "237277c4-1c56-48b3-ad45-31cc4be0d878",
+      "card_name": "Aladdin's Ring",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 8,
+            "activation_cost_mana": "{8}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 4,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 4,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 4,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 8,
+        "activation_cost_mana": "{8}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:d9f906480e5a8a407a6851d319dcc3f1",
+      "normalized_name": "aladdin's ring",
+      "notes": "XMage authoritative exact-scope split: local class AladdinsRing translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "69d4e7f46e106ed36d40d535401711cb",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AladdinsRing",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AladdinsRing.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "1e8d1eab-aa65-454a-b6bd-549db8a69b22",
+      "card_name": "Anaba Shaman",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c",
+      "normalized_name": "anaba shaman",
+      "notes": "XMage authoritative exact-scope split: local class AnabaShaman translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "d2ded326358a59b57a910e672ed5b437",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AnabaShaman",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AnabaShaman.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "c50cf33e-d59e-4c84-b2ce-1c787aaa1a54",
+      "card_name": "Barbarian Lunatic",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{R}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:9596872138224e75f7476a08d868834e",
+      "normalized_name": "barbarian lunatic",
+      "notes": "XMage authoritative exact-scope split: local class BarbarianLunatic translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "7ba598c9860da1d2bcd27a1a21b7639b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BarbarianLunatic",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BarbarianLunatic.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "9fbbcd09-dbf0-4260-a838-7aa44d951b88",
+      "card_name": "Crackling Triton",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{R}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:43119f804cde8602830ef195e415c76c",
+      "normalized_name": "crackling triton",
+      "notes": "XMage authoritative exact-scope split: local class CracklingTriton translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "a47b858a43cedac1db88e109b623f223",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CracklingTriton",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CracklingTriton.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "5a0c623e-55bf-4141-9608-2f7f6e2fb8b8",
+      "card_name": "Ember Hauler",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 1,
+            "activation_cost_mana": "{1}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e",
+      "normalized_name": "ember hauler",
+      "notes": "XMage authoritative exact-scope split: local class EmberHauler translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "5a94850681adebf4628b748abeebd7d7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "EmberHauler",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/EmberHauler.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "d0ef7321-ab37-43cd-9fbf-7f06247cb5ad",
+      "card_name": "Explosive Apparatus",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:4a4d328666dfb4fb304c95c2af13e959",
+      "normalized_name": "explosive apparatus",
+      "notes": "XMage authoritative exact-scope split: local class ExplosiveApparatus translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "84478d2ae1fbdc4acb0e586b2c7096d8",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ExplosiveApparatus",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/ExplosiveApparatus.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "c6bac77f-b105-4b0a-9fd3-da0223c5f32d",
+      "card_name": "Flamecast Wheel",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 5,
+            "activation_cost_mana": "{5}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:bc690f8e2ca9998ebd206b19e8817fbb",
+      "normalized_name": "flamecast wheel",
+      "notes": "XMage authoritative exact-scope split: local class FlamecastWheel translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "fc2dde6b37db0f6c819e0ad177e81a31",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FlamecastWheel",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FlamecastWheel.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "ab2ac17b-4cec-4a6a-b25a-c12645022fc0",
+      "card_name": "Flamekin Spitfire",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:13ade5b7a53f9f98f28c187b28859d05",
+      "normalized_name": "flamekin spitfire",
+      "notes": "XMage authoritative exact-scope split: local class FlamekinSpitfire translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "92f99419c72b3afcbd863841044e461c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FlamekinSpitfire",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FlamekinSpitfire.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "42f9c4a4-3838-4ef0-adc5-0b538b1eb369",
+      "card_name": "Frostling",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:01e185e9814db4f08d623c6827f35704",
+      "normalized_name": "frostling",
+      "notes": "XMage authoritative exact-scope split: local class Frostling translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "986869cd6a72824715ce58801dae25de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Frostling",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/Frostling.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "0fd92bd7-1591-4499-8122-4448da68d6c3",
+      "card_name": "Granite Shard",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:d7370d97081f642e53f65474b27245c8",
+      "normalized_name": "granite shard",
+      "notes": "XMage authoritative exact-scope split: local class GraniteShard translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "98b5abd6ac7a38fb3b09a8581cb0dfb5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GraniteShard",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GraniteShard.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "d4f763fc-2718-49da-bab2-4e1cd1422410",
+      "card_name": "Hatchet Bully",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [
+              "R"
+            ],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}{R}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:7cc2f5ff22923da354818e0ec6a091b7",
+      "normalized_name": "hatchet bully",
+      "notes": "XMage authoritative exact-scope split: local class HatchetBully translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "e993f20e3097eea48d5870edcab1643a",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HatchetBully",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HatchetBully.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "f3824207-d439-43cb-b628-da7ec7b90f44",
+      "card_name": "Lightning-Core Excavator",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 5,
+            "activation_cost_mana": "{5}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 5,
+        "activation_cost_mana": "{5}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:00ef7c2adfd591ea858cd10b6d46e817",
+      "normalized_name": "lightning-core excavator",
+      "notes": "XMage authoritative exact-scope split: local class LightningCoreExcavator translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "931cb5a029bfb76c58633dff41562422",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LightningCoreExcavator",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LightningCoreExcavator.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "944ddee1-7d04-4aba-9759-79e14db278ce",
+      "card_name": "Mogg Fanatic",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:30ee2fb7f7651610705eefd665c87f6d",
+      "normalized_name": "mogg fanatic",
+      "notes": "XMage authoritative exact-scope split: local class MoggFanatic translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "889ae5b251eb57db05036c51ece803f5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoggFanatic",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoggFanatic.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "e2437130-df21-4646-9ef3-337b623f49a8",
+      "card_name": "Moonglove Extract",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:6b123d98ecf8f3ed768dea5771ea93f4",
+      "normalized_name": "moonglove extract",
+      "notes": "XMage authoritative exact-scope split: local class MoongloveExtract translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "bd511d8f3c1e713f0af8241946b4373f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MoongloveExtract",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MoongloveExtract.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "c8e6f984-0689-4ebd-94dd-c9551c3e2ffb",
+      "card_name": "Rod of Ruin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 1,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 1,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 1,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:6894b985ed758f321a25ff0fdeadd293",
+      "normalized_name": "rod of ruin",
+      "notes": "XMage authoritative exact-scope split: local class RodOfRuin translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "7e013ec5d6c6e08035c623431ea9ed25",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RodOfRuin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RodOfRuin.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "35c2eedb-dee6-44b8-acc3-107bf4724e3d",
+      "card_name": "Scalding Cauldron",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:32b8c4fcb11dcfdeb631fdae9f16fe70",
+      "normalized_name": "scalding cauldron",
+      "notes": "XMage authoritative exact-scope split: local class ScaldingCauldron translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "515c3fa0890b578c428f980b21e4dae9",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ScaldingCauldron",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ScaldingCauldron.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "a36483a3-1e88-43ba-81dd-5968ebfb89d6",
+      "card_name": "Seal of Fire",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "enchantment",
+        "target": "any_target"
+      },
+      "effect": "enchantment",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:cb72b48051ce82e5b6dd1272903c2fff",
+      "normalized_name": "seal of fire",
+      "notes": "XMage authoritative exact-scope split: local class SealOfFire translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "0ac767ef83fef3012d7fb2245512a2fd",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SealOfFire",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SealOfFire.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "b18cd894-596e-49dc-b71c-dcb55420f72d",
+      "card_name": "Shock Troops",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 0,
+            "activation_cost_mana": "{0}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": false,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a",
+      "normalized_name": "shock troops",
+      "notes": "XMage authoritative exact-scope split: local class ShockTroops translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "a644e7df36ff6c2ce701c9e113559862",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ShockTroops",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ShockTroops.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "63edbcda-537f-49d5-a725-2066c7b43bd5",
+      "card_name": "Silent Dart",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:c524d3f4d4927ef8091205b192c0edc1",
+      "normalized_name": "silent dart",
+      "notes": "XMage authoritative exact-scope split: local class SilentDart translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "6852e893406f6346fcec69b9725be846",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SilentDart",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SilentDart.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "003743af-c6b9-4745-ba1c-161c12668dfc",
+      "card_name": "Tower of Calamities",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 8,
+            "activation_cost_mana": "{8}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": true,
+            "amount": 12,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 12,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 12,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 8,
+        "activation_cost_mana": "{8}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:e28986392d6e65bf4bad9410b94bef21",
+      "normalized_name": "tower of calamities",
+      "notes": "XMage authoritative exact-scope split: local class TowerOfCalamities translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "563391bfd97c5cc2b4138cc0164cf284",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TowerOfCalamities",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TowerOfCalamities.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "537916ae-32b4-4fa2-8e8d-d26b49727058",
+      "card_name": "Valakut Invoker",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "any_target"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activation_cost_colors": [],
+            "activation_cost_generic": 8,
+            "activation_cost_mana": "{8}",
+            "activation_requires_sacrifice": false,
+            "activation_requires_tap": false,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 8,
+        "activation_cost_mana": "{8}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:3f76c615e5a1b8175b6fee50cb2c0e92",
+      "normalized_name": "valakut invoker",
+      "notes": "XMage authoritative exact-scope split: local class ValakutInvoker translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "c28c6a755e918fa29f8ef41550e43d53",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ValakutInvoker",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/ValakutInvoker.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "f1b9d01e-7fcf-4337-bc6e-2409df8b614c",
+      "card_name": "Vial of Dragonfire",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 2,
+            "activation_cost_mana": "{2}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "amount": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 2,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 2,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:473f6fb9e4197b5749d43188d5e1b977",
+      "normalized_name": "vial of dragonfire",
+      "notes": "XMage authoritative exact-scope split: local class VialOfDragonfire translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "5556058f27024634e80d57f89702a6d7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "VialOfDragonfire",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VialOfDragonfire.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-01T13:59:57+00:00",
+    "queue_scope": "commander_legal_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "direct_damage::targeted_damage_variant_v1": 23
+    },
+    "blocked_reason_counts": {
+      "activated_damage_oracle_not_simple": 57,
+      "activated_damage_source_cost_not_supported": 24,
+      "activated_draw_oracle_not_simple": 4,
+      "activated_draw_source_cost_not_supported": 26,
+      "activated_draw_source_not_battlefield": 1,
+      "add_counters_ability_class_not_simple": 4,
+      "add_counters_counter_not_fixed": 8,
+      "add_counters_effect_class_not_pure": 63,
+      "add_counters_oracle_not_simple": 1,
+      "add_counters_target_not_supported": 2,
+      "additional_cost_detected": 146,
+      "board_wipe_ability_class_not_simple": 67,
+      "board_wipe_damage_amount_not_fixed": 9,
+      "board_wipe_damage_scope_not_supported": 13,
+      "board_wipe_destroy_scope_not_supported": 37,
+      "board_wipe_effect_class_not_supported": 81,
+      "board_wipe_oracle_not_simple": 37,
+      "boost_keyword_oracle_not_exact_fixed": 25,
+      "boost_keyword_oracle_not_simple": 2,
+      "boost_keyword_source_not_single_fixed": 14,
+      "boost_target_source_not_single_fixed": 34,
+      "bounce_ability_class_not_simple": 28,
+      "bounce_effect_class_not_pure": 44,
+      "bounce_target_not_supported": 20,
+      "counter_ability_class_not_simple": 19,
+      "counter_effect_class_not_pure": 35,
+      "counter_oracle_not_simple": 2,
+      "counter_target_not_supported": 23,
+      "damage_amount_not_fixed": 44,
+      "damage_effect_class_not_pure": 123,
+      "damage_life_gain_oracle_not_simple": 7,
+      "damage_life_gain_source_not_fixed": 18,
+      "damage_target_not_supported": 10,
+      "destroy_effect_class_not_pure": 138,
+      "destroy_life_gain_ability_class_not_simple": 2,
+      "destroy_life_gain_source_not_fixed": 14,
+      "destroy_target_not_supported": 57,
+      "dies_draw_count_not_fixed": 2,
+      "draw_effect_class_not_pure": 556,
+      "etb_damage_target_not_supported": 13,
+      "etb_destroy_target_not_supported": 13,
+      "etb_draw_count_not_fixed": 13,
+      "etb_life_gain_amount_not_fixed": 12,
+      "etb_recursion_target_not_supported": 11,
+      "exile_effect_class_not_pure": 42,
+      "exile_oracle_not_simple": 8,
+      "exile_target_not_supported": 23,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_effect_class_not_pure": 99,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_effect_class_not_simple": 303,
+      "mana_source_oracle_not_simple": 119,
+      "mana_source_safe_ability_missing": 132,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 133,
+      "not_instant_or_sorcery_spell": 3815,
+      "not_one_shot_spell_ability": 249,
+      "recursion_ability_class_not_simple": 13,
+      "recursion_battlefield_ability_class_not_simple": 9,
+      "recursion_battlefield_oracle_not_simple": 1,
+      "recursion_battlefield_target_not_supported": 12,
+      "recursion_effect_class_not_pure": 430,
+      "recursion_oracle_not_simple": 12,
+      "recursion_target_not_supported": 8,
+      "static_keyword_not_creature": 1,
+      "token_description_keyword_not_supported": 12,
+      "token_description_not_creature_token": 12,
+      "token_literal_description_missing": 14,
+      "token_source_additional_tokens_not_supported": 5,
+      "token_source_create_token_not_fixed": 22,
+      "token_source_custom_text_not_supported": 8,
+      "token_source_not_single_create_token_effect": 1
+    },
+    "considered_supported_work_unit_rows": 7396,
+    "family_counts": {
+      "xmage_permanent_simple_activated_damage": 23
+    },
+    "proposal_count": 23,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 23
+    },
+    "safe_for_batch_pg_package_count": 23,
+    "scope_counts": {
+      "xmage_permanent_simple_activated_damage_v1": 23
+    }
+  }
+}

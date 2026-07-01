@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg309_permanent_activated_draw_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG309. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG310. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -116,7 +116,9 @@ exact creatures with fixed enter-the-battlefield token creation; PG305 added
 PG306 added 13 exact one-shot damage plus controller life-gain spells; PG307
 added 13 exact one-shot destroy-target plus controller life-gain spells; PG308
 added 38 exact restricted target spells; PG309 added 18 exact permanent
-activated draw rules with mana/tap/self-sacrifice activation handling.
+activated draw rules with mana/tap/self-sacrifice activation handling; PG310
+added 23 exact permanent activated damage rules with mana/tap/self-sacrifice
+activation handling.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -140,7 +142,10 @@ restricted target fixed damage, destroy and exile spells with runtime legality
 for attacking/blocking, tapped/untapped, flying, color, power and mana-value
 constraints; PG309 added permanent simple activated draw support for fixed draw
 abilities with mana/tap/self-sacrifice costs and focused blocking for unsafe
-costs or dynamic counts.
+costs or dynamic counts; PG310 added permanent simple activated damage support
+for fixed any-target or target-creature damage abilities with mana/tap/source
+sacrifice costs and focused blocking for target-sacrifice costs, dynamic
+amounts, and unsupported player-or-planeswalker targets.
 Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
@@ -221,15 +226,19 @@ Evidence:
 - `master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_e2e_validation.md`
 - `master_optimizer_reports/pg309_xmage_permanent_activated_draw_wave_pg_to_sqlite_sync.json`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg309_permanent_activated_draw_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg309_existing_supported_recheck.md`
+- `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_package.md`
+- `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_e2e_validation.md`
+- `master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg310_existing_supported_recheck.md`
 
-After PG309, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7396` considered supported rows; continue by adding a
+After PG310, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7373` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG309 queue is the current scheduling
-source: `target_identity_count=27568`, `xmage_authoritative_source_count=27254`,
-`xmage_authoritative_adapter_required_count=27254`, `parser_gap=0`, and
+the current authoritative queue. The post-PG310 queue is the current scheduling
+source: `target_identity_count=27545`, `xmage_authoritative_source_count=27231`,
+`xmage_authoritative_adapter_required_count=27231`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the

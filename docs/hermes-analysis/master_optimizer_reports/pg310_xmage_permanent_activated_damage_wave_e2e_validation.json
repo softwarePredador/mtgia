@@ -1,0 +1,844 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T14:20:34.535438+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_manifest.json",
+  "package_id": "pg310_xmage_permanent_activated_damage_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 23
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aeolipile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e",
+          "oracle_hash": "42a63959fe9b8333f26fa224e63b8401",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aladdin's Ring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9f906480e5a8a407a6851d319dcc3f1",
+          "oracle_hash": "69d4e7f46e106ed36d40d535401711cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Anaba Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c",
+          "oracle_hash": "d2ded326358a59b57a910e672ed5b437",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Barbarian Lunatic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9596872138224e75f7476a08d868834e",
+          "oracle_hash": "7ba598c9860da1d2bcd27a1a21b7639b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Crackling Triton",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43119f804cde8602830ef195e415c76c",
+          "oracle_hash": "a47b858a43cedac1db88e109b623f223",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Ember Hauler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e",
+          "oracle_hash": "5a94850681adebf4628b748abeebd7d7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Explosive Apparatus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a4d328666dfb4fb304c95c2af13e959",
+          "oracle_hash": "84478d2ae1fbdc4acb0e586b2c7096d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Flamecast Wheel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc690f8e2ca9998ebd206b19e8817fbb",
+          "oracle_hash": "fc2dde6b37db0f6c819e0ad177e81a31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Flamekin Spitfire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:13ade5b7a53f9f98f28c187b28859d05",
+          "oracle_hash": "92f99419c72b3afcbd863841044e461c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Frostling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:01e185e9814db4f08d623c6827f35704",
+          "oracle_hash": "986869cd6a72824715ce58801dae25de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Granite Shard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d7370d97081f642e53f65474b27245c8",
+          "oracle_hash": "98b5abd6ac7a38fb3b09a8581cb0dfb5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Hatchet Bully",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7cc2f5ff22923da354818e0ec6a091b7",
+          "oracle_hash": "e993f20e3097eea48d5870edcab1643a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Lightning-Core Excavator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00ef7c2adfd591ea858cd10b6d46e817",
+          "oracle_hash": "931cb5a029bfb76c58633dff41562422",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Mogg Fanatic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30ee2fb7f7651610705eefd665c87f6d",
+          "oracle_hash": "889ae5b251eb57db05036c51ece803f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Moonglove Extract",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6b123d98ecf8f3ed768dea5771ea93f4",
+          "oracle_hash": "bd511d8f3c1e713f0af8241946b4373f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Rod of Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6894b985ed758f321a25ff0fdeadd293",
+          "oracle_hash": "7e013ec5d6c6e08035c623431ea9ed25",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scalding Cauldron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32b8c4fcb11dcfdeb631fdae9f16fe70",
+          "oracle_hash": "515c3fa0890b578c428f980b21e4dae9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Seal of Fire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb72b48051ce82e5b6dd1272903c2fff",
+          "oracle_hash": "0ac767ef83fef3012d7fb2245512a2fd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Shock Troops",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a",
+          "oracle_hash": "a644e7df36ff6c2ce701c9e113559862",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Silent Dart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c524d3f4d4927ef8091205b192c0edc1",
+          "oracle_hash": "6852e893406f6346fcec69b9725be846",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Tower of Calamities",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e28986392d6e65bf4bad9410b94bef21",
+          "oracle_hash": "563391bfd97c5cc2b4138cc0164cf284",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Valakut Invoker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f76c615e5a1b8175b6fee50cb2c0e92",
+          "oracle_hash": "c28c6a755e918fa29f8ef41550e43d53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Vial of Dragonfire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:473f6fb9e4197b5749d43188d5e1b977",
+          "oracle_hash": "5556058f27024634e80d57f89702a6d7",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 23
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aeolipile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e",
+          "oracle_hash": "42a63959fe9b8333f26fa224e63b8401",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Aladdin's Ring",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d9f906480e5a8a407a6851d319dcc3f1",
+          "oracle_hash": "69d4e7f46e106ed36d40d535401711cb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Anaba Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c",
+          "oracle_hash": "d2ded326358a59b57a910e672ed5b437",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Barbarian Lunatic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9596872138224e75f7476a08d868834e",
+          "oracle_hash": "7ba598c9860da1d2bcd27a1a21b7639b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Crackling Triton",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:43119f804cde8602830ef195e415c76c",
+          "oracle_hash": "a47b858a43cedac1db88e109b623f223",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Ember Hauler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e",
+          "oracle_hash": "5a94850681adebf4628b748abeebd7d7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Explosive Apparatus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a4d328666dfb4fb304c95c2af13e959",
+          "oracle_hash": "84478d2ae1fbdc4acb0e586b2c7096d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Flamecast Wheel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc690f8e2ca9998ebd206b19e8817fbb",
+          "oracle_hash": "fc2dde6b37db0f6c819e0ad177e81a31",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Flamekin Spitfire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:13ade5b7a53f9f98f28c187b28859d05",
+          "oracle_hash": "92f99419c72b3afcbd863841044e461c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Frostling",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:01e185e9814db4f08d623c6827f35704",
+          "oracle_hash": "986869cd6a72824715ce58801dae25de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Granite Shard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d7370d97081f642e53f65474b27245c8",
+          "oracle_hash": "98b5abd6ac7a38fb3b09a8581cb0dfb5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Hatchet Bully",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7cc2f5ff22923da354818e0ec6a091b7",
+          "oracle_hash": "e993f20e3097eea48d5870edcab1643a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Lightning-Core Excavator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00ef7c2adfd591ea858cd10b6d46e817",
+          "oracle_hash": "931cb5a029bfb76c58633dff41562422",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Mogg Fanatic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30ee2fb7f7651610705eefd665c87f6d",
+          "oracle_hash": "889ae5b251eb57db05036c51ece803f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Moonglove Extract",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6b123d98ecf8f3ed768dea5771ea93f4",
+          "oracle_hash": "bd511d8f3c1e713f0af8241946b4373f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Rod of Ruin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6894b985ed758f321a25ff0fdeadd293",
+          "oracle_hash": "7e013ec5d6c6e08035c623431ea9ed25",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scalding Cauldron",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32b8c4fcb11dcfdeb631fdae9f16fe70",
+          "oracle_hash": "515c3fa0890b578c428f980b21e4dae9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Seal of Fire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cb72b48051ce82e5b6dd1272903c2fff",
+          "oracle_hash": "0ac767ef83fef3012d7fb2245512a2fd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Shock Troops",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a",
+          "oracle_hash": "a644e7df36ff6c2ce701c9e113559862",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Silent Dart",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c524d3f4d4927ef8091205b192c0edc1",
+          "oracle_hash": "6852e893406f6346fcec69b9725be846",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Tower of Calamities",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e28986392d6e65bf4bad9410b94bef21",
+          "oracle_hash": "563391bfd97c5cc2b4138cc0164cf284",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Valakut Invoker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3f76c615e5a1b8175b6fee50cb2c0e92",
+          "oracle_hash": "c28c6a755e918fa29f8ef41550e43d53",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Vial of Dragonfire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:473f6fb9e4197b5749d43188d5e1b977",
+          "oracle_hash": "5556058f27024634e80d57f89702a6d7",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 23
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aeolipile",
+          "logical_rule_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aladdin's Ring",
+          "logical_rule_key": "battle_rule_v1:d9f906480e5a8a407a6851d319dcc3f1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anaba Shaman",
+          "logical_rule_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barbarian Lunatic",
+          "logical_rule_key": "battle_rule_v1:9596872138224e75f7476a08d868834e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crackling Triton",
+          "logical_rule_key": "battle_rule_v1:43119f804cde8602830ef195e415c76c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ember Hauler",
+          "logical_rule_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Explosive Apparatus",
+          "logical_rule_key": "battle_rule_v1:4a4d328666dfb4fb304c95c2af13e959"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flamecast Wheel",
+          "logical_rule_key": "battle_rule_v1:bc690f8e2ca9998ebd206b19e8817fbb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flamekin Spitfire",
+          "logical_rule_key": "battle_rule_v1:13ade5b7a53f9f98f28c187b28859d05"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frostling",
+          "logical_rule_key": "battle_rule_v1:01e185e9814db4f08d623c6827f35704"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Granite Shard",
+          "logical_rule_key": "battle_rule_v1:d7370d97081f642e53f65474b27245c8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hatchet Bully",
+          "logical_rule_key": "battle_rule_v1:7cc2f5ff22923da354818e0ec6a091b7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lightning-Core Excavator",
+          "logical_rule_key": "battle_rule_v1:00ef7c2adfd591ea858cd10b6d46e817"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mogg Fanatic",
+          "logical_rule_key": "battle_rule_v1:30ee2fb7f7651610705eefd665c87f6d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Moonglove Extract",
+          "logical_rule_key": "battle_rule_v1:6b123d98ecf8f3ed768dea5771ea93f4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rod of Ruin",
+          "logical_rule_key": "battle_rule_v1:6894b985ed758f321a25ff0fdeadd293"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scalding Cauldron",
+          "logical_rule_key": "battle_rule_v1:32b8c4fcb11dcfdeb631fdae9f16fe70"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seal of Fire",
+          "logical_rule_key": "battle_rule_v1:cb72b48051ce82e5b6dd1272903c2fff"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shock Troops",
+          "logical_rule_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Silent Dart",
+          "logical_rule_key": "battle_rule_v1:c524d3f4d4927ef8091205b192c0edc1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tower of Calamities",
+          "logical_rule_key": "battle_rule_v1:e28986392d6e65bf4bad9410b94bef21"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Valakut Invoker",
+          "logical_rule_key": "battle_rule_v1:3f76c615e5a1b8175b6fee50cb2c0e92"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vial of Dragonfire",
+          "logical_rule_key": "battle_rule_v1:473f6fb9e4197b5749d43188d5e1b977"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 23
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aeolipile",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:1498f35bbd99fcc8c3049a52e2ca660e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Aladdin's Ring",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:d9f906480e5a8a407a6851d319dcc3f1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Anaba Shaman",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Barbarian Lunatic",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9596872138224e75f7476a08d868834e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crackling Triton",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:43119f804cde8602830ef195e415c76c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ember Hauler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Explosive Apparatus",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:4a4d328666dfb4fb304c95c2af13e959"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flamecast Wheel",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:bc690f8e2ca9998ebd206b19e8817fbb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flamekin Spitfire",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:13ade5b7a53f9f98f28c187b28859d05"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frostling",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:01e185e9814db4f08d623c6827f35704"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Granite Shard",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:d7370d97081f642e53f65474b27245c8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hatchet Bully",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7cc2f5ff22923da354818e0ec6a091b7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lightning-Core Excavator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:00ef7c2adfd591ea858cd10b6d46e817"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mogg Fanatic",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:30ee2fb7f7651610705eefd665c87f6d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Moonglove Extract",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:6b123d98ecf8f3ed768dea5771ea93f4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rod of Ruin",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:6894b985ed758f321a25ff0fdeadd293"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scalding Cauldron",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:32b8c4fcb11dcfdeb631fdae9f16fe70"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seal of Fire",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:cb72b48051ce82e5b6dd1272903c2fff"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shock Troops",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Silent Dart",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:c524d3f4d4927ef8091205b192c0edc1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tower of Calamities",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:e28986392d6e65bf4bad9410b94bef21"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Valakut Invoker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3f76c615e5a1b8175b6fee50cb2c0e92"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vial of Dragonfire",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:473f6fb9e4197b5749d43188d5e1b977"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

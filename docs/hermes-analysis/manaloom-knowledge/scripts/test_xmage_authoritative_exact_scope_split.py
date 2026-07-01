@@ -624,7 +624,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.TAP_DAMAGE_ACTIVATED_SCOPE)
         self.assertEqual(effect["_activated_rule_effects"][0]["target"], "any_target")
 
-    def test_creature_tap_damage_blocks_mana_cost_activation(self) -> None:
+    def test_permanent_activated_damage_maps_creature_mana_tap_cost(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
             effect_classes=["DamageTargetEffect"],
@@ -637,18 +637,33 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             metadata(
                 name="Fixture Shaman",
                 type_line="Creature - Minotaur Shaman",
-                oracle_text="{T}: Fixture Shaman deals 1 damage to any target.",
+                oracle_text="{R}, {T}: Fixture Shaman deals 1 damage to any target.",
             ),
-            source_text=(
-                "this.addAbility(new SimpleActivatedAbility("
-                "new DamageTargetEffect(1), new ManaCostsImpl<>(\"{R}\")));"
-            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1),
+                    new ManaCostsImpl<>("{R}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_tap_damage_source_not_simple_tap")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["R"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
 
-    def test_creature_tap_damage_blocks_noncreature_permanent(self) -> None:
+    def test_permanent_activated_damage_maps_artifact_tap_self_sacrifice(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
             effect_classes=["DamageTargetEffect"],
@@ -659,18 +674,158 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Fixture Rod",
+                name="Fixture Aeolipile",
                 type_line="Artifact",
-                oracle_text="{T}: Fixture Rod deals 1 damage to any target.",
+                oracle_text="{1}, {T}, Sacrifice this artifact: It deals 2 damage to any target.",
             ),
-            source_text=(
-                "this.addAbility(new SimpleActivatedAbility("
-                "new DamageTargetEffect(1), new TapSourceCost()));"
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(2),
+                    new ManaCostsImpl<>("{1}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 2)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["activation_cost_mana"], "{1}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_damage"])
+
+    def test_permanent_activated_damage_maps_creature_self_sacrifice_target_creature(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Lunatic",
+                type_line="Creature - Barbarian",
+                oracle_text="{2}{R}, Sacrifice this creature: It deals 2 damage to target creature.",
             ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(2),
+                    new ManaCostsImpl<>("{2}{R}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+        self.assertEqual(effect["activation_cost_mana"], "{2}{R}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["R"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_damage_blocks_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Dealer",
+                type_line="Creature - Goblin Rogue",
+                oracle_text="{R}, Sacrifice a Goblin: Fixture Dealer deals 4 damage to target creature.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(4),
+                    new ManaCostsImpl<>("{R}")
+                );
+                ability.addCost(new SacrificeTargetCost(new TargetControlledCreaturePermanent()));
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_tap_damage_not_creature")
+        self.assertEqual(reason, "activated_damage_source_cost_not_supported")
+
+    def test_permanent_activated_damage_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Elemental",
+                type_line="Creature - Elemental",
+                oracle_text="{X}{R}, Sacrifice this creature: It deals X damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(ManacostVariableValue.instance),
+                    new ManaCostsImpl<>("{X}{R}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_damage_oracle_not_simple")
+
+    def test_permanent_activated_damage_blocks_player_or_planeswalker_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Magmutt",
+                type_line="Creature - Elemental Dog",
+                oracle_text="{T}: Fixture Magmutt deals 1 damage to target player or planeswalker.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(1),
+                    new TapSourceCost()
+                );
+                ability.addTarget(new TargetPlayerOrPlaneswalker());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_damage_oracle_not_simple")
 
     def test_creature_etb_damage_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(

@@ -35313,6 +35313,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
 
 
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
+SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 
 
 def _activated_rule_effects_for_permanent(permanent):
@@ -35335,13 +35336,18 @@ def _activated_rule_effects_for_permanent(permanent):
         effects.append(enriched)
     if (
         permanent.get("activated_effect") == "direct_damage"
-        and permanent.get("activated_battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+        and permanent.get("activated_battle_model_scope")
+        in {GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE, SIMPLE_ACTIVATED_DAMAGE_SCOPE}
     ):
         direct_effect = {
             "effect": "direct_damage",
             "battle_model_scope": permanent.get("activated_battle_model_scope"),
             "ability_kind": "activated",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
             "amount": permanent.get("activated_damage_amount") or permanent.get("amount") or permanent.get("damage"),
             "damage": permanent.get("activated_damage_amount") or permanent.get("amount") or permanent.get("damage"),
             "target": permanent.get("target"),
@@ -35367,9 +35373,9 @@ def generic_tap_damage_effect_for_permanent(permanent):
     for effect_data in _activated_rule_effects_for_permanent(permanent):
         if (
             effect_data.get("effect") == "direct_damage"
-            and effect_data.get("battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+            and effect_data.get("battle_model_scope")
+            in {GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE, SIMPLE_ACTIVATED_DAMAGE_SCOPE}
             and effect_data.get("ability_kind") == "activated"
-            and effect_data.get("activation_requires_tap")
         ):
             try:
                 amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
@@ -35386,9 +35392,22 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
         return False
     if permanent not in getattr(player, "battlefield", []):
         return False
-    if permanent.get("tapped"):
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
         return False
-    if is_battlefield_creature(permanent) and permanent.get("summoning_sick") and not has_haste(permanent):
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
         return False
     if direct_damage_targets_player(effect_data):
         if any(opponent.is_alive() for opponent in opponents or []):
@@ -35411,9 +35430,30 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
     ):
         return False
     phase = phase or "precombat_main"
-    permanent["tapped"] = True
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.spend_mana(activation_cost):
+        return False
+    old_tap_damage_scope = effect_data.get("battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
     fields = replay_rule_fields(effect_data)
     damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    requires_tap = bool(effect_data.get("activation_requires_tap"))
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
     emit_decision_trace(
         decision_type="activated_ability",
         player=player,
@@ -35434,25 +35474,43 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         rejected_options=[],
         score_components={
             "damage": damage,
-            "requires_tap": 1,
+            "activation_cost": activation_cost,
+            "requires_tap": 1 if requires_tap else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
         confidence="medium",
         expected_benefit_score=max(10, damage * 8),
-        actual_outcome="activated_tap_damage_used",
-        reason="use_free_tap_damage_when_main_phase_target_available",
+        actual_outcome="activated_damage_used",
+        reason="use_activated_damage_when_main_phase_target_available",
         heuristic_version=DECISION_STRATEGY_VERSION,
-        risk_flags=["tap_ability", "simplified_target_choice"],
+        resource_delta={
+            "damage": damage,
+            "mana": -mana_paid,
+            "tapped": 1 if requires_tap else 0,
+            "permanents": -1 if sacrificed_source else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": requires_tap,
+                "sacrifice_source": sacrificed_source,
+                "simplified_target_choice": True,
+            }.items()
+            if active
+        ],
     )
     emit_replay_event(
         "activated_ability",
         player=player.name,
         card=permanent.get("name", "?"),
         effect="direct_damage",
-        activation_kind="tap_damage",
-        activation_cost="tap",
-        tapped=True,
+        activation_kind="tap_damage" if old_tap_damage_scope else "simple_activated_damage",
+        activation_cost="tap" if old_tap_damage_scope and activation_cost == "{0}" else activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        mana_paid=mana_paid,
         turn=turn,
         phase=phase,
         **fields,

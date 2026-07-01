@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg309_permanent_activated_draw_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27568`
-- XMage authoritative source resolved: `27254`
+- target all-card battle-gap identities: `27545`
+- XMage authoritative source resolved: `27231`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27254`
+- XMage authoritative adapter required: `27231`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27254` identities, card semantics are accepted from XMage; work is now
+- For `27231` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG309 Exact Adapter Waves
+## PG283-PG310 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG309 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG310 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -221,6 +221,11 @@ patterns:
   sacrifice cost ->
   `xmage_creature_tap_fixed_damage_target_activated_v1` with nested
   `xmage_tap_fixed_damage_target_activated_ability_v1`
+- `direct_damage::targeted_damage_variant_v1` with
+  `DamageTargetEffect + SimpleActivatedAbility` on permanents, exact fixed
+  activated damage Oracle text, mana/tap/self-sacrifice source costs only, and
+  simple `any target` or `target creature` targets ->
+  `xmage_permanent_simple_activated_damage_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - fixed damage, destroy and exile target spells with XMage/Oracle-matched
@@ -1416,6 +1421,70 @@ PG309 measured result:
   `xmage_authoritative_adapter_required_count=27254`.
 - Running the exact splitter after PG309 on supported units returns
   `proposal_count=0` over `7396` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG310 evidence:
+
+- PG310 permanent activated damage package:
+  `docs/hermes-analysis/master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_package.md`
+- PG310 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_apply_evidence.md`
+- PG310 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_e2e_validation.md`
+- PG310 PG -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg310_xmage_permanent_activated_damage_wave_pg_to_sqlite_sync.json`
+- PG310 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg310_permanent_activated_damage_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg310_permanent_activated_damage_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg310_permanent_activated_damage_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg310_permanent_activated_damage_wave.md`
+- post-PG310 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg310_permanent_activated_damage_wave_recheck.md`
+- post-PG310 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg310_permanent_activated_damage_wave.md`
+- PG310 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_damage_wave.md`
+- post-PG310 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg310_existing_supported_recheck.md`
+
+PG310 measured result:
+
+- PG310 promoted `23` exact permanent activated damage rules whose local XMage
+  source and Oracle text agree on fixed activated direct damage.
+- Runtime now supports simple permanent activated damage abilities with mana
+  costs, colored activation costs, optional tap cost, optional source sacrifice,
+  summoning-sickness blocking only when tap is required, player/creature target
+  resolution, and replay events that preserve the old `tap_damage` event kind
+  for the PG296 scope while using `simple_activated_damage` for PG310.
+- PostgreSQL apply evidence reports `23/23` promoted rows, `23/23`
+  verified/auto rows, and `23/23` matching Oracle hash rows, with `0` stale
+  shadow rows backed up.
+- PG -> Hermes/SQLite sync loaded `6946` PostgreSQL rules, inserted/updated
+  `6740` SQLite rows, and exported `4553` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover artifact mana/tap/self-sacrifice damage,
+  creature colored-cost/self-sacrifice damage, missing-mana blocking,
+  unsupported sacrifice-target cost blocking, dynamic amount blocking, and
+  player-or-planeswalker target blocking; `143` focused exact-scope tests pass.
+- Global all-card readiness after PG310:
+  `battle_and_oracle_ready=2079` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `ready_product_qa_unique_cards=818`.
+- Global all-card authoritative queue after PG310:
+  `target_identity_count=27545`, `xmage_authoritative_source_count=27231`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27231`.
+- Running the exact splitter after PG310 on supported units returns
+  `proposal_count=0` over `7373` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

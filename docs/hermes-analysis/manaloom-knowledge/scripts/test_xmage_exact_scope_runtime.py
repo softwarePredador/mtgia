@@ -1009,6 +1009,167 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_damage_artifact_pays_taps_sacrifices_and_damages_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        active.mana_pool.add_generic(1)
+        permanent = {
+            "name": "Fixture Aeolipile",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_aeolipile",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(52),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(opponent.life, 3)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Aeolipile"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("activation_cost") == "{1}"
+                and data.get("sacrificed_source") is True
+                and data.get("mana_paid") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_aeolipile"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Aeolipile"
+                and data.get("amount") == 2
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_creature_pays_colored_sacrifices_and_hits_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("red", 1)
+        target = {"name": "Target Piker", "type_line": "Creature - Goblin", "power": 2, "toughness": 2}
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Fixture Lunatic",
+            "type_line": "Creature - Barbarian",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "activation_cost_mana": "{2}{R}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_lunatic",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(53),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual(active.available_mana(), 0)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Lunatic"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("activation_cost") == "{2}{R}"
+                and data.get("mana_paid") == 3
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Lunatic"
+                and data.get("target") == "Target Piker"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_blocks_when_mana_is_missing(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        permanent = {
+            "name": "Fixture Aeolipile",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(54),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertIn(permanent, active.battlefield)
+        self.assertNotIn(permanent, active.graveyard)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual(opponent.life, 5)
+        self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
