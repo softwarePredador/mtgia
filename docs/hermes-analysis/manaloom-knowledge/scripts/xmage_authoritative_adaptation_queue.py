@@ -28,6 +28,7 @@ CONTRACT = readiness.XMAGE_FLOW
 
 DEFAULT_SCOPE = "commander_legal_battle_gap"
 SCOPES = {DEFAULT_SCOPE, "all_battle_gap"}
+CARD_SPECIFIC_TOKEN_VARIANT_PREFIX = "xmage_create_token_variant_"
 
 
 def utc_now() -> str:
@@ -89,6 +90,8 @@ def adapter_work_unit(effect_json: dict[str, Any], parsed_entry: dict[str, Any] 
     scope = str(effect_json.get("battle_model_scope") or "")
     if effect == "external_reference_required_manual_model" or scope == "xmage_reference_requires_manual_model_review_v1":
         return xmage_signature_work_unit(parsed_entry)
+    if effect == "token_maker" and scope.startswith(CARD_SPECIFIC_TOKEN_VARIANT_PREFIX):
+        return f"token_maker::{xmage_signature_work_unit(parsed_entry)}"
     if effect or scope:
         return f"{effect or 'unknown_effect'}::{scope or 'unknown_scope'}"
     signals = ",".join(parsed_entry.get("signals") or []) if parsed_entry else ""

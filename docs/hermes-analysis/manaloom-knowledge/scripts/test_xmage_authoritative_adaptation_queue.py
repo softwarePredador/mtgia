@@ -107,6 +107,42 @@ class XMageAuthoritativeAdaptationQueueTest(unittest.TestCase):
             "external_reference_required_manual_model::xmage_reference_requires_manual_model_review_v1",
         )
 
+    def test_card_specific_token_variants_are_grouped_by_xmage_signature(self) -> None:
+        unit = adapter_work_unit(
+            {
+                "effect": "token_maker",
+                "battle_model_scope": "xmage_create_token_variant_fixturecard_v1",
+            },
+            {
+                "card_superclass": "CardImpl",
+                "signals": ["token", "triggered_ability"],
+                "effect_classes": ["CreateTokenEffect"],
+                "ability_classes": ["EntersBattlefieldTriggeredAbility"],
+                "target_classes": [],
+                "condition_classes": [],
+            },
+        )
+
+        self.assertEqual(
+            unit,
+            "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::no_target_class::no_condition_class::token,triggered_ability",
+        )
+        self.assertNotIn("fixturecard", unit)
+
+    def test_specific_token_runtime_scope_stays_as_effect_scope_unit(self) -> None:
+        unit = adapter_work_unit(
+            {
+                "effect": "token_maker",
+                "battle_model_scope": "instant_sorcery_cast_create_1_1_red_elemental_v1",
+            },
+            parsed(),
+        )
+
+        self.assertEqual(
+            unit,
+            "token_maker::instant_sorcery_cast_create_1_1_red_elemental_v1",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -121,7 +121,7 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_token_grouping_replan.md`
 
 Current measured queue:
 
@@ -130,7 +130,7 @@ Current measured queue:
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
 - XMage authoritative adapter required: `27417`
-- ManaLoom adapter work-unit keys: `11905`
+- ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9887`
 
 Interpretation:
@@ -146,6 +146,10 @@ Interpretation:
   adapter work-unit names. Fallback hints must be split by real XMage Java
   class/effect/ability signatures; they are blocked only from executable PG
   promotion until ManaLoom has the matching runtime adapter.
+- Card-specific `token_maker` scopes generated as
+  `xmage_create_token_variant_<card>_v1` are planning artifacts, not real
+  family boundaries. They must be grouped by XMage signature before scheduling
+  a token wave.
 - This goal stops only when the refreshed global queue has no remaining
   `xmage_authoritative_adapter_required`, no `xmage_authoritative_parser_gap`,
   and every `xmage_missing_source_exception` is classified into an explicit
@@ -930,8 +934,10 @@ PG302 evidence:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg302_creature_etb_damage_wave_recheck.md`
 - post-PG302 authoritative queue:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
+- post-PG302 token grouping replan:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_token_grouping_replan.md`
 - post-PG302 supported splitter recheck:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_existing_supported_recheck.md`
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_token_grouping_replan_supported_recheck.md`
 
 PG302 measured result:
 
@@ -961,6 +967,11 @@ PG302 measured result:
   `target_identity_count=27731`, `xmage_authoritative_source_count=27417`,
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=27417`.
+- Post-PG302 token grouping replan keeps the same card counts but reduces
+  `adapter_work_unit_count` from `11905` to `11429` by grouping
+  card-specific token variants by XMage signature. The top newly visible token
+  groups are `CreateTokenEffect` with no ability class (`69` cards) and
+  `CreateTokenEffect + EntersBattlefieldTriggeredAbility` (`60` cards).
 - Running the exact splitter after PG302 on supported units returns
   `proposal_count=0` over `7311` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,

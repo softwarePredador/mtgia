@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_token_grouping_replan.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -180,12 +180,16 @@ Evidence:
 - `master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_e2e_validation.md`
 - `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_existing_supported_recheck.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_token_grouping_replan.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_token_grouping_replan_supported_recheck.md`
 
 After PG302, rerunning the exact splitter on supported units should return
 `proposal_count=0` over `7311` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue.
+the current authoritative queue. The post-PG302 token grouping replan must be
+used for scheduling because it groups card-specific
+`xmage_create_token_variant_<card>_v1` planning artifacts by real XMage
+signature and reduces artificial work units from `11905` to `11429`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
 approved PostgreSQL mutation through the evidence runner instead of ad hoc SQL:
