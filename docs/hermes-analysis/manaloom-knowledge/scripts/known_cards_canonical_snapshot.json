@@ -10444,6 +10444,87 @@
     "battle_rule_logical_key": "battle_rule_v1:53ce131ca884abd4eb34df8e371f870a",
     "battle_rule_oracle_hash": "2d9471eb906c89d40b72e3e7e290e241"
   },
+  "Carrion Beetles": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 3,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "single_graveyard": true,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{B}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_exile_activation_cost_generic": 2,
+    "graveyard_exile_activation_cost_mana": "{2}{B}",
+    "graveyard_exile_activation_requires_sacrifice": false,
+    "graveyard_exile_activation_requires_tap": true,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 3,
+    "graveyard_exile_up_to_count": true,
+    "single_graveyard": true,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5bdcda2db6ca4ec908795c86d773fd5b",
+    "battle_rule_oracle_hash": "15400777d70ce0903440c0a4fcbb25cd"
+  },
   "Carrion Feeder": {
     "ability_kind": "triggered",
     "activation_cost": "sacrifice_creature",
@@ -14483,6 +14564,75 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d54214335142fbda9e139f79184cd30"
+  },
+  "Crypt Creeper": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activated_self_sacrifice_graveyard_exile": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activated_self_sacrifice_graveyard_exile": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [],
+    "graveyard_exile_activation_cost_generic": 0,
+    "graveyard_exile_activation_cost_mana": "{0}",
+    "graveyard_exile_activation_requires_sacrifice": true,
+    "graveyard_exile_activation_requires_tap": false,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:858b9ef24c06fd327b23f1ddde7f6f01",
+    "battle_rule_oracle_hash": "1376d1b8cf7e9008e910141cbd621306"
   },
   "Crypt of Agadeem": {
     "effect": "land",
@@ -22748,6 +22898,89 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d9e200666f7e3bc7a26190104109b887",
     "battle_rule_oracle_hash": "e759ab086a019bc274394a4df42984f5"
+  },
+  "Famished Ghoul": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activated_self_sacrifice_graveyard_exile": true,
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{B}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 2,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 2,
+        "graveyard_exile_up_to_count": true,
+        "single_graveyard": true,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activated_self_sacrifice_graveyard_exile": true,
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_exile_activation_cost_generic": 1,
+    "graveyard_exile_activation_cost_mana": "{1}{B}",
+    "graveyard_exile_activation_requires_sacrifice": true,
+    "graveyard_exile_activation_requires_tap": false,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 2,
+    "graveyard_exile_up_to_count": true,
+    "single_graveyard": true,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:edd435593205d424a5da255f10ccd42b",
+    "battle_rule_oracle_hash": "8cd1048f039c8460fe6280f1a50cf702"
   },
   "Fanatic of Rhonas": {
     "cmc": 2.0,
@@ -32201,6 +32434,75 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
     "battle_rule_oracle_hash": "d7807de1ac4d487c92f86602490d7e85"
+  },
+  "Heap Doll": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activated_self_sacrifice_graveyard_exile": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activated_self_sacrifice_graveyard_exile": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [],
+    "graveyard_exile_activation_cost_generic": 0,
+    "graveyard_exile_activation_cost_mana": "{0}",
+    "graveyard_exile_activation_requires_sacrifice": true,
+    "graveyard_exile_activation_requires_tap": false,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:858b9ef24c06fd327b23f1ddde7f6f01",
+    "battle_rule_oracle_hash": "1376d1b8cf7e9008e910141cbd621306"
   },
   "Heap Gate": {
     "effect": "land",
@@ -51790,6 +52092,87 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Rag Dealer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 3,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "single_graveyard": true,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{B}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_exile_activation_cost_generic": 2,
+    "graveyard_exile_activation_cost_mana": "{2}{B}",
+    "graveyard_exile_activation_requires_sacrifice": false,
+    "graveyard_exile_activation_requires_tap": true,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 3,
+    "graveyard_exile_up_to_count": true,
+    "single_graveyard": true,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5bdcda2db6ca4ec908795c86d773fd5b",
+    "battle_rule_oracle_hash": "15400777d70ce0903440c0a4fcbb25cd"
+  },
   "Ragamuffin Raptor": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
@@ -70279,6 +70662,73 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e761dd65d93bc8b093870c692d899670"
   },
+  "Thraben Heretic": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_target": "creature",
+        "graveyard_exile_target_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [],
+    "graveyard_exile_activation_cost_generic": 0,
+    "graveyard_exile_activation_cost_mana": "{0}",
+    "graveyard_exile_activation_requires_sacrifice": false,
+    "graveyard_exile_activation_requires_tap": true,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_target": "creature",
+    "graveyard_exile_target_count": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f29d249f79c606b64c874a0e06141168",
+    "battle_rule_oracle_hash": "9018873aaad9f700c6b00b84b91e0438"
+  },
   "Thraben Valiant": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -78909,6 +79359,73 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Withered Wretch": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "graveyard_exile",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "card_types": [
+            "card"
+          ],
+          "controller": "any",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ExileTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "activated_effect": "graveyard_exile",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+    "effect": "creature",
+    "graveyard_exile_activation_cost_colors": [],
+    "graveyard_exile_activation_cost_generic": 1,
+    "graveyard_exile_activation_cost_mana": "{1}",
+    "graveyard_exile_activation_requires_sacrifice": false,
+    "graveyard_exile_activation_requires_tap": false,
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "target": "any_card",
+    "target_constraints": {
+      "card_types": [
+        "card"
+      ],
+      "controller": "any",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:41f10f2f127d58464803d5f28f5fe8d5",
+    "battle_rule_oracle_hash": "0eadc5922b314f16c54e9e873823ae83"
   },
   "Withering Torment": {
     "cmc": 3.0,

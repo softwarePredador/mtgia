@@ -25682,6 +25682,303 @@ def graveyard_to_hand_targets(player, permanent, all_players, turn):
     return candidates[:target_count]
 
 
+def graveyard_exile_candidate_score(card, owner, player, all_players, turn):
+    if not isinstance(card, dict):
+        return -1000
+    effect_data = get_card_effect(card)
+    score = threat_score(
+        str(effect_data.get("effect") or "unknown"),
+        card.get("name", "?"),
+        player,
+        all_players or [player],
+        turn,
+    )
+    score += int(float(card.get("cmc") or card_mana_value(card) or 0))
+    if owner is player:
+        score -= 8
+    return score
+
+
+def graveyard_exile_target_pairs(player, permanent, effect_data, all_players, turn):
+    target_count = max(
+        1,
+        int(
+            effect_data.get("graveyard_exile_target_count")
+            or effect_data.get("count")
+            or permanent.get("graveyard_exile_target_count")
+            or 1
+        ),
+    )
+    target_type = (
+        effect_data.get("graveyard_exile_target")
+        or effect_data.get("target")
+        or permanent.get("graveyard_exile_target")
+        or "any_card"
+    )
+    single_graveyard = bool(
+        effect_data.get("graveyard_exile_single_graveyard")
+        or effect_data.get("single_graveyard")
+        or permanent.get("graveyard_exile_single_graveyard")
+    )
+    target_controller = str(effect_data.get("target_controller") or permanent.get("target_controller") or "any")
+    if target_controller == "self":
+        candidate_players = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        candidate_players = [p for p in all_players or [] if p is not player and p.is_alive()]
+    else:
+        candidate_players = [p for p in all_players or [player] if p.is_alive()]
+
+    all_options = []
+    by_owner = []
+    for owner in candidate_players:
+        owner_candidates = []
+        for grave_card in list(getattr(owner, "graveyard", []) or []):
+            if not graveyard_card_matches_recursion_target(grave_card, target_type):
+                continue
+            score = graveyard_exile_candidate_score(grave_card, owner, player, all_players, turn)
+            owner_candidates.append((score, owner, grave_card))
+        owner_candidates.sort(
+            key=lambda item: (
+                item[0],
+                1 if item[1] is not player else 0,
+                str(item[2].get("name") or ""),
+            ),
+            reverse=True,
+        )
+        all_options.extend(owner_candidates)
+        if owner_candidates:
+            top_owner_targets = owner_candidates[:target_count]
+            by_owner.append((sum(item[0] for item in top_owner_targets), owner, top_owner_targets))
+
+    if single_graveyard:
+        if not by_owner:
+            return [], []
+        by_owner.sort(
+            key=lambda item: (
+                item[0],
+                1 if item[1] is not player else 0,
+                str(getattr(item[1], "name", "")),
+            ),
+            reverse=True,
+        )
+        return [(owner, card) for _score, owner, card in by_owner[0][2]], all_options
+
+    all_options.sort(
+        key=lambda item: (
+            item[0],
+            1 if item[1] is not player else 0,
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return [(owner, card) for _score, owner, card in all_options[:target_count]], all_options
+
+
+def activate_graveyard_exile_permanents(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase,
+):
+    if phase not in {"precombat_main", "postcombat_main"}:
+        return 0
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or permanent.get("utility_artifact_used_this_turn"):
+            continue
+        effect_data = graveyard_exile_effect_for_permanent(permanent)
+        if effect_data is None:
+            continue
+        activation_cost_generic = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(
+                effect_data.get("graveyard_exile_activation_cost_generic")
+                or effect_data.get("activation_cost_generic")
+                or 0
+            ),
+        )
+        activation_cost_colors = list(
+            effect_data.get("graveyard_exile_activation_cost_colors")
+            or effect_data.get("activation_cost_colors")
+            or []
+        )
+        activation_cost_text = (
+            effect_data.get("graveyard_exile_activation_cost_mana")
+            or effect_data.get("activation_cost_mana")
+            or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+        )
+        requires_tap = bool(
+            effect_data.get(
+                "graveyard_exile_activation_requires_tap",
+                effect_data.get("activation_requires_tap", False),
+            )
+        )
+        requires_sacrifice = bool(
+            effect_data.get(
+                "graveyard_exile_activation_requires_sacrifice",
+                effect_data.get("activation_requires_sacrifice", False),
+            )
+        )
+        if requires_tap and permanent.get("tapped"):
+            continue
+        if (
+            requires_tap
+            and is_battlefield_creature(permanent)
+            and permanent.get("summoning_sick")
+            and not has_haste(permanent)
+        ):
+            continue
+        if not player.can_pay(activation_cost_text):
+            continue
+        target_pairs, all_options = graveyard_exile_target_pairs(
+            player,
+            permanent,
+            effect_data,
+            all_players,
+            turn,
+        )
+        if not target_pairs:
+            continue
+        if not player.spend_mana(activation_cost_text):
+            continue
+        if requires_tap:
+            permanent["tapped"] = True
+        permanent["utility_artifact_used_this_turn"] = True
+        if requires_sacrifice:
+            if permanent in player.battlefield:
+                player.battlefield.remove(permanent)
+            player.graveyard.append(permanent)
+            player.record_permanent_sacrificed(permanent, turn)
+
+        exiled = []
+        exiled_pairs = []
+        owner_names = []
+        by_owner = defaultdict(list)
+        for owner, target in target_pairs:
+            by_owner[owner].append(target)
+        for owner, targets in by_owner.items():
+            removed = remove_cards_from_graveyard(
+                owner,
+                targets,
+                turn=turn,
+                source_event="activated_graveyard_exile",
+            )
+            for removed_card in removed:
+                move_to_exile(
+                    owner,
+                    removed_card,
+                    reason="activated_graveyard_exile",
+                    turn=turn,
+                )
+                exiled.append(removed_card)
+                exiled_pairs.append((owner, removed_card))
+                owner_names.append(owner.name)
+        if not exiled:
+            continue
+
+        target_type = effect_data.get("graveyard_exile_target") or effect_data.get("target") or "any_card"
+        fields = replay_rule_fields(effect_data)
+        mana_paid = activation_cost_generic + len(activation_cost_colors)
+        emit_decision_trace(
+            decision_type="utility_permanent_activation",
+            player=player,
+            turn=turn,
+            phase=phase,
+            available_options=[
+                decision_card_option(
+                    card,
+                    get_card_effect(card),
+                    score=score,
+                    action="exile_graveyard_card",
+                    target_owner=owner.name,
+                    target_type=target_type,
+                )
+                for score, owner, card in all_options[:8]
+            ],
+            chosen_option=decision_card_option(
+                exiled[0],
+                get_card_effect(exiled[0]),
+                score=graveyard_exile_candidate_score(
+                    exiled[0],
+                    exiled_pairs[0][0] if exiled_pairs else None,
+                    player,
+                    all_players,
+                    turn,
+                ),
+                action="activate_graveyard_exile",
+                target_owner=owner_names[0] if owner_names else None,
+                target_type=target_type,
+            ),
+            rejected_options=[],
+            score_components={
+                "activation_cost": activation_cost_text,
+                "activation_cost_generic": activation_cost_generic,
+                "activation_cost_colors": activation_cost_colors,
+                "target_type": target_type,
+                "exiled_count": len(exiled),
+                "requires_tap": requires_tap,
+                "sacrificed_source": requires_sacrifice,
+            },
+            rule_source=fields.get("rule_source", "permanent_simple_activated_graveyard_exile_v1"),
+            rule_status=fields.get("rule_review_status", "verified"),
+            confidence="medium",
+            expected_benefit_score=18 + len(exiled) * 4,
+            actual_outcome="activated_graveyard_exile_used",
+            reason="use_graveyard_exile_activation_when_target_available",
+            heuristic_version=DECISION_STRATEGY_VERSION,
+            resource_delta={
+                "mana": -mana_paid,
+                "graveyard_cards_exiled": len(exiled),
+                "permanents": -1 if requires_sacrifice else 0,
+            },
+            risk_flags=[
+                flag
+                for flag, active in {
+                    "tap_ability": requires_tap,
+                    "sacrifice_source": requires_sacrifice,
+                    "graveyard_hate": True,
+                }.items()
+                if active
+            ],
+        )
+        emit_replay_event(
+            "graveyard_exile_activated",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            activation_kind="simple_activated_graveyard_exile",
+            activation_cost=activation_cost_text,
+            target_type=target_type,
+            destination="exile",
+            exiled=[card.get("name", "?") for card in exiled],
+            exiled_count=len(exiled),
+            target_owners=owner_names,
+            mana_paid=mana_paid,
+            tapped=bool(permanent.get("tapped")),
+            sacrificed_self=requires_sacrifice,
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        emit_replay_event(
+            "activated_ability",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            effect="graveyard_exile",
+            activation_kind="simple_activated_graveyard_exile",
+            activation_cost=activation_cost_text,
+            mana_paid=mana_paid,
+            exiled_count=len(exiled),
+            turn=turn,
+            phase=phase,
+            **fields,
+        )
+        return 1
+    return 0
+
+
 def activate_graveyard_self_return_cards(
     player,
     opponents,
@@ -27345,6 +27642,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
         return 1
 
     if activate_permanent_life_gain_sources(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_graveyard_exile_permanents(
         player,
         opponents,
         all_players,
@@ -36317,6 +36624,7 @@ SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost
 SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
+SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 
 
@@ -36499,7 +36807,71 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             target_boost_effect[key] = permanent.get(key)
         effects.append(target_boost_effect)
+    if (
+        permanent.get("activated_effect") == "graveyard_exile"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE
+    ):
+        graveyard_exile_effect = {
+            "effect": "graveyard_exile",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "graveyard_exile",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("graveyard_exile_target") or permanent.get("target") or "any_card",
+            "target_constraints": permanent.get("target_constraints"),
+            "count": permanent.get("graveyard_exile_target_count") or permanent.get("count") or 1,
+            "destination": permanent.get("graveyard_exile_destination") or "exile",
+            "target_controller": permanent.get("target_controller") or "any",
+            "graveyard_exile_target": permanent.get("graveyard_exile_target") or permanent.get("target") or "any_card",
+            "graveyard_exile_target_count": permanent.get("graveyard_exile_target_count") or permanent.get("count") or 1,
+            "graveyard_exile_destination": permanent.get("graveyard_exile_destination") or "exile",
+            "graveyard_exile_single_graveyard": bool(permanent.get("graveyard_exile_single_graveyard")),
+            "graveyard_exile_up_to_count": bool(permanent.get("graveyard_exile_up_to_count")),
+            "graveyard_exile_activation_cost_mana": permanent.get("graveyard_exile_activation_cost_mana")
+            or permanent.get("activation_cost_mana"),
+            "graveyard_exile_activation_cost_generic": permanent.get("graveyard_exile_activation_cost_generic")
+            or permanent.get("activation_cost_generic"),
+            "graveyard_exile_activation_cost_colors": permanent.get("graveyard_exile_activation_cost_colors")
+            or permanent.get("activation_cost_colors"),
+            "graveyard_exile_activation_requires_tap": bool(
+                permanent.get("graveyard_exile_activation_requires_tap", permanent.get("activation_requires_tap", False))
+            ),
+            "graveyard_exile_activation_requires_sacrifice": bool(
+                permanent.get(
+                    "graveyard_exile_activation_requires_sacrifice",
+                    permanent.get("activation_requires_sacrifice", False),
+                )
+            ),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            graveyard_exile_effect[key] = permanent.get(key)
+        effects.append(graveyard_exile_effect)
     return effects
+
+
+def graveyard_exile_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_GRAVEYARD_EXILE_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "graveyard_exile"
+        ):
+            return effect_data
+    return None
 
 
 def generic_tap_damage_effect_for_permanent(permanent):

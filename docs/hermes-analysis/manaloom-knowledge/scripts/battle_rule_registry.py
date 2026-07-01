@@ -92,6 +92,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "remove_creature": "removal",
     "fated_clash_protect_then_destroy": "wipe",
     "remove_permanent": "removal",
+    "graveyard_exile": "removal",
     "remove_artifact_or_3dmg": "removal",
     "damage_player_and_creatures": "removal",
     "deal_damage": "removal",
@@ -292,6 +293,9 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     ):
         category = "protection"
         subtype = "activated_targeted_protection_response"
+    elif effect_json.get("activated_effect") == "graveyard_exile":
+        category = "removal"
+        subtype = "graveyard_hate"
     elif effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             category = "ramp"
@@ -314,6 +318,8 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
             subtype = "temporary_debuff"
         else:
             subtype = "temporary_pump"
+    elif effect == "graveyard_exile":
+        subtype = "graveyard_hate"
     role = {
         "category": category,
         "effect": effect,

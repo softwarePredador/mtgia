@@ -2352,6 +2352,136 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_recursion_oracle_not_simple")
 
+    def test_permanent_activated_graveyard_exile_maps_up_to_three_single_graveyard(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carrion Beetles",
+                type_line="Creature - Insect",
+                oracle_text="{2}{B}, {T}: Exile up to three target cards from a single graveyard.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new ManaCostsImpl<>("{2}{B}"));
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetCardInASingleGraveyard(0, 3, StaticFilters.FILTER_CARD_CARDS));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE)
+        self.assertEqual(effect["activated_effect"], "graveyard_exile")
+        self.assertEqual(effect["graveyard_exile_target"], "any_card")
+        self.assertEqual(effect["graveyard_exile_target_count"], 3)
+        self.assertTrue(effect["graveyard_exile_up_to_count"])
+        self.assertTrue(effect["graveyard_exile_single_graveyard"])
+        self.assertEqual(effect["activation_cost_mana"], "{2}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["effect"], "graveyard_exile")
+
+    def test_permanent_activated_graveyard_exile_maps_creature_target_tap_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Thraben Heretic",
+                type_line="Creature - Human Wizard",
+                oracle_text="{T}: Exile target creature card from a graveyard.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new TapSourceCost());
+                ability.addTarget(new TargetCardInGraveyard(StaticFilters.FILTER_CARD_CREATURE_A_GRAVEYARD));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["graveyard_exile_target"], "creature")
+        self.assertEqual(effect["graveyard_exile_target_count"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "any", "card_types": ["creature"]},
+        )
+
+    def test_permanent_activated_graveyard_exile_blocks_variable_reveal_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Martyr of Bones",
+                type_line="Creature - Human Wizard",
+                oracle_text="{1}: Exile target card from a graveyard.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new GenericManaCost(1));
+                ability.addCost(new RevealVariableBlackCardsFromHandCost());
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetCardInASingleGraveyard(0, 1, new FilterCard("up to X target cards")));
+                ability.setTargetAdjuster(new XTargetsCountAdjuster());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_graveyard_exile_source_cost_not_supported")
+
+    def test_permanent_activated_graveyard_exile_blocks_multiple_abilities(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Steamclaw",
+                type_line="Artifact",
+                oracle_text="{3}: Exile target card from a graveyard.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(new ExileTargetEffect(), new TapSourceCost());
+                ability.addCost(new GenericManaCost(3));
+                ability.addTarget(new TargetCardInGraveyard());
+                this.addAbility(ability);
+                ability = new SimpleActivatedAbility(new ExileTargetEffect(), new GenericManaCost(1));
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetCardInGraveyard());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_graveyard_exile_source_multiple_abilities_not_supported")
+
     def test_graveyard_self_return_mana_only_creature_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

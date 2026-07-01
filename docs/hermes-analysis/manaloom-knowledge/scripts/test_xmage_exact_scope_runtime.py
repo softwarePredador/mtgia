@@ -4223,6 +4223,163 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_graveyard_exile_pays_mana_and_exiles_opponent_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        own_card = {"name": "Own Flashback", "type_line": "Sorcery", "cmc": 2}
+        target = {"name": "Opponent Reanimate", "type_line": "Sorcery", "cmc": 1}
+        active.graveyard.append(own_card)
+        opponent.graveyard.append(target)
+        permanent = {
+            "name": "Withered Wretch",
+            "type_line": "Creature - Zombie Cleric",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "activated_effect": "graveyard_exile",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "graveyard_exile_target": "any_card",
+            "graveyard_exile_target_count": 1,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_activation_cost_mana": "{1}",
+            "graveyard_exile_activation_cost_generic": 1,
+            "graveyard_exile_activation_cost_colors": [],
+            "graveyard_exile_activation_requires_tap": False,
+            "graveyard_exile_activation_requires_sacrifice": False,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_withered_wretch",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Own Flashback"])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Opponent Reanimate"])
+        self.assertTrue(
+            any(
+                event == "graveyard_exile_activated"
+                and data.get("card") == "Withered Wretch"
+                and data.get("activation_kind") == "simple_activated_graveyard_exile"
+                and data.get("activation_cost") == "{1}"
+                and data.get("exiled") == ["Opponent Reanimate"]
+                and data.get("target_owners") == ["Opponent"]
+                and data.get("mana_paid") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_graveyard_exile_single_graveyard_exiles_multiple_and_sacrifices_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        opponent.graveyard.extend(
+            [
+                {"name": "Opponent Escape", "type_line": "Creature - Zombie", "cmc": 4},
+                {"name": "Opponent Flashback", "type_line": "Instant", "cmc": 2},
+            ]
+        )
+        active.graveyard.append({"name": "Own Spell", "type_line": "Sorcery", "cmc": 5})
+        permanent = {
+            "name": "Famished Ghoul",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "activated_effect": "graveyard_exile",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "graveyard_exile_target": "any_card",
+            "graveyard_exile_target_count": 2,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_single_graveyard": True,
+            "graveyard_exile_up_to_count": True,
+            "graveyard_exile_activation_cost_mana": "{1}{B}",
+            "graveyard_exile_activation_cost_generic": 1,
+            "graveyard_exile_activation_cost_colors": ["B"],
+            "graveyard_exile_activation_requires_tap": False,
+            "graveyard_exile_activation_requires_sacrifice": True,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_famished_ghoul",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Own Spell", "Famished Ghoul"])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertCountEqual(
+            [card["name"] for card in opponent.exile],
+            ["Opponent Escape", "Opponent Flashback"],
+        )
+        self.assertTrue(
+            any(
+                event == "graveyard_exile_activated"
+                and data.get("card") == "Famished Ghoul"
+                and data.get("sacrificed_self") is True
+                and data.get("exiled_count") == 2
+                and data.get("target_owners") == ["Opponent", "Opponent"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_graveyard_exile_blocks_summoning_sick_tap_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Opponent Bear", "type_line": "Creature - Bear", "cmc": 2}
+        opponent.graveyard.append(target)
+        permanent = {
+            "name": "Thraben Heretic",
+            "type_line": "Creature - Human Wizard",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "activated_effect": "graveyard_exile",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_exile_graveyard_card_v1",
+            "graveyard_exile_target": "creature",
+            "graveyard_exile_target_count": 1,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_activation_cost_mana": "{0}",
+            "graveyard_exile_activation_cost_generic": 0,
+            "graveyard_exile_activation_cost_colors": [],
+            "graveyard_exile_activation_requires_tap": True,
+            "graveyard_exile_activation_requires_sacrifice": False,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=18,
+            rng=random.Random(18),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opponent Bear"])
+        self.assertEqual(opponent.exile, [])
+        self.assertFalse(any(event == "graveyard_exile_activated" for event, _ in self.events))
+
     def test_graveyard_self_return_does_not_move_without_mana(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

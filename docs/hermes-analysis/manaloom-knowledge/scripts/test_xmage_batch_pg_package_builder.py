@@ -77,6 +77,11 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "dies_recursion_count": 1,
             "dies_recursion_destination": "hand",
             "dies_recursion_exclude_self": True,
+            "graveyard_exile_target": "any_card",
+            "graveyard_exile_target_count": 3,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_up_to_count": True,
+            "graveyard_exile_single_graveyard": True,
             "recursion_components": [
                 {
                     "target": "creature",
@@ -117,6 +122,11 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "dies_recursion_count": 1,
             "dies_recursion_destination": "hand",
             "dies_recursion_exclude_self": True,
+            "graveyard_exile_target": "any_card",
+            "graveyard_exile_target_count": 3,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_up_to_count": True,
+            "graveyard_exile_single_graveyard": True,
             "recursion_components": [
                 {
                     "target": "creature",

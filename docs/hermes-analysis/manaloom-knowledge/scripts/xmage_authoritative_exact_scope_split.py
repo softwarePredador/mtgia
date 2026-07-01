@@ -94,6 +94,7 @@ TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
+PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE = "xmage_permanent_simple_activated_exile_graveyard_card_v1"
 PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
@@ -1643,6 +1644,16 @@ def is_permanent_activated_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_graveyard_exile_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"ExileTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
 def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -2945,6 +2956,154 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
     }
 
 
+def activated_graveyard_exile_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_graveyard_exile_oracle_not_simple"
+    effect_text = text.rsplit(":", 1)[1].strip()
+    patterns: list[tuple[str, str, bool, bool]] = [
+        (r"^exile target card from a graveyard\.?$", "any_card", False, False),
+        (r"^exile target creature card from a graveyard\.?$", "creature", False, False),
+        (
+            r"^exile up to (one|two|three|\d+) target cards from a single graveyard\.?$",
+            "any_card",
+            True,
+            True,
+        ),
+        (
+            r"^exile up to (one|two|three|\d+) target creature cards from a single graveyard\.?$",
+            "creature",
+            True,
+            True,
+        ),
+    ]
+    words = {"one": 1, "two": 2, "three": 3}
+    for pattern, target, up_to, single_graveyard in patterns:
+        match = re.match(pattern, effect_text)
+        if not match:
+            continue
+        count = 1
+        if match.groups():
+            value = match.group(1)
+            count = words.get(value, int(value) if value.isdigit() else 0)
+        if count <= 0:
+            return "activated_graveyard_exile_oracle_count_not_supported"
+        return {
+            "target": target,
+            "count": count,
+            "up_to": up_to,
+            "single_graveyard": single_graveyard,
+        }
+    return "activated_graveyard_exile_oracle_not_simple"
+
+
+def activated_graveyard_exile_target_from_source(text: str) -> dict[str, Any] | str:
+    target_card_count = len(re.findall(r"\bTargetCardInGraveyard\s*\(", text))
+    target_single_count = len(re.findall(r"\bTargetCardInASingleGraveyard\s*\(", text))
+    if target_card_count + target_single_count != 1:
+        return "activated_graveyard_exile_source_target_not_supported"
+    if target_card_count:
+        target = (
+            "creature"
+            if (
+                "FILTER_CARD_CREATURE_A_GRAVEYARD" in text
+                or "FilterCreatureCard" in text
+            )
+            else "any_card"
+        )
+        return {
+            "target": target,
+            "count": 1,
+            "up_to": False,
+            "single_graveyard": False,
+        }
+    match = re.search(r"TargetCardInASingleGraveyard\s*\(\s*0\s*,\s*(\d+)\s*,", text, re.S)
+    if not match:
+        return "activated_graveyard_exile_source_target_not_supported"
+    target = (
+        "creature"
+        if (
+            "FILTER_CARD_CREATURE_A_GRAVEYARD" in text
+            or "FilterCreatureCard" in text
+        )
+        else "any_card"
+    )
+    return {
+        "target": target,
+        "count": int(match.group(1)),
+        "up_to": True,
+        "single_graveyard": True,
+    }
+
+
+def activated_graveyard_exile_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "RevealVariableBlackCardsFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "VariableCost",
+        "XTargetsCountAdjuster",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_graveyard_exile_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_graveyard_exile_source_cost_not_supported"
+    effect_matches = re.findall(r"ExileTargetEffect\s*\(", text)
+    if len(effect_matches) != 1:
+        return "activated_graveyard_exile_source_multiple_abilities_not_supported"
+    effect_index = text.find("ExileTargetEffect")
+    window = text[max(0, effect_index - 500) : effect_index + 1800]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_graveyard_exile_source_not_simple_activated"
+    parsed_target = activated_graveyard_exile_target_from_source(text)
+    if isinstance(parsed_target, str):
+        return parsed_target
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_matches:
+        cost_text = "{" + str(sum(int(value) for value in generic_matches)) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_graveyard_exile_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        **parsed_target,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
+
+
+def graveyard_exile_target_constraints_for(target: str, *, controller: str = "any") -> dict[str, Any]:
+    constraints: dict[str, Any] = {"zone": "graveyard", "controller": controller}
+    if target == "creature":
+        constraints["card_types"] = ["creature"]
+    elif target in {"any_card", "card"}:
+        constraints["card_types"] = ["card"]
+    else:
+        constraints["target"] = target
+    return constraints
+
+
 def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     match = re.match(r"^you gain (\d+) life\.?$", oracle_text(metadata))
     if not match:
@@ -3486,6 +3645,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated draw ability"
     elif scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
         scope_kind = "permanent with a simple activated fixed life-gain ability"
+    elif scope == PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE:
+        scope_kind = "permanent with a simple activated graveyard-exile ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     return (
@@ -3562,6 +3723,7 @@ def split_row(
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
+    permanent_activated_graveyard_exile_unit = is_permanent_activated_graveyard_exile_unit(row)
     graveyard_self_return_unit = (
         unit == RECURSION_UNIT
         and effect_classes(row) == {"ReturnSourceFromGraveyardToHandEffect"}
@@ -3591,6 +3753,7 @@ def split_row(
         and not permanent_activated_target_keyword_unit
         and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
+        and not permanent_activated_graveyard_exile_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
     ):
@@ -3620,6 +3783,7 @@ def split_row(
         and not permanent_activated_target_keyword_unit
         and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
+        and not permanent_activated_graveyard_exile_unit
         and not graveyard_self_return_unit
     ):
         if not is_spell(metadata):
@@ -4200,6 +4364,108 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_graveyard_to_hand",
+        ), "selected_exact_scope"
+
+    if permanent_activated_graveyard_exile_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_graveyard_exile_not_permanent"
+        oracle_exile = activated_graveyard_exile_from_oracle(metadata)
+        if isinstance(oracle_exile, str):
+            return None, oracle_exile
+        parsed_activation = activated_graveyard_exile_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in ("target", "count", "up_to", "single_graveyard"):
+            if parsed_activation.get(key) != oracle_exile.get(key):
+                return None, "activated_graveyard_exile_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        target_type = str(oracle_exile["target"])
+        target_count = int(oracle_exile["count"])
+        target_constraints = graveyard_exile_target_constraints_for(target_type)
+        activated_effect = {
+            "effect": "graveyard_exile",
+            "battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "graveyard_exile",
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "count": target_count,
+            "destination": "exile",
+            "target_controller": "any",
+            "graveyard_exile_target": target_type,
+            "graveyard_exile_target_count": target_count,
+            "graveyard_exile_destination": "exile",
+            "xmage_effect_class": "ExileTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "graveyard_exile",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE,
+            "target": target_type,
+            "target_constraints": target_constraints,
+            "graveyard_exile_target": target_type,
+            "graveyard_exile_target_count": target_count,
+            "graveyard_exile_destination": "exile",
+            "target_controller": "any",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "ExileTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+            "graveyard_exile_activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "graveyard_exile_activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "graveyard_exile_activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "graveyard_exile_activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "graveyard_exile_activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
+        }
+        if oracle_exile.get("up_to"):
+            activated_effect["up_to_count"] = True
+            activated_effect["graveyard_exile_up_to_count"] = True
+            effect_json["up_to_count"] = True
+            effect_json["graveyard_exile_up_to_count"] = True
+        if oracle_exile.get("single_graveyard"):
+            activated_effect["single_graveyard"] = True
+            activated_effect["graveyard_exile_single_graveyard"] = True
+            effect_json["single_graveyard"] = True
+            effect_json["graveyard_exile_single_graveyard"] = True
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_graveyard_exile"] = True
+            activated_effect["activated_self_sacrifice_graveyard_exile"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_graveyard_exile",
         ), "selected_exact_scope"
 
     if unit == RECURSION_UNIT and classes == {"ReturnSourceFromGraveyardToHandEffect"}:
@@ -5458,6 +5724,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
+            and not is_permanent_activated_graveyard_exile_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
             continue
@@ -5508,6 +5775,7 @@ def build_exact_split_report(
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with ExileTargetEffect, SimpleActivatedAbility, exact activated graveyard-exile Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
