@@ -47738,6 +47738,10 @@ def apply_effect_immediate(
                             permanent["summoning_sick"] = not permanent["haste"]
                             permanent["tapped"] = bool(permanent.get("tapped") or enters_tapped)
                         destination_controller.battlefield.append(permanent)
+                    elif component_destination == "library_top":
+                        participant.library.insert(0, recovered_card)
+                    elif component_destination == "library_bottom":
+                        participant.library.append(recovered_card)
                     else:
                         participant.hand.append(recovered_card)
             recovered_by_component.append(

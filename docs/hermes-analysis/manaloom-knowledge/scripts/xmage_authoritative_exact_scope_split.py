@@ -108,6 +108,7 @@ COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+GRAVEYARD_TO_LIBRARY_SPELL_SCOPE = "xmage_put_target_graveyard_card_on_library_spell_v1"
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
@@ -1096,6 +1097,64 @@ def source_supports_battlefield_recursion_target(source_text: str, target_gravey
     if controller in {"any", "any_player"}:
         return "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text
     return False
+
+
+def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (
+            r"^put target card from your graveyard on top of your library\.?$",
+            {"target": "any_card", "count": 1, "destination": "library_top", "up_to_count": False},
+        ),
+        (
+            r"^put target card from your graveyard on the bottom of your library\.?$",
+            {"target": "any_card", "count": 1, "destination": "library_bottom", "up_to_count": False},
+        ),
+        (
+            r"^put up to three target creature cards from your graveyard on top of your library\.?$",
+            {"target": "creature", "count": 3, "destination": "library_top", "up_to_count": True},
+        ),
+        (
+            r"^put up to three target creature cards from your graveyard on the bottom of your library\.?$",
+            {"target": "creature", "count": 3, "destination": "library_bottom", "up_to_count": True},
+        ),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return dict(result)
+    return None
+
+
+def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    effect_matches = re.findall(r"new\s+PutOnLibraryTargetEffect\s*\(\s*(true|false)\s*\)", text)
+    if len(effect_matches) != 1:
+        return "graveyard_to_library_source_not_single_effect"
+    destination = "library_top" if effect_matches[0] == "true" else "library_bottom"
+    if "TargetCardInYourGraveyard" not in text:
+        return "graveyard_to_library_source_target_not_supported"
+    if "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text:
+        return "graveyard_to_library_source_target_not_supported"
+    if "EachTargetPointer" in text or ".setTargetPointer" in text:
+        return "graveyard_to_library_source_target_not_supported"
+    if "FILTER_CARD_CREATURES_YOUR_GRAVEYARD" in text or "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text:
+        target = "creature"
+    elif re.search(r"TargetCardInYourGraveyard\s*\(\s*\)", text):
+        target = "any_card"
+    else:
+        return "graveyard_to_library_source_target_not_supported"
+    count = 1
+    up_to = False
+    count_match = re.search(r"TargetCardInYourGraveyard\s*\(\s*0\s*,\s*(\d+)\s*,", text, re.S)
+    if count_match:
+        count = int(count_match.group(1))
+        up_to = True
+    return {
+        "target": target,
+        "count": count,
+        "destination": destination,
+        "up_to_count": up_to,
+    }
 
 
 def destroy_all_types_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
@@ -5444,6 +5503,42 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit == RECURSION_UNIT:
+        if classes == {"PutOnLibraryTargetEffect"}:
+            if ability_classes(row):
+                return None, "graveyard_to_library_ability_class_not_simple"
+            oracle_target = graveyard_to_library_from_oracle(metadata)
+            if oracle_target is None:
+                return None, "graveyard_to_library_oracle_not_simple"
+            source_target = graveyard_to_library_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in ("target", "count", "destination", "up_to_count"):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"graveyard_to_library_source_oracle_{key}_mismatch"
+            target_type = str(oracle_target["target"])
+            count = int(oracle_target["count"])
+            destination = str(oracle_target["destination"])
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": GRAVEYARD_TO_LIBRARY_SPELL_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": destination,
+                "target_controller": "self",
+                "target_graveyard_controller": "self",
+                "library_controller": "self",
+                "xmage_effect_class": "PutOnLibraryTargetEffect",
+                **flags,
+            }
+            if oracle_target.get("up_to_count"):
+                effect_json["up_to_count"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_library_spell",
+            ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
             if ability_classes(row):
                 return None, "recursion_battlefield_ability_class_not_simple"
@@ -5879,6 +5974,11 @@ def build_exact_split_report(
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_permanent_activated_graveyard_exile_unit(row)
             and not is_boost_keyword_spell_unit(row)
+            and not (
+                str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
+                and effect_classes(row) == {"PutOnLibraryTargetEffect"}
+                and not ability_classes(row)
+            )
         ):
             continue
         considered += 1
@@ -5932,6 +6032,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",

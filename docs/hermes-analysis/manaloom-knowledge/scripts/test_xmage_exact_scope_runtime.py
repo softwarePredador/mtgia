@@ -267,6 +267,81 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_library_top_recursion_moves_card_from_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Existing Top", "type_line": "Creature - Human", "cmc": 1}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Graveyard Answer", "type_line": "Instant", "cmc": 2}
+        active.graveyard.append(target)
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "scope": "any_card"},
+            "count": 1,
+            "destination": "library_top",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Reclaim", "type_line": "Instant"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.library[:2]], ["Graveyard Answer", "Existing Top"])
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Reclaim"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Reclaim"
+                and data.get("destination") == "library_top"
+                and data.get("recovered") == ["Graveyard Answer"]
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_library_bottom_recursion_moves_card_from_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Existing Top", "type_line": "Creature - Human", "cmc": 1}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Graveyard Memory", "type_line": "Sorcery", "cmc": 2}
+        active.graveyard.append(target)
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "scope": "any_card"},
+            "count": 1,
+            "destination": "library_bottom",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Bottom", "type_line": "Sorcery"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.library], ["Existing Top", "Graveyard Memory"])
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Bottom"])
+
     def test_recursion_battlefield_from_opponent_graveyard_enters_under_controller(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

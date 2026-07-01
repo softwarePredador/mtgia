@@ -2094,6 +2094,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
+    def test_graveyard_to_library_spell_maps_to_library_top_recursion(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["PutOnLibraryTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Reclaim",
+                type_line="Instant",
+                oracle_text="Put target card from your graveyard on top of your library.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "recursion")
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_TO_LIBRARY_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "any_card")
+        self.assertEqual(effect["count"], 1)
+        self.assertEqual(effect["destination"], "library_top")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["target_graveyard_controller"], "self")
+        self.assertEqual(effect["library_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "scope": "any_card"},
+        )
+
+    def test_graveyard_to_library_up_to_three_creatures_preserves_count(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["PutOnLibraryTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Reinforcements",
+                type_line="Instant",
+                oracle_text="Put up to three target creature cards from your graveyard on top of your library.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(true));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    0, 3, StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 3)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["destination"], "library_top")
+
+    def test_graveyard_to_library_source_destination_mismatch_blocks(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["PutOnLibraryTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Bottom",
+                type_line="Sorcery",
+                oracle_text="Put target card from your graveyard on top of your library.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new PutOnLibraryTargetEffect(false));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_to_library_source_oracle_destination_mismatch")
+
     def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
         proposal, reason = split.split_row(

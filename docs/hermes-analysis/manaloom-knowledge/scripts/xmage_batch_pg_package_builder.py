@@ -26,6 +26,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "target_controller",
     "target_graveyard_controller",
     "battlefield_controller",
+    "library_controller",
     "target_constraints",
     "count",
     "up_to_count",
