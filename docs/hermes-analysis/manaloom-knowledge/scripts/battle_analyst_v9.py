@@ -4026,7 +4026,18 @@ def choose_add_counters_target(player, opponents, card, effect_data):
     return owner, target, [target for _owner, target in candidates]
 
 
-def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn):
+def resolve_add_counters_target_effect(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    *,
+    finish_spell=True,
+    event_name="add_counters_resolved",
+    trigger=None,
+    phase=None,
+):
     counter_type = str(effect_data.get("counter_type") or "+1/+1")
     count = max(0, int(effect_data.get("counter_count") or effect_data.get("count") or 1))
     target_owner, target, target_options = choose_add_counters_target(
@@ -4036,8 +4047,7 @@ def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn
         effect_data,
     )
     if target is None or target_owner is None or count <= 0:
-        emit_replay_event(
-            "add_counters_resolved",
+        event_payload = dict(
             player=player.name,
             card=card.get("name", "?"),
             counter_type=counter_type,
@@ -4047,7 +4057,14 @@ def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        if trigger:
+            event_payload["trigger"] = trigger
+            event_payload["effect"] = "add_counters"
+        if phase:
+            event_payload["phase"] = phase
+        emit_replay_event(event_name, **event_payload)
+        if finish_spell:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
     power_before = int(float(target.get("power") or 0))
@@ -4084,8 +4101,7 @@ def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn
         target_controller=target_owner,
         target_type=add_counters_target_type(effect_data),
     )
-    emit_replay_event(
-        "add_counters_resolved",
+    event_payload = dict(
         player=player.name,
         card=card.get("name", "?"),
         target_player=target_owner.name,
@@ -4106,8 +4122,58 @@ def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn
         **decision,
         **replay_rule_fields(effect_data),
     )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if trigger:
+        event_payload["trigger"] = trigger
+        event_payload["effect"] = "add_counters"
+    if phase:
+        event_payload["phase"] = phase
+    emit_replay_event(event_name, **event_payload)
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return target
+
+
+def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn):
+    return resolve_add_counters_target_effect(
+        player,
+        opponents,
+        card,
+        effect_data,
+        turn,
+        finish_spell=True,
+    )
+
+
+def resolve_etb_add_counters_target(player, opponents, permanent, effect_data, turn, *, phase="battlefield_etb"):
+    etb_effect = {
+        **effect_data,
+        "effect": "add_counters",
+        "target": effect_data.get("etb_add_counters_target") or effect_data.get("target") or "creature",
+        "target_constraints": effect_data.get("target_constraints") or {"card_types": ["creature"]},
+        "target_controller": effect_data.get("target_controller") or "any",
+        "counter_type": (
+            effect_data.get("etb_add_counters_counter_type")
+            or effect_data.get("counter_type")
+            or "+1/+1"
+        ),
+        "counter_count": int(
+            effect_data.get("etb_add_counters_count")
+            or effect_data.get("counter_count")
+            or effect_data.get("count")
+            or 1
+        ),
+    }
+    return resolve_add_counters_target_effect(
+        player,
+        opponents,
+        permanent,
+        etb_effect,
+        turn,
+        finish_spell=False,
+        event_name="trigger_resolved",
+        trigger="enters_battlefield",
+        phase=phase,
+    )
 
 
 def stat_modifier_is_harmful(effect_data):
@@ -16468,6 +16534,15 @@ def resolve_generic_permanent_etb(
             toughness_after=int(float(permanent.get("toughness") or 0)),
             turn=turn,
             **replay_rule_fields(effect_data),
+        )
+    if effect_data.get("etb_add_counters_count"):
+        resolve_etb_add_counters_target(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            phase=phase,
         )
     if effect_data.get("etb_land_ramp_count"):
         if (

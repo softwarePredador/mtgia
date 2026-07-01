@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG322. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG323. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -138,7 +138,8 @@ PG319 added 6 graveyard self-return activated rules; PG320 added 14 fixed
 activated life-gain permanents; PG321 added 32 exact static controlled-creature
 power/toughness boosts from `BoostControlledEffect + SimpleStaticAbility`;
 PG322 added 19 exact one-shot controlled-creature boost spells from fixed
-`BoostControlledEffect` source rows.
+`BoostControlledEffect` source rows; PG323 added 11 exact creatures with
+enter-the-battlefield fixed add-counters triggers to one target creature.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -152,7 +153,8 @@ static self combat and safe defensive keywords on creatures, plus fixed ETB
 life gain on creatures, fixed ETB draw on creatures, creature tap-only
 activated fixed damage, creature ETB destroy-target triggers, creature ETB
 graveyard recursion-to-hand triggers, fixed creature dies-draw triggers, and
-fixed creature enter-the-battlefield damage triggers, plus fixed one-shot
+fixed creature enter-the-battlefield damage triggers, fixed creature
+enter-the-battlefield add-counters triggers, plus fixed one-shot
 spell token creation with literal creature token classes and safe
 `flying`/`haste` token keywords, plus fixed creature ETB token creation with
 literal creature token classes and safe token keyword preservation, plus fixed
@@ -334,13 +336,20 @@ Evidence:
 - `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
 - `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg322_boost_controlled_until_eot_wave.md`
 - `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg322_existing_supported_recheck.md`
+- `master_optimizer_reports/pg323_xmage_creature_etb_add_counters_wave_package.md`
+- `master_optimizer_reports/pg323_xmage_creature_etb_add_counters_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg323_xmage_creature_etb_add_counters_wave_e2e_validation.md`
+- `master_optimizer_reports/pg323_xmage_creature_etb_add_counters_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg323_creature_etb_add_counters_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg323_existing_supported_recheck.md`
 
-After PG322, the post-controlled-boost queue is the current scheduling source:
-`target_identity_count=27323`, `xmage_authoritative_source_count=27009`,
-`xmage_authoritative_adapter_required_count=27009`, `parser_gap=0`, and
+After PG323, the post-ETB-add-counters queue is the current scheduling source:
+`target_identity_count=27312`, `xmage_authoritative_source_count=26998`,
+`xmage_authoritative_adapter_required_count=26998`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`. Continue by adding a new exact
 subpattern/runtime adapter for a remaining high-volume family from that queue;
-do not schedule from any older PG315/PG320/PG321 queue artifact.
+do not schedule from any older PG315/PG320/PG321/PG322 queue artifact.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
 approved PostgreSQL mutation through the evidence runner instead of ad hoc SQL:

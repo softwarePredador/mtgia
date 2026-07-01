@@ -2838,6 +2838,117 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_add_plus_one_counter_buffs_own_best_creature_without_graveyarding_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        best = {"name": "Best Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        active.battlefield.append(best)
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+            "etb_add_counters_target": "creature",
+            "etb_add_counters_counter_type": "+1/+1",
+            "etb_add_counters_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Bond Beetle",
+                "type_line": "Creature - Insect",
+                "oracle_text": (
+                    "When Fixture Bond Beetle enters the battlefield, put a +1/+1 counter on target creature."
+                ),
+                "power": 0,
+                "toughness": 1,
+            },
+            turn=11,
+            rng=random.Random(11),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(best["plus_one_counters"], 1)
+        self.assertEqual(best["power"], 5)
+        self.assertEqual(best["toughness"], 5)
+        self.assertNotIn("plus_one_counters", enemy)
+        self.assertEqual([card["name"] for card in active.graveyard], [])
+        self.assertIn("Fixture Bond Beetle", [card["name"] for card in active.battlefield])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Bond Beetle"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "add_counters"
+                and data.get("target") == "Best Bear"
+                and data.get("counter_type") == "+1/+1"
+                and data.get("counters_added") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_minus_one_counter_can_kill_opponent_creature_without_graveyarding_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Enemy Cub", "type_line": "Creature - Bear", "power": 1, "toughness": 1}
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(own)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+            "etb_add_counters_target": "creature",
+            "etb_add_counters_counter_type": "-1/-1",
+            "etb_add_counters_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "-1/-1",
+            "counter_count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Pith Driller",
+                "type_line": "Artifact Creature - Phyrexian Horror",
+                "oracle_text": (
+                    "When Fixture Pith Driller enters the battlefield, put a -1/-1 counter on target creature."
+                ),
+                "power": 2,
+                "toughness": 4,
+            },
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Cub"])
+        self.assertIn("Fixture Pith Driller", [card["name"] for card in active.battlefield])
+        self.assertEqual([card["name"] for card in active.graveyard], [])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Pith Driller"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "add_counters"
+                and data.get("target") == "Enemy Cub"
+                and data.get("counter_type") == "-1/-1"
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_stat_modifier_until_eot_spell_buffs_own_best_creature_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

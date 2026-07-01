@@ -4899,6 +4899,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:844eb66e1a20132baf2eb07da49faf43"
   },
+  "Backup Agent": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
+  },
   "Bad River": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -7674,6 +7703,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2eb093a58537802466ff92c4713d5896",
     "battle_rule_oracle_hash": "c8613ed33d6f138602cecbda69fa7b60"
+  },
+  "Bond Beetle": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
   },
   "Bonders' Enclave": {
     "effect": "land",
@@ -14431,6 +14489,35 @@
     "battle_rule_logical_key": "battle_rule_v1:251a36ce251e58e59c75224f84568765",
     "battle_rule_oracle_hash": "94e09cb834f3730999bab3bb621006fc"
   },
+  "Cultbrand Cinder": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "-1/-1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "-1/-1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87bb5098acfdc36d67b255b2346e4460",
+    "battle_rule_oracle_hash": "0d42483b15b32006a643cdf851b984e9"
+  },
   "Cultivate": {
     "basic_only": true,
     "effect": "land_ramp",
@@ -15217,6 +15304,35 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Dauntless Survivor": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
   },
   "Davros, Dalek Creator": {
     "ability_kind": "triggered",
@@ -34850,6 +34966,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cddd177eac9b084e9366e1448a48974c"
   },
+  "Iron Bully": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "keywords": [
+      "menace"
+    ],
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f47be2bf0ed5ba799787dbd6cd91821",
+    "battle_rule_oracle_hash": "aba0ad0f016850655d66b0657e8579ea"
+  },
   "Iron Giant": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -35001,6 +35150,64 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:89a9ff542073be9f24838606dbf94713",
     "battle_rule_oracle_hash": "02d7bae0e60dfddbf0919ff8bd26801b"
+  },
+  "Ironpaw Aspirant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
+  },
+  "Ironshell Beetle": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
   },
   "Ironwright's Cleansing": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -35412,6 +35619,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326",
     "battle_rule_oracle_hash": "4d1d6845d3cb2d0dddd2bb2f2216d769"
+  },
+  "Jeong Jeong's Deserters": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
   },
   "Jeska's Will": {
     "battle_model_scope": "choose_both_with_commander_red_by_target_opponent_hand_impulse_top_three_v1",
@@ -48319,6 +48555,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Pith Driller": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "-1/-1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "-1/-1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87bb5098acfdc36d67b255b2346e4460",
+    "battle_rule_oracle_hash": "fe4fc466b098a3cb9e97ae5f0b1082ff"
+  },
   "Pitiless Gorgon": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -56091,6 +56356,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+  },
+  "Satyr Grovedancer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
+    "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
   },
   "Satyr Rambler": {
     "_keywords_are_self": true,
@@ -65125,6 +65419,39 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:fb9b2b633a4842d42599c293e0de4d68"
+  },
+  "Supply-Line Cranes": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_add_counters_target_creature_v1",
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "creature",
+    "etb_add_counters_count": 1,
+    "etb_add_counters_counter_type": "+1/+1",
+    "etb_add_counters_target": "creature",
+    "instant": false,
+    "keywords": [
+      "flying"
+    ],
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d5caf0ce251c182b57cd9ca9d74d8b2a",
+    "battle_rule_oracle_hash": "66ab7b835a56ca4b092bb75abee91a0f"
   },
   "Supreme Verdict": {
     "cmc": 4.0,

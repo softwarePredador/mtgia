@@ -50,7 +50,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`.
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.
   - Manifesto de replay corrente para o checkpoint operacional:
     `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
@@ -63,7 +63,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     separar sync Oracle/legalities, blank Oracle text esperado, cobertura por
     `card_id`/`normalized_name`, propagacao real por `oracle_id` e familias
     XMage. Evidencia corrente:
-    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg322_boost_controlled_until_eot_wave_recheck.md`.
+    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg323_creature_etb_add_counters_wave_recheck.md`.
   - Para acelerar a adaptacao de todas as cartas, rode tambem
     `manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py`.
     Ele prova a fila no grao correto sem usar decks cadastrados como demanda:
@@ -78,9 +78,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG322:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`.
-    Resultado all-card: `27323` identidades ainda com gap, `27009` com fonte
+    Evidencia corrente pos-PG323:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.
+    Resultado all-card: `27312` identidades ainda com gap, `26998` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
     gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -122,10 +122,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     anthem/lord, subtipo, artefato criatura e criatura lendaria. O PG322
     adicionou `19` spells one-shot de boost para criaturas controladas ate o
     fim do turno via `BoostControlledEffect` fixo, com runtime
-    `controlled_stat_modifier_until_eot`. Todos os pacotes PG285-PG322
+    `controlled_stat_modifier_until_eot`. O PG323 adicionou `11` criaturas com
+    ETB que coloca counter fixo em uma criatura alvo via
+    `AddCountersTargetEffect + EntersBattlefieldTriggeredAbility`, mantendo a
+    fonte no campo e bloqueando multi-target/filtros. Todos os pacotes
+    PG285-PG323
     passaram postcheck PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O
-    splitter PG322 selecionou `19` propostas, o recheck pos-PG322 voltou
-    `proposal_count=0`, e a fila pos-PG322 caiu para `27009` adapters XMage
+    splitter PG323 selecionou `11` propostas, o recheck pos-PG323 voltou
+    `proposal_count=0`, e a fila pos-PG323 caiu para `26998` adapters XMage
     pendentes; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
     reducao reutilizavel, partindo da fila global e nao de decks cadastrados.

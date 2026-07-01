@@ -126,6 +126,7 @@ ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
+ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -968,6 +969,24 @@ def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int
     return match.group(2), count
 
 
+def etb_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = strip_leading_parenthetical_reminders(
+        re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    )
+    match = re.match(
+        r"^(?:when|whenever) (?:this creature|.+) enters(?: the battlefield)?, put "
+        r"(a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(\+1/\+1|-1/-1) counters? on target creature\.?$",
+        text,
+    )
+    if not match:
+        return None
+    count = counter_count_from_text(match.group(1))
+    if count is None or count <= 0:
+        return None
+    return match.group(2), count
+
+
 def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
     matches = re.findall(
         r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
@@ -1467,6 +1486,19 @@ def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
         and effect_classes(row) == {"CreateTokenEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
         and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
+    )
+
+
+def is_creature_etb_add_counters_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != ADD_COUNTERS_TARGET_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"AddCountersTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "counter", "triggered_ability"}
     )
 
 
@@ -3083,6 +3115,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
+        ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
@@ -3159,6 +3192,7 @@ def split_row(
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
+    etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
@@ -3186,6 +3220,7 @@ def split_row(
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_token_creature_unit
+        and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
@@ -3214,6 +3249,7 @@ def split_row(
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not etb_token_creature_unit
+        and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
@@ -3937,6 +3973,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_create_tokens",
+        ), "selected_exact_scope"
+
+    if etb_add_counters_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_add_counters_not_creature"
+        source_counter = fixed_counter_target_from_source(source_text)
+        if source_counter is None:
+            return None, "etb_add_counters_counter_not_fixed"
+        oracle_counter = etb_counter_target_from_oracle(metadata)
+        if oracle_counter is None:
+            return None, "etb_add_counters_target_not_supported"
+        if source_counter != oracle_counter:
+            return None, "etb_add_counters_source_oracle_mismatch"
+        counter_type, count = oracle_counter
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_ADD_COUNTERS_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_add_counters_target": "creature",
+            "etb_add_counters_counter_type": counter_type,
+            "etb_add_counters_count": count,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": counter_type,
+            "counter_count": count,
+            "xmage_effect_class": "AddCountersTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+            **flags,
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_add_counters_target_creature",
         ), "selected_exact_scope"
 
     if static_controlled_pt_unit:
@@ -4872,6 +4948,7 @@ def build_exact_split_report(
             and not is_creature_etb_damage_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
+            and not is_creature_etb_add_counters_unit(row)
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
@@ -4920,6 +4997,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+                "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
