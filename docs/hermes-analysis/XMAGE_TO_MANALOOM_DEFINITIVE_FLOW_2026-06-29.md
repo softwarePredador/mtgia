@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg312_permanent_activated_destroy_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg313_permanent_activated_self_boost_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27515`
-- XMage authoritative source resolved: `27201`
+- target all-card battle-gap identities: `27452`
+- XMage authoritative source resolved: `27138`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27201`
+- XMage authoritative adapter required: `27138`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27201` identities, card semantics are accepted from XMage; work is now
+- For `27138` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG312 Exact Adapter Waves
+## PG283-PG313 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG312 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG313 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -240,6 +240,12 @@ patterns:
   artifact creature, basic land, permanent, instant/sorcery, artifact or
   enchantment, and any card when source and Oracle agree ->
   `xmage_permanent_simple_activated_graveyard_to_hand_v1`
+- `xmage_signature::BoostSourceEffect::SimpleActivatedAbility::no_target_class::no_condition_class::activated_ability`
+  with exact activated self power/toughness boost text, battlefield permanents,
+  simple mana/tap source costs only, no life/discard/sacrifice-target/untap or
+  target-tap costs, no hybrid/Phyrexian/untap-symbol costs, no dynamic X boost,
+  and no modal/compound text ->
+  `xmage_permanent_simple_activated_self_boost_until_eot_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - fixed damage, destroy and exile target spells with XMage/Oracle-matched
@@ -1646,6 +1652,79 @@ PG312 measured result:
   `proposal_count=0` over `7343` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern
   from the post-PG312 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `626`.
+
+PG313 evidence:
+
+- PG313 permanent activated self-boost package:
+  `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_package.md`
+- PG313 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_pg_apply_evidence.md`
+- PG313 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_e2e_validation.md`
+- PG313 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_pg_to_sqlite_sync.json`
+- PG313 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG313 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg313_permanent_activated_self_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg313_permanent_activated_self_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg313_permanent_activated_self_boost_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg313_permanent_activated_self_boost_wave.md`
+- post-PG313 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg313_permanent_activated_self_boost_wave_recheck.md`
+- post-PG313 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg313_permanent_activated_self_boost_wave.md`
+- PG313 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_self_boost_wave.md`
+- post-PG313 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg313_existing_supported_recheck.md`
+
+PG313 measured result:
+
+- PG313 promoted `63` exact permanent simple activated self-boost rules. The
+  promoted runtime effect is `self_stat_modifier_until_eot`, with target `self`,
+  explicit power/toughness deltas, activation cost metadata, tap handling, and
+  cleanup at end of turn.
+- Runtime now supports simple activated self-boost permanents with mana/tap
+  payment, summoning-sickness blocking for tap-creature activations unless the
+  source has haste, automatic profitable non-tap power-positive activation, and
+  until-end-of-turn stat cleanup.
+- The splitter blocks unsafe neighbors such as `PayLifeCost`, discard,
+  sacrifice-target, `TapTargetCost`, `UntapSourceCost`, hybrid/Phyrexian/untap
+  symbols, X or dynamic boosts, and modal or compound activated text.
+- PostgreSQL apply evidence reports `63/63` promoted rows, `63/63`
+  verified/auto rows, and `63/63` matching Oracle hash rows, with `1` backup
+  row.
+- PG battle-rules -> Hermes/SQLite sync loaded `7039` PostgreSQL rules,
+  inserted/updated `6833` SQLite rows, and exported `4644` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5653` PostgreSQL card rows,
+  wrote `5579` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for legacy
+  trusted SQLite rules without `oracle_hash`; legacy contamination `pass`.
+- Focused exact-scope tests cover mapping, colored activation cost parsing,
+  blocking target-tap costs, blocking variable boost text, runtime activation
+  payment, until-end-of-turn cleanup, summoning-sickness blocking, and automatic
+  profitable activation; `168` focused exact-scope tests pass.
+- Global all-card readiness after PG313:
+  `battle_and_oracle_ready=2172` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3320`.
+- Global all-card authoritative queue after PG313:
+  `target_identity_count=27452`, `xmage_authoritative_source_count=27138`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27138`.
+- Running the exact splitter after PG313 on supported units returns
+  `proposal_count=0` over `7366` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG313 queue. The largest current work units are `recursion`
   `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `626`.

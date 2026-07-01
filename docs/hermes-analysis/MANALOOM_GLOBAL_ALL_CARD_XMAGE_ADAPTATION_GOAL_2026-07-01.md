@@ -8,7 +8,7 @@ Fonte operacional:
 
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 - `docs/hermes-analysis/BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg312_permanent_activated_destroy_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg313_permanent_activated_self_boost_wave.md`
 
 ## Objetivo
 
@@ -23,21 +23,21 @@ fila global de cartas conhecidas pelo ManaLoom.
 
 ## Estado atual
 
-Checkpoint: pos-PG312, `xmage_permanent_simple_activated_destroy_target_v1`.
+Checkpoint: pos-PG313, `xmage_permanent_simple_activated_self_boost_until_eot_v1`.
 
 | Metrica | Valor |
 | --- | ---: |
-| `target_identity_count` | 27515 |
-| `xmage_authoritative_source_count` | 27201 |
+| `target_identity_count` | 27452 |
+| `xmage_authoritative_source_count` | 27138 |
 | `xmage_missing_source_exception_count` | 314 |
 | `xmage_authoritative_parser_gap_count` | 0 |
-| `xmage_authoritative_adapter_required_count` | 27201 |
+| `xmage_authoritative_adapter_required_count` | 27138 |
 | `manual_semantic_decision_units_remaining` | 314 |
 | `adapter_work_unit_count` | 11429 |
 
 Leitura correta:
 
-- `27201` identidades ja tem verdade comportamental no XMage local.
+- `27138` identidades ja tem verdade comportamental no XMage local.
 - O trabalho restante nelas e traduzir XMage para adapters/runtime ManaLoom por
   familia/subpadrao, nao revisar semanticamente carta por carta.
 - `314` identidades nao resolveram classe local no XMage e ficam em trilha
@@ -101,24 +101,22 @@ Prioridade secundaria:
 
 ## Proxima etapa concreta
 
-PG312 fechou o subpadrao de permanente com habilidade ativada simples que
-destroi alvo. Foram promovidas 19 cartas: Ark of Blight, Barbarian Riftcutter,
-Druid Lyrist, Elf Replica, Elvish Lyrist, Elvish Scrapper, Executioner's
-Capsule, Felidar Cub, Kami of Ancient Law, Keening Apparition, Mine Bearer,
-Priest of Iroas, Reckless Reveler, Ronom Unicorn, Royal Assassin, Ruinous
-Gremlin, Scavenger Folk, Torch Fiend e Universal Solvent.
+PG313 fechou o subpadrao de permanente com habilidade ativada simples que aplica
+boost de poder/resistencia na propria fonte ate o fim do turno. Foram promovidas
+63 cartas com custos de ativacao simples suportados e efeitos
+`self_stat_modifier_until_eot`.
 
-Evidencias PG312:
+Evidencias PG313:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_package.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_pg_apply_evidence.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_e2e_validation.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg312_existing_supported_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_pg_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg313_xmage_permanent_activated_self_boost_wave_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg313_existing_supported_recheck.md`
 
-O splitter exato pos-PG312 retorna `proposal_count=0` sobre `7343` linhas
-suportadas consideradas. Portanto, a proxima etapa nao e repetir este
-subpadrao, e sim escolher outro subpadrao runtime-backed a partir da fila
-pos-PG312.
+O splitter exato pos-PG313 retorna `proposal_count=0` sobre `7366` linhas
+suportadas consideradas. Portanto, a proxima etapa nao e repetir os subpadroes
+ja cobertos, e sim escolher outro subpadrao runtime-backed a partir da fila
+pos-PG313.
 
 Maiores work units atuais para priorizacao:
 
@@ -136,7 +134,9 @@ O proximo lote deve seguir a mesma disciplina: minerar uma assinatura XMage
 estreita, implementar splitter exato, runtime e testes, aplicar PostgreSQL,
 sincronizar Hermes/SQLite, rodar E2E/auditorias e recalcular a fila.
 
-Subpadrao PG312 ja fechado:
+Subpadroes permanentes ativados ja fechados:
+
+PG312:
 
 - `DestroyTargetEffect`
 - `SimpleActivatedAbility`
@@ -150,11 +150,26 @@ Nome:
 
 - `xmage_permanent_simple_activated_destroy_target_v1`
 
+PG313:
+
+- `BoostSourceEffect`
+- `SimpleActivatedAbility`
+- permanente no campo de batalha
+- efeito aplicado somente na propria fonte ate o fim do turno
+- custos suportados: mana simples e tap da propria fonte
+- limpeza obrigatoria via `until_end_of_turn`
+
+Nome:
+
+- `xmage_permanent_simple_activated_self_boost_until_eot_v1`
+
 Bloqueios reais deixados para sublotes posteriores:
 
 - custos de sacrificar outro alvo/permanente, descarte, exilio,
-  OrCost/CompositeCost, alvos especificos ainda nao modelados, clausulas Oracle
-  extras como restricao de timing, e efeitos compostos com multiplas zonas.
+  OrCost/CompositeCost, PayLifeCost, TapTargetCost, UntapSourceCost,
+  hibrido/Phyrexian/untap symbols ainda nao normalizados, alvos especificos
+  ainda nao modelados, clausulas Oracle extras como restricao de timing, efeitos
+  X/dinamicos, modos multiplos e efeitos compostos com multiplas zonas.
 
 ## Regra contra desvio
 

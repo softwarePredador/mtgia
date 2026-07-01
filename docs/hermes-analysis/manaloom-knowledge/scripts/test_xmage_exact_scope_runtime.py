@@ -1332,6 +1332,163 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(opponent.graveyard, [])
         self.assertFalse(any(event == "removal_resolved" for event, _ in self.events))
 
+    def test_simple_activated_self_boost_pays_mana_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("red", 1)
+        permanent = {
+            "name": "Fixture Hellhound",
+            "type_line": "Creature - Elemental Dog",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "target": "self",
+            "target_controller": "self",
+            "power": 2,
+            "toughness": 2,
+            "power_delta": 1,
+            "toughness_delta": 0,
+            "power_boost": 1,
+            "toughness_boost": 0,
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": False,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_hellhound",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            permanent,
+            turn=18,
+            rng=random.Random(18),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(permanent["power"], 3)
+        self.assertEqual(permanent["toughness"], 2)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Hellhound"
+                and data.get("activation_kind") == "simple_activated_self_boost"
+                and data.get("activation_cost") == "{R}"
+                and data.get("mana_paid") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_hellhound"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("target") == "Fixture Hellhound"
+                and data.get("power_delta") == 1
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(permanent["power"], 2)
+        self.assertEqual(permanent["toughness"], 2)
+
+    def test_simple_activated_self_boost_blocks_summoning_sick_tap_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Fixture Matron",
+            "type_line": "Creature - Human Cleric",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "power": 1,
+            "toughness": 3,
+            "power_delta": 0,
+            "toughness_delta": 3,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            permanent,
+            turn=19,
+            rng=random.Random(19),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertEqual(permanent["power"], 1)
+        self.assertEqual(permanent["toughness"], 3)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
+
+    def test_best_simple_activated_self_boost_auto_uses_profitable_nontap_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("red", 1)
+        tap_only = {
+            "name": "Fixture Vanguard",
+            "type_line": "Creature - Elf",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "power": 1,
+            "toughness": 1,
+            "power_delta": 0,
+            "toughness_delta": 4,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "summoning_sick": False,
+        }
+        pump = {
+            "name": "Fixture Firebreather",
+            "type_line": "Creature - Elemental",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_self_boost_until_eot_v1",
+            "power": 2,
+            "toughness": 2,
+            "power_delta": 1,
+            "toughness_delta": 0,
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": False,
+            "summoning_sick": True,
+        }
+        active.battlefield.extend([tap_only, pump])
+
+        activated = self.battle.activate_best_generic_self_boost_permanent(
+            active,
+            [active, opponent],
+            turn=20,
+            rng=random.Random(20),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(pump["power"], 3)
+        self.assertEqual(tap_only["toughness"], 1)
+        self.assertFalse(tap_only.get("tapped", False))
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

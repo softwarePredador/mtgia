@@ -39,6 +39,10 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+SELF_BOOST_ACTIVATED_UNIT = (
+    "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::"
+    "no_target_class::no_condition_class::activated_ability"
+)
 BOOST_KEYWORD_UNIT = "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1"
 TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
@@ -87,6 +91,7 @@ DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
+SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
@@ -1115,6 +1120,16 @@ def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_self_boost_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != SELF_BOOST_ACTIVATED_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"BoostSourceEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_permanent_activated_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
@@ -1485,13 +1500,152 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
     generic = 0
     colors: list[str] = []
     for symbol in re.findall(r"\{([^}]+)\}", cost_text or ""):
-        if symbol.isdigit():
-            generic += int(symbol)
-        elif symbol in {"W", "U", "B", "R", "G"}:
-            colors.append(symbol)
+        normalized = str(symbol or "").strip().upper()
+        if normalized.isdigit():
+            generic += int(normalized)
+        elif normalized in {"W", "U", "B", "R", "G"}:
+            colors.append(normalized)
         else:
             return None
     return generic, colors
+
+
+def activation_cost_from_oracle_prefix(cost_text: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(cost_text or "").strip().lower())
+    risky_tokens = [
+        "/",
+        "{q}",
+        "discard",
+        "sacrifice",
+        "pay ",
+        "tap an untapped",
+        "remove ",
+        "exile ",
+        "return ",
+    ]
+    if any(token in text for token in risky_tokens):
+        return "activated_self_boost_oracle_cost_not_supported"
+    requires_tap = "{t}" in text
+    mana_text = re.sub(r"\s*,?\s*\{t\}\s*,?\s*", "", text).strip()
+    if mana_text in {"", ","}:
+        mana_text = "{0}"
+    if not re.fullmatch(r"(?:\{[0-9wubrg]\})+", mana_text):
+        return "activated_self_boost_oracle_cost_not_supported"
+    canonical = re.sub(
+        r"\{([^}]+)\}",
+        lambda match: "{" + match.group(1).upper() + "}",
+        mana_text,
+    )
+    parsed = parse_mana_cost_text(canonical)
+    if parsed is None:
+        return "activated_self_boost_oracle_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "activation_cost_mana": canonical,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": requires_tap,
+        "activation_requires_sacrifice": False,
+    }
+
+
+def activated_self_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_self_boost_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    card_name = normalize_name(str(metadata.get("name") or ""))
+    source_pattern = r"(?:this creature"
+    if card_name:
+        source_pattern += rf"|{re.escape(card_name)}"
+    source_pattern += r")"
+    match = re.match(
+        rf"^{source_pattern} gets ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+        effect_text,
+    )
+    if not match:
+        return "activated_self_boost_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text)
+    if isinstance(activation, str):
+        return activation
+    return {
+        "power_delta": int(match.group(1)),
+        "toughness_delta": int(match.group(2)),
+        **activation,
+    }
+
+
+def activated_self_boost_cost_from_source(window: str) -> dict[str, Any] | str:
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_self_boost_source_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_self_boost_source_cost_not_supported"
+    if mana_matches:
+        cost_text = mana_matches[0]
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_self_boost_source_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": False,
+    }
+
+
+def activated_self_boost_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "SacrificeSourceCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+        "UntapSourceCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_self_boost_source_cost_not_supported"
+    boost_matches = re.findall(
+        r"new\s+BoostSourceEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*"
+        r"(?:,\s*Duration\.EndOfTurn\s*)?\)",
+        text,
+        re.S,
+    )
+    if len(boost_matches) != 1:
+        return "activated_self_boost_source_not_single_fixed"
+    boost_index = text.find("BoostSourceEffect")
+    window = text[max(0, boost_index - 500) : boost_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_self_boost_source_not_simple_activated"
+    activation = activated_self_boost_cost_from_source(window)
+    if isinstance(activation, str):
+        return activation
+    return {
+        "power_delta": int(boost_matches[0][0]),
+        "toughness_delta": int(boost_matches[0][1]),
+        **activation,
+    }
 
 
 def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
@@ -2143,6 +2297,7 @@ def split_row(
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
+    permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
@@ -2160,6 +2315,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_self_boost_unit
         and not permanent_activated_recursion_to_hand_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
@@ -2183,6 +2339,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_self_boost_unit
         and not permanent_activated_recursion_to_hand_unit
     ):
         if not is_spell(metadata):
@@ -2319,6 +2476,83 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_destroy_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_self_boost_unit:
+        if not is_creature_metadata(metadata):
+            return None, "activated_self_boost_not_creature"
+        oracle_boost = activated_self_boost_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        parsed_activation = activated_self_boost_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        if (
+            int(parsed_activation["power_delta"]) != int(oracle_boost["power_delta"])
+            or int(parsed_activation["toughness_delta"]) != int(oracle_boost["toughness_delta"])
+        ):
+            return None, "activated_self_boost_source_oracle_boost_mismatch"
+        source_cost = (
+            int(parsed_activation["activation_cost_generic"]),
+            list(parsed_activation["activation_cost_colors"]),
+            bool(parsed_activation["activation_requires_tap"]),
+        )
+        oracle_cost = (
+            int(oracle_boost["activation_cost_generic"]),
+            list(oracle_boost["activation_cost_colors"]),
+            bool(oracle_boost["activation_requires_tap"]),
+        )
+        if source_cost != oracle_cost:
+            return None, "activated_self_boost_source_oracle_cost_mismatch"
+        activated_effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": SELF_BOOST_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": int(oracle_boost["power_delta"]),
+            "toughness_delta": int(oracle_boost["toughness_delta"]),
+            "power_boost": int(oracle_boost["power_delta"]),
+            "toughness_boost": int(oracle_boost["toughness_delta"]),
+            "duration": "until_end_of_turn",
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": SELF_BOOST_ACTIVATED_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activated_battle_model_scope": SELF_BOOST_ACTIVATED_SCOPE,
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": {"source": "self", "card_types": ["creature"]},
+            "power_delta": int(oracle_boost["power_delta"]),
+            "toughness_delta": int(oracle_boost["toughness_delta"]),
+            "power_boost": int(oracle_boost["power_delta"]),
+            "toughness_boost": int(oracle_boost["toughness_delta"]),
+            "duration": "until_end_of_turn",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": False,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_self_boost_until_eot",
         ), "selected_exact_scope"
 
     if permanent_activated_recursion_to_hand_unit:
@@ -3295,6 +3529,7 @@ def build_exact_split_report(
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
+            and not is_permanent_activated_self_boost_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
@@ -3338,6 +3573,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
+                "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",

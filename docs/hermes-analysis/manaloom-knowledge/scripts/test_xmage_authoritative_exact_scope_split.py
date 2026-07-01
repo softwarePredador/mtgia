@@ -1882,6 +1882,118 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["vigilance"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_activated_self_boost_creature_maps_to_self_stat_modifier(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Matron",
+                type_line="Creature - Human Cleric",
+                oracle_text="{W}, {T}: This creature gets +0/+3 until end of turn.",
+            ),
+            source_text=(
+                'Ability ability = new SimpleActivatedAbility(new BoostSourceEffect(0,3,Duration.EndOfTurn), '
+                'new ManaCostsImpl<>("{W}"));'
+                "ability.addCost(new TapSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.SELF_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "self_stat_modifier_until_eot")
+        self.assertEqual(effect["power_delta"], 0)
+        self.assertEqual(effect["toughness_delta"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{W}")
+        self.assertEqual(effect["activation_cost_colors"], ["W"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["target"], "self")
+
+    def test_activated_self_boost_accepts_colored_mana_cost_source(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Crusader",
+                type_line="Creature - Human Soldier",
+                oracle_text="{R}: This creature gets +1/+0 until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostSourceEffect(1, 0, Duration.EndOfTurn), "
+                "new ColoredManaCost(ColoredManaSymbol.R)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_cost_colors"], ["R"])
+        self.assertFalse(effect["activation_requires_tap"])
+
+    def test_activated_self_boost_blocks_tapping_another_creature_cost(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Behemoth",
+                type_line="Creature - Elemental",
+                oracle_text="Tap an untapped creature you control: This creature gets +1/+1 until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostSourceEffect(1, 1, Duration.EndOfTurn), "
+                "new TapTargetCost(StaticFilters.FILTER_CONTROLLED_UNTAPPED_CREATURE)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_self_boost_oracle_cost_not_supported")
+
+    def test_activated_self_boost_blocks_variable_power(self) -> None:
+        row = queue_row(
+            split.SELF_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Animist",
+                type_line="Creature - Human Shaman",
+                oracle_text="{3}: This creature gets +X/+0 until end of turn, where X is its power.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostSourceEffect(new SourcePermanentPowerValue(), 0, Duration.EndOfTurn), "
+                "new GenericManaCost(3)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_self_boost_oracle_not_simple")
+
     def test_static_keyword_creature_allows_multiline_keyword_oracle(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",

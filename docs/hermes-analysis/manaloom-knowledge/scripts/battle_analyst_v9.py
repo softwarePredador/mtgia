@@ -13118,6 +13118,16 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+            if activate_best_generic_self_boost_permanent(
+                active_player,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
         emit_priority_pass_sequence(
             active_player,
             all_players,
@@ -35384,6 +35394,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
+SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 
 
 def _activated_rule_effects_for_permanent(permanent):
@@ -35464,6 +35475,40 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             destroy_effect[key] = permanent.get(key)
         effects.append(destroy_effect)
+    if (
+        permanent.get("activated_effect") == "self_stat_modifier_until_eot"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_SELF_BOOST_SCOPE
+    ):
+        boost_effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "self_stat_modifier_until_eot",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": False,
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": "self",
+            "target_controller": "self",
+            "target_constraints": permanent.get("target_constraints") or {"source": "self", "card_types": ["creature"]},
+            "power_delta": permanent.get("power_delta") or permanent.get("power_boost"),
+            "toughness_delta": permanent.get("toughness_delta") or permanent.get("toughness_boost"),
+            "power_boost": permanent.get("power_boost") or permanent.get("power_delta"),
+            "toughness_boost": permanent.get("toughness_boost") or permanent.get("toughness_delta"),
+            "duration": permanent.get("duration") or "until_end_of_turn",
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            boost_effect[key] = permanent.get(key)
+        effects.append(boost_effect)
     return effects
 
 
@@ -35917,6 +35962,231 @@ def activate_best_generic_destroy_permanent(player, opponents, all_players, turn
         turn,
         rng,
         phase=phase,
+    )
+
+
+def activated_self_boost_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_SELF_BOOST_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activated_effect") == "self_stat_modifier_until_eot"
+        ):
+            return effect_data
+    return None
+
+
+def _self_boost_activation_cost(effect_data):
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    return activation_cost
+
+
+def can_activate_generic_self_boost_permanent(player, permanent, *, effect_data=None, auto_only=False):
+    effect_data = effect_data or activated_self_boost_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if not is_battlefield_creature(permanent):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = _self_boost_activation_cost(effect_data)
+    if not player.can_pay(activation_cost):
+        return False
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    current_toughness = int(float(permanent.get("toughness") or permanent.get("power") or 0))
+    if current_toughness + toughness_delta <= 0:
+        return False
+    if auto_only:
+        if effect_data.get("activation_requires_tap"):
+            return False
+        if power_delta <= 0:
+            return False
+    return True
+
+
+def activate_generic_self_boost_permanent(
+    player,
+    all_players,
+    permanent,
+    turn,
+    rng,
+    *,
+    phase=None,
+    auto_only=False,
+):
+    effect_data = activated_self_boost_effect_for_permanent(permanent)
+    if not can_activate_generic_self_boost_permanent(
+        player,
+        permanent,
+        effect_data=effect_data,
+        auto_only=auto_only,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    activation_cost = _self_boost_activation_cost(effect_data)
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    power_before = int(float(permanent.get("power") or 0))
+    toughness_before = int(float(permanent.get("toughness") or permanent.get("power") or 0))
+    remember_until_eot(permanent, "power")
+    remember_until_eot(permanent, "toughness")
+    permanent["power"] = power_before + power_delta
+    permanent["toughness"] = toughness_before + toughness_delta
+    power_after = int(float(permanent.get("power") or 0))
+    toughness_after = int(float(permanent.get("toughness") or permanent.get("power") or 0))
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                effect_data,
+                action="activate_self_boost",
+                score=max(1, power_delta) * 10 + max(0, toughness_delta),
+            )
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            effect_data,
+            action="activate_self_boost",
+        ),
+        rejected_options=[],
+        score_components={
+            "activation_cost": activation_cost,
+            "power_delta": power_delta,
+            "toughness_delta": toughness_delta,
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(8, power_delta * 10 + toughness_delta * 2),
+        actual_outcome="activated_self_boost_used",
+        reason="use_self_boost_until_eot_when_profitable",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "power": power_delta,
+            "toughness": toughness_delta,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "temporary_boost": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="stat_modifier_until_eot",
+        activation_kind="simple_activated_self_boost",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        mana_paid=mana_paid,
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    destination = None
+    result = "stat_modifier_until_eot_applied"
+    if toughness_after <= 0 and permanent in player.battlefield:
+        destination = move_creature_from_battlefield(
+            player,
+            permanent,
+            reason="zero_toughness",
+            source=permanent,
+        )
+        result = "creature_put_into_graveyard_zero_toughness"
+    emit_replay_event(
+        "stat_modifier_until_eot_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target_player=player.name,
+        target=permanent.get("name", "?"),
+        target_power_before=power_before,
+        target_power_after=power_after,
+        target_toughness_before=toughness_before,
+        target_toughness_after=toughness_after,
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        result=result,
+        destination=destination,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    check_sbas_until_stable(all_players)
+    return True
+
+
+def activate_best_generic_self_boost_permanent(player, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_self_boost_effect_for_permanent(permanent)
+        if not can_activate_generic_self_boost_permanent(
+            player,
+            permanent,
+            effect_data=effect_data,
+            auto_only=True,
+        ):
+            continue
+        power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+        toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+        activation_cost = int(effect_data.get("activation_cost_generic") or 0) + len(
+            effect_data.get("activation_cost_colors") or []
+        )
+        options.append((power_delta * 10 + toughness_delta - activation_cost, power_delta, permanent))
+    if not options:
+        return False
+    options.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return activate_generic_self_boost_permanent(
+        player,
+        all_players,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+        auto_only=True,
     )
 
 
