@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -33,6 +34,42 @@ class _AuthTimeoutApiClient extends ApiClient {
     Duration? timeout,
   }) async {
     throw TimeoutException('SocketException RequestOptions stackTrace');
+  }
+}
+
+class _RegisterSuccessApiClient extends ApiClient {
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    expect(endpoint, '/auth/register');
+    return ApiResponse(201, {
+      'token': 'register-secret-token-value',
+      'user': {
+        'id': 'user-2',
+        'username': 'qa_register_user',
+        'email': 'qa_register_user@example.com',
+      },
+    });
+  }
+}
+
+class _TokenValidationApiClient extends ApiClient {
+  int getCalls = 0;
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    getCalls++;
+    expect(endpoint, '/auth/me');
+    return ApiResponse(200, {
+      'user': {
+        'id': 'user-saved',
+        'username': 'saved_user',
+        'email': 'saved_user@example.com',
+      },
+    });
   }
 }
 
@@ -91,6 +128,38 @@ void main() {
     expect(joined, contains('token recebido: sim'));
   });
 
+  test('register debug logs do not expose email, password or token', () async {
+    SharedPreferences.setMockInitialValues({});
+    final provider = AuthProvider(apiClient: _RegisterSuccessApiClient());
+    final logs = <String>[];
+    final previousDebugPrint = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {
+      if (message != null) {
+        logs.add(message);
+      }
+    };
+
+    try {
+      final ok = await provider.register(
+        username: 'qa_register_user',
+        email: 'qa_register_user@example.com',
+        password: 'Password123!',
+      );
+
+      expect(ok, isTrue);
+    } finally {
+      debugPrint = previousDebugPrint;
+    }
+
+    final joined = logs.join('\n');
+    expect(joined, isNot(contains('qa_register_user@example.com')));
+    expect(joined, isNot(contains('Password123!')));
+    expect(joined, isNot(contains('register-secret-token-value')));
+    expect(joined, contains('email_domain=example.com'));
+    expect(joined, contains('POST /auth/register'));
+    expect(joined, contains('token recebido: sim'));
+  });
+
   test('login network failure exposes friendly user message only', () async {
     SharedPreferences.setMockInitialValues({});
     final provider = AuthProvider(apiClient: _AuthTimeoutApiClient());
@@ -104,6 +173,32 @@ void main() {
     );
     expect(provider.errorMessage, isNot(contains('SocketException')));
     expect(provider.errorMessage, isNot(contains('RequestOptions')));
+  });
+
+  test('initialize reuses in-flight token validation', () async {
+    SharedPreferences.setMockInitialValues({
+      'auth_token': 'saved-token',
+      'user_data': jsonEncode({
+        'id': 'user-saved',
+        'username': 'saved_user',
+        'email': 'saved_user@example.com',
+      }),
+    });
+    final api = _TokenValidationApiClient();
+    final provider = AuthProvider(apiClient: api);
+
+    final firstInitialization = provider.initialize();
+    final secondInitialization = provider.initialize();
+
+    await Future.wait([firstInitialization, secondInitialization]);
+
+    expect(api.getCalls, 1);
+    expect(provider.status, AuthStatus.authenticated);
+    expect(provider.user?.id, 'user-saved');
+
+    await provider.initialize();
+
+    expect(api.getCalls, 2);
   });
 
   test('late profile refresh cannot repopulate user after logout', () async {

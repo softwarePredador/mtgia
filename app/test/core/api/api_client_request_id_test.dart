@@ -1,9 +1,26 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+
+class _MaxRecordingRandom implements Random {
+  final calls = <int>[];
+
+  @override
+  bool nextBool() => false;
+
+  @override
+  double nextDouble() => 0;
+
+  @override
+  int nextInt(int max) {
+    calls.add(max);
+    return max - 1;
+  }
+}
 
 void main() {
   group('ApiClient request id', () {
@@ -19,6 +36,18 @@ void main() {
 
       expect(requestId, startsWith('mob-'));
       expect(requestId, contains('-'));
+    });
+
+    test('uses web-safe entropy chunks for request ids', () {
+      final random = _MaxRecordingRandom();
+
+      final requestId = ApiClient.generateRequestId(
+        now: DateTime.fromMillisecondsSinceEpoch(42),
+        random: random,
+      );
+
+      expect(random.calls, equals([0x10000, 0x10000]));
+      expect(requestId, endsWith('-ffffffff'));
     });
 
     test('appends x-request-id without dropping headers', () {
@@ -90,6 +119,37 @@ void main() {
       expect(response.data, isA<Map<String, dynamic>>());
       expect(response.requestId, outboundRequestId);
       expect(response.responseRequestId, outboundRequestId);
+    });
+
+    test('request logs use endpoint path instead of public host', () async {
+      final logs = <String>[];
+      final previousDebugPrint = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) {
+        if (message != null) logs.add(message);
+      };
+      ApiClient.resetForTesting(
+        performanceUnavailable: true,
+        httpClient: MockClient((request) async {
+          return http.Response(
+            '{"status":"ready"}',
+            200,
+            headers: const {'content-type': 'application/json'},
+          );
+        }),
+      );
+
+      try {
+        await ApiClient().get('/ready');
+      } finally {
+        debugPrint = previousDebugPrint;
+      }
+
+      final joined = logs.join('\n');
+      expect(joined, contains('GET /ready'));
+      expect(
+        joined,
+        isNot(contains('https://evolution-cartinhas.8ktevp.easypanel.host')),
+      );
     });
 
     test('keeps request correlation available on HTTP errors', () async {

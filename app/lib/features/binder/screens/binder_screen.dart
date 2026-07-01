@@ -1551,6 +1551,10 @@ class _BinderItemCard extends StatelessWidget {
                             color: AppTheme.brass400.withValues(alpha: 0.8),
                           ),
                         ],
+                        if (item.cardIsReserved) ...[
+                          const SizedBox(width: 6),
+                          _badge('Reserved', AppTheme.brass400),
+                        ],
                         if (item.cardSetCode != null) ...[
                           const SizedBox(width: 6),
                           Text(

@@ -50,7 +50,12 @@ class AppObservability {
     _attachGlobalHandlers();
     await appRunner();
 
-    if (!isEnabled || _sentryInitStarted) {
+    if (!isEnabled) {
+      debugPrint('[Observability] Sentry desabilitado: SENTRY_DSN vazio.');
+      return;
+    }
+
+    if (_sentryInitStarted) {
       return;
     }
 

@@ -80,6 +80,7 @@ Future<Response> onRequest(RequestContext context) async {
               .split('T')
               .first,
         'rarity': map['rarity'],
+        'is_reserved': map['is_reserved'] == true,
         'collector_number': map['collector_number'],
         'foil': map['foil'],
       };
@@ -164,7 +165,7 @@ _QueryBuilder _buildQuery(
               $identityColumns
               c.oracle_text, c.colors, c.color_identity, c.image_url,
               LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
-              c.collector_number, c.foil,
+              c.is_reserved, c.collector_number, c.foil,
               s.name AS set_name,
               s.release_date AS set_release_date
             FROM cards c
@@ -191,7 +192,7 @@ _QueryBuilder _buildQuery(
               $identityColumns
               c.oracle_text, c.colors, c.color_identity, c.image_url,
               LOWER(c.set_code) AS set_code, c.rarity, c.cmc,
-              c.collector_number, c.foil
+              c.is_reserved, c.collector_number, c.foil
             FROM cards c
             $whereClause
             ORDER BY c.name, LOWER(c.set_code)

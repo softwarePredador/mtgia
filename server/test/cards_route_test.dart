@@ -30,6 +30,8 @@ void main() {
       expect(source, contains('final safeLimit = limit.clamp(1, 200)'));
       expect(source, contains("params['limit'] ?? '50'"));
       expect(source, contains("params['page'] ?? '1'"));
+      expect(source, contains("'is_reserved': map['is_reserved'] == true"));
+      expect(source, contains('c.is_reserved'));
     });
 
     test('printings sync boundary is explicit and write-capable', () {
@@ -44,8 +46,18 @@ void main() {
       );
       expect(source, contains('_syncPrintingsFromScryfall'));
       expect(source, contains('INSERT INTO cards'));
+      expect(source, contains('is_reserved'));
+      expect(source, contains("p['reserved']"));
       expect(source, contains('ON CONFLICT (scryfall_id) DO UPDATE SET'));
       expect(source, contains('INSERT INTO sets'));
+    });
+
+    test('resolve route preserves reserved-list metadata', () {
+      final source = File('routes/cards/resolve/index.dart').readAsStringSync();
+
+      expect(source, contains("'is_reserved': m['is_reserved'] == true"));
+      expect(source, contains("card['reserved']"));
+      expect(source, contains('is_reserved = COALESCE'));
     });
   });
 }

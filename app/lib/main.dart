@@ -11,6 +11,7 @@ import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/platform_unavailable_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
 import 'features/decks/providers/deck_provider.dart';
@@ -208,6 +209,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
 
     // Iniciar/parar polling de notificações quando autenticado
     _authProvider.addListener(_onAuthChanged);
+    unawaited(_authProvider.initialize());
 
     // Log da URL da API no boot
     ApiClient.debugLogBaseUrl();
@@ -307,7 +309,20 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
 
         GoRoute(
           path: lifeCounterRoutePath,
-          builder: (context, state) => const LotusLifeCounterScreen(),
+          builder:
+              (context, state) =>
+                  kIsWeb
+                      ? const PlatformUnavailableScreen(
+                        title: 'Contador disponivel no app mobile',
+                        message:
+                            'O contador Lotus usa WebView nativo e fica '
+                            'desabilitado no Flutter Web neste corte.',
+                        details:
+                            'No navegador, continue usando deck builder, IA, '
+                            'colecao, planos, comunidade e trade. A rota fica '
+                            'protegida para nao quebrar o app web.',
+                      )
+                      : const LotusLifeCounterScreen(),
         ),
 
         ShellRoute(

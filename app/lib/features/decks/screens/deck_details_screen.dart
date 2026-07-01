@@ -881,6 +881,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                                   backgroundColor: AppTheme.surfaceSlate
                                       .withValues(alpha: 0.78),
                                 ),
+                              if (card.isReserved)
+                                _buildDeckCardMetaPill(
+                                  label: 'Reserved',
+                                  textColor: AppTheme.brass400,
+                                  backgroundColor: AppTheme.brass400.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  borderColor: AppTheme.brass400.withValues(
+                                    alpha: 0.24,
+                                  ),
+                                ),
                               if (card.condition != CardCondition.nm)
                                 _buildDeckCardMetaPill(
                                   label: card.condition.code,

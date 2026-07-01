@@ -105,6 +105,7 @@ class CardProvider extends ChangeNotifier {
             setName: json['set_name'],
             setReleaseDate: json['set_release_date'],
             rarity: json['rarity'] ?? '',
+            isReserved: json['is_reserved'] as bool? ?? false,
             collectorNumber: json['collector_number']?.toString(),
             foil: json['foil'] as bool?,
             quantity: 1,

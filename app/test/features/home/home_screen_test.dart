@@ -133,7 +133,7 @@ void main() {
       const AssetImage('assets/branding/home_hero_banner.png'),
       tester.element(find.byType(HomeScreen)),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
 
     await expectLater(
       find.byKey(const Key('home-hero-frame')),

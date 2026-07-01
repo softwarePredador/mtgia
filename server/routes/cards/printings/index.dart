@@ -100,6 +100,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         s.name AS set_name,
         s.release_date AS set_release_date,
         c.rarity,
+        c.is_reserved,
         c.price,
         c.price_updated_at,
         c.collector_number,
@@ -127,6 +128,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
         c.image_url,
         LOWER(c.set_code) AS set_code,
         c.rarity,
+        c.is_reserved,
         c.price,
         c.price_updated_at,
         c.collector_number,
@@ -156,6 +158,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           s.name AS set_name,
           s.release_date AS set_release_date,
           c.rarity,
+          c.is_reserved,
           c.price,
           c.price_updated_at,
           c.collector_number,
@@ -184,6 +187,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
           c.image_url,
           LOWER(c.set_code) AS set_code,
           c.rarity,
+          c.is_reserved,
           c.price,
           c.price_updated_at,
           c.collector_number,
@@ -226,6 +230,7 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
             .split('T')
             .first,
       'rarity': m['rarity'],
+      'is_reserved': m['is_reserved'] == true,
       'price': m['price'],
       'price_updated_at':
           (m['price_updated_at'] as DateTime?)?.toIso8601String(),
@@ -300,6 +305,7 @@ Future<int> _syncPrintingsFromScryfall(
     final oracleText = p['oracle_text']?.toString();
     final setCode = p['set']?.toString();
     final rarity = p['rarity']?.toString();
+    final isReserved = p['reserved'] is bool ? p['reserved'] as bool : null;
     final cmc = p['cmc']?.toString();
     final collectorNumber = p['collector_number']?.toString();
     final foil = p['foil'] is bool ? p['foil'] as bool : null;
@@ -367,13 +373,14 @@ Future<int> _syncPrintingsFromScryfall(
         Sql.named('''
           INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
                              colors, color_identity, image_url, set_code, rarity, cmc,
-                             collector_number, foil$identityInsertColumns)
+                             is_reserved, collector_number, foil$identityInsertColumns)
           VALUES (
             @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
             @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal, @collector_number, @foil$identityInsertValues
+            @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
           )
           ON CONFLICT (scryfall_id) DO UPDATE SET
+            is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
             collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
             foil = COALESCE(cards.foil, EXCLUDED.foil),
             $identityUpdates
@@ -391,6 +398,7 @@ Future<int> _syncPrintingsFromScryfall(
           'image_url': imageUrl,
           'set_code': setCode,
           'rarity': rarity,
+          'is_reserved': isReserved,
           'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
           'collector_number': collectorNumber,
           'foil': foil,

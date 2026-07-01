@@ -58,6 +58,7 @@ class ApiClient {
   static http.Client _httpClient = http.Client();
   static bool _performanceUnavailable = false;
   static final Random _requestIdRandom = Random.secure();
+  static const int _requestIdEntropyChunkMax = 0x10000;
 
   @visibleForTesting
   static void resetForTesting({
@@ -102,7 +103,15 @@ class ApiClient {
     final resolvedNow = now ?? DateTime.now();
     final resolvedRandom = random ?? _requestIdRandom;
     final timestamp = resolvedNow.microsecondsSinceEpoch.toRadixString(16);
-    final entropy = resolvedRandom.nextInt(1 << 32).toRadixString(16);
+    final entropyHigh = resolvedRandom
+        .nextInt(_requestIdEntropyChunkMax)
+        .toRadixString(16)
+        .padLeft(4, '0');
+    final entropyLow = resolvedRandom
+        .nextInt(_requestIdEntropyChunkMax)
+        .toRadixString(16)
+        .padLeft(4, '0');
+    final entropy = '$entropyHigh$entropyLow';
     return 'mob-$timestamp-$entropy';
   }
 
@@ -170,7 +179,7 @@ class ApiClient {
     final stopwatch = Stopwatch()..start();
     final effectiveTimeout = timeoutForEndpoint(endpoint);
 
-    debugPrint('[🌐 ApiClient] GET $url');
+    debugPrint('[🌐 ApiClient] GET $endpoint');
 
     try {
       await metric?.start();
@@ -243,7 +252,7 @@ class ApiClient {
     // Endpoints de IA têm timeout maior (2 minutos)
     final effectiveTimeout = timeoutForEndpoint(endpoint, override: timeout);
 
-    debugPrint('[🌐 ApiClient] POST $url');
+    debugPrint('[🌐 ApiClient] POST $endpoint');
 
     try {
       await metric?.start();
@@ -307,7 +316,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Put);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] PUT $url');
+    debugPrint('[🌐 ApiClient] PUT $endpoint');
 
     try {
       await metric?.start();
@@ -365,7 +374,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Patch);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] PATCH $url');
+    debugPrint('[🌐 ApiClient] PATCH $endpoint');
 
     try {
       await metric?.start();
@@ -419,7 +428,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Delete);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] DELETE $url');
+    debugPrint('[🌐 ApiClient] DELETE $endpoint');
 
     try {
       await metric?.start();

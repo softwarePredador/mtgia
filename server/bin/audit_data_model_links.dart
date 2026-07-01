@@ -280,6 +280,7 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
 
     final rollbackValidation = await _validateViewsInRollback(connection);
     final fanout = await _fanoutChecks(connection, relations);
+    final nullOwnerDecks = await _nullOwnerDeckAudit(connection, relations);
 
     return {
       'skipped': false,
@@ -295,6 +296,7 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
       'critical_view_presence': viewPresence,
       'rollback_view_validation': rollbackValidation,
       'fanout_checks': fanout,
+      'null_owner_deck_audit': nullOwnerDecks,
     };
   } finally {
     await connection.close();
@@ -305,6 +307,83 @@ Future<int> _countRelation(Connection connection, String relation) async {
   final result = await connection
       .execute('SELECT COUNT(*)::int AS c FROM ${_q(relation)}');
   return _toInt(result.first.toColumnMap()['c']);
+}
+
+Future<Map<String, dynamic>> _nullOwnerDeckAudit(
+  Connection connection,
+  Map<String, String> relations,
+) async {
+  if (!relations.containsKey('decks') || !relations.containsKey('deck_cards')) {
+    return {'available': false, 'reason': 'decks/deck_cards missing'};
+  }
+
+  final result = await connection.execute(Sql.named('''
+    WITH null_decks AS (
+      SELECT d.id::text,
+             d.name,
+             d.format,
+             d.is_public,
+             d.created_at,
+             COUNT(dc.id)::int AS deck_card_rows,
+             COALESCE(SUM(dc.quantity), 0)::int AS total_quantity,
+             BOOL_OR(dc.is_commander) AS has_commander
+      FROM decks d
+      LEFT JOIN deck_cards dc ON dc.deck_id = d.id
+      WHERE d.user_id IS NULL
+      GROUP BY d.id, d.name, d.format, d.is_public, d.created_at
+    )
+    SELECT
+      COUNT(*)::int AS null_user_decks,
+      COUNT(*) FILTER (WHERE is_public = true)::int AS public_count,
+      COUNT(*) FILTER (WHERE is_public = false OR is_public IS NULL)::int
+        AS private_or_null_public_count,
+      COUNT(*) FILTER (WHERE deck_card_rows = 0)::int AS empty_count,
+      COUNT(*) FILTER (WHERE deck_card_rows > 0)::int AS populated_count,
+      COUNT(*) FILTER (WHERE has_commander = true)::int AS commander_count,
+      COUNT(*) FILTER (
+        WHERE name LIKE 'PG REGISTERED %'
+          AND LOWER(COALESCE(format, '')) = 'commander'
+          AND COALESCE(is_public, false) = false
+          AND COALESCE(total_quantity, 0) = 100
+          AND COALESCE(has_commander, false) = true
+      )::int AS pg_registered_private_commander_count,
+      jsonb_agg(
+        jsonb_build_object(
+          'id', id,
+          'name', name,
+          'format', format,
+          'is_public', COALESCE(is_public, false),
+          'deck_card_rows', deck_card_rows,
+          'total_quantity', total_quantity,
+          'has_commander', COALESCE(has_commander, false),
+          'created_at', created_at
+        )
+        ORDER BY created_at NULLS LAST, name
+      ) FILTER (WHERE id IS NOT NULL) AS examples
+    FROM null_decks
+  '''));
+
+  final row = result.first.toColumnMap();
+  final total = _toInt(row['null_user_decks']);
+  final pgRegistered = _toInt(row['pg_registered_private_commander_count']);
+  final status = total == 0
+      ? 'none'
+      : total == pgRegistered
+          ? 'classified_private_pg_registered_lab_decks'
+          : 'unclassified_null_owner_decks_present';
+
+  return {
+    'available': true,
+    'status': status,
+    'null_user_decks': total,
+    'public_count': _toInt(row['public_count']),
+    'private_or_null_public_count': _toInt(row['private_or_null_public_count']),
+    'empty_count': _toInt(row['empty_count']),
+    'populated_count': _toInt(row['populated_count']),
+    'commander_count': _toInt(row['commander_count']),
+    'pg_registered_private_commander_count': pgRegistered,
+    'examples': row['examples'] ?? const [],
+  };
 }
 
 Future<Map<String, dynamic>> _validateViewsInRollback(
@@ -620,6 +699,28 @@ List<Map<String, String>> _recommendations(
             : 'Route deck analysis, optimize context, recommendations, weakness analysis, and Hermes syncs through aggregated snapshots.',
       });
     }
+
+    final nullOwner =
+        dbAudit['null_owner_deck_audit'] as Map<String, dynamic>? ?? {};
+    if (nullOwner['status'] == 'unclassified_null_owner_decks_present') {
+      recs.add({
+        'priority': 'P0',
+        'title': 'Classify decks without user_id before cleanup',
+        'reason':
+            'Some decks without owners do not match the private PG registered lab-deck pattern.',
+        'action':
+            'Prepare an approval-gated PostgreSQL package before assigning owners, publishing, or deleting those decks.',
+      });
+    } else if (_toInt(nullOwner['null_user_decks']) > 0) {
+      recs.add({
+        'priority': 'P2',
+        'title': 'Keep null-owner PG registered decks out of product cleanup',
+        'reason':
+            'All null-owner decks match private complete PG registered Commander lab variants.',
+        'action':
+            'Do not delete automatically. Assign an owner only through an explicit PostgreSQL package if these variants need product visibility.',
+      });
+    }
   }
 
   if (dbAudit['skipped'] == true) {
@@ -673,9 +774,13 @@ String _toMarkdown(Map<String, dynamic> report) {
   final staleDocs = staticAudit['stale_docs'] as List<dynamic>;
   final app = staticAudit['app_endpoints'] as Map<String, dynamic>;
   final sync = staticAudit['sync_scripts'] as Map<String, dynamic>;
+  final generatedAt =
+      DateTime.tryParse(report['generated_at']?.toString() ?? '');
+  final reportDate =
+      generatedAt?.toIso8601String().substring(0, 10) ?? 'unknown-date';
 
   final b = StringBuffer()
-    ..writeln('# Data Model Final Validation — 2026-06-15')
+    ..writeln('# Data Model Final Validation — $reportDate')
     ..writeln()
     ..writeln('Generated at: `${report['generated_at']}`')
     ..writeln()
@@ -709,6 +814,11 @@ String _toMarkdown(Map<String, dynamic> report) {
       ..writeln('```json')
       ..writeln(
           const JsonEncoder.withIndent('  ').convert(database['fanout_checks']))
+      ..writeln('```')
+      ..writeln('- Null-owner deck audit:')
+      ..writeln('```json')
+      ..writeln(const JsonEncoder.withIndent('  ')
+          .convert(database['null_owner_deck_audit']))
       ..writeln('```')
       ..writeln('- Critical row counts:')
       ..writeln('```json')

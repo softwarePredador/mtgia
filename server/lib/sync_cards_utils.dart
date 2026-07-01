@@ -12,7 +12,8 @@ import 'mtg_data_integrity_support.dart';
 ///
 /// Índices do retorno:
 /// [0] oracleId, [1] name, [2] manaCost, [3] typeLine, [4] oracleText,
-/// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity
+/// [5] colors, [6] colorIdentity, [7] imageUrl, [8] setCode, [9] rarity,
+/// [10] isReserved
 List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
   Map<String, dynamic>? chosen;
   for (final p in printings) {
@@ -44,6 +45,8 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
     (chosen['printings'] as List?)?.cast<dynamic>().firstOrNull?.toString(),
   );
   final rarity = chosen['rarity']?.toString();
+  final isReserved =
+      chosen['isReserved'] is bool ? chosen['isReserved'] as bool : null;
 
   // Use scryfallId for direct image URL (more reliable than name-based)
   final scryfallId = ids?['scryfallId']?.toString();
@@ -71,6 +74,7 @@ List<Object?>? extractCardRow(String cardName, List<dynamic> printings) {
     imageUrl,
     setCode,
     rarity,
+    isReserved,
   ];
 }
 
@@ -132,8 +136,8 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
     syncRow[11],
     syncRow[12],
     syncRow[13],
-    syncRow[14],
     syncRow[15],
+    syncRow[16],
   ];
 }
 
@@ -143,7 +147,8 @@ List<Object?>? extractSetCardRow(Map<String, dynamic> card, String setCode) {
 /// [0] scryfallPrintingId, [1] oracleId, [2] name, [3] manaCost,
 /// [4] typeLine, [5] oracleText, [6] colors, [7] colorIdentity, [8] power,
 /// [9] toughness, [10] keywords, [11] imageUrl, [12] setCode, [13] rarity,
-/// [14] collectorNumber, [15] foil, [16] layout, [17] cardFacesJson
+/// [14] isReserved, [15] collectorNumber, [16] foil, [17] layout,
+/// [18] cardFacesJson
 List<Object?>? extractSetCardSyncRow(
     Map<String, dynamic> card, String setCode) {
   final canonicalSetCode = normalizeMtgSetCode(setCode) ?? setCode.trim();
@@ -204,6 +209,7 @@ List<Object?>? extractSetCardSyncRow(
     imageUrl,
     canonicalSetCode,
     card['rarity']?.toString(),
+    card['isReserved'] is bool ? card['isReserved'] as bool : null,
     collectorNumber,
     foil,
     card['layout']?.toString(),

@@ -361,6 +361,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           c.image_url,
           c.set_code,
           c.rarity,
+          c.is_reserved,
           c.collector_number,
           c.foil,
           ${hasSets ? 's.name' : 'NULL::text'} AS set_name,

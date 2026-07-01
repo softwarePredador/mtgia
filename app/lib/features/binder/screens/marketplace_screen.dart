@@ -468,6 +468,8 @@ class _MarketplaceCard extends StatelessWidget {
                           size: 14,
                           color: AppTheme.brass400.withValues(alpha: 0.8),
                         ),
+                      if (item.cardIsReserved)
+                        _badge('Reserved', AppTheme.brass400),
                     ],
                   ),
                   const SizedBox(height: 4),

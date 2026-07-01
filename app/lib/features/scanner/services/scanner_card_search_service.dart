@@ -135,6 +135,8 @@ class ScannerCardSearchService {
       setName: json['set_name']?.toString(),
       setReleaseDate: json['set_release_date']?.toString(),
       rarity: json['rarity']?.toString() ?? '',
+      isReserved:
+          json['is_reserved'] is bool ? json['is_reserved'] as bool : false,
       quantity: 1,
       isCommander: false,
       collectorNumber: json['collector_number']?.toString(),

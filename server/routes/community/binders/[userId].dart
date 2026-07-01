@@ -35,7 +35,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
       whereClauses.add('(bi.for_trade = TRUE OR bi.for_sale = TRUE)');
     } else {
       // Sem filtro de list_type: mostrar disponíveis (have com flag) ou wants
-      whereClauses.add("(bi.list_type = 'want' OR bi.for_trade = TRUE OR bi.for_sale = TRUE)");
+      whereClauses.add(
+          "(bi.list_type = 'want' OR bi.for_trade = TRUE OR bi.for_sale = TRUE)");
     }
 
     if (forTrade == 'true') {
@@ -76,7 +77,8 @@ Future<Response> onRequest(RequestContext context, String userId) async {
              bi.list_type,
              c.name AS card_name, c.image_url AS card_image_url,
              c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
-             c.rarity AS card_rarity
+             c.rarity AS card_rarity,
+             c.is_reserved AS card_is_reserved
       FROM user_binder_items bi
       JOIN cards c ON c.id = bi.card_id
       WHERE $where
@@ -95,6 +97,7 @@ Future<Response> onRequest(RequestContext context, String userId) async {
           'set_code': cols['card_set_code'],
           'mana_cost': cols['card_mana_cost'],
           'rarity': cols['card_rarity'],
+          'is_reserved': cols['card_is_reserved'] == true,
         },
         'quantity': cols['quantity'],
         'condition': cols['condition'],

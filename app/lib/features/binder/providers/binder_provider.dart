@@ -16,6 +16,7 @@ class BinderItem {
   final String? cardManaCost;
   final String? cardRarity;
   final String? cardTypeLine;
+  final bool cardIsReserved;
   final double? cardMarketPrice;
   final String? createdAt;
   final String? updatedAt;
@@ -41,6 +42,7 @@ class BinderItem {
     this.cardManaCost,
     this.cardRarity,
     this.cardTypeLine,
+    this.cardIsReserved = false,
     this.cardMarketPrice,
     this.createdAt,
     this.updatedAt,
@@ -73,6 +75,10 @@ class BinderItem {
       cardRarity: card?['rarity'] as String? ?? json['card_rarity'] as String?,
       cardTypeLine:
           card?['type_line'] as String? ?? json['card_type_line'] as String?,
+      cardIsReserved:
+          card?['is_reserved'] as bool? ??
+          json['card_is_reserved'] as bool? ??
+          false,
       cardMarketPrice:
           card?['market_price'] != null
               ? (card?['market_price'] as num).toDouble()
@@ -285,6 +291,7 @@ class MarketplaceItem extends BinderItem {
     super.cardManaCost,
     super.cardRarity,
     super.cardTypeLine,
+    super.cardIsReserved,
     super.quantity,
     super.condition,
     super.isFoil,
@@ -318,6 +325,7 @@ class MarketplaceItem extends BinderItem {
       cardManaCost: card?['mana_cost'] as String?,
       cardRarity: card?['rarity'] as String?,
       cardTypeLine: card?['type_line'] as String?,
+      cardIsReserved: card?['is_reserved'] as bool? ?? false,
       quantity: json['quantity'] as int? ?? 1,
       condition: json['condition'] as String? ?? 'NM',
       isFoil: json['is_foil'] as bool? ?? false,
