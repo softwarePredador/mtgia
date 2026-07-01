@@ -84,6 +84,7 @@ TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
 PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
+PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
@@ -1089,6 +1090,16 @@ def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_life_gain_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"GainLifeEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -1679,6 +1690,87 @@ def activation_cost_from_oracle_prefix(
         "activation_cost_colors": colors,
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
+    }
+
+
+def activated_life_gain_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_life_gain_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    match = re.fullmatch(r"you gain (?P<amount>\d+) life\.?", effect_text)
+    if not match:
+        return "activated_life_gain_oracle_not_simple"
+    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_life_gain")
+    return {
+        "life_gain_amount": int(match.group("amount")),
+        **activation,
+    }
+
+
+def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileFromTopOfLibraryCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_life_gain_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_life_gain_source_cost_not_supported"
+    gain_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    if len(gain_matches) != 1:
+        return "activated_life_gain_source_amount_not_fixed"
+    amount = int(gain_matches[0])
+    if amount <= 0:
+        return "activated_life_gain_source_amount_not_fixed"
+    gain_index = text.find("GainLifeEffect")
+    window = text[max(0, gain_index - 500) : gain_index + 1600]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_life_gain_source_not_simple_activated"
+    mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window, re.S)
+    generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window, re.S)
+    colored_matches = re.findall(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window, re.S)
+    cost_kinds = sum(1 for matches in (mana_matches, generic_matches, colored_matches) if matches)
+    if cost_kinds > 1:
+        return "activated_life_gain_source_cost_not_supported"
+    if len(mana_matches) > 1 or len(generic_matches) > 1 or len(colored_matches) > 1:
+        return "activated_life_gain_source_cost_not_supported"
+    if mana_matches:
+        cost_text = mana_matches[0]
+    elif generic_matches:
+        cost_text = "{" + generic_matches[0] + "}"
+    elif colored_matches:
+        cost_text = "{" + colored_matches[0] + "}"
+    else:
+        cost_text = "{0}"
+    parsed = parse_mana_cost_text(cost_text)
+    if parsed is None:
+        return "activated_life_gain_source_mana_cost_not_supported"
+    generic, colors = parsed
+    return {
+        "life_gain_amount": amount,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": generic,
+        "activation_cost_colors": colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
     }
 
 
@@ -2755,6 +2847,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated destroy-target ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
         scope_kind = "permanent with a simple activated draw ability"
+    elif scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
+        scope_kind = "permanent with a simple activated fixed life-gain ability"
     elif scope == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE:
         scope_kind = "graveyard simple activated self-return-to-hand ability"
     return (
@@ -2823,6 +2917,7 @@ def split_row(
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
     permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
+    permanent_activated_life_gain_unit = is_permanent_activated_life_gain_unit(row)
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
@@ -2848,6 +2943,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
@@ -2874,6 +2970,7 @@ def split_row(
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
         and not permanent_activated_destroy_unit
+        and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
         and not permanent_activated_recursion_to_hand_unit
@@ -3013,6 +3110,81 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_destroy_target",
+        ), "selected_exact_scope"
+
+    if permanent_activated_life_gain_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_life_gain_not_permanent"
+        oracle_life_gain = activated_life_gain_from_oracle(metadata)
+        if isinstance(oracle_life_gain, str):
+            return None, oracle_life_gain
+        parsed_activation = activated_life_gain_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        for key in (
+            "life_gain_amount",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+        ):
+            if parsed_activation.get(key) != oracle_life_gain.get(key):
+                return None, f"activated_life_gain_source_oracle_{key}_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        activated_effect = {
+            "effect": "life_gain",
+            "battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "controller_gain_life",
+            "target": "self",
+            "target_controller": "self",
+            "life_gain_amount": oracle_life_gain["life_gain_amount"],
+            "activated_life_gain_amount": oracle_life_gain["life_gain_amount"],
+            "xmage_effect_class": "GainLifeEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "controller_gain_life",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
+            "target": "self",
+            "target_controller": "self",
+            "life_gain_amount": oracle_life_gain["life_gain_amount"],
+            "activated_life_gain_amount": oracle_life_gain["life_gain_amount"],
+            "permanent_type": permanent_effect,
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "GainLifeEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "activation_cost_mana": parsed_activation["activation_cost_mana"],
+            "activation_cost_generic": parsed_activation["activation_cost_generic"],
+            "activation_cost_colors": parsed_activation["activation_cost_colors"],
+            "activation_requires_tap": parsed_activation["activation_requires_tap"],
+            "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_life_gain"] = True
+            activated_effect["activated_self_sacrifice_life_gain"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_life_gain",
         ), "selected_exact_scope"
 
     if permanent_activated_self_boost_unit:
@@ -4361,6 +4533,7 @@ def build_exact_split_report(
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
             and not is_permanent_activated_destroy_unit(row)
+            and not is_permanent_activated_life_gain_unit(row)
             and not is_permanent_activated_self_boost_unit(row)
             and not is_permanent_activated_target_boost_unit(row)
             and not is_permanent_activated_target_keyword_unit(row)
@@ -4407,6 +4580,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
+                "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",

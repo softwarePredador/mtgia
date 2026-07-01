@@ -427,6 +427,133 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_draw_oracle_not_simple")
 
+    def test_permanent_activated_life_gain_maps_simple_mana_and_tap_cost(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fountain of Youth",
+                type_line="Artifact",
+                oracle_text="{2}, {T}: You gain 1 life.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new GainLifeEffect(1),
+                    new GenericManaCost(2)
+                );
+                ability.addCost(new TapSourceCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["activated_effect"], "controller_gain_life")
+        self.assertEqual(effect["life_gain_amount"], 1)
+        self.assertEqual(effect["activated_life_gain_amount"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_life_gain_maps_self_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bottle Gnomes",
+                type_line="Artifact Creature - Gnome",
+                oracle_text="Sacrifice this creature: You gain 3 life.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new GainLifeEffect(3),
+                    new SacrificeSourceCost()
+                );
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE)
+        self.assertEqual(effect["life_gain_amount"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_life_gain"])
+
+    def test_permanent_activated_life_gain_blocks_target_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Altar",
+                type_line="Artifact",
+                oracle_text="{1}, Sacrifice a creature: You gain 3 life.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new GainLifeEffect(3),
+                    new GenericManaCost(1)
+                );
+                ability.addCost(new SacrificeTargetCost(new TargetControlledCreaturePermanent()));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_life_gain_oracle_cost_not_supported")
+
+    def test_permanent_activated_life_gain_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Healer",
+                type_line="Creature - Cleric",
+                oracle_text="{T}: You gain life equal to this creature's toughness.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    new GainLifeEffect(SourcePermanentToughnessValue.instance),
+                    new TapSourceCost()));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_life_gain_oracle_not_simple")
+
     def test_fixed_damage_spell_requires_numeric_damage_and_supported_target(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

@@ -7607,6 +7607,7 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "damage",
     "count",
     "life_gain_amount",
+    "activated_life_gain_amount",
     "mana_produced",
     "produces",
     "activation_requires_tap",
@@ -25563,6 +25564,173 @@ def activate_graveyard_self_return_cards(
     return 1
 
 
+def activate_permanent_life_gain_sources(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase,
+):
+    if phase not in {"precombat_main", "postcombat_main"}:
+        return 0
+    candidates = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        if not isinstance(permanent, dict):
+            continue
+        if permanent.get("utility_artifact_used_this_turn"):
+            continue
+        effect_data = permanent if permanent.get("battle_model_scope") else get_card_effect(permanent)
+        if not (
+            effect_data.get("battle_model_scope") == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE
+            or effect_data.get("activated_battle_model_scope") == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE
+        ):
+            continue
+        amount = int(
+            effect_data.get("activated_life_gain_amount")
+            or effect_data.get("life_gain_amount")
+            or 0
+        )
+        if amount <= 0:
+            continue
+        activation_cost_generic = adjusted_activated_ability_generic_cost(
+            player,
+            permanent,
+            int(effect_data.get("activation_cost_generic") or 0),
+        )
+        activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+        activation_cost_text = (
+            effect_data.get("activation_cost_mana")
+            or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+        )
+        requires_tap = bool(effect_data.get("activation_requires_tap"))
+        requires_sacrifice = bool(effect_data.get("activation_requires_sacrifice"))
+        if requires_tap and permanent.get("tapped"):
+            continue
+        if (
+            requires_tap
+            and is_battlefield_creature(permanent)
+            and permanent.get("summoning_sick")
+            and not has_haste(permanent)
+        ):
+            continue
+        if not player.can_pay(activation_cost_text):
+            continue
+        life_missing = max(0, 40 - int(getattr(player, "life", 0) or 0))
+        score = amount + life_missing + (4 if requires_sacrifice else 0)
+        candidates.append(
+            {
+                "permanent": permanent,
+                "effect_data": effect_data,
+                "amount": amount,
+                "activation_cost_text": activation_cost_text,
+                "activation_cost_generic": activation_cost_generic,
+                "activation_cost_colors": activation_cost_colors,
+                "requires_tap": requires_tap,
+                "requires_sacrifice": requires_sacrifice,
+                "score": score,
+            }
+        )
+    if not candidates:
+        return 0
+    candidates.sort(
+        key=lambda item: (
+            -int(item["score"]),
+            bool(item["requires_sacrifice"]),
+            int(float(item["permanent"].get("cmc") or card_mana_value(item["permanent"]) or 0)),
+            item["permanent"].get("name", "?"),
+        )
+    )
+    selected = candidates[0]
+    permanent = selected["permanent"]
+    effect_data = selected["effect_data"]
+    activation_cost_text = selected["activation_cost_text"]
+    if not player.spend_mana(activation_cost_text):
+        return 0
+    if selected["requires_tap"]:
+        permanent["tapped"] = True
+    permanent["utility_artifact_used_this_turn"] = True
+    if selected["requires_sacrifice"]:
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+    life_before = int(getattr(player, "life", 0) or 0)
+    gain_life(player, int(selected["amount"]), cap=999)
+    life_after = int(getattr(player, "life", life_before) or 0)
+    life_gained = max(0, life_after - life_before)
+    emit_decision_trace(
+        decision_type="utility_permanent_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                item["permanent"],
+                item["effect_data"],
+                score=item["score"],
+                action="activate_life_gain_permanent",
+                life_gain_amount=item["amount"],
+            )
+            for item in candidates[:8]
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            effect_data,
+            score=selected["score"],
+            action="activate_life_gain_permanent",
+            life_gain_amount=selected["amount"],
+        ),
+        score_components={
+            "activation_cost": activation_cost_text,
+            "activation_cost_generic": selected["activation_cost_generic"],
+            "activation_cost_colors": selected["activation_cost_colors"],
+            "life_gain_requested": selected["amount"],
+            "requires_tap": selected["requires_tap"],
+            "sacrificed_source": selected["requires_sacrifice"],
+        },
+        rule_source="permanent_simple_activated_life_gain_v1",
+        rule_status=effect_data.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=selected["score"],
+        reason="convert an activated permanent ability into fixed life gain",
+        strategic_principle="use available life-gain activations when costs are payable",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -(selected["activation_cost_generic"] + len(selected["activation_cost_colors"])),
+            "life": life_gained,
+            "permanents": -1 if selected["requires_sacrifice"] else 0,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": selected["requires_tap"],
+                "sacrifice_source": selected["requires_sacrifice"],
+                "life_gain": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "life_gain_activated",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        activation_kind="simple_activated_life_gain",
+        activation_cost=activation_cost_text,
+        life_gain_requested=int(selected["amount"]),
+        life_gained=life_gained,
+        controller_life_before=life_before,
+        controller_life_after=life_after,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_self=bool(selected["requires_sacrifice"]),
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return 1
+
+
 def activate_graveyard_recycling_artifacts(
     player,
     opponents,
@@ -26912,6 +27080,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             return 1
 
     if activate_graveyard_self_return_cards(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
+
+    if activate_permanent_life_gain_sources(
         player,
         opponents,
         all_players,
@@ -35611,6 +35789,7 @@ SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_targe
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
+PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE = "xmage_permanent_simple_activated_life_gain_v1"
 GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 
 

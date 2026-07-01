@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg319_graveyard_self_return_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27388`
-- XMage authoritative source resolved: `27074`
+- target all-card battle-gap identities: `27374`
+- XMage authoritative source resolved: `27060`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27074`
+- XMage authoritative adapter required: `27060`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27074` identities, card semantics are accepted from XMage; work is now
+- For `27060` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG319 Exact Adapter Waves
+## PG283-PG320 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG319 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG320 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -188,6 +188,12 @@ patterns:
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
   `xmage_creature_etb_gain_life_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` with
+  `GainLifeEffect + SimpleActivatedAbility` on battlefield permanents, exact
+  fixed activated life-gain Oracle/source text, mana/tap/source self-sacrifice
+  costs only, and no target sacrifice, discard, exile, graveyard, variable, or
+  compound cost/effect text ->
+  `xmage_permanent_simple_activated_life_gain_v1`
 - `draw_engine::xmage_draw_card_variant_review_v1` with
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
@@ -2186,6 +2192,78 @@ PG319 measured result:
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `613`.
 
+PG320 evidence:
+
+- PG320 permanent activated life-gain package:
+  `docs/hermes-analysis/master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_package.md`
+- PG320 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_pg_apply_evidence.md`
+- PG320 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_e2e_validation.md`
+- PG320 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_pg_to_sqlite_sync.json`
+- PG320 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG320 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg320_permanent_activated_life_gain_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg320_permanent_activated_life_gain_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg320_permanent_activated_life_gain_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg320_permanent_activated_life_gain_wave.md`
+- post-PG320 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg320_permanent_activated_life_gain_wave_recheck.md`
+- post-PG320 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
+- PG320 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_life_gain_wave.md`
+- post-PG320 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg320_existing_supported_recheck.md`
+
+PG320 measured result:
+
+- PG320 promoted `14` exact battlefield permanents with simple activated fixed
+  life-gain abilities: `Bottle Gnomes`, `Braidwood Cup`, `Brindle Boar`,
+  `Dedicated Martyr`, `Font of Vigor`, `Fountain of Youth`, `Marble Chalice`,
+  `Silent Attendant`, `Soulmender`, `Starlight Invoker`, `Stone Haven Medic`,
+  `Tanglebloom`, `Tower of Eons`, and `Zarichi Tiger`.
+- Runtime now supports main-phase activation for
+  `xmage_permanent_simple_activated_life_gain_v1`, pays the activation cost,
+  taps the source when required, sacrifices the source when required, applies
+  fixed controller life gain, and emits `life_gain_activated` with exact
+  logical rule fields.
+- The splitter blocks variable life-gain amounts, target-sacrifice costs,
+  discard/exile/graveyard costs, non-simple activated abilities, and
+  source/Oracle amount or cost mismatches.
+- PostgreSQL apply evidence reports `14/14` promoted rows, `14/14`
+  verified/auto rows, `14/14` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `3512` PostgreSQL rules,
+  inserted/updated `3511` SQLite rows, and exported `4707` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5723` PostgreSQL card rows,
+  wrote `5648` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning; legacy
+  contamination `pass`.
+- Focused exact-scope tests cover safe activated life-gain splitting,
+  source-sacrifice blocking/selection, dynamic amount blocking, mana payment,
+  tapping, life total mutation, and self-sacrifice movement to graveyard.
+- Global all-card readiness after PG320:
+  `battle_and_oracle_ready=2250`, `battle_family_mapper_required=30297`, and
+  `snapshot_has_verified_rule=3398`.
+- Global all-card authoritative queue after PG320:
+  `target_identity_count=27374`, `xmage_authoritative_source_count=27060`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27060`.
+- Running the exact splitter after PG320 on supported units returns
+  `proposal_count=0` over `8012` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG320 queue. The largest current work units are `recursion`
+  `1978`, `draw_engine` `1660`, `grant_protection` `1162`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `740`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `613`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -2825,7 +2903,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG319 queue, the next exact runtime-backed work should be selected from
+post-PG320 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`
@@ -2833,7 +2911,7 @@ these largest reusable work units, not from deck intuition:
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
 5. `add_counters::source_add_counters_variant_v1` - `795`
-6. `life_gain::xmage_life_gain_variant_review_v1` - `754`
+6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
 7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`
 8. `removal_destroy::targeted_destroy_variant_v1` - `636`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`

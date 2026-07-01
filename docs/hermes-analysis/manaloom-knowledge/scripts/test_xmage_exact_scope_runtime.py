@@ -245,6 +245,108 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_life_gain_permanent_pays_mana_taps_and_gains_life(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 35
+        active.mana_pool.add_generic(2)
+        permanent = {
+            "name": "Fountain of Youth",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+            "activated_effect": "controller_gain_life",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+            "life_gain_amount": 1,
+            "activated_life_gain_amount": 1,
+            "activation_cost_mana": "{2}",
+            "activation_cost_generic": 2,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_fountain_of_youth",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            rng=random.Random(5),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.life, 36)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertIn(permanent, active.battlefield)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "life_gain_activated"
+                and data.get("activation_kind") == "simple_activated_life_gain"
+                and data.get("card") == "Fountain of Youth"
+                and data.get("activation_cost") == "{2}"
+                and data.get("life_gain_requested") == 1
+                and data.get("life_gained") == 1
+                and data.get("controller_life_before") == 35
+                and data.get("controller_life_after") == 36
+                and data.get("tapped") is True
+                and data.get("sacrificed_self") is False
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_life_gain_self_sacrifice_moves_source_to_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 33
+        permanent = {
+            "name": "Bottle Gnomes",
+            "type_line": "Artifact Creature - Gnome",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+            "activated_effect": "controller_gain_life",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_life_gain_v1",
+            "life_gain_amount": 3,
+            "activated_life_gain_amount": 3,
+            "activated_self_sacrifice_life_gain": True,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "summoning_sick": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_bottle_gnomes",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=6,
+            rng=random.Random(6),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.life, 36)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "life_gain_activated"
+                and data.get("card") == "Bottle Gnomes"
+                and data.get("activation_cost") == "{0}"
+                and data.get("life_gain_requested") == 3
+                and data.get("life_gained") == 3
+                and data.get("sacrificed_self") is True
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_create_creature_tokens_spell_creates_modeled_tokens(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

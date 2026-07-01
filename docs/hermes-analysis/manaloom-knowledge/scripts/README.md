@@ -296,15 +296,32 @@ Evidence:
 - `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_e2e_validation.md`
 - `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_to_sqlite_sync.json`
 - `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_battle_rules_pg_to_sqlite_sync.json`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg315_existing_supported_recheck.md`
+- `master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_package.md`
+- `master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg316_xmage_permanent_activated_target_boost_source_sacrifice_wave_e2e_validation.md`
+- `master_optimizer_reports/pg317_xmage_permanent_activated_target_keyword_static_self_keyword_wave_package.md`
+- `master_optimizer_reports/pg317_xmage_permanent_activated_target_keyword_static_self_keyword_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg317_xmage_permanent_activated_target_keyword_static_self_keyword_wave_e2e_validation.md`
+- `master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_package.md`
+- `master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_e2e_validation.md`
+- `master_optimizer_reports/pg319_xmage_graveyard_self_return_wave_package.md`
+- `master_optimizer_reports/pg319_xmage_graveyard_self_return_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg319_xmage_graveyard_self_return_wave_e2e_validation.md`
+- `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_package.md`
+- `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_e2e_validation.md`
+- `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_battle_rules_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg320_existing_supported_recheck.md`
 
-After PG315, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7433` considered supported rows; continue by adding a
+After PG320, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `8012` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG315 queue is the current scheduling
-source: `target_identity_count=27421`, `xmage_authoritative_source_count=27107`,
-`xmage_authoritative_adapter_required_count=27107`, `parser_gap=0`, and
+the current authoritative queue. The post-PG320 queue is the current scheduling
+source: `target_identity_count=27374`, `xmage_authoritative_source_count=27060`,
+`xmage_authoritative_adapter_required_count=27060`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
