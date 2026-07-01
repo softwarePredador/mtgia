@@ -63,6 +63,15 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
             "count": 1,
             "destination": "play",
             "exiles_self": False,
+            "mode_selection": "one_or_both",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                }
+            ],
         },
         "review_status": "verified",
         "execution_status": "auto",
@@ -81,6 +90,15 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
         "count": 1,
         "destination": "play",
         "exiles_self": False,
+        "mode_selection": "one_or_both",
+        "recursion_components": [
+            {
+                "target": "creature",
+                "count": 1,
+                "destination": "hand",
+                "target_controller": "self",
+            }
+        ],
     }
 
 

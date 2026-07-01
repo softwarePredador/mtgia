@@ -29,6 +29,8 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "up_to_count",
     "destination",
     "exiles_self",
+    "mode_selection",
+    "recursion_components",
     "damage",
     "life_gain",
     "counter_type",

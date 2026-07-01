@@ -1818,6 +1818,69 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["target"], target)
                 self.assertEqual(effect["target_constraints"], constraints)
 
+    def test_graveyard_to_hand_choose_one_or_both_maps_components(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Grim Discovery",
+                oracle_text=(
+                    "Choose one or both —\n"
+                    "• Return target creature card from your graveyard to your hand.\n"
+                    "• Return target land card from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().getModes().setMinModes(1);
+                this.getSpellAbility().getModes().setMaxModes(2);
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                Mode mode = new Mode(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addMode(mode);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1")
+        self.assertEqual(effect["mode_selection"], "one_or_both")
+        self.assertEqual(
+            effect["recursion_components"],
+            [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "land",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+        )
+
+    def test_graveyard_to_hand_choose_one_or_both_requires_source_modes(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Grim Discovery",
+                oracle_text=(
+                    "Choose one or both —\n"
+                    "• Return target creature card from your graveyard to your hand.\n"
+                    "• Return target land card from your graveyard to your hand."
+                ),
+            ),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_choose_one_or_both_source_not_supported")
+
     def test_graveyard_to_hand_exile_self_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
@@ -1920,7 +1983,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "recursion_oracle_not_simple")
+        self.assertEqual(reason, "recursion_choose_one_or_both_source_not_supported")
 
     def test_graveyard_to_hand_additional_cost_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])

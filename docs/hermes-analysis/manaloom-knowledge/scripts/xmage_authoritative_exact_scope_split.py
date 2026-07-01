@@ -772,6 +772,14 @@ def recursion_target_constraints_for(target: str) -> dict[str, Any]:
         constraints["subtypes"] = ["goblin"]
     elif target in {"creature", "artifact", "enchantment", "sorcery", "instant", "land"}:
         constraints["card_types"] = [target]
+    elif target == "planeswalker":
+        constraints["card_types"] = ["planeswalker"]
+    elif target == "human_creature":
+        constraints["card_types"] = ["creature"]
+        constraints["subtypes"] = ["human"]
+    elif target == "non_human_creature":
+        constraints["card_types"] = ["creature"]
+        constraints["exclude_subtypes"] = ["human"]
     elif target == "basic_land":
         constraints["card_types"] = ["land"]
         constraints["supertypes"] = ["basic"]
@@ -793,6 +801,53 @@ def recursion_target_constraints_for(target: str) -> dict[str, Any]:
     else:
         constraints["target"] = target
     return constraints
+
+
+def recursion_component(target: str, count: int = 1) -> dict[str, Any]:
+    return {
+        "target": target,
+        "target_constraints": recursion_target_constraints_for(target),
+        "count": count,
+        "destination": "hand",
+        "target_controller": "self",
+    }
+
+
+def recursion_choose_one_or_both_from_text(text: str) -> list[dict[str, Any]] | None:
+    text = re.sub(r"\s+", " ", str(text or "").strip().lower())
+    if not text.startswith("choose one or both"):
+        return None
+    target_map = {
+        "artifact": "artifact",
+        "creature": "creature",
+        "enchantment": "enchantment",
+        "human creature": "human_creature",
+        "land": "land",
+        "non-human creature": "non_human_creature",
+        "planeswalker": "planeswalker",
+    }
+    matches = re.findall(
+        r"return target ([a-z-]+(?: [a-z-]+)?) card from your graveyard to your hand",
+        text,
+    )
+    components: list[dict[str, Any]] = []
+    for phrase in matches:
+        target = target_map.get(phrase.strip())
+        if target is None:
+            return None
+        components.append(recursion_component(target))
+    if len(components) != 2:
+        return None
+    return components
+
+
+def source_supports_choose_one_or_both_recursion(source_text: str) -> bool:
+    text = str(source_text or "")
+    return (
+        "getModes().setMinModes(1)" in text
+        and "getModes().setMaxModes(2)" in text
+        and text.count("ReturnFromGraveyardToHandTargetEffect") >= 2
+    )
 
 
 def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
@@ -4796,6 +4851,26 @@ def split_row(
             return None, "recursion_effect_class_not_pure"
         if ability_classes(row):
             return None, "recursion_ability_class_not_simple"
+        choose_components = recursion_choose_one_or_both_from_text(oracle_text(metadata))
+        if choose_components is not None:
+            if not source_supports_choose_one_or_both_recursion(source_text):
+                return None, "recursion_choose_one_or_both_source_not_supported"
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+                "mode_selection": "one_or_both",
+                "recursion_components": choose_components,
+                "destination": "hand",
+                "target_controller": "self",
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_hand_choose_one_or_both_spell",
+            ), "selected_exact_scope"
         if has_oracle_complexity(metadata):
             return None, "recursion_oracle_not_simple"
         target = recursion_to_hand_from_oracle(metadata)
@@ -5161,6 +5236,7 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",

@@ -1093,6 +1093,51 @@
     "battle_rule_logical_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
     "battle_rule_oracle_hash": "bb99dc3202d60eebefd671ebb94d5fdd"
   },
+  "Aid the Fallen": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "planeswalker"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9d1eb17d007f244339a3e02c362cf00a",
+    "battle_rule_oracle_hash": "9496532b5e3c5ae695453c3fd062e385"
+  },
   "Air Elemental": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -26248,6 +26293,51 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Fortuitous Find": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d6ac105b3ca97e86df22cbe8592432e9",
+    "battle_rule_oracle_hash": "23e9a63be8f33cd858a93d55ce59e41a"
+  },
   "Forum of Amity": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -30495,6 +30585,51 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Grim Discovery": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9bbc6cefcd7b190ac1df9e56a7c715af",
+    "battle_rule_oracle_hash": "ffdc50eb8241cba31a0ba1200c592f7f"
   },
   "Grim Flowering": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -53199,6 +53334,51 @@
     "battle_rule_logical_key": "battle_rule_v1:1a987670b594e446e4b1a122214e549e",
     "battle_rule_oracle_hash": "7d58da0feedf10778e5f0a84b724e08c"
   },
+  "Remember the Fallen": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bb779f40e2b217f92aee5d47260bd257",
+    "battle_rule_oracle_hash": "ff4a45cfcecac5f218642ae2ec20e237"
+  },
   "Remote Farm": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -54052,6 +54232,51 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:bd174969a9568e932ead996951ee8ec8",
     "battle_rule_oracle_hash": "19baafcc9f4b0da0129b72d41728a354"
+  },
+  "Reviving Melody": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4061e3abb8aa410e9f72764cbbf49f5a",
+    "battle_rule_oracle_hash": "daaf4e7a32130bf0ef21c9e245b9a200"
   },
   "Revoke Existence": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -58317,6 +58542,51 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+  },
+  "Season of Renewal": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": false,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ad3fe6c520d7ca458e2ff435cef3161d",
+    "battle_rule_oracle_hash": "daaf4e7a32130bf0ef21c9e245b9a200"
   },
   "Season of the Bold": {
     "cmc": 5.0,
@@ -66044,6 +66314,57 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+  },
+  "Survivors' Bond": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "human_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "subtypes": [
+            "human"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "non_human_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "exclude_subtypes": [
+            "human"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f23fb97f6a14327ce3f054e72c7f2e32",
+    "battle_rule_oracle_hash": "525cdc44e5da52d3fe4f190cb49a010d"
   },
   "Survivors' Encampment": {
     "effect": "land",

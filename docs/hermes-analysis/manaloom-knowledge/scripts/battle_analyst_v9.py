@@ -33983,6 +33983,10 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return len(_spell_color_symbols(card)) >= 2
     if target in ("goblin_card", "goblin"):
         return "goblin" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("human_creature", "human"):
+        return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("non_human_creature", "nonhuman_creature", "non-human"):
+        return is_creature_card(card) and "human" not in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("permanent", "permanent_card"):
         return is_land(card) or any(
             kind in type_line
@@ -34010,6 +34014,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "artifact" in type_line
     if target in ("enchantment", "enchantment_card"):
         return "enchantment" in type_line
+    if target in ("planeswalker", "planeswalker_card"):
+        return "planeswalker" in type_line
     if target in ("artifact_or_enchantment", "artifact_enchantment", "artifact_or_enchantment_card"):
         return "artifact" in type_line or "enchantment" in type_line
     if target in ("artifact_or_creature", "artifact_creature_choice", "artifact_or_creature_card"):
@@ -47113,36 +47119,51 @@ def apply_effect_immediate(
             participants = [player]
         recovered = []
         recovered_by_player = {}
-        for participant in participants:
-            count = (
-                len(participant.graveyard)
-                if return_all_matching
-                else int(effect_data.get("count") or 2)
-            )
-            candidates = [
-                grave_card
-                for grave_card in participant.graveyard
-                if graveyard_card_matches_recursion_target(
-                    grave_card,
-                    target_type,
-                    mana_value_max=mana_value_max,
+        recovered_by_component = []
+
+        def resolve_recursion_component(component_data, component_index=None):
+            component_target = component_data.get("target")
+            component_destination = component_data.get("destination", destination)
+            component_target_controller = str(component_data.get("target_controller") or target_controller)
+            component_mana_value_max = recursion_mana_value_max(component_data)
+            if component_mana_value_max is None:
+                component_mana_value_max = mana_value_max
+            if component_target_controller == "each_player":
+                component_participants = [player] + list(opponents or [])
+            else:
+                component_participants = [player]
+            component_recovered = []
+            for participant in component_participants:
+                count = (
+                    len(participant.graveyard)
+                    if return_all_matching or component_data.get("return_all_matching")
+                    else int(component_data.get("count") or 2)
                 )
-            ]
-            participant_recovered = candidates[:count]
-            if participant_recovered:
-                recovered_by_player[participant.name] = [
-                    recovered_card.get("name", "?")
-                    for recovered_card in participant_recovered
-                    if isinstance(recovered_card, dict)
+                candidates = [
+                    grave_card
+                    for grave_card in participant.graveyard
+                    if graveyard_card_matches_recursion_target(
+                        grave_card,
+                        component_target,
+                        mana_value_max=component_mana_value_max,
+                    )
                 ]
-            for recovered_card in remove_cards_from_graveyard(
-                participant,
-                participant_recovered,
-                turn=turn,
-                source_event="recursion",
-            ):
+                participant_recovered = candidates[:count]
+                if participant_recovered:
+                    recovered_by_player.setdefault(participant.name, []).extend(
+                        recovered_card.get("name", "?")
+                        for recovered_card in participant_recovered
+                        if isinstance(recovered_card, dict)
+                    )
+                for recovered_card in remove_cards_from_graveyard(
+                    participant,
+                    participant_recovered,
+                    turn=turn,
+                    source_event="recursion",
+                ):
                     recovered.append(recovered_card)
-                    if destination == "battlefield":
+                    component_recovered.append(recovered_card)
+                    if component_destination == "battlefield":
                         permanent_effect = get_card_effect(recovered_card)
                         permanent = prepare_entering_permanent(
                             enrich_card({**recovered_card, **permanent_effect}),
@@ -47160,6 +47181,29 @@ def apply_effect_immediate(
                         participant.battlefield.append(permanent)
                     else:
                         participant.hand.append(recovered_card)
+            recovered_by_component.append(
+                {
+                    "index": component_index,
+                    "target_type": component_target,
+                    "destination": component_destination,
+                    "recovered": [
+                        recovered_card.get("name", "?")
+                        for recovered_card in component_recovered
+                        if isinstance(recovered_card, dict)
+                    ],
+                }
+            )
+
+        recursion_components = [
+            component
+            for component in (effect_data.get("recursion_components") or [])
+            if isinstance(component, dict)
+        ]
+        if recursion_components:
+            for index, component in enumerate(recursion_components):
+                resolve_recursion_component(component, component_index=index)
+        else:
+            resolve_recursion_component(effect_data)
         emit_replay_event(
             "recursion_resolved",
             player=player.name,
@@ -47167,11 +47211,13 @@ def apply_effect_immediate(
             recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
             recovered_count=len(recovered),
             recovered_by_player=recovered_by_player,
+            recovered_by_component=recovered_by_component,
             target_type=target_type,
             target_controller=target_controller,
             destination=destination,
             mana_value_max=mana_value_max,
             return_all_matching=return_all_matching,
+            mode_selection=effect_data.get("mode_selection"),
             grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),
             turn=turn,
             **replay_rule_fields(effect_data),

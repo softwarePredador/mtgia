@@ -2790,6 +2790,62 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
 
                 self.assertEqual([card["name"] for card in active.hand], expected_names)
 
+    def test_graveyard_to_hand_choose_one_or_both_components_resolve(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Human", "type_line": "Creature - Human Soldier"},
+                {"name": "Target Construct", "type_line": "Artifact Creature - Construct"},
+                {"name": "Target Land", "type_line": "Land"},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
+            "mode_selection": "one_or_both",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "land",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+                    "count": 1,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Grim Discovery", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Human", "Target Land"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Construct", "Fixture Grim Discovery"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("mode_selection") == "one_or_both"
+                and data.get("recovered_count") == 2
+                and [item["target_type"] for item in data.get("recovered_by_component", [])] == ["creature", "land"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
