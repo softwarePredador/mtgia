@@ -112,6 +112,10 @@ class DeckDiagnosticPanel extends StatelessWidget {
           if (analysis?.hasLaunchSignals ?? false) ...[
             const SizedBox(height: 14),
             _LaunchReadinessStrip(analysis: analysis!),
+            if (analysis!.cardBattleReadiness.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              _CardBattleReadinessBadges(items: analysis!.cardBattleReadiness),
+            ],
           ],
           const SizedBox(height: 16),
           Text(
@@ -178,6 +182,142 @@ class DeckDiagnosticPanel extends StatelessWidget {
             (entry) => _DiagnosticInsightRow(entry.value, index: entry.key),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CardBattleReadinessBadges extends StatelessWidget {
+  final List<DeckCardBattleReadiness> items;
+
+  const _CardBattleReadinessBadges({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final visible = items.take(8).toList(growable: false);
+    final hiddenCount = items.length - visible.length;
+
+    return Container(
+      key: const Key('deck-card-battle-readiness-badges'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: AppTheme.outlineMuted.withValues(alpha: 0.45),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Battle por carta',
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ...visible.map(_CardBattleBadge.new),
+              if (hiddenCount > 0)
+                _OverflowBadge(label: '+$hiddenCount cartas'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CardBattleBadge extends StatelessWidget {
+  final DeckCardBattleReadiness item;
+
+  const _CardBattleBadge(this.item);
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = _cardBattleTone(item.status);
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 260),
+      child: Container(
+        key: Key('deck-card-battle-readiness-${item.name}'),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: tone.background,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          border: Border.all(color: tone.border.withValues(alpha: 0.65)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.isCommander
+                  ? Icons.military_tech_outlined
+                  : Icons.psychology_alt_outlined,
+              size: 15,
+              color: tone.foreground,
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                item.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: tone.foreground,
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                item.safeStatusLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppTheme.textPrimary.withValues(alpha: 0.86),
+                  fontSize: AppTheme.fontSm,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OverflowBadge extends StatelessWidget {
+  final String label;
+
+  const _OverflowBadge({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: AppTheme.fontSm,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -327,6 +467,18 @@ class _LaunchReadinessStrip extends StatelessWidget {
       default:
         return _DiagnosticTone.neutral;
     }
+  }
+}
+
+_DiagnosticTone _cardBattleTone(String status) {
+  switch (status) {
+    case 'verified_simulation':
+      return _DiagnosticTone.good;
+    case 'partial_simulation':
+    case 'pending_adapter':
+      return _DiagnosticTone.warn;
+    default:
+      return _DiagnosticTone.neutral;
   }
 }
 

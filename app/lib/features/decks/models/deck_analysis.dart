@@ -6,6 +6,7 @@ class DeckAnalysisData {
     this.functionalTags,
     this.readiness,
     this.battleReadiness,
+    this.cardBattleReadiness = const <DeckCardBattleReadiness>[],
     this.understandingSummary,
     this.commanderContract,
   });
@@ -16,6 +17,7 @@ class DeckAnalysisData {
   final DeckFunctionalTags? functionalTags;
   final DeckReadinessSummary? readiness;
   final DeckBattleReadinessSummary? battleReadiness;
+  final List<DeckCardBattleReadiness> cardBattleReadiness;
   final DeckUnderstandingSummary? understandingSummary;
   final DeckCommanderContractSummary? commanderContract;
 
@@ -29,6 +31,9 @@ class DeckAnalysisData {
             : DeckFunctionalTags.fromJson(functionalTagsPayload);
     final readinessPayload = _asStringMap(json['readiness']);
     final battleReadinessPayload = _asStringMap(json['battle_readiness']);
+    final cardBattleReadiness = _parseMapList(
+      json['card_battle_readiness'],
+    ).map(DeckCardBattleReadiness.fromJson).toList(growable: false);
     final understandingPayload = _asStringMap(json['understanding_summary']);
     final commanderContractPayload = _asStringMap(json['commander_contract']);
 
@@ -45,6 +50,7 @@ class DeckAnalysisData {
           battleReadinessPayload.isEmpty
               ? null
               : DeckBattleReadinessSummary.fromJson(battleReadinessPayload),
+      cardBattleReadiness: cardBattleReadiness,
       understandingSummary:
           understandingPayload.isEmpty
               ? null
@@ -61,6 +67,7 @@ class DeckAnalysisData {
   bool get hasLaunchSignals =>
       readiness != null ||
       battleReadiness != null ||
+      cardBattleReadiness.isNotEmpty ||
       understandingSummary != null ||
       (commanderContract?.shouldDisplay ?? false);
 
@@ -91,6 +98,59 @@ class DeckAnalysisData {
       return 'functional_tags do backend';
     }
     return 'functional_tags ($version)';
+  }
+}
+
+class DeckCardBattleReadiness {
+  const DeckCardBattleReadiness({
+    required this.schemaVersion,
+    required this.cardId,
+    required this.name,
+    required this.quantity,
+    required this.isCommander,
+    required this.status,
+    required this.statusLabel,
+    required this.battleRuleCount,
+    required this.verifiedBattleRuleCount,
+    required this.sourceCoverage,
+    required this.detail,
+    this.disclaimer,
+  });
+
+  final String schemaVersion;
+  final String cardId;
+  final String name;
+  final int quantity;
+  final bool isCommander;
+  final String status;
+  final String statusLabel;
+  final int battleRuleCount;
+  final int verifiedBattleRuleCount;
+  final Map<String, dynamic> sourceCoverage;
+  final String detail;
+  final String? disclaimer;
+
+  factory DeckCardBattleReadiness.fromJson(Map<String, dynamic> json) {
+    return DeckCardBattleReadiness(
+      schemaVersion: json['schema_version']?.toString() ?? '',
+      cardId: json['card_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      quantity: _parseInt(json['quantity']),
+      isCommander: _parseBool(json['is_commander']),
+      status: json['status']?.toString() ?? '',
+      statusLabel: json['status_label']?.toString() ?? '',
+      battleRuleCount: _parseInt(json['battle_rule_count']),
+      verifiedBattleRuleCount: _parseInt(json['verified_battle_rule_count']),
+      sourceCoverage: _asStringMap(json['source_coverage']),
+      detail: json['detail']?.toString() ?? '',
+      disclaimer: _optionalTrimmedString(json['disclaimer']),
+    );
+  }
+
+  String get safeStatusLabel {
+    final label = statusLabel.trim();
+    if (label.isNotEmpty) return label;
+    return status.trim().isEmpty ? 'Sem leitura' : status;
   }
 }
 

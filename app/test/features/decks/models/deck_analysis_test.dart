@@ -126,6 +126,34 @@ void main() {
           },
           'disclaimer': 'Runtime verificado quando existe.',
         },
+        'card_battle_readiness': [
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'cmdr',
+            'name': 'Talrand, Sky Summoner',
+            'quantity': 1,
+            'is_commander': true,
+            'status': 'verified_simulation',
+            'status_label': 'Simulação verificada',
+            'battle_rule_count': 2,
+            'verified_battle_rule_count': 1,
+            'source_coverage': {'has_verified_battle_rules': true},
+            'detail': '1 regra verificada para battle.',
+          },
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'complex',
+            'name': 'Complex Card',
+            'quantity': 1,
+            'is_commander': false,
+            'status': 'pending_adapter',
+            'status_label': 'Adaptador pendente',
+            'battle_rule_count': 0,
+            'verified_battle_rule_count': 0,
+            'source_coverage': {},
+            'detail': 'Texto Oracle presente.',
+          },
+        ],
         'understanding_summary': {
           'schema_version': 'deck_understanding_summary_v1_2026-07-01',
           'source': 'card_intelligence_snapshot',
@@ -192,6 +220,13 @@ void main() {
       expect(analysis.battleReadiness?.samples['pending_adapter'], [
         'Complex Card',
       ]);
+      expect(analysis.cardBattleReadiness, hasLength(2));
+      expect(analysis.cardBattleReadiness.first.isCommander, isTrue);
+      expect(
+        analysis.cardBattleReadiness.first.safeStatusLabel,
+        'Simulação verificada',
+      );
+      expect(analysis.cardBattleReadiness.last.sourceCoverage, isEmpty);
       expect(
         analysis.understandingSummary?.functionalCoverageLabel,
         '74% classificado',

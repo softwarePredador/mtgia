@@ -469,6 +469,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         issues: issues,
       ),
       'battle_readiness': _buildBattleReadinessSummary(cards),
+      'card_battle_readiness': _buildCardBattleReadiness(cards),
       'understanding_summary': _buildUnderstandingSummary(
         cards: cards,
         functionalSummary: functionalSummary,
@@ -653,6 +654,51 @@ Map<String, dynamic> _buildDeckReadinessSummary({
   };
 }
 
+List<Map<String, dynamic>> _buildCardBattleReadiness(
+  List<Map<String, dynamic>> cards,
+) {
+  final readiness = cards.map((card) {
+    final name = card['name']?.toString() ?? '';
+    final quantity = _quantity(card);
+    final battleRuleCount = _intValue(card['battle_rule_count']);
+    final verifiedBattleRuleCount =
+        _intValue(card['verified_battle_rule_count']);
+    final status = _cardBattleReadinessStatus(card);
+    final sourceCoverage = card['source_coverage'] is Map
+        ? (card['source_coverage'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+
+    return {
+      'schema_version': 'card_battle_readiness_v1_2026-07-01',
+      'card_id': card['id']?.toString() ?? '',
+      'name': name,
+      'quantity': quantity,
+      'is_commander': card['is_commander'] == true,
+      'status': status,
+      'status_label': _cardBattleReadinessLabel(status),
+      'battle_rule_count': battleRuleCount,
+      'verified_battle_rule_count': verifiedBattleRuleCount,
+      'source_coverage': sourceCoverage,
+      'detail': _cardBattleReadinessDetail(
+        status: status,
+        verifiedBattleRuleCount: verifiedBattleRuleCount,
+        battleRuleCount: battleRuleCount,
+      ),
+      'disclaimer':
+          'Badge conservador: indica cobertura de regra/battle no backend, nao garantia de simulacao perfeita.',
+    };
+  }).toList(growable: false);
+
+  final sorted = [...readiness];
+  sorted.sort((a, b) {
+    final commanderCompare = (b['is_commander'] == true ? 1 : 0) -
+        (a['is_commander'] == true ? 1 : 0);
+    if (commanderCompare != 0) return commanderCompare;
+    return (a['name']?.toString() ?? '').compareTo(b['name']?.toString() ?? '');
+  });
+  return sorted;
+}
+
 Map<String, dynamic> _buildBattleReadinessSummary(
   List<Map<String, dynamic>> cards,
 ) {
@@ -722,6 +768,51 @@ Map<String, dynamic> _buildBattleReadinessSummary(
     'disclaimer':
         'Battle readiness indica suporte verificado do runtime quando existe; nao significa simulacao perfeita de todas as cartas.',
   };
+}
+
+String _cardBattleReadinessStatus(Map<String, dynamic> card) {
+  final oracleText = card['oracle_text']?.toString().trim() ?? '';
+  final battleRuleCount = _intValue(card['battle_rule_count']);
+  final verifiedBattleRuleCount = _intValue(card['verified_battle_rule_count']);
+
+  if (verifiedBattleRuleCount > 0) return 'verified_simulation';
+  if (battleRuleCount > 0) return 'partial_simulation';
+  if (oracleText.isNotEmpty) return 'pending_adapter';
+  return 'rules_text_only';
+}
+
+String _cardBattleReadinessLabel(String status) {
+  switch (status) {
+    case 'verified_simulation':
+      return 'Simulação verificada';
+    case 'partial_simulation':
+      return 'Simulação parcial';
+    case 'pending_adapter':
+      return 'Adaptador pendente';
+    case 'rules_text_only':
+      return 'Texto de regra';
+    default:
+      return 'Sem leitura';
+  }
+}
+
+String _cardBattleReadinessDetail({
+  required String status,
+  required int verifiedBattleRuleCount,
+  required int battleRuleCount,
+}) {
+  switch (status) {
+    case 'verified_simulation':
+      return '$verifiedBattleRuleCount regra(s) verificadas para battle.';
+    case 'partial_simulation':
+      return '$battleRuleCount regra(s) mapeadas, ainda sem verificação completa.';
+    case 'pending_adapter':
+      return 'Texto Oracle presente, mas sem adaptador battle verificado.';
+    case 'rules_text_only':
+      return 'Sem texto Oracle ou regra battle suficiente para simulação.';
+    default:
+      return 'Sem leitura de battle para esta carta.';
+  }
 }
 
 Map<String, dynamic> _buildUnderstandingSummary({

@@ -410,6 +410,34 @@ void main() {
             'pending_adapter': ['Pteramander'],
           },
         },
+        'card_battle_readiness': [
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'cmdr',
+            'name': 'Talrand, Sky Summoner',
+            'quantity': 1,
+            'is_commander': true,
+            'status': 'verified_simulation',
+            'status_label': 'Simulação verificada',
+            'battle_rule_count': 2,
+            'verified_battle_rule_count': 1,
+            'source_coverage': {'has_verified_battle_rules': true},
+            'detail': '1 regra verificada para battle.',
+          },
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'ptera',
+            'name': 'Pteramander',
+            'quantity': 34,
+            'is_commander': false,
+            'status': 'pending_adapter',
+            'status_label': 'Adaptador pendente',
+            'battle_rule_count': 0,
+            'verified_battle_rule_count': 0,
+            'source_coverage': {},
+            'detail': 'Texto Oracle presente.',
+          },
+        ],
         'understanding_summary': {
           'schema_version': 'deck_understanding_summary_v1_2026-07-01',
           'source': 'card_intelligence_snapshot',
@@ -491,6 +519,19 @@ void main() {
       expect(find.text('Plano Commander'), findsOneWidget);
       expect(find.text('Pronto para battle gate'), findsOneWidget);
       expect(find.text('Battle gate: Pendente'), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-card-battle-readiness-badges')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle por carta'), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('deck-card-battle-readiness-Talrand, Sky Summoner'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Simulação verificada'), findsOneWidget);
+      expect(find.text('Adaptador pendente'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
