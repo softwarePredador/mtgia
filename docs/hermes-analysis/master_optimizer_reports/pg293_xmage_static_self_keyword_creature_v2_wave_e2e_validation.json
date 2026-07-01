@@ -1,0 +1,2952 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T09:48:57.550634+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg293_xmage_static_self_keyword_creature_v2_wave_manifest.json",
+  "package_id": "pg293_xmage_static_self_keyword_creature_v2_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 85
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Angelic Wall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+          "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Anvilwrought Raptor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Archers of Qarsi",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Ascended Lawmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Aven Fleetwing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Bassara Tower Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b985c8afe3cee5239512126646ae5a1d",
+          "oracle_hash": "eb029ed2d7332d82ddfb0a3960a6bf52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Benthic Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Boros Recruit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+          "oracle_hash": "7e9d28d9bb393d84347ae81297a21f8e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Cloud Crusader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Cold-Water Snapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Conifer Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Consulate Skygate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Copper Host Crusher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+          "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Daggerdrome Imp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Darksteel Gargoyle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+          "oracle_hash": "c1c35491453d7994da7a573f25b937b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Darksteel Myr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9",
+          "oracle_hash": "7dd3906f42df1ac5364b28969f62ea9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Dawnstrike Paladin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869",
+          "oracle_hash": "5d557f45692ae19657cdec6ba5053d52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deadly Insect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deadly Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deathgaze Cockatrice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deft Duelist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:491dafd573860ac3df2e157dfe995c38",
+          "oracle_hash": "2b1a88c1f32e65e2c036439022ef4688",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Elvish Lookout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Giant Solifuge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:940d079dd113c93d3b21bd9ae8bde994",
+          "oracle_hash": "79d577c0db10717419325924825c28f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Gladecover Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Grendel, Spawn of Knull",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "077677c4eec459eaabc4fc3c72f8ee51",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Griffin Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Hawkeater Moth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+          "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Healer's Hawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Humble Budoka",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Humongulus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kalonian Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kederekt Creeper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b4f0544c5b93d915e081cf10bc61d4c",
+          "oracle_hash": "04b94ea4bd680bbf1f56a3799303655e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kessig Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Knight of Meadowgrain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5918a1a9677ea32765e8beaee7cc1f97",
+          "oracle_hash": "a97a51d8c329258749b45d800fae64c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kodama of the North Tree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51284c5c397a8e4e2a62a56cd45efabe",
+          "oracle_hash": "a26969a67ffeb050eb7075483a2eba27",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Lightning Stormkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3",
+          "oracle_hash": "06c7ee5f130fba7e5b6894720665f3ff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Midnight Assassin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Mist Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Monster Mashup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+          "oracle_hash": "0ef14cd5dfd68e86721d6b54d040c864",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Nightveil Predator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+          "oracle_hash": "0386f0160bd05b6ff392414aaf23531d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Pegasus Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Peregrine Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Pincher Beetles",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Plated Crusher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+          "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Plated Slagwurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Porcelain Legionnaire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+          "oracle_hash": "6004a621673a1e45bcd26f2564ea14d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Primal Huntbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Razorfoot Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Relic Sloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f924eb92c16aaf3e960985ebdf0f9fb7",
+          "oracle_hash": "2966277efe8158a3183f75a0d5a0b466",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Resistance Skywarden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+          "oracle_hash": "bbfe14ceb0430f14ffbed5e95eb613f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Rubbleback Rhino",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Sacred Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Scaled Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Seraph of the Suns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+          "oracle_hash": "1cd0f63d0735e8dd564d4e3c59319a38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Serra Angel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Simic Sky Swallower",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f9a8f6f967583dc772e67c5f37c25728",
+          "oracle_hash": "2b4471b7bd408d4108fbb84ddc8b209a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skyshroud Falcon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "e1528476f4465cfb54a103159363cabe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skysnare Spider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c",
+          "oracle_hash": "131fe24ee7ad32bc324d61e392966454",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skyspear Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2d338e4620590b1267116f689ad9de65",
+          "oracle_hash": "b776f5c6af902f6ca22891f6466f37dc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Slash Panther",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
+          "oracle_hash": "acd489bf8e6a4f4a58889135fd728248",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Slippery Bogle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Soul of the Rapids",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Spined Thopter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
+          "oracle_hash": "8c44476226e6bb84584f5ad380fb8120",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Sungrace Pegasus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Swiftblade Vindicator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25f83ff390db24d119084aa01280d30a",
+          "oracle_hash": "4bf30b22e2e301dbdc562ddf14d93916",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Tajuru Pathwarden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48",
+          "oracle_hash": "6cb942574b2fdebbc6d1cdb692accb6a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Taoist Hermit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "The Terror of Serpent's Pass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Thornweald Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Thundering Tanadon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
+          "oracle_hash": "8afcd78935ed974ae73286920eef92da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Tidehollow Strix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vampire Nighthawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51140e79ce351bf2b80077d0fea65a9a",
+          "oracle_hash": "be6a89a4d8c0984a2cca5f6b8486b5f9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vampire of the Dire Moon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:133a7b88ecdd416c6985848aa6797731",
+          "oracle_hash": "e8ee2f646605fe68bcfde9b3a5102901",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vault Skirge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "31df3e49b8917c164c8c0ac303fb41b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Venomthrope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+          "oracle_hash": "5ae2051ac260f269b9f2f01b4aa288d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Denial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:613f578399a838c542c8aee2f2648adf",
+          "oracle_hash": "6a1e87280e8b82b2a81ab865a0378a2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Razors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+          "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Spears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+          "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Swords",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+          "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Vines",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "d83308a1bfb0cb5f22db4670d3334d6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wardscale Crocodile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wind Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e",
+          "oracle_hash": "ffd969ec7b7f72e7e1e71b9031a0907d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wrecking Crew",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:44e84ac245ac00f6728ae9fed0542716",
+          "oracle_hash": "8f6dda447be5aca51d3b5bb3f80538ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Zephid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+          "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Zetalpa, Primal Dawn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4419f452779e337103ec339acffee21",
+          "oracle_hash": "08caa42e66609cdd65188918e8043f01",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 85
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Angelic Wall",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+          "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Anvilwrought Raptor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Archers of Qarsi",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Ascended Lawmage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Aven Fleetwing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Bassara Tower Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b985c8afe3cee5239512126646ae5a1d",
+          "oracle_hash": "eb029ed2d7332d82ddfb0a3960a6bf52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Benthic Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Boros Recruit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+          "oracle_hash": "7e9d28d9bb393d84347ae81297a21f8e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Cloud Crusader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Cold-Water Snapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Conifer Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Consulate Skygate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Copper Host Crusher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+          "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Daggerdrome Imp",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Darksteel Gargoyle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+          "oracle_hash": "c1c35491453d7994da7a573f25b937b3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Darksteel Myr",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9",
+          "oracle_hash": "7dd3906f42df1ac5364b28969f62ea9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Dawnstrike Paladin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869",
+          "oracle_hash": "5d557f45692ae19657cdec6ba5053d52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deadly Insect",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deadly Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deathgaze Cockatrice",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Deft Duelist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:491dafd573860ac3df2e157dfe995c38",
+          "oracle_hash": "2b1a88c1f32e65e2c036439022ef4688",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Elvish Lookout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Giant Solifuge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:940d079dd113c93d3b21bd9ae8bde994",
+          "oracle_hash": "79d577c0db10717419325924825c28f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Gladecover Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Grendel, Spawn of Knull",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "077677c4eec459eaabc4fc3c72f8ee51",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Griffin Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Hawkeater Moth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+          "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Healer's Hawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Humble Budoka",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Humongulus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kalonian Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kederekt Creeper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7b4f0544c5b93d915e081cf10bc61d4c",
+          "oracle_hash": "04b94ea4bd680bbf1f56a3799303655e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kessig Recluse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Knight of Meadowgrain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5918a1a9677ea32765e8beaee7cc1f97",
+          "oracle_hash": "a97a51d8c329258749b45d800fae64c8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Kodama of the North Tree",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51284c5c397a8e4e2a62a56cd45efabe",
+          "oracle_hash": "a26969a67ffeb050eb7075483a2eba27",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Lightning Stormkin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3",
+          "oracle_hash": "06c7ee5f130fba7e5b6894720665f3ff",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Midnight Assassin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Mist Leopard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Monster Mashup",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+          "oracle_hash": "0ef14cd5dfd68e86721d6b54d040c864",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Nightveil Predator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+          "oracle_hash": "0386f0160bd05b6ff392414aaf23531d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Pegasus Charger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Peregrine Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Pincher Beetles",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+          "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Plated Crusher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+          "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Plated Slagwurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Porcelain Legionnaire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+          "oracle_hash": "6004a621673a1e45bcd26f2564ea14d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Primal Huntbeast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Razorfoot Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+          "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Relic Sloth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f924eb92c16aaf3e960985ebdf0f9fb7",
+          "oracle_hash": "2966277efe8158a3183f75a0d5a0b466",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Resistance Skywarden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+          "oracle_hash": "bbfe14ceb0430f14ffbed5e95eb613f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Rubbleback Rhino",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Sacred Wolf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Scaled Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Seraph of the Suns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+          "oracle_hash": "1cd0f63d0735e8dd564d4e3c59319a38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Serra Angel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Simic Sky Swallower",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f9a8f6f967583dc772e67c5f37c25728",
+          "oracle_hash": "2b4471b7bd408d4108fbb84ddc8b209a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skyshroud Falcon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+          "oracle_hash": "e1528476f4465cfb54a103159363cabe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skysnare Spider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c",
+          "oracle_hash": "131fe24ee7ad32bc324d61e392966454",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Skyspear Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2d338e4620590b1267116f689ad9de65",
+          "oracle_hash": "b776f5c6af902f6ca22891f6466f37dc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Slash Panther",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
+          "oracle_hash": "acd489bf8e6a4f4a58889135fd728248",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Slippery Bogle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Soul of the Rapids",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+          "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Spined Thopter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
+          "oracle_hash": "8c44476226e6bb84584f5ad380fb8120",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Sungrace Pegasus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Swiftblade Vindicator",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25f83ff390db24d119084aa01280d30a",
+          "oracle_hash": "4bf30b22e2e301dbdc562ddf14d93916",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Tajuru Pathwarden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48",
+          "oracle_hash": "6cb942574b2fdebbc6d1cdb692accb6a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Taoist Hermit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "The Terror of Serpent's Pass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Thornweald Archer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+          "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Thundering Tanadon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
+          "oracle_hash": "8afcd78935ed974ae73286920eef92da",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Tidehollow Strix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+          "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vampire Nighthawk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:51140e79ce351bf2b80077d0fea65a9a",
+          "oracle_hash": "be6a89a4d8c0984a2cca5f6b8486b5f9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vampire of the Dire Moon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:133a7b88ecdd416c6985848aa6797731",
+          "oracle_hash": "e8ee2f646605fe68bcfde9b3a5102901",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Vault Skirge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+          "oracle_hash": "31df3e49b8917c164c8c0ac303fb41b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Venomthrope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+          "oracle_hash": "5ae2051ac260f269b9f2f01b4aa288d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Denial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:613f578399a838c542c8aee2f2648adf",
+          "oracle_hash": "6a1e87280e8b82b2a81ab865a0378a2c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Razors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+          "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Spears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+          "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Swords",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+          "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wall of Vines",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+          "oracle_hash": "d83308a1bfb0cb5f22db4670d3334d6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wardscale Crocodile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+          "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wind Spirit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e",
+          "oracle_hash": "ffd969ec7b7f72e7e1e71b9031a0907d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Wrecking Crew",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:44e84ac245ac00f6728ae9fed0542716",
+          "oracle_hash": "8f6dda447be5aca51d3b5bb3f80538ea",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Zephid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+          "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "card_name": "Zetalpa, Primal Dawn",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4419f452779e337103ec339acffee21",
+          "oracle_hash": "08caa42e66609cdd65188918e8043f01",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 85
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Angelic Wall",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anvilwrought Raptor",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Archers of Qarsi",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ascended Lawmage",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven Fleetwing",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bassara Tower Archer",
+          "logical_rule_key": "battle_rule_v1:b985c8afe3cee5239512126646ae5a1d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Benthic Giant",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boros Recruit",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cloud Crusader",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cold-Water Snapper",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Conifer Strider",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Consulate Skygate",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Copper Host Crusher",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Daggerdrome Imp",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Darksteel Gargoyle",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Darksteel Myr",
+          "logical_rule_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dawnstrike Paladin",
+          "logical_rule_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deadly Insect",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deadly Recluse",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathgaze Cockatrice",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deft Duelist",
+          "logical_rule_key": "battle_rule_v1:491dafd573860ac3df2e157dfe995c38"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elvish Lookout",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Giant Solifuge",
+          "logical_rule_key": "battle_rule_v1:940d079dd113c93d3b21bd9ae8bde994"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gladecover Scout",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grendel, Spawn of Knull",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Griffin Sentinel",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hawkeater Moth",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Healer's Hawk",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Humble Budoka",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Humongulus",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kalonian Behemoth",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kederekt Creeper",
+          "logical_rule_key": "battle_rule_v1:7b4f0544c5b93d915e081cf10bc61d4c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kessig Recluse",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Knight of Meadowgrain",
+          "logical_rule_key": "battle_rule_v1:5918a1a9677ea32765e8beaee7cc1f97"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kodama of the North Tree",
+          "logical_rule_key": "battle_rule_v1:51284c5c397a8e4e2a62a56cd45efabe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lightning Stormkin",
+          "logical_rule_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Midnight Assassin",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mist Leopard",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Monster Mashup",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nightveil Predator",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pegasus Charger",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Peregrine Griffin",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pincher Beetles",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plated Crusher",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plated Slagwurm",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Porcelain Legionnaire",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Primal Huntbeast",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Razorfoot Griffin",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Relic Sloth",
+          "logical_rule_key": "battle_rule_v1:f924eb92c16aaf3e960985ebdf0f9fb7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Resistance Skywarden",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rubbleback Rhino",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sacred Wolf",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scaled Behemoth",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seraph of the Suns",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Serra Angel",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Simic Sky Swallower",
+          "logical_rule_key": "battle_rule_v1:f9a8f6f967583dc772e67c5f37c25728"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skyshroud Falcon",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skysnare Spider",
+          "logical_rule_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skyspear Cavalry",
+          "logical_rule_key": "battle_rule_v1:2d338e4620590b1267116f689ad9de65"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slash Panther",
+          "logical_rule_key": "battle_rule_v1:33e1dd27537361327415a737afccc230"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slippery Bogle",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soul of the Rapids",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spined Thopter",
+          "logical_rule_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sungrace Pegasus",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Swiftblade Vindicator",
+          "logical_rule_key": "battle_rule_v1:25f83ff390db24d119084aa01280d30a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tajuru Pathwarden",
+          "logical_rule_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Taoist Hermit",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "The Terror of Serpent's Pass",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thornweald Archer",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thundering Tanadon",
+          "logical_rule_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tidehollow Strix",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vampire Nighthawk",
+          "logical_rule_key": "battle_rule_v1:51140e79ce351bf2b80077d0fea65a9a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vampire of the Dire Moon",
+          "logical_rule_key": "battle_rule_v1:133a7b88ecdd416c6985848aa6797731"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vault Skirge",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Venomthrope",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Denial",
+          "logical_rule_key": "battle_rule_v1:613f578399a838c542c8aee2f2648adf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Razors",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Spears",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Swords",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wall of Vines",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wardscale Crocodile",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wind Spirit",
+          "logical_rule_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wrecking Crew",
+          "logical_rule_key": "battle_rule_v1:44e84ac245ac00f6728ae9fed0542716"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zephid",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zetalpa, Primal Dawn",
+          "logical_rule_key": "battle_rule_v1:f4419f452779e337103ec339acffee21"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 85
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Angelic Wall",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Anvilwrought Raptor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Archers of Qarsi",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ascended Lawmage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Aven Fleetwing",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bassara Tower Archer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b985c8afe3cee5239512126646ae5a1d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Benthic Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Boros Recruit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cloud Crusader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cold-Water Snapper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Conifer Strider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Consulate Skygate",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Copper Host Crusher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Daggerdrome Imp",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Darksteel Gargoyle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Darksteel Myr",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dawnstrike Paladin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deadly Insect",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deadly Recluse",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathgaze Cockatrice",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deft Duelist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:491dafd573860ac3df2e157dfe995c38"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elvish Lookout",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Giant Solifuge",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:940d079dd113c93d3b21bd9ae8bde994"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gladecover Scout",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grendel, Spawn of Knull",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Griffin Sentinel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hawkeater Moth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Healer's Hawk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Humble Budoka",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Humongulus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kalonian Behemoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kederekt Creeper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7b4f0544c5b93d915e081cf10bc61d4c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kessig Recluse",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Knight of Meadowgrain",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5918a1a9677ea32765e8beaee7cc1f97"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kodama of the North Tree",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:51284c5c397a8e4e2a62a56cd45efabe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lightning Stormkin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Midnight Assassin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mist Leopard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Monster Mashup",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nightveil Predator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pegasus Charger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Peregrine Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pincher Beetles",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plated Crusher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plated Slagwurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Porcelain Legionnaire",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Primal Huntbeast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Razorfoot Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Relic Sloth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f924eb92c16aaf3e960985ebdf0f9fb7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Resistance Skywarden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rubbleback Rhino",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sacred Wolf",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scaled Behemoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seraph of the Suns",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Serra Angel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Simic Sky Swallower",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f9a8f6f967583dc772e67c5f37c25728"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skyshroud Falcon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skysnare Spider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skyspear Cavalry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2d338e4620590b1267116f689ad9de65"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slash Panther",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:33e1dd27537361327415a737afccc230"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slippery Bogle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soul of the Rapids",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spined Thopter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sungrace Pegasus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Swiftblade Vindicator",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:25f83ff390db24d119084aa01280d30a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tajuru Pathwarden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Taoist Hermit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "The Terror of Serpent's Pass",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thornweald Archer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thundering Tanadon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tidehollow Strix",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vampire Nighthawk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:51140e79ce351bf2b80077d0fea65a9a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vampire of the Dire Moon",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:133a7b88ecdd416c6985848aa6797731"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vault Skirge",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Venomthrope",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Denial",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:613f578399a838c542c8aee2f2648adf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Razors",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Spears",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Swords",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wall of Vines",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wardscale Crocodile",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wind Spirit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wrecking Crew",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:44e84ac245ac00f6728ae9fed0542716"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zephid",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zetalpa, Primal Dawn",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f4419f452779e337103ec339acffee21"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

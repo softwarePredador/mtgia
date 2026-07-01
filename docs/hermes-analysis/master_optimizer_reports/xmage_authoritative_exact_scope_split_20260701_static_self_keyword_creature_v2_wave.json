@@ -1,0 +1,4192 @@
+{
+  "blocked_samples": {
+    "add_counters_ability_class_not_simple": [
+      "Earthen Arms",
+      "Nature's Panoply",
+      "Stinging Shot",
+      "Travel Preparations"
+    ],
+    "add_counters_counter_not_fixed": [
+      "Common Bond",
+      "Gird for Battle",
+      "Incremental Blight",
+      "Incremental Growth",
+      "Reap What Is Sown",
+      "River Heralds' Boon",
+      "Stand Together",
+      "Strength of Solidarity"
+    ],
+    "add_counters_effect_class_not_pure": [
+      "Aggressive Negotiations",
+      "Ajani's Influence",
+      "Ancient Animus",
+      "Awakening of Vitu-Ghazi",
+      "Azula Always Lies",
+      "Biogenic Upgrade",
+      "Blur of Blades",
+      "Boon of Safety",
+      "Clash of the Eikons",
+      "Clockspinning",
+      "Courage in Crisis",
+      "Domri's Ambush"
+    ],
+    "add_counters_oracle_not_simple": [
+      "Protection Magic"
+    ],
+    "add_counters_target_not_supported": [
+      "Thrive",
+      "Unexpected Fangs"
+    ],
+    "additional_cost_detected": [
+      "Abjure",
+      "Acceptable Losses",
+      "Aether Tide",
+      "Altar's Reap",
+      "Angelic Purge",
+      "Annihilating Glare",
+      "Artillerize",
+      "Bankrupt in Blood",
+      "Betrayer's Bargain",
+      "Bitter Triumph",
+      "Blood Divination",
+      "Blood for Bones"
+    ],
+    "board_wipe_ability_class_not_simple": [
+      "Akroma's Vengeance",
+      "Artistic Process",
+      "Blasphemous Edict",
+      "Boiling Earth",
+      "Burn Down the House",
+      "Cinderclasm",
+      "Claws of Wirewood",
+      "Crush the Weak",
+      "Deafening Clarion",
+      "Devastating Mastery",
+      "Doomskar",
+      "Dusk // Dawn"
+    ],
+    "board_wipe_damage_amount_not_fixed": [
+      "Calamitous Cave-In",
+      "Chain Reaction",
+      "Corrosive Gale",
+      "Gates Ablaze",
+      "Immolating Gyre",
+      "Radiant Flames",
+      "Savage Twister",
+      "Skyreaping",
+      "Windstorm"
+    ],
+    "board_wipe_damage_scope_not_supported": [
+      "Breath Weapon",
+      "Evaporate",
+      "Fiery Cannonade",
+      "Gale Force",
+      "Incandescent Aria",
+      "Inflame",
+      "Kaervek's Hex",
+      "Marrow Shards",
+      "Rain of Blades",
+      "Sandstorm",
+      "Squall",
+      "Warpath"
+    ],
+    "board_wipe_destroy_scope_not_supported": [
+      "Acid Rain",
+      "Anarchy",
+      "Boil",
+      "Boiling Seas",
+      "Citywide Bust",
+      "Cleanse",
+      "Consume the Meek",
+      "Culling Sun",
+      "Damning Verdict",
+      "Extinguish All Hope",
+      "Fight to the Death",
+      "Flashfires"
+    ],
+    "board_wipe_effect_class_not_supported": [
+      "Balancing Act",
+      "Barter in Blood",
+      "Bend or Break",
+      "Blood Money",
+      "Bontu's Last Reckoning",
+      "Burning of Xinye",
+      "By Invitation Only",
+      "Call to the Void",
+      "Cataclysm",
+      "Catastrophe",
+      "Ceaseless Conflict",
+      "Celestial Judgment"
+    ],
+    "board_wipe_oracle_not_simple": [
+      "Anger of the Gods",
+      "Barrage of Boulders",
+      "Blood on the Snow",
+      "Breaking Point",
+      "Brotherhood's End",
+      "Calming Verse",
+      "Cleansing Meditation",
+      "Cleansing Nova",
+      "Crisis of Conscience",
+      "Crux of Fate",
+      "Fated Retribution",
+      "Final Act"
+    ],
+    "boost_target_source_not_single_fixed": [
+      "Accelerated Mutation",
+      "Agony Warp",
+      "Allied Assault",
+      "Bloodcurdling Scream",
+      "Bounty of Might",
+      "capital offense",
+      "Dauntless Onslaught",
+      "Death Wind",
+      "Defile",
+      "Desert's Due",
+      "Drag Down",
+      "Enrage"
+    ],
+    "bounce_ability_class_not_simple": [
+      "Alchemist's Retrieval",
+      "Capsize",
+      "Champion's Victory",
+      "Clutch of Currents",
+      "Command of Unsummoning",
+      "Consuming Vortex",
+      "Dematerialize",
+      "Deny Reality",
+      "Depart the Realm",
+      "Essence Fracture",
+      "Floodwaters",
+      "Into Thin Air"
+    ],
+    "bounce_effect_class_not_pure": [
+      "Absorb Identity",
+      "Alley Evasion",
+      "Applied Biomancy",
+      "Banishing Betrayal",
+      "Baral's Expertise",
+      "Barrin's Unmaking",
+      "Boing!",
+      "Brutal Expulsion",
+      "Callous Dismissal",
+      "Clutch of the Undercity",
+      "Consign // Oblivion",
+      "Dead // Gone"
+    ],
+    "bounce_target_not_supported": [
+      "Aether Gale",
+      "Aether Tradewinds",
+      "Bounce Off",
+      "Captivating Gyre",
+      "Churning Eddy",
+      "Counterintelligence",
+      "Cut the Earthly Bond",
+      "Distorting Wake",
+      "Hoodwink",
+      "Into the Void",
+      "Peel from Reality",
+      "Quicksilver Geyser"
+    ],
+    "counter_ability_class_not_simple": [
+      "Admiral's Order",
+      "Broken Concentration",
+      "Consign to Memory",
+      "Controvert",
+      "Fervent Denial",
+      "Forbid",
+      "Forceful Denial",
+      "Last Word",
+      "Long River's Pull",
+      "Muddle the Mixture",
+      "Neutralize",
+      "Out of Bounds"
+    ],
+    "counter_effect_class_not_pure": [
+      "Amazing Acrobatics",
+      "Bar the Gate",
+      "Bring the Ending",
+      "Confirm Suspicions",
+      "Countersquall",
+      "Dawn Charm",
+      "Deny the Witch",
+      "Didn't Say Please",
+      "Discombobulate",
+      "Dissolve",
+      "Ertai's Trickery",
+      "Essence Capture"
+    ],
+    "counter_oracle_not_simple": [
+      "Change the Equation",
+      "Spell Blast"
+    ],
+    "counter_target_not_supported": [
+      "Avoid Fate",
+      "Ceremonious Rejection",
+      "Disallow",
+      "Disdainful Stroke",
+      "Double Negative",
+      "Flashfreeze",
+      "Frazzle",
+      "Guttural Response",
+      "Hisoka's Defiance",
+      "Intervene",
+      "Minor Misstep",
+      "Mystic Denial"
+    ],
+    "damage_amount_not_fixed": [
+      "Armed Response",
+      "Artillery Blast",
+      "Blaze",
+      "Clan Defiance",
+      "Devil's Play",
+      "Divine Retribution",
+      "Dogpile",
+      "Earth Tremor",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Fanning the Flames",
+      "Feedback Bolt"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Bolt of Keranos",
+      "Bot Bashing Time",
+      "Brimstone Volley"
+    ],
+    "damage_target_not_supported": [
+      "Arrows of Justice",
+      "Burning Oil",
+      "Consuming Bonfire",
+      "Cosmium Blast",
+      "Divine Arrow",
+      "Dragon's Presence",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Gideon's Reproach",
+      "Hamato Ninp\u014d",
+      "Impeccable Timing",
+      "Iron Verdict"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Artisan's Sorrow",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle"
+    ],
+    "destroy_target_not_supported": [
+      "Asphyxiate",
+      "Assassin's Blade",
+      "Assassinate",
+      "Avalanche",
+      "Bramblecrush",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Crush",
+      "Curtains' Call"
+    ],
+    "draw_effect_class_not_pure": [
+      "Aang's Defense",
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afflict",
+      "Afterlife Insurance",
+      "Aggressive Urge",
+      "Airbending Lesson",
+      "Allied Strategies",
+      "Amass the Components",
+      "Ambition's Cost"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Devout Decree",
+      "Dispatch"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_target_not_supported": [
+      "Blade Banish",
+      "Blazing Hope",
+      "Bring to Trial",
+      "Celestial Purge",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Epic Downfall",
+      "Excoriate",
+      "Exorcise",
+      "Expel"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Aerial Assault",
+      "Aerial Predation",
+      "Agonizing Syphon",
+      "Appetite for the Unnatural",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Abzan Banner",
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "All-Fates Scroll",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Animal Attendant",
+      "Arcum's Astrolabe",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Agent of Stromgald",
+      "Apprentice Wizard",
+      "Arc Reactor",
+      "Basal Thrull",
+      "Black Lotus",
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Blood Pet",
+      "Blood Vassal",
+      "Bog Initiate",
+      "Bog Witch",
+      "Catalyst Elemental"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aang, A Lot to Learn",
+      "Abandoned Sarcophagus",
+      "Aberrant",
+      "Aberrant Mind Sorcerer",
+      "Abhorrent Oculus",
+      "Abiding Grace",
+      "Abigale, Poet Laureate // Heroic Stanza",
+      "Abomination",
+      "Abomination of Llanowar",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abu Ja'far"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "All Hallow's Eve",
+      "Anzrag's Rampage",
+      "Arm with Aether",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Back for More",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind"
+    ],
+    "recursion_ability_class_not_simple": [
+      "Blood Beckoning",
+      "Call to the Netherworld",
+      "Dead Revels",
+      "Disturbed Burial",
+      "Grim Harvest",
+      "Life from the Loam",
+      "Morgue Theft",
+      "Mystic Retrieval",
+      "Peerless Recycling",
+      "Sacred Excavation",
+      "Soulless Revival",
+      "Unmake the Graves"
+    ],
+    "recursion_effect_class_not_pure": [
+      "Aberrant Return",
+      "Abuelo's Awakening",
+      "Accumulate Wisdom",
+      "Aether Burst",
+      "Aether Helix",
+      "Afterlife from the Loam",
+      "Agonizing Remorse",
+      "All Suns' Dawn",
+      "Animal Magnetism",
+      "Animist's Awakening",
+      "Another Chance",
+      "Anticognition"
+    ],
+    "recursion_oracle_not_simple": [
+      "Aid the Fallen",
+      "Fortuitous Find",
+      "Ghoulcaller's Chant",
+      "Grim Discovery",
+      "March of the Drowned",
+      "Raise the Draugr",
+      "Remember the Fallen",
+      "Return from Extinction",
+      "Reviving Melody",
+      "Season of Renewal",
+      "Survivors' Bond",
+      "Unbury"
+    ],
+    "recursion_target_not_supported": [
+      "Aphetto Dredging",
+      "Boggart Birth Rite",
+      "Death Denied",
+      "Death's Duet",
+      "Reborn Hope",
+      "Revive",
+      "Rise from the Wreck",
+      "Rogues' Gallery"
+    ],
+    "static_keyword_not_creature": [
+      "Darksteel Relic",
+      "Monster Mash-Up"
+    ]
+  },
+  "generated_at": "2026-07-01T09:48:22+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
+    "supported_adapter_work_units": [
+      "add_counters::targeted_add_counters_variant_v1",
+      "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "bounce::targeted_return_to_hand_variant_v1",
+      "counter_spell::counter_target_stack_object_variant_v1",
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "recursion::xmage_graveyard_return_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1",
+      "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting"
+    ],
+    "supported_dynamic_adapter_work_units": [
+      "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d0d2ac66-7b31-4dfe-8ba6-610f2aa5bb88",
+      "card_name": "Angelic Wall",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+      "normalized_name": "angelic wall",
+      "notes": "XMage authoritative exact-scope split: local class AngelicWall translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AngelicWall",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AngelicWall.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d2cea66f-1c5d-4175-aed3-0c3928934d7b",
+      "card_name": "Anvilwrought Raptor",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flying": true,
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+      "normalized_name": "anvilwrought raptor",
+      "notes": "XMage authoritative exact-scope split: local class AnvilwroughtRaptor translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AnvilwroughtRaptor",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AnvilwroughtRaptor.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1e198092-3659-4e82-bd3a-72e191e81885",
+      "card_name": "Archers of Qarsi",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "keywords": [
+          "reach",
+          "defender"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+      "normalized_name": "archers of qarsi",
+      "notes": "XMage authoritative exact-scope split: local class ArchersOfQarsi translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ArchersOfQarsi",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/ArchersOfQarsi.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "c367ac1c-a551-4d31-88fe-3118430e6d1c",
+      "card_name": "Ascended Lawmage",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "hexproof": true,
+        "keywords": [
+          "flying",
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+      "normalized_name": "ascended lawmage",
+      "notes": "XMage authoritative exact-scope split: local class AscendedLawmage translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AscendedLawmage",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AscendedLawmage.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4a6731cc-0357-43cf-9ac2-39ff9fbc5465",
+      "card_name": "Aven Fleetwing",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "hexproof": true,
+        "keywords": [
+          "flying",
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+      "normalized_name": "aven fleetwing",
+      "notes": "XMage authoritative exact-scope split: local class AvenFleetwing translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AvenFleetwing",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AvenFleetwing.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "38063b6b-bb24-439e-b7e5-b7a3806f6e9b",
+      "card_name": "Bassara Tower Archer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "reach",
+          "hexproof"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "HexproofAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:b985c8afe3cee5239512126646ae5a1d",
+      "normalized_name": "bassara tower archer",
+      "notes": "XMage authoritative exact-scope split: local class BassaraTowerArcher translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eb029ed2d7332d82ddfb0a3960a6bf52",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BassaraTowerArcher",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BassaraTowerArcher.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "b757eba3-7d52-4557-bc9a-f21c344e422a",
+      "card_name": "Benthic Giant",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "benthic giant",
+      "notes": "XMage authoritative exact-scope split: local class BenthicGiant translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BenthicGiant",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BenthicGiant.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d12d719e-210b-447b-8aee-56949696623d",
+      "card_name": "Boros Recruit",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+      "normalized_name": "boros recruit",
+      "notes": "XMage authoritative exact-scope split: local class BorosRecruit translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "7e9d28d9bb393d84347ae81297a21f8e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BorosRecruit",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BorosRecruit.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "39a8ce14-64f6-42fb-8f36-15ae79075aee",
+      "card_name": "Cloud Crusader",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flying": true,
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+      "normalized_name": "cloud crusader",
+      "notes": "XMage authoritative exact-scope split: local class CloudCrusader translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CloudCrusader",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CloudCrusader.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "5e99a6e7-5587-49d4-af0b-8991d3500dbf",
+      "card_name": "Cold-Water Snapper",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "cold-water snapper",
+      "notes": "XMage authoritative exact-scope split: local class ColdWaterSnapper translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ColdWaterSnapper",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ColdWaterSnapper.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "221c4750-ec19-4a2d-9ddf-f255aaaae392",
+      "card_name": "Conifer Strider",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "conifer strider",
+      "notes": "XMage authoritative exact-scope split: local class ConiferStrider translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ConiferStrider",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ConiferStrider.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "8157c61a-fdf5-4ee5-8519-3ca29a5fd081",
+      "card_name": "Consulate Skygate",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "keywords": [
+          "reach",
+          "defender"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+      "normalized_name": "consulate skygate",
+      "notes": "XMage authoritative exact-scope split: local class ConsulateSkygate translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "bfb511415eeae2b10287c96c44bd4adf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ConsulateSkygate",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/ConsulateSkygate.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "992d739c-42ee-4062-8546-1726f4408d4f",
+      "card_name": "Copper Host Crusher",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "trample",
+          "hexproof"
+        ],
+        "trample": true,
+        "xmage_ability_classes": [
+          "HexproofAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+      "normalized_name": "copper host crusher",
+      "notes": "XMage authoritative exact-scope split: local class CopperHostCrusher translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CopperHostCrusher",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CopperHostCrusher.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d592ab21-d54f-4b0c-9f7c-982aa2bcd86f",
+      "card_name": "Daggerdrome Imp",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+      "normalized_name": "daggerdrome imp",
+      "notes": "XMage authoritative exact-scope split: local class DaggerdromeImp translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DaggerdromeImp",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DaggerdromeImp.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,IndestructibleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "bcb8be1a-61b6-4926-9f56-00727077a460",
+      "card_name": "Darksteel Gargoyle",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "indestructible": true,
+        "keywords": [
+          "flying",
+          "indestructible"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "IndestructibleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+      "normalized_name": "darksteel gargoyle",
+      "notes": "XMage authoritative exact-scope split: local class DarksteelGargoyle translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "c1c35491453d7994da7a573f25b937b3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DarksteelGargoyle",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DarksteelGargoyle.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::IndestructibleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "579852f8-8346-4466-811e-495825a24e04",
+      "card_name": "Darksteel Myr",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "indestructible": true,
+        "keywords": [
+          "indestructible"
+        ],
+        "xmage_ability_classes": [
+          "IndestructibleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:4861207cdea84c3f0de9c4492b7b9fb9",
+      "normalized_name": "darksteel myr",
+      "notes": "XMage authoritative exact-scope split: local class DarksteelMyr translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "7dd3906f42df1ac5364b28969f62ea9c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DarksteelMyr",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DarksteelMyr.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::LifelinkAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "23e36999-6299-47af-83eb-cbef25f2688a",
+      "card_name": "Dawnstrike Paladin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "lifelink",
+          "vigilance"
+        ],
+        "lifelink": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "LifelinkAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869",
+      "normalized_name": "dawnstrike paladin",
+      "notes": "XMage authoritative exact-scope split: local class DawnstrikePaladin translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "5d557f45692ae19657cdec6ba5053d52",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DawnstrikePaladin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DawnstrikePaladin.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d3e32572-36b3-4b85-bd07-4c430699e9f5",
+      "card_name": "Deadly Insect",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "deadly insect",
+      "notes": "XMage authoritative exact-scope split: local class DeadlyInsect translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DeadlyInsect",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeadlyInsect.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "07f42360-75ee-4312-820e-17467e0cfd69",
+      "card_name": "Deadly Recluse",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+      "normalized_name": "deadly recluse",
+      "notes": "XMage authoritative exact-scope split: local class DeadlyRecluse translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DeadlyRecluse",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeadlyRecluse.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "16b4f933-64d9-4a54-aa67-c7b29128a7ed",
+      "card_name": "Deathgaze Cockatrice",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+      "normalized_name": "deathgaze cockatrice",
+      "notes": "XMage authoritative exact-scope split: local class DeathgazeCockatrice translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DeathgazeCockatrice",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeathgazeCockatrice.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "e6af434f-fcc4-4a0d-bdcd-4690257975f0",
+      "card_name": "Deft Duelist",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike",
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:491dafd573860ac3df2e157dfe995c38",
+      "normalized_name": "deft duelist",
+      "notes": "XMage authoritative exact-scope split: local class DeftDuelist translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "2b1a88c1f32e65e2c036439022ef4688",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DeftDuelist",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DeftDuelist.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "8db7bb82-63c2-425c-92b6-f082da94872b",
+      "card_name": "Elvish Lookout",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "elvish lookout",
+      "notes": "XMage authoritative exact-scope split: local class ElvishLookout translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ElvishLookout",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/e/ElvishLookout.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "48e1e76e-fd7c-4e69-8292-d5df89dd6743",
+      "card_name": "Giant Solifuge",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "haste": true,
+        "keywords": [
+          "trample",
+          "haste",
+          "shroud"
+        ],
+        "shroud": true,
+        "trample": true,
+        "xmage_ability_classes": [
+          "HasteAbility",
+          "ShroudAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:940d079dd113c93d3b21bd9ae8bde994",
+      "normalized_name": "giant solifuge",
+      "notes": "XMage authoritative exact-scope split: local class GiantSolifuge translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "79d577c0db10717419325924825c28f5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GiantSolifuge",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GiantSolifuge.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4340e6fe-e95c-4d36-8f02-df8817697b1c",
+      "card_name": "Gladecover Scout",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "gladecover scout",
+      "notes": "XMage authoritative exact-scope split: local class GladecoverScout translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GladecoverScout",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GladecoverScout.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "f0963053-89d7-4819-978e-85b3d60db318",
+      "card_name": "Grendel, Spawn of Knull",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+      "normalized_name": "grendel, spawn of knull",
+      "notes": "XMage authoritative exact-scope split: local class GrendelSpawnOfKnull translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "077677c4eec459eaabc4fc3c72f8ee51",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GrendelSpawnOfKnull",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GrendelSpawnOfKnull.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "40df2598-d070-4f61-8b99-8434bd566887",
+      "card_name": "Griffin Sentinel",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+      "normalized_name": "griffin sentinel",
+      "notes": "XMage authoritative exact-scope split: local class GriffinSentinel translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GriffinSentinel",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GriffinSentinel.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "0aa7e17b-5203-4526-903c-afaf2e9b32d3",
+      "card_name": "Hawkeater Moth",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+      "normalized_name": "hawkeater moth",
+      "notes": "XMage authoritative exact-scope split: local class HawkeaterMoth translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HawkeaterMoth",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HawkeaterMoth.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1b83c976-a49a-4d78-bdd1-784955a6b1db",
+      "card_name": "Healer's Hawk",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+      "normalized_name": "healer's hawk",
+      "notes": "XMage authoritative exact-scope split: local class HealersHawk translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HealersHawk",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HealersHawk.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "35d56b5b-3115-416e-9730-68b830ee1507",
+      "card_name": "Humble Budoka",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "humble budoka",
+      "notes": "XMage authoritative exact-scope split: local class HumbleBudoka translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HumbleBudoka",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HumbleBudoka.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "5bcfc983-929b-4809-a523-eefe58fcbea5",
+      "card_name": "Humongulus",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "humongulus",
+      "notes": "XMage authoritative exact-scope split: local class Humongulus translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Humongulus",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/Humongulus.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "23caa502-9c75-4277-b338-ab0db71ef169",
+      "card_name": "Kalonian Behemoth",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "kalonian behemoth",
+      "notes": "XMage authoritative exact-scope split: local class KalonianBehemoth translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KalonianBehemoth",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KalonianBehemoth.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,MenaceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "b0d275a2-1424-41cf-bff6-9bf04150dae6",
+      "card_name": "Kederekt Creeper",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "menace"
+        ],
+        "menace": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "MenaceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:7b4f0544c5b93d915e081cf10bc61d4c",
+      "normalized_name": "kederekt creeper",
+      "notes": "XMage authoritative exact-scope split: local class KederektCreeper translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "04b94ea4bd680bbf1f56a3799303655e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KederektCreeper",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KederektCreeper.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ee54b206-029e-4cbf-9d22-4b46b6535656",
+      "card_name": "Kessig Recluse",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+      "normalized_name": "kessig recluse",
+      "notes": "XMage authoritative exact-scope split: local class KessigRecluse translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KessigRecluse",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KessigRecluse.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "c8df9702-a912-488e-8b60-6de89709c266",
+      "card_name": "Knight of Meadowgrain",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:5918a1a9677ea32765e8beaee7cc1f97",
+      "normalized_name": "knight of meadowgrain",
+      "notes": "XMage authoritative exact-scope split: local class KnightOfMeadowgrain translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a97a51d8c329258749b45d800fae64c8",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KnightOfMeadowgrain",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KnightOfMeadowgrain.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "34b4d9c8-f460-482e-be15-1b61e43573a0",
+      "card_name": "Kodama of the North Tree",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample",
+          "shroud"
+        ],
+        "shroud": true,
+        "trample": true,
+        "xmage_ability_classes": [
+          "ShroudAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:51284c5c397a8e4e2a62a56cd45efabe",
+      "normalized_name": "kodama of the north tree",
+      "notes": "XMage authoritative exact-scope split: local class KodamaOfTheNorthTree translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a26969a67ffeb050eb7075483a2eba27",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KodamaOfTheNorthTree",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KodamaOfTheNorthTree.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,HasteAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "3deb2d4d-e59e-4b9e-ac52-acc7e9520d77",
+      "card_name": "Lightning Stormkin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "haste": true,
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HasteAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:e526f04fc2d80423d401a137f6a4d2f3",
+      "normalized_name": "lightning stormkin",
+      "notes": "XMage authoritative exact-scope split: local class LightningStormkin translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "06c7ee5f130fba7e5b6894720665f3ff",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LightningStormkin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LightningStormkin.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "035b1b4f-773e-4924-8dcd-17c289e0cac1",
+      "card_name": "Midnight Assassin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+      "normalized_name": "midnight assassin",
+      "notes": "XMage authoritative exact-scope split: local class MidnightAssassin translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MidnightAssassin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MidnightAssassin.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "7cab2f42-8e0b-461d-a091-f8eb24a76051",
+      "card_name": "Mist Leopard",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "mist leopard",
+      "notes": "XMage authoritative exact-scope split: local class MistLeopard translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MistLeopard",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MistLeopard.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::MenaceAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "e7fe6715-27ad-4fa7-89f9-3f9cea81f5f4",
+      "card_name": "Monster Mashup",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "menace",
+          "reach"
+        ],
+        "menace": true,
+        "reach": true,
+        "xmage_ability_classes": [
+          "MenaceAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+      "normalized_name": "monster mashup",
+      "notes": "XMage authoritative exact-scope split: local class MonsterMashup translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "0ef14cd5dfd68e86721d6b54d040c864",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MonsterMashup",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MonsterMashup.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ae3f6e79-23a4-4888-97be-9f00157a675b",
+      "card_name": "Nightveil Predator",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "hexproof": true,
+        "keywords": [
+          "flying",
+          "deathtouch",
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+      "normalized_name": "nightveil predator",
+      "notes": "XMage authoritative exact-scope split: local class NightveilPredator translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "0386f0160bd05b6ff392414aaf23531d",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "NightveilPredator",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NightveilPredator.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "9018fb45-19e0-4311-8bf6-ec2ccfa92699",
+      "card_name": "Pegasus Charger",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flying": true,
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+      "normalized_name": "pegasus charger",
+      "notes": "XMage authoritative exact-scope split: local class PegasusCharger translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PegasusCharger",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PegasusCharger.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "df12d044-8ea7-4055-a675-7daae1f99d5a",
+      "card_name": "Peregrine Griffin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flying": true,
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+      "normalized_name": "peregrine griffin",
+      "notes": "XMage authoritative exact-scope split: local class PeregrineGriffin translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "93d16df1ee55f8155677016e4ce03b99",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PeregrineGriffin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PeregrineGriffin.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "a6460182-3458-4eb3-9db8-13fc62f67837",
+      "card_name": "Pincher Beetles",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
+      "normalized_name": "pincher beetles",
+      "notes": "XMage authoritative exact-scope split: local class PincherBeetles translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PincherBeetles",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PincherBeetles.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "7a785dbb-72e5-4f07-bf22-19e41627d31b",
+      "card_name": "Plated Crusher",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "trample",
+          "hexproof"
+        ],
+        "trample": true,
+        "xmage_ability_classes": [
+          "HexproofAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:9f7b9f4e97747d4fe8217c174fef8636",
+      "normalized_name": "plated crusher",
+      "notes": "XMage authoritative exact-scope split: local class PlatedCrusher translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "51633d057b6c087e0e7ab21f54528529",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PlatedCrusher",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PlatedCrusher.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "208a7cc8-ea6b-4a10-ad5b-77a21b4b9826",
+      "card_name": "Plated Slagwurm",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "plated slagwurm",
+      "notes": "XMage authoritative exact-scope split: local class PlatedSlagwurm translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PlatedSlagwurm",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PlatedSlagwurm.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "3f879029-1123-419b-b36f-de4e0bf7965a",
+      "card_name": "Porcelain Legionnaire",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
+      "normalized_name": "porcelain legionnaire",
+      "notes": "XMage authoritative exact-scope split: local class PorcelainLegionnaire translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "6004a621673a1e45bcd26f2564ea14d5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PorcelainLegionnaire",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PorcelainLegionnaire.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "377abd61-04eb-4a7f-b2bb-c60dccb2d661",
+      "card_name": "Primal Huntbeast",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "primal huntbeast",
+      "notes": "XMage authoritative exact-scope split: local class PrimalHuntbeast translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PrimalHuntbeast",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PrimalHuntbeast.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1ee83f54-f7fc-4087-8162-2cfe430cbfa2",
+      "card_name": "Razorfoot Griffin",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flying": true,
+        "keywords": [
+          "flying",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
+      "normalized_name": "razorfoot griffin",
+      "notes": "XMage authoritative exact-scope split: local class RazorfootGriffin translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "046ce6c77f38cd754f7cd6360fa8e929",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RazorfootGriffin",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RazorfootGriffin.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::MenaceAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ed3e4013-5be4-43be-9337-abe0ad73a78b",
+      "card_name": "Relic Sloth",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "menace",
+          "vigilance"
+        ],
+        "menace": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "MenaceAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f924eb92c16aaf3e960985ebdf0f9fb7",
+      "normalized_name": "relic sloth",
+      "notes": "XMage authoritative exact-scope split: local class RelicSloth translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "2966277efe8158a3183f75a0d5a0b466",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RelicSloth",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RelicSloth.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::MenaceAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "765c83be-8761-449e-9bc0-5b2a27400c8c",
+      "card_name": "Resistance Skywarden",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "menace",
+          "reach"
+        ],
+        "menace": true,
+        "reach": true,
+        "xmage_ability_classes": [
+          "MenaceAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:bc198a8ba238242dbc7481f7cb03697d",
+      "normalized_name": "resistance skywarden",
+      "notes": "XMage authoritative exact-scope split: local class ResistanceSkywarden translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "bbfe14ceb0430f14ffbed5e95eb613f4",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ResistanceSkywarden",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/ResistanceSkywarden.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "be490acd-2d37-44b2-87d9-33ae45acf468",
+      "card_name": "Rubbleback Rhino",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "rubbleback rhino",
+      "notes": "XMage authoritative exact-scope split: local class RubblebackRhino translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RubblebackRhino",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RubblebackRhino.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d24c6a4c-942c-4e1e-99eb-e860afb17621",
+      "card_name": "Sacred Wolf",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "sacred wolf",
+      "notes": "XMage authoritative exact-scope split: local class SacredWolf translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SacredWolf",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SacredWolf.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ed6e0d8d-2a1d-4355-9d72-5a5e9f0b34ca",
+      "card_name": "Scaled Behemoth",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "scaled behemoth",
+      "notes": "XMage authoritative exact-scope split: local class ScaledBehemoth translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ScaledBehemoth",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/ScaledBehemoth.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,IndestructibleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "94273765-5d53-46b1-947c-06880b17c0fc",
+      "card_name": "Seraph of the Suns",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "indestructible": true,
+        "keywords": [
+          "flying",
+          "indestructible"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "IndestructibleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:0e930435c4990d3e70a054b8fb49cc37",
+      "normalized_name": "seraph of the suns",
+      "notes": "XMage authoritative exact-scope split: local class SeraphOfTheSuns translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "1cd0f63d0735e8dd564d4e3c59319a38",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SeraphOfTheSuns",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SeraphOfTheSuns.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "47dc2f15-2b2c-4072-9098-26d15f9978e5",
+      "card_name": "Serra Angel",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+      "normalized_name": "serra angel",
+      "notes": "XMage authoritative exact-scope split: local class SerraAngel translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "3f0f55e397cf4c146056c6f35cab4acf",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SerraAngel",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SerraAngel.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4f9ca618-3f5f-4709-9959-aea9c4c8f1ed",
+      "card_name": "Simic Sky Swallower",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "trample",
+          "shroud"
+        ],
+        "shroud": true,
+        "trample": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ShroudAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f9a8f6f967583dc772e67c5f37c25728",
+      "normalized_name": "simic sky swallower",
+      "notes": "XMage authoritative exact-scope split: local class SimicSkySwallower translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "2b4471b7bd408d4108fbb84ddc8b209a",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SimicSkySwallower",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SimicSkySwallower.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "8d5c2602-396b-4592-9f64-9eb50fe8f096",
+      "card_name": "Skyshroud Falcon",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
+      "normalized_name": "skyshroud falcon",
+      "notes": "XMage authoritative exact-scope split: local class SkyshroudFalcon translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "e1528476f4465cfb54a103159363cabe",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SkyshroudFalcon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SkyshroudFalcon.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::ReachAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4f05c1bb-a6e4-410a-9187-2e5147fd3048",
+      "card_name": "Skysnare Spider",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "reach",
+          "vigilance"
+        ],
+        "reach": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "ReachAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2942aac8d8f5522b082ea69ad8340e5c",
+      "normalized_name": "skysnare spider",
+      "notes": "XMage authoritative exact-scope split: local class SkysnareSpider translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "131fe24ee7ad32bc324d61e392966454",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SkysnareSpider",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SkysnareSpider.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DoubleStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "9293de7e-b893-4e11-bee7-2a802ea5f4a4",
+      "card_name": "Skyspear Cavalry",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "double_strike": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "double_strike"
+        ],
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2d338e4620590b1267116f689ad9de65",
+      "normalized_name": "skyspear cavalry",
+      "notes": "XMage authoritative exact-scope split: local class SkyspearCavalry translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "b776f5c6af902f6ca22891f6466f37dc",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SkyspearCavalry",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SkyspearCavalry.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::HasteAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "e34a63e0-f285-465d-9058-da56cccc8e6f",
+      "card_name": "Slash Panther",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "haste": true,
+        "keywords": [
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "HasteAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
+      "normalized_name": "slash panther",
+      "notes": "XMage authoritative exact-scope split: local class SlashPanther translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "acd489bf8e6a4f4a58889135fd728248",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SlashPanther",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SlashPanther.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "bb2bc194-b7ea-4f62-b8b5-1c0c70b49833",
+      "card_name": "Slippery Bogle",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "slippery bogle",
+      "notes": "XMage authoritative exact-scope split: local class SlipperyBogle translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SlipperyBogle",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SlipperyBogle.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "000e3f4a-0230-4d96-8ca7-99557b220569",
+      "card_name": "Soul of the Rapids",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "hexproof": true,
+        "keywords": [
+          "flying",
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:96b2ef898d1bfe14b105c5f4fdf86a81",
+      "normalized_name": "soul of the rapids",
+      "notes": "XMage authoritative exact-scope split: local class SoulOfTheRapids translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a1e7d1d0776e0f7595ea86a89cba6f3c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SoulOfTheRapids",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SoulOfTheRapids.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "8998a37b-ffd3-4db7-9bab-57e6041258ee",
+      "card_name": "Spined Thopter",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
+      "normalized_name": "spined thopter",
+      "notes": "XMage authoritative exact-scope split: local class SpinedThopter translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8c44476226e6bb84584f5ad380fb8120",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SpinedThopter",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SpinedThopter.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "9e19482d-77f3-49bd-b754-f0cced41f6dd",
+      "card_name": "Sungrace Pegasus",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+      "normalized_name": "sungrace pegasus",
+      "notes": "XMage authoritative exact-scope split: local class SungracePegasus translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "d7807de1ac4d487c92f86602490d7e85",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SungracePegasus",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SungracePegasus.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DoubleStrikeAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "bf5ae921-4977-44bc-9238-838faaed2a25",
+      "card_name": "Swiftblade Vindicator",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "double_strike": true,
+        "effect": "creature",
+        "keywords": [
+          "double_strike",
+          "trample",
+          "vigilance"
+        ],
+        "trample": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:25f83ff390db24d119084aa01280d30a",
+      "normalized_name": "swiftblade vindicator",
+      "notes": "XMage authoritative exact-scope split: local class SwiftbladeVindicator translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "4bf30b22e2e301dbdc562ddf14d93916",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SwiftbladeVindicator",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SwiftbladeVindicator.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "6e2e373b-eccd-4a28-9867-3430f32a8686",
+      "card_name": "Tajuru Pathwarden",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample",
+          "vigilance"
+        ],
+        "trample": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2c2a303057fec961fff5e174fdb42e48",
+      "normalized_name": "tajuru pathwarden",
+      "notes": "XMage authoritative exact-scope split: local class TajuruPathwarden translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "6cb942574b2fdebbc6d1cdb692accb6a",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TajuruPathwarden",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TajuruPathwarden.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "0a538935-76fc-43b4-9016-1840de63ee22",
+      "card_name": "Taoist Hermit",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "taoist hermit",
+      "notes": "XMage authoritative exact-scope split: local class TaoistHermit translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TaoistHermit",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TaoistHermit.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "259c168e-91ec-4016-938e-4eb090298446",
+      "card_name": "The Terror of Serpent's Pass",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "the terror of serpent's pass",
+      "notes": "XMage authoritative exact-scope split: local class TheTerrorOfSerpentsPass translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TheTerrorOfSerpentsPass",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TheTerrorOfSerpentsPass.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "0ab8bd94-9521-4293-8bc6-1fbba580b1e7",
+      "card_name": "Thornweald Archer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
+      "normalized_name": "thornweald archer",
+      "notes": "XMage authoritative exact-scope split: local class ThornwealdArcher translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "a506dddb02e366c9956b2707bbc7a61e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ThornwealdArcher",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/ThornwealdArcher.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::TrampleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "e1c7f803-b021-449e-bb5a-ad1e368ece2a",
+      "card_name": "Thundering Tanadon",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "trample"
+        ],
+        "trample": true,
+        "xmage_ability_classes": [
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
+      "normalized_name": "thundering tanadon",
+      "notes": "XMage authoritative exact-scope split: local class ThunderingTanadon translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8afcd78935ed974ae73286920eef92da",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ThunderingTanadon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/ThunderingTanadon.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "74086eb3-e98b-4013-ac6c-92ea34a871c7",
+      "card_name": "Tidehollow Strix",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:1c1d13dbe66e303cfd393ff472494c6c",
+      "normalized_name": "tidehollow strix",
+      "notes": "XMage authoritative exact-scope split: local class TidehollowStrix translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "02ea635dd14c67af16ed9207a2f273bb",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TidehollowStrix",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TidehollowStrix.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4f089072-57c7-434c-abd5-c993033c4d81",
+      "card_name": "Vampire Nighthawk",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "deathtouch",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:51140e79ce351bf2b80077d0fea65a9a",
+      "normalized_name": "vampire nighthawk",
+      "notes": "XMage authoritative exact-scope split: local class VampireNighthawk translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "be6a89a4d8c0984a2cca5f6b8486b5f9",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "VampireNighthawk",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VampireNighthawk.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "da123d67-fc67-43c3-90dd-47d02555416d",
+      "card_name": "Vampire of the Dire Moon",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "keywords": [
+          "deathtouch",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:133a7b88ecdd416c6985848aa6797731",
+      "normalized_name": "vampire of the dire moon",
+      "notes": "XMage authoritative exact-scope split: local class VampireOfTheDireMoon translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "e8ee2f646605fe68bcfde9b3a5102901",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "VampireOfTheDireMoon",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VampireOfTheDireMoon.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1ef99ecb-36d6-4a43-8c52-4f13c8e32769",
+      "card_name": "Vault Skirge",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "lifelink"
+        ],
+        "lifelink": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "LifelinkAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f8d4931e4339d98de5e71420161b7c75",
+      "normalized_name": "vault skirge",
+      "notes": "XMage authoritative exact-scope split: local class VaultSkirge translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "31df3e49b8917c164c8c0ac303fb41b8",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "VaultSkirge",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VaultSkirge.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "058d5186-0b1d-4223-883f-3be56cc0956b",
+      "card_name": "Venomthrope",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flying": true,
+        "hexproof": true,
+        "keywords": [
+          "flying",
+          "deathtouch",
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlyingAbility",
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:5f3b8379fae36ce008a64666d9218a5c",
+      "normalized_name": "venomthrope",
+      "notes": "XMage authoritative exact-scope split: local class Venomthrope translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "5ae2051ac260f269b9f2f01b4aa288d9",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Venomthrope",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/Venomthrope.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1fe59721-8b0b-4060-8fa5-a74b1db1f0dc",
+      "card_name": "Wall of Denial",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "defender",
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FlyingAbility",
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:613f578399a838c542c8aee2f2648adf",
+      "normalized_name": "wall of denial",
+      "notes": "XMage authoritative exact-scope split: local class WallOfDenial translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "6a1e87280e8b82b2a81ab865a0378a2c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WallOfDenial",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WallOfDenial.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FirstStrikeAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4d532a8b-838f-4e6c-a488-d488b71c961e",
+      "card_name": "Wall of Razors",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FirstStrikeAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+      "normalized_name": "wall of razors",
+      "notes": "XMage authoritative exact-scope split: local class WallOfRazors translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WallOfRazors",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WallOfRazors.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FirstStrikeAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d2dea715-35ea-4076-919b-9d0de0dc8d16",
+      "card_name": "Wall of Spears",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "first_strike": true,
+        "keywords": [
+          "first_strike",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FirstStrikeAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:059e142ff975ea78cffce9d194c481fa",
+      "normalized_name": "wall of spears",
+      "notes": "XMage authoritative exact-scope split: local class WallOfSpears translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "689f0afc34cde2530e3e9063a1600ae7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WallOfSpears",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WallOfSpears.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "b97c5796-2695-40c1-8b38-87c18628e319",
+      "card_name": "Wall of Swords",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
+      "normalized_name": "wall of swords",
+      "notes": "XMage authoritative exact-scope split: local class WallOfSwords translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "0c5de3314a56ec9848ad8de98f85e5f5",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WallOfSwords",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WallOfSwords.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "a8d25f8a-6056-447e-ad17-6da69417bf9c",
+      "card_name": "Wall of Vines",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "keywords": [
+          "reach",
+          "defender"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:2c228229bd9ba601d274f70cde0de87a",
+      "normalized_name": "wall of vines",
+      "notes": "XMage authoritative exact-scope split: local class WallOfVines translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "d83308a1bfb0cb5f22db4670d3334d6c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WallOfVines",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WallOfVines.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "4e264c6f-0761-4562-a2bf-47a79b4af12e",
+      "card_name": "Wardscale Crocodile",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "hexproof": true,
+        "keywords": [
+          "hexproof"
+        ],
+        "xmage_ability_classes": [
+          "HexproofAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
+      "normalized_name": "wardscale crocodile",
+      "notes": "XMage authoritative exact-scope split: local class WardscaleCrocodile translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "91702377ce6d69cc19357882d3ac24de",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WardscaleCrocodile",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WardscaleCrocodile.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlyingAbility,MenaceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "df08a00e-d1f1-4fd5-b856-9188bb90b714",
+      "card_name": "Wind Spirit",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "menace"
+        ],
+        "menace": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "MenaceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:73675a4e3548ce04c5253f5c2e48a20e",
+      "normalized_name": "wind spirit",
+      "notes": "XMage authoritative exact-scope split: local class WindSpirit translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "ffd969ec7b7f72e7e1e71b9031a0907d",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WindSpirit",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WindSpirit.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::ReachAbility,TrampleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "2177865d-a0d4-40ca-98d3-4399ea7caa24",
+      "card_name": "Wrecking Crew",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "keywords": [
+          "reach",
+          "trample"
+        ],
+        "reach": true,
+        "trample": true,
+        "xmage_ability_classes": [
+          "ReachAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:44e84ac245ac00f6728ae9fed0542716",
+      "normalized_name": "wrecking crew",
+      "notes": "XMage authoritative exact-scope split: local class WreckingCrew translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "8f6dda447be5aca51d3b5bb3f80538ea",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WreckingCrew",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WreckingCrew.java"
+    },
+    {
+      "adapter_work_unit": "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "17212e5e-c590-45b9-9b4f-de261ec1443f",
+      "card_name": "Zephid",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flying": true,
+        "keywords": [
+          "flying",
+          "shroud"
+        ],
+        "shroud": true,
+        "xmage_ability_classes": [
+          "FlyingAbility",
+          "ShroudAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:ee1e550fa9895cac7ed96686f86feabb",
+      "normalized_name": "zephid",
+      "notes": "XMage authoritative exact-scope split: local class Zephid translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "062b4d594b2a8232595853720db8ccef",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Zephid",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/z/Zephid.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DoubleStrikeAbility,FlyingAbility,IndestructibleAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "9adf5563-b851-44cf-b8ab-f0d8bdcc32b4",
+      "card_name": "Zetalpa, Primal Dawn",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "double_strike": true,
+        "effect": "creature",
+        "flying": true,
+        "indestructible": true,
+        "keywords": [
+          "flying",
+          "double_strike",
+          "trample",
+          "vigilance",
+          "indestructible"
+        ],
+        "trample": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "DoubleStrikeAbility",
+          "FlyingAbility",
+          "IndestructibleAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:f4419f452779e337103ec339acffee21",
+      "normalized_name": "zetalpa, primal dawn",
+      "notes": "XMage authoritative exact-scope split: local class ZetalpaPrimalDawn translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow instant/sorcery spell with focused runtime coverage.",
+      "oracle_hash": "08caa42e66609cdd65188918e8043f01",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ZetalpaPrimalDawn",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/z/ZetalpaPrimalDawn.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-01T09:40:05+00:00",
+    "queue_scope": "all_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1": 36,
+      "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DeathtouchAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 4,
+      "xmage_signature::no_effect_class::DeathtouchAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DeathtouchAbility,MenaceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DeathtouchAbility,ReachAbility::no_target_class::no_condition_class::no_signal": 3,
+      "xmage_signature::no_effect_class::DefenderAbility,FirstStrikeAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::DefenderAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::DefenderAbility,ReachAbility::no_target_class::no_condition_class::no_signal": 3,
+      "xmage_signature::no_effect_class::DoubleStrikeAbility,FlyingAbility,IndestructibleAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DoubleStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DoubleStrikeAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 5,
+      "xmage_signature::no_effect_class::FirstStrikeAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FirstStrikeAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::FlyingAbility,HasteAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlyingAbility,IndestructibleAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::FlyingAbility,LifelinkAbility::no_target_class::no_condition_class::no_signal": 4,
+      "xmage_signature::no_effect_class::FlyingAbility,MenaceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::FlyingAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::HasteAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::IndestructibleAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::LifelinkAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::MenaceAbility,ReachAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::MenaceAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::ReachAbility,TrampleAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::ReachAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::TrampleAbility::no_target_class::no_condition_class::no_signal": 1
+    },
+    "blocked_reason_counts": {
+      "add_counters_ability_class_not_simple": 4,
+      "add_counters_counter_not_fixed": 8,
+      "add_counters_effect_class_not_pure": 63,
+      "add_counters_oracle_not_simple": 1,
+      "add_counters_target_not_supported": 2,
+      "additional_cost_detected": 144,
+      "board_wipe_ability_class_not_simple": 67,
+      "board_wipe_damage_amount_not_fixed": 9,
+      "board_wipe_damage_scope_not_supported": 13,
+      "board_wipe_destroy_scope_not_supported": 38,
+      "board_wipe_effect_class_not_supported": 83,
+      "board_wipe_oracle_not_simple": 38,
+      "boost_target_source_not_single_fixed": 35,
+      "bounce_ability_class_not_simple": 28,
+      "bounce_effect_class_not_pure": 44,
+      "bounce_target_not_supported": 20,
+      "counter_ability_class_not_simple": 19,
+      "counter_effect_class_not_pure": 35,
+      "counter_oracle_not_simple": 2,
+      "counter_target_not_supported": 23,
+      "damage_amount_not_fixed": 45,
+      "damage_effect_class_not_pure": 123,
+      "damage_target_not_supported": 24,
+      "destroy_effect_class_not_pure": 138,
+      "destroy_target_not_supported": 74,
+      "draw_effect_class_not_pure": 562,
+      "exile_effect_class_not_pure": 42,
+      "exile_oracle_not_simple": 8,
+      "exile_target_not_supported": 30,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_effect_class_not_pure": 166,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_effect_class_not_simple": 307,
+      "mana_source_oracle_not_simple": 121,
+      "mana_source_safe_ability_missing": 133,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 135,
+      "not_instant_or_sorcery_spell": 4090,
+      "not_one_shot_spell_ability": 250,
+      "recursion_ability_class_not_simple": 13,
+      "recursion_effect_class_not_pure": 461,
+      "recursion_oracle_not_simple": 12,
+      "recursion_target_not_supported": 8,
+      "static_keyword_not_creature": 2
+    },
+    "considered_supported_work_unit_rows": 7536,
+    "family_counts": {
+      "xmage_static_self_combat_keyword_creature": 85
+    },
+    "proposal_count": 85,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 85
+    },
+    "safe_for_batch_pg_package_count": 85,
+    "scope_counts": {
+      "xmage_static_self_combat_keyword_creature_v1": 85
+    }
+  }
+}

@@ -606,6 +606,78 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["vigilance"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_static_keyword_creature_allows_multiline_keyword_oracle(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FirstStrikeAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FirstStrikeAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Artifact Creature - Bird",
+                oracle_text="Flying\nFirst strike",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(FirstStrikeAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertEqual(proposal["effect_json"]["keywords"], ["flying", "first_strike"])
+
+    def test_static_self_keyword_creature_can_come_from_broad_protection_work_unit(self) -> None:
+        row = queue_row(
+            "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "HexproofAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Creature - Vedalken Wizard",
+                oracle_text="Flying, hexproof",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(HexproofAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_KEYWORD_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["flying", "hexproof"])
+        self.assertTrue(effect["hexproof"])
+
+    def test_static_self_keyword_creature_maps_indestructible_and_shroud(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::IndestructibleAbility,ShroudAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["IndestructibleAbility", "ShroudAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Artifact Creature - Construct",
+                oracle_text="Shroud\nIndestructible",
+            ),
+            source_text=(
+                "this.addAbility(ShroudAbility.getInstance());"
+                "this.addAbility(IndestructibleAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["shroud", "indestructible"])
+        self.assertTrue(effect["shroud"])
+        self.assertTrue(effect["indestructible"])
+
     def test_static_keyword_creature_requires_oracle_keyword_match(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",

@@ -125,21 +125,24 @@ UNSAFE_MANA_ABILITY_CLASSES = {
     "LimitedTimesPerTurnActivatedManaAbility",
 }
 
-COMBAT_KEYWORD_ABILITY_CLASSES = {
+STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "DeathtouchAbility": "deathtouch",
     "DefenderAbility": "defender",
     "DoubleStrikeAbility": "double_strike",
     "FirstStrikeAbility": "first_strike",
     "FlyingAbility": "flying",
     "HasteAbility": "haste",
+    "HexproofAbility": "hexproof",
+    "IndestructibleAbility": "indestructible",
     "LifelinkAbility": "lifelink",
     "MenaceAbility": "menace",
     "ReachAbility": "reach",
+    "ShroudAbility": "shroud",
     "TrampleAbility": "trample",
     "VigilanceAbility": "vigilance",
 }
 
-COMBAT_KEYWORD_ORDER = [
+STATIC_SELF_KEYWORD_ORDER = [
     "flying",
     "first_strike",
     "double_strike",
@@ -151,6 +154,9 @@ COMBAT_KEYWORD_ORDER = [
     "vigilance",
     "haste",
     "defender",
+    "hexproof",
+    "shroud",
+    "indestructible",
 ]
 
 
@@ -581,23 +587,20 @@ def is_creature_metadata(metadata: dict[str, Any]) -> bool:
 
 
 def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
-    unit = str(row.get("adapter_work_unit") or "")
     abilities = ability_classes(row)
     return (
-        unit.startswith("xmage_signature::no_effect_class::")
-        and unit.endswith("::no_target_class::no_condition_class::no_signal")
-        and bool(abilities)
+        bool(abilities)
         and not effect_classes(row)
         and not (row.get("xmage_signals") or [])
-        and abilities.issubset(COMBAT_KEYWORD_ABILITY_CLASSES)
+        and abilities.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
     )
 
 
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
-        COMBAT_KEYWORD_ABILITY_CLASSES[ability]
+        STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
         for ability in ability_classes(row)
-        if ability in COMBAT_KEYWORD_ABILITY_CLASSES
+        if ability in STATIC_SELF_KEYWORD_ABILITY_CLASSES
     }
 
 
@@ -606,28 +609,34 @@ def normalize_keyword_phrase(value: str) -> str:
 
 
 def ordered_keywords(keywords: set[str]) -> list[str]:
-    return [keyword for keyword in COMBAT_KEYWORD_ORDER if keyword in keywords]
+    return [keyword for keyword in STATIC_SELF_KEYWORD_ORDER if keyword in keywords]
 
 
 def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
     raw = str(metadata.get("oracle_text") or "").strip()
     if not raw:
         return None
-    first_line = raw.splitlines()[0]
-    first_line = re.sub(r"\([^)]*\)", "", first_line).strip().rstrip(".")
-    if not first_line:
-        return None
-    parts = [
-        normalize_keyword_phrase(part)
-        for part in re.split(r"[,;]", first_line)
-        if str(part or "").strip()
-    ]
-    if not parts:
-        return None
-    allowed = set(COMBAT_KEYWORD_ABILITY_CLASSES.values())
-    if any(part not in allowed for part in parts):
-        return None
-    return set(parts)
+    allowed = set(STATIC_SELF_KEYWORD_ABILITY_CLASSES.values())
+    keywords: set[str] = set()
+    for line in raw.splitlines():
+        line = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
+        if not line:
+            if keywords:
+                break
+            continue
+        parts = [
+            normalize_keyword_phrase(part)
+            for part in re.split(r"[,;]", line)
+            if str(part or "").strip()
+        ]
+        if not parts:
+            if keywords:
+                break
+            continue
+        if any(part not in allowed for part in parts):
+            break
+        keywords.update(parts)
+    return keywords or None
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -1135,7 +1144,7 @@ def build_exact_split_report(
             "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
-                "xmage_signature::no_effect_class::<combat keyword abilities>::no_target_class::no_condition_class::no_signal",
+                "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,

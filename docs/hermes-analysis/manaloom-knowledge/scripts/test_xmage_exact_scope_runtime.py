@@ -826,6 +826,37 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(permanent["haste"])
         self.assertFalse(permanent["summoning_sick"])
 
+    def test_static_self_keyword_creature_runtime_enforces_hexproof_shroud_indestructible(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        card = {
+            "name": "Fixture Protected Creature",
+            "type_line": "Artifact Creature - Construct",
+            "oracle_text": "Hexproof\nShroud\nIndestructible",
+            "controller": "Active",
+            "power": 2,
+            "toughness": 2,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+            "keywords": ["hexproof", "shroud", "indestructible"],
+            "_keywords_are_self": True,
+        }
+
+        permanent = self.battle.enrich_card({**card, **effect})
+
+        self.assertTrue(permanent["hexproof"])
+        self.assertTrue(permanent["shroud"])
+        self.assertTrue(permanent["indestructible"])
+        self.assertFalse(self.battle.is_legal_target({"name": "Enemy Spell"}, permanent, opponent))
+        self.assertFalse(self.battle.is_legal_target({"name": "Own Spell"}, permanent, active))
+
+        permanent_without_shroud = dict(permanent)
+        permanent_without_shroud["shroud"] = False
+        self.assertFalse(self.battle.is_legal_target({"name": "Enemy Spell"}, permanent_without_shroud, opponent))
+        self.assertTrue(self.battle.is_legal_target({"name": "Own Spell"}, permanent_without_shroud, active))
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

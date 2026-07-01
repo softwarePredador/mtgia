@@ -747,6 +747,7 @@ def replay_card_snapshot(card):
                 "indestructible",
                 "haste",
                 "vigilance",
+                "hexproof",
                 "shroud",
             )
             if card.get(keyword)
@@ -3445,6 +3446,8 @@ SELF_KEYWORD_ABILITIES = {
     "indestructible",
     "haste",
     "vigilance",
+    "hexproof",
+    "shroud",
     "flash",
     "menace",
     "infect",
@@ -3466,18 +3469,26 @@ def _oracle_self_keyword_values(card):
     oracle_text = str(card.get("oracle_text") or "").strip()
     if not oracle_text:
         return set()
-    first_line = oracle_text.splitlines()[0].strip()
-    first_line = re.sub(r"\([^)]*\)", "", first_line).strip().rstrip(".")
-    if not first_line:
-        return set()
-    parts = [
-        part.strip().lower().replace(" ", "_")
-        for part in re.split(r"[,;]", first_line)
-        if part.strip()
-    ]
-    if not parts or any(part not in SELF_KEYWORD_ABILITIES for part in parts):
-        return set()
-    return set(parts)
+    keywords = set()
+    for line in oracle_text.splitlines():
+        line = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
+        if not line:
+            if keywords:
+                break
+            continue
+        parts = [
+            part.strip().lower().replace(" ", "_")
+            for part in re.split(r"[,;]", line)
+            if part.strip()
+        ]
+        if not parts:
+            if keywords:
+                break
+            continue
+        if any(part not in SELF_KEYWORD_ABILITIES for part in parts):
+            break
+        keywords.update(parts)
+    return keywords
 
 
 def enrich_card(card):

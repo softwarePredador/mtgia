@@ -76,11 +76,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG292:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg292_static_keyword_creature_wave.md`.
-    Resultado all-card: `30844` identidades ainda com gap, `27908` com fonte
+    Evidencia corrente pos-PG293:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg293_static_self_keyword_creature_v2_wave.md`.
+    Resultado all-card: `30759` identidades ainda com gap, `27823` com fonte
     XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
-    gaps e `12065` work units de adaptador ManaLoom por assinatura/effect
+    gaps e `12038` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
     simples (`draw`, `direct_damage`, `destroy target`). O PG284 adicionou
     `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
@@ -92,9 +92,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     adicionou `3` add-counters spells de alvo criatura (`Battlegrowth`,
     `Blight Rot`, `Scar`). O PG291 adicionou `42` boost/debuff spells de alvo
     criatura com modificador de poder/resistencia ate o fim do turno. O PG292
-    adicionou `409` criaturas com keyword estatica de combate propria. Todos os
-    pacotes PG285-PG292 passaram postcheck PostgreSQL e E2E em
-    PG/SQLite/snapshot/runtime. O splitter pos-PG292 retorna
+    adicionou `409` criaturas com keyword estatica de combate propria. O PG293
+    adicionou `85` criaturas com keyword estatica propria, incluindo multiline
+    Oracle e `hexproof`/`shroud`/`indestructible` seguros. Todos os
+    pacotes PG285-PG293 passaram postcheck PostgreSQL e E2E em
+    PG/SQLite/snapshot/runtime. O splitter pos-PG293 retorna
     `proposal_count=0` para os escopos ja implementados; a proxima etapa exige
     novo subpadrao runtime, nao rerun do mesmo splitter.
 
