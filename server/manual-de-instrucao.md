@@ -3,6 +3,67 @@
 > **Antes de alterar qualquer endpoint app-facing, consultar e atualizar `server/doc/API_CONTRACTS_AND_DATA_MAP.md`**.
 > **Antes de criar/alterar runtime visual do app, consultar e atualizar `app/doc/UI_TEST_SURFACE_MAP.md`**.
 
+## 2026-07-01 — Sync global de legalidades e auditoria all-card
+
+Motivo:
+
+- A rotina antiga de legalidades nasceu focada em `msh,msc,mar`; isso nao
+  atende o tratamento global de todas as cartas MTG conhecidas por ManaLoom.
+- A auditoria de readiness deve partir de `cards` inteiro e usar decks apenas
+  como prioridade, nao como filtro.
+
+Patch aplicado:
+
+- `server/bin/sync_card_legalities_from_scryfall.py` agora usa somente
+  `cards.oracle_id` na Scryfall Collection API. `scryfall_id` nao e fallback
+  valido para request por `oracle_id`.
+- O default de `--sets` passou a ser vazio, isto e, todos os cards com
+  Commander faltante; `--sets` continua existindo para lote estreito.
+- `server/bin/sync_card_legalities_from_scryfall.sh` e o reconciliador
+  EasyPanel foram alinhados para nao fixar `msh,msc,mar`.
+- Criado
+  `docs/hermes-analysis/manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py`
+  para rotear o universo global de cartas em lanes de Oracle/legalities,
+  cobertura por nome/oracle e familias de battle.
+
+Resultado real aplicado no PostgreSQL:
+
+```json
+{
+  "candidate_cards": 2448,
+  "oracle_ids_requested": 2378,
+  "oracle_ids_found": 2378,
+  "oracle_ids_not_found": 0,
+  "legality_rows_ready": 56304,
+  "legality_rows_upserted": 56304,
+  "commander_statuses": {
+    "banned": 14,
+    "legal": 63,
+    "not_legal": 2371
+  }
+}
+```
+
+Cobertura pos-sync:
+
+- `missing_all_legalities=0`.
+- `missing_commander_legality=3`, todos `A-` digitais sem `oracle_id` oficial
+  exato seguro no banco.
+- `oracle_data_sync=4` depois de separar Oracle text vazio esperado em
+  vanilla/no-rules.
+- `oracle_identity_rule_link_or_copy=2` depois de considerar cobertura por
+  `normalized_name`; antes a auditoria inflava esse bloco para `199`.
+
+Comandos globais:
+
+```bash
+python3 server/bin/sync_card_legalities_from_scryfall.py --sets ""
+python3 server/bin/sync_card_legalities_from_scryfall.py --sets "" --apply
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3 \
+  --xmage-limit 250
+```
+
 ## 2026-06-18 — Sync focado de legalidades para fechar `needs_legality_sync`
 
 Motivo:

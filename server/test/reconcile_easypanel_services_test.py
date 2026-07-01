@@ -53,7 +53,7 @@ def test_desired_env_for_manaloom_ops_matches_cutover_contract() -> None:
     assert desired["PULL_LEARNING_EVENTS_CRON"] == "0 * * * *"
     assert desired["MANALOOM_SYNC_CARD_LEGALITIES_CRON"] == "30 */6 * * *"
     assert desired["MANALOOM_SYNC_CARD_LEGALITIES_APPLY"] == "1"
-    assert desired["MANALOOM_SYNC_LEGALITIES_SETS"] == "msh,msc,mar"
+    assert desired["MANALOOM_SYNC_LEGALITIES_SETS"] == ""
     assert desired["MANALOOM_NEW_CARD_CANDIDATE_REVIEW_CRON"] == "35 */6 * * *"
     assert desired["MTGIA_ENV_FILE"] == "/app/server/.env"
     assert desired["HERMES_KNOWLEDGE_DB"] == "/data/manaloom-ops/knowledge.db"

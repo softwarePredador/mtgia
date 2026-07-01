@@ -53,6 +53,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
     `manaloom-knowledge/scripts/operational_surface_alignment_audit.py`.
+  - A partir de 2026-07-01, a fila de cartas e global sobre `cards`, nao
+    limitada a Lorehold/decks cadastrados. Rode
+    `manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py` para
+    separar sync Oracle/legalities, blank Oracle text esperado, cobertura por
+    `card_id`/`normalized_name`, propagacao real por `oracle_id` e familias
+    XMage. Evidencia corrente:
+    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3.md`.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

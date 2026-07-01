@@ -34,6 +34,33 @@ Use a staged source-and-gate pipeline:
 
 The definitive rule: broad XMage extraction may create review candidates and family lanes, but it must not create executable battle truth or PostgreSQL promotion by itself.
 
+## Global All-Card Scope
+
+As of 2026-07-01, card-rule acceleration is global over every PostgreSQL
+`cards` row known by ManaLoom. Lorehold, saved decks, learned decks, and replay
+usage are priority signals only; they are not the base scope.
+
+Use
+`docs/hermes-analysis/manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py`
+to route the all-card inventory before creating a battle-family batch. The
+current report is:
+
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v3.md`
+
+Current routing rules:
+
+- Start from `cards`, then left join deck usage only for priority.
+- Sync Oracle/legalities first. The 2026-07-01 global legalities apply upserted
+  `56304` rows into `card_legalities`, reducing `missing_all_legalities` to
+  `0` and `missing_commander_legality` to `3`.
+- Treat blank Oracle text on vanilla/no-rules cards as a generic/no-card-rule
+  lane, not as a battle mapper or Oracle backfill blocker.
+- Count trusted battle coverage by `card_id` or by the existing
+  `card_battle_rules.normalized_name + logical_rule_key` storage key. Do not
+  create duplicate work for reprints already covered by normalized name.
+- Use `oracle_id` rule propagation only for true alias/double-face gaps where
+  neither `card_id` nor normalized name already has trusted coverage.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.

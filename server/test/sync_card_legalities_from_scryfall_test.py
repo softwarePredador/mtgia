@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import sys
 import unittest
 from pathlib import Path
@@ -85,6 +86,15 @@ class SyncCardLegalitiesFromScryfallTest(unittest.TestCase):
 
     def test_normalize_sets_dedupes_lowercase(self) -> None:
         self.assertEqual(self.sync.normalize_sets("MSH, msc, msh,,MAR"), ["mar", "msc", "msh"])
+
+    def test_default_sets_are_global_missing_commander_scope(self) -> None:
+        self.assertEqual(self.sync.parse_args([]).sets, "")
+
+    def test_load_candidates_uses_oracle_id_not_scryfall_id_fallback(self) -> None:
+        source = inspect.getsource(self.sync.load_candidates)
+        self.assertIn("c.oracle_id IS NOT NULL", source)
+        self.assertIn("c.oracle_id::text AS oracle_id", source)
+        self.assertNotIn("COALESCE(c.oracle_id, c.scryfall_id)", source)
 
 
 if __name__ == "__main__":
