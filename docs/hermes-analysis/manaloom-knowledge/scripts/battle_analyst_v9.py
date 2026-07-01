@@ -30406,6 +30406,33 @@ def library_tutor_candidates(player, target_type):
             type_line = str(candidate.get("type_line") or "").lower()
             if is_effective_land(candidate) and "basic" in type_line:
                 candidates.append(candidate)
+        elif target_type == "forest":
+            if is_effective_land(candidate) and (
+                normalize_card_name(candidate.get("name", "")) == "forest"
+                or "forest" in type_line
+            ):
+                candidates.append(candidate)
+        elif target_type == "snow_land":
+            if is_effective_land(candidate) and "snow" in type_line:
+                candidates.append(candidate)
+        elif target_type == "basic_land_type":
+            if is_effective_land(candidate) and any(
+                land_type in type_line
+                for land_type in ("plains", "island", "swamp", "mountain", "forest")
+            ):
+                candidates.append(candidate)
+        elif target_type == "plains_island_swamp_or_mountain":
+            if is_effective_land(candidate) and any(
+                land_type in type_line
+                for land_type in ("plains", "island", "swamp", "mountain")
+            ):
+                candidates.append(candidate)
+        elif target_type == "basic_land_or_gate":
+            if is_effective_land(candidate) and ("basic" in type_line or "gate" in type_line):
+                candidates.append(candidate)
+        elif target_type == "basic_land_or_town":
+            if is_effective_land(candidate) and ("basic" in type_line or "town" in type_line):
+                candidates.append(candidate)
         elif target_type == "basic_plains":
             type_line = str(candidate.get("type_line") or "").lower()
             if (
@@ -30483,6 +30510,12 @@ def library_tutor_candidates(player, target_type):
                 candidates.append(candidate)
         elif target_type == "instant_or_sorcery":
             if is_instant_or_sorcery_spell(candidate):
+                candidates.append(candidate)
+        elif target_type == "instant":
+            if is_instant(candidate):
+                candidates.append(candidate)
+        elif target_type == "sorcery":
+            if is_sorcery(candidate):
                 candidates.append(candidate)
         elif target_type == "cheap_instant_or_sorcery":
             try:
@@ -30588,10 +30621,16 @@ def tutor_destination_for_target_type(target_type):
     return "hand"
 
 
-def move_library_tutor_selection(player, selected_cards, target_type):
+def move_library_tutor_selection(player, selected_cards, target_type, effect_data=None):
     destination = tutor_destination_for_target_type(target_type)
     moved_cards = []
     library_top_insert_index = 0
+    tutor_enters_tapped = bool(
+        isinstance(effect_data, dict)
+        and effect_data.get("tutor_enters_tapped")
+        and destination == "battlefield"
+    )
+    tutor_tapped_known = isinstance(effect_data, dict) and "tutor_enters_tapped" in effect_data
     for selected_card in selected_cards:
         if selected_card not in player.library:
             continue
@@ -30605,11 +30644,14 @@ def move_library_tutor_selection(player, selected_cards, target_type):
         elif destination == "battlefield":
             permanent_effect = get_card_effect(selected_card)
             permanent = enrich_card({**selected_card, **permanent_effect})
+            if tutor_tapped_known:
+                permanent["tapped"] = tutor_enters_tapped
             if is_creature_card(selected_card):
                 permanent["effect"] = "creature"
                 permanent["haste"] = has_haste(permanent)
                 permanent["summoning_sick"] = not permanent["haste"]
-                permanent["tapped"] = False
+                if not tutor_tapped_known:
+                    permanent["tapped"] = False
             player.battlefield.append(permanent)
         else:
             player.hand.append(selected_card)
@@ -34153,6 +34195,7 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
         player,
         [selected_card for selected_card, _score, _reason in selected],
         target_type,
+        effect_data,
     )
     emit_replay_event(
         "tutor_resolved",
@@ -46600,6 +46643,7 @@ def apply_effect_immediate(
                 player,
                 [selected_card for selected_card, _score, _reason in selected_candidates],
                 target_type,
+                effect_data,
             )
             found = moved_cards[0] if moved_cards else found
         else:

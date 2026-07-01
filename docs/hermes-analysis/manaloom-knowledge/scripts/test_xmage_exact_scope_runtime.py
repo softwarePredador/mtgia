@@ -64,6 +64,85 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_library_tutor_to_battlefield_respects_tapped_flag(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Forest", "type_line": "Basic Land - Forest", "cmc": 0},
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "tutor",
+            "battle_model_scope": "xmage_library_search_to_battlefield_spell_v1",
+            "target": "plains_island_swamp_or_mountain_to_battlefield",
+            "count": 1,
+            "tutor_enters_tapped": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Farseek", "type_line": "Sorcery"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(len(active.battlefield), 1)
+        tutored = active.battlefield[0]
+        self.assertEqual(tutored["name"], "Mountain")
+        self.assertTrue(tutored.get("tapped"))
+        self.assertTrue(
+            any(
+                event == "tutor_resolved"
+                and data.get("card") == "Fixture Farseek"
+                and data.get("destination") == "battlefield"
+                and data.get("found") == "Mountain"
+                for event, data in self.events
+            )
+        )
+
+    def test_library_tutor_to_top_moves_selected_card_to_library_top(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fixture Creature", "type_line": "Creature - Human", "cmc": 1},
+                {"name": "Fixture Sorcery", "type_line": "Sorcery", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "tutor",
+            "battle_model_scope": "xmage_library_search_to_library_top_spell_v1",
+            "target": "sorcery_to_top",
+            "count": 1,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Personal Tutor", "type_line": "Sorcery"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.library[0]["name"], "Fixture Sorcery")
+        self.assertEqual(len(active.hand), 0)
+        self.assertTrue(
+            any(
+                event == "tutor_resolved"
+                and data.get("card") == "Fixture Personal Tutor"
+                and data.get("destination") == "library_top"
+                and data.get("found") == "Fixture Sorcery"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_permanent_pays_mana_taps_and_draws(self) -> None:
         active = self.battle.Player(
             "Active",

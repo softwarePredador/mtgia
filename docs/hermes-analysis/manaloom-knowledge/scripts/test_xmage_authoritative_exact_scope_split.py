@@ -232,6 +232,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(proposal["safe_for_batch_pg_package"])
 
+    def test_library_tutor_land_to_battlefield_spell_is_package_safe(self) -> None:
+        row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutInPlayEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Farseek",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Search your library for a Plains, Island, Swamp, or Mountain card, "
+                    "put it onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("Plains, Island, Swamp, or Mountain card");
+                this.getSpellAbility().addEffect(new SearchLibraryPutInPlayEffect(
+                    new TargetCardInLibrary(filter), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "tutor")
+        self.assertEqual(effect["battle_model_scope"], split.TUTOR_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "plains_island_swamp_or_mountain_to_battlefield")
+        self.assertEqual(effect["count"], 1)
+        self.assertTrue(effect["tutor_enters_tapped"])
+
+    def test_library_tutor_to_top_spell_is_package_safe(self) -> None:
+        row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutOnLibraryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Personal Tutor",
+                type_line="Sorcery",
+                oracle_text="Search your library for a sorcery card, reveal it, then shuffle and put that card on top.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("sorcery card");
+                this.getSpellAbility().addEffect(new SearchLibraryPutOnLibraryEffect(new TargetCardInLibrary(filter), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "tutor")
+        self.assertEqual(effect["battle_model_scope"], split.TUTOR_TOP_SCOPE)
+        self.assertEqual(effect["target"], "sorcery_to_top")
+        self.assertEqual(effect["count"], 1)
+
+    def test_library_tutor_spell_blocks_additional_cost(self) -> None:
+        row = queue_row(split.TUTOR_UNIT, effect_classes=["SearchLibraryPutInPlayEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Migration",
+                type_line="Sorcery",
+                oracle_text=(
+                    "As an additional cost to cast this spell, reveal a Dinosaur card from your hand or pay {1}. "
+                    "Search your library for a basic land card, put it onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addCost(new OptionalAdditionalCostImpl("reveal a Dinosaur card from your hand or pay {1}"));
+                this.getSpellAbility().addEffect(new SearchLibraryPutInPlayEffect(
+                    new TargetCardInLibrary(StaticFilters.FILTER_CARD_BASIC_LAND), true));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "additional_cost_detected")
+
     def test_permanent_activated_draw_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

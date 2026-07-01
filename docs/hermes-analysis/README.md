@@ -50,7 +50,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
@@ -76,9 +76,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG317:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg317_permanent_activated_target_keyword_static_self_keyword_wave.md`.
-    Resultado all-card: `27407` identidades ainda com gap, `27093` com fonte
+    Evidencia corrente pos-PG318:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`.
+    Resultado all-card: `27394` identidades ainda com gap, `27080` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
     gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -107,12 +107,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     dies-draw, ETB damage, token spells/ETB tokens, boost+keyword, damage/destroy
     com life gain, alvo restrito, permanentes ativados de draw/damage/recursion/
     destroy/self-boost/target-keyword/target-boost e target-boost com sacrificio
-    da propria fonte, alem de target-keyword com keyword estatica propria. Todos
-    os pacotes PG285-PG317 passaram postcheck PostgreSQL e E2E em
-    PG/SQLite/snapshot/runtime. O splitter pos-PG317 retorna `proposal_count=0`
-    sobre `7419` linhas suportadas consideradas; a
+    da propria fonte, alem de target-keyword com keyword estatica propria. O
+    PG318 adicionou `13` tutors de biblioteca exatos para campo de batalha/topo
+    do grimorio, incluindo land tutors como `Farseek`/`Nature's Lore` e
+    `Personal Tutor`. Todos os pacotes PG285-PG318 passaram postcheck
+    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG318
+    retorna `proposal_count=0` sobre `8032` linhas suportadas consideradas; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
-    reducao reutilizavel.
+    reducao reutilizavel, partindo da fila global e nao de decks cadastrados.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

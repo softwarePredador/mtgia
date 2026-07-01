@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg317_permanent_activated_target_keyword_static_self_keyword_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27407`
-- XMage authoritative source resolved: `27093`
+- target all-card battle-gap identities: `27394`
+- XMage authoritative source resolved: `27080`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27093`
+- XMage authoritative adapter required: `27080`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27093` identities, card semantics are accepted from XMage; work is now
+- For `27080` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG317 Exact Adapter Waves
+## PG283-PG318 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG317 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG318 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -279,6 +279,12 @@ patterns:
   `ReturnFromGraveyardToBattlefieldTargetEffect`, no ability class, no
   additional cost, and exact self-graveyard single-target Oracle text ->
   `xmage_return_target_graveyard_card_to_battlefield_spell_v1`
+- `tutor::xmage_library_search_variant_review_v1` with
+  `SearchLibraryPutInPlayEffect` or `SearchLibraryPutOnLibraryEffect`, no
+  ability class, no additional cost, exact Oracle/source target/count/destination
+  matching, and simple land-to-battlefield or sorcery-to-library-top targets ->
+  `xmage_library_search_to_battlefield_spell_v1` and
+  `xmage_library_search_to_library_top_spell_v1`
 - `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1` ->
   `xmage_destroy_all_matching_permanents_spell_v1` and
   `xmage_fixed_damage_all_matching_permanents_spell_v1`
@@ -2035,6 +2041,77 @@ PG317 measured result:
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `626`.
 
+PG318 evidence:
+
+- PG318 library tutor spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_package.md`
+- PG318 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_pg_apply_evidence.md`
+- PG318 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_e2e_validation.md`
+- PG318 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_pg_to_sqlite_sync.json`
+- PG318 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg318_xmage_library_tutor_spell_wave_battle_rules_pg_to_sqlite_sync_canonical.json`
+- PG318 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg318_library_tutor_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg318_library_tutor_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg318_library_tutor_spell_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg318_library_tutor_spell_wave.md`
+- post-PG318 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg318_library_tutor_spell_wave_recheck.md`
+- post-PG318 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`
+- PG318 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_library_tutor_spell_wave.md`
+- post-PG318 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg318_existing_supported_recheck.md`
+
+PG318 measured result:
+
+- PG318 promoted `13` exact one-shot library tutor spells: `Circuitous Route`,
+  `Farseek`, `Into the North`, `Natural Connection`, `Nature's Lore`,
+  `Personal Tutor`, `Ranger's Path`, `Reshape the Earth`, `Shared Roots`,
+  `Skyshroud Claim`, `Spoils of Victory`, `Three Visits`, and `Untamed Wilds`.
+- Runtime now supports library-search tutor target families for `forest`,
+  `snow_land`, `basic_land_type`, `plains_island_swamp_or_mountain`,
+  `basic_land_or_gate`, `basic_land_or_town`, `instant`, and `sorcery`, and
+  preserves `tutor_enters_tapped` for battlefield land tutors.
+- The splitter blocks additional costs, distinct-name target selection,
+  non-spell/ability-class/effect-class unsupported tutor cases, and any
+  Oracle/source target/count/destination mismatch.
+- PostgreSQL apply evidence reports `13/13` promoted rows, `13/13`
+  verified/auto rows, `13/13` matching Oracle hash rows, and `14` stale shadow
+  rows backed up.
+- PG battle-rules -> Hermes/SQLite sync loaded `3492` PostgreSQL rules,
+  inserted/updated `3491` SQLite rows, and exported `4687` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5703` PostgreSQL card rows,
+  wrote `5628` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning; legacy
+  contamination `pass`.
+- Focused exact-scope tests cover strict library tutor splitting, additional
+  cost blocking, battlefield tapped-entry preservation, and library-top tutor
+  resolution; `190` focused exact-scope tests pass.
+- Global all-card readiness after PG318:
+  `battle_and_oracle_ready=2230`, `battle_family_mapper_required=30317`, and
+  `snapshot_has_verified_rule=3378`.
+- Global all-card authoritative queue after PG318:
+  `target_identity_count=27394`, `xmage_authoritative_source_count=27080`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27080`.
+- Running the exact splitter after PG318 on supported units returns
+  `proposal_count=0` over `8032` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG318 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1162`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `613`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -2470,23 +2547,29 @@ PG -> Hermes sync.
 
 ## Definitive Flow
 
-### Gate 0 - Scope Selection
+### Gate 0 - Global Scope Selection
 
 Input:
 
-- latest battle/replay artifact scope;
-- forced deck IDs such as Lorehold deck 6 and relevant learned opponent decks;
-- any explicit user-specified decks.
+- PostgreSQL `cards` inventory;
+- current legalities and Oracle identity data;
+- current trusted battle-rule coverage by `card_id`, normalized name, and
+  true Oracle identity aliases;
+- deck/replay/learned usage only as QA sampling and smoke-test seeds.
 
 Output:
 
-- `aggregate_scope.effective_deck_ids`
-- combined deck-card coherence report
+- all-card readiness report;
+- authoritative XMage adaptation queue;
+- family/work-unit counts;
+- explicit missing-source exception lane.
 
 Rules:
 
-- Replay/deck evidence prioritizes work.
-- Replay/deck evidence does not define rule truth.
+- The base scope is global over all known cards, not Lorehold, registered decks,
+  or currently saved decks.
+- Replay/deck evidence may prioritize QA validation only.
+- Replay/deck evidence does not define rule truth or market demand.
 
 ### Gate 1 - Oracle/Data Normalization
 
@@ -2667,41 +2750,47 @@ Rules:
 
 ## Current Priority Order
 
-Use this order until a fresh E2E queue changes it:
+Use the fresh global authoritative queue after every package. As of the
+post-PG318 queue, the next exact runtime-backed work should be selected from
+these largest reusable work units, not from deck intuition:
 
-1. Close any exact package-ready lane only if it is non-generic and has focused
-   runtime/test proof.
-2. Split and test `ramp_permanent` because it currently has `49` cards and is
-   turn-timing critical.
-3. Split and test `targeted_interaction` because it now has `24` cards after
-   blink, redirect, multi-damage, and target-untap routing.
-4. Split and test `tutor` because it has `14` cards and strongly affects
-   combo/deck search behavior.
-5. Split and test `free_cast` because it has `11` cards and high runtime risk.
-6. Split and test `passive`, `recursion`, `targeted_protection`,
-   `ramp_ritual`, and `life_total_change` in that order unless a replay/deck
-   priority makes one urgent.
-7. Treat the remaining `token_maker` runtime item as an exact Hazel's
-   Brewmaster exception, not as permission to implement a generic token-maker
-   executor.
-8. Work the remaining `manual_model` backlog by adding mapper patterns, not by
-   reviewing one card at a time.
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1984`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
+3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
+4. `direct_damage::targeted_damage_variant_v1` - `928`
+5. `add_counters::source_add_counters_variant_v1` - `795`
+6. `life_gain::xmage_life_gain_variant_review_v1` - `754`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`
+8. `removal_destroy::targeted_destroy_variant_v1` - `636`
+9. `tutor::xmage_library_search_variant_review_v1` - `613`
+
+Selection rule:
+
+- close any exact package-ready lane first only if it is non-generic and has
+  focused runtime/test proof;
+- otherwise split the highest reusable work unit into a narrow
+  `battle_model_scope` whose XMage source, Oracle text, runtime behavior, and
+  negative blockers all agree;
+- if the split produces no safe candidates, record the blocker counts and move
+  to the next largest reusable work unit;
+- do not implement broad `xmage_*_review_v1` behavior directly and do not
+  schedule card-by-card work before all reusable subpatterns have been tried.
 
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
 
-- current replay/deck scope manifest;
-- combined coherence report;
-- XMage index;
-- validity audit;
-- semantic family report;
-- proposal report;
-- shadow pattern registry;
+- global all-card readiness report;
+- authoritative XMage adaptation queue;
+- exact-scope split report for the selected family/subpattern;
+- blocked-reason counts for unsafe neighbors;
 - focused tests/runtime output for any executable change;
 - PostgreSQL package evidence when a durable rule is promoted;
-- PG -> Hermes sync report after apply;
-- post-sync deck/replay audit.
+- PG -> Hermes/SQLite sync report after apply;
+- canonical snapshot refresh;
+- E2E package validation;
+- final alignment audits;
+- post-sync queue rebuild proving the package reduced a real queue dimension.
 
 ## Stop Conditions
 
@@ -2731,26 +2820,23 @@ A card is considered closed for battle/deckbuilding only when all are true:
 
 ## Practical Next Command
 
-The next productive command should rebuild the current queue after any new
-runtime/package wave, then pick the highest queue-reducing exact scope:
+The next productive command should rebuild the global authoritative queue after
+any new runtime/package wave, then pick the highest queue-reducing exact scope:
 
 ```bash
-python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_current_replay_batch_pipeline.py \
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py \
   --xmage-root /Users/desenvolvimentomobile/Downloads/mage-master \
-  --skip-materialize \
-  --include-deck-id 6 \
-  --include-deck-id 607 \
-  --include-deck-id 608 \
-  --include-deck-id 609 \
-  --include-deck-id 610 \
-  --include-deck-id 611 \
-  --include-deck-id 612 \
-  --include-deck-id 613 \
-  --include-deck-id 614 \
-  --include-deck-id 615 \
-  --include-deck-id 616 \
-  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_$(date -u +%Y%m%d_%H%M%S)_current
+  --scope commander_legal_battle_gap \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_$(date -u +%Y%m%d_%H%M%S)_current
 ```
 
-Then use the manifest/family/proposal/pattern reports to select the next exact
-scope. Do not select work by intuition when the queue reports disagree.
+Then inspect `summary.top_adapter_work_units`, implement the next exact
+subpattern, and rerun:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_YYYYMMDD_HHMMSS_current.json \
+  --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_YYYYMMDD_HHMMSS_next
+```
+
+Do not select work by intuition when the global queue reports disagree.

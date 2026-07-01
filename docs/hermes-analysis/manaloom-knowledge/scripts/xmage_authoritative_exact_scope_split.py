@@ -33,6 +33,7 @@ RAMP_CREATURE_UNIT = "ramp_permanent::xmage_creature_mana_source_variant_review_
 COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
+TUTOR_UNIT = "tutor::xmage_library_search_variant_review_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
 ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
 BOOST_TARGET_UNIT = (
@@ -67,6 +68,7 @@ SUPPORTED_UNITS = {
     COUNTER_UNIT,
     BOUNCE_UNIT,
     RECURSION_UNIT,
+    TUTOR_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
@@ -90,6 +92,8 @@ COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
+TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
@@ -118,6 +122,7 @@ SPELL_UNITS = {
     COUNTER_UNIT,
     BOUNCE_UNIT,
     RECURSION_UNIT,
+    TUTOR_UNIT,
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
@@ -2435,6 +2440,156 @@ def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
     return None
 
 
+COUNT_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
+
+
+def library_tutor_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.removesuffix(".")
+    mapping = {
+        "basic land card": "basic_land",
+        "basic land cards": "basic_land",
+        "basic lands": "basic_land",
+        "basic land cards and/or gate cards": "basic_land_or_gate",
+        "basic lands and/or gates": "basic_land_or_gate",
+        "basic land cards and/or town cards with different names": "basic_land_or_town",
+        "forest card": "forest",
+        "forest cards": "forest",
+        "land cards": "land",
+        "snow land card": "snow_land",
+        "plains, island, swamp, or mountain card": "plains_island_swamp_or_mountain",
+        "plains, island, swamp, mountain, or forest card": "basic_land_type",
+        "sorcery card": "sorcery",
+    }
+    return mapping.get(normalized)
+
+
+def parse_library_tutor_query(query: str) -> dict[str, Any] | None:
+    text = re.sub(r"\s+", " ", str(query or "").strip().lower())
+    up_to = False
+    count = 1
+    phrase = text
+    match = re.match(r"^up to (?P<count>\w+) (?P<phrase>.+)$", text)
+    if match:
+        count_text = match.group("count")
+        count = COUNT_WORDS.get(count_text) or (int(count_text) if count_text.isdigit() else 0)
+        up_to = True
+        phrase = match.group("phrase")
+    else:
+        for prefix in ("a ", "an "):
+            if phrase.startswith(prefix):
+                phrase = phrase[len(prefix) :]
+                break
+    target = library_tutor_target_from_phrase(phrase)
+    if target is None or count <= 0:
+        return None
+    return {"target": target, "count": count, "up_to_count": up_to}
+
+
+def library_tutor_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    if "additional cost" in text:
+        return "library_tutor_oracle_additional_cost_not_supported"
+    top_match = re.match(
+        r"^search your library for (?P<query>.+?), reveal it, then shuffle and put that card on top\.?$",
+        text,
+    )
+    if top_match:
+        parsed = parse_library_tutor_query(top_match.group("query"))
+        if parsed is None:
+            return "library_tutor_oracle_target_not_supported"
+        parsed["destination"] = "library_top"
+        parsed["enters_tapped"] = False
+        return parsed
+
+    battle_match = re.match(
+        r"^search your library for (?P<query>.+?)(?:,| and) put "
+        r"(?:it|that card|them|those cards) onto the battlefield(?P<tapped> tapped)?"
+        r"(?:, then shuffle|\. then shuffle)\.?$",
+        text,
+    )
+    if battle_match:
+        parsed = parse_library_tutor_query(battle_match.group("query"))
+        if parsed is None:
+            return "library_tutor_oracle_target_not_supported"
+        parsed["destination"] = "battlefield"
+        parsed["enters_tapped"] = bool(battle_match.group("tapped"))
+        return parsed
+    return "library_tutor_oracle_not_simple"
+
+
+def library_tutor_target_from_source(source: str) -> str | None:
+    text = source or ""
+    if "FILTER_CARD_BASIC_LAND" in text:
+        return "basic_land"
+    if "FILTER_CARD_LANDS" in text:
+        return "land"
+    filter_match = re.search(r'new\s+Filter(?:Land)?Card\s*\(\s*"([^"]+)"\s*\)', text)
+    if filter_match:
+        return library_tutor_target_from_phrase(filter_match.group(1))
+    return None
+
+
+def library_tutor_count_from_source(source: str) -> tuple[int, bool]:
+    match = re.search(
+        r"TargetCard(?:WithDifferentName)?InLibrary\s*\(\s*0\s*,\s*(\d+)\s*,",
+        source or "",
+        re.S,
+    )
+    if match:
+        return int(match.group(1)), True
+    return 1, False
+
+
+def library_tutor_from_source(source: str, effect_class: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "library_tutor_source_additional_cost_not_supported"
+    if "TargetCardWithDifferentNameInLibrary" in text:
+        return "library_tutor_source_distinct_names_not_supported"
+    target = library_tutor_target_from_source(text)
+    if target is None:
+        return "library_tutor_source_target_not_supported"
+    count, up_to = library_tutor_count_from_source(text)
+    if effect_class == "SearchLibraryPutInPlayEffect":
+        if "SearchLibraryPutInPlayEffect" not in text:
+            return "library_tutor_source_effect_not_found"
+        tapped_match = re.search(
+            r"SearchLibraryPutInPlayEffect\s*\(\s*(?:new\s+TargetCardInLibrary\s*\([^)]*\)|\w+)\s*,\s*(true|false)",
+            text,
+            re.S,
+        )
+        return {
+            "target": target,
+            "count": count,
+            "up_to_count": up_to,
+            "destination": "battlefield",
+            "enters_tapped": bool(tapped_match and tapped_match.group(1) == "true"),
+        }
+    if effect_class == "SearchLibraryPutOnLibraryEffect":
+        if "SearchLibraryPutOnLibraryEffect" not in text:
+            return "library_tutor_source_effect_not_found"
+        return {
+            "target": target,
+            "count": count,
+            "up_to_count": up_to,
+            "destination": "library_top",
+            "enters_tapped": False,
+        }
+    return "library_tutor_source_effect_not_supported"
+
+
 def target_constraints_for(target: str) -> dict[str, Any]:
     if target == "any_target":
         return {"scope": "any_target"}
@@ -3804,6 +3959,44 @@ def split_row(
         if up_to:
             effect_json["up_to_count"] = True
         return build_proposal(row, metadata, effect_json, family_id="xmage_graveyard_to_hand_spell"), "selected_exact_scope"
+
+    if unit == TUTOR_UNIT:
+        if not is_spell(metadata):
+            return None, "not_instant_or_sorcery_spell"
+        if ability_classes(row):
+            return None, "tutor_ability_class_not_simple"
+        if has_additional_cost(source_text) or "additional cost" in oracle_text(metadata):
+            return None, "additional_cost_detected"
+        if classes not in ({"SearchLibraryPutInPlayEffect"}, {"SearchLibraryPutOnLibraryEffect"}):
+            return None, "tutor_effect_class_not_supported"
+        effect_class = next(iter(classes))
+        oracle_tutor = library_tutor_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = library_tutor_from_source(source_text, effect_class)
+        if isinstance(source_tutor, str):
+            return None, source_tutor
+        for key in ("target", "count", "up_to_count", "destination", "enters_tapped"):
+            if source_tutor.get(key) != oracle_tutor.get(key):
+                return None, f"library_tutor_source_oracle_{key}_mismatch"
+        destination = oracle_tutor["destination"]
+        target = f"{oracle_tutor['target']}_to_battlefield" if destination == "battlefield" else f"{oracle_tutor['target']}_to_top"
+        count = int(oracle_tutor["count"])
+        scope = TUTOR_BATTLEFIELD_SCOPE if destination == "battlefield" else TUTOR_TOP_SCOPE
+        effect_json = {
+            "effect": "tutor",
+            "battle_model_scope": scope,
+            "target": target,
+            "count": count,
+            "max_count": count,
+            "xmage_effect_class": effect_class,
+            **flags,
+        }
+        if oracle_tutor.get("up_to_count"):
+            effect_json["up_to_count"] = True
+        if destination == "battlefield":
+            effect_json["tutor_enters_tapped"] = bool(oracle_tutor.get("enters_tapped"))
+        return build_proposal(row, metadata, effect_json, family_id="xmage_library_search_spell"), "selected_exact_scope"
 
     if unit == BOARD_WIPE_UNIT:
         if ability_classes(row):
