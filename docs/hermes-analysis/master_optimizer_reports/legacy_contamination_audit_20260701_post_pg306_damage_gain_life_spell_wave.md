@@ -1,7 +1,7 @@
 # Legacy Contamination Audit
 
 - Status: `pass`
-- Generated at: `2026-07-01T13:02:54.238032+00:00`
+- Generated at: `2026-07-01T13:06:05.190547+00:00`
 - Delegates to: `workspace_contract_drift_audit.py`
 
 ## Summary

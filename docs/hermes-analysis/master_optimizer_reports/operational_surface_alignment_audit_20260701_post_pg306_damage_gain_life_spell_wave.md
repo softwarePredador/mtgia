@@ -1,9 +1,9 @@
 # Operational Surface Alignment Audit
 
-- Generated at: `2026-07-01T13:02:53.134168+00:00`
+- Generated at: `2026-07-01T13:06:04.820147+00:00`
 - Status: `pass`
 - Summary: `{"check_count": 35, "status_counts": {"pass": 35}}`
-- Inventory: `{"report_files": 5312, "script_files": 437, "top_level_docs": 109}`
+- Inventory: `{"report_files": 5320, "script_files": 437, "top_level_docs": 109}`
 
 | Check | Status | Detail |
 | --- | --- | --- |
