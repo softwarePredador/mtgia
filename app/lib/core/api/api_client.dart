@@ -40,9 +40,7 @@ class ApiClient {
     'DISABLE_FIREBASE_PERFORMANCE_INIT',
     defaultValue: false,
   );
-  static const String _debugAndroidEmulatorUrl = 'http://10.0.2.2:8080';
-  static const String _debugLocalhostUrl = 'http://127.0.0.1:8080';
-  static const String _releaseFallbackUrl =
+  static const String _serverFallbackUrl =
       'https://evolution-cartinhas.8ktevp.easypanel.host';
 
   // ──────────────────────────────────────────
@@ -78,14 +76,7 @@ class ApiClient {
       return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
     }
 
-    if (kDebugMode) {
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-        return _debugAndroidEmulatorUrl;
-      }
-      return _debugLocalhostUrl;
-    }
-
-    return _releaseFallbackUrl;
+    return _serverFallbackUrl;
   }
 
   /// Log da URL base resolvida (chamado uma vez no boot)
@@ -97,7 +88,7 @@ class ApiClient {
     if (_envBaseUrl.trim().isEmpty) {
       if (kDebugMode) {
         debugPrint(
-          '[🌐 ApiClient] fallback de debug ativo; em device físico ou backend remoto use --dart-define=API_BASE_URL=https://seu-host',
+          '[🌐 ApiClient] API_BASE_URL ausente; usando servidor público. Para backend local, passe --dart-define=API_BASE_URL=http://127.0.0.1:8080',
         );
       } else if (baseUrl.isEmpty) {
         debugPrint(
@@ -560,8 +551,9 @@ class ApiClient {
   void _ensureBaseUrlConfigured() {
     if (baseUrl.isNotEmpty) return;
     throw StateError(
-      'API_BASE_URL não configurado. Em debug use --dart-define=API_BASE_URL=http://seu-host:8080 '
-      'para backend remoto/device físico; em release/profile configure a URL pública da API no build.',
+      'API_BASE_URL não configurado e fallback público indisponível. '
+      'Configure --dart-define=API_BASE_URL=https://seu-host para backend remoto, '
+      'ou passe uma URL local explicitamente durante desenvolvimento.',
     );
   }
 }
