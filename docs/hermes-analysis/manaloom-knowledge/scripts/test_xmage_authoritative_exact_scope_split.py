@@ -983,6 +983,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_count_not_fixed")
 
+    def test_creature_dies_draw_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Scholar",
+                type_line="Creature - Human Wizard",
+                oracle_text="When this creature dies, draw two cards.",
+            ),
+            source_text="this.addAbility(new DiesSourceTriggeredAbility(new DrawCardSourceControllerEffect(2)));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.DIES_DRAW_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["draw_cards_when_this_dies"], 2)
+
+    def test_creature_dies_draw_preserves_static_keyword_and_optional_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Fisher",
+                type_line="Creature - Bird",
+                oracle_text="Flying\nWhen this creature dies, you may draw a card.",
+            ),
+            source_text="this.addAbility(FlyingAbility.getInstance()); this.addAbility(new DiesSourceTriggeredAbility(new DrawCardSourceControllerEffect()));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["dies_draw_optional"])
+        self.assertEqual(effect["draw_cards_when_this_dies"], 1)
+
+    def test_creature_dies_draw_blocks_conditional_amount(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Zubera",
+                type_line="Creature - Zubera Spirit",
+                oracle_text="When this creature dies, draw a card for each Zubera that died this turn.",
+            ),
+            source_text="this.addAbility(new DiesSourceTriggeredAbility(new DrawCardSourceControllerEffect(new ZuberaValue())));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_draw_count_not_fixed")
+
     def test_creature_etb_destroy_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DESTROY_UNIT,

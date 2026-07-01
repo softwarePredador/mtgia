@@ -999,6 +999,42 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_draw_trigger_draws_when_moved_to_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Draw A"}, {"name": "Draw B"}, {"name": "Draw C"}],
+        )
+        permanent = {
+            "name": "Fixture Scholar",
+            "type_line": "Creature - Human Wizard",
+            "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+            "draw_cards_when_this_dies": 2,
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual([card["name"] for card in active.hand], ["Draw A", "Draw B"])
+        self.assertEqual([card["name"] for card in active.library], ["Draw C"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Scholar"])
+        self.assertTrue(
+            any(
+                event == "dies_draw_resolved"
+                and data.get("card") == "Fixture Scholar"
+                and data.get("draw_count") == 2
+                and data.get("cards_drawn") == ["Draw A", "Draw B"]
+                and data.get("source") == "Fixture Removal"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_graveyard_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

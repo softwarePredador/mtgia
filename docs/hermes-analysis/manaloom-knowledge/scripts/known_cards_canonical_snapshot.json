@@ -3380,6 +3380,28 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Aven Fisher": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "dies_draw_optional": true,
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+    "battle_rule_oracle_hash": "35358c6326c79dff970e9334ec8c9fc7"
+  },
   "Aven Fleetwing": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -7158,6 +7180,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8bb799fcab485467f01ab993c9a6c490"
+  },
+  "Buzz Bots": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying",
+      "vigilance"
+    ],
+    "trigger": "dies",
+    "vigilance": true,
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+    "battle_rule_oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c"
   },
   "Cabal Coffers": {
     "effect": "land",
@@ -11682,6 +11727,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f7c3765a8a69fba19efc9b2ace7a7abc"
+  },
+  "Darkslick Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
   "Darkslick Shores": {
     "effect": "land",
@@ -16900,6 +16966,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f30c522a9f02fff8ee918471a4c698ef"
   },
+  "Exultant Cultist": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+    "battle_rule_oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f"
+  },
   "Exultant Skymarcher": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -17754,6 +17836,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "963bacdc88ebfc83725d4e33e5055d58"
+  },
+  "Feral Prowler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+    "battle_rule_oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f"
   },
   "Feral Roar": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
@@ -26345,6 +26443,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eef2e30d6f8673ad547f28231192ba12"
   },
+  "Ithilien Kingfisher": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
+  },
   "Izzet Boilerworks": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -27458,6 +27577,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
+  },
+  "Kingfisher": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
   "Kinnan, Bonder Prodigy": {
     "activated_top_five_nonhuman_creature_to_battlefield_cost_text": "{5}{G}{U}",
@@ -30330,6 +30470,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:fb9b2b633a4842d42599c293e0de4d68"
   },
+  "Malcator's Watcher": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying",
+      "vigilance"
+    ],
+    "trigger": "dies",
+    "vigilance": true,
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+    "battle_rule_oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c"
+  },
   "Malcolm, Alluring Scoundrel": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -31319,6 +31482,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+  },
+  "Messenger Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
   "Messenger Falcons": {
     "_keywords_are_self": true,
@@ -34971,6 +35155,23 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e6415c80b5efe7c3d98ed939ed243dac"
   },
+  "Oculus": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "dies_draw_optional": true,
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1",
+    "battle_rule_oracle_hash": "6b50ed9a786cc4c6a67a39958cde14d5"
+  },
   "Odric, Lunarch Marshal": {
     "cmc": 4.0,
     "effect": "indestructible",
@@ -35648,6 +35849,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Outlaw Medic": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "keywords": [
+      "lifelink"
+    ],
+    "lifelink": true,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562",
+    "battle_rule_oracle_hash": "5222cfc1c97ff774bd7ae4c29facbcb9"
+  },
   "Outpost Siege": {
     "cmc": 4.0,
     "effect": "remove_creature",
@@ -35974,6 +36196,27 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Palace Familiar": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
   "Palant\u00edr of Orthanc": {
     "ability_kind": "triggered",
@@ -38389,6 +38632,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2fb771380609b4d180c1e6816bf8b556",
     "battle_rule_oracle_hash": "01ee853118a4f1e5fe31a9d1e3ec6c5d"
+  },
+  "Purple-Crystal Crab": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+    "battle_rule_oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f"
   },
   "Pursue the Past": {
     "cmc": 0.0,
@@ -41640,6 +41899,27 @@
     "battle_rule_logical_key": "battle_rule_v1:c68e635c5defec520b399779a409a08e",
     "battle_rule_oracle_hash": "d496299033167e64d1ba06610979c042"
   },
+  "Riptide Crab": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "keywords": [
+      "vigilance"
+    ],
+    "trigger": "dies",
+    "vigilance": true,
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5a56c6f641c9b74b02fdbdcdedd2a09",
+    "battle_rule_oracle_hash": "2280fa92174caef69c202572ea704e5d"
+  },
   "Riptide Laboratory": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -42613,6 +42893,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ac1ab7b07d9e4a4cb5ce455bc50ccb7e",
     "battle_rule_oracle_hash": "41538153d9a8b81b8233170efee5f9da"
+  },
+  "Runewing": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "defender": true,
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying",
+      "defender"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:371517171c3c8e8acf8a1361cfa159a0",
+    "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
   "Rupture Spire": {
     "effect": "land",
@@ -45975,6 +46278,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b123339bcf829b9e1ba1f08999b3ad59"
   },
+  "Silverback Shaman": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "keywords": [
+      "trample"
+    ],
+    "trample": true,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a99f0e46cabe2435deed0a78680e6169",
+    "battle_rule_oracle_hash": "b45dc07e5871f7dba2ae764dfb4247b1"
+  },
   "Silverbeak Griffin": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -48294,6 +48618,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:bf049ad84b753619ef29cb4f4482c3e1"
   },
+  "Spore Crawler": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+    "battle_rule_oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f"
+  },
   "Spore Frog": {
     "cmc": 1.0,
     "effect": "indestructible",
@@ -49774,6 +50114,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Summit Sentinel": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+    "battle_rule_oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f"
+  },
   "Summon: Bahamut": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -50360,6 +50716,28 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Surveilling Sprite": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "dies_draw_optional": true,
+    "draw_cards_when_this_dies": 1,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+    "battle_rule_oracle_hash": "9337d0e3a5e0c18a935780ff11d2fd75"
   },
   "Survival of the Fittest": {
     "effect": "passive",
@@ -60829,6 +61207,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "3595fe627f1b6adb32bafe5c4a236316"
+  },
+  "Youthful Scholar": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+    "draw_cards_when_this_dies": 2,
+    "effect": "creature",
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0e16e994fbe4555f04230a5cd25e40d8",
+    "battle_rule_oracle_hash": "c5a00d45e9edfaf008a133c55fea3f24"
   },
   "Zagoth Triome": {
     "effect": "land",

@@ -1,0 +1,742 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T11:35:12.518778+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_manifest.json",
+  "package_id": "pg301_xmage_creature_dies_draw_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 20
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Aven Fisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+          "oracle_hash": "35358c6326c79dff970e9334ec8c9fc7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Buzz Bots",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+          "oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Darkslick Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Exultant Cultist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Feral Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Ithilien Kingfisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Kingfisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Malcator's Watcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+          "oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Messenger Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Oculus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1",
+          "oracle_hash": "6b50ed9a786cc4c6a67a39958cde14d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Outlaw Medic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562",
+          "oracle_hash": "5222cfc1c97ff774bd7ae4c29facbcb9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Palace Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Purple-Crystal Crab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Riptide Crab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e5a56c6f641c9b74b02fdbdcdedd2a09",
+          "oracle_hash": "2280fa92174caef69c202572ea704e5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Runewing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:371517171c3c8e8acf8a1361cfa159a0",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Silverback Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a99f0e46cabe2435deed0a78680e6169",
+          "oracle_hash": "b45dc07e5871f7dba2ae764dfb4247b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Spore Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Summit Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Surveilling Sprite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+          "oracle_hash": "9337d0e3a5e0c18a935780ff11d2fd75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Youthful Scholar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e16e994fbe4555f04230a5cd25e40d8",
+          "oracle_hash": "c5a00d45e9edfaf008a133c55fea3f24",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 20
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Aven Fisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+          "oracle_hash": "35358c6326c79dff970e9334ec8c9fc7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Buzz Bots",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+          "oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Darkslick Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Exultant Cultist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Feral Prowler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Ithilien Kingfisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Kingfisher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Malcator's Watcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c",
+          "oracle_hash": "36f0097c0400d7b90626ea3f2f801a9c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Messenger Drake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Oculus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1",
+          "oracle_hash": "6b50ed9a786cc4c6a67a39958cde14d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Outlaw Medic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562",
+          "oracle_hash": "5222cfc1c97ff774bd7ae4c29facbcb9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Palace Familiar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Purple-Crystal Crab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Riptide Crab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e5a56c6f641c9b74b02fdbdcdedd2a09",
+          "oracle_hash": "2280fa92174caef69c202572ea704e5d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Runewing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:371517171c3c8e8acf8a1361cfa159a0",
+          "oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Silverback Shaman",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a99f0e46cabe2435deed0a78680e6169",
+          "oracle_hash": "b45dc07e5871f7dba2ae764dfb4247b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Spore Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Summit Sentinel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d",
+          "oracle_hash": "fb092a7e7ac7389ff02bf4b417932b5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Surveilling Sprite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880",
+          "oracle_hash": "9337d0e3a5e0c18a935780ff11d2fd75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "card_name": "Youthful Scholar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e16e994fbe4555f04230a5cd25e40d8",
+          "oracle_hash": "c5a00d45e9edfaf008a133c55fea3f24",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 20
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven Fisher",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Buzz Bots",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Darkslick Drake",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Exultant Cultist",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Feral Prowler",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ithilien Kingfisher",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kingfisher",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Malcator's Watcher",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Messenger Drake",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Oculus",
+          "logical_rule_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Outlaw Medic",
+          "logical_rule_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Palace Familiar",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Purple-Crystal Crab",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Riptide Crab",
+          "logical_rule_key": "battle_rule_v1:e5a56c6f641c9b74b02fdbdcdedd2a09"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Runewing",
+          "logical_rule_key": "battle_rule_v1:371517171c3c8e8acf8a1361cfa159a0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Silverback Shaman",
+          "logical_rule_key": "battle_rule_v1:a99f0e46cabe2435deed0a78680e6169"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spore Crawler",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Summit Sentinel",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Surveilling Sprite",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_draw_cards_v1",
+          "battle_rule_version": 2,
+          "card_name": "Youthful Scholar",
+          "logical_rule_key": "battle_rule_v1:0e16e994fbe4555f04230a5cd25e40d8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 20
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aven Fisher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Buzz Bots",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Darkslick Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Exultant Cultist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Feral Prowler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ithilien Kingfisher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kingfisher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Malcator's Watcher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:addae1873b8bafa674aa0afff1ada67c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Messenger Drake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Oculus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:baf5208731a47caf902b797a4015f6c1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Outlaw Medic",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a1716618c3327adc32eff035e108b562"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Palace Familiar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Purple-Crystal Crab",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Riptide Crab",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e5a56c6f641c9b74b02fdbdcdedd2a09"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Runewing",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:371517171c3c8e8acf8a1361cfa159a0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Silverback Shaman",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a99f0e46cabe2435deed0a78680e6169"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spore Crawler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Summit Sentinel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:65cc6b89128097ecf46cac9de6ac6a0d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Surveilling Sprite",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:561fedc0b7c3a796f8a3426d6f0a7880"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Youthful Scholar",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:0e16e994fbe4555f04230a5cd25e40d8"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

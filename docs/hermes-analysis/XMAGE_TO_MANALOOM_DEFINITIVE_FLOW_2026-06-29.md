@@ -121,15 +121,15 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg300_recursion_battlefield_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg301_creature_dies_draw_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27759`
-- XMage authoritative source resolved: `27445`
+- target all-card battle-gap identities: `27739`
+- XMage authoritative source resolved: `27425`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27445`
+- XMage authoritative adapter required: `27425`
 - ManaLoom adapter work-unit keys: `11905`
 - authoritative source coverage ratio: `0.9887`
 
@@ -151,9 +151,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG300 Exact Adapter Waves
+## PG283-PG301 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG300 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG301 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -180,6 +180,11 @@ patterns:
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
   `xmage_creature_etb_draw_cards_v1`
+- `draw_engine::xmage_draw_card_variant_review_v1` with
+  `DrawCardSourceControllerEffect + DiesSourceTriggeredAbility` on creatures,
+  optional static self keywords, and exact fixed "When/Whenever this creature
+  dies, draw N cards" Oracle text ->
+  `xmage_creature_dies_draw_cards_v1`
 - `removal_destroy::targeted_destroy_variant_v1` with
   `DestroyTargetEffect + EntersBattlefieldTriggeredAbility` on creatures and
   exact unrestricted ETB destroy Oracle text ->
@@ -852,6 +857,54 @@ PG300 measured result:
   `proposal_count=0` over `7317` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with the largest
   current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG301 evidence:
+
+- PG301 creature dies draw package:
+  `docs/hermes-analysis/master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_package.md`
+- PG301 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_pg_apply_evidence.md`
+- PG301 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_e2e_validation.md`
+- post-PG301 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg301_creature_dies_draw_wave_recheck.md`
+- post-PG301 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg301_creature_dies_draw_wave.md`
+- post-PG301 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg301_existing_supported_recheck.md`
+
+PG301 measured result:
+
+- PG301 promoted `20` exact creatures whose local XMage source is
+  `DrawCardSourceControllerEffect` behind `DiesSourceTriggeredAbility`, mapped
+  to `xmage_creature_dies_draw_cards_v1`.
+- Runtime now resolves `draw_cards_when_this_dies` only when the permanent
+  moves from battlefield to graveyard and emits `dies_draw_resolved` replay
+  evidence with the requested and actual drawn card count.
+- The splitter blocks variable or conditional dies-draw amounts such as
+  Zubera-style text, and allows only optional static self keywords plus exact
+  fixed dies-draw Oracle text.
+- PostgreSQL postcheck: `20/20` promoted rows, `20/20` verified/auto, `20/20`
+  matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6752` PostgreSQL rows, inserted/updated
+  `6546` SQLite rows, and exported `4365` canonical snapshot rows.
+- E2E package validation: PostgreSQL `20/20`, SQLite `20/20`, canonical
+  snapshot `20/20`, and runtime `get_card_effect` `20/20`.
+- Focused exact-scope tests cover strict dies-draw mapping, static keyword and
+  optional draw preservation, dynamic/blocked dies-draw text, and runtime
+  battlefield-to-graveyard draw resolution; `98` focused exact-scope tests
+  pass.
+- Global all-card authoritative queue after PG301:
+  `target_identity_count=27739`, `xmage_authoritative_source_count=27425`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27425`.
+- Running the exact splitter after PG301 on supported units returns
+  `proposal_count=0` over `7319` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,
   `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
   `tutor`.

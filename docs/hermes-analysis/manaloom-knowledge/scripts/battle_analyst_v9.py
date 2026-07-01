@@ -16960,6 +16960,28 @@ def grant_graveyard_flashback_until_eot(player, source_card, effect_data, turn):
     return granted
 
 
+def resolve_permanent_dies_draw(owner, permanent, *, destination=None, reason=None, source=None):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return []
+    draw_count = max(0, int(permanent.get("draw_cards_when_this_dies") or 0))
+    if draw_count <= 0:
+        return []
+    drawn = owner.draw(draw_count)
+    emit_replay_event(
+        "dies_draw_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        draw_count=draw_count,
+        cards_drawn=[card.get("name", "?") for card in drawn if isinstance(card, dict)],
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        optional=bool(permanent.get("dies_draw_optional")),
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return drawn
+
+
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
     destination = _move_creature_from_battlefield(
         owner,
@@ -16983,6 +17005,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
             source=source.get("name", "?") if isinstance(source, dict) else source,
             turn=CURRENT_REPLAY_TURN,
         )
+    resolve_permanent_dies_draw(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     resolve_leave_battlefield_treasure_trigger(
         owner,
         creature,
@@ -17024,6 +17053,13 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             source=source.get("name", "?") if isinstance(source, dict) else source,
             turn=CURRENT_REPLAY_TURN,
         )
+    resolve_permanent_dies_draw(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     resolve_leave_battlefield_treasure_trigger(
         owner,
         permanent,

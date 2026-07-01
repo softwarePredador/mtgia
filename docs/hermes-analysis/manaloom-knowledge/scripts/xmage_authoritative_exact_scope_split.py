@@ -76,6 +76,7 @@ ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -675,6 +676,19 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"DiesSourceTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and "DiesSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
 def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
         return False
@@ -854,6 +868,27 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def dies_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    match = re.match(
+        r"^(?:when|whenever) this creature dies, (you may )?draw "
+        r"(a|one|two|three|four|five|\d+) cards?\.?$",
+        text,
+    )
+    if not match:
+        return None
+    value = match.group(2)
+    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    count = words.get(value)
+    if count is None and value.isdigit():
+        count = int(value)
+    if count is None:
+        count = 0
+    if count <= 0:
+        return None
+    return count, bool(match.group(1))
+
+
 def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
     patterns: list[tuple[str, tuple[str, str]]] = [
@@ -1028,6 +1063,7 @@ def split_row(
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
@@ -1036,6 +1072,7 @@ def split_row(
         and not keyword_creature_unit
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not dies_draw_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
@@ -1050,6 +1087,7 @@ def split_row(
         unit in SPELL_UNITS
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not dies_draw_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
@@ -1160,6 +1198,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_draw_cards",
+        ), "selected_exact_scope"
+
+    if dies_draw_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_draw_not_creature"
+        parsed = dies_draw_from_oracle(metadata)
+        constructor_count = java_constructor_int_or_noarg_default(
+            source_text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if parsed is None:
+            return None, "dies_draw_count_not_fixed"
+        count, optional = parsed
+        if constructor_count is None:
+            return None, "dies_draw_count_source_not_fixed"
+        if constructor_count != count:
+            return None, "dies_draw_count_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_DRAW_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "draw_cards_when_this_dies": count,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+        }
+        if optional:
+            effect_json["dies_draw_optional"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_draw_cards",
         ), "selected_exact_scope"
 
     if etb_destroy_creature_unit:
@@ -1608,6 +1686,7 @@ def build_exact_split_report(
             and not is_static_keyword_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
+            and not is_creature_dies_draw_unit(row)
             and not is_creature_tap_damage_unit(row)
         ):
             continue
@@ -1644,6 +1723,7 @@ def build_exact_split_report(
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
             ],
