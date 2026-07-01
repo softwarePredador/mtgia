@@ -4245,6 +4245,55 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
     return target
 
 
+def resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
+    power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
+    toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
+    affected = []
+    moved = []
+    for target in list(getattr(player, "battlefield", []) or []):
+        if not is_battlefield_creature(target):
+            continue
+        power_before = int(float(target.get("power") or 0))
+        toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+        remember_until_eot(target, "power")
+        remember_until_eot(target, "toughness")
+        target["power"] = power_before + power_delta
+        target["toughness"] = toughness_before + toughness_delta
+        record = {
+            "target": target.get("name", "?"),
+            "power_before": power_before,
+            "toughness_before": toughness_before,
+            "power_after": target.get("power"),
+            "toughness_after": target.get("toughness"),
+        }
+        affected.append(record)
+        if int(float(target.get("toughness") or 0)) <= 0:
+            destination = move_creature_from_battlefield(
+                player,
+                target,
+                reason="zero_toughness",
+                source=card,
+            )
+            record["destination"] = destination
+            moved.append(target.get("name", "?"))
+    result = "stat_modifier_until_eot_applied" if affected else "no_affected_creatures"
+    emit_replay_event(
+        "controlled_stat_modifier_until_eot_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        affected_count=len(affected),
+        affected=[dict(item) for item in affected],
+        moved_to_graveyard=moved,
+        power_delta=power_delta,
+        toughness_delta=toughness_delta,
+        result=result,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return affected
+
+
 def transform_permanent_to_face(
     player,
     permanent,
@@ -7601,11 +7650,16 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "battle_model_scope",
     "target",
     "target_type",
+    "target_controller",
     "target_constraints",
     "destination",
     "amount",
     "damage",
     "count",
+    "power_delta",
+    "toughness_delta",
+    "power_boost",
+    "toughness_boost",
     "life_gain_amount",
     "activated_life_gain_amount",
     "static_effect",
@@ -46182,6 +46236,8 @@ def apply_effect_immediate(
         resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "stat_modifier_until_eot":
         resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
+    elif effect == "controlled_stat_modifier_until_eot":
+        resolve_controlled_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent":
         apply_damage_each_opponent(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent_and_opponent_creatures":

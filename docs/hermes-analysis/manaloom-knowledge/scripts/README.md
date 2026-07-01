@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG321. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG322. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -136,7 +136,9 @@ PG317 added 5 target-keyword rules on sources that also carry static self
 keywords; PG318 added 13 exact library tutors to battlefield or library top;
 PG319 added 6 graveyard self-return activated rules; PG320 added 14 fixed
 activated life-gain permanents; PG321 added 32 exact static controlled-creature
-power/toughness boosts from `BoostControlledEffect + SimpleStaticAbility`.
+power/toughness boosts from `BoostControlledEffect + SimpleStaticAbility`;
+PG322 added 19 exact one-shot controlled-creature boost spells from fixed
+`BoostControlledEffect` source rows.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -145,6 +147,7 @@ fixed damage wipes, and fixed target-creature `+1/+1`/`-1/-1` counters, plus
 supported restricted battlefield targets for damage/destroy/exile spells
 (attacking/blocking, tapped/untapped, flying, color, power and mana value), plus
 fixed target-creature power/toughness modifiers until end of turn, plus exact
+one-shot controlled-creature power/toughness modifiers until end of turn, plus exact
 static self combat and safe defensive keywords on creatures, plus fixed ETB
 life gain on creatures, fixed ETB draw on creatures, creature tap-only
 activated fixed damage, creature ETB destroy-target triggers, creature ETB
@@ -324,13 +327,20 @@ Evidence:
 - `master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_pg_to_sqlite_sync.json`
 - `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
 - `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg321_static_controlled_pt_wave.md`
+- `master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_package.md`
+- `master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_e2e_validation.md`
+- `master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg322_boost_controlled_until_eot_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg322_existing_supported_recheck.md`
 
-After PG321, the post-static-P/T queue is the current scheduling source:
-`target_identity_count=27342`, `xmage_authoritative_source_count=27028`,
-`xmage_authoritative_adapter_required_count=27028`, `parser_gap=0`, and
+After PG322, the post-controlled-boost queue is the current scheduling source:
+`target_identity_count=27323`, `xmage_authoritative_source_count=27009`,
+`xmage_authoritative_adapter_required_count=27009`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`. Continue by adding a new exact
 subpattern/runtime adapter for a remaining high-volume family from that queue;
-do not schedule from any older PG315/PG320 queue artifact.
+do not schedule from any older PG315/PG320/PG321 queue artifact.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
 approved PostgreSQL mutation through the evidence runner instead of ad hoc SQL:

@@ -63,7 +63,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     separar sync Oracle/legalities, blank Oracle text esperado, cobertura por
     `card_id`/`normalized_name`, propagacao real por `oracle_id` e familias
     XMage. Evidencia corrente:
-    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v5_demand_corrected.md`.
+    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg322_boost_controlled_until_eot_wave_recheck.md`.
   - Para acelerar a adaptacao de todas as cartas, rode tambem
     `manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py`.
     Ele prova a fila no grao correto sem usar decks cadastrados como demanda:
@@ -78,9 +78,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG321:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`.
-    Resultado all-card: `27342` identidades ainda com gap, `27028` com fonte
+    Evidencia corrente pos-PG322:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`.
+    Resultado all-card: `27323` identidades ainda com gap, `27009` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
     gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -119,11 +119,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Bottle Gnomes`, `Fountain of Youth`, `Tower of Eons` e `Zarichi Tiger`.
     O PG321 adicionou `32` estaticas exatas de poder/resistencia para criaturas
     controladas via `BoostControlledEffect + SimpleStaticAbility`, incluindo
-    anthem/lord, subtipo, artefato criatura e criatura lendaria. Todos os
-    pacotes PG285-PG321
+    anthem/lord, subtipo, artefato criatura e criatura lendaria. O PG322
+    adicionou `19` spells one-shot de boost para criaturas controladas ate o
+    fim do turno via `BoostControlledEffect` fixo, com runtime
+    `controlled_stat_modifier_until_eot`. Todos os pacotes PG285-PG322
     passaram postcheck PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O
-    splitter PG321 selecionou `32` propostas e a fila pos-PG321 caiu para
-    `27028` adapters XMage pendentes; a
+    splitter PG322 selecionou `19` propostas, o recheck pos-PG322 voltou
+    `proposal_count=0`, e a fila pos-PG322 caiu para `27009` adapters XMage
+    pendentes; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
     reducao reutilizavel, partindo da fila global e nao de decks cadastrados.
 

@@ -5133,6 +5133,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d491eb5bd49e767cbb09724ec816c640"
   },
+  "Banners Raised": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:758379aa90cbe2e5c114399d45d00bf1",
+    "battle_rule_oracle_hash": "97ca2185bc707363b4789d65a99302ec"
+  },
   "Bant Panorama": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -5141,6 +5165,30 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Bar the Door": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 0,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 4,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb307d5ca8a5d2779541522a6ad32f69",
+    "battle_rule_oracle_hash": "1938eace3289a48300804f86293e1664"
   },
   "Barad-d\u00fbr": {
     "effect": "land",
@@ -9195,6 +9243,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Burn Bright": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e20dede213f8c1f7d3fcbaa83ce533be",
+    "battle_rule_oracle_hash": "5c68e750337da9865f0f2f5a0cb10217"
+  },
   "Burn Down the House": {
     "cmc": 5.0,
     "effect": "damage_wipe",
@@ -11060,6 +11132,30 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:824ba0de681326e26cd769c161748b0e",
+    "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
+  },
   "Charging Badger": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -11458,6 +11554,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3c22e89b02ea9618870fd2814ad1d7e7"
+  },
+  "Chorus of Woe": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 1,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6a96488869f752a5e6acaedf653694bc",
+    "battle_rule_oracle_hash": "97ca2185bc707363b4789d65a99302ec"
   },
   "Chromatic Lantern": {
     "cmc": 3.0,
@@ -16476,6 +16596,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8b297552724d5caee8f0cac7f8e26426"
   },
+  "Desperate Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 2,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:24e91f8a511dc8c4b498c5a029cdf595",
+    "battle_rule_oracle_hash": "5c68e750337da9865f0f2f5a0cb10217"
+  },
   "Desperate Ritual": {
     "ability_kind": "one_shot",
     "battle_model_scope": "three_red_mana_arcane_splice_ritual_v1",
@@ -21182,6 +21326,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e9a2f41b86aad0a56d142873b1267daf"
+  },
+  "Ethereal Guidance": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 2,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a515b10370267a73fd1a35a0c4c63cdc",
+    "battle_rule_oracle_hash": "7ec41c9bad175a324e468a9e979cd2b6"
   },
   "Ethersworn Canonist": {
     "ability_kind": "static",
@@ -28310,6 +28478,30 @@
     "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
     "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
   },
+  "Glorious Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:824ba0de681326e26cd769c161748b0e",
+    "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
+  },
   "Glorious End": {
     "cmc": 3.0,
     "count": 1,
@@ -34102,6 +34294,30 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Inspired Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8e0d8fc616060b14382f9df036a97948",
+    "battle_rule_oracle_hash": "7ec41c9bad175a324e468a9e979cd2b6"
   },
   "Inspired Tinkering": {
     "cmc": 5.0,
@@ -46936,6 +47152,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Path of Anger's Flame": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 2,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e20dede213f8c1f7d3fcbaa83ce533be",
+    "battle_rule_oracle_hash": "5c68e750337da9865f0f2f5a0cb10217"
+  },
   "Path of the Pyromancer": {
     "cmc": 5.0,
     "count": 5,
@@ -53427,6 +53667,30 @@
     "battle_rule_logical_key": "battle_rule_v1:4884db05ef45776327579e6b42adb1c2",
     "battle_rule_oracle_hash": "d26672e06cb7b0cd8ecd135122028a7f"
   },
+  "Righteous Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 2,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 2,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7bb31532956d7658387aa79047990b07",
+    "battle_rule_oracle_hash": "efa3de01048e0b5a07672b743e5323e4"
+  },
   "Righteous Fury": {
     "cmc": 6.0,
     "effect": "board_wipe",
@@ -56125,6 +56389,30 @@
     "battle_rule_logical_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7",
     "battle_rule_oracle_hash": "53c8b48a1b03617cb95fe3dadb7b508e"
   },
+  "Scare Tactics": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 0,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:758379aa90cbe2e5c114399d45d00bf1",
+    "battle_rule_oracle_hash": "97ca2185bc707363b4789d65a99302ec"
+  },
   "Scattered Groves": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -58698,6 +58986,30 @@
     "battle_rule_logical_key": "battle_rule_v1:9b7901013756d402d940fddd499770d6",
     "battle_rule_oracle_hash": "8ef64c5662955843e452e5177f3522c2"
   },
+  "Shield Wall": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 0,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 2,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:18c11c3c2d008f4c64ced22099060477",
+    "battle_rule_oracle_hash": "8e7c7cdfdf1ab8a3fc1ed2467a9a7d58"
+  },
   "Shifting Woodland": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -61234,6 +61546,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3f70951247fb56241b8dc39adc6674c1"
   },
+  "Solidarity": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 0,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 5,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7cf3d68b56f34ef24c6766142072ecd1",
+    "battle_rule_oracle_hash": "26e18e44356c6f9c61fd592dca42a2d1"
+  },
   "Solitude": {
     "cmc": 5.0,
     "effect": "creature",
@@ -63067,6 +63403,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "ec9843e6ec6cb36ed1d45f1d8448fb85"
+  },
+  "Steadfastness": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 0,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 3,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:67d8446992a54e2ed536b0dd6fd98236",
+    "battle_rule_oracle_hash": "226c154e1397dca3e2f7aecda5ae1631"
   },
   "Steam Augury": {
     "ability_kind": "one_shot",
@@ -73693,6 +74053,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:6934211378fc1e2ec6ce96d5290f6643"
   },
+  "Virtuous Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 1,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7750e1110ef674d09a86c0ba486ec1dc",
+    "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
+  },
   "Viscera Seer": {
     "cmc": 1.0,
     "effect": "topdeck_manipulation",
@@ -73712,6 +74096,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:eaa27d98bb13d1caeabde36eb8fa8a0b"
+  },
+  "Vitalizing Wind": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 7,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 7,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:44783db8ed99e23fc1028c0148c41885",
+    "battle_rule_oracle_hash": "b4bf02590ba138aa075f2ecdea5c296a"
   },
   "Vithian Renegades": {
     "ability_kind": "triggered",
@@ -75047,6 +75455,54 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b7602d6f4394bcf05ab962f0f844ef1d"
+  },
+  "Warrior's Charge": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": false,
+    "power_delta": 1,
+    "sorcery": true,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7750e1110ef674d09a86c0ba486ec1dc",
+    "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
+  },
+  "Warrior's Honor": {
+    "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+    "effect": "controlled_stat_modifier_until_eot",
+    "instant": true,
+    "power_delta": 1,
+    "sorcery": false,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "toughness_delta": 1,
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:824ba0de681326e26cd769c161748b0e",
+    "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
   },
   "Warrior's Oath": {
     "cmc": 2.0,

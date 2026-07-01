@@ -123,21 +123,22 @@ to build this queue. Current evidence:
 
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27342`
-- XMage authoritative source resolved: `27028`
+- target all-card battle-gap identities: `27323`
+- XMage authoritative source resolved: `27009`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27028`
+- XMage authoritative adapter required: `27009`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27028` identities, card semantics are accepted from XMage; work is now
+- For `27009` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -156,9 +157,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG321 Exact Adapter Waves
+## PG283-PG322 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG321 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG322 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -309,6 +310,11 @@ patterns:
   `xmage_fixed_add_counters_target_creature_spell_v1`
 - `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting` ->
   `xmage_fixed_boost_target_creature_until_eot_spell_v1`
+- `xmage_signature::BoostControlledEffect::no_ability_class::no_target_class::no_condition_class::no_signal`
+  with exact one-shot "Creatures you control get +N/+N until end of turn"
+  Oracle text, one fixed `BoostControlledEffect`, no color/modal/dynamic
+  filter, and runtime until-end-of-turn cleanup ->
+  `xmage_fixed_boost_controlled_creatures_until_eot_spell_v1`
 - `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
   with one `BoostTargetEffect`, one `GainAbilityTargetEffect`, one fixed target
   creature, and exact until-end-of-turn keyword Oracle text ->
@@ -2319,6 +2325,62 @@ PG321 measured result:
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=27028`.
 
+PG322 evidence:
+
+- PG322 controlled boost until EOT package:
+  `docs/hermes-analysis/master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_package.md`
+- PG322 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_pg_apply_evidence.md`
+- PG322 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_pg_to_sqlite_sync.json`
+- PG322 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg322_xmage_boost_controlled_until_eot_wave_e2e_validation.md`
+- PG322 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg322_boost_controlled_until_eot_wave_docs_recheck.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg322_boost_controlled_until_eot_wave_docs_recheck.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg322_boost_controlled_until_eot_wave_docs_recheck.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg322_boost_controlled_until_eot_wave_docs_recheck.md`
+- PG322 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg322_boost_controlled_until_eot_wave.md`
+- post-PG322 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
+- post-PG322 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg322_existing_supported_recheck.md`
+- post-PG322 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg322_boost_controlled_until_eot_wave_recheck.md`
+
+PG322 measured result:
+
+- PG322 promoted `19` exact one-shot spells whose local XMage source is one
+  fixed `BoostControlledEffect` and whose Oracle text is exactly "Creatures you
+  control get +N/+N until end of turn."
+- Runtime now supports `controlled_stat_modifier_until_eot`, applies the
+  modifier only to the controller's current battlefield creatures, records
+  until-end-of-turn power/toughness cleanup, and preserves opposing creatures.
+- The splitter blocks unsafe neighbors such as white-creature filters,
+  modal/two-effect spells, and dynamic/source-filtered variants until narrower
+  filter and modal adapters exist.
+- PostgreSQL apply evidence reports `19/19` promoted rows, `19/19`
+  verified/auto rows, `19/19` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7168` PostgreSQL rules,
+  inserted/updated `6962` SQLite rows, and exported `4766` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Post-PG322 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG322 rows themselves have `19/19` matching Oracle hashes.
+- Global all-card readiness after PG322:
+  `battle_and_oracle_ready=2301`, `battle_family_mapper_required=30246`, and
+  `snapshot_has_verified_rule=3449`.
+- Global all-card authoritative queue after PG322:
+  `target_identity_count=27323`, `xmage_authoritative_source_count=27009`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27009`.
+- Running the exact splitter after PG322 on supported units returns
+  `proposal_count=0` over `8030` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -2958,7 +3020,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG321 queue, the next exact runtime-backed work should be selected from
+post-PG322 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`

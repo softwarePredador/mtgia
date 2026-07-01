@@ -2252,6 +2252,60 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_target_source_not_single_fixed")
 
+    def test_fixed_boost_controlled_creatures_spell_maps_to_controlled_stat_modifier(self) -> None:
+        row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Creatures you control get +2/+0 until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostControlledEffect("
+                "2, 0, Duration.EndOfTurn, StaticFilters.FILTER_PERMANENT_CREATURES, false));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "controlled_stat_modifier_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_CONTROLLED_SPELL_SCOPE)
+        self.assertEqual(effect["target"], "controlled_creatures")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(effect["power_delta"], 2)
+        self.assertEqual(effect["toughness_delta"], 0)
+
+    def test_boost_controlled_color_filter_stays_blocked(self) -> None:
+        row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="White creatures you control get +2/+2 until end of turn."),
+            source_text=(
+                "filter.add(new ColorPredicate(ObjectColor.WHITE));"
+                "this.getSpellAbility().addEffect(new BoostControlledEffect("
+                "2, 2, Duration.EndOfTurn, filter, false));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_controlled_source_filter_not_supported")
+
+    def test_boost_controlled_modal_spell_stays_blocked(self) -> None:
+        row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Choose one — • Creatures you control get +2/+0 until end of turn. "
+                    "• Creatures you control get +0/+2 until end of turn."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostControlledEffect(2, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new BoostControlledEffect(0, 2, Duration.EndOfTurn));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_controlled_source_not_single_fixed")
+
     def test_fixed_boost_keyword_target_creature_maps_to_stat_modifier_with_keyword(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

@@ -2997,6 +2997,62 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_controlled_stat_modifier_until_eot_spell_buffs_only_own_creatures_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        small = {"name": "Small Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        best = {"name": "Best Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        active.battlefield.extend([small, best])
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "controlled_stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
+            "target": "controlled_creatures",
+            "target_controller": "self",
+            "target_constraints": {"controller": "self", "card_types": ["creature"]},
+            "power_delta": 2,
+            "toughness_delta": 0,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Burn Bright",
+                "type_line": "Instant",
+                "oracle_text": "Creatures you control get +2/+0 until end of turn.",
+            },
+            turn=13,
+            rng=random.Random(13),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(small["power"], 4)
+        self.assertEqual(small["toughness"], 2)
+        self.assertEqual(best["power"], 6)
+        self.assertEqual(best["toughness"], 4)
+        self.assertEqual(enemy["power"], 5)
+        self.assertEqual(enemy["toughness"], 5)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Burn Bright"])
+        self.assertTrue(
+            any(
+                event == "controlled_stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Burn Bright"
+                and data.get("affected_count") == 2
+                and data.get("power_delta") == 2
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(small["power"], 2)
+        self.assertEqual(small["toughness"], 2)
+        self.assertEqual(best["power"], 4)
+        self.assertEqual(best["toughness"], 4)
+
     def test_static_combat_keyword_creature_effect_enriches_permanent_keywords(self) -> None:
         card = {
             "name": "Fixture Keyword Creature",

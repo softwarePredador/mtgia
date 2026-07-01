@@ -40,6 +40,10 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+BOOST_CONTROLLED_SPELL_UNIT = (
+    "xmage_signature::BoostControlledEffect::no_ability_class::"
+    "no_target_class::no_condition_class::no_signal"
+)
 SELF_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostSourceEffect::SimpleActivatedAbility::"
     "no_target_class::no_condition_class::activated_ability"
@@ -76,6 +80,7 @@ SUPPORTED_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    BOOST_CONTROLLED_SPELL_UNIT,
     STATIC_CONTROLLED_PT_UNIT,
     TOKEN_SPELL_UNIT,
 }
@@ -105,6 +110,7 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
+BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
@@ -134,6 +140,7 @@ SPELL_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    BOOST_CONTROLLED_SPELL_UNIT,
     TOKEN_SPELL_UNIT,
 }
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
@@ -1231,6 +1238,44 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     if power is None or toughness is None:
         return None
     return power, toughness
+
+
+def fixed_boost_controlled_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | str | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    if "choose one" in text.lower() or "+x/" in text.lower() or "/+x" in text.lower():
+        return "boost_controlled_oracle_not_simple"
+    match = re.match(
+        r"^creatures you control get ([+-]?\d+)/([+-]?\d+) until end of turn\.?$",
+        text,
+        re.I,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(1))
+    toughness = signed_int_from_oracle(match.group(2))
+    if power is None or toughness is None:
+        return None
+    return power, toughness
+
+
+def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | None:
+    text = source or ""
+    matches = re.findall(
+        r"new\s+BoostControlledEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*"
+        r"Duration\.EndOfTurn(?P<rest>[^)]*)\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return None
+    power_raw, toughness_raw, rest = matches[0]
+    rest_text = str(rest or "")
+    if rest_text.strip():
+        if "StaticFilters.FILTER_PERMANENT_CREATURES" not in rest_text:
+            return "boost_controlled_source_filter_not_supported"
+        if any(marker in text for marker in STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS):
+            return "boost_controlled_source_filter_not_supported"
+    return int(power_raw), int(toughness_raw)
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
@@ -3023,6 +3068,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
+    elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
+        scope_kind = "fixed controlled-creature boost until end of turn spell"
     elif scope == TARGET_BOOST_ACTIVATED_SCOPE:
         scope_kind = "permanent simple activated target-creature boost until end of turn"
     elif scope == TARGET_KEYWORD_ACTIVATED_SCOPE:
@@ -4653,6 +4700,42 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
 
+    if unit == BOOST_CONTROLLED_SPELL_UNIT:
+        if classes != {"BoostControlledEffect"}:
+            return None, "boost_controlled_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "boost_controlled_ability_class_not_simple"
+        source_boost = fixed_boost_controlled_from_source(source_text)
+        if isinstance(source_boost, str):
+            return None, source_boost
+        if source_boost is None:
+            return None, "boost_controlled_source_not_single_fixed"
+        oracle_boost = fixed_boost_controlled_from_oracle(metadata)
+        if isinstance(oracle_boost, str):
+            return None, oracle_boost
+        if oracle_boost is None:
+            return None, "boost_controlled_oracle_not_simple"
+        if source_boost != oracle_boost:
+            return None, "boost_controlled_source_oracle_mismatch"
+        power, toughness = oracle_boost
+        effect_json = {
+            "effect": "controlled_stat_modifier_until_eot",
+            "battle_model_scope": BOOST_CONTROLLED_SPELL_SCOPE,
+            "target": "controlled_creatures",
+            "target_controller": "self",
+            "target_constraints": {"controller": "self", "card_types": ["creature"]},
+            "power_delta": power,
+            "toughness_delta": toughness,
+            "xmage_effect_class": "BoostControlledEffect",
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_boost_controlled_creatures_until_eot_spell",
+        ), "selected_exact_scope"
+
     if unit == BOOST_TARGET_UNIT:
         if classes != {"BoostTargetEffect"}:
             return None, "boost_target_effect_class_not_pure"
@@ -4841,6 +4924,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
+                "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
