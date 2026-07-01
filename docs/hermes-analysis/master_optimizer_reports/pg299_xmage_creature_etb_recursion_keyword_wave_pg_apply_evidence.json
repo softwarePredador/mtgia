@@ -1,0 +1,125 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG299",
+  "generated_at": "2026-07-01T11:09:18.745622+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg299_xmage_creature_etb_recursion_keyword_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Cadaver Imp",
+      "Griffin Dreamfinder",
+      "Mnemonic Wall",
+      "Sanctum Gargoyle"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 4,
+    "promoted_rule_rows": 4,
+    "promoted_verified_auto_rows": 4,
+    "row_count": 4
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Cadaver Imp",
+      "logical_rule_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+      "normalized_name": "cadaver imp",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Griffin Dreamfinder",
+      "logical_rule_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+      "normalized_name": "griffin dreamfinder",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Mnemonic Wall",
+      "logical_rule_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+      "normalized_name": "mnemonic wall",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Sanctum Gargoyle",
+      "logical_rule_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+      "normalized_name": "sanctum gargoyle",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Cadaver Imp",
+      "Griffin Dreamfinder",
+      "Mnemonic Wall",
+      "Sanctum Gargoyle"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 4,
+    "total_target_card_rows": 4,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "8fbcb0a9-3715-4d44-a3c9-dfcd0520b8c9",
+      "card_name": "Cadaver Imp",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+      "normalized_name": "cadaver imp",
+      "oracle_hash": "910ed751dff9fb80f8a7c8281e8128b9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7ce3f03b-b789-4c5b-863c-b18ace7ca03b",
+      "card_name": "Griffin Dreamfinder",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+      "normalized_name": "griffin dreamfinder",
+      "oracle_hash": "93eb7869756f2660ce3687dbed245a4f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "899fbb22-5fa4-423e-b216-35dd260a2453",
+      "card_name": "Mnemonic Wall",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+      "normalized_name": "mnemonic wall",
+      "oracle_hash": "38990ed649f59ec9b0756b3b7d437c1e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7ff0cfc1-e248-4e53-be6e-04d9d350ef07",
+      "card_name": "Sanctum Gargoyle",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+      "normalized_name": "sanctum gargoyle",
+      "oracle_hash": "1ab85b577dff1ec22a95fab98e61eed4",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_creature_etb_recursion_keyword_wave"
+}

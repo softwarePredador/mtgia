@@ -1054,6 +1054,37 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
         )
 
+    def test_creature_etb_recursion_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Gargoyle",
+                type_line="Artifact Creature - Gargoyle",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature enters, you may return target artifact card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect(), true));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "artifact")
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+
     def test_creature_etb_recursion_blocks_conditional_text(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

@@ -7171,6 +7171,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Cadaver Imp": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+    "battle_rule_oracle_hash": "910ed751dff9fb80f8a7c8281e8128b9"
+  },
   "Caduceus, Staff of Hermes": {
     "cmc": 3.0,
     "effect": "indestructible",
@@ -22514,6 +22544,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Griffin Dreamfinder": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "enchantment",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+    "battle_rule_oracle_hash": "93eb7869756f2660ce3687dbed245a4f"
+  },
   "Griffin Sentinel": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -31993,6 +32053,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2f8f2ae1782f7b1b6c7eb91e07d68c12",
     "battle_rule_oracle_hash": "b4574af3998d9b4c2baf686ccb8dcfff"
+  },
+  "Mnemonic Wall": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+    "defender": true,
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "instant_or_sorcery",
+    "keywords": [
+      "defender"
+    ],
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+    "battle_rule_oracle_hash": "38990ed649f59ec9b0756b3b7d437c1e"
   },
   "Moaning Spirit": {
     "_keywords_are_self": true,
@@ -42704,6 +42795,36 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b411c1b26599c890aeef40da1a43d162"
+  },
+  "Sanctum Gargoyle": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "artifact",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+    "battle_rule_oracle_hash": "1ab85b577dff1ec22a95fab98e61eed4"
   },
   "Sanctum of Eternity": {
     "effect": "land",

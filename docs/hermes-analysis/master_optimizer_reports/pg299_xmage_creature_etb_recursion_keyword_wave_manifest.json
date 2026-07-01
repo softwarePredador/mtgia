@@ -1,0 +1,201 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg299_xmage_creature_etb_recursion_keyword_wave_20260701",
+  "deploy_id": "PG299",
+  "expected_rules": [
+    {
+      "card_name": "Cadaver Imp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+      "min_rule_version": 2,
+      "normalized_name": "cadaver imp",
+      "oracle_hash": "910ed751dff9fb80f8a7c8281e8128b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Griffin Dreamfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+      "min_rule_version": 2,
+      "normalized_name": "griffin dreamfinder",
+      "oracle_hash": "93eb7869756f2660ce3687dbed245a4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mnemonic Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+      "min_rule_version": 2,
+      "normalized_name": "mnemonic wall",
+      "oracle_hash": "38990ed649f59ec9b0756b3b7d437c1e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sanctum Gargoyle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+      "min_rule_version": 2,
+      "normalized_name": "sanctum gargoyle",
+      "oracle_hash": "1ab85b577dff1ec22a95fab98e61eed4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_graveyard_to_hand": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg299_xmage_creature_etb_recursion_keyword_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-01T11:09:09+00:00",
+  "mutations_performed": [
+    "postgres_apply_pg299_xmage_creature_etb_recursion_keyword_wave",
+    "pg_to_hermes_sqlite_sync",
+    "battle_package_end_to_end_validation"
+  ],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cadaver Imp"
+      },
+      "card_name": "Cadaver Imp",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+      "normalized_name": "cadaver imp",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Griffin Dreamfinder"
+      },
+      "card_name": "Griffin Dreamfinder",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+      "normalized_name": "griffin dreamfinder",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Mnemonic Wall"
+      },
+      "card_name": "Mnemonic Wall",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+      "normalized_name": "mnemonic wall",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      }
+    },
+    {
+      "card": {
+        "name": "Sanctum Gargoyle"
+      },
+      "card_name": "Sanctum Gargoyle",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+      "normalized_name": "sanctum gargoyle",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cadaver Imp",
+    "Griffin Dreamfinder",
+    "Mnemonic Wall",
+    "Sanctum Gargoyle"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_creature_etb_recursion_keyword_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Cadaver Imp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1f62355235258125d70850193a57c376",
+      "min_rule_version": 2,
+      "normalized_name": "cadaver imp",
+      "oracle_hash": "910ed751dff9fb80f8a7c8281e8128b9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Griffin Dreamfinder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:665bf5d3bac2c2881c49ec01c4963243",
+      "min_rule_version": 2,
+      "normalized_name": "griffin dreamfinder",
+      "oracle_hash": "93eb7869756f2660ce3687dbed245a4f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mnemonic Wall",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:51142803b38be588b3f2eddebf47fa6d",
+      "min_rule_version": 2,
+      "normalized_name": "mnemonic wall",
+      "oracle_hash": "38990ed649f59ec9b0756b3b7d437c1e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sanctum Gargoyle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9f727b3670308479674b28e324c1a8b2",
+      "min_rule_version": 2,
+      "normalized_name": "sanctum gargoyle",
+      "oracle_hash": "1ab85b577dff1ec22a95fab98e61eed4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "applied_synced_e2e_passed"
+}

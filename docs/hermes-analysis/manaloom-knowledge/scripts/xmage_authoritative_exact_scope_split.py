@@ -665,9 +665,12 @@ def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
 def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
         effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
-        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
 
@@ -723,6 +726,27 @@ def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
             break
         keywords.update(parts)
     return keywords or None
+
+
+def oracle_text_after_leading_static_keywords(metadata: dict[str, Any]) -> str:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return ""
+    allowed = set(STATIC_SELF_KEYWORD_ABILITY_CLASSES.values())
+    kept: list[str] = []
+    skipping_keywords = True
+    for line in raw.splitlines():
+        cleaned = re.sub(r"\([^)]*\)", "", line).strip().rstrip(".")
+        parts = [
+            normalize_keyword_phrase(part)
+            for part in re.split(r"[,;]", cleaned)
+            if str(part or "").strip()
+        ]
+        if skipping_keywords and parts and all(part in allowed for part in parts):
+            continue
+        skipping_keywords = False
+        kept.append(line)
+    return re.sub(r"\s+", " ", "\n".join(kept).strip()).lower()
 
 
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -842,7 +866,7 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
 
 
 def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    text = oracle_text_after_leading_static_keywords(metadata)
     target_patterns: list[tuple[str, str]] = [
         ("instant_or_sorcery", r"instant or sorcery"),
         ("artifact_or_enchantment", r"artifact or enchantment"),
@@ -1160,6 +1184,12 @@ def split_row(
             "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         if up_to:
             effect_json["etb_recursion_up_to_count"] = True
         return build_proposal(
