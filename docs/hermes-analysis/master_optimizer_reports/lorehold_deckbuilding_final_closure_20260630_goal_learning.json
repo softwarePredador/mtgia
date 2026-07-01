@@ -1,0 +1,73 @@
+{
+  "artifact_type": "lorehold_deckbuilding_final_closure",
+  "final_decision": {
+    "decision": "keep_607_as_current_lorehold_champion_under_active_contract",
+    "forbidden_next_steps": [
+      "do not run another one-for-one swap gate against 607",
+      "do not cut Creative Technique or Bender's Waterskin as generic cuts",
+      "do not treat forced-access signal as natural deck promotion",
+      "do not replace 607 from structure-only or aggregate-only evidence"
+    ],
+    "reason": "All current from-scratch shells and one-for-one package routes are below or blocked against protected 607, and no seed-safe cut or reviewable cut-evidence gap remains.",
+    "reopen_conditions": [
+      "new external/card evidence changes a cut-safety row",
+      "the owner explicitly relaxes protected-cut rules for a named slot",
+      "a new full-shell archetype is evaluated under a separate declared contract",
+      "battle/runtime changes materially alter the current 607 evidence inputs"
+    ]
+  },
+  "generated_at": "2026-07-01T00:03:46Z",
+  "handoff": {
+    "current_deck_artifact": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.json",
+    "current_decklist_artifact": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.decklist.txt",
+    "planner_final_artifact": "docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_cut_evidence_exhausted.json",
+    "safe_next_work": [
+      "use deck 607 as the Lorehold baseline for battle validation",
+      "continue card-rule/runtime family work independently of deck swaps",
+      "only reopen deckbuilding through one of the listed reopen conditions"
+    ]
+  },
+  "postgres_writes": false,
+  "source_db_mutated": false,
+  "source_reports": {
+    "champion_snapshot": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.json",
+    "cut_evidence_expander": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260630_goal_learning.json",
+    "micro_package_model": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json",
+    "planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_cut_evidence_exhausted.json"
+  },
+  "status": "closed_current_607_champion",
+  "summary": {
+    "commander_count": 1,
+    "deck_id": 607,
+    "final_state": "closed_current_607_champion",
+    "hard_blocked_count": 92,
+    "land_count": 34,
+    "micro_package_ready_count": 0,
+    "planner_recommended_next_action": "no_cut_slot_to_expand_under_current_607_contract",
+    "protected_anchor_count": 9,
+    "recommended_next_action": "keep_607_closed_until_reopen_condition",
+    "reviewable_evidence_gap_count": 0,
+    "role_counts": {
+      "board_wipe": 6,
+      "commander": 1,
+      "creature": 2,
+      "draw": 12,
+      "engine": 2,
+      "land": 34,
+      "protection": 9,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "unknown": 2,
+      "wincon": 9
+    },
+    "same_lane_hard_blocked_count": 2,
+    "seed_safe_ready_count": 0,
+    "total_cards": 100,
+    "validation_error_count": 0
+  },
+  "validation": {
+    "errors": [],
+    "status": "pass"
+  }
+}

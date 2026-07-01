@@ -81,6 +81,9 @@ DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT = (
 DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT = (
     REPORT_DIR / "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
 )
+DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT = (
+    REPORT_DIR / "lorehold_deckbuilding_final_closure_20260630_goal_learning.json"
+)
 DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
     REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
 ]
@@ -2012,6 +2015,36 @@ def build_trace_cut_evidence_expander_action(
     return None
 
 
+def build_deckbuilding_final_closure_action(
+    final_closure: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not final_closure:
+        return None
+    if str(final_closure.get("status") or "") != "closed_current_607_champion":
+        return None
+    summary = final_closure.get("summary") or {}
+    decision = final_closure.get("final_decision") or {}
+    return {
+        "priority": -11,
+        "action_key": "lorehold_deckbuilding_closed_current_607_champion",
+        "status": "closed_no_deck_change_under_active_contract",
+        "lane": "deckbuilding_closure",
+        "candidate_cards": [],
+        "cut_cards": [],
+        "why_now": (
+            "The final closure artifact proves protected 607 is the current Lorehold "
+            "champion and the active one-for-one improvement contract is exhausted."
+        ),
+        "blockers": list(decision.get("forbidden_next_steps") or []),
+        "next_steps": list((final_closure.get("handoff") or {}).get("safe_next_work") or []),
+        "evidence": {
+            "final_closure_summary": summary,
+            "final_decision": decision,
+            "source_reports": final_closure.get("source_reports") or {},
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -2127,6 +2160,7 @@ def build_plan(
     trace_targeted_micro_package_model: dict[str, Any] | None = None,
     current_champion_snapshot: dict[str, Any] | None = None,
     trace_cut_evidence_expander: dict[str, Any] | None = None,
+    deckbuilding_final_closure: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
@@ -2141,6 +2175,7 @@ def build_plan(
     ),
     current_champion_snapshot_path: Path = DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT,
     trace_cut_evidence_expander_path: Path = DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
+    deckbuilding_final_closure_path: Path = DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -2170,6 +2205,11 @@ def build_plan(
     )
     if from_scratch_failure_action:
         actions.append(from_scratch_failure_action)
+    final_closure_action = build_deckbuilding_final_closure_action(
+        deckbuilding_final_closure
+    )
+    if final_closure_action:
+        actions.append(final_closure_action)
     cut_evidence_expander_action = build_trace_cut_evidence_expander_action(
         trace_cut_evidence_expander
     )
@@ -2304,6 +2344,9 @@ def build_plan(
         "trace_cut_evidence_expander_report": (
             str(trace_cut_evidence_expander_path) if trace_cut_evidence_expander else None
         ),
+        "deckbuilding_final_closure_report": (
+            str(deckbuilding_final_closure_path) if deckbuilding_final_closure else None
+        ),
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -2348,6 +2391,9 @@ def build_plan(
             "trace_cut_evidence_expander_summary": (
                 (trace_cut_evidence_expander or {}).get("summary") or {}
             ),
+            "deckbuilding_final_closure_summary": (
+                (deckbuilding_final_closure or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -2372,6 +2418,7 @@ def build_plan(
             "A trace-targeted micro-package model with zero seed-safe cuts freezes 607 as the current champion until new cut evidence exists.",
             "After the 607 current champion snapshot exists, the next action is cut-evidence expansion for exact slots, not another snapshot.",
             "If cut-evidence expansion has zero reviewable slots, the current 607 one-for-one deck contract is exhausted.",
+            "If final closure exists, do not keep planning Lorehold deck swaps under the active contract.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -2404,6 +2451,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Trace-targeted micro-package model: `{payload.get('trace_targeted_micro_package_model_report') or '-'}`",
         f"- Current champion snapshot: `{payload.get('current_champion_snapshot_report') or '-'}`",
         f"- Trace cut evidence expander: `{payload.get('trace_cut_evidence_expander_report') or '-'}`",
+        f"- Deckbuilding final closure: `{payload.get('deckbuilding_final_closure_report') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -2516,6 +2564,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
     )
+    parser.add_argument(
+        "--deckbuilding-final-closure-report",
+        type=Path,
+        default=DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT,
+    )
     parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
@@ -2588,6 +2641,11 @@ def main() -> int:
         if args.trace_cut_evidence_expander_report.exists()
         else None
     )
+    deckbuilding_final_closure = (
+        read_json(args.deckbuilding_final_closure_report)
+        if args.deckbuilding_final_closure_report.exists()
+        else None
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -2610,6 +2668,7 @@ def main() -> int:
         trace_targeted_micro_package_model=trace_targeted_micro_package_model,
         current_champion_snapshot=current_champion_snapshot,
         trace_cut_evidence_expander=trace_cut_evidence_expander,
+        deckbuilding_final_closure=deckbuilding_final_closure,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
@@ -2622,6 +2681,7 @@ def main() -> int:
         trace_targeted_micro_package_model_path=args.trace_targeted_micro_package_model_report,
         current_champion_snapshot_path=args.current_champion_snapshot_report,
         trace_cut_evidence_expander_path=args.trace_cut_evidence_expander_report,
+        deckbuilding_final_closure_path=args.deckbuilding_final_closure_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

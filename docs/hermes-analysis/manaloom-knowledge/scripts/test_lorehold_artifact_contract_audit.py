@@ -391,6 +391,18 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "summary": {},
                 },
             ),
+            (
+                "lorehold_deckbuilding_final_closure",
+                {
+                    "final_decision": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "source_db_mutated": False,
+                    "source_reports": {},
+                    "summary": {},
+                    "validation": {},
+                },
+            ),
         ]
 
         with tempfile.TemporaryDirectory() as tmp:

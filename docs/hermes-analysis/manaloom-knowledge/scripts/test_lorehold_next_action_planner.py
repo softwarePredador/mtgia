@@ -33,6 +33,9 @@ def test_defaults_use_current_cut_models():
     assert planner.DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT.name == (
         "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
     )
+    assert planner.DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT.name == (
+        "lorehold_deckbuilding_final_closure_20260630_goal_learning.json"
+    )
     assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
         "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
     )
@@ -1665,6 +1668,44 @@ def test_next_action_planner_records_exhausted_cut_evidence_contract():
     )
     assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
     assert action["evidence"]["cut_evidence_summary"]["hard_blocked_count"] == 94
+
+
+def test_next_action_planner_stops_when_final_closure_exists():
+    final_closure = {
+        "status": "closed_current_607_champion",
+        "summary": {
+            "deck_id": 607,
+            "recommended_next_action": "keep_607_closed_until_reopen_condition",
+        },
+        "final_decision": {
+            "decision": "keep_607_as_current_lorehold_champion_under_active_contract",
+            "forbidden_next_steps": [
+                "do not run another one-for-one swap gate against 607"
+            ],
+        },
+        "handoff": {
+            "safe_next_work": [
+                "use deck 607 as the Lorehold baseline for battle validation"
+            ]
+        },
+        "source_reports": {"planner": "planner.json"},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        deckbuilding_final_closure=final_closure,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "lorehold_deckbuilding_closed_current_607_champion"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -11
+    assert action["status"] == "closed_no_deck_change_under_active_contract"
+    assert action["evidence"]["final_closure_summary"]["deck_id"] == 607
+    assert payload["summary"]["deckbuilding_final_closure_summary"]["deck_id"] == 607
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

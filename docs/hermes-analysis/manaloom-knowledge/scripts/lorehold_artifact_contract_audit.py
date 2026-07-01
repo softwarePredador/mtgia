@@ -512,6 +512,11 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             "trace cut evidence expansion queue",
         ),
         (
+            "lorehold_deckbuilding_final_closure",
+            {"final_decision", "source_reports", "validation"},
+            "Lorehold deckbuilding final closure",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",

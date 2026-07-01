@@ -952,6 +952,31 @@ Trace cut-evidence expansion generated on 2026-06-30:
   and
   `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_cut_evidence_exhausted.md`.
 
+Lorehold deckbuilding final closure generated on 2026-06-30:
+
+- Scope: final read-only closure over the current champion snapshot,
+  trace-targeted micro-package model, cut-evidence expander, and final planner.
+- Result: status `closed_current_607_champion`; deck `607` remains the current
+  Lorehold champion under the active contract.
+- Closure evidence: `100` cards, `1` commander, `34` lands, `9` protected
+  anchors, `0` micro-packages ready, `0` seed-safe cuts, `0` reviewable
+  cut-evidence gaps, `92` hard-blocked slots, and `2` same-lane hard-blocked
+  slots.
+- Final planner top action:
+  `lorehold_deckbuilding_closed_current_607_champion`.
+- Reopen conditions: new external/card evidence changes a cut-safety row; the
+  owner explicitly relaxes protected-cut rules for a named slot; a new
+  full-shell archetype is evaluated under a separate declared contract; or
+  battle/runtime changes materially alter the current `607` evidence inputs.
+- Forbidden under this closure: do not run another one-for-one swap gate
+  against `607`, do not cut `Creative Technique` or `Bender's Waterskin` as
+  generic cuts, do not promote from forced-access signal alone, and do not
+  replace `607` from structure-only or aggregate-only evidence.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_final_closure_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_final_closure.md`.
+
 Electro ramp-benchmark decision generated on 2026-06-30:
 
 - Candidate:
