@@ -446,6 +446,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(effect["up_to_count"])
 
+    def test_graveyard_to_battlefield_spell_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Sorcery",
+                oracle_text="Return target creature card from your graveyard to the battlefield.",
+            ),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "recursion")
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 1)
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertEqual(effect["target_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+        )
+
+    def test_graveyard_to_battlefield_opponent_graveyard_stays_blocked(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Sorcery",
+                oracle_text="Put target creature card from an opponent's graveyard onto the battlefield under your control.",
+            ),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_battlefield_target_not_supported")
+
     def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
         proposal, reason = split.split_row(

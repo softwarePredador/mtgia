@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg299_creature_etb_recursion_keyword_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg300_recursion_battlefield_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27767`
-- XMage authoritative source resolved: `27453`
+- target all-card battle-gap identities: `27759`
+- XMage authoritative source resolved: `27445`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27453`
+- XMage authoritative adapter required: `27445`
 - ManaLoom adapter work-unit keys: `11905`
 - authoritative source coverage ratio: `0.9887`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27479` identities, card semantics are accepted from XMage; work is now
+- For `27445` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -151,9 +151,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG299 Exact Adapter Waves
+## PG283-PG300 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG299 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG300 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -206,6 +206,10 @@ patterns:
   `xmage_return_target_to_hand_spell_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` ->
   `xmage_return_target_graveyard_card_to_hand_spell_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnFromGraveyardToBattlefieldTargetEffect`, no ability class, no
+  additional cost, and exact self-graveyard single-target Oracle text ->
+  `xmage_return_target_graveyard_card_to_battlefield_spell_v1`
 - `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1` ->
   `xmage_destroy_all_matching_permanents_spell_v1` and
   `xmage_fixed_damage_all_matching_permanents_spell_v1`
@@ -801,6 +805,51 @@ PG299 measured result:
   `xmage_authoritative_adapter_required_count=27453`.
 - Running the exact splitter after PG299 on supported units returns
   `proposal_count=0` over `7325` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with the largest
+  current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG300 evidence:
+
+- PG300 recursion battlefield spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg300_xmage_recursion_battlefield_spell_wave_package.md`
+- PG300 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg300_xmage_recursion_battlefield_spell_wave_pg_apply_evidence.md`
+- PG300 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg300_xmage_recursion_battlefield_spell_wave_e2e_validation.md`
+- post-PG300 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg300_recursion_battlefield_spell_wave_recheck.md`
+- post-PG300 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg300_recursion_battlefield_spell_wave.md`
+- post-PG300 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg300_existing_supported_recheck.md`
+
+PG300 measured result:
+
+- PG300 promoted `8` exact self-graveyard recursion spells whose local XMage
+  source is `ReturnFromGraveyardToBattlefieldTargetEffect` with no ability
+  class and whose Oracle text is exactly a single target artifact, creature, or
+  permanent card from your graveyard returned to the battlefield.
+- The splitter maps them to
+  `xmage_return_target_graveyard_card_to_battlefield_spell_v1` and still blocks
+  opponent graveyards, X counts, name/type restrictions, total mana value,
+  "this turn", tapped entry, modal text, and additional costs.
+- PostgreSQL postcheck: `8/8` promoted rows, `8/8` verified/auto, `8/8`
+  matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6732` PostgreSQL rows, inserted/updated
+  `6526` SQLite rows, and exported `4345` canonical snapshot rows.
+- E2E package validation: PostgreSQL `8/8`, SQLite `8/8`, canonical snapshot
+  `8/8`, and runtime `get_card_effect` `8/8`.
+- Focused exact-scope tests cover graveyard-to-battlefield recursion returning
+  the matching permanent to battlefield; `94` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG300:
+  `target_identity_count=27759`, `xmage_authoritative_source_count=27445`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27445`.
+- Running the exact splitter after PG300 on supported units returns
+  `proposal_count=0` over `7317` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with the largest
   current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

@@ -2577,6 +2577,31 @@
     "battle_rule_logical_key": "battle_rule_v1:65364d83bdc42005334bdc5e2beb030e",
     "battle_rule_oracle_hash": "1093e687c86515e54fbd4a00f8a70ed0"
   },
+  "Argivian Restoration": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+    "battle_rule_oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a"
+  },
   "Argoth, Sanctum of Nature // Titania, Gaea Incarnate": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -6540,6 +6565,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:455b65e5bead32b4b5fdcb2f5d3615cf",
     "battle_rule_oracle_hash": "b58a3d0a1f40a44bfd78ceba0bcff704"
+  },
+  "Breath of Life": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+    "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
   },
   "Breeding Pool": {
     "effect": "land",
@@ -17175,6 +17225,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:1e5bcf3b45fcae347879976d74d2ef84"
+  },
+  "False Defeat": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+    "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
   },
   "False Summoning": {
     "battle_model_scope": "xmage_counter_target_spell_v1",
@@ -34856,6 +34931,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:7ba79bcba13b052df554a05022a06cba"
   },
+  "Obzedat's Aid": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927",
+    "battle_rule_oracle_hash": "d640c0b86638a9ae30425fb27c9a4bbb"
+  },
   "Ocelot Pride": {
     "cmc": 1.0,
     "effect": "token_maker",
@@ -40167,6 +40272,31 @@
     "battle_rule_logical_key": "battle_rule_v1:90b82cfc81ff726ac0fc96a1b220f263",
     "battle_rule_oracle_hash": "041645992d04029f74855292bb1459f4"
   },
+  "Refurbish": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+    "battle_rule_oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a"
+  },
   "Refute": {
     "ability_kind": "one_shot",
     "battle_model_scope": "counter_spell_draw_then_discard_v1",
@@ -40903,6 +41033,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:dbfba32fbd58b0d3483c87f324b21cc9"
   },
+  "Resurrection": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+    "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
+  },
   "Retraction Helix": {
     "effect": "remove_permanent",
     "instant": true,
@@ -41493,6 +41648,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Rise Again": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+    "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
   },
   "Rise of the Eldrazi": {
     "_composite_rule_components": [
@@ -60918,6 +61098,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Zombify": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+    "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
   },
   "Zuko's Offense": {
     "amount": 2,

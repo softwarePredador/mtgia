@@ -1,0 +1,334 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T11:21:01.788055+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg300_xmage_recursion_battlefield_spell_wave_manifest.json",
+  "package_id": "pg300_xmage_recursion_battlefield_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Argivian Restoration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+          "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Breath of Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "False Defeat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Obzedat's Aid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927",
+          "oracle_hash": "d640c0b86638a9ae30425fb27c9a4bbb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Refurbish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+          "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Resurrection",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Rise Again",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Zombify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Argivian Restoration",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+          "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Breath of Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "False Defeat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Obzedat's Aid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927",
+          "oracle_hash": "d640c0b86638a9ae30425fb27c9a4bbb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Refurbish",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+          "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Resurrection",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Rise Again",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Zombify",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+          "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Argivian Restoration",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Breath of Life",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "False Defeat",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Obzedat's Aid",
+          "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Refurbish",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Resurrection",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rise Again",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zombify",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Argivian Restoration",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Breath of Life",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "False Defeat",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Obzedat's Aid",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Refurbish",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Resurrection",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rise Again",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zombify",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

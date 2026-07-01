@@ -955,6 +955,50 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        non_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 1,
+            "destination": "battlefield",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Resurrection",
+                "type_line": "Sorcery",
+                "oracle_text": "Return target creature card from your graveyard to the battlefield.",
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Target Bear"])
+        self.assertEqual([card["name"] for card in active.hand], [])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bolt", "Fixture Resurrection"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Resurrection"
+                and data.get("recovered") == ["Target Bear"]
+                and data.get("target_type") == "creature"
+                and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_graveyard_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

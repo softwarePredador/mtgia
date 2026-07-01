@@ -1,0 +1,217 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG300",
+  "generated_at": "2026-07-01T11:20:30.520208+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg300_xmage_recursion_battlefield_spell_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg300_xmage_recursion_battlefield_spell_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Argivian Restoration",
+      "Breath of Life",
+      "False Defeat",
+      "Obzedat's Aid",
+      "Refurbish",
+      "Resurrection",
+      "Rise Again",
+      "Zombify"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 8,
+    "promoted_rule_rows": 8,
+    "promoted_verified_auto_rows": 8,
+    "row_count": 8
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Argivian Restoration",
+      "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+      "normalized_name": "argivian restoration",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Breath of Life",
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "breath of life",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "False Defeat",
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "false defeat",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Obzedat's Aid",
+      "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927",
+      "normalized_name": "obzedat's aid",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Refurbish",
+      "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+      "normalized_name": "refurbish",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Resurrection",
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "resurrection",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Rise Again",
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "rise again",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Zombify",
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "zombify",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Argivian Restoration",
+      "Breath of Life",
+      "False Defeat",
+      "Obzedat's Aid",
+      "Refurbish",
+      "Resurrection",
+      "Rise Again",
+      "Zombify"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 8,
+    "total_target_card_rows": 8,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "8affc6fa-d7ec-4088-b62f-b8ed28b9a0b0",
+      "card_name": "Argivian Restoration",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+      "normalized_name": "argivian restoration",
+      "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c8f119ea-0199-4f25-ba23-6bfa9b8b1d11",
+      "card_name": "Breath of Life",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "breath of life",
+      "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "92667cd2-5ef4-4b96-ac30-ee7e988d1fc0",
+      "card_name": "False Defeat",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "false defeat",
+      "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "427ce116-111d-4d04-b825-fe49f573c367",
+      "card_name": "Obzedat's Aid",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0fbc3ef723d43c6064a5bc2c78287927",
+      "normalized_name": "obzedat's aid",
+      "oracle_hash": "d640c0b86638a9ae30425fb27c9a4bbb",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "270e1149-83f1-45ee-a4a1-e5b888296acb",
+      "card_name": "Refurbish",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:d28dc68f4c31a93694dcb4be850ea0a4",
+      "normalized_name": "refurbish",
+      "oracle_hash": "8e7d6e6d898113c74f02dd1711125e2a",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5d87d43d-8867-4223-b418-5349be995be8",
+      "card_name": "Resurrection",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "resurrection",
+      "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "39e5f82a-202f-4d94-b7f6-e6fe869f378f",
+      "card_name": "Rise Again",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "rise again",
+      "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1dfe2ca2-dc57-4918-b326-dce5e2ba20f1",
+      "card_name": "Zombify",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
+      "normalized_name": "zombify",
+      "oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_recursion_battlefield_spell_wave"
+}

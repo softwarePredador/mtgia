@@ -66,6 +66,7 @@ MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
+RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
@@ -472,6 +473,28 @@ def recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, b
         (
             r"^return up to two target permanent cards from your graveyard to your hand\.?$",
             ("permanent", 2, True),
+        ),
+    ]
+    for pattern, result in patterns:
+        if re.match(pattern, text):
+            return result
+    return None
+
+
+def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, tuple[str, int]]] = [
+        (
+            r"^return target permanent card from your graveyard to the battlefield\.?$",
+            ("permanent", 1),
+        ),
+        (
+            r"^return target artifact card from your graveyard to the battlefield\.?$",
+            ("artifact", 1),
+        ),
+        (
+            r"^return target creature card from your graveyard to the battlefield\.?$",
+            ("creature", 1),
         ),
     ]
     for pattern, result in patterns:
@@ -1384,6 +1407,32 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit == RECURSION_UNIT:
+        if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
+            if ability_classes(row):
+                return None, "recursion_battlefield_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "recursion_battlefield_oracle_not_simple"
+            target = recursion_to_battlefield_from_oracle(metadata)
+            if target is None:
+                return None, "recursion_battlefield_target_not_supported"
+            target_type, count = target
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_BATTLEFIELD_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": "battlefield",
+                "target_controller": "self",
+                "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_battlefield_spell",
+            ), "selected_exact_scope"
         if classes != {"ReturnFromGraveyardToHandTargetEffect"}:
             return None, "recursion_effect_class_not_pure"
         if ability_classes(row):
