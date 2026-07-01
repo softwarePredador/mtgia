@@ -402,6 +402,220 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_tap_damage_enters_without_damage_then_activates(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        activated_effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+            "ability_kind": "activated",
+            "activation_requires_tap": True,
+            "amount": 2,
+            "damage": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "_rule_source": "curated",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+            "_rule_logical_key": "battle_rule_v1:fixture_tap_damage",
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+            "activated_damage_amount": 2,
+            "activation_requires_tap": True,
+            "_activated_rule_effects": [activated_effect],
+            "_rule_source": "curated",
+            "_rule_review_status": "verified",
+            "_rule_execution_status": "auto",
+            "_rule_logical_key": "battle_rule_v1:fixture_tap_damage",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Archer",
+                "type_line": "Creature - Human Archer",
+                "oracle_text": "{T}: Fixture Archer deals 2 damage to any target.",
+                "power": 1,
+                "toughness": 1,
+            },
+            turn=5,
+            rng=random.Random(47),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 5)
+        self.assertFalse(any(event == "damage_resolved" for event, _ in self.events))
+        permanent = active.battlefield[0]
+        permanent["summoning_sick"] = False
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=6,
+            rng=random.Random(48),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent["tapped"])
+        self.assertEqual(opponent.life, 3)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Archer"
+                and data.get("activation_kind") == "tap_damage"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_tap_damage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Archer"
+                and data.get("amount") == 2
+                and data.get("result") == "player_damage"
+                and data.get("phase") == "precombat_main"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        permanent = {
+            "name": "Fixture Archer",
+            "type_line": "Creature - Human Archer",
+            "effect": "creature",
+            "summoning_sick": True,
+            "tapped": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+                    "ability_kind": "activated",
+                    "activation_requires_tap": True,
+                    "amount": 1,
+                    "damage": 1,
+                    "target": "any_target",
+                    "target_constraints": {"scope": "any_target"},
+                }
+            ],
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=5,
+            rng=random.Random(49),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertFalse(permanent["tapped"])
+        self.assertEqual(opponent.life, 5)
+        self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
+
+    def test_priority_round_uses_ready_creature_tap_damage(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+        permanent = {
+            "name": "Fixture Archer",
+            "type_line": "Creature - Human Archer",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "summoning_sick": False,
+            "tapped": False,
+            "_activated_rule_effects": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+                    "ability_kind": "activated",
+                    "activation_requires_tap": True,
+                    "amount": 1,
+                    "damage": 1,
+                    "target": "any_target",
+                    "target_constraints": {"scope": "any_target"},
+                }
+            ],
+        }
+        active.battlefield.append(permanent)
+        stack = self.battle.Stack()
+
+        acted = self.battle.priority_round(
+            active,
+            [active, opponent],
+            stack,
+            turn=6,
+            rng=random.Random(50),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(acted)
+        self.assertTrue(permanent["tapped"])
+        self.assertEqual(opponent.life, 4)
+
+    def test_best_creature_tap_damage_handles_tied_options(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 5
+
+        def tap_damage_permanent(name: str) -> dict:
+            return {
+                "name": name,
+                "type_line": "Creature - Human Wizard",
+                "effect": "creature",
+                "power": 1,
+                "toughness": 1,
+                "summoning_sick": False,
+                "tapped": False,
+                "_activated_rule_effects": [
+                    {
+                        "effect": "direct_damage",
+                        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+                        "ability_kind": "activated",
+                        "activation_requires_tap": True,
+                        "amount": 1,
+                        "damage": 1,
+                        "target": "any_target",
+                        "target_constraints": {"scope": "any_target"},
+                    }
+                ],
+            }
+
+        active.battlefield.extend(
+            [
+                tap_damage_permanent("Fixture Acolyte"),
+                tap_damage_permanent("Fixture Battlemage"),
+            ]
+        )
+
+        activated = self.battle.activate_best_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=6,
+            rng=random.Random(51),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(opponent.life, 4)
+        tapped = [card["name"] for card in active.battlefield if card.get("tapped")]
+        self.assertEqual(tapped, ["Fixture Battlemage"])
+
     def test_exile_target_spell_moves_permanent_to_exile(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

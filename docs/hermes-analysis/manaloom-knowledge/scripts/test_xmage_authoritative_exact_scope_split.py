@@ -85,6 +85,84 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "damage_amount_not_fixed")
 
+    def test_creature_tap_damage_maps_to_creature_with_activated_damage(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Archer",
+                type_line="Creature - Human Archer",
+                oracle_text="{T}: Fixture Archer deals 1 damage to any target.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new DamageTargetEffect(1), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.CREATURE_TAP_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_effect"], "direct_damage")
+        self.assertEqual(effect["activated_damage_amount"], 1)
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.TAP_DAMAGE_ACTIVATED_SCOPE)
+        self.assertEqual(effect["_activated_rule_effects"][0]["target"], "any_target")
+
+    def test_creature_tap_damage_blocks_mana_cost_activation(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Shaman",
+                type_line="Creature - Minotaur Shaman",
+                oracle_text="{T}: Fixture Shaman deals 1 damage to any target.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new DamageTargetEffect(1), new ManaCostsImpl<>(\"{R}\")));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_tap_damage_source_not_simple_tap")
+
+    def test_creature_tap_damage_blocks_noncreature_permanent(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Rod",
+                type_line="Artifact",
+                oracle_text="{T}: Fixture Rod deals 1 damage to any target.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new DamageTargetEffect(1), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_tap_damage_not_creature")
+
     def test_destroy_target_creature_maps_to_remove_creature_runtime(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(

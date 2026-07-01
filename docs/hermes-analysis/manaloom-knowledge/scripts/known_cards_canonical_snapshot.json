@@ -37155,6 +37155,78 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Prodigal Pyromancer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
+  },
+  "Prodigal Sorcerer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
+  },
   "Profane Tutor": {
     "cmc": 0.0,
     "effect": "tutor",
@@ -38708,6 +38780,42 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9ebdd456c04ec50d9efbc010ee85c689"
+  },
+  "Razorfin Hunter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
   },
   "Razorfoot Griffin": {
     "_keywords_are_self": true,
@@ -41103,6 +41211,42 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Rootwater Hunter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
   },
   "Rorix Bladewing": {
     "_keywords_are_self": true,
@@ -55983,6 +56127,42 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4a1dd909b60f72b7c8d8c5fcb6752a97"
   },
+  "Viashino Fangtail": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
+  },
   "Viashino Runner": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -59575,5 +59755,41 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:2c294b705a02af9c6d9b71749a512057"
+  },
+  "Zuran Spellcaster": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_requires_tap": true,
+        "amount": 1,
+        "battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_activation_cost": "tap",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_tap_fixed_damage_target_activated_ability_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_creature_tap_fixed_damage_target_activated_v1",
+    "effect": "creature",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:91b6836aaecc7fc9dc5de29478462357",
+    "battle_rule_oracle_hash": "c5b1b992d7c7837bf0adfb1c18226e45"
   }
 }

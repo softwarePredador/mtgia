@@ -121,23 +121,23 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg295_creature_etb_draw_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg296_creature_tap_damage_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `30694`
-- XMage authoritative source resolved: `27758`
-- local XMage missing-source exceptions: `2936`
+- target all-card battle-gap identities: `27812`
+- XMage authoritative source resolved: `27498`
+- local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- ManaLoom adapter work-unit keys: `12038`
-- authoritative source coverage ratio: `0.9043`
+- ManaLoom adapter work-unit keys: `11905`
+- authoritative source coverage ratio: `0.9887`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27758` identities, card semantics are accepted from XMage; work is now
+- For `27498` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
-- `2936` identities remain residual exceptions because the local XMage checkout
+- `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
   official/Forge/manual-model or product-exclusion lane, not a reason to slow
   the XMage-resolved adapter queue.
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG295 Exact Adapter Waves
+## PG283-PG296 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG295 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG296 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -179,6 +179,12 @@ patterns:
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
   `xmage_creature_etb_draw_cards_v1`
+- `direct_damage::targeted_damage_variant_v1` with
+  `DamageTargetEffect + SimpleActivatedAbility` on creatures, exact Oracle
+  `{T}: ... deals N damage ...`, XMage `TapSourceCost` only, and no mana or
+  sacrifice cost ->
+  `xmage_creature_tap_fixed_damage_target_activated_v1` with nested
+  `xmage_tap_fixed_damage_target_activated_ability_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
@@ -594,6 +600,55 @@ PG295 measured result:
   reuse signal coming from `SimpleActivatedAbility` signatures across
   `direct_damage`, `removal_destroy`, `draw_engine`, `tutor`, `life_gain`, and
   boost effects.
+
+PG296 evidence:
+
+- PG296 creature tap-damage package:
+  `docs/hermes-analysis/master_optimizer_reports/pg296_xmage_creature_tap_damage_wave_package.md`
+- PG296 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg296_xmage_creature_tap_damage_wave_pg_apply_evidence.md`
+- PG296 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg296_xmage_creature_tap_damage_wave_e2e_validation.md`
+- post-PG296 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg296_creature_tap_damage_wave_recheck.md`
+- post-PG296 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg296_creature_tap_damage_wave.md`
+- post-PG296 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg296_existing_supported_recheck.md`
+
+PG296 measured result:
+
+- PG296 promoted `6` exact creatures whose local XMage source is
+  `DamageTargetEffect(N)` behind `SimpleActivatedAbility` with exactly
+  `TapSourceCost`, mapped to
+  `xmage_creature_tap_fixed_damage_target_activated_v1` with nested
+  `xmage_tap_fixed_damage_target_activated_ability_v1`.
+- Runtime now treats the card as a creature when cast, does not deal damage on
+  entry, and can later tap a ready non-summoning-sick permanent to deal fixed
+  damage to a legal target without moving the permanent out of battlefield.
+- The splitter blocks activated damage with mana/sacrifice/additional costs,
+  noncreature sources, and non-simple Oracle templates until those exact cost
+  and target models exist.
+- PostgreSQL postcheck: `6/6` promoted rows, `6/6` verified/auto,
+  `6/6` matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6` PostgreSQL rows, inserted/updated `6`
+  SQLite rows, and exported `4286` canonical snapshot rows.
+- E2E package validation: PostgreSQL `6/6`, SQLite `6/6`, canonical
+  snapshot `6/6`, and runtime `get_card_effect` `6/6`.
+- Focused runtime tests cover no damage on creature entry, later tap-damage
+  activation, summoning-sickness blocking, priority-round activation, and tied
+  activatable permanent ordering; `82` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG296:
+  `target_identity_count=27812`, `xmage_authoritative_source_count=27498`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27498`.
+- Running the exact splitter after PG296 on supported units returns
+  `proposal_count=0` over `7370` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with the largest
+  current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `removal_destroy`, `draw_cards`, and
+  `tutor`.
 
 ## Why This Is The Best Current Flow
 

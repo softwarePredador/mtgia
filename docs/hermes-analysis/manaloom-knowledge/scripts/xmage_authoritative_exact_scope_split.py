@@ -57,6 +57,8 @@ SUPPORTED_UNITS = {
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
+TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
@@ -639,6 +641,16 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_tap_damage_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DamageTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -695,6 +707,40 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     if re.search(r"target creature\b", text):
         return "creature"
     return None
+
+
+def activated_tap_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^\{t\}: [^.]+ deals (\d+) damage to (any target|target opponent|target player|target creature or planeswalker|target creature)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target_phrase = match.group(2)
+    target_map = {
+        "any target": "any_target",
+        "target opponent": "opponent",
+        "target player": "player",
+        "target creature or planeswalker": "creature_or_planeswalker",
+        "target creature": "creature",
+    }
+    return int(match.group(1)), target_map[target_phrase]
+
+
+def activated_tap_damage_amount_from_source(source: str) -> int | None:
+    if has_additional_cost(source):
+        return None
+    if re.search(r"\b(ManaCostsImpl|GenericManaCost|ColoredManaCost|Sacrifice)", source or ""):
+        return None
+    match = re.search(
+        r"new\s+SimpleActivatedAbility\s*\(\s*new\s+DamageTargetEffect\s*\(\s*(\d+)\s*(?:,\s*\"[^\"]*\")?\s*\)\s*,\s*new\s+TapSourceCost\s*\(\s*\)\s*\)",
+        source or "",
+        re.S,
+    )
+    if not match:
+        return None
+    return int(match.group(1))
 
 
 def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
@@ -770,6 +816,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "instant/sorcery spell"
     if str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
+    elif scope in {ETB_LIFE_GAIN_CREATURE_SCOPE, ETB_DRAW_CREATURE_SCOPE}:
+        scope_kind = "creature enter-the-battlefield triggered ability"
+    elif scope == CREATURE_TAP_DAMAGE_SCOPE:
+        scope_kind = "creature with tap-only activated damage ability"
     return (
         "XMage authoritative exact-scope split: local class "
         f"{row.get('xmage_class')} translated into ManaLoom runtime scope {scope}. "
@@ -827,11 +877,13 @@ def split_row(
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     if (
         unit not in SUPPORTED_UNITS
         and not keyword_creature_unit
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not creature_tap_damage_unit
     ):
         return None, "unsupported_adapter_work_unit"
     if not metadata:
@@ -839,7 +891,12 @@ def split_row(
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
 
-    if unit in SPELL_UNITS and not etb_life_gain_creature_unit and not etb_draw_creature_unit:
+    if (
+        unit in SPELL_UNITS
+        and not etb_life_gain_creature_unit
+        and not etb_draw_creature_unit
+        and not creature_tap_damage_unit
+    ):
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
         if ability_kind(row) != "one_shot":
@@ -946,6 +1003,51 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_draw_cards",
+        ), "selected_exact_scope"
+
+    if creature_tap_damage_unit:
+        if not is_creature_metadata(metadata):
+            return None, "activated_tap_damage_not_creature"
+        oracle_damage = activated_tap_damage_from_oracle(metadata)
+        if oracle_damage is None:
+            return None, "activated_tap_damage_oracle_not_simple"
+        amount, target = oracle_damage
+        source_amount = activated_tap_damage_amount_from_source(source_text)
+        if source_amount is None:
+            return None, "activated_tap_damage_source_not_simple_tap"
+        if source_amount != amount:
+            return None, "activated_tap_damage_source_oracle_mismatch"
+        activated_effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": TAP_DAMAGE_ACTIVATED_SCOPE,
+            "ability_kind": "activated",
+            "activation_requires_tap": True,
+            "activated_effect": "direct_damage",
+            "amount": amount,
+            "damage": amount,
+            "target": target,
+            "target_constraints": target_constraints_for(target),
+            "xmage_effect_class": "DamageTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_activation_cost": "tap",
+        }
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": CREATURE_TAP_DAMAGE_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": TAP_DAMAGE_ACTIVATED_SCOPE,
+            "activated_damage_amount": amount,
+            "activation_requires_tap": True,
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "DamageTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_tap_fixed_damage",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
@@ -1263,6 +1365,7 @@ def build_exact_split_report(
             and not is_static_keyword_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
+            and not is_creature_tap_damage_unit(row)
         ):
             continue
         considered += 1
@@ -1298,6 +1401,7 @@ def build_exact_split_report(
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,

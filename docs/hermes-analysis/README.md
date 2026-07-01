@@ -76,11 +76,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG295:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg295_creature_etb_draw_wave.md`.
-    Resultado all-card: `30694` identidades ainda com gap, `27758` com fonte
-    XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
-    gaps e `12038` work units de adaptador ManaLoom por assinatura/effect
+    Evidencia corrente pos-PG296:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg296_creature_tap_damage_wave.md`.
+    Resultado all-card: `27812` identidades ainda com gap, `27498` com fonte
+    XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
+    gaps e `11905` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
     simples (`draw`, `direct_damage`, `destroy target`). O PG284 adicionou
     `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
@@ -98,11 +98,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `37` criaturas com ganho de vida fixo ao entrar no campo de batalha,
     bloqueando casos proporcionais como "for each". O PG295 adicionou `28`
     criaturas com draw fixo ao entrar no campo de batalha, bloqueando draw
-    proporcional/dinamico. Todos os pacotes PG285-PG295 passaram postcheck
-    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG295
-    retorna `proposal_count=0` para os escopos ja implementados; a proxima
-    etapa exige novo subpadrao runtime, com maior reaproveitamento em
-    `SimpleActivatedAbility` antes dos lotes ativados.
+    proporcional/dinamico. O PG296 adicionou `6` criaturas com habilidade
+    ativada `{T}` de dano fixo a alvo, criando a base runtime para
+    `SimpleActivatedAbility` sem custo de mana/sacrificio. Todos os pacotes PG285-PG296 passaram postcheck
+    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG296
+    retorna `proposal_count=0` sobre `7370` linhas suportadas consideradas; a
+    proxima etapa deve continuar em novos subpadroes runtime-backed de maior
+    reducao reutilizavel.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

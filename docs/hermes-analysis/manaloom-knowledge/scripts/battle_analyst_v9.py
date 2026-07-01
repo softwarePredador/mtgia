@@ -12947,6 +12947,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+            if activate_best_generic_tap_damage_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
         emit_priority_pass_sequence(
             active_player,
             all_players,
@@ -34648,7 +34659,7 @@ def trigger_white_instant_sorcery_lifegain_damage(
     return resolved
 
 
-def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
+def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, finish_spell=True, phase="resolution"):
     raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
     if raw_amount == "x_available":
         amount = max(1, int(card.get("cmc") or 0), player.available_mana())
@@ -34659,7 +34670,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
         amount,
         card,
         turn=turn,
-        phase="resolution",
+        phase=phase,
     )
     life_gain_requested = int(effect_data.get("gain_life") or effect_data.get("controller_gain_life") or 0)
     lifelink_sources = spell_lifelink_sources(player, card)
@@ -34691,7 +34702,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 amount,
                 damage_event_type="permanent",
                 turn=turn,
-                phase="resolution",
+                phase=phase,
                 emit=False,
             )
             if is_battlefield_creature(target):
@@ -34748,7 +34759,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 amount,
                 damage_event_type="permanent",
                 turn=turn,
-                phase="resolution",
+                phase=phase,
             )
             target_kind = target_option["kind"]
             result = "damage_resolved"
@@ -34766,7 +34777,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                     target,
                     target_amount,
                     turn=turn,
-                    phase="resolution",
+                    phase=phase,
                     damage_event="direct_damage",
                 )
                 process_taii_wakeen_noncombat_damage_to_creature(
@@ -34776,7 +34787,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                     target,
                     target_amount,
                     turn=turn,
-                    phase="resolution",
+                    phase=phase,
                 )
                 destination = move_creature_from_battlefield(
                     opp,
@@ -34829,6 +34840,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 controller_life_before=controller_life_before,
                 controller_life_after=controller_life_after,
                 turn=turn,
+                phase=phase,
                 **replay_rule_fields(effect_data),
             )
             trigger_white_instant_sorcery_lifegain_damage(
@@ -34837,9 +34849,10 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
                 card,
                 life_gained,
                 turn,
-                phase="resolution",
+                phase=phase,
             )
-            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            if finish_spell:
+                finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
             return
     alive_opponents = [opp for opp in opponents if opp.is_alive()]
     if not direct_damage_targets_player(effect_data):
@@ -34850,9 +34863,11 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             amount=amount,
             result="no_legal_creature_target",
             turn=turn,
+            phase=phase,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        if finish_spell:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return
     if alive_opponents:
         target_player = min(alive_opponents, key=lambda opp: opp.life)
@@ -34863,7 +34878,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             card,
             amount,
             turn=turn,
-            phase="resolution",
+            phase=phase,
             damage_event_type="player",
         )
         life_gained, controller_life_before, controller_life_after, spell_lifelink_gain = (
@@ -34887,6 +34902,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             controller_life_before=controller_life_before,
             controller_life_after=controller_life_after,
             turn=turn,
+            phase=phase,
             **replay_rule_fields(effect_data),
         )
         trigger_white_instant_sorcery_lifegain_damage(
@@ -34895,9 +34911,201 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng):
             card,
             life_gained,
             turn,
-            phase="resolution",
+            phase=phase,
         )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish_spell:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+
+
+GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
+
+
+def _activated_rule_effects_for_permanent(permanent):
+    effects = []
+    for effect in permanent.get("_activated_rule_effects") or []:
+        if not isinstance(effect, dict):
+            continue
+        enriched = copy.deepcopy(effect)
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            if enriched.get(key) in (None, "", [], {}):
+                enriched[key] = permanent.get(key)
+        effects.append(enriched)
+    if (
+        permanent.get("activated_effect") == "direct_damage"
+        and permanent.get("activated_battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+    ):
+        direct_effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "amount": permanent.get("activated_damage_amount") or permanent.get("amount") or permanent.get("damage"),
+            "damage": permanent.get("activated_damage_amount") or permanent.get("amount") or permanent.get("damage"),
+            "target": permanent.get("target"),
+            "target_constraints": permanent.get("target_constraints"),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            direct_effect[key] = permanent.get(key)
+        effects.append(direct_effect)
+    return effects
+
+
+def generic_tap_damage_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("effect") == "direct_damage"
+            and effect_data.get("battle_model_scope") == GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("activation_requires_tap")
+        ):
+            try:
+                amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+            except (TypeError, ValueError):
+                amount = 0
+            if amount > 0:
+                return effect_data
+    return None
+
+
+def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or generic_tap_damage_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if permanent.get("tapped"):
+        return False
+    if is_battlefield_creature(permanent) and permanent.get("summoning_sick") and not has_haste(permanent):
+        return False
+    if direct_damage_targets_player(effect_data):
+        if any(opponent.is_alive() for opponent in opponents or []):
+            return True
+    for opponent in opponents or []:
+        if not opponent.is_alive():
+            continue
+        if removal_target_candidates(opponent, effect_data, controller=player, source=permanent):
+            return True
+    return False
+
+
+def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rng, *, phase=None):
+    effect_data = generic_tap_damage_effect_for_permanent(permanent)
+    if not can_activate_generic_tap_damage_permanent(
+        player,
+        permanent,
+        opponents,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    permanent["tapped"] = True
+    fields = replay_rule_fields(effect_data)
+    damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                permanent,
+                effect_data,
+                action="activate_tap_damage",
+            )
+        ],
+        chosen_option=decision_card_option(
+            permanent,
+            effect_data,
+            action="activate_tap_damage",
+        ),
+        rejected_options=[],
+        score_components={
+            "damage": damage,
+            "requires_tap": 1,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(10, damage * 8),
+        actual_outcome="activated_tap_damage_used",
+        reason="use_free_tap_damage_when_main_phase_target_available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        risk_flags=["tap_ability", "simplified_target_choice"],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect="direct_damage",
+        activation_kind="tap_damage",
+        activation_cost="tap",
+        tapped=True,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    apply_direct_damage(
+        player,
+        opponents,
+        permanent,
+        effect_data,
+        turn,
+        rng,
+        finish_spell=False,
+        phase=phase,
+    )
+    return True
+
+
+def activate_best_generic_tap_damage_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = generic_tap_damage_effect_for_permanent(permanent)
+        if not can_activate_generic_tap_damage_permanent(
+            player,
+            permanent,
+            opponents,
+            effect_data=effect_data,
+        ):
+            continue
+        amount = int(effect_data.get("amount") or effect_data.get("damage") or 0)
+        options.append((amount, int(permanent.get("power") or 0), permanent))
+    if not options:
+        return False
+    options.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return activate_generic_tap_damage_permanent(
+        player,
+        opponents,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+    )
 
 
 def apply_damage_each_opponent(player, opponents, card, effect_data, turn):
