@@ -357,7 +357,7 @@ Future<Map<String, dynamic>> _fanoutChecks(
           COUNT(*)::int AS rows,
           COUNT(DISTINCT dc.id)::int AS distinct_deck_card_rows
         FROM deck_cards dc
-        JOIN card_intelligence_snapshot cis ON cis.id = dc.card_id
+        JOIN card_intelligence_snapshot cis ON cis.card_id = dc.card_id
       ''',
     );
   }

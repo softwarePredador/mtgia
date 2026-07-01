@@ -662,10 +662,9 @@ def semantic_deck_cards_snapshot_sql() -> str:
                   COALESCE(cis.battle_rules, '[]'::jsonb)
                     AS battle_rules_json
                 FROM deck_cards dc
-                JOIN card_intelligence_snapshot cis ON cis.id = dc.card_id
+                JOIN card_intelligence_snapshot cis ON cis.card_id = dc.card_id
                 WHERE dc.deck_id = %s
                 GROUP BY
-                  cis.id,
                   cis.card_id,
                   cis.name,
                   cis.function_tags,

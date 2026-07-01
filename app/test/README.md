@@ -65,7 +65,6 @@ Cobertura principal:
 
 - `deck_diagnostic_panel_test.dart`
 - `sample_hand_widget_test.dart`
-- `deck_card_overflow_test.dart`
 
 Cobrem:
 
@@ -103,8 +102,7 @@ flutter test test/features/decks/models/deck_card_item_test.dart \
   test/features/decks/providers/deck_provider_test.dart \
   test/features/decks/screens/deck_flow_entry_screens_test.dart \
   test/features/decks/widgets/deck_diagnostic_panel_test.dart \
-  test/features/decks/widgets/sample_hand_widget_test.dart \
-  test/features/decks/widgets/deck_card_overflow_test.dart
+  test/features/decks/widgets/sample_hand_widget_test.dart
 ```
 
 ### Validacao completa do app
@@ -112,37 +110,6 @@ flutter test test/features/decks/models/deck_card_item_test.dart \
 ```bash
 flutter test
 ```
-
-### Prova visual do life counter clone
-
-```bash
-flutter test test/features/home/life_counter_clone_proof_test.dart --no-version-check
-powershell -ExecutionPolicy Bypass -File tool/generate_life_counter_clone_proof.ps1
-```
-
-Essa suite gera a prova side-by-side do clone:
-
-- screenshots atuais do app em `test/features/home/goldens/`
-- benchmarks convertidos em `test/features/home/benchmarks/`
-- provas side-by-side finais em `test/features/home/proofs/`
-
-Leitura de aceite:
-
-- a mesa, o hub e os overlays precisam bater visualmente na leitura imediata
-- banners promocionais do app de referencia nao entram como criterio de aceite
-- qualquer regressao visual relevante passa a aparecer no diff do golden
-
-Nota operacional de 2026-04-29:
-
-- `life_counter_clone_proof_test.dart` e suite legada de paridade historica; o caminho vivo segue em `LotusLifeCounterScreen`.
-- A suite usa tolerancia por arquivo apenas para ruido pequeno de rasterizacao/fonte observado na auditoria ampla:
-  - normal 4p: ate `0.06%`
-  - hub aberto: ate `0.10%`
-  - settings: ate `0.20%`
-  - set life: ate `0.08%`
-  - high roll: ate `0.35%`
-- Diffs acima desses limites continuam falhando e gerando artefatos em `test/features/home/failures`.
-- Use `--update-goldens` somente depois de revisar visualmente os PNGs afetados e confirmar mudanca legitima de baseline.
 
 ### Prova visual do hero da Home
 
@@ -177,12 +144,8 @@ Escopo:
 - feedback do shell
 - rota viva `/life-counter`
 
-Suites legadas mantidas como referencia/paridade historica:
-
-- `test/features/home/life_counter_screen_test.dart`
-- `test/features/home/life_counter_clone_proof_test.dart`
-
-Essas suites continuam uteis para comparacao visual e de UX, mas nao sao mais a confianca principal da feature ativa em producao.
+As suites de paridade do clone nativo antigo foram removidas em 2026-07-01.
+O aceite atual fica no host Lotus e nos fluxos internos/fallbacks vivos.
 
 ## Proximo salto de cobertura
 

@@ -36,7 +36,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         await _hasTable(pool, 'card_intelligence_snapshot');
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
     final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.id'
+        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.card_id'
         : 'JOIN cards c ON dc.card_id = c.id';
     final priceSelect =
         hasCardIntelligenceSnapshot ? 'c.price_usd AS price' : 'c.price';

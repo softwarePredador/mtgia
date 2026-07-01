@@ -38,6 +38,5 @@ bool _isExcluded(String path) {
       path.startsWith('lib/features/scanner/') ||
       path.startsWith('lib/features/home/life_counter/') ||
       path.startsWith('lib/features/home/lotus/') ||
-      path == 'lib/features/home/life_counter_screen.dart' ||
       path == 'lib/features/home/lotus_life_counter_screen.dart';
 }

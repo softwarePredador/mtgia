@@ -68,7 +68,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(_buildSubject());
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('ManaLoom'), findsOneWidget);
     expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
