@@ -399,8 +399,8 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: AppTheme.iconSpinnerSm,
+                      height: AppTheme.iconSpinnerSm,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: AppTheme.manaViolet,
@@ -510,7 +510,9 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                                               ? AppTheme.manaViolet
                                               : AppTheme.outlineMuted
                                                   .withValues(alpha: 0.5),
-                                      borderRadius: BorderRadius.circular(3),
+                                      borderRadius: BorderRadius.circular(
+                                        AppTheme.radiusXs,
+                                      ),
                                     ),
                                     child: Text(
                                       cardEditionCodeLabel(
@@ -971,8 +973,8 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                     child:
                         _saving
                             ? const SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: AppTheme.iconSpinnerSm,
+                              height: AppTheme.iconSpinnerSm,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: AppTheme.backgroundAbyss,

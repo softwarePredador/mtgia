@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/observability/app_observability.dart';
+import '../../core/theme/app_theme.dart';
 import 'life_counter/life_counter_day_night_state.dart';
 import 'life_counter/life_counter_day_night_state_store.dart';
 import 'life_counter/life_counter_game_timer_state.dart';
@@ -4808,7 +4809,7 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
         _handleBackNavigationAttempt(didPop);
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.lifeCounterBlack,
         // A plain body avoids the zero-sized viewport issue we hit when wrapping
         // this PlatformView in a Stack on Android.
         body: _hostController.buildView(context),

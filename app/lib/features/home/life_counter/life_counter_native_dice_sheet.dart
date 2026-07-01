@@ -15,7 +15,7 @@ Future<LifeCounterSession?> showLifeCounterNativeDiceSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeDiceSheet(
         initialSession: initialSession,
@@ -111,7 +111,7 @@ class _LifeCounterNativeDiceSheetState
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -320,7 +320,7 @@ class _DiceSectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),
@@ -343,7 +343,7 @@ class _SummaryChip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: AppTheme.outlineMuted),
       ),
       child: Padding(
@@ -395,7 +395,7 @@ class _RollChip extends StatelessWidget {
             highlighted
                 ? AppTheme.primarySoft.withValues(alpha: 0.18)
                 : AppTheme.surfaceElevated,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(
           color: highlighted ? AppTheme.primarySoft : AppTheme.outlineMuted,
         ),

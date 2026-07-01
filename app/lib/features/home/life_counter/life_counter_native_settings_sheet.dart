@@ -11,7 +11,7 @@ Future<LifeCounterSettings?> showLifeCounterNativeSettingsSheet(
   return showModalBottomSheet<LifeCounterSettings>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeSettingsSheet(initialSettings: initialSettings);
     },
@@ -106,7 +106,7 @@ class _LifeCounterNativeSettingsSheetState
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],

@@ -442,6 +442,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             color: theme.colorScheme.error.withValues(
                               alpha: 0.4,
                             ),
+                            width: AppTheme.strokeThin,
                           ),
                         ),
                         child: Row(
@@ -760,7 +761,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: AppTheme.mythicGold.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                       border: Border.all(
                         color: AppTheme.mythicGold.withValues(alpha: 0.28),
                       ),
@@ -781,7 +782,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                       child: CachedCardImage(
                         imageUrl: card.imageUrl,
-                        width: 44,
+                        width: AppTheme.touchTargetMin,
                         height: 62,
                       ),
                     ),
@@ -914,7 +915,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: borderColor != null ? Border.all(color: borderColor) : null,
+        border:
+            borderColor != null
+                ? Border.all(color: borderColor, width: AppTheme.strokeThin)
+                : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

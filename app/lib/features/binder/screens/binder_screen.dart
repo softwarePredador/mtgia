@@ -449,7 +449,10 @@ class _BinderListViewState extends State<_BinderListView>
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(color: accent.withValues(alpha: 0.22)),
+              border: Border.all(
+                color: accent.withValues(alpha: 0.22),
+                width: AppTheme.strokeThin,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -751,7 +754,10 @@ class _DashboardSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,7 +972,10 @@ class _DistributionChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Text(
         '$label • $value',
@@ -1007,7 +1016,10 @@ class _StatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.surfaceSlate,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: color.withValues(alpha: 0.22)),
+          border: Border.all(
+            color: color.withValues(alpha: 0.22),
+            width: AppTheme.strokeThin,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1488,7 +1500,10 @@ class _BinderItemCard extends StatelessWidget {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        side: const BorderSide(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1500,7 +1515,7 @@ class _BinderItemCard extends StatelessWidget {
             children: [
               CachedCardImage(
                 imageUrl: item.cardImageUrl,
-                width: 46,
+                width: AppTheme.touchTargetMin,
                 height: 64,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),

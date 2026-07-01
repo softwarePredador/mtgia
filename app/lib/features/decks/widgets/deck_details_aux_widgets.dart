@@ -64,6 +64,7 @@ class DeckPricingRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: theme.colorScheme.outline.withValues(alpha: 0.35),
+          width: AppTheme.strokeThin,
         ),
       ),
       child: Row(
@@ -236,8 +237,8 @@ class ColorIdentityPips extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.only(right: 3),
               child: SizedBox(
-                width: 20,
-                height: 20,
+                width: AppTheme.iconSpinnerSm,
+                height: AppTheme.iconSpinnerSm,
                 child: SvgPicture.asset(
                   'assets/symbols/$c.svg',
                   placeholderBuilder: (_) => FallbackColorPip(letter: c),
@@ -257,12 +258,15 @@ class FallbackColorPip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 20,
-      height: 20,
+      width: AppTheme.iconSpinnerSm,
+      height: AppTheme.iconSpinnerSm,
       decoration: BoxDecoration(
         color: AppTheme.manaPipBackground(letter),
         shape: BoxShape.circle,
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(

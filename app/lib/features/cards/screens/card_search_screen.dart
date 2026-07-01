@@ -261,10 +261,10 @@ class _CardSearchScreenState extends State<CardSearchScreen>
         backgroundColor: AppTheme.backgroundAbyss,
         surfaceTintColor: AppTheme.transparent,
         title: Container(
-          height: 38,
+          height: AppTheme.touchTargetMin,
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             border: Border.all(
               color: AppTheme.brass400.withValues(alpha: 0.18),
             ),
@@ -326,7 +326,7 @@ class _CardSearchScreenState extends State<CardSearchScreen>
           Padding(
             padding: const EdgeInsets.only(left: 8, right: 10),
             child: InkWell(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -577,7 +577,7 @@ class _SearchResultsHeader extends StatelessWidget {
             margin: const EdgeInsets.only(right: 10),
             decoration: BoxDecoration(
               color: AppTheme.frost400,
-              borderRadius: BorderRadius.circular(99),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             ),
           ),
           Expanded(
@@ -765,8 +765,8 @@ class _CardSearchResultTile extends StatelessWidget {
                     ),
                   ),
                   child: SizedBox(
-                    width: 38,
-                    height: 38,
+                    width: AppTheme.touchTargetMin,
+                    height: AppTheme.touchTargetMin,
                     child: IconButton(
                       key: Key('card-search-add-${card.id}'),
                       tooltip: canAdd ? 'Adicionar' : 'Indisponível',
@@ -821,7 +821,7 @@ class _SearchIdentityPips extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: AppTheme.backgroundAbyss.withValues(alpha: 0.5),
-                      width: 0.5,
+                      width: AppTheme.strokeHairline,
                     ),
                   ),
                   child: Text(

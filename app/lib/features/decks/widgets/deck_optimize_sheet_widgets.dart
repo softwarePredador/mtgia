@@ -32,7 +32,10 @@ class SheetHeroCard extends StatelessWidget {
           colors: [accent.withValues(alpha: 0.18), AppTheme.surfaceElevated],
         ),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: accent.withValues(alpha: 0.24), width: 0.8),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.24),
+          width: AppTheme.strokeMedium,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +66,7 @@ class SheetHeroCard extends StatelessWidget {
                   subtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ],
@@ -98,7 +101,10 @@ class StrategyOptionCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: BorderSide(color: accent.withValues(alpha: 0.22), width: 0.8),
+        side: BorderSide(
+          color: accent.withValues(alpha: 0.22),
+          width: AppTheme.strokeMedium,
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -531,7 +537,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                             'Ganhos: ${(widget.postAnalysis['improvements'] as List).take(2).join(' • ')}',
                             style: const TextStyle(
                               color: AppTheme.textSecondary,
-                              height: 1.35,
+                              height: AppTheme.lineHeightCompact,
                             ),
                           ),
                         ),
@@ -556,7 +562,7 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
                                   '• $line',
                                   style: const TextStyle(
                                     color: AppTheme.textSecondary,
-                                    height: 1.35,
+                                    height: AppTheme.lineHeightCompact,
                                   ),
                                 ),
                               ),
@@ -875,7 +881,7 @@ class OutcomeInfoDialog extends StatelessWidget {
                                 '• $reason',
                                 style: const TextStyle(
                                   color: AppTheme.textSecondary,
-                                  height: 1.35,
+                                  height: AppTheme.lineHeightCompact,
                                 ),
                               ),
                             ),
@@ -935,7 +941,10 @@ class GuidedRebuildActionDialog extends StatelessWidget {
             const SizedBox(height: 12),
             const Text(
               'O ManaLoom pode criar um rascunho reconstruído sem alterar o deck original.',
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                height: AppTheme.lineHeightCompact,
+              ),
             ),
             if (reasons.isNotEmpty) ...[
               const SizedBox(height: 16),
@@ -955,7 +964,7 @@ class GuidedRebuildActionDialog extends StatelessWidget {
                                 '• $reason',
                                 style: const TextStyle(
                                   color: AppTheme.textSecondary,
-                                  height: 1.35,
+                                  height: AppTheme.lineHeightCompact,
                                 ),
                               ),
                             ),
@@ -1185,7 +1194,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: AppTheme.fontSm,
-                            height: 1.35,
+                            height: AppTheme.lineHeightCompact,
                           ),
                         ),
                       ),
@@ -1199,7 +1208,7 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
                             fontSize: AppTheme.fontSm,
-                            height: 1.35,
+                            height: AppTheme.lineHeightCompact,
                           ),
                         ),
                       ),

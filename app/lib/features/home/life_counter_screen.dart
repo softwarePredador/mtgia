@@ -541,7 +541,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: barrierLabel,
-      barrierColor: Colors.black.withValues(alpha: 0.72),
+      barrierColor: AppTheme.lifeCounterBlack.withValues(alpha: 0.72),
       pageBuilder: (ctx, _, __) => builder(ctx),
       transitionDuration: const Duration(milliseconds: 280),
       transitionBuilder: (ctx, animation, secondaryAnimation, child) {
@@ -869,7 +869,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.lifeCounterBlack,
       body: SafeArea(
         bottom: false,
         child: Stack(
@@ -878,7 +878,7 @@ class _LifeCounterScreenState extends State<LifeCounterScreen> {
               child: IgnorePointer(
                 ignoring: _isHubExpanded,
                 child: ColoredBox(
-                  color: Colors.black,
+                  color: AppTheme.lifeCounterBlack,
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(2, 2, 2, 4),
                     child: _buildTablePlayers(),
@@ -1432,7 +1432,7 @@ class _TableControlHub extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.76),
+                    color: AppTheme.lifeCounterWhite.withValues(alpha: 0.76),
                     fontSize: AppTheme.fontSm,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.45,
@@ -1462,7 +1462,6 @@ class _HubToolsFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final frameSize = 98 * scaleFactor;
-    final radius = 20 * scaleFactor;
 
     return Positioned.fill(
       child: IgnorePointer(
@@ -1490,9 +1489,11 @@ class _HubToolsFrame extends StatelessWidget {
               message: 'Ferramentas da mesa',
               child: Material(
                 key: const Key('life-counter-hub-tools'),
-                color: Colors.transparent,
+                color: AppTheme.transparent,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(radius),
+                  borderRadius: BorderRadius.circular(
+                    AppTheme.radiusXl * scaleFactor,
+                  ),
                   onTap: onTap,
                   child: SizedBox(width: frameSize, height: frameSize),
                 ),
@@ -1530,10 +1531,10 @@ class _HubMedallion extends StatelessWidget {
         message:
             isExpanded ? 'Fechar controles da mesa' : 'Abrir controles da mesa',
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             key: const Key('life-counter-hub-toggle'),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 220),
@@ -1552,9 +1553,9 @@ class _HubMedallion extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(
-                              0xFF9CE9FF,
-                            ).withValues(alpha: isExpanded ? 0.2 : 0.11),
+                            color: AppTheme.lifeCounterHubGlow.withValues(
+                              alpha: isExpanded ? 0.2 : 0.11,
+                            ),
                             blurRadius: isExpanded ? 24 : 14,
                             spreadRadius: isExpanded ? 2 : 0,
                           ),
@@ -1569,14 +1570,16 @@ class _HubMedallion extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(
+                          color: AppTheme.lifeCounterWhite.withValues(
                             alpha: isExpanded ? 0.32 : 0.2,
                           ),
                           width: 1.2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.24),
+                            color: AppTheme.lifeCounterBlack.withValues(
+                              alpha: 0.24,
+                            ),
                             blurRadius: isExpanded ? 20 : 14,
                             spreadRadius: 1.5 * scaleFactor,
                             offset: Offset(0, 8 * scaleFactor),
@@ -1602,7 +1605,7 @@ class _HubMedallion extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(
+                          color: AppTheme.lifeCounterWhite.withValues(
                             alpha: isExpanded ? 0.3 : 0.2,
                           ),
                           width: 1.1,
@@ -1615,7 +1618,9 @@ class _HubMedallion extends StatelessWidget {
                       size: iconSize,
                       shadows: [
                         Shadow(
-                          color: Colors.white.withValues(alpha: 0.36),
+                          color: AppTheme.lifeCounterWhite.withValues(
+                            alpha: 0.36,
+                          ),
                           blurRadius: 6,
                         ),
                       ],
@@ -1675,7 +1680,7 @@ class _HubMedallionPainter extends CustomPainter {
 
     final coreStroke =
         Paint()
-          ..color = Colors.black.withValues(alpha: 0.1)
+          ..color = AppTheme.lifeCounterBlack.withValues(alpha: 0.1)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1
           ..strokeJoin = StrokeJoin.round
@@ -1710,7 +1715,10 @@ class _HubMedallionPainter extends CustomPainter {
           ..shader = LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white.withValues(alpha: 0.18), Colors.transparent],
+            colors: [
+              AppTheme.lifeCounterWhite.withValues(alpha: 0.18),
+              AppTheme.transparent,
+            ],
           ).createShader(
             Rect.fromCenter(
               center: center.translate(0, -size.height * 0.16),
@@ -1734,7 +1742,9 @@ class _HubMedallionPainter extends CustomPainter {
 
     final centerGlow =
         Paint()
-          ..color = Colors.white.withValues(alpha: 0.28 + (0.12 * progress))
+          ..color = AppTheme.lifeCounterWhite.withValues(
+            alpha: 0.28 + (0.12 * progress),
+          )
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
     canvas.drawCircle(center, size.width * 0.05, centerGlow);
   }
@@ -1764,8 +1774,9 @@ class _HubPetalAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = onTap != null;
     final visualOpacity = enabled ? 1.0 : 0.58;
-    final topTint = Color.lerp(color, Colors.white, 0.2) ?? color;
-    final bottomTint = Color.lerp(color, Colors.black, 0.12) ?? color;
+    final topTint = Color.lerp(color, AppTheme.lifeCounterWhite, 0.2) ?? color;
+    final bottomTint =
+        Color.lerp(color, AppTheme.lifeCounterBlack, 0.12) ?? color;
 
     return Semantics(
       button: true,
@@ -1777,11 +1788,11 @@ class _HubPetalAction extends StatelessWidget {
           key: buttonKey,
           color: const Color.fromARGB(0, 0, 0, 0),
           child: InkWell(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
               width: 102 * scaleFactor,
-              height: 40 * scaleFactor,
+              height: AppTheme.touchTargetMin * scaleFactor,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -1791,14 +1802,18 @@ class _HubPetalAction extends StatelessWidget {
                     bottomTint.withValues(alpha: visualOpacity),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 border: Border.all(
-                  color: Colors.black.withValues(alpha: 0.2 * visualOpacity),
-                  width: 0.9,
+                  color: AppTheme.lifeCounterBlack.withValues(
+                    alpha: 0.2 * visualOpacity,
+                  ),
+                  width: AppTheme.strokeRegular,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.1 * visualOpacity),
+                    color: AppTheme.lifeCounterWhite.withValues(
+                      alpha: 0.1 * visualOpacity,
+                    ),
                     blurRadius: 3 * scaleFactor,
                     offset: Offset.zero,
                   ),
@@ -1813,10 +1828,10 @@ class _HubPetalAction extends StatelessWidget {
                       label,
                       maxLines: 1,
                       style: TextStyle(
-                        color: Colors.black.withValues(
+                        color: AppTheme.lifeCounterBlack.withValues(
                           alpha: 0.9 * visualOpacity,
                         ),
-                        fontSize: 13.4 * scaleFactor,
+                        fontSize: AppTheme.fontLifeCounterLabel * scaleFactor,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.1,
                       ),
@@ -1887,7 +1902,7 @@ class _TableOverlayFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: SafeArea(
         child: Align(
           alignment: Alignment.topCenter,
@@ -1911,8 +1926,10 @@ class _TableOverlayFrame extends StatelessWidget {
                         Text(
                           title,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.98),
-                            fontSize: 24,
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.98,
+                            ),
+                            fontSize: AppTheme.fontLifeCounterAction,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.8,
                           ),
@@ -1922,7 +1939,9 @@ class _TableOverlayFrame extends StatelessWidget {
                           Text(
                             subtitle!,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.66),
+                              color: AppTheme.lifeCounterWhite.withValues(
+                                alpha: 0.66,
+                              ),
                               fontSize: AppTheme.fontSm,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
@@ -1944,9 +1963,11 @@ class _TableOverlayFrame extends StatelessWidget {
                       child: Tooltip(
                         message: 'Fechar painel',
                         child: Material(
-                          color: Colors.transparent,
+                          color: AppTheme.transparent,
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusPill,
+                            ),
                             onTap: () => Navigator.of(context).pop(),
                             child: Ink(
                               width: 48,
@@ -1957,7 +1978,7 @@ class _TableOverlayFrame extends StatelessWidget {
                               ),
                               child: const Icon(
                                 Icons.close_rounded,
-                                color: Colors.white,
+                                color: AppTheme.lifeCounterWhite,
                               ),
                             ),
                           ),
@@ -1985,7 +2006,7 @@ class _OverlaySectionHeading extends StatelessWidget {
     return Text(
       label,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.86),
+        color: AppTheme.lifeCounterWhite.withValues(alpha: 0.86),
         fontSize: AppTheme.fontSm,
         fontWeight: FontWeight.w900,
         letterSpacing: 1,
@@ -2018,22 +2039,27 @@ class _PlayerLayoutPreview extends StatelessWidget {
         message: semanticLabel,
         child: Material(
           key: previewKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(
+              AppTheme.radiusLifeCounterAction,
+            ),
             child: Ink(
               width: 176,
               height: 72,
               decoration: BoxDecoration(
-                color: selected ? AppTheme.lifeCounterPink : Colors.transparent,
-                borderRadius: BorderRadius.circular(28),
+                color:
+                    selected ? AppTheme.lifeCounterPink : AppTheme.transparent,
+                borderRadius: BorderRadius.circular(
+                  AppTheme.radiusLifeCounterAction,
+                ),
                 border: Border.all(
                   color:
                       selected
                           ? AppTheme.lifeCounterPink
-                          : Colors.white.withValues(alpha: 0.9),
-                  width: 2,
+                          : AppTheme.lifeCounterWhite.withValues(alpha: 0.9),
+                  width: AppTheme.strokeStrong,
                 ),
               ),
               child: Padding(
@@ -2055,11 +2081,14 @@ class _PlayerLayoutGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tileColor = playerCount >= 4 ? Colors.black : Colors.white;
+    final tileColor =
+        playerCount >= 4
+            ? AppTheme.lifeCounterBlack
+            : AppTheme.lifeCounterWhite;
     final tileAlt =
         playerCount >= 4
-            ? Colors.black.withValues(alpha: 0.82)
-            : Colors.white.withValues(alpha: 0.9);
+            ? AppTheme.lifeCounterBlack.withValues(alpha: 0.82)
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.9);
 
     Widget tile({Color? color}) {
       return Expanded(
@@ -2067,7 +2096,7 @@ class _PlayerLayoutGlyph extends StatelessWidget {
           margin: const EdgeInsets.all(3),
           decoration: BoxDecoration(
             color: color ?? tileColor,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterSm),
           ),
         ),
       );
@@ -2098,7 +2127,7 @@ class _PlayerLayoutGlyph extends StatelessWidget {
           margin: const EdgeInsets.all(3),
           decoration: BoxDecoration(
             color: tileAlt,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterSm),
           ),
         );
       }
@@ -2168,7 +2197,7 @@ class _HistoryOverlay extends StatelessWidget {
             lastTableEvent == null ? 'NO TABLE EVENT.' : lastTableEvent!,
             key: const Key('life-counter-history-last-event'),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+              color: AppTheme.lifeCounterWhite.withValues(alpha: 0.9),
               fontSize: AppTheme.fontMd,
               height: 1.3,
               fontWeight: FontWeight.w800,
@@ -2181,8 +2210,8 @@ class _HistoryOverlay extends StatelessWidget {
             '$snapshotCount SAVED',
             key: const Key('life-counter-history-snapshot-count'),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.72),
-              fontSize: 22,
+              color: AppTheme.lifeCounterWhite.withValues(alpha: 0.72),
+              fontSize: AppTheme.fontLifeCounterHub,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.6,
             ),
@@ -2203,9 +2232,9 @@ class _OverlayPlainText extends StatelessWidget {
     return Text(
       body,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.86),
+        color: AppTheme.lifeCounterWhite.withValues(alpha: 0.86),
         fontSize: AppTheme.fontMd,
-        height: 1.35,
+        height: AppTheme.lineHeightCompact,
         fontWeight: FontWeight.w700,
       ),
     );
@@ -2270,20 +2299,26 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                       },
                       onSubmitted: (value) => _runSearch(context, value),
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.96),
+                        color: AppTheme.lifeCounterWhite.withValues(
+                          alpha: 0.96,
+                        ),
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.2,
                       ),
                       decoration: InputDecoration(
                         hintText: 'SEARCH CARDS',
                         hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.34),
+                          color: AppTheme.lifeCounterWhite.withValues(
+                            alpha: 0.34,
+                          ),
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
                         ),
                         prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: Colors.white.withValues(alpha: 0.82),
+                          color: AppTheme.lifeCounterWhite.withValues(
+                            alpha: 0.82,
+                          ),
                         ),
                         suffixIcon:
                             _controller.text.isEmpty
@@ -2300,30 +2335,42 @@ class _CardSearchOverlayState extends State<_CardSearchOverlay> {
                                   },
                                   icon: Icon(
                                     Icons.close_rounded,
-                                    color: Colors.white.withValues(alpha: 0.82),
+                                    color: AppTheme.lifeCounterWhite.withValues(
+                                      alpha: 0.82,
+                                    ),
                                   ),
                                 ),
                         filled: true,
-                        fillColor: Colors.black.withValues(alpha: 0.28),
+                        fillColor: AppTheme.lifeCounterBlack.withValues(
+                          alpha: 0.28,
+                        ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
                           borderSide: const BorderSide(
-                            color: Colors.white,
+                            color: AppTheme.lifeCounterWhite,
                             width: 1.8,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
                           borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.94),
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.94,
+                            ),
                             width: 1.8,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLg,
+                          ),
                           borderSide: const BorderSide(
                             color: AppTheme.lifeCounterBlue,
-                            width: 2,
+                            width: AppTheme.strokeStrong,
                           ),
                         ),
                       ),
@@ -2424,24 +2471,24 @@ class _CardSearchSuggestionChip extends StatelessWidget {
         message: 'Buscar $label',
         child: Material(
           key: chipKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.22),
-                borderRadius: BorderRadius.circular(999),
+                color: AppTheme.lifeCounterBlack.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.94),
+                  color: AppTheme.lifeCounterWhite.withValues(alpha: 0.94),
                   width: 1.5,
                 ),
               ),
               child: Text(
                 label.toUpperCase(),
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.86),
+                  color: AppTheme.lifeCounterWhite.withValues(alpha: 0.86),
                   fontSize: AppTheme.fontXs,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
@@ -2471,9 +2518,9 @@ class _CardSearchResultTile extends StatelessWidget {
         message: 'Abrir $cardName',
         child: Material(
           key: tileKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterLg),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
@@ -2482,25 +2529,27 @@ class _CardSearchResultTile extends StatelessWidget {
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.24),
-                borderRadius: BorderRadius.circular(16),
+                color: AppTheme.lifeCounterBlack.withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.94),
+                  color: AppTheme.lifeCounterWhite.withValues(alpha: 0.94),
                   width: 1.3,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 38,
+                    width: AppTheme.touchTargetMin,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppTheme.lifeCounterWhite.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.radiusLifeCounterSm,
+                      ),
                     ),
                     child: Icon(
                       Icons.style_rounded,
-                      color: Colors.white.withValues(alpha: 0.72),
+                      color: AppTheme.lifeCounterWhite.withValues(alpha: 0.72),
                       size: 18,
                     ),
                   ),
@@ -2514,7 +2563,9 @@ class _CardSearchResultTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.96),
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.96,
+                            ),
                             fontSize: AppTheme.fontMd,
                             fontWeight: FontWeight.w800,
                           ),
@@ -2529,7 +2580,9 @@ class _CardSearchResultTile extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.62),
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.62,
+                            ),
                             fontSize: AppTheme.fontSm,
                             fontWeight: FontWeight.w600,
                             height: 1.25,
@@ -2541,7 +2594,7 @@ class _CardSearchResultTile extends StatelessWidget {
                   const SizedBox(width: 10),
                   Icon(
                     Icons.open_in_new_rounded,
-                    color: Colors.white.withValues(alpha: 0.72),
+                    color: AppTheme.lifeCounterWhite.withValues(alpha: 0.72),
                     size: 18,
                   ),
                 ],
@@ -2572,14 +2625,14 @@ class _TableBottomRail extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: AppTheme.lifeCounterIvory,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(
-          color: Colors.black.withValues(alpha: 0.15),
+          color: AppTheme.lifeCounterBlack.withValues(alpha: 0.15),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
+            color: AppTheme.lifeCounterBlack.withValues(alpha: 0.28),
             blurRadius: 28,
             offset: const Offset(0, 10),
           ),
@@ -2636,18 +2689,18 @@ class _BottomRailPill extends StatelessWidget {
         message: label,
         child: Material(
           key: pillKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
               decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(999),
+                color: AppTheme.lifeCounterBlack,
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.18),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -2656,12 +2709,12 @@ class _BottomRailPill extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: 15, color: Colors.white),
+                  Icon(icon, size: 15, color: AppTheme.lifeCounterWhite),
                   const SizedBox(width: 6),
                   Text(
                     label,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppTheme.lifeCounterWhite,
                       fontSize: AppTheme.fontSm,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.55,
@@ -3065,11 +3118,13 @@ class _PlayerPanelState extends State<_PlayerPanel> {
     final isLightPanel =
         ThemeData.estimateBrightnessForColor(baseColor) == Brightness.light;
     final dominantValueColor =
-        isLightPanel ? Colors.black : Colors.white.withValues(alpha: 0.98);
+        isLightPanel
+            ? AppTheme.lifeCounterBlack
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.98);
     final supportingColor =
         isLightPanel
-            ? Colors.black.withValues(alpha: 0.46)
-            : Colors.white.withValues(alpha: 0.38);
+            ? AppTheme.lifeCounterBlack.withValues(alpha: 0.46)
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.38);
     final quickActions = <Widget>[
       _PlayerInlineAction(
         actionKey: Key('life-counter-player-roll-d20-${widget.panelIndex}'),
@@ -3226,9 +3281,9 @@ class _PlayerPanelState extends State<_PlayerPanel> {
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
         color: baseColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXl),
         border: Border.all(
-          color: isCommanderLethal ? AppTheme.error : Colors.black,
+          color: isCommanderLethal ? AppTheme.error : AppTheme.lifeCounterBlack,
           width: isCommanderLethal ? 3 : 3,
         ),
         boxShadow: const [],
@@ -3533,10 +3588,10 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                     color: supportingColor,
                     fontSize:
                         _isDenseCompact
-                            ? 20
+                            ? AppTheme.fontXxl
                             : widget.compact
-                            ? 24
-                            : 28,
+                            ? AppTheme.fontLifeCounterAction
+                            : AppTheme.fontLifeCounterStepLarge,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3556,10 +3611,10 @@ class _PlayerPanelState extends State<_PlayerPanel> {
                     color: supportingColor,
                     fontSize:
                         _isDenseCompact
-                            ? 20
+                            ? AppTheme.fontXxl
                             : widget.compact
-                            ? 24
-                            : 28,
+                            ? AppTheme.fontLifeCounterAction
+                            : AppTheme.fontLifeCounterStepLarge,
                     fontWeight: FontWeight.w800,
                     height: 1,
                   ),
@@ -3682,10 +3737,10 @@ class _PlayerPanelState extends State<_PlayerPanel> {
             color: dominantValueColor,
             fontSize:
                 _isDenseCompact
-                    ? 104
+                    ? AppTheme.fontLifeCounterCoreDense
                     : widget.compact
-                    ? 126
-                    : 184,
+                    ? AppTheme.fontLifeCounterCoreCompact
+                    : AppTheme.fontLifeCounterCoreLarge,
             fontWeight: FontWeight.w900,
             height: 0.88,
             letterSpacing:
@@ -3732,7 +3787,7 @@ class _PlayerInlineAction extends StatelessWidget {
         message: label,
         child: Material(
           key: actionKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusXl),
             onTap: onTap,
@@ -3756,7 +3811,7 @@ class _PlayerInlineAction extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppTheme.radiusXl),
                 border: Border.all(
                   color: accent.withValues(alpha: destructive ? 0.3 : 0.18),
-                  width: 0.8,
+                  width: AppTheme.strokeMedium,
                 ),
               ),
               child: Row(
@@ -3874,25 +3929,25 @@ class _PlayerCounterConsoleStat extends StatelessWidget {
     final baseColor =
         isActive
             ? accent.withValues(alpha: 0.18)
-            : Colors.black.withValues(alpha: 0.34);
+            : AppTheme.lifeCounterBlack.withValues(alpha: 0.34);
     final borderColor =
         isActive
             ? accent.withValues(alpha: 0.42)
-            : Colors.white.withValues(alpha: 0.12);
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.12);
     final labelColor =
         isActive
             ? accent.withValues(alpha: 0.92)
-            : Colors.white.withValues(alpha: 0.5);
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.5);
     final valueColor =
         isActive
-            ? Colors.white.withValues(alpha: 0.96)
-            : Colors.white.withValues(alpha: 0.7);
+            ? AppTheme.lifeCounterWhite.withValues(alpha: 0.96)
+            : AppTheme.lifeCounterWhite.withValues(alpha: 0.7);
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: baseColor,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: borderColor, width: 0.9),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        border: Border.all(color: borderColor, width: AppTheme.strokeRegular),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(
@@ -3987,15 +4042,15 @@ class _LifeQuickAdjustButton extends StatelessWidget {
         label: semanticLabel ?? label,
         button: true,
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             key: buttonKey,
             borderRadius: BorderRadius.circular(AppTheme.radiusXl),
             onTap: onTap,
             child: Ink(
               decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(999),
+                color: AppTheme.transparent,
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
               ),
               child: Center(
                 child: FittedBox(
@@ -4006,10 +4061,10 @@ class _LifeQuickAdjustButton extends StatelessWidget {
                       color: color,
                       fontSize:
                           isDenseCompact
-                              ? 18
+                              ? AppTheme.fontXl
                               : compact
-                              ? 22
-                              : 24,
+                              ? AppTheme.fontLifeCounterHub
+                              : AppTheme.fontLifeCounterAction,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -4055,7 +4110,7 @@ class _PanelTakeoverOverlay extends StatelessWidget {
           opacity: value,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -4066,7 +4121,7 @@ class _PanelTakeoverOverlay extends StatelessWidget {
               ),
               border: Border.all(
                 color: accent.withValues(alpha: 0.92),
-                width: 3,
+                width: AppTheme.strokeAccent,
               ),
               boxShadow: [
                 BoxShadow(
@@ -4099,7 +4154,9 @@ class _PanelTakeoverOverlay extends StatelessWidget {
                         title,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.98),
+                          color: AppTheme.lifeCounterWhite.withValues(
+                            alpha: 0.98,
+                          ),
                           fontSize:
                               isDenseCompact
                                   ? 26
@@ -4151,7 +4208,7 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDenseCompact = compact && dense;
-    final valueColor = Colors.black.withValues(alpha: 0.96);
+    final valueColor = AppTheme.lifeCounterBlack.withValues(alpha: 0.96);
     final eventLabel = kind == 'd20' ? 'D20' : 'HIGH ROLL';
     final resultLabel =
         kind == 'd20'
@@ -4179,8 +4236,14 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomCenter,
               colors: [
-                Color.alphaBlend(Colors.white.withValues(alpha: 0.08), color),
-                Color.alphaBlend(Colors.black.withValues(alpha: 0.18), color),
+                Color.alphaBlend(
+                  AppTheme.lifeCounterWhite.withValues(alpha: 0.08),
+                  color,
+                ),
+                Color.alphaBlend(
+                  AppTheme.lifeCounterBlack.withValues(alpha: 0.18),
+                  color,
+                ),
                 color,
               ],
             );
@@ -4195,15 +4258,15 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
           opacity: progress,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppTheme.radiusXl),
               gradient: background,
               border: Border.all(
                 color:
                     isWinner
-                        ? Colors.white.withValues(alpha: 0.42)
+                        ? AppTheme.lifeCounterWhite.withValues(alpha: 0.42)
                         : isTie
-                        ? Colors.black.withValues(alpha: 0.12)
-                        : Colors.white.withValues(alpha: 0.08),
+                        ? AppTheme.lifeCounterBlack.withValues(alpha: 0.12)
+                        : AppTheme.lifeCounterWhite.withValues(alpha: 0.08),
                 width: isWinner ? 2 : 1.1,
               ),
               boxShadow: [
@@ -4277,13 +4340,17 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                     : 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(
+                            color: AppTheme.lifeCounterBlack.withValues(
                               alpha: kind == 'd20' ? 0.16 : 0.72,
                             ),
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusPill,
+                            ),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              width: 0.8,
+                              color: AppTheme.lifeCounterWhite.withValues(
+                                alpha: 0.12,
+                              ),
+                              width: AppTheme.strokeMedium,
                             ),
                           ),
                           child: Text(
@@ -4293,7 +4360,9 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                               color:
                                   kind == 'd20'
                                       ? valueColor.withValues(alpha: 0.8)
-                                      : Colors.white.withValues(alpha: 0.94),
+                                      : AppTheme.lifeCounterWhite.withValues(
+                                        alpha: 0.94,
+                                      ),
                               fontSize:
                                   isDenseCompact
                                       ? AppTheme.fontXs - 1
@@ -4338,7 +4407,7 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.white.withValues(
+                                    color: AppTheme.lifeCounterWhite.withValues(
                                       alpha:
                                           isWinner
                                               ? 0.26 * progress
@@ -4374,10 +4443,12 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                     color: valueColor,
                                     fontSize:
                                         isDenseCompact
-                                            ? 128
+                                            ? AppTheme.fontLifeCounterTableDense
                                             : compact
-                                            ? 168
-                                            : 246,
+                                            ? AppTheme
+                                                .fontLifeCounterTableCompact
+                                            : AppTheme
+                                                .fontLifeCounterTableLarge,
                                     fontWeight: FontWeight.w900,
                                     height: 0.78,
                                     letterSpacing:
@@ -4420,26 +4491,27 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                                                 : 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(
-                                          alpha: isTie ? 0.82 : 0.76,
-                                        ),
+                                        color: AppTheme.lifeCounterBlack
+                                            .withValues(
+                                              alpha: isTie ? 0.82 : 0.76,
+                                            ),
                                         borderRadius: BorderRadius.circular(
-                                          999,
+                                          AppTheme.radiusPill,
                                         ),
                                         border: Border.all(
-                                          color: Colors.white.withValues(
-                                            alpha: isTie ? 0.14 : 0.18,
-                                          ),
-                                          width: 0.8,
+                                          color: AppTheme.lifeCounterWhite
+                                              .withValues(
+                                                alpha: isTie ? 0.14 : 0.18,
+                                              ),
+                                          width: AppTheme.strokeMedium,
                                         ),
                                       ),
                                       child: Text(
                                         resultLabel,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.96,
-                                          ),
+                                          color: AppTheme.lifeCounterWhite
+                                              .withValues(alpha: 0.96),
                                           fontSize:
                                               isDenseCompact
                                                   ? AppTheme.fontXs - 1
@@ -4528,11 +4600,11 @@ class _PanelEventTakeoverOverlay extends StatelessWidget {
                 width: 18,
                 height: 18,
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(4),
+                  color: AppTheme.lifeCounterBlack.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                   border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    width: 0.8,
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.12),
+                    width: AppTheme.strokeMedium,
                   ),
                 ),
               ),
@@ -4876,7 +4948,7 @@ class _TableToolsSheetState extends State<_TableToolsSheet> {
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w800,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
           ],
@@ -4969,10 +5041,10 @@ class _DiceOverlay extends StatelessWidget {
               key: const Key('life-counter-dice-last-event'),
               lastTableEvent!,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.86),
+                color: AppTheme.lifeCounterWhite.withValues(alpha: 0.86),
                 fontSize: AppTheme.fontMd,
                 fontWeight: FontWeight.w800,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
                 letterSpacing: 0.1,
               ),
             ),
@@ -5002,7 +5074,7 @@ class _DiceActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = accent ?? Colors.white;
+    final borderColor = accent ?? AppTheme.lifeCounterWhite;
     return Semantics(
       button: true,
       label: '$label, $detail',
@@ -5010,9 +5082,11 @@ class _DiceActionRow extends StatelessWidget {
         message: '$label: $detail',
         child: Material(
           key: buttonKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
+            borderRadius: BorderRadius.circular(
+              emphasized ? AppTheme.radiusLifeCounterXl : AppTheme.radiusLg,
+            ),
             onTap: onTap,
             child: Ink(
               width: double.infinity,
@@ -5021,9 +5095,16 @@ class _DiceActionRow extends StatelessWidget {
                 vertical: emphasized ? 18 : 14,
               ),
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: emphasized ? 0.56 : 0.32),
-                borderRadius: BorderRadius.circular(emphasized ? 22 : 16),
-                border: Border.all(color: borderColor, width: 2),
+                color: AppTheme.lifeCounterBlack.withValues(
+                  alpha: emphasized ? 0.56 : 0.32,
+                ),
+                borderRadius: BorderRadius.circular(
+                  emphasized ? AppTheme.radiusLifeCounterXl : AppTheme.radiusLg,
+                ),
+                border: Border.all(
+                  color: borderColor,
+                  width: AppTheme.strokeStrong,
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -5035,7 +5116,7 @@ class _DiceActionRow extends StatelessWidget {
                         Text(
                           label,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppTheme.lifeCounterWhite,
                             fontSize: emphasized ? 26 : 22,
                             fontWeight: FontWeight.w900,
                             letterSpacing: emphasized ? 0.8 : 0.5,
@@ -5046,7 +5127,9 @@ class _DiceActionRow extends StatelessWidget {
                         Text(
                           detail,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.68),
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.68,
+                            ),
                             fontSize: AppTheme.fontXs,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.7,
@@ -5064,7 +5147,7 @@ class _DiceActionRow extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: borderColor.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                       border: Border.all(
                         color: borderColor.withValues(alpha: 0.7),
                         width: 1.2,
@@ -5120,7 +5203,7 @@ class _RollOffPlayerResult extends StatelessWidget {
               isWinner
                   ? AppTheme.primarySoft.withValues(alpha: 0.28)
                   : AppTheme.outlineMuted.withValues(alpha: 0.75),
-          width: 0.8,
+          width: AppTheme.strokeMedium,
         ),
       ),
       child: Column(
@@ -5215,7 +5298,7 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
   Widget build(BuildContext context) {
     final displayValue = _buffer.isEmpty ? '0' : _buffer;
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: SafeArea(
         child: Stack(
           children: [
@@ -5225,7 +5308,9 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                 label: 'Fechar ajuste de vida',
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Container(color: Colors.black.withValues(alpha: 0.74)),
+                  child: Container(
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.74),
+                  ),
                 ),
               ),
             ),
@@ -5240,7 +5325,9 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                       widget.playerLabel.toUpperCase(),
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.28),
+                        color: AppTheme.lifeCounterWhite.withValues(
+                          alpha: 0.28,
+                        ),
                         fontSize: AppTheme.fontSm,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.6,
@@ -5257,8 +5344,8 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                             displayValue,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 72,
+                              color: AppTheme.lifeCounterWhite,
+                              fontSize: AppTheme.fontLifeCounterLargeValue,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -3,
                               height: 0.9,
@@ -5342,7 +5429,9 @@ class _SetLifeOverlayState extends State<_SetLifeOverlay> {
                           child: Text(
                             'SET LIFE',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.56),
+                              color: AppTheme.lifeCounterWhite.withValues(
+                                alpha: 0.56,
+                              ),
                               fontSize: AppTheme.fontMd,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 0.8,
@@ -5390,9 +5479,9 @@ class _SetLifeKeypadButton extends StatelessWidget {
         message: semanticLabel,
         child: Material(
           key: buttonKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterXl),
             onTap: onTap,
             child: Ink(
               width: 58,
@@ -5402,7 +5491,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.22),
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.22),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -5415,7 +5504,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
                     color:
                         destructive
                             ? AppTheme.lifeCounterPink
-                            : Colors.white.withValues(alpha: 0.96),
+                            : AppTheme.lifeCounterWhite.withValues(alpha: 0.96),
                     fontSize: label == 'DEL' ? 17 : 30,
                     fontWeight: FontWeight.w900,
                     letterSpacing: label == 'DEL' ? 1.2 : 0.4,
@@ -5488,7 +5577,7 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
     final hasChanges = parsedValue != widget.initialLife;
 
     return Material(
-      color: Colors.transparent,
+      color: AppTheme.transparent,
       child: SafeArea(
         child: Stack(
           children: [
@@ -5498,7 +5587,9 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                 label: 'Fechar ajuste de vida',
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Container(color: Colors.black.withValues(alpha: 0.76)),
+                  child: Container(
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.76),
+                  ),
                 ),
               ),
             ),
@@ -5529,7 +5620,9 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                         widget.playerLabel.toUpperCase(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.28),
+                          color: AppTheme.lifeCounterWhite.withValues(
+                            alpha: 0.28,
+                          ),
                           fontSize: AppTheme.fontSm,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.8,
@@ -5540,15 +5633,23 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                         key: const Key('life-counter-set-life-shell'),
                         padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.72),
-                          borderRadius: BorderRadius.circular(28),
+                          color: AppTheme.lifeCounterBlack.withValues(
+                            alpha: 0.72,
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLifeCounterAction,
+                          ),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.08),
+                            color: AppTheme.lifeCounterWhite.withValues(
+                              alpha: 0.08,
+                            ),
                             width: 1,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.34),
+                              color: AppTheme.lifeCounterBlack.withValues(
+                                alpha: 0.34,
+                              ),
                               blurRadius: 36,
                               offset: const Offset(0, 18),
                             ),
@@ -5565,10 +5666,16 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                                 vertical: 14,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(24),
+                                color: AppTheme.lifeCounterWhite.withValues(
+                                  alpha: 0.05,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusLifeCounterXxl,
+                                ),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.08),
+                                  color: AppTheme.lifeCounterWhite.withValues(
+                                    alpha: 0.08,
+                                  ),
                                   width: 1,
                                 ),
                               ),
@@ -5592,8 +5699,9 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                                     key: ValueKey(displayValue),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 76,
+                                      color: AppTheme.lifeCounterWhite,
+                                      fontSize:
+                                          AppTheme.fontLifeCounterXLargeValue,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: -3.4,
                                       height: 0.88,
@@ -5676,9 +5784,10 @@ class _BenchmarkSetLifeOverlayState extends State<_BenchmarkSetLifeOverlay> {
                                   child: Text(
                                     'SET LIFE',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: hasChanges ? 0.72 : 0.38,
-                                      ),
+                                      color: AppTheme.lifeCounterWhite
+                                          .withValues(
+                                            alpha: hasChanges ? 0.72 : 0.38,
+                                          ),
                                       fontSize: AppTheme.fontMd,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.8,
@@ -5730,9 +5839,9 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
         message: semanticLabel,
         child: Material(
           key: buttonKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
               width: 62,
@@ -5741,14 +5850,14 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
                 color: AppTheme.lifeCounterSheetDark,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withValues(
+                  color: AppTheme.lifeCounterWhite.withValues(
                     alpha: destructive ? 0.06 : 0.08,
                   ),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.22),
+                    color: AppTheme.lifeCounterBlack.withValues(alpha: 0.22),
                     blurRadius: 14,
                     offset: const Offset(0, 6),
                   ),
@@ -5761,7 +5870,7 @@ class _BenchmarkSetLifeKeypadButton extends StatelessWidget {
                     color:
                         destructive
                             ? AppTheme.lifeCounterPink
-                            : Colors.white.withValues(alpha: 0.96),
+                            : AppTheme.lifeCounterWhite.withValues(alpha: 0.96),
                     fontSize: label == 'DEL' ? 17 : 30,
                     fontWeight: FontWeight.w900,
                     letterSpacing: label == 'DEL' ? 1.2 : 0.4,
@@ -5807,7 +5916,10 @@ class _PlayerSelectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.22), width: 0.8),
+        border: Border.all(
+          color: color.withValues(alpha: 0.22),
+          width: AppTheme.strokeMedium,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -5841,7 +5953,7 @@ class _PlayerSelectionCard extends StatelessWidget {
                   labelStyle: TextStyle(
                     color:
                         selectedPlayer == i
-                            ? Colors.white
+                            ? AppTheme.lifeCounterWhite
                             : AppTheme.textSecondary,
                     fontWeight: FontWeight.w700,
                   ),
@@ -6121,7 +6233,9 @@ class _CommanderDamageQuickOverlayState
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: AppTheme.error.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(
+                  AppTheme.radiusLifeCounterLg,
+                ),
                 border: Border.all(
                   color: AppTheme.error.withValues(alpha: 0.28),
                   width: 1,
@@ -6209,13 +6323,13 @@ class _CommanderDamageQuickRow extends StatelessWidget {
         color:
             isLethal
                 ? AppTheme.error.withValues(alpha: 0.12)
-                : Colors.black.withValues(alpha: 0.24),
-        borderRadius: BorderRadius.circular(18),
+                : AppTheme.lifeCounterBlack.withValues(alpha: 0.24),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterLg),
         border: Border.all(
           color:
               isLethal
                   ? AppTheme.error.withValues(alpha: 0.34)
-                  : Colors.white.withValues(alpha: 0.1),
+                  : AppTheme.lifeCounterWhite.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -6257,7 +6371,7 @@ class _CommanderDamageQuickRow extends StatelessWidget {
             onTap: value > 0 ? onDecrement : null,
           ),
           SizedBox(
-            width: 44,
+            width: AppTheme.touchTargetMin,
             child: Center(
               child: Text(
                 key: valueKey,
@@ -6419,14 +6533,14 @@ class _RoundButton extends StatelessWidget {
       child: Tooltip(
         message: semanticLabel,
         child: Material(
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
             key: buttonKey,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppTheme.radiusXl),
             onTap: onTap,
             child: Container(
-              width: 44,
-              height: 44,
+              width: AppTheme.touchTargetMin,
+              height: AppTheme.touchTargetMin,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color:
@@ -6563,13 +6677,17 @@ class _StartingLifePresetRow extends StatelessWidget {
         ],
         const SizedBox(width: 10),
         Container(
-          width: 46,
-          height: 46,
+          width: AppTheme.touchTargetMin,
+          height: AppTheme.touchTargetMin,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white, width: 2),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(color: AppTheme.lifeCounterWhite, width: 2),
           ),
-          child: const Icon(Icons.edit_rounded, color: Colors.white, size: 20),
+          child: const Icon(
+            Icons.edit_rounded,
+            color: AppTheme.lifeCounterWhite,
+            size: 20,
+          ),
         ),
       ],
     );
@@ -6600,32 +6718,35 @@ class _StartingLifePresetButton extends StatelessWidget {
         message: semanticLabel,
         child: Material(
           key: buttonKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             onTap: onTap,
             child: Ink(
-              width: 46,
-              height: 46,
+              width: AppTheme.touchTargetMin,
+              height: AppTheme.touchTargetMin,
               decoration: BoxDecoration(
                 color:
                     selected
                         ? AppTheme.lifeCounterSettingsSelected
-                        : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+                        : AppTheme.transparent,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
                   color:
                       selected
                           ? AppTheme.lifeCounterSettingsSelected
-                          : Colors.white,
-                  width: 2,
+                          : AppTheme.lifeCounterWhite,
+                  width: AppTheme.strokeStrong,
                 ),
               ),
               child: Center(
                 child: Text(
                   '$life',
                   style: TextStyle(
-                    color: selected ? Colors.black : Colors.white,
+                    color:
+                        selected
+                            ? AppTheme.lifeCounterBlack
+                            : AppTheme.lifeCounterWhite,
                     fontSize: AppTheme.fontLg,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.4,
@@ -6667,19 +6788,21 @@ class _SettingsToggleRow extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(
               color:
-                  selected ? AppTheme.lifeCounterSettingsRadio : Colors.white,
+                  selected
+                      ? AppTheme.lifeCounterSettingsRadio
+                      : AppTheme.lifeCounterWhite,
               width: 2.2,
             ),
             color:
                 selected
                     ? AppTheme.lifeCounterSettingsRadio
-                    : Colors.transparent,
+                    : AppTheme.transparent,
           ),
           child:
               selected
                   ? const Icon(
                     Icons.check_rounded,
-                    color: Colors.white,
+                    color: AppTheme.lifeCounterWhite,
                     size: 16,
                   )
                   : null,
@@ -6692,7 +6815,7 @@ class _SettingsToggleRow extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppTheme.lifeCounterWhite,
                   fontSize: AppTheme.fontMd,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.4,
@@ -6702,7 +6825,7 @@ class _SettingsToggleRow extends StatelessWidget {
                 Text(
                   subtitle!.toUpperCase(),
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.48),
+                    color: AppTheme.lifeCounterWhite.withValues(alpha: 0.48),
                     fontSize: AppTheme.fontXs,
                     fontWeight: FontWeight.w700,
                     height: 1.2,

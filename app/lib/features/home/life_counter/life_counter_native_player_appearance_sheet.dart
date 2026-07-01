@@ -37,7 +37,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerAppearanceSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativePlayerAppearanceSheet(
         initialSession: initialSession,
@@ -473,7 +473,7 @@ class _LifeCounterNativePlayerAppearanceSheetState
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -815,7 +815,9 @@ class _BackgroundPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _parseColor(background);
     final foreground =
-        color.computeLuminance() > 0.55 ? Colors.black : Colors.white;
+        color.computeLuminance() > 0.55
+            ? AppTheme.lifeCounterBlack
+            : AppTheme.lifeCounterWhite;
 
     return Container(
       width: double.infinity,
@@ -903,7 +905,9 @@ class _BackgroundChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _parseColor(colorValue);
     final foreground =
-        color.computeLuminance() > 0.55 ? Colors.black : Colors.white;
+        color.computeLuminance() > 0.55
+            ? AppTheme.lifeCounterBlack
+            : AppTheme.lifeCounterWhite;
 
     final semanticLabel = 'Selecionar cor $colorValue';
     return Semantics(
@@ -923,8 +927,8 @@ class _BackgroundChip extends StatelessWidget {
               color: color,
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
-                color: selected ? AppTheme.textPrimary : Colors.transparent,
-                width: 2,
+                color: selected ? AppTheme.textPrimary : AppTheme.transparent,
+                width: AppTheme.strokeStrong,
               ),
               boxShadow:
                   selected

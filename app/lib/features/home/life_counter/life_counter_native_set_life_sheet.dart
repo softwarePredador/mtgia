@@ -12,7 +12,7 @@ Future<LifeCounterSession?> showLifeCounterNativeSetLifeSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeSetLifeSheet(
         initialSession: initialSession,
@@ -157,7 +157,7 @@ class _LifeCounterNativeSetLifeSheetState
                               style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -232,7 +232,7 @@ class _LifeCounterNativeSetLifeSheetState
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     color: AppTheme.textPrimary,
-                                    fontSize: 62,
+                                    fontSize: AppTheme.fontLifeCounterInputValue,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: -2,
                                     height: 1,
@@ -328,7 +328,7 @@ class _LifeCounterNativeSetLifeSheetState
                                 style: const TextStyle(
                                   color: AppTheme.textSecondary,
                                   fontSize: AppTheme.fontSm,
-                                  height: 1.35,
+                                  height: AppTheme.lineHeightCompact,
                                 ),
                               ),
                             ],
@@ -494,7 +494,7 @@ class _SetLifeKeypadButton extends StatelessWidget {
                       ? AppTheme.lifeCounterPinkText
                       : AppTheme.textPrimary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppTheme.radiusXl),
                 side: BorderSide(
                   color:
                       destructive

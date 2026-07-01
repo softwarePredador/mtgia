@@ -24,8 +24,8 @@ class DialogTitleBlock extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 38,
-          height: 38,
+          width: AppTheme.touchTargetMin,
+          height: AppTheme.touchTargetMin,
           decoration: BoxDecoration(
             color: accent.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -50,7 +50,7 @@ class DialogTitleBlock extends StatelessWidget {
                   subtitle!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ],
@@ -84,7 +84,10 @@ class DialogSectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.2), width: 0.8),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.2),
+          width: AppTheme.strokeMedium,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +138,10 @@ class DeckMetaChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: color.withValues(alpha: 0.28), width: 0.7),
+        border: Border.all(
+          color: color.withValues(alpha: 0.28),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -249,8 +255,8 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: AppTheme.touchTargetMin,
+              height: AppTheme.touchTargetMin,
               decoration: BoxDecoration(
                 color: widget.accent.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
@@ -281,7 +287,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppTheme.textSecondary,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ],
@@ -297,7 +303,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   border: Border.all(
                     color: widget.accent.withValues(alpha: 0.16),
-                    width: 0.8,
+                    width: AppTheme.strokeMedium,
                   ),
                 ),
                 child: Row(
@@ -317,7 +323,7 @@ class _FlowLoadingDialogState extends State<FlowLoadingDialog> {
                           key: ValueKey(currentTip),
                           style: const TextStyle(
                             color: AppTheme.textSecondary,
-                            height: 1.35,
+                            height: AppTheme.lineHeightCompact,
                           ),
                         ),
                       ),

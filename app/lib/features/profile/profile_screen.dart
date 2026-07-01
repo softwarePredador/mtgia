@@ -289,7 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: AppTheme.backgroundAbyss,
-                                        width: 2,
+                                        width: AppTheme.strokeStrong,
                                       ),
                                     ),
                                     child: Semantics(

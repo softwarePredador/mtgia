@@ -461,7 +461,7 @@ class _DecksTab extends StatelessWidget {
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+            side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -697,7 +697,7 @@ class _UsersListTabState extends State<_UsersListTab> {
           color: AppTheme.surfaceSlate,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+            side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
           ),
           child: ListTile(
             leading: CircleAvatar(
@@ -1202,7 +1202,7 @@ class _PublicBinderItemCard extends StatelessWidget {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        side: const BorderSide(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),

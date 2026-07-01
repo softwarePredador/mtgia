@@ -15,7 +15,7 @@ Future<void> showLifeCounterNativeCardSearchSheet(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativeCardSearchSheet(
         providerFactory: providerFactory,
@@ -110,7 +110,7 @@ class _LifeCounterNativeCardSearchSheetState
                                     style: TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
-                                      height: 1.35,
+                                      height: AppTheme.lineHeightCompact,
                                     ),
                                   ),
                                 ],
@@ -212,7 +212,7 @@ class _LifeCounterNativeCardSearchSheetState
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
                                       fontWeight: FontWeight.w600,
-                                      height: 1.35,
+                                      height: AppTheme.lineHeightCompact,
                                     ),
                                   )
                                 else if (provider.isLoading)
@@ -241,7 +241,7 @@ class _LifeCounterNativeCardSearchSheetState
                                       color: AppTheme.textSecondary,
                                       fontSize: AppTheme.fontMd,
                                       fontWeight: FontWeight.w600,
-                                      height: 1.35,
+                                      height: AppTheme.lineHeightCompact,
                                     ),
                                   )
                                 else
@@ -306,15 +306,15 @@ class _CardSearchSuggestionChip extends StatelessWidget {
         message: 'Buscar $label',
         child: Material(
           key: chipKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
             onTap: onTap,
             child: Ink(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 border: Border.all(color: AppTheme.outlineMuted),
               ),
               child: Text(
@@ -350,9 +350,9 @@ class _CardSearchResultTile extends StatelessWidget {
         message: 'Abrir $cardName',
         child: Material(
           key: tileKey,
-          color: Colors.transparent,
+          color: AppTheme.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterLg),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => CardDetailScreen(card: card)),
@@ -362,17 +362,19 @@ class _CardSearchResultTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                 border: Border.all(color: AppTheme.outlineMuted),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 38,
+                    width: AppTheme.touchTargetMin,
                     height: 52,
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceSlate,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.radiusLifeCounterSm,
+                      ),
                     ),
                     child: const Icon(
                       Icons.style_rounded,

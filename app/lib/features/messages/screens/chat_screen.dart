@@ -217,7 +217,10 @@ class _ChatScreenState extends State<ChatScreen> {
             decoration: const BoxDecoration(
               color: AppTheme.surfaceSlate,
               border: Border(
-                top: BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+                top: BorderSide(
+                  color: AppTheme.outlineMuted,
+                  width: AppTheme.strokeHairline,
+                ),
               ),
             ),
             child: Row(
@@ -256,8 +259,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       icon:
                           provider.isSending
                               ? const SizedBox(
-                                width: 20,
-                                height: 20,
+                                width: AppTheme.iconSpinnerSm,
+                                height: AppTheme.iconSpinnerSm,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   color: AppTheme.brass400,
@@ -308,12 +311,17 @@ class _MessageBubble extends StatelessWidget {
                 isMe
                     ? AppTheme.brass400.withValues(alpha: 0.34)
                     : AppTheme.outlineMuted.withValues(alpha: 0.55),
+            width: AppTheme.strokeThin,
           ),
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 16),
+            topLeft: const Radius.circular(AppTheme.radiusLg),
+            topRight: const Radius.circular(AppTheme.radiusLg),
+            bottomLeft: Radius.circular(
+              isMe ? AppTheme.radiusLg : AppTheme.radiusXs,
+            ),
+            bottomRight: Radius.circular(
+              isMe ? AppTheme.radiusXs : AppTheme.radiusLg,
+            ),
           ),
         ),
         child: Column(

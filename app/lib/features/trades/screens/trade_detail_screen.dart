@@ -157,7 +157,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Row(
         children: [
@@ -309,7 +312,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.35),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +402,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 children: [
                   CachedCardImage(
                     imageUrl: item.card.imageUrl,
-                    width: 28,
+                    width: AppTheme.touchTargetMin,
                     height: 40,
                     borderRadius: BorderRadius.circular(AppTheme.radiusXs),
                   ),
@@ -597,7 +603,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: isDone ? 0.14 : 0.06),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                      border: Border.all(color: color.withValues(alpha: 0.25)),
+                      border: Border.all(
+                        color: color.withValues(alpha: 0.25),
+                        width: AppTheme.strokeThin,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -645,7 +654,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                         if (!isLast)
                           Expanded(
                             child: Container(
-                              width: 2,
+                              width: AppTheme.strokeStrong,
                               color: AppTheme.outlineMuted,
                             ),
                           ),
@@ -994,7 +1003,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

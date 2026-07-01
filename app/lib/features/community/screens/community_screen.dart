@@ -207,19 +207,19 @@ class _ExploreTabState extends State<_ExploreTab>
                   filled: true,
                   fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                     borderSide: BorderSide(
                       color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                     borderSide: BorderSide(
                       color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                     borderSide: BorderSide(
                       color: AppTheme.brass400.withValues(alpha: 0.8),
                     ),
@@ -626,19 +626,19 @@ class _UserSearchTabState extends State<_UserSearchTab>
               filled: true,
               fillColor: AppTheme.surfaceSlate.withValues(alpha: 0.94),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 borderSide: BorderSide(
                   color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 borderSide: BorderSide(
                   color: AppTheme.outlineMuted.withValues(alpha: 0.75),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 borderSide: BorderSide(
                   color: AppTheme.brass400.withValues(alpha: 0.8),
                 ),
@@ -1070,7 +1070,10 @@ class _CommunityChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.11),
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
-        border: Border.all(color: accent.withValues(alpha: 0.26)),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.26),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1472,7 +1475,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                 width: 48,
                 height: 48,
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   onTap: provider.isLoading ? null : () => provider.refresh(),
                   child: Icon(
                     Icons.refresh,
@@ -1533,8 +1536,8 @@ class _CotacoesTabState extends State<_CotacoesTab>
                 children: [
                   // Rank badge
                   Container(
-                    width: 28,
-                    height: 28,
+                    width: AppTheme.touchTargetMin,
+                    height: AppTheme.touchTargetMin,
                     decoration: BoxDecoration(
                       color:
                           index < 3
@@ -1545,6 +1548,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           index < 3
                               ? Border.all(
                                 color: changeColor.withValues(alpha: 0.2),
+                                width: AppTheme.strokeThin,
                               )
                               : null,
                     ),
@@ -1677,6 +1681,7 @@ class _CotacoesTabState extends State<_CotacoesTab>
                           ),
                           border: Border.all(
                             color: changeColor.withValues(alpha: 0.22),
+                            width: AppTheme.strokeThin,
                           ),
                         ),
                         child: Row(

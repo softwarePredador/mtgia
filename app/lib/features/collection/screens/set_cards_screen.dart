@@ -318,7 +318,7 @@ class _SetHeader extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppTheme.cardGradient,
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          border: Border.all(color: AppTheme.outlineMuted, width: 0.8),
+          border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeMedium),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,15 +382,15 @@ class _SetCardTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
       ),
       child: ListTile(
         key: Key('set-card-${card.name}'),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
           child: SizedBox(
-            width: 44,
+            width: AppTheme.touchTargetMin,
             height: 60,
             child:
                 card.imageUrl == null || card.imageUrl!.isEmpty
@@ -482,7 +482,7 @@ class _InfoChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(color: AppTheme.outlineMuted, width: AppTheme.strokeHairline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

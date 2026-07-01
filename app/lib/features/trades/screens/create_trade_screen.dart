@@ -291,7 +291,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,7 +466,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppTheme.textSecondary.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXxs),
                   ),
                 ),
                 Padding(
@@ -645,14 +648,14 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   borderSide: const BorderSide(
                     color: AppTheme.outlineMuted,
-                    width: 0.5,
+                    width: AppTheme.strokeHairline,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   borderSide: const BorderSide(
                     color: AppTheme.outlineMuted,
-                    width: 0.5,
+                    width: AppTheme.strokeHairline,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -831,7 +834,7 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
                 color: AppTheme.outlineMuted.withValues(alpha: 0.5),
-                width: 0.5,
+                width: AppTheme.strokeHairline,
               ),
             ),
             child: Text(
@@ -888,7 +891,10 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: BorderSide(color: accentColor.withValues(alpha: 0.3), width: 0.5),
+        side: BorderSide(
+          color: accentColor.withValues(alpha: 0.3),
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(8),
@@ -1083,14 +1089,14 @@ class _CreateTradeScreenState extends State<CreateTradeScreen> {
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               borderSide: const BorderSide(
                 color: AppTheme.outlineMuted,
-                width: 0.5,
+                width: AppTheme.strokeHairline,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               borderSide: const BorderSide(
                 color: AppTheme.outlineMuted,
-                width: 0.5,
+                width: AppTheme.strokeHairline,
               ),
             ),
             focusedBorder: OutlineInputBorder(

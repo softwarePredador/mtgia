@@ -437,7 +437,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                               height: 36,
                               decoration: BoxDecoration(
                                 color: AppTheme.surfaceSlate,
-                                borderRadius: BorderRadius.circular(999),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusPill,
+                                ),
                                 border: Border.all(
                                   color:
                                       hasQuery
@@ -490,7 +492,9 @@ class _DeckListScreenState extends State<DeckListScreen> {
                             child: Tooltip(
                               message: 'Alternar filtro de decks',
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(999),
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusPill,
+                                ),
                                 onTap:
                                     () => setState(() {
                                       _deckFilter =
@@ -789,7 +793,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     'Essa ação remove a lista da sua coleção de decks e não pode ser desfeita.',
                     style: TextStyle(
                       color: AppTheme.textSecondary,
-                      height: 1.35,
+                      height: AppTheme.lineHeightCompact,
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -962,13 +966,13 @@ class _QuickDeckAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: BorderRadius.circular(AppTheme.radiusPill),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: AppTheme.backgroundAbyss.withValues(alpha: 0.55),
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           border: Border.all(
             color: AppTheme.outlineMuted.withValues(alpha: 0.65),
           ),
@@ -1219,7 +1223,9 @@ class _DeckSpotlightCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'Excluir',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppTheme.error),
               ),
             ],
           ),
@@ -1244,7 +1250,7 @@ class _DeckInfoBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.54),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: accent.withValues(alpha: 0.42)),
       ),
       child: Text(
@@ -1277,7 +1283,7 @@ class _DeckColorPips extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.54),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
         border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.7)),
       ),
       child: Row(
@@ -1618,7 +1624,9 @@ class _DeckGalleryCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'Excluir',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppTheme.error),
               ),
             ],
           ),
@@ -1699,7 +1707,7 @@ class _DeckEmptyState extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                   fontSize: AppTheme.fontSm,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
                 textAlign: TextAlign.center,
               ),

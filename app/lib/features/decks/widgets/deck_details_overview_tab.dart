@@ -108,7 +108,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               border: Border.all(
                 color: AppTheme.outlineMuted.withValues(alpha: 0.6),
-                width: 0.8,
+                width: AppTheme.strokeMedium,
               ),
             ),
             child: ClipRRect(
@@ -175,7 +175,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                                           border: Border.all(
                                             color: AppTheme.outlineMuted
                                                 .withValues(alpha: 0.35),
-                                            width: 0.5,
+                                            width: AppTheme.strokeHairline,
                                           ),
                                         )
                                         : null,
@@ -654,7 +654,10 @@ class _SummaryTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.22)),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.22),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -879,14 +882,17 @@ class _LegalityConfidenceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.28), width: 0.9),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.28),
+          width: AppTheme.strokeRegular,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: AppTheme.touchTargetMin,
+            height: AppTheme.touchTargetMin,
             decoration: BoxDecoration(
               color: accent.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -933,7 +939,7 @@ class _LegalityConfidenceCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -1017,7 +1023,10 @@ class _ValidationIssueRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: issue.accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: issue.accent.withValues(alpha: 0.22)),
+        border: Border.all(
+          color: issue.accent.withValues(alpha: 0.22),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -1111,7 +1120,10 @@ class _InlineCommanderBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.24),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1156,7 +1168,7 @@ class _DescriptionSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.6),
-          width: 0.9,
+          width: AppTheme.strokeRegular,
         ),
       ),
       child: Column(
@@ -1205,7 +1217,7 @@ class _DescriptionSection extends StatelessWidget {
                   description!,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppTheme.textPrimary.withValues(alpha: 0.9),
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ),
@@ -1335,7 +1347,7 @@ class _StrategySummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.6),
-          width: 0.9,
+          width: AppTheme.strokeRegular,
         ),
       ),
       child: Column(
@@ -1379,6 +1391,7 @@ class _StrategySummaryCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                 border: Border.all(
                   color: toneColor.withValues(alpha: hasArchetype ? 0.3 : 0.22),
+                  width: AppTheme.strokeThin,
                 ),
               ),
               child: Row(

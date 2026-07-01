@@ -184,7 +184,7 @@ class _NotificationTile extends StatelessWidget {
                   isRead
                       ? AppTheme.outlineMuted
                       : AppTheme.brass400.withValues(alpha: 0.28),
-              width: 0.8,
+              width: AppTheme.strokeMedium,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -197,7 +197,7 @@ class _NotificationTile extends StatelessWidget {
                   height: 42,
                   decoration: BoxDecoration(
                     color: AppTheme.brass400,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   ),
                 ),
                 const SizedBox(width: 10),

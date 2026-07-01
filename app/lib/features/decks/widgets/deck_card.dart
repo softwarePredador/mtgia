@@ -76,7 +76,10 @@ class DeckCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -138,7 +141,7 @@ class DeckCard extends StatelessWidget {
                                   color: AppTheme.outlineMuted.withValues(
                                     alpha: 0.75,
                                   ),
-                                  width: 0.5,
+                                  width: AppTheme.strokeHairline,
                                 ),
                               ),
                               child: ClipRRect(
@@ -173,7 +176,7 @@ class DeckCard extends StatelessWidget {
                                         border: Border.all(
                                           color: AppTheme.outlineMuted
                                               .withValues(alpha: 0.35),
-                                          width: 0.5,
+                                          width: AppTheme.strokeHairline,
                                         ),
                                       )
                                       : null,
@@ -291,7 +294,9 @@ class DeckCard extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXxs,
+                          ),
                           child: LinearProgressIndicator(
                             value: progress,
                             minHeight: 3,
@@ -440,7 +445,12 @@ class DeckCard extends StatelessWidget {
                 color: theme.colorScheme.error,
               ),
               const SizedBox(width: 8),
-              Text('Excluir', style: TextStyle(color: theme.colorScheme.error)),
+              Text(
+                'Excluir',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.error,
+                ),
+              ),
             ],
           ),
         ),
@@ -500,7 +510,10 @@ class _FallbackPip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.manaPipBackground(letter),
         shape: BoxShape.circle,
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       alignment: Alignment.center,
       child: Text(
@@ -556,7 +569,7 @@ class _PublicStatusChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusXs),
         border: Border.all(
           color: AppTheme.primarySoft.withValues(alpha: 0.24),
-          width: 0.5,
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: const Row(

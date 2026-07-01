@@ -127,7 +127,7 @@ class AuthBrandHeader extends StatelessWidget {
           height: logoSize,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLogoOuter),
             border: Border.all(
               color: AppTheme.brass400.withValues(alpha: 0.32),
             ),
@@ -140,7 +140,7 @@ class AuthBrandHeader extends StatelessWidget {
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(AppTheme.radiusLogoInner),
             child: Image.asset(
               'assets/branding/app_logo.png',
               fit: BoxFit.cover,
@@ -185,7 +185,7 @@ class AuthBrandHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium?.copyWith(
             color: AppTheme.textSecondary,
-            height: 1.35,
+            height: AppTheme.lineHeightCompact,
           ),
         ),
       ],
@@ -204,7 +204,7 @@ class AuthFormSurface extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLogoInner),
         border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.16)),
         boxShadow: [
           BoxShadow(

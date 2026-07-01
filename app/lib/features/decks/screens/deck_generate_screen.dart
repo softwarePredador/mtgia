@@ -670,8 +670,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               icon:
                   _isGenerating
                       ? const SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: AppTheme.iconSpinnerSm,
+                        height: AppTheme.iconSpinnerSm,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                       : const Icon(Icons.auto_awesome),
@@ -745,7 +745,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
               const SizedBox(height: 18),
@@ -859,7 +859,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.55),
-          width: 0.8,
+          width: AppTheme.strokeMedium,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
@@ -940,7 +940,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.errorContainer,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(color: theme.colorScheme.outline),
+                border: Border.all(
+                  color: theme.colorScheme.outline,
+                  width: AppTheme.strokeThin,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1087,7 +1090,7 @@ class _LearnedDeckCallout extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
                 color: AppTheme.brass400.withValues(alpha: 0.34),
-                width: 0.8,
+                width: AppTheme.strokeMedium,
               ),
             ),
             child: Row(
@@ -1231,7 +1234,7 @@ class _LearnedDeckPreviewSummary extends StatelessWidget {
         border: Border(
           left: BorderSide(
             color: AppTheme.frost400.withValues(alpha: 0.78),
-            width: 2,
+            width: AppTheme.strokeStrong,
           ),
         ),
       ),
@@ -1316,7 +1319,7 @@ class _GenerateProgressPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.brass500.withValues(alpha: 0.28),
-          width: 0.8,
+          width: AppTheme.strokeMedium,
         ),
       ),
       child: Column(
@@ -1411,15 +1414,15 @@ class _AiTrustPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.frost400.withValues(alpha: 0.26),
-          width: 0.8,
+          width: AppTheme.strokeMedium,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: AppTheme.touchTargetMin,
+            height: AppTheme.touchTargetMin,
             decoration: BoxDecoration(
               color: AppTheme.frost400.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1447,7 +1450,7 @@ class _AiTrustPanel extends StatelessWidget {
                   'Gerar cria uma proposta revisável; otimizar depois faz ajuste leve ou rebuild guiado. Meta pode orientar escolhas, mas nunca substitui validação e review.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ],

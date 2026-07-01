@@ -320,10 +320,10 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Container(
           width: 3,
-          height: 20,
+          height: AppTheme.iconSpinnerSm,
           decoration: BoxDecoration(
             color: AppTheme.frost400,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           ),
         ),
         const SizedBox(width: 12),
@@ -461,6 +461,7 @@ class _QuickActionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   border: Border.all(
                     color: data.accent.withValues(alpha: 0.18),
+                    width: AppTheme.strokeThin,
                   ),
                 ),
                 child: Icon(data.icon, color: data.accent, size: 18),
@@ -584,8 +585,8 @@ class _RecentDeckCard extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints.tightFor(
-                        width: 28,
-                        height: 28,
+                        width: AppTheme.touchTargetMin,
+                        height: AppTheme.touchTargetMin,
                       ),
                       onPressed: () => context.go('/decks/${deck.id}'),
                       icon: const Icon(Icons.more_vert_rounded),
@@ -639,7 +640,9 @@ class _RecentDeckCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusPill,
+                          ),
                           child: LinearProgressIndicator(
                             minHeight: 3,
                             value: ratio,
@@ -961,7 +964,10 @@ class _ActivityRow extends StatelessWidget {
             decoration: BoxDecoration(
               color: data.color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: data.color.withValues(alpha: 0.16)),
+              border: Border.all(
+                color: data.color.withValues(alpha: 0.16),
+                width: AppTheme.strokeThin,
+              ),
             ),
             child: Icon(data.icon, color: data.color, size: 20),
           ),
