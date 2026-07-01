@@ -3174,6 +3174,62 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d060f39142261847d31b48c0088866a1"
   },
+  "Ark of Blight": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "land",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "land",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "artifact",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:08d9df008ee631abc65fee573ded07c2",
+    "battle_rule_oracle_hash": "55fe8efd99ddba967ab95921a4ac24b4"
+  },
   "Armageddon": {
     "ability_kind": "one_shot",
     "battle_model_scope": "destroy_all_lands_v1",
@@ -4672,6 +4728,62 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9596872138224e75f7476a08d868834e",
     "battle_rule_oracle_hash": "7ba598c9860da1d2bcd27a1a21b7639b"
+  },
+  "Barbarian Riftcutter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "land",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "land",
+        "target_constraints": {
+          "card_types": [
+            "land"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "land",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "land",
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:58c76518460704baef9635112315ee2f",
+    "battle_rule_oracle_hash": "b73efb35a65f0f8f47e4165704ca05cc"
   },
   "Barbarian Ring": {
     "effect": "land",
@@ -16162,6 +16274,66 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
   },
+  "Druid Lyrist": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e7049ecf012a134de9c3c1c9ccf67f75",
+    "battle_rule_oracle_hash": "01b8b772db58352c0caabbc1bc88a7f7"
+  },
   "Druid of the Cowl": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -17270,6 +17442,66 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:aec110d9f8e062262b1c1fd4330c8e30"
   },
+  "Elf Replica": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:05a3704112adae630352e57d39c0727c",
+    "battle_rule_oracle_hash": "6e9a037771847b8037d9ad91a44c87c6"
+  },
   "Elfhame Palace": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -17469,6 +17701,66 @@
     "battle_rule_logical_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
     "battle_rule_oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f"
   },
+  "Elvish Lyrist": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e7049ecf012a134de9c3c1c9ccf67f75",
+    "battle_rule_oracle_hash": "01b8b772db58352c0caabbc1bc88a7f7"
+  },
   "Elvish Mystic": {
     "ability_kind": "activated",
     "battle_model_scope": "one_mana_one_one_green_mana_dork_v1",
@@ -17538,6 +17830,66 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:88aefc9f03d894e1bbce1c1440414da8",
     "battle_rule_oracle_hash": "105179d596870443cc13a419c0fd940c"
+  },
+  "Elvish Scrapper": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "artifact",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "artifact",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:39a1ef69d7cb14d4d98d66cda1f29355",
+    "battle_rule_oracle_hash": "66872d568cc7eb8c249846e98681cee1"
   },
   "Elvish Spirit Guide": {
     "ability_kind": "activated",
@@ -18662,6 +19014,72 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:46f94fb49517fc83e4c0fdf93017d4a6",
     "battle_rule_oracle_hash": "287fd2ab88d04bfad8ad581bc03ff9e2"
+  },
+  "Executioner's Capsule": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "nonblack_creature",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{B}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_creature",
+    "activated_remove_target": "nonblack_creature",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "artifact",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "exclude_colors": [
+        "B"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:463340f192a794f01ba21b6fde8d1b8c",
+    "battle_rule_oracle_hash": "5bb7c24fb40e366a77a70a7942810c96"
   },
   "Exemplar of Light": {
     "cmc": 4.0,
@@ -19803,6 +20221,62 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
+  },
+  "Felidar Cub": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d785cce5e96ace9d9bd08d0200e672f",
+    "battle_rule_oracle_hash": "59054373999f52f5c61e900b2cd126f0"
   },
   "Felidar Guardian": {
     "cmc": 4.0,
@@ -30404,6 +30878,62 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
   },
+  "Kami of Ancient Law": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d785cce5e96ace9d9bd08d0200e672f",
+    "battle_rule_oracle_hash": "59054373999f52f5c61e900b2cd126f0"
+  },
   "Kami of the Crescent Moon": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -30664,6 +31194,62 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
+  },
+  "Keening Apparition": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d785cce5e96ace9d9bd08d0200e672f",
+    "battle_rule_oracle_hash": "59054373999f52f5c61e900b2cd126f0"
   },
   "Keep Watch": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -35650,6 +36236,64 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+  },
+  "Mine Bearer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "attacking_creature",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_creature",
+    "activated_remove_target": "attacking_creature",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:313e70f804c019a6a9bc0f697a5baf09",
+    "battle_rule_oracle_hash": "8cb04d8422b51ca22fcd12e688cd6643"
   },
   "Mine Collapse": {
     "amount": 5,
@@ -42006,6 +42650,66 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
+  "Priest of Iroas": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{W}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "W"
+    ],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}{W}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:54e6b1b8bbff1025da23b0e69d4a9e7d",
+    "battle_rule_oracle_hash": "c70da96f0ca61eccedb9a3954baae52b"
+  },
   "Priest of Titania": {
     "cmc": 2.0,
     "effect": "ramp_permanent",
@@ -44484,6 +45188,66 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:554fe811b81e8a284b8a5ca9c6543caa"
   },
+  "Reckless Reveler": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "artifact",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "artifact",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{R}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b5d2ad173e55240e81f7411d552d6bed",
+    "battle_rule_oracle_hash": "b3fd92752a5f7edb6364a03105a72537"
+  },
   "Reclaiming Vines": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -46796,6 +47560,62 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cc39d66bf67346dd3ca13d4644a47d3a"
   },
+  "Ronom Unicorn": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "enchantment",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "enchantment",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d785cce5e96ace9d9bd08d0200e672f",
+    "battle_rule_oracle_hash": "59054373999f52f5c61e900b2cd126f0"
+  },
   "Rooftop Storm": {
     "cmc": 6.0,
     "effect": "draw_engine",
@@ -47043,14 +47863,60 @@
     "battle_rule_oracle_hash": "6a0dec90c07bc23ce77fe21f9c952b0a"
   },
   "Royal Assassin": {
-    "cmc": 3.0,
-    "effect": "remove_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cf71f740297d9cf175957ff99a270d98"
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_creature",
+        "activated_remove_target": "tapped_creature",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "tapped_state": "tapped"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_creature",
+    "activated_remove_target": "tapped_creature",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:093b69617bed69805ad14119ac616695",
+    "battle_rule_oracle_hash": "e4d78ae8c9f7c81aa8e61b0ef11c1e62"
   },
   "Royal Falcon": {
     "_keywords_are_self": true,
@@ -47176,6 +48042,66 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cf8f05433163f19c19ad60378af66b92"
+  },
+  "Ruinous Gremlin": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "artifact",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "artifact",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{R}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dcc5be77c7863a5aa15fc894c6cc10a5",
+    "battle_rule_oracle_hash": "936b290efadbeb7ad4a3d25de2dce828"
   },
   "Ruinous Path": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -48472,6 +49398,66 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:94a798b0cab44d9ddb7589006e034201",
     "battle_rule_oracle_hash": "2219b7c50c0840b493615d0d22b2b614"
+  },
+  "Scavenger Folk": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "artifact",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "artifact",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:39a1ef69d7cb14d4d98d66cda1f29355",
+    "battle_rule_oracle_hash": "66872d568cc7eb8c249846e98681cee1"
   },
   "Scavenger Grounds": {
     "effect": "land",
@@ -60334,6 +61320,62 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:7ba79bcba13b052df554a05022a06cba"
   },
+  "Torch Fiend": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "artifact",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "artifact",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "creature",
+    "target": "artifact",
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:57f5a60cfb2f871b0f58dccb1d76fedf",
+    "battle_rule_oracle_hash": "b3fd92752a5f7edb6364a03105a72537"
+  },
   "Torment of Hailfire": {
     "cmc": 2.0,
     "count": 1,
@@ -62336,6 +63378,62 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Universal Solvent": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "destroy_target",
+        "activated_remove_effect": "remove_permanent",
+        "activated_remove_target": "permanent",
+        "activated_self_sacrifice_destroy": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 7,
+        "activation_cost_mana": "{7}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DestroyTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "activated_effect": "destroy_target",
+    "activated_remove_effect": "remove_permanent",
+    "activated_remove_target": "permanent",
+    "activated_self_sacrifice_destroy": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 7,
+    "activation_cost_mana": "{7}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+    "destination": "graveyard",
+    "effect": "artifact",
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "permanent"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DestroyTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8e8cadaffa59e2c5f26f8d67f1bbc899",
+    "battle_rule_oracle_hash": "625945ac79862d96cbaefe6707bbd35a"
   },
   "Universal Surveillance": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",

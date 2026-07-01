@@ -13096,6 +13096,17 @@ def priority_round(active_player, all_players, stack, turn, rng, phase=None):
                 check_sbas_until_stable(all_players)
                 flush_triggers_in_apnap(active_player, all_players, stack)
                 return True
+            if activate_best_generic_destroy_permanent(
+                active_player,
+                opponents,
+                all_players,
+                turn,
+                rng,
+                phase=phase,
+            ):
+                check_sbas_until_stable(all_players)
+                flush_triggers_in_apnap(active_player, all_players, stack)
+                return True
             if activate_best_generic_tap_damage_permanent(
                 active_player,
                 opponents,
@@ -35372,6 +35383,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
 
 GENERIC_TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 SIMPLE_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
+SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 
 
 def _activated_rule_effects_for_permanent(permanent):
@@ -35422,6 +35434,36 @@ def _activated_rule_effects_for_permanent(permanent):
         ):
             direct_effect[key] = permanent.get(key)
         effects.append(direct_effect)
+    if (
+        permanent.get("activated_effect") == "destroy_target"
+        and permanent.get("activated_battle_model_scope") == SIMPLE_ACTIVATED_DESTROY_SCOPE
+    ):
+        destroy_effect = {
+            "effect": permanent.get("activated_remove_effect") or "remove_permanent",
+            "battle_model_scope": permanent.get("activated_battle_model_scope"),
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
+            "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_cost_mana": permanent.get("activation_cost_mana"),
+            "activation_cost_generic": permanent.get("activation_cost_generic"),
+            "activation_cost_colors": permanent.get("activation_cost_colors"),
+            "target": permanent.get("target"),
+            "target_constraints": permanent.get("target_constraints"),
+            "destination": permanent.get("destination") or "graveyard",
+            "activated_remove_target": permanent.get("activated_remove_target"),
+        }
+        for key in (
+            "_rule_source",
+            "_rule_review_status",
+            "_rule_execution_status",
+            "_rule_confidence",
+            "_rule_version",
+            "_rule_logical_key",
+            "_rule_oracle_hash",
+        ):
+            destroy_effect[key] = permanent.get(key)
+        effects.append(destroy_effect)
     return effects
 
 
@@ -35612,6 +35654,265 @@ def activate_best_generic_tap_damage_permanent(player, opponents, all_players, t
     return activate_generic_tap_damage_permanent(
         player,
         opponents,
+        options[0][2],
+        turn,
+        rng,
+        phase=phase,
+    )
+
+
+def activated_destroy_effect_for_permanent(permanent):
+    if not isinstance(permanent, dict):
+        return None
+    for effect_data in _activated_rule_effects_for_permanent(permanent):
+        if (
+            effect_data.get("battle_model_scope") == SIMPLE_ACTIVATED_DESTROY_SCOPE
+            and effect_data.get("ability_kind") == "activated"
+            and effect_data.get("effect") in TARGETED_REMOVAL_EFFECTS
+        ):
+            return effect_data
+    return None
+
+
+def can_activate_generic_destroy_permanent(player, permanent, opponents, *, effect_data=None):
+    effect_data = effect_data or activated_destroy_effect_for_permanent(permanent)
+    if effect_data is None:
+        return False
+    if permanent not in getattr(player, "battlefield", []):
+        return False
+    if effect_data.get("activation_requires_tap") and permanent.get("tapped"):
+        return False
+    if (
+        effect_data.get("activation_requires_tap")
+        and is_battlefield_creature(permanent)
+        and permanent.get("summoning_sick")
+        and not has_haste(permanent)
+    ):
+        return False
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.can_pay(activation_cost):
+        return False
+    return any(
+        opponent.is_alive()
+        and removal_target_candidates(opponent, effect_data, controller=player, source=permanent)
+        for opponent in opponents or []
+    )
+
+
+def _best_activated_destroy_target(player, permanent, opponents, effect_data):
+    options = []
+    for opponent in opponents or []:
+        if not opponent.is_alive():
+            continue
+        for target in removal_target_candidates(opponent, effect_data, controller=player, source=permanent):
+            options.append((target_priority(target), opponent, target))
+    if not options:
+        return None, None, []
+    options.sort(
+        key=lambda item: (
+            item[0],
+            str(item[1].name),
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return options[0][1], options[0][2], options
+
+
+def activate_generic_destroy_permanent(player, opponents, all_players, permanent, turn, rng, *, phase=None):
+    effect_data = activated_destroy_effect_for_permanent(permanent)
+    if not can_activate_generic_destroy_permanent(
+        player,
+        permanent,
+        opponents,
+        effect_data=effect_data,
+    ):
+        return False
+    phase = phase or "precombat_main"
+    target_player, target, scored_options = _best_activated_destroy_target(
+        player,
+        permanent,
+        opponents,
+        effect_data,
+    )
+    if target is None or target_player is None:
+        return False
+    target_type = str(effect_data.get("target") or "").lower()
+    if not target_type:
+        target_type = "creature" if effect_data.get("effect") == "remove_creature" else "nonland_permanent"
+    decision = targeting_decision(
+        permanent,
+        target,
+        player,
+        target_controller=target_player,
+        target_type=target_type,
+    )
+    activation_cost = effect_data.get("activation_cost_mana")
+    if not activation_cost:
+        activation_cost = _activation_cost_text(
+            int(effect_data.get("activation_cost_generic") or 0),
+            effect_data.get("activation_cost_colors") or [],
+        )
+    if not player.spend_mana(activation_cost):
+        return False
+    if effect_data.get("activation_requires_tap"):
+        permanent["tapped"] = True
+    sacrificed_source = False
+    if effect_data.get("activation_requires_sacrifice"):
+        if permanent in player.battlefield:
+            player.battlefield.remove(permanent)
+        player.graveyard.append(permanent)
+        player.record_permanent_sacrificed(permanent, turn)
+        sacrificed_source = True
+    if check_ward(target, permanent, player, rng):
+        emit_replay_event(
+            "removal_countered_by_ward",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            target_player=target_player.name,
+            target=target.get("name", "?"),
+            turn=turn,
+            phase=phase,
+            **decision,
+            **replay_rule_fields(effect_data),
+        )
+        return True
+
+    activation_cost_generic = int(effect_data.get("activation_cost_generic") or 0)
+    activation_cost_colors = list(effect_data.get("activation_cost_colors") or [])
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    available_options = [
+        decision_card_option(
+            candidate,
+            get_card_effect(candidate),
+            action="activate_destroy_target",
+            score=sum(priority),
+            target_controller=controller.name,
+        )
+        for priority, controller, candidate in scored_options[:8]
+    ]
+    fields = replay_rule_fields(effect_data)
+    emit_decision_trace(
+        decision_type="activated_ability",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=available_options,
+        chosen_option=available_options[0] if available_options else decision_card_option(target, get_card_effect(target)),
+        rejected_options=available_options[1:],
+        score_components={
+            "activation_cost": activation_cost,
+            "target": target.get("name", "?"),
+            "target_type": target_type,
+            "target_score": list(target_priority(target)),
+            "requires_tap": 1 if effect_data.get("activation_requires_tap") else 0,
+            "requires_sacrifice": 1 if sacrificed_source else 0,
+        },
+        rule_source=fields.get("rule_source", "battle_rule"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=max(20, sum(target_priority(target)) * 5),
+        actual_outcome="activated_destroy_used",
+        reason="use_activated_destroy_when_profitable_target_available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "tapped": 1 if effect_data.get("activation_requires_tap") else 0,
+            "permanents": -1 if sacrificed_source else 0,
+            "opponent_permanents_removed": 1,
+        },
+        risk_flags=[
+            flag
+            for flag, active in {
+                "tap_ability": bool(effect_data.get("activation_requires_tap")),
+                "sacrifice_source": sacrificed_source,
+                "activated_destroy_target": True,
+            }.items()
+            if active
+        ],
+    )
+    emit_replay_event(
+        "activated_ability",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        effect=effect_data.get("effect"),
+        activation_kind="simple_activated_destroy",
+        activation_cost=activation_cost,
+        tapped=bool(permanent.get("tapped")),
+        sacrificed_source=sacrificed_source,
+        mana_paid=mana_paid,
+        target=target.get("name", "?"),
+        target_player=target_player.name,
+        target_type=target_type,
+        turn=turn,
+        phase=phase,
+        **fields,
+    )
+    emit_replay_event(
+        "removal_resolved",
+        player=player.name,
+        card=permanent.get("name", "?"),
+        target_player=target_player.name,
+        target=target.get("name", "?"),
+        target_effect=get_card_effect(target).get("effect", target.get("effect")),
+        target_power=target.get("power"),
+        target_toughness=target.get("toughness"),
+        target_is_creature=is_battlefield_creature(target),
+        target_type_line=target.get("type_line", ""),
+        available_targets=len(scored_options),
+        **target_selection_replay_fields(target, [item[2] for item in scored_options]),
+        destination=removal_destination(effect_data),
+        turn=turn,
+        phase=phase,
+        **decision,
+        **removal_annotation_replay_fields(effect_data),
+        **replay_rule_fields(effect_data),
+    )
+    move_removed_permanent_to_destination(
+        target_player,
+        target,
+        permanent,
+        effect_data,
+        turn,
+        rng,
+        all_players=all_players,
+    )
+    check_sbas_until_stable(all_players)
+    return True
+
+
+def activate_best_generic_destroy_permanent(player, opponents, all_players, turn, rng, *, phase=None):
+    options = []
+    for permanent in list(getattr(player, "battlefield", []) or []):
+        effect_data = activated_destroy_effect_for_permanent(permanent)
+        if not can_activate_generic_destroy_permanent(
+            player,
+            permanent,
+            opponents,
+            effect_data=effect_data,
+        ):
+            continue
+        target_player, target, _scored = _best_activated_destroy_target(
+            player,
+            permanent,
+            opponents,
+            effect_data,
+        )
+        if target is None or target_player is None:
+            continue
+        options.append((target_priority(target), str(permanent.get("name") or ""), permanent))
+    if not options:
+        return False
+    options.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return activate_generic_destroy_permanent(
+        player,
+        opponents,
+        all_players,
         options[0][2],
         turn,
         rng,

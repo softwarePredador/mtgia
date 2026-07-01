@@ -827,6 +827,145 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_damage_oracle_not_simple")
 
+    def test_permanent_activated_destroy_maps_tapped_creature_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Assassin",
+                type_line="Creature - Human Assassin",
+                oracle_text="{T}: Destroy target tapped creature.",
+            ),
+            source_text="""
+                filter.add(TappedPredicate.TAPPED);
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new TapSourceCost()
+                );
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_effect"], "destroy_target")
+        self.assertEqual(effect["activated_remove_effect"], "remove_creature")
+        self.assertEqual(effect["activated_remove_target"], "tapped_creature")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "tapped_state": "tapped"})
+        self.assertEqual(effect["activation_cost_mana"], "{0}")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+
+    def test_permanent_activated_destroy_maps_self_sacrifice_artifact_target(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Reveler",
+                type_line="Creature - Devil",
+                oracle_text="{R}, Sacrifice this creature: Destroy target artifact.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{R}")
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetArtifactPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DESTROY_SCOPE)
+        self.assertEqual(effect["activated_remove_effect"], "remove_permanent")
+        self.assertEqual(effect["activated_remove_target"], "artifact")
+        self.assertEqual(effect["target"], "artifact")
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_cost_colors"], ["R"])
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_destroy"])
+
+    def test_permanent_activated_destroy_blocks_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Attrition",
+                type_line="Enchantment",
+                oracle_text="{B}, Sacrifice a creature: Destroy target nonblack creature.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{B}")
+                );
+                ability.addCost(new SacrificeTargetCost(new TargetControlledCreaturePermanent()));
+                ability.addTarget(new TargetCreaturePermanent(
+                    StaticFilters.FILTER_PERMANENT_CREATURE_NON_BLACK
+                ));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_destroy_source_cost_not_supported")
+
+    def test_permanent_activated_destroy_blocks_extra_oracle_clause(self) -> None:
+        row = queue_row(
+            split.DESTROY_UNIT,
+            effect_classes=["DestroyTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Miner",
+                type_line="Creature - Dwarf",
+                oracle_text="{2}{R}, {T}: Destroy target nonbasic land. Activate only during your turn.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DestroyTargetEffect(),
+                    new ManaCostsImpl<>("{2}{R}")
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetLandPermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_destroy_oracle_not_simple")
+
     def test_creature_etb_damage_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,

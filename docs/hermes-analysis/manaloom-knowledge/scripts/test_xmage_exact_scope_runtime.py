@@ -1170,6 +1170,168 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(opponent.life, 5)
         self.assertFalse(any(event == "activated_ability" for event, _ in self.events))
 
+    def test_simple_activated_destroy_taps_and_destroys_tapped_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Tapped Piker",
+            "type_line": "Creature - Goblin",
+            "power": 2,
+            "toughness": 2,
+            "tapped": True,
+        }
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Fixture Assassin",
+            "type_line": "Creature - Human Assassin",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "tapped_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "tapped_state": "tapped"},
+            "destination": "graveyard",
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_assassin",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=15,
+            rng=random.Random(15),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertIn(permanent, active.battlefield)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Assassin"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("target") == "Tapped Piker"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_assassin"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Assassin"
+                and data.get("target") == "Tapped Piker"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_destroy_self_sacrifices_and_destroys_artifact(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("red", 1)
+        target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Fixture Reveler",
+            "type_line": "Creature - Devil",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_permanent",
+            "activated_remove_target": "artifact",
+            "target": "artifact",
+            "target_constraints": {"card_types": ["artifact"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Fixture Reveler"
+                and data.get("activation_kind") == "simple_activated_destroy"
+                and data.get("sacrificed_source") is True
+                and data.get("mana_paid") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_destroy_blocks_summoning_sick_tap_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Tapped Piker", "type_line": "Creature - Goblin", "tapped": True}
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Fixture Assassin",
+            "type_line": "Creature - Human Assassin",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "tapped_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "tapped_state": "tapped"},
+            "destination": "graveyard",
+            "activation_cost_mana": "{0}",
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "summoning_sick": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertIn(target, opponent.battlefield)
+        self.assertEqual(opponent.graveyard, [])
+        self.assertFalse(any(event == "removal_resolved" for event, _ in self.events))
+
     def test_creature_tap_damage_blocks_summoning_sick_activation(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

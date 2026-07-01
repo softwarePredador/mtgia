@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg312_permanent_activated_destroy_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27534`
-- XMage authoritative source resolved: `27220`
+- target all-card battle-gap identities: `27515`
+- XMage authoritative source resolved: `27201`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27220`
+- XMage authoritative adapter required: `27201`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27220` identities, card semantics are accepted from XMage; work is now
+- For `27201` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG311 Exact Adapter Waves
+## PG283-PG312 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG311 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG312 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -226,6 +226,12 @@ patterns:
   activated damage Oracle text, mana/tap/self-sacrifice source costs only, and
   simple `any target` or `target creature` targets ->
   `xmage_permanent_simple_activated_damage_v1`
+- `removal_destroy::targeted_destroy_variant_v1` with
+  `DestroyTargetEffect + SimpleActivatedAbility` on permanents, exact activated
+  destroy-target Oracle text, mana/tap/source self-sacrifice costs only, no
+  discard/exile/OrCost/CompositeCost/sacrifice-target costs, and supported
+  battlefield target constraints ->
+  `xmage_permanent_simple_activated_destroy_target_v1`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnFromGraveyardToHandTargetEffect + SimpleActivatedAbility` on
   permanents, exact Oracle activated graveyard-to-hand text, mana/tap/source
@@ -1570,6 +1576,79 @@ PG311 measured result:
   `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `655`, and `tutor` `626`.
+
+PG312 evidence:
+
+- PG312 permanent activated destroy-target package:
+  `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_package.md`
+- PG312 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_pg_apply_evidence.md`
+- PG312 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_e2e_validation.md`
+- PG312 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_pg_to_sqlite_sync.json`
+- PG312 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG312 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg312_permanent_activated_destroy_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg312_permanent_activated_destroy_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg312_permanent_activated_destroy_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg312_permanent_activated_destroy_wave.md`
+- post-PG312 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg312_permanent_activated_destroy_wave_recheck.md`
+- post-PG312 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg312_permanent_activated_destroy_wave.md`
+- PG312 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_destroy_wave.md`
+- post-PG312 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg312_existing_supported_recheck.md`
+
+PG312 measured result:
+
+- PG312 promoted `19` exact permanent simple activated destroy-target rules:
+  Ark of Blight, Barbarian Riftcutter, Druid Lyrist, Elf Replica, Elvish
+  Lyrist, Elvish Scrapper, Executioner's Capsule, Felidar Cub, Kami of Ancient
+  Law, Keening Apparition, Mine Bearer, Priest of Iroas, Reckless Reveler,
+  Ronom Unicorn, Royal Assassin, Ruinous Gremlin, Scavenger Folk, Torch Fiend,
+  and Universal Solvent.
+- Runtime now supports simple activated destroy-target permanents with
+  mana/tap/source self-sacrifice activation costs, summoning-sickness blocking
+  for tap-creature activations, ward handling after activation cost payment,
+  target-constraint legality, and main-phase activation selection.
+- The splitter blocks unsafe neighbors such as sacrifice-target costs,
+  discard/exile/OrCost/CompositeCost costs, non-simple destroy constructors,
+  unsupported targets, and Oracle clauses with extra timing or other effects.
+- PostgreSQL apply evidence reports `19/19` promoted rows, `19/19`
+  verified/auto rows, and `19/19` matching Oracle hash rows, with `2` backup
+  rows from old Royal Assassin rules.
+- PG battle-rules -> Hermes/SQLite sync loaded `6976` PostgreSQL rules,
+  inserted/updated `6770` SQLite rows, and exported `4582` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover tapped-creature destroy, self-sacrifice
+  artifact destroy, sacrifice-target blocking, extra Oracle-clause blocking,
+  runtime destroy resolution, source self-sacrifice, and summoning-sickness
+  blocking; `161` focused exact-scope tests pass.
+- Global all-card readiness after PG312:
+  `battle_and_oracle_ready=2109` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3257`.
+- Global all-card authoritative queue after PG312:
+  `target_identity_count=27515`, `xmage_authoritative_source_count=27201`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27201`.
+- Running the exact splitter after PG312 on supported units returns
+  `proposal_count=0` over `7343` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG312 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1179`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `626`.
 
 ## Why This Is The Best Current Flow
 

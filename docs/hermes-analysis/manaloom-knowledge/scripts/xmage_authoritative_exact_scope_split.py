@@ -72,6 +72,7 @@ DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 PERMANENT_ACTIVATED_DAMAGE_SCOPE = "xmage_permanent_simple_activated_damage_v1"
+PERMANENT_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_target_v1"
 PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE = "xmage_permanent_simple_activated_graveyard_to_hand_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
@@ -1104,6 +1105,16 @@ def is_permanent_activated_damage_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_permanent_activated_destroy_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DestroyTargetEffect"}
+        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "activated_ability" in set(row.get("xmage_signals") or [])
+    )
+
+
 def is_permanent_activated_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
@@ -1564,6 +1575,113 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def activated_destroy_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return None
+    effect_text = text.rsplit(":", 1)[1].strip()
+    effect_metadata = dict(metadata)
+    effect_metadata["oracle_text"] = effect_text
+    return destroy_target_from_oracle(effect_metadata)
+
+
+def activated_destroy_target_from_source(text: str) -> str | None:
+    if "TargetPointer" in text or ".setTargetPointer" in text or "EachTargetPointer" in text:
+        return None
+    target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
+    if len(target_classes) != 1:
+        return None
+    restricted = restricted_battlefield_target_from_source(text)
+    if restricted is not None:
+        return restricted
+    target_patterns = [
+        (
+            "artifact_or_enchantment",
+            r"TargetPermanent\s*\(\s*StaticFilters\.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT\s*\)",
+        ),
+        (
+            "artifact_or_enchantment",
+            r"FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT",
+        ),
+        (
+            "creature_enchantment_or_planeswalker",
+            r"FILTER_PERMANENT_CREATURE_ENCHANTMENT_OR_PLANESWALKER",
+        ),
+        (
+            "nonland_permanent",
+            r"FILTER_PERMANENT_NON_LAND|FilterNonlandPermanent",
+        ),
+        ("creature_or_planeswalker", r"TargetCreatureOrPlaneswalker\s*\("),
+        ("artifact", r"TargetArtifactPermanent\s*\("),
+        ("enchantment", r"TargetEnchantmentPermanent\s*\("),
+        ("land", r"TargetLandPermanent\s*\("),
+        ("creature", r"TargetCreaturePermanent\s*\("),
+        ("permanent", r"TargetPermanent\s*\(\s*\)"),
+    ]
+    matched = [
+        target
+        for target, pattern in target_patterns
+        if re.search(pattern, text, re.S)
+    ]
+    matched = list(dict.fromkeys(matched))
+    if len(matched) != 1:
+        return None
+    return matched[0]
+
+
+def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    risky_cost_classes = {
+        "CompositeCost",
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileFromGraveCost",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "OrCost",
+        "PayLifeCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "SacrificeTargetCost",
+        "TapTargetCost",
+    }
+    if "Zone.GRAVEYARD" in text:
+        return "activated_destroy_source_not_battlefield"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
+    if present_risky:
+        return "activated_destroy_source_cost_not_supported"
+    if len(re.findall(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S)) != 1:
+        return "activated_destroy_source_not_simple_destroy_effect"
+    destroy_index = text.find("DestroyTargetEffect")
+    window = text[max(0, destroy_index - 500) : destroy_index + 2000]
+    if "SimpleActivatedAbility" not in window:
+        return "activated_destroy_source_not_simple_activated"
+    target = activated_destroy_target_from_source(text)
+    if target is None:
+        return "activated_destroy_source_target_not_supported"
+    cost_text = "{0}"
+    mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
+    generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    if mana_match:
+        cost_text = mana_match.group(1)
+    elif generic_match:
+        cost_text = "{" + generic_match.group(1) + "}"
+    parsed_cost = parse_mana_cost_text(cost_text)
+    if parsed_cost is None:
+        return "activated_destroy_source_mana_cost_not_supported"
+    activation_cost_generic, activation_cost_colors = parsed_cost
+    return {
+        "target": target,
+        "activation_cost_mana": cost_text,
+        "activation_cost_generic": activation_cost_generic,
+        "activation_cost_colors": activation_cost_colors,
+        "activation_requires_tap": "TapSourceCost" in window,
+        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+    }
+
+
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     risky_cost_classes = {
@@ -1955,6 +2073,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature with tap-only activated damage ability"
     elif scope == PERMANENT_ACTIVATED_DAMAGE_SCOPE:
         scope_kind = "permanent with a simple activated damage ability"
+    elif scope == PERMANENT_ACTIVATED_DESTROY_SCOPE:
+        scope_kind = "permanent with a simple activated destroy-target ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
         scope_kind = "permanent with a simple activated draw ability"
     return (
@@ -2022,6 +2142,7 @@ def split_row(
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
     permanent_activated_damage_unit = is_permanent_activated_damage_unit(row)
+    permanent_activated_destroy_unit = is_permanent_activated_destroy_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
@@ -2038,6 +2159,7 @@ def split_row(
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
+        and not permanent_activated_destroy_unit
         and not permanent_activated_recursion_to_hand_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
@@ -2060,6 +2182,7 @@ def split_row(
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
         and not permanent_activated_damage_unit
+        and not permanent_activated_destroy_unit
         and not permanent_activated_recursion_to_hand_unit
     ):
         if not is_spell(metadata):
@@ -2115,6 +2238,87 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_draw",
+        ), "selected_exact_scope"
+
+    if permanent_activated_destroy_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "activated_destroy_not_permanent"
+        oracle_destroy = activated_destroy_from_oracle(metadata)
+        if oracle_destroy is None:
+            return None, "activated_destroy_oracle_not_simple"
+        parsed_activation = activated_destroy_from_source(source_text)
+        if isinstance(parsed_activation, str):
+            return None, parsed_activation
+        oracle_effect, oracle_target_type = oracle_destroy
+        if str(parsed_activation["target"]) != str(oracle_target_type):
+            return None, "activated_destroy_source_oracle_target_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        target_base = restricted_target_base(oracle_target_type)
+        activated_effect = {
+            "effect": oracle_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_DESTROY_SCOPE,
+            "ability_kind": "activated",
+            "activated_effect": "destroy_target",
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_constraints": target_constraints_for(oracle_target_type),
+            "destination": "graveyard",
+            "xmage_effect_class": "DestroyTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+        }
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": PERMANENT_ACTIVATED_DESTROY_SCOPE,
+            "ability_kind": "static_and_activated",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": PERMANENT_ACTIVATED_DESTROY_SCOPE,
+            "activated_remove_effect": oracle_effect,
+            "activated_remove_target": oracle_target_type,
+            "target": target_base,
+            "target_constraints": target_constraints_for(oracle_target_type),
+            "destination": "graveyard",
+            "_activated_rule_effects": [activated_effect],
+            "xmage_effect_class": "DestroyTargetEffect",
+            "xmage_ability_class": "SimpleActivatedAbility",
+            **{
+                key: parsed_activation[key]
+                for key in (
+                    "activation_cost_mana",
+                    "activation_cost_generic",
+                    "activation_cost_colors",
+                    "activation_requires_tap",
+                    "activation_requires_sacrifice",
+                )
+            },
+        }
+        if parsed_activation.get("activation_requires_sacrifice"):
+            effect_json["activated_self_sacrifice_destroy"] = True
+            activated_effect["activated_self_sacrifice_destroy"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_permanent_simple_activated_destroy_target",
         ), "selected_exact_scope"
 
     if permanent_activated_recursion_to_hand_unit:
@@ -3090,6 +3294,7 @@ def build_exact_split_report(
             and not is_creature_etb_token_unit(row)
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
+            and not is_permanent_activated_destroy_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
@@ -3132,6 +3337,7 @@ def build_exact_split_report(
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+                "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",

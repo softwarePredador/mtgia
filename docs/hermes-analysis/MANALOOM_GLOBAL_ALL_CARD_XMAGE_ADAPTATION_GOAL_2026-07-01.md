@@ -8,7 +8,7 @@ Fonte operacional:
 
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 - `docs/hermes-analysis/BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg311_permanent_activated_recursion_to_hand_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg312_permanent_activated_destroy_wave.md`
 
 ## Objetivo
 
@@ -23,21 +23,21 @@ fila global de cartas conhecidas pelo ManaLoom.
 
 ## Estado atual
 
-Checkpoint: pos-PG311, `xmage_permanent_simple_activated_graveyard_to_hand_v1`.
+Checkpoint: pos-PG312, `xmage_permanent_simple_activated_destroy_target_v1`.
 
 | Metrica | Valor |
 | --- | ---: |
-| `target_identity_count` | 27534 |
-| `xmage_authoritative_source_count` | 27220 |
+| `target_identity_count` | 27515 |
+| `xmage_authoritative_source_count` | 27201 |
 | `xmage_missing_source_exception_count` | 314 |
 | `xmage_authoritative_parser_gap_count` | 0 |
-| `xmage_authoritative_adapter_required_count` | 27220 |
+| `xmage_authoritative_adapter_required_count` | 27201 |
 | `manual_semantic_decision_units_remaining` | 314 |
 | `adapter_work_unit_count` | 11429 |
 
 Leitura correta:
 
-- `27220` identidades ja tem verdade comportamental no XMage local.
+- `27201` identidades ja tem verdade comportamental no XMage local.
 - O trabalho restante nelas e traduzir XMage para adapters/runtime ManaLoom por
   familia/subpadrao, nao revisar semanticamente carta por carta.
 - `314` identidades nao resolveram classe local no XMage e ficam em trilha
@@ -101,23 +101,24 @@ Prioridade secundaria:
 
 ## Proxima etapa concreta
 
-PG311 fechou o subpadrao de permanente com habilidade ativada simples que
-retorna card do cemiterio para a mao. Foram promovidas 11 cartas: Adun
-Oakenshield, Argivian Archaeologist, Corpse Hauler, Dowsing Shaman, Font of
-Return, Groundskeeper, Hanna, Ship's Navigator, Rootwater Diver, Salvage Scout,
-Skull of Orm e Spellkeeper Weird.
+PG312 fechou o subpadrao de permanente com habilidade ativada simples que
+destroi alvo. Foram promovidas 19 cartas: Ark of Blight, Barbarian Riftcutter,
+Druid Lyrist, Elf Replica, Elvish Lyrist, Elvish Scrapper, Executioner's
+Capsule, Felidar Cub, Kami of Ancient Law, Keening Apparition, Mine Bearer,
+Priest of Iroas, Reckless Reveler, Ronom Unicorn, Royal Assassin, Ruinous
+Gremlin, Scavenger Folk, Torch Fiend e Universal Solvent.
 
-Evidencias PG311:
+Evidencias PG312:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_package.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_pg_apply_evidence.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg311_xmage_permanent_activated_recursion_to_hand_wave_e2e_validation.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg311_existing_supported_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_pg_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg312_xmage_permanent_activated_destroy_wave_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg312_existing_supported_recheck.md`
 
-O splitter exato pos-PG311 retorna `proposal_count=0` sobre `7362` linhas
+O splitter exato pos-PG312 retorna `proposal_count=0` sobre `7343` linhas
 suportadas consideradas. Portanto, a proxima etapa nao e repetir este
 subpadrao, e sim escolher outro subpadrao runtime-backed a partir da fila
-pos-PG311.
+pos-PG312.
 
 Maiores work units atuais para priorizacao:
 
@@ -128,32 +129,32 @@ Maiores work units atuais para priorizacao:
 - `add_counters` por fonte: 795
 - `life_gain`: 754
 - `draw_cards`: 676
-- `removal_destroy`: 655
+- `removal_destroy`: 636
 - `tutor`: 626
 
 O proximo lote deve seguir a mesma disciplina: minerar uma assinatura XMage
 estreita, implementar splitter exato, runtime e testes, aplicar PostgreSQL,
 sincronizar Hermes/SQLite, rodar E2E/auditorias e recalcular a fila.
 
-Subpadrao PG311 ja fechado:
+Subpadrao PG312 ja fechado:
 
-- `ReturnFromGraveyardToHandTargetEffect`
+- `DestroyTargetEffect`
 - `SimpleActivatedAbility`
 - permanente no campo de batalha
 - custos suportados: mana simples, tap e sacrificio da propria fonte
-- alvos suportados: criatura, artefato, encantamento, instant/sorcery,
-  artefato ou encantamento, artifact creature, permanent, any card quando a
-  fonte e o Oracle concordarem
+- alvos suportados: artifact, enchantment, land, permanent, tapped creature,
+  attacking creature, nonblack creature e outros alvos de permanente ja
+  validados por `target_constraints`.
 
-Nome sugerido:
+Nome:
 
-- `xmage_permanent_simple_activated_graveyard_to_hand_v1`
+- `xmage_permanent_simple_activated_destroy_target_v1`
 
 Bloqueios reais deixados para sublotes posteriores:
 
-- custos de descarte, exilio de cards do cemiterio, OrCost/CompositeCost,
-  fontes ativadas do cemiterio, subtipo especifico ainda nao mapeado como
-  Arcane, condicoes de watcher e efeitos compostos com multiplas zonas.
+- custos de sacrificar outro alvo/permanente, descarte, exilio,
+  OrCost/CompositeCost, alvos especificos ainda nao modelados, clausulas Oracle
+  extras como restricao de timing, e efeitos compostos com multiplas zonas.
 
 ## Regra contra desvio
 
