@@ -456,6 +456,58 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_damage_resolves_after_entering_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Piker",
+            "type_line": "Creature - Goblin Warrior",
+            "power": 2,
+            "toughness": 1,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_damage_amount": 1,
+            "etb_damage_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_damage",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Sparkmage",
+                "type_line": "Creature - Human Wizard",
+                "oracle_text": "When this creature enters, it deals 1 damage to target creature.",
+                "power": 1,
+                "toughness": 1,
+            },
+            turn=4,
+            rng=random.Random(49),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Sparkmage"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Piker"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Sparkmage"
+                and data.get("target") == "Target Piker"
+                and data.get("amount") == 1
+                and data.get("result") == "creature_destroyed"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_etb_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_tap_damage_enters_without_damage_then_activates(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

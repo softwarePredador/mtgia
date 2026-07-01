@@ -832,6 +832,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f5bb5190b2e292d8b33faeaf1639088c"
   },
+  "Akoum Boulderfoot": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 1,
+    "etb_damage_target": "any_target",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+    "battle_rule_oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8"
+  },
   "Akoum Refuge": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -5350,6 +5371,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "5c9312a9432775bc6a4073c667c0407e"
+  },
+  "Blisterstick Shaman": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 1,
+    "etb_damage_target": "any_target",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+    "battle_rule_oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8"
   },
   "Blood Crypt // Blood Crypt": {
     "effect": "land",
@@ -10336,6 +10378,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Corrupt Eunuchs": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 2,
+    "etb_damage_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+    "battle_rule_oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4"
   },
   "Corrupted Conviction": {
     "cmc": 1.0,
@@ -18403,6 +18468,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
   },
+  "Fire Imp": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 2,
+    "etb_damage_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+    "battle_rule_oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4"
+  },
   "Fire Nation Attacks": {
     "cmc": 5.0,
     "effect": "token_maker",
@@ -18807,6 +18895,29 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Flametongue Kavu": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 4,
+    "etb_damage_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:22463a20fe885e7421278c4535de33b3",
+    "battle_rule_oracle_hash": "f158afdf97fc5a10935820ec11da373b"
   },
   "Flare of Cultivation": {
     "cmc": 3.0,
@@ -21572,6 +21683,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "2166542fdd309faf49b670f6c0bafbc9"
+  },
+  "Goblin Commando": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 2,
+    "etb_damage_target": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+    "battle_rule_oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4"
   },
   "Goblin Cratermaker": {
     "effect": "creature",
@@ -46641,6 +46775,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Skeleton Archer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 1,
+    "etb_damage_target": "any_target",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+    "battle_rule_oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8"
+  },
   "Skemfar Elderhall": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -48146,6 +48301,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:febd37997bb3683614d20454522b342f",
     "battle_rule_oracle_hash": "8d6835d5e6db53462b419f309fb2501f"
+  },
+  "Sparkmage Apprentice": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_fixed_damage_target_v1",
+    "effect": "creature",
+    "etb_damage_amount": 1,
+    "etb_damage_target": "any_target",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+    "battle_rule_oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8"
   },
   "Spatial Contortion": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",

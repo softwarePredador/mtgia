@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg301_creature_dies_draw_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG301. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG302. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -108,7 +108,8 @@ creatures where static self keywords such as `flying` or `defender` are
 preserved; PG300 added 8 exact one-shot self-graveyard recursion spells
 returning artifact, creature, or permanent cards to the battlefield; PG301
 added 20 exact creatures with fixed dies-draw triggers, including static
-self-keyword preservation and optional draw handling.
+self-keyword preservation and optional draw handling; PG302 added 8 exact
+creatures with fixed enter-the-battlefield damage triggers.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -118,7 +119,8 @@ fixed target-creature power/toughness modifiers until end of turn, plus exact
 static self combat and safe defensive keywords on creatures, plus fixed ETB
 life gain on creatures, fixed ETB draw on creatures, creature tap-only
 activated fixed damage, creature ETB destroy-target triggers, creature ETB
-graveyard recursion-to-hand triggers, and fixed creature dies-draw triggers.
+graveyard recursion-to-hand triggers, fixed creature dies-draw triggers, and
+fixed creature enter-the-battlefield damage triggers.
 Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
@@ -174,11 +176,14 @@ Evidence:
 - `master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_package.md`
 - `master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg301_xmage_creature_dies_draw_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg301_creature_dies_draw_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg301_existing_supported_recheck.md`
+- `master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_package.md`
+- `master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_existing_supported_recheck.md`
 
-After PG301, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7319` considered supported rows; continue by adding a
+After PG302, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7311` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
 the current authoritative queue.
 

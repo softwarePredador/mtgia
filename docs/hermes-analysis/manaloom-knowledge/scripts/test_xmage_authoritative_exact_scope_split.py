@@ -163,6 +163,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_tap_damage_not_creature")
 
+    def test_creature_etb_damage_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Boulderfoot",
+                type_line="Creature - Giant Warrior",
+                oracle_text="When this creature enters, it deals 1 damage to any target.",
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DamageTargetEffect(1)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DAMAGE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_damage_amount"], 1)
+        self.assertEqual(effect["etb_damage_target"], "any_target")
+
+    def test_creature_etb_damage_blocks_variable_amount(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Ravager",
+                type_line="Creature - Giant Wizard",
+                oracle_text=(
+                    "When this creature enters, it deals X damage to any target, "
+                    "where X is the greatest number of creatures you control that have a creature type in common."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DamageTargetEffect(new GreatestSharedCreatureTypeCount())));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_damage_target_not_supported")
+
+    def test_creature_etb_damage_blocks_restricted_flying_target(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Rig",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "When this creature enters, you may have it deal 4 damage "
+                    "to target creature with flying."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DamageTargetEffect(4), true));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_damage_target_not_supported")
+
     def test_destroy_target_creature_maps_to_remove_creature_runtime(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(

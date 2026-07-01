@@ -121,15 +121,15 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg301_creature_dies_draw_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27739`
-- XMage authoritative source resolved: `27425`
+- target all-card battle-gap identities: `27731`
+- XMage authoritative source resolved: `27417`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27425`
+- XMage authoritative adapter required: `27417`
 - ManaLoom adapter work-unit keys: `11905`
 - authoritative source coverage ratio: `0.9887`
 
@@ -151,9 +151,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG301 Exact Adapter Waves
+## PG283-PG302 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG301 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG302 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -185,6 +185,10 @@ patterns:
   optional static self keywords, and exact fixed "When/Whenever this creature
   dies, draw N cards" Oracle text ->
   `xmage_creature_dies_draw_cards_v1`
+- `direct_damage::targeted_damage_variant_v1` with `DamageTargetEffect +
+  EntersBattlefieldTriggeredAbility` on creatures and exact fixed ETB damage
+  Oracle text ->
+  `xmage_creature_etb_fixed_damage_target_v1`
 - `removal_destroy::targeted_destroy_variant_v1` with
   `DestroyTargetEffect + EntersBattlefieldTriggeredAbility` on creatures and
   exact unrestricted ETB destroy Oracle text ->
@@ -903,6 +907,62 @@ PG301 measured result:
   `xmage_authoritative_adapter_required_count=27425`.
 - Running the exact splitter after PG301 on supported units returns
   `proposal_count=0` over `7319` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
+PG302 evidence:
+
+- PG302 creature ETB damage package:
+  `docs/hermes-analysis/master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_package.md`
+- PG302 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_pg_apply_evidence.md`
+- PG302 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_e2e_validation.md`
+- PG302 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg302_creature_etb_damage_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg302_creature_etb_damage_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg302_creature_etb_damage_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg302_creature_etb_damage_wave.md`
+- post-PG302 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg302_creature_etb_damage_wave_recheck.md`
+- post-PG302 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg302_creature_etb_damage_wave.md`
+- post-PG302 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg302_existing_supported_recheck.md`
+
+PG302 measured result:
+
+- PG302 promoted `8` exact creatures whose local XMage source is
+  `DamageTargetEffect` behind `EntersBattlefieldTriggeredAbility`, mapped to
+  `xmage_creature_etb_fixed_damage_target_v1`.
+- Runtime now resolves `etb_damage_amount` through the existing direct-damage
+  executor after the creature enters the battlefield, with `finish_spell=false`
+  so the source creature stays on battlefield.
+- The splitter blocks variable/X, conditional/raid, target restrictions such
+  as flying-only or damaged-this-turn, and target-player-or-planeswalker text
+  until narrower target models exist.
+- PostgreSQL postcheck: `8/8` promoted rows, `8/8` verified/auto, `8/8`
+  matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6760` PostgreSQL rows, inserted/updated
+  `6554` SQLite rows, and exported `4373` canonical snapshot rows.
+- E2E package validation: PostgreSQL `8/8`, SQLite `8/8`, canonical snapshot
+  `8/8`, and runtime `get_card_effect` `8/8`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning; legacy
+  contamination `pass`.
+- Focused exact-scope tests cover fixed ETB damage mapping, variable and
+  restricted-target blocking, and runtime ETB damage destroying a target
+  creature while preserving the source creature; `102` focused exact-scope
+  tests pass.
+- Global all-card authoritative queue after PG302:
+  `target_identity_count=27731`, `xmage_authoritative_source_count=27417`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27417`.
+- Running the exact splitter after PG302 on supported units returns
+  `proposal_count=0` over `7311` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern,
   with the largest current work units led by `recursion`, `draw_engine`,
   `grant_protection_from_chosen_color`, residual `direct_damage`,

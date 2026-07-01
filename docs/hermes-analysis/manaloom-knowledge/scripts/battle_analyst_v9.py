@@ -16329,6 +16329,26 @@ def resolve_generic_permanent_etb(
             turn=turn,
             **replay_rule_fields(effect_data),
         )
+    if effect_data.get("etb_damage_amount"):
+        amount = int(effect_data.get("etb_damage_amount") or 0)
+        etb_damage_effect = {
+            **effect_data,
+            "effect": "direct_damage",
+            "amount": amount,
+            "damage": amount,
+            "target": effect_data.get("etb_damage_target") or effect_data.get("target"),
+            "target_constraints": effect_data.get("target_constraints") or {},
+        }
+        apply_direct_damage(
+            player,
+            opponents,
+            permanent,
+            etb_damage_effect,
+            turn,
+            rng,
+            finish_spell=False,
+            phase=phase or "battlefield_etb",
+        )
     resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
     if effect_data.get("etb_tutor_target"):
         resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)

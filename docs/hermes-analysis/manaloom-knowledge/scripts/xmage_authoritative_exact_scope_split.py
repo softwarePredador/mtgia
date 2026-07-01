@@ -74,6 +74,7 @@ BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
+ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
@@ -689,6 +690,16 @@ def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_damage_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DamageTargetEffect"}
+        and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_etb_destroy_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DESTROY_UNIT:
         return False
@@ -889,6 +900,39 @@ def dies_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
     return count, bool(match.group(1))
 
 
+def etb_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    patterns: list[tuple[str, str]] = [
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to any target\.?$",
+            "any_target",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target creature or planeswalker\.?$",
+            "creature_or_planeswalker",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target creature an opponent controls\.?$",
+            "creature",
+        ),
+        (
+            r"^when this creature enters(?: the battlefield)?, "
+            r"(?:it|this creature) deals (\d+) damage to target creature\.?$",
+            "creature",
+        ),
+    ]
+    for pattern, target in patterns:
+        match = re.match(pattern, text)
+        if match:
+            amount = int(match.group(1))
+            if amount > 0:
+                return amount, target
+    return None
+
+
 def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
     patterns: list[tuple[str, tuple[str, str]]] = [
@@ -1000,6 +1044,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
+        ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
     }:
@@ -1064,6 +1109,7 @@ def split_row(
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
+    etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
@@ -1073,6 +1119,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
@@ -1088,6 +1135,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
         and not creature_tap_damage_unit
@@ -1238,6 +1286,37 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_dies_draw_cards",
+        ), "selected_exact_scope"
+
+    if etb_damage_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_damage_not_creature"
+        parsed = etb_damage_target_from_oracle(metadata)
+        if parsed is None:
+            return None, "etb_damage_target_not_supported"
+        amount, target = parsed
+        constructor_amount = java_constructor_int(source_text, "DamageTargetEffect")
+        if constructor_amount is None or constructor_amount <= 0:
+            return None, "etb_damage_amount_source_not_fixed"
+        if constructor_amount != amount:
+            return None, "etb_damage_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_DAMAGE_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_damage_amount": amount,
+            "etb_damage_target": target,
+            "target": target,
+            "target_constraints": target_constraints_for(target),
+            "xmage_effect_class": "DamageTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_fixed_damage_target",
         ), "selected_exact_scope"
 
     if etb_destroy_creature_unit:
@@ -1687,6 +1766,7 @@ def build_exact_split_report(
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
             and not is_creature_dies_draw_unit(row)
+            and not is_creature_etb_damage_unit(row)
             and not is_creature_tap_damage_unit(row)
         ):
             continue
@@ -1724,6 +1804,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
+                "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
             ],

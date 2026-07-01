@@ -1,0 +1,217 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG302",
+  "generated_at": "2026-07-01T11:49:00.041661+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg302_xmage_creature_etb_damage_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg302_xmage_creature_etb_damage_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Akoum Boulderfoot",
+      "Blisterstick Shaman",
+      "Corrupt Eunuchs",
+      "Fire Imp",
+      "Flametongue Kavu",
+      "Goblin Commando",
+      "Skeleton Archer",
+      "Sparkmage Apprentice"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 8,
+    "promoted_rule_rows": 8,
+    "promoted_verified_auto_rows": 8,
+    "row_count": 8
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Akoum Boulderfoot",
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "akoum boulderfoot",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Blisterstick Shaman",
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "blisterstick shaman",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Corrupt Eunuchs",
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "corrupt eunuchs",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Fire Imp",
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "fire imp",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Flametongue Kavu",
+      "logical_rule_key": "battle_rule_v1:22463a20fe885e7421278c4535de33b3",
+      "normalized_name": "flametongue kavu",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Goblin Commando",
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "goblin commando",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Skeleton Archer",
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "skeleton archer",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Sparkmage Apprentice",
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "sparkmage apprentice",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Akoum Boulderfoot",
+      "Blisterstick Shaman",
+      "Corrupt Eunuchs",
+      "Fire Imp",
+      "Flametongue Kavu",
+      "Goblin Commando",
+      "Skeleton Archer",
+      "Sparkmage Apprentice"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 8,
+    "total_target_card_rows": 8,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "bd9e9b54-57a8-4241-8597-964045f220d5",
+      "card_name": "Akoum Boulderfoot",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "akoum boulderfoot",
+      "oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9e898fcd-4a42-4d69-9f76-22fcc1abae58",
+      "card_name": "Blisterstick Shaman",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "blisterstick shaman",
+      "oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9f7e9fdc-3ea6-41a3-8140-21c29841a416",
+      "card_name": "Corrupt Eunuchs",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "corrupt eunuchs",
+      "oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2d7eed09-011a-43c7-84ac-41f17c6eb360",
+      "card_name": "Fire Imp",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "fire imp",
+      "oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "8265d15e-bd47-4c19-8212-878d466da216",
+      "card_name": "Flametongue Kavu",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:22463a20fe885e7421278c4535de33b3",
+      "normalized_name": "flametongue kavu",
+      "oracle_hash": "f158afdf97fc5a10935820ec11da373b",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c96b07bc-3930-4a17-99e6-f5c6196d6130",
+      "card_name": "Goblin Commando",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:0ec21fb7926cc051327c2aef53549b01",
+      "normalized_name": "goblin commando",
+      "oracle_hash": "6cb7c3a573c3fc76d7a0275462aba0e4",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "cf2b7102-483e-4cf2-a0ee-ed37738b7733",
+      "card_name": "Skeleton Archer",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "skeleton archer",
+      "oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "c1310a41-831e-41ef-842e-cde305cd184d",
+      "card_name": "Sparkmage Apprentice",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:10ed26189f39de99d282a85334cead7d",
+      "normalized_name": "sparkmage apprentice",
+      "oracle_hash": "45281fde9e9ca072507cc0f3396ef1f8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_creature_etb_damage_wave"
+}
