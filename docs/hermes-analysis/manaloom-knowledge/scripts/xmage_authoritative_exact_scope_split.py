@@ -39,6 +39,7 @@ BOOST_TARGET_UNIT = (
     "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::"
     "no_condition_class::targeting"
 )
+BOOST_KEYWORD_UNIT = "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1"
 TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
     "no_target_class::no_condition_class::token"
@@ -80,6 +81,7 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
+BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
@@ -217,6 +219,39 @@ STATIC_SELF_KEYWORD_ORDER = [
     "shroud",
     "indestructible",
 ]
+TARGET_GRANT_KEYWORD_ABILITY_CLASSES = {
+    key: value
+    for key, value in STATIC_SELF_KEYWORD_ABILITY_CLASSES.items()
+    if value
+    in {
+        "deathtouch",
+        "double_strike",
+        "first_strike",
+        "flying",
+        "haste",
+        "hexproof",
+        "indestructible",
+        "lifelink",
+        "menace",
+        "reach",
+        "trample",
+        "vigilance",
+    }
+}
+TARGET_GRANT_KEYWORD_ORACLE_WORDS = {
+    "deathtouch": "deathtouch",
+    "double strike": "double_strike",
+    "first strike": "first_strike",
+    "flying": "flying",
+    "haste": "haste",
+    "hexproof": "hexproof",
+    "indestructible": "indestructible",
+    "lifelink": "lifelink",
+    "menace": "menace",
+    "reach": "reach",
+    "trample": "trample",
+    "vigilance": "vigilance",
+}
 
 
 def utc_now() -> str:
@@ -818,6 +853,48 @@ def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
     return int(matches[0][0]), int(matches[0][1])
 
 
+def fixed_boost_keyword_target_from_source(
+    source: str,
+    keyword_ability_class: str,
+) -> tuple[int, int, str] | None:
+    text = source or ""
+    boost_matches = re.findall(
+        r"new\s+BoostTargetEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*Duration\.EndOfTurn\s*\)",
+        text,
+        re.S,
+    )
+    if len(boost_matches) != 1:
+        return None
+    gain_matches = re.findall(r"new\s+GainAbilityTargetEffect\s*\(", text)
+    if len(gain_matches) != 1:
+        return None
+    ability_expr = (
+        rf"(?:{re.escape(keyword_ability_class)}\.getInstance\s*\(\s*\)"
+        rf"|new\s+{re.escape(keyword_ability_class)}\s*\([^)]*\))"
+    )
+    if not re.search(
+        rf"new\s+GainAbilityTargetEffect\s*\(\s*{ability_expr}\s*,\s*Duration\.EndOfTurn",
+        text,
+        re.S,
+    ):
+        return None
+    any_target = re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)
+    controlled_target = re.findall(r"new\s+TargetControlledCreaturePermanent\s*\(", text)
+    if len(any_target) + len(controlled_target) != 1:
+        return None
+    if controlled_target:
+        if not re.search(r"new\s+TargetControlledCreaturePermanent\s*\(\s*\)", text):
+            return None
+        target_controller = "self"
+    else:
+        if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+            return None
+        target_controller = "any"
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    return int(boost_matches[0][0]), int(boost_matches[0][1]), target_controller
+
+
 def strip_leading_parenthetical_reminders(text: str) -> str:
     cleaned = str(text or "").strip()
     while True:
@@ -847,6 +924,24 @@ def fixed_boost_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] 
     if power is None or toughness is None:
         return None
     return power, toughness
+
+
+def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    keyword_words = "|".join(re.escape(word) for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True))
+    match = re.match(
+        rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) and gains ({keyword_words}) until end of turn\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(2))
+    toughness = signed_int_from_oracle(match.group(3))
+    if power is None or toughness is None:
+        return None
+    target_controller = "self" if match.group(1) else "any"
+    keyword = TARGET_GRANT_KEYWORD_ORACLE_WORDS[match.group(4)]
+    return power, toughness, keyword, target_controller
 
 
 def is_creature_metadata(metadata: dict[str, Any]) -> bool:
@@ -951,6 +1046,17 @@ def is_creature_tap_damage_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"DamageTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
+def is_boost_keyword_spell_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    return (
+        str(row.get("adapter_work_unit") or "") == BOOST_KEYWORD_UNIT
+        and effect_classes(row) == {"BoostTargetEffect", "GainAbilityTargetEffect"}
+        and set(row.get("xmage_signals") or []) == {"targeting"}
+        and len(abilities) == 1
+        and next(iter(abilities)) in TARGET_GRANT_KEYWORD_ABILITY_CLASSES
     )
 
 
@@ -1264,6 +1370,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution creature-token maker"
+    elif scope == BOOST_KEYWORD_SCOPE:
+        scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -1338,6 +1446,7 @@ def split_row(
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
+    boost_keyword_spell_unit = is_boost_keyword_spell_unit(row)
     fixed_token_spell_unit = unit == TOKEN_SPELL_UNIT
     if (
         unit not in SUPPORTED_UNITS
@@ -1350,6 +1459,7 @@ def split_row(
         and not etb_recursion_creature_unit
         and not etb_token_creature_unit
         and not creature_tap_damage_unit
+        and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
     ):
         return None, "unsupported_adapter_work_unit"
@@ -1359,7 +1469,7 @@ def split_row(
         return None, "oracle_text_missing"
 
     if (
-        unit in SPELL_UNITS
+        (unit in SPELL_UNITS or boost_keyword_spell_unit)
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
@@ -2012,6 +2122,55 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_boost_target_creature_until_eot_spell"), "selected_exact_scope"
 
+    if boost_keyword_spell_unit:
+        if classes != {"BoostTargetEffect", "GainAbilityTargetEffect"}:
+            return None, "boost_keyword_effect_class_not_pure"
+        abilities = ability_classes(row)
+        if len(abilities) != 1:
+            return None, "boost_keyword_ability_not_single"
+        ability_class = next(iter(abilities))
+        keyword = TARGET_GRANT_KEYWORD_ABILITY_CLASSES.get(ability_class)
+        if not keyword:
+            return None, "boost_keyword_ability_not_supported"
+        if has_oracle_complexity(metadata):
+            return None, "boost_keyword_oracle_not_simple"
+        source_boost = fixed_boost_keyword_target_from_source(source_text, ability_class)
+        if source_boost is None:
+            return None, "boost_keyword_source_not_single_fixed"
+        oracle_boost = fixed_boost_keyword_target_from_oracle(metadata)
+        if oracle_boost is None:
+            return None, "boost_keyword_oracle_not_exact_fixed"
+        source_power, source_toughness, source_target_controller = source_boost
+        oracle_power, oracle_toughness, oracle_keyword, oracle_target_controller = oracle_boost
+        if (source_power, source_toughness) != (oracle_power, oracle_toughness):
+            return None, "boost_keyword_source_oracle_boost_mismatch"
+        if keyword != oracle_keyword:
+            return None, "boost_keyword_source_oracle_keyword_mismatch"
+        if source_target_controller != oracle_target_controller:
+            return None, "boost_keyword_source_oracle_target_mismatch"
+        effect_json = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": BOOST_KEYWORD_SCOPE,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": oracle_target_controller,
+            "power_delta": oracle_power,
+            "toughness_delta": oracle_toughness,
+            "power_boost": oracle_power,
+            "toughness_boost": oracle_toughness,
+            "duration": "until_end_of_turn",
+            "granted_keywords_until_eot": [keyword],
+            "xmage_effect_classes": ["BoostTargetEffect", "GainAbilityTargetEffect"],
+            "xmage_ability_class": ability_class,
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_boost_keyword_target_creature_until_eot_spell",
+        ), "selected_exact_scope"
+
     if unit in RAMP_UNITS:
         if is_spell(metadata):
             return None, "mana_source_spell_not_supported"
@@ -2069,6 +2228,7 @@ def build_exact_split_report(
             and not is_creature_etb_damage_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
+            and not is_boost_keyword_spell_unit(row)
         ):
             continue
         considered += 1
@@ -2109,6 +2269,7 @@ def build_exact_split_report(
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
+                "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,

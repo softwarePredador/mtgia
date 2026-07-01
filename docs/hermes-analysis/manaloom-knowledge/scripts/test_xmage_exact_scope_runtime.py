@@ -1409,6 +1409,64 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(best["power"], 4)
         self.assertEqual(best["toughness"], 4)
 
+    def test_stat_modifier_until_eot_spell_grants_keyword_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Ground Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+            "keywords": ["vigilance"],
+            "vigilance": True,
+        }
+        active.battlefield.append(target)
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "self",
+            "power_delta": 2,
+            "toughness_delta": 2,
+            "granted_keywords_until_eot": ["flying"],
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Wings",
+                "type_line": "Instant",
+                "oracle_text": "Target creature you control gets +2/+2 and gains flying until end of turn.",
+            },
+            turn=12,
+            rng=random.Random(12),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 4)
+        self.assertTrue(target["flying"])
+        self.assertEqual(target["keywords"], ["vigilance", "flying"])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Wings"
+                and data.get("target") == "Ground Bear"
+                and data.get("granted_keywords_until_eot") == ["flying"]
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(target["power"], 2)
+        self.assertEqual(target["toughness"], 2)
+        self.assertEqual(target["keywords"], ["vigilance"])
+        self.assertNotIn("flying", target)
+
     def test_stat_modifier_until_eot_spell_can_kill_opponent_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

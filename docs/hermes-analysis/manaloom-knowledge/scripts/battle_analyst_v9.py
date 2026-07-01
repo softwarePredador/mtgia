@@ -4190,6 +4190,17 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
     remember_until_eot(target, "toughness")
     target["power"] = power_before + power_delta
     target["toughness"] = toughness_before + toughness_delta
+    granted_keywords = [
+        str(keyword or "").strip()
+        for keyword in (effect_data.get("granted_keywords_until_eot") or [])
+        if str(keyword or "").strip()
+    ]
+    if granted_keywords:
+        current_keywords = list(target.get("keywords") or [])
+        merged_keywords = list(dict.fromkeys([*current_keywords, *granted_keywords]))
+        set_until_eot(target, "keywords", merged_keywords)
+        for keyword in granted_keywords:
+            set_until_eot(target, keyword, True)
     power_after = int(float(target.get("power") or 0))
     toughness_after = int(float(target.get("toughness") or target.get("power") or 0))
     destination = None
@@ -4221,6 +4232,7 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         target_toughness_after=toughness_after,
         power_delta=power_delta,
         toughness_delta=toughness_delta,
+        granted_keywords_until_eot=granted_keywords,
         result=result,
         destination=destination,
         available_targets=len(target_options),

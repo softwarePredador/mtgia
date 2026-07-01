@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg304_creature_etb_token_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg305_boost_keyword_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27677`
-- XMage authoritative source resolved: `27363`
+- target all-card battle-gap identities: `27650`
+- XMage authoritative source resolved: `27336`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27363`
+- XMage authoritative adapter required: `27336`
 - ManaLoom adapter work-unit keys: `11429`
-- authoritative source coverage ratio: `0.9887`
+- authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27363` identities, card semantics are accepted from XMage; work is now
+- For `27336` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG304 Exact Adapter Waves
+## PG283-PG305 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG304 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG305 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -230,6 +230,10 @@ patterns:
   `xmage_fixed_add_counters_target_creature_spell_v1`
 - `xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting` ->
   `xmage_fixed_boost_target_creature_until_eot_spell_v1`
+- `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+  with one `BoostTargetEffect`, one `GainAbilityTargetEffect`, one fixed target
+  creature, and exact until-end-of-turn keyword Oracle text ->
+  `xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1`
 - `xmage_signature::no_effect_class::<combat keyword ability classes>::no_target_class::no_condition_class::no_signal` ->
   `xmage_static_self_combat_keyword_creature_v1`
 - `token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token` with

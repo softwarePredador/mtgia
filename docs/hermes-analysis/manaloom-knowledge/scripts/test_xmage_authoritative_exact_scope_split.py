@@ -951,6 +951,56 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_target_source_not_single_fixed")
 
+    def test_fixed_boost_keyword_target_creature_maps_to_stat_modifier_with_keyword(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["FlyingAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text="Target creature you control gets +1/+1 and gains flying until end of turn."
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 1, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "FlyingAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "stat_modifier_until_eot")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_KEYWORD_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["flying"])
+        self.assertEqual(effect["target_controller"], "self")
+
+    def test_fixed_boost_keyword_requires_target_controller_match(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["TrampleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gets +2/+2 and gains trample until end of turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(2, 2, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "TrampleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetControlledCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_keyword_source_oracle_target_mismatch")
+
     def test_static_combat_keyword_creature_maps_to_creature_with_keywords(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",

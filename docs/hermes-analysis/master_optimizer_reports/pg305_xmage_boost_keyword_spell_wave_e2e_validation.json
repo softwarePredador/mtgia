@@ -1,0 +1,980 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T12:46:14.696083+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_manifest.json",
+  "package_id": "pg305_xmage_boost_keyword_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Awaken the Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Bestow Greatness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed",
+          "oracle_hash": "467a19f71881fd720f7d13f538a4f98c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Colossal Might",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:de5944bc08a8722fed1f5d6074d14a70",
+          "oracle_hash": "434f2df5c5d257fdfe92270c02dbd7c4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Crash the Ramparts",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fanatical Fever",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f49c32ccf671ac5a1e6c342d8300fe5",
+          "oracle_hash": "65d3b1da504d83abf67171b2f703614c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fanatical Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fit of Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06c741f842b5bbcfc4e84fbbddd4bcdb",
+          "oracle_hash": "1584fa97236b36542d469bc73db32124",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Flowstone Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25320a2f2832cfb1e19391dcb65b7a31",
+          "oracle_hash": "a15167a94c91bb507e49612c4e31f03e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Gift of Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6fa40610cc46dc112db856d05e1d6fb5",
+          "oracle_hash": "33d24712d115b02d428d5d7fe74cd0e4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Give In to Violence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:921d62d7b77a16a68193a4dd2907e79a",
+          "oracle_hash": "6d1d1c565ac94f21e382be5c6bbf14db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Interjection",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd",
+          "oracle_hash": "48587a2f80ce949a40d73619aa4022bf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Larger Than Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18775898a3dc6af0bee9c3d53d1040ab",
+          "oracle_hash": "467a19f71881fd720f7d13f538a4f98c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of Thorns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bb8ec835ade411ad00191eb09e719823",
+          "oracle_hash": "ac73c4ba063af815b30c013e08fde906",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Mighty Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cadd14648d5c61c5515a5d6db1897244",
+          "oracle_hash": "51a033aa2d5cae49c442fad7b6e4ed85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Precise Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e2b7ef68567218c1936dba6a26881be",
+          "oracle_hash": "5a93509f9e377be2774b8d3f059a0999",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rise to the Challenge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
+          "oracle_hash": "262b967f9e07cb229f7af108b99ce784",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rush of Adrenaline",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c7f8b2ca1bfdb6d7d22a8aeee669ae55",
+          "oracle_hash": "a3de402cee644d7e02aaa5f3b248ec0b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Sangrite Surge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d65b218f0e6e135fb9b13d5c109ff51f",
+          "oracle_hash": "ea990510dbae320f30808970949e9a67",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Screaming Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:629993278610b6e4dcea82f544188eb3",
+          "oracle_hash": "774f350fa50dd102cac476145439fcec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Seize the Initiative",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:af934f624c23f546111efb40f2347dde",
+          "oracle_hash": "0b985f3c9cdf22d7b5f69aba8687def2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Skillful Lunge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
+          "oracle_hash": "262b967f9e07cb229f7af108b99ce784",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Staggering Size",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Tread Upon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17181b3758715c010ef6b1ac5aeecea7",
+          "oracle_hash": "1fcfc2f2cec4a68ec5f3b7fd8776a0f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Uncaged Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6530137c29850c260b0379db8edcfb49",
+          "oracle_hash": "a7b3a15f7625a99f457ec344ac7be67f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Uncanny Speed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f013574936f5e8fffea57206aa10f2b",
+          "oracle_hash": "6a5fae188bf21d06857b84f18c1d7127",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Unnatural Predation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17a1ee402481bfe5f083f29b642eb1ef",
+          "oracle_hash": "9d2e3ad41f65070991cbbe239661357c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Zealous Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd",
+          "oracle_hash": "48587a2f80ce949a40d73619aa4022bf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 27
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Awaken the Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Bestow Greatness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed",
+          "oracle_hash": "467a19f71881fd720f7d13f538a4f98c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Colossal Might",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:de5944bc08a8722fed1f5d6074d14a70",
+          "oracle_hash": "434f2df5c5d257fdfe92270c02dbd7c4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Crash the Ramparts",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fanatical Fever",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4f49c32ccf671ac5a1e6c342d8300fe5",
+          "oracle_hash": "65d3b1da504d83abf67171b2f703614c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fanatical Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Fit of Rage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:06c741f842b5bbcfc4e84fbbddd4bcdb",
+          "oracle_hash": "1584fa97236b36542d469bc73db32124",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Flowstone Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25320a2f2832cfb1e19391dcb65b7a31",
+          "oracle_hash": "a15167a94c91bb507e49612c4e31f03e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Gift of Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6fa40610cc46dc112db856d05e1d6fb5",
+          "oracle_hash": "33d24712d115b02d428d5d7fe74cd0e4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Give In to Violence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:921d62d7b77a16a68193a4dd2907e79a",
+          "oracle_hash": "6d1d1c565ac94f21e382be5c6bbf14db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Interjection",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd",
+          "oracle_hash": "48587a2f80ce949a40d73619aa4022bf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Larger Than Life",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:18775898a3dc6af0bee9c3d53d1040ab",
+          "oracle_hash": "467a19f71881fd720f7d13f538a4f98c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Lash of Thorns",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bb8ec835ade411ad00191eb09e719823",
+          "oracle_hash": "ac73c4ba063af815b30c013e08fde906",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Mighty Leap",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cadd14648d5c61c5515a5d6db1897244",
+          "oracle_hash": "51a033aa2d5cae49c442fad7b6e4ed85",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Precise Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0e2b7ef68567218c1936dba6a26881be",
+          "oracle_hash": "5a93509f9e377be2774b8d3f059a0999",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rise to the Challenge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
+          "oracle_hash": "262b967f9e07cb229f7af108b99ce784",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Rush of Adrenaline",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c7f8b2ca1bfdb6d7d22a8aeee669ae55",
+          "oracle_hash": "a3de402cee644d7e02aaa5f3b248ec0b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Sangrite Surge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d65b218f0e6e135fb9b13d5c109ff51f",
+          "oracle_hash": "ea990510dbae320f30808970949e9a67",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Screaming Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:629993278610b6e4dcea82f544188eb3",
+          "oracle_hash": "774f350fa50dd102cac476145439fcec",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Seize the Initiative",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:af934f624c23f546111efb40f2347dde",
+          "oracle_hash": "0b985f3c9cdf22d7b5f69aba8687def2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Skillful Lunge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
+          "oracle_hash": "262b967f9e07cb229f7af108b99ce784",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Staggering Size",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a",
+          "oracle_hash": "f0147d752ed8a8422b059b7e81fe1058",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Tread Upon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17181b3758715c010ef6b1ac5aeecea7",
+          "oracle_hash": "1fcfc2f2cec4a68ec5f3b7fd8776a0f0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Uncaged Fury",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6530137c29850c260b0379db8edcfb49",
+          "oracle_hash": "a7b3a15f7625a99f457ec344ac7be67f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Uncanny Speed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f013574936f5e8fffea57206aa10f2b",
+          "oracle_hash": "6a5fae188bf21d06857b84f18c1d7127",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Unnatural Predation",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17a1ee402481bfe5f083f29b642eb1ef",
+          "oracle_hash": "9d2e3ad41f65070991cbbe239661357c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "card_name": "Zealous Strike",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd",
+          "oracle_hash": "48587a2f80ce949a40d73619aa4022bf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Awaken the Bear",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bestow Greatness",
+          "logical_rule_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Colossal Might",
+          "logical_rule_key": "battle_rule_v1:de5944bc08a8722fed1f5d6074d14a70"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crash the Ramparts",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fanatical Fever",
+          "logical_rule_key": "battle_rule_v1:4f49c32ccf671ac5a1e6c342d8300fe5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fanatical Strength",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fit of Rage",
+          "logical_rule_key": "battle_rule_v1:06c741f842b5bbcfc4e84fbbddd4bcdb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Flowstone Strike",
+          "logical_rule_key": "battle_rule_v1:25320a2f2832cfb1e19391dcb65b7a31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gift of Strength",
+          "logical_rule_key": "battle_rule_v1:6fa40610cc46dc112db856d05e1d6fb5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Give In to Violence",
+          "logical_rule_key": "battle_rule_v1:921d62d7b77a16a68193a4dd2907e79a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Interjection",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Larger Than Life",
+          "logical_rule_key": "battle_rule_v1:18775898a3dc6af0bee9c3d53d1040ab"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lash of Thorns",
+          "logical_rule_key": "battle_rule_v1:bb8ec835ade411ad00191eb09e719823"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mighty Leap",
+          "logical_rule_key": "battle_rule_v1:cadd14648d5c61c5515a5d6db1897244"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Precise Strike",
+          "logical_rule_key": "battle_rule_v1:0e2b7ef68567218c1936dba6a26881be"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rise to the Challenge",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rush of Adrenaline",
+          "logical_rule_key": "battle_rule_v1:c7f8b2ca1bfdb6d7d22a8aeee669ae55"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sangrite Surge",
+          "logical_rule_key": "battle_rule_v1:d65b218f0e6e135fb9b13d5c109ff51f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Screaming Fury",
+          "logical_rule_key": "battle_rule_v1:629993278610b6e4dcea82f544188eb3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seize the Initiative",
+          "logical_rule_key": "battle_rule_v1:af934f624c23f546111efb40f2347dde"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skillful Lunge",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Staggering Size",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tread Upon",
+          "logical_rule_key": "battle_rule_v1:17181b3758715c010ef6b1ac5aeecea7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Uncaged Fury",
+          "logical_rule_key": "battle_rule_v1:6530137c29850c260b0379db8edcfb49"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Uncanny Speed",
+          "logical_rule_key": "battle_rule_v1:9f013574936f5e8fffea57206aa10f2b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Unnatural Predation",
+          "logical_rule_key": "battle_rule_v1:17a1ee402481bfe5f083f29b642eb1ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zealous Strike",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 27
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Awaken the Bear",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bestow Greatness",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Colossal Might",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:de5944bc08a8722fed1f5d6074d14a70"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crash the Ramparts",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fanatical Fever",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:4f49c32ccf671ac5a1e6c342d8300fe5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fanatical Strength",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fit of Rage",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:06c741f842b5bbcfc4e84fbbddd4bcdb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Flowstone Strike",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:25320a2f2832cfb1e19391dcb65b7a31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gift of Strength",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6fa40610cc46dc112db856d05e1d6fb5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Give In to Violence",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:921d62d7b77a16a68193a4dd2907e79a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Interjection",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Larger Than Life",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:18775898a3dc6af0bee9c3d53d1040ab"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lash of Thorns",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:bb8ec835ade411ad00191eb09e719823"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mighty Leap",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:cadd14648d5c61c5515a5d6db1897244"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Precise Strike",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:0e2b7ef68567218c1936dba6a26881be"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rise to the Challenge",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rush of Adrenaline",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:c7f8b2ca1bfdb6d7d22a8aeee669ae55"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sangrite Surge",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:d65b218f0e6e135fb9b13d5c109ff51f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Screaming Fury",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:629993278610b6e4dcea82f544188eb3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seize the Initiative",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:af934f624c23f546111efb40f2347dde"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skillful Lunge",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Staggering Size",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9163dea3a4511d5276a90376e477b12a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tread Upon",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:17181b3758715c010ef6b1ac5aeecea7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Uncaged Fury",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6530137c29850c260b0379db8edcfb49"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Uncanny Speed",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9f013574936f5e8fffea57206aa10f2b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Unnatural Predation",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:17a1ee402481bfe5f083f29b642eb1ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zealous Strike",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
