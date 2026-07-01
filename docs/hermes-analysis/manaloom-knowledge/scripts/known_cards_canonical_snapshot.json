@@ -2593,6 +2593,34 @@
     "battle_rule_logical_key": "battle_rule_v1:ca223e0299028677b4a0b4e45cd0c75e",
     "battle_rule_oracle_hash": "536d078a076180a38cf3f87e757e67b8"
   },
+  "Anthem of Champions": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
+    "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
+  },
   "Anvil of Bogardan": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -5564,6 +5592,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e91c0024c11eb7533d3b6bccc877f31e"
   },
+  "Battle Sliver": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_required_subtypes": [
+      "sliver"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "sliver"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:60e35ba25a2e0d7ff24564fe0942b8c2",
+    "battle_rule_oracle_hash": "de6fce82cc922326e827ac9bb7d074da"
+  },
   "Battlefield Forge": {
     "battle_model_scope": "pain_land_colorless_or_boros_mana_life_loss_runtime_v1",
     "colorless_mana_life_loss": 0,
@@ -6014,6 +6076,34 @@
     "battle_rule_logical_key": "battle_rule_v1:abd1c0f34c739ff646806725283ab285",
     "battle_rule_oracle_hash": "8c4b52de0b3d7a4a30116a40dcc51dd1"
   },
+  "Benalish Marshal": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f02b2deb33fa99677fcd434c5d27a1e4",
+    "battle_rule_oracle_hash": "c2697c07d36a7fa3b054ad337b71714b"
+  },
   "Bender's Waterskin": {
     "battle_model_scope": "artifact_any_color_mana_rock_untaps_each_opponent_untap_step_v1",
     "cmc": 3.0,
@@ -6248,6 +6338,16 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5d3ec3f1d92cfe2044d0172c4e3765ba",
     "battle_rule_oracle_hash": "2119fc1976cfab2480a9d86c57f1859b"
+  },
+  "Birds of Paradise // Birds of Paradise": {
+    "cmc": 1.0,
+    "effect": "ramp_permanent",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "disabled",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43"
   },
   "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
     "ability_kind": "triggered",
@@ -6531,6 +6631,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a48e59b8a7ed03df606ba36d44936260"
   },
+  "Bladestitched Skaab": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "zombie"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "zombie"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:737f8d061edc246384dcca90775c5415",
+    "battle_rule_oracle_hash": "4b21406d6b423eb82f32ca998acb32ed"
+  },
   "Blasphemous Act": {
     "battle_model_scope": "blasphemous_act_damage_13_each_creature_dynamic_cost_v1",
     "cmc": 9.0,
@@ -6675,6 +6809,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e35e9434e3ba0e376ce4d59aeeca7c53",
     "battle_rule_oracle_hash": "8ce7e0891951f4240f4cc67d1b944bb0"
+  },
+  "Blessed Orator": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 0,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6896f59ac19797e5e104d00702887972",
+    "battle_rule_oracle_hash": "adcd42dc75e7711099a8b3c1c8edb7db"
   },
   "Blessed Wind": {
     "cmc": 9.0,
@@ -8787,6 +8949,42 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Broodwarden": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_required_subtypes": [
+      "eldrazi",
+      "spawn"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "eldrazi",
+        "spawn"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b97ce15000b3e1d8a086253885e312b4",
+    "battle_rule_oracle_hash": "87bd4904fba7d9d413eefa990cb506f9"
   },
   "Brotherhood Headquarters": {
     "effect": "land",
@@ -11027,6 +11225,104 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Chief of the Edge": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "warrior"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "warrior"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f2b42ee23e399ee440f73b58e0c9604a",
+    "battle_rule_oracle_hash": "4fbf1158aa7e758fa6a4937092608d76"
+  },
+  "Chief of the Foundry": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_artifact_creature": true,
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e4985c9eebe10bd0769a39956fa0d1a2",
+    "battle_rule_oracle_hash": "b2850c84ef7b6c75d06bf9bf827751df"
+  },
+  "Chief of the Scale": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 0,
+    "static_required_subtypes": [
+      "warrior"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "warrior"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9272ceffa9ca8197ab8f059e501f6fb2",
+    "battle_rule_oracle_hash": "68b98ee9526f8f6463917c89ddb17a4a"
+  },
   "Child of Night": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -11636,6 +11932,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Cleaving Sliver": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_required_subtypes": [
+      "sliver"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "sliver"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:60e35ba25a2e0d7ff24564fe0942b8c2",
+    "battle_rule_oracle_hash": "de6fce82cc922326e827ac9bb7d074da"
+  },
   "Cleric Class": {
     "cmc": 1.0,
     "effect": "recursion",
@@ -12091,6 +12421,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "46ad40844d44d9b32843f29a0e83290b"
+  },
+  "Collective Blessing": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 3,
+    "static_toughness_bonus": 3,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a74605cdb38825bda628bc9b56a3035c",
+    "battle_rule_oracle_hash": "36cc7a5e307c7a9b01edf04a91b44a13"
   },
   "Collective Resistance": {
     "cmc": 2.0,
@@ -14877,6 +15235,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869",
     "battle_rule_oracle_hash": "5d557f45692ae19657cdec6ba5053d52"
+  },
+  "Day of Destiny": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_required_supertypes": [
+      "legendary"
+    ],
+    "static_toughness_bonus": 2,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "supertypes": [
+        "legendary"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:923b32156cd90e5b521de88e09797000",
+    "battle_rule_oracle_hash": "3b350fa8f4fda82be1d0f0468717cdbf"
   },
   "Day of Judgment": {
     "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
@@ -22423,6 +22815,18 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:abcfd8a217652da7900e0b2e59338ac4"
   },
+  "Fell the Profane // Fell Mire": {
+    "cmc": 4.0,
+    "effect": "remove_creature",
+    "instant": true,
+    "target": "creature",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "review_only",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:dfad90ea3d1b8c336de2d7bbf25442b4"
+  },
   "Fellwar Stone": {
     "battle_model_scope": "conditional_opponent_color_mana_rock_v1",
     "cmc": 2.0,
@@ -23262,6 +23666,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "2166542fdd309faf49b670f6c0bafbc9"
+  },
+  "Fire Nation's Conquest": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a97302af0fe4a11ba8832e28e46dda13",
+    "battle_rule_oracle_hash": "b71064ba687c902897d42ed861260b04"
   },
   "Fire-Lit Thicket": {
     "effect": "land",
@@ -24671,6 +25103,34 @@
     "battle_rule_logical_key": "battle_rule_v1:25320a2f2832cfb1e19391dcb65b7a31",
     "battle_rule_oracle_hash": "a15167a94c91bb507e49612c4e31f03e"
   },
+  "Flowstone Surge": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": -1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2783b9eda902669f0a52e7fa7cebff59",
+    "battle_rule_oracle_hash": "b3880d3f4b839272685941bff5e27e9f"
+  },
   "Flurry of Horns": {
     "ability_kind": "one_shot",
     "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
@@ -26043,6 +26503,34 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b7602d6f4394bcf05ab962f0f844ef1d"
+  },
+  "Gaea's Anthem": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
+    "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
   },
   "Gaea's Cradle": {
     "effect": "land",
@@ -27793,6 +28281,34 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Glorious Anthem": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
+    "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
   },
   "Glorious End": {
     "cmc": 3.0,
@@ -29717,6 +30233,16 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:efb8905b224067dc9b1c61e0bf194bfe"
+  },
+  "Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun": {
+    "cmc": 3.0,
+    "effect": "topdeck_manipulation",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "review_only",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:6ef4e3fb06fb42f336d38ac6e724ccdd"
   },
   "Growth Spiral": {
     "cmc": 2.0,
@@ -33651,6 +34177,50 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "eb2813246000c2c0bfe218cb61fed144"
   },
+  "Inspiring Veteran": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "knight"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "knight"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e91cb54787c150a950c0124054309126",
+    "battle_rule_oracle_hash": "f1e5196107c2b2cc34a6309cd0a73705"
+  },
+  "Insult // Injury": {
+    "cmc": 3.0,
+    "effect": "finisher",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "review_only",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:802683f320c420eff2f09721ebefad4d"
+  },
   "Insurrection": {
     "battle_model_scope": "steal_all_creatures_until_eot_haste_attack_projection_v1",
     "cmc": 8.0,
@@ -35150,6 +35720,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Kargan Warleader": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "warrior"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "warrior"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3888e024ddb8283ee06cac5022629ff5",
+    "battle_rule_oracle_hash": "c5a2c8adbc918e2900a71987b6103905"
+  },
   "Karmic Guide": {
     "effect": "creature",
     "etb_recursion_count": 1,
@@ -35819,6 +36423,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d62df448f2eebf9b8e6c988fb52b288f"
   },
+  "King of the Pride": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 2,
+    "static_required_subtypes": [
+      "cat"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "cat"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fbeb25a093587cc9a1861d69d53973f6",
+    "battle_rule_oracle_hash": "3b9d6fd52d39b2f4630218f3c594b85e"
+  },
   "Kingfisher": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -36227,6 +36865,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "34800e10f2cc4ada6a104213ade817dc"
+  },
+  "Kongming, \"Sleeping Dragon\"": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f02b2deb33fa99677fcd434c5d27a1e4",
+    "battle_rule_oracle_hash": "c2697c07d36a7fa3b054ad337b71714b"
   },
   "Kor Haven": {
     "effect": "land",
@@ -40295,6 +40961,40 @@
     "battle_rule_logical_key": "battle_rule_v1:6391ead7eef36b3bba201942eb647ba7",
     "battle_rule_oracle_hash": "5d011f88becddfad22856da64756453e"
   },
+  "Megantic Sliver": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 3,
+    "static_required_subtypes": [
+      "sliver"
+    ],
+    "static_toughness_bonus": 3,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "sliver"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:af52f2522b722ebd8183cdb6797cddb6",
+    "battle_rule_oracle_hash": "839dd112df96c77d969fe686550df871"
+  },
   "Megrim": {
     "ability_kind": "triggered",
     "battle_model_scope": "opponent_discards_card_damage_that_player_v1",
@@ -42577,6 +43277,16 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Mountain": {
+    "cmc": 0.0,
+    "effect": "land",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "disabled",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167"
   },
   "Mountain // Mountain": {
     "ability_kind": "activated",
@@ -47493,6 +48203,16 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:a1b95017c34d505762b96c3b3aeded78"
   },
+  "Plains": {
+    "cmc": 0.0,
+    "effect": "land",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "disabled",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:33d0f77ed0b6806a7128dbd3d865b167"
+  },
   "Plains // Plains": {
     "ability_kind": "activated",
     "basic_land_types": [
@@ -48102,6 +48822,40 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+  },
+  "Pride of the Perfect": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_required_subtypes": [
+      "elf"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "elf"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b4cc6f3cfe337a9c2a808ff3d25ea3b2",
+    "battle_rule_oracle_hash": "c4f245b2116bae57eae095150622198f"
   },
   "Priest of Forgotten Gods": {
     "cmc": 2.0,
@@ -51227,6 +51981,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:41a3506a6969888f362a122077db87cb",
     "battle_rule_oracle_hash": "08a27b0252c823f1a0d6532701925010"
+  },
+  "Regal Imperiosaur": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "dinosaur"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "dinosaur"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7276dce362b3959d6b6c3e533a890d64",
+    "battle_rule_oracle_hash": "a164459e356158f9a6c09fd21e728207"
   },
   "Regenesis": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -60387,6 +61175,16 @@
     "battle_rule_logical_key": "battle_rule_v1:42621fcae461313f674d46db0da059af",
     "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
+  "Sol Ring // Sol Ring": {
+    "cmc": 1.0,
+    "effect": "ramp_permanent",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "disabled",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:0efab52e2fe6c51956a3d94ac671fd43"
+  },
   "Soldevi Excavations": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -61754,6 +62552,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:26190cd09ff09f21859165388f24587b"
   },
+  "Squirrel Sovereign": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "squirrel"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "squirrel"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:533e58728b30227e7e05654b691f7a30",
+    "battle_rule_oracle_hash": "f5cb868f4d425b80d061a35086747103"
+  },
   "Squirrelanoids": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -62293,6 +63125,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8358ad4dae1cce40788051c6c95584b9",
     "battle_rule_oracle_hash": "5c9312a9432775bc6a4073c667c0407e"
+  },
+  "Steelform Sliver": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 0,
+    "static_required_subtypes": [
+      "sliver"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "sliver"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8637b946a1643e28c2e684fba5071c4b",
+    "battle_rule_oracle_hash": "bd6465bc1dbde9cc3b35f344518f4255"
   },
   "Steelshaper's Gift": {
     "ability_kind": "one_shot",
@@ -65661,6 +66527,36 @@
     "battle_rule_logical_key": "battle_rule_v1:2b97b9a6db5fae915b68ed6352aec8ac",
     "battle_rule_oracle_hash": "ce0223742a8d4366cdc69c977caf472c"
   },
+  "Tempered Steel": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "passive",
+    "permanent_type": "enchantment",
+    "static_applies_to": "creatures_you_control",
+    "static_artifact_creature": true,
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": false,
+    "static_power_bonus": 2,
+    "static_toughness_bonus": 2,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b00fb97fd02aaf64bb1252495a35cf1c",
+    "battle_rule_oracle_hash": "aeffe1ab96adc1e78b328ff57802d4d4"
+  },
   "Tempest Drake": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -67096,6 +67992,40 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:fc6cfe6af63487d983f2abf5c9519782"
+  },
+  "Thirsting Bloodlord": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "vampire"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "vampire"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2b41b043ff02a8ffb1cadfc6e0da99b6",
+    "battle_rule_oracle_hash": "d6ffdb46787ded9a85924bb45b6c234a"
   },
   "Thirsting Roots": {
     "cmc": 1.0,
@@ -70092,6 +71022,16 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:65ec1069a1f4ab42ccc1ec21a27885d6"
   },
+  "Ugin, Eye of the Storms // Ugin, Eye of the Storms": {
+    "cmc": 7.0,
+    "effect": "draw_cards",
+    "battle_rule_source": "generated",
+    "battle_rule_review_status": "needs_review",
+    "battle_rule_execution_status": "review_only",
+    "battle_rule_confidence": 0.55,
+    "battle_rule_version": 1,
+    "battle_rule_logical_key": "battle_rule_v1:49959166c74f2c4ab715186557d0a17f"
+  },
   "Ugin, the Ineffable": {
     "cmc": 6.0,
     "effect": "remove_permanent",
@@ -72182,6 +73122,68 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Veteran Armorer": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 0,
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6896f59ac19797e5e104d00702887972",
+    "battle_rule_oracle_hash": "adcd42dc75e7711099a8b3c1c8edb7db"
+  },
+  "Veteran Armorsmith": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 0,
+    "static_required_subtypes": [
+      "soldier"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "soldier"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6d3c9cf1ff08ea44f3ad34f4bb40f693",
+    "battle_rule_oracle_hash": "fbbf3e12220b79b3b77c9a81baeb5e39"
+  },
   "Veteran Cavalier": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -72200,6 +73202,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "fb84a3bb7563739be586d1570e8c9a56"
+  },
+  "Veteran Swordsmith": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "soldier"
+    ],
+    "static_toughness_bonus": 0,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "soldier"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:425b33e7d92eb4746bf961ac5645241b",
+    "battle_rule_oracle_hash": "e47cdada763569a6ed0d1bdbd9527652"
   },
   "Vexing Bauble": {
     "activated_draw_on_self_sacrifice": true,
@@ -75695,6 +76731,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Wizened Cenn": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "kithkin"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "kithkin"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:887f40400a0eea3cb51c891a258c29eb",
+    "battle_rule_oracle_hash": "4ed7bdb3e9d94870a0673b4901f1b477"
+  },
   "Woe Strider": {
     "cmc": 3.0,
     "effect": "token_maker",
@@ -76312,6 +77382,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
+  },
+  "Yotian Tactician": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+    "effect": "creature",
+    "permanent_type": "creature",
+    "static_applies_to": "creatures_you_control",
+    "static_effect": "controlled_power_toughness_boost",
+    "static_exclude_source": true,
+    "static_power_bonus": 1,
+    "static_required_subtypes": [
+      "soldier"
+    ],
+    "static_toughness_bonus": 1,
+    "target": "controlled_creatures",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "soldier"
+      ]
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostControlledEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5037a89710fa8f2fe3658b333c2db3aa",
+    "battle_rule_oracle_hash": "a265aaeb5e89871e6877e48b66ded6d3"
   },
   "You Cannot Pass!": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",

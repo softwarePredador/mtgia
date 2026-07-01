@@ -50,7 +50,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`.
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`.
   - Manifesto de replay corrente para o checkpoint operacional:
     `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
@@ -78,9 +78,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG320:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`.
-    Resultado all-card: `27374` identidades ainda com gap, `27060` com fonte
+    Evidencia corrente pos-PG321:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`.
+    Resultado all-card: `27342` identidades ainda com gap, `27028` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
     gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -117,10 +117,13 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `Sanitarium Skeleton` e `Firewing Phoenix`. O PG320 adicionou `14`
     permanentes com habilidade ativada simples de ganho de vida fixo, incluindo
     `Bottle Gnomes`, `Fountain of Youth`, `Tower of Eons` e `Zarichi Tiger`.
-    Todos os pacotes PG285-PG320
+    O PG321 adicionou `32` estaticas exatas de poder/resistencia para criaturas
+    controladas via `BoostControlledEffect + SimpleStaticAbility`, incluindo
+    anthem/lord, subtipo, artefato criatura e criatura lendaria. Todos os
+    pacotes PG285-PG321
     passaram postcheck PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O
-    splitter pos-PG320 retorna `proposal_count=0` sobre `8012` linhas
-    suportadas consideradas; a
+    splitter PG321 selecionou `32` propostas e a fila pos-PG321 caiu para
+    `27028` adapters XMage pendentes; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
     reducao reutilizavel, partindo da fila global e nao de decks cadastrados.
 

@@ -30,6 +30,130 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.battle.REPLAY_EVENT_HANDLER = self.previous_handler
 
+    def test_static_controlled_power_toughness_boost_applies_without_accumulating(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        anthem = {
+            "name": "Glorious Anthem",
+            "type_line": "Enchantment",
+            "effect": "passive",
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+            "static_exclude_source": False,
+        }
+        bear = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [anthem, bear]
+        opponent.battlefield = [enemy]
+
+        self.battle.refresh_controlled_static_power_toughness_bonuses(
+            active,
+            turn=1,
+            phase="test",
+            emit_events=True,
+        )
+        self.battle.refresh_controlled_static_power_toughness_bonuses(
+            active,
+            turn=1,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(bear["power"], 3)
+        self.assertEqual(bear["toughness"], 3)
+        self.assertEqual(enemy["power"], 2)
+        self.assertEqual(enemy["toughness"], 2)
+        self.assertEqual(bear["static_power_toughness_sources"], ["Glorious Anthem"])
+        self.assertTrue(
+            any(
+                event == "static_power_toughness_boost_changed"
+                and data.get("card") == "Active Bear"
+                and data.get("power_after") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_static_controlled_power_toughness_boost_reverts_when_source_leaves(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        anthem = {
+            "name": "Glorious Anthem",
+            "type_line": "Enchantment",
+            "effect": "passive",
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+        }
+        bear = {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [anthem, bear]
+
+        self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+        active.battlefield.remove(anthem)
+        self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+
+        self.assertEqual(bear["power"], 2)
+        self.assertEqual(bear["toughness"], 2)
+        self.assertNotIn("static_power_toughness_sources", bear)
+        self.assertNotIn("_static_controlled_pt_power_bonus", bear)
+
+    def test_static_controlled_power_toughness_boost_respects_exclude_source_and_artifact_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        chief = {
+            "name": "Chief of the Foundry",
+            "type_line": "Artifact Creature - Construct",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 3,
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_power_bonus": 1,
+            "static_toughness_bonus": 1,
+            "static_exclude_source": True,
+            "static_artifact_creature": True,
+        }
+        construct = {
+            "name": "Ally Construct",
+            "type_line": "Artifact Creature - Construct",
+            "power": 2,
+            "toughness": 2,
+        }
+        bear = {"name": "Ally Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield = [chief, construct, bear]
+
+        self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+
+        self.assertEqual(chief["power"], 2)
+        self.assertEqual(chief["toughness"], 3)
+        self.assertEqual(construct["power"], 3)
+        self.assertEqual(construct["toughness"], 3)
+        self.assertEqual(bear["power"], 2)
+        self.assertEqual(bear["toughness"], 2)
+
+    def test_static_controlled_power_toughness_boost_respects_subtype_filter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        lord = {
+            "name": "Pride of the Perfect",
+            "type_line": "Enchantment",
+            "effect": "passive",
+            "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 0,
+            "static_required_subtypes": ["elf"],
+        }
+        elf = {"name": "Ally Elf", "type_line": "Creature - Elf Warrior", "power": 1, "toughness": 1}
+        goblin = {"name": "Ally Goblin", "type_line": "Creature - Goblin", "power": 1, "toughness": 1}
+        active.battlefield = [lord, elf, goblin]
+
+        self.battle.refresh_controlled_static_power_toughness_bonuses(active)
+
+        self.assertEqual(elf["power"], 3)
+        self.assertEqual(elf["toughness"], 1)
+        self.assertEqual(goblin["power"], 1)
+        self.assertEqual(goblin["toughness"], 1)
+
     def test_fixed_source_controller_draw_spell_draws_requested_cards(self) -> None:
         active = self.battle.Player(
             "Active",

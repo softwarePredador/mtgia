@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG315. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG321. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -131,7 +131,12 @@ handling, target-creature legality, supported `haste`/`flying`/`trample`/
 `first_strike` grants, and until-end-of-turn cleanup; PG315 added 19 exact
 permanent activated target-creature boost/debuff rules with mana/tap activation
 handling, beneficial/harmful target selection, zero-toughness cleanup, and
-until-end-of-turn cleanup.
+until-end-of-turn cleanup; PG316 added 9 source-sacrifice target-boost rules;
+PG317 added 5 target-keyword rules on sources that also carry static self
+keywords; PG318 added 13 exact library tutors to battlefield or library top;
+PG319 added 6 graveyard self-return activated rules; PG320 added 14 fixed
+activated life-gain permanents; PG321 added 32 exact static controlled-creature
+power/toughness boosts from `BoostControlledEffect + SimpleStaticAbility`.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -313,16 +318,19 @@ Evidence:
 - `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_e2e_validation.md`
 - `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_pg_to_sqlite_sync.json`
 - `master_optimizer_reports/pg320_xmage_permanent_activated_life_gain_wave_battle_rules_pg_to_sqlite_sync.json`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg320_existing_supported_recheck.md`
+- `master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_package.md`
+- `master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_e2e_validation.md`
+- `master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg321_static_controlled_pt_wave.md`
 
-After PG320, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `8012` considered supported rows; continue by adding a
-new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG320 queue is the current scheduling
-source: `target_identity_count=27374`, `xmage_authoritative_source_count=27060`,
-`xmage_authoritative_adapter_required_count=27060`, `parser_gap=0`, and
-`xmage_missing_source_exception_count=314`.
+After PG321, the post-static-P/T queue is the current scheduling source:
+`target_identity_count=27342`, `xmage_authoritative_source_count=27028`,
+`xmage_authoritative_adapter_required_count=27028`, `parser_gap=0`, and
+`xmage_missing_source_exception_count=314`. Continue by adding a new exact
+subpattern/runtime adapter for a remaining high-volume family from that queue;
+do not schedule from any older PG315/PG320 queue artifact.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
 approved PostgreSQL mutation through the evidence runner instead of ad hoc SQL:

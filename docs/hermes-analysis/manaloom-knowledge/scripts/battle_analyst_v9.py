@@ -7608,6 +7608,14 @@ CARD_EFFECT_FIELD_RULE_KEYS = (
     "count",
     "life_gain_amount",
     "activated_life_gain_amount",
+    "static_effect",
+    "static_applies_to",
+    "static_power_bonus",
+    "static_toughness_bonus",
+    "static_exclude_source",
+    "static_required_subtypes",
+    "static_required_supertypes",
+    "static_artifact_creature",
     "mana_produced",
     "produces",
     "activation_requires_tap",
@@ -11380,6 +11388,12 @@ def move_permanent_from_battlefield_to_hand(owner, permanent, *, reason=None, so
         source=source,
     )
     refresh_controlled_static_indestructible(
+        owner,
+        turn=turn if turn is not None else CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_power_toughness_bonuses(
         owner,
         turn=turn if turn is not None else CURRENT_REPLAY_TURN,
         phase="leave_battlefield",
@@ -17247,6 +17261,12 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         phase="leave_battlefield",
         emit_events=True,
     )
+    refresh_controlled_static_power_toughness_bonuses(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
     return destination
 
 
@@ -17297,6 +17317,12 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             source_event=str(reason or "battlefield_to_graveyard"),
         )
     refresh_controlled_static_indestructible(
+        owner,
+        turn=CURRENT_REPLAY_TURN,
+        phase="leave_battlefield",
+        emit_events=True,
+    )
+    refresh_controlled_static_power_toughness_bonuses(
         owner,
         turn=CURRENT_REPLAY_TURN,
         phase="leave_battlefield",
@@ -17422,6 +17448,10 @@ def removal_target_candidates(player, effect_data=None, *, controller=None, sour
     if not target_type:
         target_type = "creature" if effect == "remove_creature" else "nonland_permanent"
     refresh_controlled_static_indestructible(
+        player,
+        phase="target_selection",
+    )
+    refresh_controlled_static_power_toughness_bonuses(
         player,
         phase="target_selection",
     )
@@ -20642,6 +20672,12 @@ def resolve_glyphbridge_selective_creature_wipe(player, opponents, card, effect_
     permanent["type_line"] = effect_data.get("type_line") or permanent.get("type_line") or "Artifact"
     player.battlefield.append(permanent)
     refresh_all_controlled_static_indestructible(
+        participants,
+        turn=turn,
+        phase="glyphbridge_selective_creature_wipe",
+        emit_events=True,
+    )
+    refresh_all_controlled_static_power_toughness_bonuses(
         participants,
         turn=turn,
         phase="glyphbridge_selective_creature_wipe",
@@ -32954,6 +32990,214 @@ def refresh_all_controlled_static_indestructible(
     return refreshed
 
 
+STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
+
+
+def _static_pt_int(value, default=0):
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def _static_pt_tokens(value):
+    return {
+        token
+        for token in re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).split()
+        if token
+    }
+
+
+def _static_pt_subtype_tokens(permanent):
+    type_line = str((permanent or {}).get("type_line") or "")
+    subtype_text = type_line.split("-", 1)[1] if "-" in type_line else type_line
+    return _static_pt_tokens(subtype_text)
+
+
+def controlled_static_power_toughness_sources(controller):
+    sources = []
+    for source in getattr(controller, "battlefield", []) or []:
+        if not isinstance(source, dict):
+            continue
+        if (
+            source.get("battle_model_scope") == STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE
+            and source.get("static_effect") == "controlled_power_toughness_boost"
+        ):
+            sources.append(source)
+    return sources
+
+
+def static_controlled_power_toughness_applies_to(permanent, source, effect_data):
+    if not isinstance(permanent, dict) or not isinstance(effect_data, dict):
+        return False
+    if not is_battlefield_creature(permanent):
+        return False
+    if bool(effect_data.get("static_exclude_source")) and permanent is source:
+        return False
+    type_tokens = _static_pt_tokens(permanent.get("type_line"))
+    if effect_data.get("static_artifact_creature") and "artifact" not in type_tokens:
+        return False
+    required_supertypes = {
+        str(value).strip().lower()
+        for value in effect_data.get("static_required_supertypes", []) or []
+        if str(value).strip()
+    }
+    if required_supertypes and not required_supertypes.issubset(type_tokens):
+        return False
+    required_subtypes = {
+        str(value).strip().lower()
+        for value in effect_data.get("static_required_subtypes", []) or []
+        if str(value).strip()
+    }
+    if required_subtypes and not required_subtypes.issubset(_static_pt_subtype_tokens(permanent)):
+        return False
+    return True
+
+
+def static_controlled_power_toughness_bonus_for_permanent(
+    permanent,
+    controller,
+    *,
+    sources=None,
+):
+    power_bonus = 0
+    toughness_bonus = 0
+    source_names = []
+    source_keys = []
+    for source in sources if sources is not None else controlled_static_power_toughness_sources(controller):
+        if not static_controlled_power_toughness_applies_to(permanent, source, source):
+            continue
+        power_bonus += _static_pt_int(source.get("static_power_bonus"), default=0)
+        toughness_bonus += _static_pt_int(source.get("static_toughness_bonus"), default=0)
+        source_names.append(source.get("name", "?"))
+        if source.get("_rule_logical_key"):
+            source_keys.append(source.get("_rule_logical_key"))
+    return power_bonus, toughness_bonus, source_names, source_keys
+
+
+def apply_controlled_static_power_toughness_to_permanent(
+    permanent,
+    controller,
+    *,
+    sources=None,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or controller is None or not is_battlefield_creature(permanent):
+        return False
+    old_power_bonus = _static_pt_int(permanent.get("_static_controlled_pt_power_bonus"), default=0)
+    old_toughness_bonus = _static_pt_int(permanent.get("_static_controlled_pt_toughness_bonus"), default=0)
+    current_power = _static_pt_int(permanent.get("power", permanent.get("base_power")), default=1)
+    current_toughness = _static_pt_int(
+        permanent.get("toughness", permanent.get("base_toughness")),
+        default=current_power or 1,
+    )
+    base_power = current_power - old_power_bonus
+    base_toughness = current_toughness - old_toughness_bonus
+    power_bonus, toughness_bonus, source_names, source_keys = static_controlled_power_toughness_bonus_for_permanent(
+        permanent,
+        controller,
+        sources=sources,
+    )
+    before = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "source_names": permanent.get("static_power_toughness_sources") or [],
+    }
+    changed = (
+        old_power_bonus != power_bonus
+        or old_toughness_bonus != toughness_bonus
+        or list(before["source_names"]) != source_names
+    )
+    if power_bonus or toughness_bonus:
+        permanent["power"] = base_power + power_bonus
+        permanent["toughness"] = base_toughness + toughness_bonus
+        permanent["_static_controlled_pt_power_bonus"] = power_bonus
+        permanent["_static_controlled_pt_toughness_bonus"] = toughness_bonus
+        permanent["static_power_toughness_sources"] = source_names
+        permanent["static_power_toughness_rule_keys"] = source_keys
+    else:
+        permanent["power"] = base_power
+        permanent["toughness"] = base_toughness
+        permanent.pop("_static_controlled_pt_power_bonus", None)
+        permanent.pop("_static_controlled_pt_toughness_bonus", None)
+        permanent.pop("static_power_toughness_sources", None)
+        permanent.pop("static_power_toughness_rule_keys", None)
+    if emit_event and changed:
+        emit_replay_event(
+            "static_power_toughness_boost_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            source_cards=source_names,
+            power_before=before["power"],
+            toughness_before=before["toughness"],
+            power_after=permanent.get("power"),
+            toughness_after=permanent.get("toughness"),
+            power_bonus=power_bonus,
+            toughness_bonus=toughness_bonus,
+            turn=turn,
+            phase=phase,
+        )
+    return bool(power_bonus or toughness_bonus)
+
+
+def refresh_controlled_static_power_toughness_bonuses(
+    controller,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    sources = controlled_static_power_toughness_sources(controller)
+    refreshed = []
+    for permanent in list(getattr(controller, "battlefield", []) or []):
+        if not isinstance(permanent, dict) or not is_battlefield_creature(permanent):
+            continue
+        active = apply_controlled_static_power_toughness_to_permanent(
+            permanent,
+            controller,
+            sources=sources,
+            turn=turn,
+            phase=phase,
+            emit_event=emit_events,
+        )
+        if active or permanent.get("_static_controlled_pt_power_bonus") or permanent.get("_static_controlled_pt_toughness_bonus"):
+            refreshed.append(
+                {
+                    "card": permanent.get("name", "?"),
+                    "power": permanent.get("power"),
+                    "toughness": permanent.get("toughness"),
+                    "sources": permanent.get("static_power_toughness_sources") or [],
+                }
+            )
+    return refreshed
+
+
+def refresh_all_controlled_static_power_toughness_bonuses(
+    participants,
+    *,
+    turn=None,
+    phase=None,
+    emit_events=False,
+):
+    refreshed = []
+    seen = set()
+    for participant in participants or []:
+        if participant is None or id(participant) in seen:
+            continue
+        seen.add(id(participant))
+        refreshed.extend(
+            refresh_controlled_static_power_toughness_bonuses(
+                participant,
+                turn=turn,
+                phase=phase,
+                emit_events=emit_events,
+            )
+        )
+    return refreshed
+
+
 def _life_threshold_int(value, default=0):
     try:
         return int(float(value))
@@ -33192,6 +33436,13 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
         except (TypeError, ValueError):
             permanent["toughness"] = permanent["power"] or 1
         apply_life_total_threshold_source_static(
+            permanent,
+            controller,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
+        apply_controlled_static_power_toughness_to_permanent(
             permanent,
             controller,
             turn=turn,
@@ -37819,6 +38070,12 @@ def apply_damage_wipe_treasure(player, opponents, card, effect_data, turn, rng):
         phase="damage_wipe_treasure",
         emit_events=True,
     )
+    refresh_all_controlled_static_power_toughness_bonuses(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe_treasure",
+        emit_events=True,
+    )
     amount = int(effect_data.get("damage") or effect_data.get("average_damage") or 6)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
@@ -37934,6 +38191,12 @@ def damage_wipe_amount(player, card, effect_data):
 
 def apply_damage_wipe(player, opponents, card, effect_data, turn, *, finish_spell=True):
     refresh_all_controlled_static_indestructible(
+        [player, *list(opponents)],
+        turn=turn,
+        phase="damage_wipe",
+        emit_events=True,
+    )
+    refresh_all_controlled_static_power_toughness_bonuses(
         [player, *list(opponents)],
         turn=turn,
         phase="damage_wipe",
@@ -44156,6 +44419,12 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                     phase=phase,
                     emit_events=True,
                 )
+                refresh_controlled_static_power_toughness_bonuses(
+                    player,
+                    turn=turn,
+                    phase=phase,
+                    emit_events=True,
+                )
                 emit_replay_event(
                     "creature_cast",
                     player=player.name,
@@ -44825,6 +45094,14 @@ def apply_effect_immediate(
             turn=turn,
         )
 
+    def refresh_static_power_toughness_after_battlefield_change():
+        return refresh_controlled_static_power_toughness_bonuses(
+            player,
+            turn=turn,
+            phase=phase or "resolution",
+            emit_events=True,
+        )
+
     if effect == "composite_resolution":
         summary = resolve_composite_resolution_effect(
             player,
@@ -44955,6 +45232,7 @@ def apply_effect_immediate(
             phase=phase or "resolution",
             emit_events=True,
         )
+        refresh_static_power_toughness_after_battlefield_change()
         resolve_generic_permanent_etb(
             player,
             opponents,
@@ -45104,6 +45382,7 @@ def apply_effect_immediate(
                 all_players_for_entry,
                 turn=turn,
             )
+            refresh_static_power_toughness_after_battlefield_change()
             resolve_generic_permanent_etb(
                 player,
                 opponents,
@@ -45940,6 +46219,12 @@ def apply_effect_immediate(
             resolve_modal_destroy_board_wipe(player, opponents, card, effect_data, turn)
             return
         refresh_all_controlled_static_indestructible(
+            [player, *list(opponents)],
+            turn=turn,
+            phase="board_wipe",
+            emit_events=True,
+        )
+        refresh_all_controlled_static_power_toughness_bonuses(
             [player, *list(opponents)],
             turn=turn,
             phase="board_wipe",

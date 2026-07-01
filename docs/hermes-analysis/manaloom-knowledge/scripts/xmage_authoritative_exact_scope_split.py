@@ -48,6 +48,10 @@ TARGET_BOOST_ACTIVATED_UNIT = (
     "xmage_signature::BoostTargetEffect::SimpleActivatedAbility::"
     "TargetCreaturePermanent::no_condition_class::targeting,activated_ability"
 )
+STATIC_CONTROLLED_PT_UNIT = (
+    "xmage_signature::BoostControlledEffect::SimpleStaticAbility::"
+    "no_target_class::no_condition_class::static_ability"
+)
 BOOST_KEYWORD_UNIT = "grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1"
 TOKEN_SPELL_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::"
@@ -72,6 +76,7 @@ SUPPORTED_UNITS = {
     BOARD_WIPE_UNIT,
     ADD_COUNTERS_TARGET_UNIT,
     BOOST_TARGET_UNIT,
+    STATIC_CONTROLLED_PT_UNIT,
     TOKEN_SPELL_UNIT,
 }
 
@@ -105,6 +110,7 @@ SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_
 TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
+STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
@@ -1014,6 +1020,188 @@ def fixed_boost_keyword_target_from_source(
     return int(boost_matches[0][0]), int(boost_matches[0][1]), target_controller
 
 
+STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS = {
+    "attacking",
+    "blocking",
+    "blocked",
+    "enchanted",
+    "equipped",
+    "modified",
+    "tapped",
+    "untapped",
+    "white",
+    "blue",
+    "black",
+    "red",
+    "green",
+}
+
+STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS = (
+    "ColorPredicate",
+    "TappedPredicate",
+    "Predicates.or",
+    "Predicates.and",
+    "EnchantedPredicate",
+    "EquippedPredicate",
+    "AttackingPredicate",
+    "BlockingPredicate",
+    "ControlledByControllerPredicate",
+)
+
+STATIC_CONTROLLED_PT_IRREGULAR_SUBTYPES = {
+    "elves": "elf",
+    "dwarves": "dwarf",
+    "thallids": "thallid",
+    "zombies": "zombie",
+    "kithkin": "kithkin",
+}
+
+
+def canonical_static_subtype(value: str) -> str:
+    token = re.sub(r"[^a-z0-9]+", " ", str(value or "").strip().lower()).strip()
+    if not token:
+        return ""
+    if token in STATIC_CONTROLLED_PT_IRREGULAR_SUBTYPES:
+        return STATIC_CONTROLLED_PT_IRREGULAR_SUBTYPES[token]
+    if token.endswith("ies") and len(token) > 3:
+        return f"{token[:-3]}y"
+    if token.endswith("ves") and len(token) > 3:
+        return f"{token[:-3]}f"
+    if token.endswith("s") and not token.endswith("ss"):
+        return token[:-1]
+    return token
+
+
+def static_controlled_pt_constraints_from_subject(subject: str) -> dict[str, Any] | str:
+    phrase = re.sub(r"\s+", " ", str(subject or "").strip().lower())
+    if not phrase or phrase == "creatures":
+        return {}
+    if phrase.endswith(" creatures"):
+        phrase = phrase[: -len(" creatures")].strip()
+    if not phrase:
+        return {}
+    words = phrase.split()
+    if any(word in STATIC_CONTROLLED_PT_BLOCKED_ORACLE_WORDS for word in words):
+        return "static_controlled_pt_oracle_filter_not_supported"
+    constraints: dict[str, Any] = {}
+    subtypes: list[str] = []
+    for word in words:
+        if word == "artifact":
+            constraints["static_artifact_creature"] = True
+            continue
+        if word == "legendary":
+            constraints["static_required_supertypes"] = ["legendary"]
+            continue
+        subtype = canonical_static_subtype(word)
+        if subtype:
+            subtypes.append(subtype)
+    if subtypes:
+        constraints["static_required_subtypes"] = sorted(set(subtypes))
+    return constraints
+
+
+def static_controlled_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    match = re.match(
+        r"^(?:each )?(?P<other>other )?(?P<subject>[a-z0-9' -]+?) "
+        r"you control get (?P<power>[+-]?\d+)/(?P<toughness>[+-]?\d+)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    subject = match.group("subject").strip()
+    constraints = static_controlled_pt_constraints_from_subject(subject)
+    if isinstance(constraints, str):
+        return constraints
+    power = signed_int_from_oracle(match.group("power"))
+    toughness = signed_int_from_oracle(match.group("toughness"))
+    if power is None or toughness is None:
+        return None
+    return {
+        "static_power_bonus": power,
+        "static_toughness_bonus": toughness,
+        "static_exclude_source": bool(match.group("other")),
+        **constraints,
+    }
+
+
+def static_controlled_pt_filter_constraints_from_source(source: str, filter_name: str | None) -> dict[str, Any] | str:
+    text = source or ""
+    if any(marker in text for marker in STATIC_CONTROLLED_PT_BLOCKED_SOURCE_MARKERS):
+        return "static_controlled_pt_source_filter_not_supported"
+    if not filter_name:
+        return {}
+    if filter_name == "StaticFilters.FILTER_PERMANENT_CREATURES":
+        return {}
+    if filter_name == "StaticFilters.FILTER_PERMANENT_SLIVERS":
+        return {"static_required_subtypes": ["sliver"]}
+    if filter_name == "StaticFilters.FILTER_PERMANENTS_ARTIFACT_CREATURE":
+        return {"static_artifact_creature": True}
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
+        return "static_controlled_pt_source_filter_not_supported"
+    constraints: dict[str, Any] = {}
+    subtype_tokens = re.findall(
+        rf"{re.escape(filter_name)}\s*=\s*new\s+Filter(?:Creature)?Permanent\s*\(\s*SubType\.([A-Z0-9_]+)",
+        text,
+    )
+    subtype_tokens += re.findall(rf"{re.escape(filter_name)}\.add\s*\(\s*SubType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)", text)
+    if subtype_tokens:
+        constraints["static_required_subtypes"] = sorted(
+            {canonical_static_subtype(token.replace("_", " ")) for token in subtype_tokens}
+        )
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*CardType\.ARTIFACT\.getPredicate\s*\(\s*\)\s*\)", text):
+        constraints["static_artifact_creature"] = True
+    if re.search(rf"{re.escape(filter_name)}\.add\s*\(\s*SuperType\.LEGENDARY\.getPredicate\s*\(\s*\)\s*\)", text):
+        constraints["static_required_supertypes"] = ["legendary"]
+    safe_get_predicates = re.findall(rf"{re.escape(filter_name)}\.add\s*\(\s*([A-Za-z]+)\.([A-Z0-9_]+)\.getPredicate", text)
+    for owner, value in safe_get_predicates:
+        if owner == "SubType":
+            continue
+        if owner == "CardType" and value == "ARTIFACT":
+            continue
+        if owner == "SuperType" and value == "LEGENDARY":
+            continue
+        return "static_controlled_pt_source_filter_not_supported"
+    if not constraints and filter_name != "filter":
+        return "static_controlled_pt_source_filter_not_supported"
+    return constraints
+
+
+def static_controlled_pt_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    matches = re.findall(
+        r"new\s+BoostControlledEffect\s*\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*"
+        r"Duration\.WhileOnBattlefield(?P<rest>[^)]*)\)",
+        text,
+        re.S,
+    )
+    if len(matches) != 1:
+        return None
+    power_raw, toughness_raw, rest = matches[0]
+    rest_text = str(rest or "")
+    bool_args = re.findall(r"\b(true|false)\b", rest_text)
+    exclude_source = bool_args[-1] == "true" if bool_args else False
+    filter_name: str | None = None
+    static_filter_match = re.search(r"(StaticFilters\.FILTER_[A-Z0-9_]+)", rest_text)
+    if static_filter_match:
+        filter_name = static_filter_match.group(1)
+    else:
+        filter_match = re.search(r",\s*([A-Za-z_][A-Za-z0-9_]*)\s*(?:,\s*(?:true|false))?\s*$", rest_text.strip())
+        if filter_match:
+            candidate = filter_match.group(1)
+            if candidate not in {"true", "false"}:
+                filter_name = candidate
+    constraints = static_controlled_pt_filter_constraints_from_source(text, filter_name)
+    if isinstance(constraints, str):
+        return constraints
+    return {
+        "static_power_bonus": int(power_raw),
+        "static_toughness_bonus": int(toughness_raw),
+        "static_exclude_source": exclude_source,
+        **constraints,
+    }
+
+
 def strip_leading_parenthetical_reminders(text: str) -> str:
     cleaned = str(text or "").strip()
     while True:
@@ -1160,6 +1348,15 @@ def is_permanent_activated_target_boost_unit(row: dict[str, Any]) -> bool:
         effect_classes(row) == {"BoostTargetEffect"}
         and ability_classes(row) == {"SimpleActivatedAbility"}
         and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
+    )
+
+
+def is_static_controlled_pt_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == STATIC_CONTROLLED_PT_UNIT
+        and effect_classes(row) == {"BoostControlledEffect"}
+        and ability_classes(row) == {"SimpleStaticAbility"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
     )
 
 
@@ -2830,6 +3027,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent simple activated target-creature boost until end of turn"
     elif scope == TARGET_KEYWORD_ACTIVATED_SCOPE:
         scope_kind = "permanent simple activated target-creature keyword until end of turn"
+    elif scope == STATIC_CONTROLLED_PT_SCOPE:
+        scope_kind = "permanent static controlled-creature power/toughness boost"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -2921,6 +3120,7 @@ def split_row(
     permanent_activated_self_boost_unit = is_permanent_activated_self_boost_unit(row)
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
+    static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     graveyard_self_return_unit = (
         unit == RECURSION_UNIT
@@ -2947,6 +3147,7 @@ def split_row(
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not boost_keyword_spell_unit
         and not fixed_token_spell_unit
@@ -2973,6 +3174,7 @@ def split_row(
         and not permanent_activated_life_gain_unit
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
+        and not static_controlled_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not graveyard_self_return_unit
     ):
@@ -3688,6 +3890,63 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_create_tokens",
+        ), "selected_exact_scope"
+
+    if static_controlled_pt_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "static_controlled_pt_not_permanent"
+        oracle_static = static_controlled_pt_from_oracle(metadata)
+        if isinstance(oracle_static, str):
+            return None, oracle_static
+        if oracle_static is None:
+            return None, "static_controlled_pt_oracle_not_exact"
+        source_static = static_controlled_pt_from_source(source_text)
+        if isinstance(source_static, str):
+            return None, source_static
+        if source_static is None:
+            return None, "static_controlled_pt_source_not_exact"
+        if source_static != oracle_static:
+            return None, "static_controlled_pt_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_type = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        permanent_effect = "creature" if permanent_type == "creature" else "passive"
+        target_constraints: dict[str, Any] = {
+            "controller": "self",
+            "card_types": ["creature"],
+        }
+        if source_static.get("static_required_subtypes"):
+            target_constraints["subtypes"] = source_static["static_required_subtypes"]
+        if source_static.get("static_required_supertypes"):
+            target_constraints["supertypes"] = source_static["static_required_supertypes"]
+        if source_static.get("static_artifact_creature"):
+            target_constraints["card_types"] = ["artifact", "creature"]
+        effect_json = {
+            "effect": permanent_effect,
+            "battle_model_scope": STATIC_CONTROLLED_PT_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "controlled_power_toughness_boost",
+            "static_applies_to": "creatures_you_control",
+            "target": "controlled_creatures",
+            "target_controller": "self",
+            "target_constraints": target_constraints,
+            "xmage_effect_class": "BoostControlledEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            **source_static,
+        }
+        effect_json["permanent_type"] = permanent_type
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_controlled_power_toughness_boost",
         ), "selected_exact_scope"
 
     if keyword_creature_unit:
@@ -4537,6 +4796,7 @@ def build_exact_split_report(
             and not is_permanent_activated_self_boost_unit(row)
             and not is_permanent_activated_target_boost_unit(row)
             and not is_permanent_activated_target_keyword_unit(row)
+            and not is_static_controlled_pt_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
         ):
@@ -4583,6 +4843,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
+                "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

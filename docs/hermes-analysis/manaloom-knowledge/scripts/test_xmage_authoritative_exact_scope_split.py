@@ -43,6 +43,140 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_static_controlled_power_toughness_boost_all_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_PT_UNIT,
+            effect_classes=["BoostControlledEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Glorious Anthem",
+                type_line="Enchantment",
+                oracle_text="Creatures you control get +1/+1.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 1, Duration.WhileOnBattlefield, StaticFilters.FILTER_PERMANENT_CREATURES, false)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CONTROLLED_PT_SCOPE)
+        self.assertEqual(effect["static_power_bonus"], 1)
+        self.assertEqual(effect["static_toughness_bonus"], 1)
+        self.assertFalse(effect["static_exclude_source"])
+        self.assertEqual(effect["target_constraints"], {"controller": "self", "card_types": ["creature"]})
+
+    def test_static_controlled_power_toughness_boost_other_creatures_excludes_source(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_PT_UNIT,
+            effect_classes=["BoostControlledEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Benalish Marshal",
+                type_line="Creature - Human Knight",
+                oracle_text="Other creatures you control get +1/+1.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 1, Duration.WhileOnBattlefield, true)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["static_exclude_source"])
+        self.assertEqual(effect["static_power_bonus"], 1)
+        self.assertEqual(effect["static_toughness_bonus"], 1)
+
+    def test_static_controlled_power_toughness_boost_artifact_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_PT_UNIT,
+            effect_classes=["BoostControlledEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Chief of the Foundry",
+                type_line="Artifact Creature - Construct",
+                oracle_text="Other artifact creatures you control get +1/+1.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 1, Duration.WhileOnBattlefield, "
+                "StaticFilters.FILTER_PERMANENTS_ARTIFACT_CREATURE, true)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["static_artifact_creature"])
+        self.assertTrue(effect["static_exclude_source"])
+        self.assertEqual(effect["target_constraints"]["card_types"], ["artifact", "creature"])
+
+    def test_static_controlled_power_toughness_boost_subtype_plural_is_package_safe(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_PT_UNIT,
+            effect_classes=["BoostControlledEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pride of the Perfect",
+                type_line="Enchantment",
+                oracle_text="Elves you control get +2/+0.",
+            ),
+            source_text=(
+                "private static final FilterPermanent filter = new FilterPermanent(SubType.ELF, \"Elves\");"
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "2, 0, Duration.WhileOnBattlefield, filter, false)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["static_required_subtypes"], ["elf"])
+        self.assertEqual(effect["target_constraints"]["subtypes"], ["elf"])
+        self.assertEqual(effect["static_power_bonus"], 2)
+        self.assertEqual(effect["static_toughness_bonus"], 0)
+
+    def test_static_controlled_power_toughness_boost_blocks_color_filtered_lord(self) -> None:
+        row = queue_row(
+            split.STATIC_CONTROLLED_PT_UNIT,
+            effect_classes=["BoostControlledEffect"],
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Honor of the Pure",
+                type_line="Enchantment",
+                oracle_text="White creatures you control get +1/+1.",
+            ),
+            source_text=(
+                "filter.add(new ColorPredicate(ObjectColor.WHITE));"
+                "this.addAbility(new SimpleStaticAbility(new BoostControlledEffect("
+                "1, 1, Duration.WhileOnBattlefield, filter, false)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_controlled_pt_oracle_filter_not_supported")
+
     def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

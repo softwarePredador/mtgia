@@ -122,21 +122,22 @@ Use
 to build this queue. Current evidence:
 
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg320_permanent_activated_life_gain_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27374`
-- XMage authoritative source resolved: `27060`
+- target all-card battle-gap identities: `27342`
+- XMage authoritative source resolved: `27028`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27060`
+- XMage authoritative adapter required: `27028`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27060` identities, card semantics are accepted from XMage; work is now
+- For `27028` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +156,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG320 Exact Adapter Waves
+## PG283-PG321 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG320 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG321 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -194,6 +195,11 @@ patterns:
   costs only, and no target sacrifice, discard, exile, graveyard, variable, or
   compound cost/effect text ->
   `xmage_permanent_simple_activated_life_gain_v1`
+- `xmage_signature::BoostControlledEffect::SimpleStaticAbility::no_target_class::no_condition_class::static_ability`
+  with exact permanent static controlled-creature power/toughness boosts,
+  simple creature/artifact/subtype/legendary filters, exact Oracle/source
+  agreement, and runtime refresh that avoids cumulative static deltas ->
+  `xmage_static_controlled_power_toughness_boost_v1`
 - `draw_engine::xmage_draw_card_variant_review_v1` with
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
@@ -2264,6 +2270,55 @@ PG320 measured result:
   `928`, `source_add_counters` `795`, `life_gain` `740`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `613`.
 
+PG321 evidence:
+
+- PG321 static controlled power/toughness package:
+  `docs/hermes-analysis/master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_package.md`
+- PG321 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_pg_apply_evidence.md`
+- PG321 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_pg_to_sqlite_sync.json`
+- PG321 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg321_xmage_static_controlled_power_toughness_boost_wave_e2e_validation.md`
+- PG321 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg321_static_controlled_power_toughness_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg321_static_controlled_power_toughness_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg321_static_controlled_power_toughness_boost_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg321_static_controlled_power_toughness_boost_wave.md`
+- PG321 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg321_static_controlled_pt_wave.md`
+- post-PG321 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
+
+PG321 measured result:
+
+- PG321 promoted `32` exact static controlled-creature power/toughness boosts
+  from `BoostControlledEffect + SimpleStaticAbility`, including anthem effects,
+  Sliver/Warrior/Soldier/Vampire/Squirrel/Elf/Dinosaur filters, artifact
+  creature filters, and legendary creature filters.
+- Runtime now supports `xmage_static_controlled_power_toughness_boost_v1` via
+  controller battlefield refresh, `excludeSource`, artifact/subtype/supertype
+  constraints, source-leave recalculation, and non-accumulating static deltas
+  that preserve other power/toughness mutations.
+- The splitter blocks color/state/conditional filters such as white creatures,
+  attacking creatures, untapped creatures, enchanted creatures, and multi-subtype
+  predicate-or text until those layer/filter models are implemented.
+- PostgreSQL apply evidence reports `32/32` promoted rows, `32/32`
+  verified/auto rows, `32/32` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7149` PostgreSQL rules,
+  inserted/updated `6920` SQLite rows, and exported `4747` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Post-PG321 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG321 rows themselves have `32/32` matching Oracle hashes.
+- Global all-card authoritative queue after PG321:
+  `target_identity_count=27342`, `xmage_authoritative_source_count=27028`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27028`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -2903,7 +2958,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG320 queue, the next exact runtime-backed work should be selected from
+post-PG321 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`
