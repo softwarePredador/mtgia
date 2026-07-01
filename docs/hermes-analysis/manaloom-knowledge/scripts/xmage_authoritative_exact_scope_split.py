@@ -33,6 +33,7 @@ COUNTER_UNIT = "counter_spell::counter_target_stack_object_variant_v1"
 BOUNCE_UNIT = "bounce::targeted_return_to_hand_variant_v1"
 RECURSION_UNIT = "recursion::xmage_graveyard_return_variant_review_v1"
 BOARD_WIPE_UNIT = "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1"
+ADD_COUNTERS_TARGET_UNIT = "add_counters::targeted_add_counters_variant_v1"
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -45,6 +46,7 @@ SUPPORTED_UNITS = {
     BOUNCE_UNIT,
     RECURSION_UNIT,
     BOARD_WIPE_UNIT,
+    ADD_COUNTERS_TARGET_UNIT,
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
@@ -58,6 +60,7 @@ BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
+ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -69,6 +72,7 @@ SPELL_UNITS = {
     BOUNCE_UNIT,
     RECURSION_UNIT,
     BOARD_WIPE_UNIT,
+    ADD_COUNTERS_TARGET_UNIT,
 }
 RAMP_UNITS = {RAMP_ARTIFACT_UNIT, RAMP_CREATURE_UNIT}
 
@@ -434,6 +438,60 @@ def damage_all_scope_from_oracle(metadata: dict[str, Any]) -> str | None:
     return None
 
 
+COUNTER_WORD_NUMBERS = {
+    "a": 1,
+    "an": 1,
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
+
+
+def counter_count_from_text(value: str) -> int | None:
+    token = str(value or "").strip().lower()
+    if token.isdigit():
+        return int(token)
+    return COUNTER_WORD_NUMBERS.get(token)
+
+
+def fixed_counter_target_from_source(source: str) -> tuple[str, int] | None:
+    matches = re.findall(
+        r"AddCountersTargetEffect\s*\(\s*CounterType\.(P1P1|M1M1)\.createInstance\s*\(\s*(\d*)\s*\)",
+        source or "",
+    )
+    if len(matches) != 1:
+        return None
+    if len(re.findall(r"\.addTarget\s*\(\s*new\s+TargetCreaturePermanent\s*\(", source or "")) != 1:
+        return None
+    if not re.search(r"\.addTarget\s*\(\s*new\s+TargetCreaturePermanent\s*\(\s*\)\s*\)", source or ""):
+        return None
+    counter_class, raw_count = matches[0]
+    counter_type = "+1/+1" if counter_class == "P1P1" else "-1/-1"
+    return counter_type, int(raw_count or "1")
+
+
+def fixed_counter_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^put (a|an|one|two|three|four|five|six|seven|eight|nine|ten|\d+) "
+        r"(\+1/\+1|-1/-1) counters? on target creature\.?$",
+        text,
+    )
+    if not match:
+        return None
+    count = counter_count_from_text(match.group(1))
+    if count is None or count <= 0:
+        return None
+    return match.group(2), count
+
+
 def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     text = oracle_text(metadata)
     if "any target" in text:
@@ -769,6 +827,36 @@ def split_row(
             }
             return build_proposal(row, metadata, effect_json, family_id="xmage_damage_all_spell"), "selected_exact_scope"
         return None, "board_wipe_effect_class_not_supported"
+
+    if unit == ADD_COUNTERS_TARGET_UNIT:
+        if classes != {"AddCountersTargetEffect"}:
+            return None, "add_counters_effect_class_not_pure"
+        if ability_classes(row):
+            return None, "add_counters_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "add_counters_oracle_not_simple"
+        source_counter = fixed_counter_target_from_source(source_text)
+        if source_counter is None:
+            return None, "add_counters_counter_not_fixed"
+        oracle_counter = fixed_counter_target_from_oracle(metadata)
+        if oracle_counter is None:
+            return None, "add_counters_target_not_supported"
+        if source_counter != oracle_counter:
+            return None, "add_counters_source_oracle_mismatch"
+        counter_type, count = oracle_counter
+        effect_json = {
+            "effect": "add_counters",
+            "battle_model_scope": ADD_COUNTERS_TARGET_SCOPE,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": counter_type,
+            "counter_count": count,
+            "count": count,
+            "xmage_effect_class": "AddCountersTargetEffect",
+            **flags,
+        }
+        return build_proposal(row, metadata, effect_json, family_id="xmage_add_counters_target_creature_spell"), "selected_exact_scope"
 
     if unit in RAMP_UNITS:
         if is_spell(metadata):

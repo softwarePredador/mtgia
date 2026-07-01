@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T09:05:24.703982+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg290_xmage_add_counters_spell_wave_manifest.json",
+  "package_id": "pg290_xmage_add_counters_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Battlegrowth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45bd50b433b58cf44d2dab3030945c4a",
+          "oracle_hash": "d74d53451d59e6a2c4eb906c03981054",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Blight Rot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:384af23b01a4c11b57e6155b3a252e34",
+          "oracle_hash": "f6b9e8b446c30f40c90aca935f88d4e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Scar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7",
+          "oracle_hash": "53c8b48a1b03617cb95fe3dadb7b508e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Battlegrowth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45bd50b433b58cf44d2dab3030945c4a",
+          "oracle_hash": "d74d53451d59e6a2c4eb906c03981054",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Blight Rot",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:384af23b01a4c11b57e6155b3a252e34",
+          "oracle_hash": "f6b9e8b446c30f40c90aca935f88d4e6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "card_name": "Scar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7",
+          "oracle_hash": "53c8b48a1b03617cb95fe3dadb7b508e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Battlegrowth",
+          "logical_rule_key": "battle_rule_v1:45bd50b433b58cf44d2dab3030945c4a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blight Rot",
+          "logical_rule_key": "battle_rule_v1:384af23b01a4c11b57e6155b3a252e34"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scar",
+          "logical_rule_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Battlegrowth",
+          "component_keys": [],
+          "effect": "add_counters",
+          "logical_rule_key": "battle_rule_v1:45bd50b433b58cf44d2dab3030945c4a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blight Rot",
+          "component_keys": [],
+          "effect": "add_counters",
+          "logical_rule_key": "battle_rule_v1:384af23b01a4c11b57e6155b3a252e34"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scar",
+          "component_keys": [],
+          "effect": "add_counters",
+          "logical_rule_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

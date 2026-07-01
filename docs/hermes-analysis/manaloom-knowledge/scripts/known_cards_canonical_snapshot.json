@@ -3019,6 +3019,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "39d45b03e1a8226fd02925e44ee7692c"
   },
+  "Battlegrowth": {
+    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+    "count": 1,
+    "counter_count": 1,
+    "counter_type": "+1/+1",
+    "effect": "add_counters",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:45bd50b433b58cf44d2dab3030945c4a",
+    "battle_rule_oracle_hash": "d74d53451d59e6a2c4eb906c03981054"
+  },
   "Baxter Building": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -3759,6 +3783,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d01f9db522798a9292667da589d7d7f4"
+  },
+  "Blight Rot": {
+    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+    "count": 4,
+    "counter_count": 4,
+    "counter_type": "-1/-1",
+    "effect": "add_counters",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:384af23b01a4c11b57e6155b3a252e34",
+    "battle_rule_oracle_hash": "f6b9e8b446c30f40c90aca935f88d4e6"
   },
   "Blighted Cataract": {
     "effect": "land",
@@ -33990,6 +34038,30 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d060f39142261847d31b48c0088866a1"
+  },
+  "Scar": {
+    "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+    "count": 1,
+    "counter_count": 1,
+    "counter_type": "-1/-1",
+    "effect": "add_counters",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "xmage_effect_class": "AddCountersTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7",
+    "battle_rule_oracle_hash": "53c8b48a1b03617cb95fe3dadb7b508e"
   },
   "Scattered Groves": {
     "effect": "land",

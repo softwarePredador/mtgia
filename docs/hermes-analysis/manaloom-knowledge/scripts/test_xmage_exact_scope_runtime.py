@@ -599,6 +599,104 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_add_plus_one_counter_spell_buffs_own_best_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        small = {"name": "Small Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        best = {"name": "Best Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        active.battlefield.extend([small, best])
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "add_counters",
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "+1/+1",
+            "counter_count": 1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Battlegrowth",
+                "type_line": "Instant",
+                "oracle_text": "Put a +1/+1 counter on target creature.",
+            },
+            turn=9,
+            rng=random.Random(9),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(best["plus_one_counters"], 1)
+        self.assertEqual(best["power"], 5)
+        self.assertEqual(best["toughness"], 5)
+        self.assertNotIn("plus_one_counters", small)
+        self.assertNotIn("plus_one_counters", enemy)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Battlegrowth"])
+        self.assertTrue(
+            any(
+                event == "add_counters_resolved"
+                and data.get("card") == "Fixture Battlegrowth"
+                and data.get("target") == "Best Bear"
+                and data.get("counter_type") == "+1/+1"
+                and data.get("counters_added") == 1
+                and data.get("result") == "counters_added"
+                for event, data in self.events
+            )
+        )
+
+    def test_add_minus_one_counters_spell_can_put_zero_toughness_creature_in_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(own)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "add_counters",
+            "battle_model_scope": "xmage_fixed_add_counters_target_creature_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "counter_type": "-1/-1",
+            "counter_count": 4,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Blight Rot",
+                "type_line": "Instant",
+                "oracle_text": "Put four -1/-1 counters on target creature.",
+            },
+            turn=10,
+            rng=random.Random(10),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Bear"])
+        self.assertEqual(active.battlefield, [own])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Blight Rot"])
+        self.assertTrue(
+            any(
+                event == "add_counters_resolved"
+                and data.get("card") == "Fixture Blight Rot"
+                and data.get("target") == "Enemy Bear"
+                and data.get("counter_type") == "-1/-1"
+                and data.get("counters_added") == 4
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_destroy_all_enchantments_board_wipe_resolves_by_type(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

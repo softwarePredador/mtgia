@@ -3965,6 +3965,140 @@ def remove_named_counters(permanent, counter_name, count=None):
     return removed
 
 
+def add_counters_target_type(effect_data):
+    return (
+        str((effect_data or {}).get("target") or "").lower()
+        or _target_type_from_constraints(effect_data)
+        or "creature"
+    )
+
+
+def add_counters_candidate_targets(player, opponents, card, effect_data):
+    target_type = add_counters_target_type(effect_data)
+    target_controller = str((effect_data or {}).get("target_controller") or "any").lower()
+    participants = []
+    if target_controller in {"self", "you", "controller", "controlled"}:
+        participants = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        participants = list(opponents or [])
+    else:
+        participants = [player] + list(opponents or [])
+    candidates = []
+    for owner in participants:
+        for permanent in list(getattr(owner, "battlefield", []) or []):
+            if not is_battlefield_creature(permanent):
+                continue
+            if not is_legal_target(
+                card if isinstance(card, dict) else effect_data,
+                permanent,
+                player,
+                target_type=target_type,
+                target_controller=owner,
+            ):
+                continue
+            candidates.append((owner, permanent))
+    return candidates
+
+
+def choose_add_counters_target(player, opponents, card, effect_data):
+    candidates = add_counters_candidate_targets(player, opponents, card, effect_data)
+    if not candidates:
+        return None, None, []
+    counter_type = str((effect_data or {}).get("counter_type") or "+1/+1")
+    if counter_type == "-1/-1":
+        preferred = [(owner, target) for owner, target in candidates if owner is not player]
+    else:
+        preferred = [(owner, target) for owner, target in candidates if owner is player]
+    if not preferred:
+        preferred = candidates
+    owner, target = max(preferred, key=lambda item: target_priority(item[1]))
+    return owner, target, [target for _owner, target in candidates]
+
+
+def resolve_add_counters_target_spell(player, opponents, card, effect_data, turn):
+    counter_type = str(effect_data.get("counter_type") or "+1/+1")
+    count = max(0, int(effect_data.get("counter_count") or effect_data.get("count") or 1))
+    target_owner, target, target_options = choose_add_counters_target(
+        player,
+        opponents,
+        card,
+        effect_data,
+    )
+    if target is None or target_owner is None or count <= 0:
+        emit_replay_event(
+            "add_counters_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            counter_type=counter_type,
+            counters_added=0,
+            target_type=add_counters_target_type(effect_data),
+            result="no_legal_target",
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        return None
+
+    power_before = int(float(target.get("power") or 0))
+    toughness_before = int(float(target.get("toughness") or target.get("power") or 0))
+    counters_before = (
+        int(target.get("plus_one_counters") or 0)
+        if counter_type == "+1/+1"
+        else int(target.get("minus_one_counters") or 0)
+        if counter_type == "-1/-1"
+        else get_named_counter_count(target, counter_type)
+    )
+    if counter_type == "+1/+1":
+        added = add_plus_one_counters(target, count) or count
+    elif counter_type == "-1/-1":
+        added = add_minus_one_counters(target, count)
+    else:
+        added = add_named_counters(target, counter_type, count)
+    power_after = int(float(target.get("power") or 0))
+    toughness_after = int(float(target.get("toughness") or target.get("power") or 0))
+    destination = None
+    result = "counters_added"
+    if counter_type == "-1/-1" and is_battlefield_creature(target) and toughness_after <= 0:
+        destination = move_creature_from_battlefield(
+            target_owner,
+            target,
+            reason="zero_toughness",
+            source=card,
+        )
+        result = "creature_put_into_graveyard_zero_toughness"
+    decision = targeting_decision(
+        card if isinstance(card, dict) else effect_data,
+        target,
+        player,
+        target_controller=target_owner,
+        target_type=add_counters_target_type(effect_data),
+    )
+    emit_replay_event(
+        "add_counters_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_player=target_owner.name,
+        target=target.get("name", "?"),
+        target_power_before=power_before,
+        target_power_after=power_after,
+        target_toughness_before=toughness_before,
+        target_toughness_after=toughness_after,
+        counter_type=counter_type,
+        counters_before=counters_before,
+        counters_added=added,
+        counters_after=counters_before + added,
+        result=result,
+        destination=destination,
+        available_targets=len(target_options),
+        **target_selection_replay_fields(target, target_options),
+        turn=turn,
+        **decision,
+        **replay_rule_fields(effect_data),
+    )
+    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    return target
+
+
 def transform_permanent_to_face(
     player,
     permanent,
@@ -43229,6 +43363,8 @@ def apply_effect_immediate(
         finish_resolved_spell(player, card, turn=turn)
     elif effect in ("deal_damage", "direct_damage"):
         apply_direct_damage(player, opponents, card, effect_data, turn, rng)
+    elif effect == "add_counters":
+        resolve_add_counters_target_spell(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent":
         apply_damage_each_opponent(player, opponents, card, effect_data, turn)
     elif effect == "damage_each_opponent_and_opponent_creatures":

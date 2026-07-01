@@ -121,12 +121,12 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg289_board_wipe_spell_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg290_add_counters_spell_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `31298`
-- XMage authoritative source resolved: `28362`
+- target all-card battle-gap identities: `31295`
+- XMage authoritative source resolved: `28359`
 - local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
 - ManaLoom adapter work-unit keys: `12093`
@@ -135,7 +135,7 @@ Current measured queue:
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `28362` identities, card semantics are accepted from XMage; work is now
+- For `28359` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `2936` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG289 Exact Adapter Waves
+## PG283-PG290 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG289 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG290 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -185,6 +185,8 @@ patterns:
 - `board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1` ->
   `xmage_destroy_all_matching_permanents_spell_v1` and
   `xmage_fixed_damage_all_matching_permanents_spell_v1`
+- `add_counters::targeted_add_counters_variant_v1` ->
+  `xmage_fixed_add_counters_target_creature_spell_v1`
 
 PG283 evidence:
 
@@ -304,7 +306,7 @@ PG285-PG287 measured result:
   against the current all-card gap. The next work must add a new exact
   subpattern/runtime adapter, not rerun the existing splitter.
 
-PG288-PG289 evidence:
+PG288-PG290 evidence:
 
 - PG288 recursion spell package:
   `docs/hermes-analysis/master_optimizer_reports/pg288_xmage_recursion_spell_wave_package.md`
@@ -318,12 +320,18 @@ PG288-PG289 evidence:
   `docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_pg_apply_evidence.md`
 - PG289 E2E validation:
   `docs/hermes-analysis/master_optimizer_reports/pg289_xmage_board_wipe_spell_wave_e2e_validation.md`
-- post-PG289 readiness:
-  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg289_board_wipe_spell_wave_recheck.md`
-- post-PG289 authoritative queue:
-  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg289_board_wipe_spell_wave.md`
+- PG290 add counters spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg290_xmage_add_counters_spell_wave_package.md`
+- PG290 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg290_xmage_add_counters_spell_wave_pg_apply_evidence.md`
+- PG290 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg290_xmage_add_counters_spell_wave_e2e_validation.md`
+- post-PG290 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg290_add_counters_spell_wave_recheck.md`
+- post-PG290 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg290_add_counters_spell_wave.md`
 
-PG288-PG289 measured result:
+PG288-PG290 measured result:
 
 - PG288 promoted `22` exact graveyard-recursion spells that return target cards
   from graveyard to hand. Runtime now handles the matching `recursion` effect
@@ -332,21 +340,28 @@ PG288-PG289 measured result:
 - PG289 promoted `13` exact mass-removal spells: `9` simple
   `DestroyAllEffect` board wipes over supported permanent type scopes and `4`
   fixed `DamageAllEffect` wipes over supported creature/planeswalker scopes.
+- PG290 promoted `3` exact `AddCountersTargetEffect` instant spells over
+  target creatures: `Battlegrowth`, `Blight Rot`, and `Scar`. Runtime now
+  handles fixed `+1/+1` and `-1/-1` counters on legal target creatures,
+  including zero-toughness cleanup after negative counters.
 - PG288 PostgreSQL postcheck: `22/22` promoted rows, `22/22` verified/auto,
   `22/22` matching Oracle hash, with `2` backup rows; E2E: PostgreSQL,
   SQLite, canonical snapshot, and runtime all `22/22`.
 - PG289 PostgreSQL postcheck: `13/13` promoted rows, `13/13` verified/auto,
   `13/13` matching Oracle hash, with `8` backup rows; E2E: PostgreSQL,
   SQLite, canonical snapshot, and runtime all `13/13`.
-- Global all-card authoritative queue after PG289:
-  `target_identity_count=31298`, `xmage_authoritative_source_count=28362`,
+- PG290 PostgreSQL postcheck: `3/3` promoted rows, `3/3` verified/auto,
+  `3/3` matching Oracle hash, with `0` backup rows; E2E: PostgreSQL,
+  SQLite, canonical snapshot, and runtime all `3/3`.
+- Global all-card authoritative queue after PG290:
+  `target_identity_count=31295`, `xmage_authoritative_source_count=28359`,
   `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
-  `xmage_authoritative_adapter_required_count=28362`.
-- Running the exact splitter after PG289 on supported units returns
-  `proposal_count=0` over `6936` considered supported rows. The next work must
+  `xmage_authoritative_adapter_required_count=28359`.
+- Running the exact splitter after PG290 on supported units returns
+  `proposal_count=0` over `7409` considered supported rows. The next work must
   implement another exact runtime-backed family/subpattern, with likely first
   candidates from the largest remaining XMage work units: `draw_engine`,
-  `add_counters`, residual `recursion`, residual `board_wipe`,
+  residual `add_counters`, residual `recursion`, residual `board_wipe`,
   `grant_protection_from_chosen_color`, and richer targeted removal/damage
   variants.
 

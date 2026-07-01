@@ -100,6 +100,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "copy_spell": "engine",
     "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",
+    "add_counters": "support",
     "graveyard_flashback_grant": "engine",
     "redistribute_life_totals": "wincon",
     "land_recursion": "engine",
@@ -297,6 +298,13 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
         elif effect_json.get("look_top_library_any_time"):
             category = "draw"
             subtype = "topdeck_visibility"
+    elif effect == "add_counters":
+        counter_type = str(effect_json.get("counter_type") or "")
+        if counter_type == "-1/-1":
+            category = "removal"
+            subtype = "negative_counters"
+        elif counter_type == "+1/+1":
+            subtype = "plus_one_counters"
     role = {
         "category": category,
         "effect": effect,

@@ -472,6 +472,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "board_wipe_destroy_scope_not_supported")
 
+    def test_fixed_plus_one_counter_target_creature_maps_to_add_counters_runtime(self) -> None:
+        row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Put a +1/+1 counter on target creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new AddCountersTargetEffect("
+                "CounterType.P1P1.createInstance()));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "add_counters")
+        self.assertEqual(effect["battle_model_scope"], split.ADD_COUNTERS_TARGET_SCOPE)
+        self.assertEqual(effect["counter_type"], "+1/+1")
+        self.assertEqual(effect["counter_count"], 1)
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"]})
+
+    def test_fixed_minus_one_counters_target_creature_preserves_count(self) -> None:
+        row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Put four -1/-1 counters on target creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new AddCountersTargetEffect("
+                "CounterType.M1M1.createInstance(4)));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["counter_type"], "-1/-1")
+        self.assertEqual(effect["counter_count"], 4)
+
+    def test_add_counters_multi_target_spell_stays_blocked(self) -> None:
+        row = queue_row(split.ADD_COUNTERS_TARGET_UNIT, effect_classes=["AddCountersTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Put a +1/+1 counter on each of up to two target creatures."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new AddCountersTargetEffect("
+                "CounterType.P1P1.createInstance()));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "add_counters_counter_not_fixed")
+
     def test_report_summarizes_selected_and_blocked_rows(self) -> None:
         rows = [
             queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"], card_id="draw"),
