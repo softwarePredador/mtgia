@@ -8,8 +8,8 @@ Goal: concluir as Etapas 1, 2 e 3 do plano de produto do ManaLoom com evidencia 
 | Etapa | Nome | Status | Resultado esperado |
 |---|---|---|---|
 | 1 | Diagnostico final do estado atual | Concluida | Produto mapeado por funcionalidade, disponibilidade, atratividade, riscos e lacunas |
-| 2 | Fechar o core para lancamento | Concluida com bloqueios | Core local/offline validado; build Android compilado; E2E publico com escrita e smoke instalado pendentes |
-| 3 | Confiabilidade tecnica e observabilidade | Em andamento | App/backend rastreaveis em falhas reais, com release smoke instalado e evidencias operacionais |
+| 2 | Fechar o core para lancamento | Concluida com bloqueios | Core local/offline validado; E2E publico com escrita e smoke instalado pendentes |
+| 3 | Confiabilidade tecnica e observabilidade | Concluida com bloqueios | Observabilidade por codigo/teste e probes read-only validados; Sentry mobile/signing/device smoke pendentes |
 
 ## Etapa 1 - Diagnostico final do estado atual
 
@@ -62,7 +62,7 @@ Validar que um usuario consegue concluir o fluxo principal sem perda de contexto
 | Apply salva e valida o deck final | PASS_LOCAL | `PUT`/bulk concluido e `validate` final registrado |
 | Export/share/copy funciona no deck validado | PARTIAL | Acao executada sem erro em build alvo |
 | Falha de IA tem UX segura | PASS_LOCAL | Caso `needs_repair`, no-op ou erro amigavel documentado |
-| Fluxo completo passa em build real | PARTIAL_BUILD_ARTIFACT | Android APK debug/release e AAB release compilados com `API_BASE_URL` publico; falta instalar/executar |
+| Fluxo completo passa em build real | BLOCKED_BY_RELEASE_SMOKE | Android APK release local foi gerado na Etapa 3; falta instalar/executar fluxo core minimo |
 
 ### Subtarefas operacionais
 
@@ -80,7 +80,11 @@ Validar que um usuario consegue concluir o fluxo principal sem perda de contexto
 
 ## Etapa 3 - Confiabilidade tecnica e observabilidade
 
-Status: `EM ANDAMENTO`
+Status: `CONCLUIDA_COM_BLOQUEIOS`
+
+Documento de saida:
+
+- `docs/qa/MANALOOM_STAGE3_OBSERVABILITY_READINESS_2026-07-01.md`
 
 Objetivo:
 
@@ -90,16 +94,16 @@ Garantir que o produto seja operavel com usuarios reais: quando algo falhar, dev
 
 | Criterio | Status | Evidencia exigida |
 |---|---|---|
-| Backend health/ready publico estavel | Parcial | Ja validado na Etapa 1; repetir no fechamento |
-| `x-request-id` manual preservado no backend | Parcial | Ja validado em `/ready`; falta app -> backend ponta a ponta |
-| `x-request-id` do app aparece em response/log/breadcrumb | Parcial | Testes unitarios cobrem envio/eco/erro; falta smoke app real com request rastreavel |
-| Sentry backend com ingestao real confirmada | Parcial | Documentado historicamente; confirmar se necessario |
-| Sentry mobile com ingestao real confirmada | Pendente | Evento real vindo do app/build alvo |
-| Release/internal build smoke com API publica | Parcial | APK debug, APK release e AAB release compilados; falta instalar/executar fluxo core minimo |
-| Rate limit/paywall de IA nao quebra UX | Pendente | Validar resposta `402`/headers/plano ou registrar como fora do release |
-| Logs nao expõem segredo/token | Pendente | Secret/log scan no escopo de release |
-| Scanner tem decisao explicita | Concluido | Fora do release por default via `ENABLE_SCANNER_RELEASE=false`; falta sprint fisica para reativar |
-| Push notification tem status explicito | Pendente | Revalidar build atual ou marcar fora do release publico |
+| Backend health/ready publico estavel | PASS | Ja validado na Etapa 1; repetido no fechamento |
+| `x-request-id` manual preservado no backend | PASS | `/ready` preservou `stage3-observability-ready-20260701` |
+| `x-request-id` do app aparece em response/log/breadcrumb | PASS_LOCAL | Testes unitarios cobrem envio/eco/erro; falta smoke app real com request rastreavel |
+| Sentry backend com ingestao real confirmada | PASS_CODE_HISTORICAL | Documentado historicamente; nao reexecutado nesta etapa |
+| Sentry mobile com ingestao real confirmada | BLOCKED_BY_SECRET_AND_RUNTIME | Evento real vindo do app/build alvo |
+| Release/internal build smoke com API publica | PARTIAL_BUILD_ARTIFACT | APK release local gerado; falta assinatura de distribuicao e instalar/executar fluxo core minimo |
+| Rate limit/paywall de IA nao quebra UX | NOT_STAGE3_CORE | Validar resposta `402`/headers/plano ou registrar como fora do release |
+| Logs nao expõem segredo/token | PASS_LOCAL_WITH_REVIEW | Testes de sanitizacao passaram; scan heuristico listou caminhos para revisao |
+| Scanner tem decisao explicita | PASS_SCOPE | Fora do release por default via `ENABLE_SCANNER_RELEASE=false`; falta sprint fisica para reativar |
+| Push notification tem status explicito | PARTIAL | Codigo/config existem; revalidar build atual ou marcar fora do release publico |
 
 ### Subtarefas operacionais
 
@@ -130,11 +134,11 @@ Garantir que o produto seja operavel com usuarios reais: quando algo falhar, dev
 
 ## Proximas acoes imediatas
 
-1. Criar/atualizar `docs/qa/MANALOOM_STAGE3_OBSERVABILITY_READINESS_2026-07-01.md`.
-2. Rodar secret/log scan no escopo de release.
-3. Instalar APK debug ou release interno em device/simulator e executar fluxo core minimo com API publica/staging.
-4. Confirmar evento Sentry mobile real ou registrar bloqueio de DSN/credencial.
-5. Preparar keystore Android real antes de qualquer AAB de distribuicao.
+1. Obter aprovacao explicita para smoke E2E publico com escrita, ou preparar staging isolado.
+2. Rodar `core_flow_smoke_test.dart` e `import_to_deck_flow_test.dart` contra o alvo aprovado.
+3. Injetar `SENTRY_DSN` seguro e rodar `mobile_sentry_smoke_test.dart` em build/dispositivo alvo.
+4. Configurar signing Android/iOS de distribuicao.
+5. Revalidar push real ou declarar fora do release publico.
 
 ## Regra de conclusao do goal
 
