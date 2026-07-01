@@ -3111,6 +3111,84 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_self_return_pays_mana_and_moves_source_to_hand(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("black", 1)
+        source = {
+            "name": "Sanitarium Skeleton",
+            "type_line": "Creature - Skeleton",
+            "cmc": 1,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+            "graveyard_self_return_to_hand": True,
+            "graveyard_self_return_destination": "hand",
+            "graveyard_self_return_activation_cost_mana": "{2}{B}",
+            "graveyard_self_return_activation_cost_generic": 2,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "_rule_logical_key": "battle_rule_v1:fixture_skeleton",
+        }
+        other = {"name": "Other Graveyard Card", "type_line": "Sorcery", "cmc": 1}
+        active.graveyard.extend([other, source])
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=15,
+            rng=random.Random(15),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Sanitarium Skeleton"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Other Graveyard Card"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Sanitarium Skeleton"
+                and data.get("activation_kind") == "graveyard_self_return_to_hand"
+                and data.get("activation_cost") == "{2}{B}"
+                and data.get("source_zone") == "graveyard"
+                and data.get("destination") == "hand"
+                and data.get("returned") == ["Sanitarium Skeleton"]
+                and data.get("mana_paid") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_self_return_does_not_move_without_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Durable Coilbug",
+            "type_line": "Creature - Insect",
+            "cmc": 5,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+            "graveyard_self_return_to_hand": True,
+            "graveyard_self_return_activation_cost_mana": "{4}{B}",
+            "graveyard_self_return_activation_cost_generic": 4,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.hand, [])
+        self.assertEqual(active.graveyard, [source])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
 
 if __name__ == "__main__":
     unittest.main()

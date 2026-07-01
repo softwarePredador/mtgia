@@ -50,7 +50,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`.
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg319_graveyard_self_return_wave_commander_legal.md`.
+  - Manifesto de replay corrente para o checkpoint operacional:
+    `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
@@ -76,9 +78,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG318:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg318_library_tutor_spell_wave_commander_legal.md`.
-    Resultado all-card: `27394` identidades ainda com gap, `27080` com fonte
+    Evidencia corrente pos-PG319:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg319_graveyard_self_return_wave_commander_legal.md`.
+    Resultado all-card: `27388` identidades ainda com gap, `27074` com fonte
     XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
     gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -110,9 +112,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     da propria fonte, alem de target-keyword com keyword estatica propria. O
     PG318 adicionou `13` tutors de biblioteca exatos para campo de batalha/topo
     do grimorio, incluindo land tutors como `Farseek`/`Nature's Lore` e
-    `Personal Tutor`. Todos os pacotes PG285-PG318 passaram postcheck
-    PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O splitter pos-PG318
-    retorna `proposal_count=0` sobre `8032` linhas suportadas consideradas; a
+    `Personal Tutor`. O PG319 adicionou `6` permanentes com habilidade simples
+    de retorno da propria carta do cemiterio para a mao, incluindo
+    `Sanitarium Skeleton` e `Firewing Phoenix`. Todos os pacotes PG285-PG319
+    passaram postcheck PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O
+    splitter pos-PG319 retorna `proposal_count=0` sobre `8026` linhas
+    suportadas consideradas; a
     proxima etapa deve continuar em novos subpadroes runtime-backed de maior
     reducao reutilizavel, partindo da fila global e nao de decks cadastrados.
 

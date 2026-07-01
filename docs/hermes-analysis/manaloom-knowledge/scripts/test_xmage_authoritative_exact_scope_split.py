@@ -1698,6 +1698,122 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_recursion_oracle_not_simple")
 
+    def test_graveyard_self_return_mana_only_creature_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sanitarium Skeleton",
+                type_line="Creature - Skeleton",
+                oracle_text="{2}{B}: Return this card from your graveyard to your hand.",
+            ),
+            source_text="""
+                this.addAbility(new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{2}{B}")
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE)
+        self.assertTrue(effect["graveyard_self_return_to_hand"])
+        self.assertEqual(effect["activation_cost_mana"], "{2}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(effect["source_zone"], "graveyard")
+        self.assertEqual(effect["destination"], "hand")
+
+    def test_graveyard_self_return_preserves_static_keyword_and_enters_tapped(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Firewing Phoenix",
+                type_line="Creature - Phoenix",
+                oracle_text="Flying\n{1}{R}{R}{R}: Return this card from your graveyard to your hand.",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{1}{R}{R}{R}")
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["activation_cost_colors"], ["R", "R", "R"])
+
+        row["xmage_ability_classes"] = ["EntersBattlefieldTappedAbility", "SimpleActivatedAbility"]
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Clay Revenant",
+                type_line="Artifact Creature - Golem",
+                oracle_text="This creature enters tapped.\n{2}{B}: Return this card from your graveyard to your hand.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTappedAbility());
+                this.addAbility(new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{2}{B}")
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["effect_json"]["enters_tapped"])
+
+    def test_graveyard_self_return_blocks_additional_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dutiful Griffin",
+                type_line="Creature - Griffin",
+                oracle_text="Flying\n{2}{W}, Sacrifice two enchantments: Return this card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{2}{W}")
+                );
+                ability.addCost(new SacrificeTargetCost(new TargetControlledPermanent(2, 2, filter, true)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_self_return_oracle_not_simple")
+
     def test_destroy_all_creatures_maps_to_board_wipe_scope(self) -> None:
         row = queue_row(split.BOARD_WIPE_UNIT, effect_classes=["DestroyAllEffect"])
         proposal, reason = split.split_row(

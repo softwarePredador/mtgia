@@ -25426,6 +25426,143 @@ def graveyard_to_hand_targets(player, permanent, all_players, turn):
     return candidates[:target_count]
 
 
+def activate_graveyard_self_return_cards(
+    player,
+    opponents,
+    all_players,
+    turn,
+    rng,
+    *,
+    phase,
+):
+    if phase not in {"precombat_main", "postcombat_main"}:
+        return 0
+    candidates = []
+    for card in list(getattr(player, "graveyard", []) or []):
+        if not isinstance(card, dict):
+            continue
+        effect_data = card if card.get("battle_model_scope") else get_card_effect(card)
+        if not (
+            effect_data.get("battle_model_scope") == GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE
+            and effect_data.get("graveyard_self_return_to_hand")
+        ):
+            continue
+        activation_cost_generic = int(
+            effect_data.get("graveyard_self_return_activation_cost_generic")
+            or effect_data.get("activation_cost_generic")
+            or 0
+        )
+        activation_cost_colors = list(
+            effect_data.get("graveyard_self_return_activation_cost_colors")
+            or effect_data.get("activation_cost_colors")
+            or []
+        )
+        activation_cost_text = (
+            effect_data.get("graveyard_self_return_activation_cost_mana")
+            or effect_data.get("activation_cost_mana")
+            or _activation_cost_text(activation_cost_generic, activation_cost_colors)
+        )
+        if not player.can_pay(activation_cost_text):
+            continue
+        score = graveyard_recycle_candidate_score(card, player, all_players, turn)
+        candidates.append(
+            {
+                "card": card,
+                "effect_data": effect_data,
+                "activation_cost_text": activation_cost_text,
+                "activation_cost_generic": activation_cost_generic,
+                "activation_cost_colors": activation_cost_colors,
+                "score": score,
+            }
+        )
+    if not candidates:
+        return 0
+    candidates.sort(
+        key=lambda item: (
+            -int(item.get("score") or 0),
+            int(float(item["card"].get("cmc") or card_mana_value(item["card"]) or 0)),
+            item["card"].get("name", "?"),
+        )
+    )
+    selected = candidates[0]
+    card = selected["card"]
+    effect_data = selected["effect_data"]
+    activation_cost_text = selected["activation_cost_text"]
+    activation_cost_generic = selected["activation_cost_generic"]
+    activation_cost_colors = selected["activation_cost_colors"]
+    mana_paid = activation_cost_generic + len(activation_cost_colors)
+    if not player.spend_mana(activation_cost_text):
+        return 0
+    moved = remove_cards_from_graveyard(
+        player,
+        [card],
+        turn=turn,
+        source_event="graveyard_self_return_to_hand",
+    )
+    if not moved:
+        return 0
+    returned_card = moved[0]
+    player.hand.append(returned_card)
+    emit_decision_trace(
+        decision_type="graveyard_activation",
+        player=player,
+        turn=turn,
+        phase=phase,
+        available_options=[
+            decision_card_option(
+                item["card"],
+                item["effect_data"],
+                score=item["score"],
+                action="return_self_from_graveyard_to_hand",
+                destination="hand",
+            )
+            for item in candidates[:8]
+        ],
+        chosen_option=decision_card_option(
+            returned_card,
+            effect_data,
+            score=selected["score"],
+            action="return_self_from_graveyard_to_hand",
+            destination="hand",
+        ),
+        score_components={
+            "activation_cost": activation_cost_text,
+            "activation_cost_generic": activation_cost_generic,
+            "activation_cost_colors": activation_cost_colors,
+        },
+        rule_source="graveyard_self_return_to_hand_v1",
+        rule_status=effect_data.get("_rule_review_status", "active"),
+        confidence="medium",
+        expected_benefit_score=selected["score"],
+        reason="convert spare mana into recurring graveyard card access",
+        strategic_principle="recover reusable graveyard threats when the mana cost is payable",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={
+            "mana": -mana_paid,
+            "cards_to_hand": 1,
+            "graveyard": -1,
+            "returned": [returned_card.get("name", "?")],
+        },
+        risk_flags=["graveyard_self_return", "mana_activation"],
+    )
+    emit_replay_event(
+        "recursion_resolved",
+        player=player.name,
+        card=returned_card.get("name", "?"),
+        activation_kind="graveyard_self_return_to_hand",
+        activation_cost=activation_cost_text,
+        source_zone="graveyard",
+        destination="hand",
+        returned=[returned_card.get("name", "?")],
+        returned_count=1,
+        mana_paid=mana_paid,
+        phase=phase,
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+    return 1
+
+
 def activate_graveyard_recycling_artifacts(
     player,
     opponents,
@@ -26773,6 +26910,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             phase=phase,
         ):
             return 1
+
+    if activate_graveyard_self_return_cards(
+        player,
+        opponents,
+        all_players,
+        turn,
+        rng,
+        phase=phase,
+    ):
+        return 1
 
     if activate_graveyard_recycling_artifacts(
         player,
@@ -35464,6 +35611,7 @@ SIMPLE_ACTIVATED_DESTROY_SCOPE = "xmage_permanent_simple_activated_destroy_targe
 SIMPLE_ACTIVATED_SELF_BOOST_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_BOOST_SCOPE = "xmage_permanent_simple_activated_target_boost_until_eot_v1"
 SIMPLE_ACTIVATED_TARGET_KEYWORD_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
+GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE = "xmage_graveyard_simple_activated_self_return_to_hand_v1"
 
 
 def _activated_rule_effects_for_permanent(permanent):
