@@ -35,13 +35,13 @@ class _FakeApiClient extends ApiClient {
         'source': 'pg_commander_learned_decks',
         'promoted_deck': const {
           'commander': 'Lorehold, the Historian',
-          'source_system': 'hermes',
+          'source_system': 'pg_commander_learned_decks',
           'source_ref': 'learned_deck:82',
           'score': 136.5,
           'legal_status': 'commander_legal',
         },
         'recommended_deck': const {
-          'source_system': 'hermes',
+          'source_system': 'pg_commander_learned_decks',
           'source_ref': 'learned_deck:82',
           'deck_name': 'Lorehold Learned',
           'archetype': 'spellslinger',

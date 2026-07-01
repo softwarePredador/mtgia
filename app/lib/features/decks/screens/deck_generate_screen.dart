@@ -1031,14 +1031,33 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return value == null || value.isEmpty ? null : value;
     }
 
+    String sourceDisplayLabel(String rawSource) {
+      final normalized = rawSource.toLowerCase();
+      if (normalized.contains('hermes') ||
+          normalized.contains('learned_deck') ||
+          normalized.contains('commander_learning') ||
+          normalized.contains('pg_commander')) {
+        return 'Deck aprendido Hermes';
+      }
+
+      final cleaned = rawSource.replaceAll(RegExp(r'[_-]+'), ' ').trim();
+      if (cleaned.isEmpty) return 'Deck aprendido';
+      return cleaned
+          .split(RegExp(r'\s+'))
+          .map((word) {
+            if (word.isEmpty) return word;
+            return word.length == 1
+                ? word.toUpperCase()
+                : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+          })
+          .join(' ');
+    }
+
     final sourceSystem =
         textValue(promotedDeck, 'source_system') ??
         textValue(recommendedDeck, 'source_system') ??
         'hermes';
-    final sourceLabel =
-        sourceSystem.toLowerCase() == 'hermes'
-            ? 'Deck aprendido Hermes'
-            : sourceSystem.toUpperCase();
+    final sourceLabel = sourceDisplayLabel(sourceSystem);
     final score = promotedDeck['score'] ?? recommendedDeck['score'];
     final legalStatus =
         textValue(promotedDeck, 'legal_status') ??
