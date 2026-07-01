@@ -1994,6 +1994,124 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_self_boost_oracle_not_simple")
 
+    def test_activated_target_boost_maps_to_target_stat_modifier(self) -> None:
+        row = queue_row(
+            split.TARGET_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Steed",
+                type_line="Creature - Beast",
+                oracle_text="{2}{U}, {T}: Target creature gets -2/-0 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostTargetEffect(-2, 0, Duration.EndOfTurn), "
+                'new ManaCostsImpl<>("{2}{U}"));'
+                "ability.addCost(new TapSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_BOOST_ACTIVATED_SCOPE)
+        self.assertEqual(effect["activated_effect"], "target_stat_modifier_until_eot")
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["power_delta"], -2)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["U"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["power_delta"], -2)
+
+    def test_activated_target_boost_accepts_colored_mana_cost_source(self) -> None:
+        row = queue_row(
+            split.TARGET_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Flame",
+                type_line="Enchantment",
+                oracle_text="{R}: Target creature gets +1/+0 until end of turn.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleActivatedAbility("
+                "new BoostTargetEffect(1, 0, Duration.EndOfTurn), "
+                "new ColoredManaCost(ColoredManaSymbol.R)));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "enchantment")
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_cost_colors"], ["R"])
+        self.assertFalse(effect["activation_requires_tap"])
+
+    def test_activated_target_boost_blocks_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.TARGET_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Sledder",
+                type_line="Creature - Goblin",
+                oracle_text="Sacrifice a Goblin: Target creature gets +1/+1 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostTargetEffect(1, 1, Duration.EndOfTurn), "
+                "new SacrificeTargetCost(filter));"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_target_boost_oracle_cost_not_supported")
+
+    def test_activated_target_boost_blocks_filtered_target_permanent(self) -> None:
+        row = queue_row(
+            split.TARGET_BOOST_ACTIVATED_UNIT,
+            effect_classes=["BoostTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Guildmage",
+                type_line="Creature - Human Wizard",
+                oracle_text="{G}: Target green creature gets +1/+1 until end of turn.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new BoostTargetEffect(1, 1, Duration.EndOfTurn), new GenericManaCost(1));"
+                "ability.addTarget(new TargetPermanent(filter));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_target_boost_oracle_not_simple")
+
     def test_activated_target_keyword_maps_to_keyword_until_eot(self) -> None:
         row = queue_row(
             split.BOOST_KEYWORD_UNIT,

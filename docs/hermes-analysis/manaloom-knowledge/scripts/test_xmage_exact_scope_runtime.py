@@ -1489,6 +1489,170 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(tap_only["toughness"], 1)
         self.assertFalse(tap_only.get("tapped", False))
 
+    def test_simple_activated_target_boost_pays_taps_and_cleans_up(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("white", 1)
+        source = {
+            "name": "Fixture Warden",
+            "type_line": "Creature - Spirit",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": 1,
+            "toughness_delta": 1,
+            "power_boost": 1,
+            "toughness_boost": 1,
+            "activation_cost_mana": "{W}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": True,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_warden",
+        }
+        small = {"name": "Small Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        best = {"name": "Best Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 5, "toughness": 5}
+        active.battlefield.extend([source, small, best])
+        opponent.battlefield.append(enemy)
+
+        activated = self.battle.activate_generic_target_boost_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=21,
+            rng=random.Random(21),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertTrue(source["tapped"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(best["power"], 5)
+        self.assertEqual(best["toughness"], 5)
+        self.assertEqual(small["power"], 2)
+        self.assertEqual(enemy["power"], 5)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("activation_kind") == "simple_activated_target_boost"
+                and data.get("target") == "Best Bear"
+                and data.get("power_delta") == 1
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_warden"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Warden"
+                and data.get("target") == "Best Bear"
+                and data.get("result") == "stat_modifier_until_eot_applied"
+                for event, data in self.events
+            )
+        )
+
+        self.battle.clear_until_eot(active)
+        self.assertEqual(best["power"], 4)
+        self.assertEqual(best["toughness"], 4)
+
+    def test_simple_activated_target_boost_can_kill_opponent_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Defiler",
+            "type_line": "Creature - Horror",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": -2,
+            "toughness_delta": -2,
+            "power_boost": -2,
+            "toughness_boost": -2,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "summoning_sick": False,
+        }
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        enemy = {"name": "Enemy Cub", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.extend([source, own])
+        opponent.battlefield.append(enemy)
+
+        activated = self.battle.activate_generic_target_boost_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=22,
+            rng=random.Random(22),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Cub"])
+        self.assertEqual(active.battlefield, [source, own])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Defiler"
+                and data.get("target") == "Enemy Cub"
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_target_boost_blocks_summoning_sick_tap_source(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        source = {
+            "name": "Fixture Steed",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "activated_effect": "target_stat_modifier_until_eot",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_target_boost_until_eot_v1",
+            "target": "creature",
+            "target_controller": "any",
+            "target_constraints": {"card_types": ["creature"]},
+            "power_delta": -2,
+            "toughness_delta": 0,
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "summoning_sick": True,
+        }
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(source)
+        opponent.battlefield.append(enemy)
+
+        activated = self.battle.activate_generic_target_boost_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            source,
+            turn=23,
+            rng=random.Random(23),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertFalse(source.get("tapped", False))
+        self.assertEqual(enemy["power"], 2)
+
     def test_simple_activated_target_keyword_pays_taps_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

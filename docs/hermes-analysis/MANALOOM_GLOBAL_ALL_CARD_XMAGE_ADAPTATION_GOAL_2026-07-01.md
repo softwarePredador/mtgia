@@ -8,7 +8,7 @@ Fonte operacional:
 
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 - `docs/hermes-analysis/BATTLE_RULES_FAMILY_PIPELINE_CONTRACT_2026-06-29.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
 
 ## Objetivo
 
@@ -23,21 +23,21 @@ fila global de cartas conhecidas pelo ManaLoom.
 
 ## Estado atual
 
-Checkpoint: pos-PG314, `xmage_permanent_simple_activated_target_keyword_until_eot_v1`.
+Checkpoint: pos-PG315, `xmage_permanent_simple_activated_target_boost_until_eot_v1`.
 
 | Metrica | Valor |
 | --- | ---: |
-| `target_identity_count` | 27440 |
-| `xmage_authoritative_source_count` | 27126 |
+| `target_identity_count` | 27421 |
+| `xmage_authoritative_source_count` | 27107 |
 | `xmage_missing_source_exception_count` | 314 |
 | `xmage_authoritative_parser_gap_count` | 0 |
-| `xmage_authoritative_adapter_required_count` | 27126 |
+| `xmage_authoritative_adapter_required_count` | 27107 |
 | `manual_semantic_decision_units_remaining` | 314 |
 | `adapter_work_unit_count` | 11429 |
 
 Leitura correta:
 
-- `27126` identidades ja tem verdade comportamental no XMage local.
+- `27107` identidades ja tem verdade comportamental no XMage local.
 - O trabalho restante nelas e traduzir XMage para adapters/runtime ManaLoom por
   familia/subpadrao, nao revisar semanticamente carta por carta.
 - `314` identidades nao resolveram classe local no XMage e ficam em trilha
@@ -101,22 +101,22 @@ Prioridade secundaria:
 
 ## Proxima etapa concreta
 
-PG314 fechou o subpadrao de permanente com habilidade ativada simples que da
-keyword temporaria a uma criatura alvo ate o fim do turno. Foram promovidas 12
-cartas com custos de ativacao simples suportados e efeito
-`target_keyword_until_eot`.
+PG315 fechou o subpadrao de permanente com habilidade ativada simples que
+modifica poder/resistencia de uma criatura alvo ate o fim do turno. Foram
+promovidas 19 cartas com custos de ativacao simples suportados e efeito
+`target_stat_modifier_until_eot`.
 
-Evidencias PG314:
+Evidencias PG315:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_package.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_pg_apply_evidence.md`
-- `docs/hermes-analysis/master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_e2e_validation.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg314_existing_supported_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg315_existing_supported_recheck.md`
 
-O splitter exato pos-PG314 retorna `proposal_count=0` sobre `7406` linhas
+O splitter exato pos-PG315 retorna `proposal_count=0` sobre `7433` linhas
 suportadas consideradas. Portanto, a proxima etapa nao e repetir os subpadroes
 ja cobertos, e sim escolher outro subpadrao runtime-backed a partir da fila
-pos-PG314.
+pos-PG315.
 
 Maiores work units atuais para priorizacao:
 
@@ -176,6 +176,21 @@ PG314:
 Nome:
 
 - `xmage_permanent_simple_activated_target_keyword_until_eot_v1`
+
+PG315:
+
+- `BoostTargetEffect`
+- `SimpleActivatedAbility`
+- alvo `TargetCreaturePermanent`
+- efeito aplicado a criatura alvo ate o fim do turno
+- custos suportados: mana simples e tap da propria fonte
+- bloqueia sacrificio, descarte, vida, exilio, alvos filtrados por subtipo/cor
+  e texto Oracle dinamico/complexo
+- limpeza obrigatoria via `until_end_of_turn`
+
+Nome:
+
+- `xmage_permanent_simple_activated_target_boost_until_eot_v1`
 
 Bloqueios reais deixados para sublotes posteriores:
 

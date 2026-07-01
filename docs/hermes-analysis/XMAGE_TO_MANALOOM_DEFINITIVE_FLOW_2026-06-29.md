@@ -121,22 +121,22 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27440`
-- XMage authoritative source resolved: `27126`
+- target all-card battle-gap identities: `27421`
+- XMage authoritative source resolved: `27107`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `27126`
+- XMage authoritative adapter required: `27107`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9886`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27126` identities, card semantics are accepted from XMage; work is now
+- For `27107` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -155,9 +155,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG314 Exact Adapter Waves
+## PG283-PG315 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG314 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG315 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -253,6 +253,12 @@ patterns:
   targets, and supported keywords `haste`, `flying`, `trample`, and
   `first_strike` ->
   `xmage_permanent_simple_activated_target_keyword_until_eot_v1`
+- `xmage_signature::BoostTargetEffect::SimpleActivatedAbility::TargetCreaturePermanent::no_condition_class::targeting,activated_ability`
+  with exact activated target-creature power/toughness modifier until end of
+  turn text, battlefield permanents, simple mana/tap source costs only, no
+  source or target sacrifice, no filtered targets, no dynamic modifiers, and no
+  compound activated text ->
+  `xmage_permanent_simple_activated_target_boost_until_eot_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - fixed damage, destroy and exile target spells with XMage/Oracle-matched
@@ -1804,6 +1810,80 @@ PG314 measured result:
   `proposal_count=0` over `7406` considered supported rows.
 - The next work must implement another exact runtime-backed family/subpattern
   from the post-PG314 queue. The largest current work units are `recursion`
+  `1984`, `draw_engine` `1660`, `grant_protection` `1167`, `direct_damage`
+  `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
+  `removal_destroy` `636`, and `tutor` `626`.
+
+PG315 evidence:
+
+- PG315 permanent activated target-boost package:
+  `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_package.md`
+- PG315 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_apply_evidence.md`
+- PG315 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_e2e_validation.md`
+- PG315 PG card metadata sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_to_sqlite_sync.json`
+- PG315 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_battle_rules_pg_to_sqlite_sync.json`
+- PG315 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg315_permanent_activated_target_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg315_permanent_activated_target_boost_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg315_permanent_activated_target_boost_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg315_permanent_activated_target_boost_wave.md`
+- post-PG315 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg315_permanent_activated_target_boost_wave_recheck.md`
+- post-PG315 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
+- PG315 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_permanent_activated_target_boost_wave.md`
+- post-PG315 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg315_existing_supported_recheck.md`
+
+PG315 measured result:
+
+- PG315 promoted `19` exact permanent simple activated target-boost rules. The
+  promoted runtime effect is `target_stat_modifier_until_eot`, with target
+  creature selection, positive pump/debuff handling, activation cost metadata,
+  tap handling, zero-toughness cleanup, and until-end-of-turn cleanup.
+- Runtime now supports simple activated target-creature stat modifiers with
+  mana/tap payment, summoning-sickness blocking for tap-creature activations,
+  target legality through `target_constraints`, beneficial auto-targeting for
+  own creatures, and harmful auto-targeting for opponent creatures.
+- The splitter blocks unsafe neighbors such as sacrifice target/source costs,
+  discard, life, exile, filtered target permanents, dynamic modifiers, target
+  pointer variants, and compound activated text.
+- PostgreSQL apply evidence reports `19/19` promoted rows, `19/19`
+  verified/auto rows, and `19/19` matching Oracle hash rows, with `0` backup
+  rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `3465` PostgreSQL rules,
+  inserted/updated `3464` SQLite rows, and exported `4667` canonical snapshot
+  rows.
+- PG card metadata -> Hermes/SQLite sync matched `5683` PostgreSQL card rows,
+  wrote `5608` SQLite cache alias rows, and backfilled `2699/2699` deck-card
+  references after one transient SQLite lock retry.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning; legacy
+  contamination `pass`.
+- Focused exact-scope tests cover mapping, colored activation cost parsing,
+  blocking sacrifice and filtered targets, runtime activation payment,
+  beneficial target selection, harmful target selection with zero-toughness
+  death, until-end-of-turn cleanup, and summoning-sickness blocking; `181`
+  focused exact-scope tests pass.
+- Global all-card readiness after PG315:
+  `battle_and_oracle_ready=2203` all-known cards,
+  `ready_product_qa_battle_and_oracle_ready=389`, and
+  `snapshot_has_verified_rule=3351`.
+- Global all-card authoritative queue after PG315:
+  `target_identity_count=27421`, `xmage_authoritative_source_count=27107`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27107`.
+- Running the exact splitter after PG315 on supported units returns
+  `proposal_count=0` over `7433` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern
+  from the post-PG315 queue. The largest current work units are `recursion`
   `1984`, `draw_engine` `1660`, `grant_protection` `1167`, `direct_damage`
   `928`, `source_add_counters` `795`, `life_gain` `754`, `draw_cards` `676`,
   `removal_destroy` `636`, and `tutor` `626`.

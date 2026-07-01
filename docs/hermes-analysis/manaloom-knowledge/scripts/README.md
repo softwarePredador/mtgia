@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG314. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG315. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -128,7 +128,10 @@ constraints; PG313 added 63 exact permanent activated self-boost rules with
 mana/tap activation handling and until-end-of-turn cleanup; PG314 added 12
 exact permanent activated target-keyword rules with mana/tap activation
 handling, target-creature legality, supported `haste`/`flying`/`trample`/
-`first_strike` grants, and until-end-of-turn cleanup.
+`first_strike` grants, and until-end-of-turn cleanup; PG315 added 19 exact
+permanent activated target-creature boost/debuff rules with mana/tap activation
+handling, beneficial/harmful target selection, zero-toughness cleanup, and
+until-end-of-turn cleanup.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -178,6 +181,12 @@ activated abilities with simple mana/tap source costs, target creature
 selection, supported temporary keyword grants, summoning-sickness handling for
 tap-creature activations, and focused blocking for source sacrifice,
 subtype-filtered targets, unsupported Oracle text, and compound costs.
+PG315 added permanent simple activated target-boost support for exact simple
+activated abilities with simple mana/tap source costs, target creature
+selection, positive and negative power/toughness modifiers, summoning-sickness
+handling for tap-creature activations, zero-toughness cleanup, and focused
+blocking for sacrifice costs, filtered targets, dynamic modifiers, target
+pointers, and compound costs.
 Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
@@ -282,15 +291,20 @@ Evidence:
 - `master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_e2e_validation.md`
 - `master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_pg_to_sqlite_sync.json`
 - `master_optimizer_reports/pg314_xmage_permanent_activated_target_keyword_wave_battle_rules_pg_to_sqlite_sync.json`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg314_permanent_activated_target_keyword_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg314_existing_supported_recheck.md`
+- `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_package.md`
+- `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_e2e_validation.md`
+- `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/pg315_xmage_permanent_activated_target_boost_wave_battle_rules_pg_to_sqlite_sync.json`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg315_permanent_activated_target_boost_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg315_existing_supported_recheck.md`
 
-After PG314, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7406` considered supported rows; continue by adding a
+After PG315, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7433` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG314 queue is the current scheduling
-source: `target_identity_count=27440`, `xmage_authoritative_source_count=27126`,
-`xmage_authoritative_adapter_required_count=27126`, `parser_gap=0`, and
+the current authoritative queue. The post-PG315 queue is the current scheduling
+source: `target_identity_count=27421`, `xmage_authoritative_source_count=27107`,
+`xmage_authoritative_adapter_required_count=27107`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the
