@@ -1104,6 +1104,62 @@ PG304 measured result:
   `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
   `tutor`.
 
+PG305 evidence:
+
+- PG305 boost plus keyword spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_package.md`
+- PG305 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_pg_apply_evidence.md`
+- PG305 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_e2e_validation.md`
+- PG305 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg305_boost_keyword_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg305_boost_keyword_spell_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg305_boost_keyword_spell_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg305_boost_keyword_spell_wave.md`
+- post-PG305 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg305_boost_keyword_spell_wave_recheck.md`
+- post-PG305 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg305_boost_keyword_spell_wave.md`
+- post-PG305 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg305_existing_supported_recheck.md`
+
+PG305 measured result:
+
+- PG305 promoted `27` exact one-shot spells whose local XMage source is one
+  `BoostTargetEffect`, one `GainAbilityTargetEffect`, and one fixed target
+  creature, mapped to
+  `xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1`.
+- Runtime now applies the temporary power/toughness modifier and also grants
+  the temporary keyword through the existing until-end-of-turn cleanup path.
+- The splitter blocks multi-target spells, unsupported or parameterized
+  ability classes, non-exact Oracle text, source/Oracle boost mismatches, and
+  source/Oracle target-controller mismatches.
+- PostgreSQL postcheck: `27/27` promoted rows, `27/27` verified/auto,
+  `27/27` matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `6841` PostgreSQL rows, inserted/updated
+  `6635` SQLite rows, and exported `4449` canonical snapshot rows.
+- E2E package validation: PostgreSQL `27/27`, SQLite `27/27`, canonical
+  snapshot `27/27`, and runtime `get_card_effect` `27/27`.
+- Final alignment audits: XMage strategy `26/26` pass; operational surface
+  `pass`; PG/Hermes/SQLite contract `48` pass with `1` known warning for
+  legacy trusted SQLite rules without `oracle_hash`; legacy contamination
+  `pass`.
+- Focused exact-scope tests cover strict boost-plus-keyword mapping,
+  target-controller mismatch blocking, keyword application, replay evidence,
+  and until-end-of-turn cleanup; `113` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG305:
+  `target_identity_count=27650`, `xmage_authoritative_source_count=27336`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27336`.
+- Running the exact splitter after PG305 on supported units returns
+  `proposal_count=0` over `7429` considered supported rows.
+- The next work must implement another exact runtime-backed family/subpattern,
+  with the largest current work units led by `recursion`, `draw_engine`,
+  `grant_protection_from_chosen_color`, residual `direct_damage`,
+  `source_add_counters`, `life_gain`, `draw_cards`, `removal_destroy`, and
+  `tutor`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
