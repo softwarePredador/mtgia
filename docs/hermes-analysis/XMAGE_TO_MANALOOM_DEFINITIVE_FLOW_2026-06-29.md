@@ -38,18 +38,20 @@ The definitive rule: broad XMage extraction may create review candidates and fam
 
 As of 2026-07-01, card-rule acceleration is global over every PostgreSQL
 `cards` row known by ManaLoom. Lorehold, saved decks, learned decks, and replay
-usage are priority signals only; they are not the base scope.
+usage are QA/validation seeds only; they are not the base scope and must not be
+treated as market-demand proxies.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py`
 to route the all-card inventory before creating a battle-family batch. The
 current report is:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v4.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_all_cards_post_legalities_v5_demand_corrected.md`
 
 Current routing rules:
 
-- Start from `cards`, then left join deck usage only for priority.
+- Start from `cards`. Left join current deck usage only for QA and smoke-test
+  sampling; do not use it as launch/user-demand priority.
 - Sync Oracle/legalities first. The 2026-07-01 global legalities apply upserted
   `56304` rows into `card_legalities`, reducing `missing_all_legalities` to
   `0` and `missing_commander_legality` to `3`.
@@ -70,25 +72,32 @@ residual families.
 
 Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_current.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_demand_corrected.md`
 
 Current measured compression:
 
 - all card rows: `34331`
 - battle-gap rows: `31772`
-- current used-deck battle-gap identities: `1511`
-- ready-product battle-gap identities: `232`
+- Commander-legal battle-gap identities: `28835`
+- external-popularity battle-gap identities: `345`
+- current registered-deck QA battle-gap identities: `1511`
+- ready-product QA battle-gap identities: `232`
 - template-first matched rows: `10285`
-- template-first matched used-deck identities: `644`
+- template-first matched Commander-legal identities: `9386`
+- template-first matched external-popularity identities: `218`
+- template-first matched registered-deck QA identities: `644`
 - template + residual family planning units: `28`
 
 Interpretation:
 
-- The immediate product queue is the `1511` used-deck identities, not all
-  `31772` battle-gap rows.
-- The first implementation wave should target generic templates that hit used
-  cards: fixed draw, fixed token creation, mana production, targeted
-  destroy/exile, counter target spell, fixed direct damage, scry/surveil, land
+- The immediate launch modeling queue is not the `1511` currently registered
+  deck identities. Those cards are a QA seed because the current corpus was
+  manually registered by the operator and is not representative of future user
+  imports.
+- The first implementation wave should target generic templates by global
+  Commander-legal breadth, with external popularity/staple signals as secondary
+  ordering: fixed token creation, fixed draw, fixed direct damage, mana
+  production, targeted destroy/exile, counter target spell, scry/surveil, land
   tutor, graveyard return, and protection-until-end-of-turn.
 - Residual high-volume families still require XMage split/scope review, but
   they should be scheduled as family/subpattern units, never as a card-by-card

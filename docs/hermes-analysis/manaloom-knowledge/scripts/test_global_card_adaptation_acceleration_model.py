@@ -48,13 +48,31 @@ class GlobalCardAdaptationAccelerationModelTest(unittest.TestCase):
         ]
         summary = model.summarize(cards)
         self.assertEqual(summary["battle_gap"]["row_count"], 4)
-        self.assertEqual(summary["battle_gap"]["used_deck_unique_names"], 3)
+        self.assertEqual(summary["battle_gap"]["registered_deck_qa_unique_names"], 3)
         self.assertEqual(summary["template_first"]["template_count"], 2)
-        self.assertEqual(summary["template_first"]["matched_used_deck_unique_names"], 2)
+        self.assertEqual(summary["template_first"]["matched_registered_deck_qa_unique_names"], 2)
         self.assertLess(
             summary["work_unit_comparison"]["template_plus_residual_family_units"],
             summary["work_unit_comparison"]["card_row_units_if_done_one_by_one"],
         )
+
+    def test_templates_sort_by_global_commander_breadth_not_registered_decks(self) -> None:
+        rows = model.aggregate_template_rows(
+            [
+                card(
+                    "Manual Deck Token",
+                    "token_creation",
+                    "Create a 1/1 white Soldier creature token.",
+                    deck_count=10,
+                    commander_legality_status="not_legal",
+                ),
+                card("Global Draw A", "draw_selection_topdeck", "Draw a card."),
+                card("Global Draw B", "draw_selection_topdeck", "Draw a card."),
+            ]
+        )
+        self.assertEqual(rows[0]["template"], "draw_fixed_cards")
+        self.assertEqual(rows[0]["commander_legal_rows"], 2)
+        self.assertEqual(rows[1]["registered_deck_qa_rows"], 1)
 
 
 if __name__ == "__main__":

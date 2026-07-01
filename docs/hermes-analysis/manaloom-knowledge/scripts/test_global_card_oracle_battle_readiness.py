@@ -75,6 +75,24 @@ class GlobalCardOracleBattleReadinessTest(unittest.TestCase):
             "counterspell_or_stack_interaction",
         )
 
+    def test_priority_score_ignores_registered_deck_usage(self) -> None:
+        base = {
+            "lanes": ["battle_family_mapper_required"],
+            "commander_legality_status": "legal",
+            "ready_product_deck_count": 0,
+            "commander_slot_count": 0,
+            "deck_count": 0,
+            "total_quantity": 0,
+        }
+        registered_deck_heavy = {
+            **base,
+            "ready_product_deck_count": 12,
+            "commander_slot_count": 4,
+            "deck_count": 99,
+            "total_quantity": 999,
+        }
+        self.assertEqual(audit.priority_score(base), audit.priority_score(registered_deck_heavy))
+
 
 if __name__ == "__main__":
     unittest.main()

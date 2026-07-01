@@ -2,11 +2,12 @@
 """Global all-card Oracle/battle readiness audit for ManaLoom.
 
 This is a read-only routing audit. It starts from every PostgreSQL `cards` row
-known by ManaLoom, then uses deck usage only as a priority signal. It identifies
-which Oracle/legalities gaps should be fixed in bulk and which battle gaps
-should be batched by semantic family. It does not promote `card_battle_rules`,
-mutate PostgreSQL, mutate Hermes SQLite, or claim that broad XMage extraction is
-executable ManaLoom truth.
+known by ManaLoom. Registered deck usage is retained as an internal QA seed,
+not as a market-demand proxy. The audit identifies which Oracle/legalities gaps
+should be fixed in bulk and which battle gaps should be batched by semantic
+family. It does not promote `card_battle_rules`, mutate PostgreSQL, mutate
+Hermes SQLite, or claim that broad XMage extraction is executable ManaLoom
+truth.
 """
 
 from __future__ import annotations
@@ -404,10 +405,7 @@ def build_card_inventory(rows: list[dict[str, Any]], *, xmage_root: Path, xmage_
 
 
 def priority_score(card: dict[str, Any]) -> int:
-    score = int(card["ready_product_deck_count"]) * 2000
-    score += int(card["commander_slot_count"]) * 300
-    score += int(card["deck_count"]) * 20
-    score += int(card["total_quantity"])
+    score = 0
     if "oracle_data_sync" in card["lanes"]:
         score += 1200
     if "legalities_sync" in card["lanes"]:
@@ -420,8 +418,8 @@ def priority_score(card: dict[str, Any]) -> int:
         score += 450
     if "battle_family_mapper_required" in card["lanes"]:
         score += 200
-    if "commander_illegal_block" in card["lanes"]:
-        score += 150
+    if str(card.get("commander_legality_status") or "") in {"legal", "restricted"}:
+        score += 50
     return score
 
 
@@ -459,6 +457,7 @@ def summarize(card_inventory: list[dict[str, Any]], all_card_inventory: dict[str
     )
     product_cards = [card for card in card_inventory if int(card["ready_product_deck_count"]) > 0]
     product_lane_counts = Counter(lane for card in product_cards for lane in card["lanes"])
+    registered_qa_cards = [card for card in card_inventory if int(card["deck_count"]) > 0]
     return {
         "all_card_inventory": all_card_inventory,
         "routing_adjustments": {
@@ -473,10 +472,10 @@ def summarize(card_inventory: list[dict[str, Any]], all_card_inventory: dict[str
             ),
         },
         "all_known_cards": len(card_inventory),
-        "ready_product_unique_cards": len(product_cards),
-        "used_in_any_deck_unique_cards": sum(1 for card in card_inventory if int(card["deck_count"]) > 0),
+        "ready_product_qa_unique_cards": len(product_cards),
+        "current_registered_deck_qa_unique_cards": len(registered_qa_cards),
         "lane_counts": dict(sorted(lane_counts.items())),
-        "ready_product_lane_counts": dict(sorted(product_lane_counts.items())),
+        "ready_product_qa_lane_counts": dict(sorted(product_lane_counts.items())),
         "battle_gap_family_counts": dict(family_counts.most_common()),
         "xmage_source_checked_counts": dict(sorted(xmage_counts.items())),
         "top_actionable_cards": [
@@ -602,7 +601,7 @@ def build_payload(*, xmage_root: Path, xmage_limit: int) -> dict[str, Any]:
             "read_only": True,
             "postgres_cards_table_is_base_scope": True,
             "postgres_is_product_truth": True,
-            "deck_usage_is_priority_only": True,
+            "registered_deck_usage_is_qa_only": True,
             "oracle_sources": [
                 "Scryfall bulk data for Oracle/card data freshness",
                 "MTGJSON as secondary bulk/reference lane",
@@ -628,8 +627,8 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         f"- Status: `{payload['status']}`",
         f"- Contract: `{payload['contract']}`",
         f"- All known cards: `{summary['all_known_cards']}`",
-        f"- Used in any deck unique cards: `{summary['used_in_any_deck_unique_cards']}`",
-        f"- Ready-product unique cards: `{summary['ready_product_unique_cards']}`",
+        f"- Current registered-deck QA unique cards: `{summary['current_registered_deck_qa_unique_cards']}`",
+        f"- Ready-product QA unique cards: `{summary['ready_product_qa_unique_cards']}`",
         "",
         "## All Card Inventory",
         "",
@@ -644,8 +643,8 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
     for metric, value in summary["routing_adjustments"].items():
         lines.append(f"| `{metric}` | {value} |")
 
-    lines.extend(["", "## Lane Counts", "", "| Lane | All Known Cards | Ready Product Cards |", "| --- | ---: | ---: |"])
-    product_counts = summary["ready_product_lane_counts"]
+    lines.extend(["", "## Lane Counts", "", "| Lane | All Known Cards | Ready Product QA Cards |", "| --- | ---: | ---: |"])
+    product_counts = summary["ready_product_qa_lane_counts"]
     for lane, count in summary["lane_counts"].items():
         lines.append(f"| `{lane}` | {count} | {product_counts.get(lane, 0)} |")
 
@@ -658,7 +657,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
         top_cards = ", ".join(f"`{name}`" for name in batch.get("top_cards", [])[:10])
         lines.append(f"| `{batch['batch']}` | {batch['card_count']} | {batch['method']} | {top_cards} |")
 
-    lines.extend(["", "## Top Actionable Cards", "", "| Card | Priority | Lanes | Family | Ready Product Decks | Decks | XMage |", "| --- | ---: | --- | --- | ---: | ---: | --- |"])
+    lines.extend(["", "## Top Actionable Cards", "", "| Card | Priority | Lanes | Family | Ready Product QA Decks | Registered QA Decks | XMage |", "| --- | ---: | --- | --- | ---: | ---: | --- |"])
     for card in summary["top_actionable_cards"][:60]:
         xmage = card["xmage_source"]
         xmage_status = "unchecked"
@@ -682,6 +681,7 @@ def write_markdown(payload: dict[str, Any], path: Path) -> None:
             "## Method Notes",
             "",
             "- Scope is every PostgreSQL `cards` row, not only Lorehold or saved decks.",
+            "- Current registered deck usage is an internal QA seed only; it is not a user-demand or launch-priority signal.",
             "- Oracle and legalities gaps should be handled in bulk before battle-family work.",
             "- Battle work should be pulled by `battle_family::*` batches, not card-by-card.",
             "- Broad XMage availability is routing evidence only; it is not executable PostgreSQL truth.",
