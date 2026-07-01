@@ -2362,6 +2362,109 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_mana_source_permanent_refreshes_fixed_distinct_symbols(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        engineer = {
+            "name": "Gyre Engineer",
+            "type_line": "Creature - Vedalken Artificer",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 2,
+            "produces": "GU",
+            "produced_mana_symbols": ["G", "U"],
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "creature",
+        }
+        active.battlefield.append(engineer)
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 2)
+        self.assertEqual(active.mana_pool.green, 1)
+        self.assertEqual(active.mana_pool.blue, 1)
+        self.assertEqual(active.mana_pool.generic, 0)
+        self.assertTrue(engineer["tapped"])
+
+    def test_mana_source_activation_mana_cost_is_paid_before_fixed_symbols_added(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        blue_source = {
+            "name": "Fixture Blue Rock",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "U",
+            "produced_mana_symbols": ["U"],
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+        }
+        apprentice = {
+            "name": "Apprentice Wizard",
+            "type_line": "Creature - Human Wizard",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 3,
+            "produces": "C",
+            "produced_mana_symbols": ["C", "C", "C"],
+            "activation_mana_cost": "{U}",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "creature",
+        }
+        active.battlefield.extend([blue_source, apprentice])
+
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.mana_pool.blue, 0)
+        self.assertEqual(active.mana_pool.colorless, 3)
+        self.assertTrue(blue_source["tapped"])
+        self.assertTrue(apprentice["tapped"])
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_cost_paid"
+                and data.get("card") == "Apprentice Wizard"
+                and data.get("activation_mana_cost") == "{U}"
+                for event, data in self.events
+            )
+        )
+
+    def test_mana_source_activation_mana_cost_blocks_without_required_mana(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        apprentice = {
+            "name": "Apprentice Wizard",
+            "type_line": "Creature - Human Wizard",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+            "is_mana_source": True,
+            "mana_produced": 3,
+            "produces": "C",
+            "produced_mana_symbols": ["C", "C", "C"],
+            "activation_mana_cost": "{U}",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "creature",
+        }
+        active.battlefield.append(apprentice)
+
+        active.refresh_mana_sources(turn=8)
+
+        self.assertEqual(active.available_mana(), 0)
+        self.assertFalse(apprentice.get("tapped", False))
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_skipped"
+                and data.get("card") == "Apprentice Wizard"
+                and data.get("reason") == "insufficient_mana_for_activation_cost"
+                for event, data in self.events
+            )
+        )
+
     def test_counter_target_creature_spell_filters_stack_target_type(self) -> None:
         opponent = self.battle.Player("Opponent", None, [])
         counter_effect = {

@@ -2704,6 +2704,33 @@
     "battle_rule_logical_key": "battle_rule_v1:f25f7f032c8935a2725f03e806412108",
     "battle_rule_oracle_hash": "ff2701341e046cdb32db1fd2d24193f3"
   },
+  "Apprentice Wizard": {
+    "activation_mana_cost": "{U}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 3,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "C",
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:715111840dbb7b32b9df369627365cc8",
+    "battle_rule_oracle_hash": "099070984047d1c18c64c650991bda6a"
+  },
   "Approach of the Second Sun": {
     "battle_model_scope": "approach_second_cast_win_v2",
     "cmc": 7.0,
@@ -26761,6 +26788,31 @@
     "battle_rule_logical_key": "battle_rule_v1:057ae0c1061a446ad927a330f7094801",
     "battle_rule_oracle_hash": "7e620dcf94b83a8d7a11992787aa2dbf"
   },
+  "Fyndhorn Elder": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G",
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f859f4c404308e062c702d67dbca286c",
+    "battle_rule_oracle_hash": "4b45de238a9e3762d33aaaa5b61d3306"
+  },
   "Fyndhorn Elves": {
     "ability_kind": "activated",
     "battle_model_scope": "one_mana_one_one_green_mana_dork_v1",
@@ -29336,14 +29388,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Golgari Signet": {
-    "cmc": 2.0,
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "B",
+      "G"
+    ],
+    "produces": "BG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:51ac953e39e93795bea61653121b163c",
+    "battle_rule_oracle_hash": "dbb91040b2349b40c18e32a3b4a45c02"
   },
   "Goliath Beetle": {
     "_keywords_are_self": true,
@@ -30214,6 +30282,31 @@
     "battle_rule_logical_key": "battle_rule_v1:c1c56ae7a9b9e0cae540e39cecb4f157",
     "battle_rule_oracle_hash": "cfaabe0e9d9d20d134845c8f4b946e1e"
   },
+  "Greenweaver Druid": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G",
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f859f4c404308e062c702d67dbca286c",
+    "battle_rule_oracle_hash": "4b45de238a9e3762d33aaaa5b61d3306"
+  },
   "Greenwood Sentinel": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -30573,14 +30666,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Gruul Signet": {
-    "cmc": 2.0,
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "R",
+      "G"
+    ],
+    "produces": "RG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7cd61b7ba1716e46f4f2a664a5f9fe28",
+    "battle_rule_oracle_hash": "3909a7ef51d5132ccaad34ff1bc9349a"
   },
   "Gruul Turf": {
     "effect": "land",
@@ -30812,6 +30921,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+  },
+  "Gyre Engineer": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G",
+      "U"
+    ],
+    "produces": "GU",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2aabddfe0a8b093caf58041c6437aa72",
+    "battle_rule_oracle_hash": "fc936cff6de18716b0979f7b8a51ee81"
   },
   "Gyre Sage": {
     "cmc": 2.0,
@@ -37188,6 +37322,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3c5e078ac2d66be738bdeb07941b8f51"
   },
+  "Knotvine Mystic": {
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 3,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R",
+      "G",
+      "W"
+    ],
+    "produces": "RGW",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:718e619a7a59106682884c6d0be2f609",
+    "battle_rule_oracle_hash": "8f59dfc2c5c157fd2d388d20153c4c37"
+  },
   "Knuckles the Echidna": {
     "ability_kind": "triggered",
     "battle_model_scope": "one_or_more_creatures_you_control_combat_damage_player_create_treasure_v1",
@@ -37394,6 +37555,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Kozilek's Channeler": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:689069ac56dc579bca9adecf0a8804d8",
+    "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
   "Kozilek's Command": {
     "effect": "remove_creature",
@@ -39354,14 +39540,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Llanowar Tribe": {
-    "cmc": 3.0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 3,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G",
+      "G",
+      "G"
+    ],
+    "produces": "G",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:20cf4c576ea78a9346624b86f456df9f",
+    "battle_rule_oracle_hash": "89ba72ff552ff065f57a974929e01d20"
   },
   "Llanowar Vanguard": {
     "_activated_rule_effects": [
@@ -44512,6 +44714,31 @@
     "battle_rule_logical_key": "battle_rule_v1:91ca67cfd1fd16ee8458255e1cae7729",
     "battle_rule_oracle_hash": "8fc1d9536381e60ea5f9fbec82c7e6a4"
   },
+  "Nantuko Elder": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "G"
+    ],
+    "produces": "CG",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dfb5ff6ef58c096cfd993f66b5e2999a",
+    "battle_rule_oracle_hash": "5d6e6227239522d226409ad1bae0f276"
+  },
   "Nantuko Monastery": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -46738,14 +46965,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Orzhov Signet": {
-    "cmc": 2.0,
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "W",
+      "B"
+    ],
+    "produces": "WB",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b76a2d0ffb7fcff1e11e21fe09235951",
+    "battle_rule_oracle_hash": "171fe54b0926b568b14abf7f587dbbe8"
   },
   "Orzhova, the Church of Deals": {
     "effect": "land",
@@ -47213,14 +47456,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Palladium Myr": {
-    "cmc": 3.0,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:689069ac56dc579bca9adecf0a8804d8",
+    "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
   "Panharmonicon": {
     "cmc": 4.0,
@@ -51309,14 +51567,30 @@
     "battle_rule_oracle_hash": "f4f7253661dc3bf12544fc82fdcf4efb"
   },
   "Rakdos Signet": {
-    "cmc": 2.0,
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "B",
+      "R"
+    ],
+    "produces": "BR",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:be06c9e9d456f7f76ed61916106b92e0",
+    "battle_rule_oracle_hash": "27af1e46265f62010eec4b68f8f5e36b"
   },
   "Rakdos, the Muscle": {
     "battle_model_scope": "flying_trample_sacrifice_indestructible_exile_annotation_v1",
@@ -58234,14 +58508,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Selesnya Signet": {
-    "cmc": 2.0,
+    "activation_mana_cost": "{1}",
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
     "effect": "ramp_permanent",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "artifact",
+    "produced_mana_symbols": [
+      "G",
+      "W"
+    ],
+    "produces": "GW",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:18ca23243adf4473055490c6af29a360",
+    "battle_rule_oracle_hash": "bdcb40d5b82988a9f6b00af5e028157f"
   },
   "Selfless Spirit": {
     "cmc": 2.0,
@@ -65022,6 +65312,31 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Sunastian Falconer": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:689069ac56dc579bca9adecf0a8804d8",
+    "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
   "Sunbaked Canyon": {
     "effect": "land",
@@ -76329,6 +76644,31 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:6391ead7eef36b3bba201942eb647ba7",
     "battle_rule_oracle_hash": "30534abd47113fbc910b9edf5fefd0bc"
+  },
+  "Weaver of Currents": {
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "C",
+      "C"
+    ],
+    "produces": "C",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:689069ac56dc579bca9adecf0a8804d8",
+    "battle_rule_oracle_hash": "7d286f5619ac8934fb07abf152ffcb60"
   },
   "Weaver of Harmony": {
     "cmc": 2.0,

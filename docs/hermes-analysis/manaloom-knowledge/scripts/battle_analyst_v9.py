@@ -4614,12 +4614,45 @@ def add_distributed_controlled_color_mana_to_pool(player, source, produced):
     return True
 
 
+def produced_mana_symbols_for_source(source):
+    if not isinstance(source, dict):
+        return []
+    symbols = source.get("produced_mana_symbols")
+    if isinstance(symbols, str):
+        decoded = read_json_list(symbols)
+        if decoded is None:
+            try:
+                decoded = json.loads(symbols)
+            except Exception:
+                decoded = None
+        symbols = decoded if decoded is not None else re.findall(r"[WUBRGC]", symbols.upper())
+    symbols = _as_list(symbols)
+    parsed = []
+    for symbol in symbols:
+        upper = str(symbol or "").strip().upper()
+        if upper in MANA_SYMBOL_TO_POOL:
+            parsed.append(upper)
+    return parsed
+
+
+def add_fixed_produced_mana_symbols_to_pool(player, source, produced):
+    symbols = produced_mana_symbols_for_source(source)
+    if not symbols:
+        return False
+    max_symbols = max(0, int(produced or 0))
+    for symbol in symbols[:max_symbols]:
+        player.mana_pool.add(MANA_SYMBOL_TO_POOL[symbol], 1)
+    return True
+
+
 def add_player_mana_source_to_pool(player, source, turn=None):
     if not hasattr(player, "conditional_mana_sources"):
         player.conditional_mana_sources = []
     produced = mana_source_production_for_state(player, source)
     if produced <= 0:
         return False
+    if add_fixed_produced_mana_symbols_to_pool(player, source, produced):
+        return True
     if add_distributed_controlled_color_mana_to_pool(player, source, produced):
         return True
     conditional_source = conditional_mana_source_for_state(player, source, produced)
@@ -8568,6 +8601,10 @@ class Player:
             if produced <= 0:
                 continue
             if not pay_mana_source_activation_costs(self, source, turn=turn):
+                continue
+            if add_fixed_produced_mana_symbols_to_pool(self, source, produced):
+                mark_mana_source_used_if_nonstandard_untap(source)
+                active_sources += 1
                 continue
             if add_distributed_controlled_color_mana_to_pool(self, source, produced):
                 mark_mana_source_used_if_nonstandard_untap(source)

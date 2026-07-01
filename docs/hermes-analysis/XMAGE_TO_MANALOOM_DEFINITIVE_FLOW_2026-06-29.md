@@ -125,21 +125,22 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg321_static_controlled_power_toughness_boost_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg324_permanent_fixed_tap_mana_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27312`
-- XMage authoritative source resolved: `26998`
+- target all-card battle-gap identities: `27296`
+- XMage authoritative source resolved: `26982`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26998`
+- XMage authoritative adapter required: `26982`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26998` identities, card semantics are accepted from XMage; work is now
+- For `26982` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -158,9 +159,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG323 Exact Adapter Waves
+## PG283-PG324 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG323 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG324 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -2445,6 +2446,73 @@ PG323 measured result:
 - Running the exact splitter after PG323 on supported units returns
   `proposal_count=0` over `8019` considered supported rows.
 
+PG324 evidence:
+
+- PG324 permanent fixed tap-mana-source package:
+  `docs/hermes-analysis/master_optimizer_reports/pg324_xmage_permanent_fixed_tap_mana_wave_package.md`
+- PG324 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg324_xmage_permanent_fixed_tap_mana_wave_pg_apply_evidence.md`
+- PG324 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg324_xmage_permanent_fixed_tap_mana_wave_pg_to_sqlite_sync.json`
+- PG324 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg324_xmage_permanent_fixed_tap_mana_wave_e2e_validation.md`
+- PG324 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg324_permanent_fixed_tap_mana_wave_docs_final_recheck.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg324_permanent_fixed_tap_mana_wave_docs_final.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg324_permanent_fixed_tap_mana_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg324_permanent_fixed_tap_mana_wave.md`
+- PG324 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg324_permanent_fixed_tap_mana_wave.md`
+- post-PG324 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg324_permanent_fixed_tap_mana_wave_commander_legal.md`
+- post-PG324 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg324_existing_supported_recheck.md`
+- post-PG324 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg324_permanent_fixed_tap_mana_wave_recheck.md`
+
+PG324 measured result:
+
+- PG324 promoted `16` exact permanent mana-source rules using
+  `xmage_simple_tap_mana_source_permanent_v1` with fixed produced mana symbols
+  and optional simple activation mana costs. The promoted cards are
+  `Apprentice Wizard`, `Fyndhorn Elder`, `Golgari Signet`,
+  `Greenweaver Druid`, `Gruul Signet`, `Gyre Engineer`, `Knotvine Mystic`,
+  `Kozilek's Channeler`, `Llanowar Tribe`, `Nantuko Elder`, `Orzhov Signet`,
+  `Palladium Myr`, `Rakdos Signet`, `Selesnya Signet`,
+  `Sunastian Falconer`, and `Weaver of Currents`.
+- Runtime now preserves fixed multi-symbol mana production through
+  `produced_mana_symbols`, so `{G}{U}` becomes one green plus one blue and
+  `{C}{C}{C}` becomes three colorless rather than flexible generic mana.
+  Runtime also pays simple `activation_mana_cost` before adding the produced
+  symbols, proven by the focused `Apprentice Wizard` positive and negative
+  tests.
+- The splitter now blocks unsafe neighbors with explicit reasons for source
+  sacrifice, target sacrifice, discard, pay-life, conditional/restricted mana,
+  missing tap cost, and non-simple Oracle text.
+- Focused tests pass for the exact splitter (`146` tests) and runtime
+  (`81` tests).
+- PostgreSQL apply evidence reports `16/16` promoted rows, `16/16`
+  verified/auto rows, `16/16` matching Oracle hash rows, and `14` stale shadow
+  rows backed up/deprecated.
+- PG battle-rules -> Hermes/SQLite sync loaded `7195` PostgreSQL rules,
+  inserted/updated `6989` SQLite rows, and exported `4786` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- Post-PG324 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG324 rows themselves have `16/16` matching Oracle hashes.
+- Global all-card readiness after PG324:
+  `battle_and_oracle_ready=2328`, `battle_family_mapper_required=30219`, and
+  `snapshot_has_verified_rule=3476`.
+- Global all-card authoritative queue after PG324:
+  `target_identity_count=27296`, `xmage_authoritative_source_count=26982`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26982`.
+- Running the exact splitter after PG324 on supported units returns
+  `proposal_count=0` over `8003` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3084,7 +3152,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG323 queue, the next exact runtime-backed work should be selected from
+post-PG324 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`

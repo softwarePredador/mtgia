@@ -2878,17 +2878,85 @@ def etb_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, in
     return None
 
 
-def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS = {
+    "sacrifice",
+    "discard",
+    "pay ",
+    "instead",
+    "if ",
+    "for each",
+    "spend this mana only",
+    "tap an untapped",
+}
+
+
+def _unique_mana_symbols(symbols: list[str]) -> str:
+    return "".join(dict.fromkeys(symbols))
+
+
+def _brace_mana_symbols(text: str) -> list[str]:
+    return [symbol.upper() for symbol in re.findall(r"\{([wubrgc])\}", text)]
+
+
+def simple_mana_source_detail_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text(metadata)
+    if any(token in text for token in UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS):
+        return None
     if text == "{t}: add one mana of any color.":
-        return "WUBRG", 1
+        return {"produces": "WUBRG", "mana_produced": 1}
     match = re.match(r"^\{t\}: add \{([wubrgc])\}\.?$", text)
     if match:
-        return match.group(1).upper(), 1
+        symbol = match.group(1).upper()
+        return {"produces": symbol, "mana_produced": 1, "produced_mana_symbols": [symbol]}
+    match = re.match(r"^\{t\}: add ((?:\{[wubrgc]\}){2,})\.?$", text)
+    if match:
+        symbols = _brace_mana_symbols(match.group(1))
+        if len(symbols) >= 2:
+            return {
+                "produces": _unique_mana_symbols(symbols),
+                "mana_produced": len(symbols),
+                "produced_mana_symbols": symbols,
+            }
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add (?P<mana>(?:\{[wubrgc]\})+)\.?$", text)
+    if match:
+        symbols = _brace_mana_symbols(match.group("mana"))
+        if symbols:
+            return {
+                "produces": _unique_mana_symbols(symbols),
+                "mana_produced": len(symbols),
+                "produced_mana_symbols": symbols,
+                "activation_mana_cost": match.group("cost").upper(),
+            }
     match = re.match(r"^\{t\}: add \{([wubrgc])\} or \{([wubrgc])\}\.?$", text)
     if match:
         produced = "".join(dict.fromkeys([match.group(1).upper(), match.group(2).upper()]))
-        return produced, 1
+        return {"produces": produced, "mana_produced": 1}
+    return None
+
+
+def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
+    detail = simple_mana_source_detail_from_oracle(metadata)
+    if detail is None:
+        return None
+    return str(detail["produces"]), int(detail["mana_produced"])
+
+
+def simple_mana_source_source_blocker(source_text: str, ability_class_values: set[str]) -> str | None:
+    text = source_text or ""
+    unsupported_markers = {
+        "SacrificeSourceCost": "mana_source_source_sacrifice_cost_not_supported",
+        "SacrificeTargetCost": "mana_source_source_sacrifice_target_cost_not_supported",
+        "Discard": "mana_source_source_discard_cost_not_supported",
+        "PayLifeCost": "mana_source_source_pay_life_cost_not_supported",
+        "ExileSourceCost": "mana_source_source_exile_cost_not_supported",
+        "ConditionalMana": "mana_source_source_conditional_mana_not_supported",
+        "spend this mana only": "mana_source_source_restricted_spend_not_supported",
+    }
+    for marker, reason in unsupported_markers.items():
+        if marker in text:
+            return reason
+    if "SimpleManaAbility" in ability_class_values and "TapSourceCost" not in text:
+        return "mana_source_simple_source_missing_tap_cost"
     return None
 
 
@@ -4901,24 +4969,30 @@ def split_row(
             return None, "mana_source_safe_ability_missing"
         if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
             return None, "mana_source_effect_class_not_simple"
-        mana_source = simple_mana_source_from_oracle(metadata)
-        if mana_source is None:
+        source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
+        if source_blocker:
+            return None, source_blocker
+        mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+        if mana_source_detail is None:
             return None, "mana_source_oracle_not_simple"
-        produces, amount = mana_source
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_type = "creature" if "creature" in type_line else "artifact" if "artifact" in type_line else "permanent"
         effect_json = {
             "effect": "ramp_permanent",
             "battle_model_scope": MANA_SCOPE,
             "is_mana_source": True,
-            "mana_produced": amount,
-            "produces": produces,
+            "mana_produced": int(mana_source_detail["mana_produced"]),
+            "produces": str(mana_source_detail["produces"]),
             "activation_requires_tap": True,
             "mana_activation_requires_tap": True,
             "permanent_type": permanent_type,
             "xmage_mana_ability_classes": sorted(mana_ability_classes),
             "xmage_effect_classes": sorted(classes),
         }
+        if mana_source_detail.get("produced_mana_symbols"):
+            effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+        if mana_source_detail.get("activation_mana_cost"):
+            effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
         return build_proposal(row, metadata, effect_json, family_id="xmage_simple_mana_source_permanent"), "selected_exact_scope"
 
     return None, "unsupported_adapter_work_unit"

@@ -1505,6 +1505,109 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertEqual(effect["permanent_type"], "creature")
 
+    def test_simple_creature_multi_symbol_mana_source_maps_fixed_symbols(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Gyre Engineer",
+                type_line="Creature - Vedalken Artificer",
+                oracle_text="{T}: Add {G}{U}.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "new Mana(0, 1, 0, 0, 1, 0, 0, 0), new TapSourceCost()));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "GU")
+        self.assertEqual(effect["mana_produced"], 2)
+        self.assertEqual(effect["produced_mana_symbols"], ["G", "U"])
+        self.assertEqual(effect["permanent_type"], "creature")
+
+    def test_simple_creature_mana_source_with_activation_cost_maps_fixed_symbols(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Apprentice Wizard",
+                type_line="Creature - Human Wizard",
+                oracle_text="{U}, {T}: Add {C}{C}{C}.",
+            ),
+            source_text=(
+                "Ability ability = new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.ColorlessMana(3), new ManaCostsImpl<>(\"{U}\"));"
+                "ability.addCost(new TapSourceCost());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["produces"], "C")
+        self.assertEqual(effect["mana_produced"], 3)
+        self.assertEqual(effect["produced_mana_symbols"], ["C", "C", "C"])
+        self.assertEqual(effect["activation_mana_cost"], "{U}")
+
+    def test_simple_creature_sacrifice_mana_source_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blood Pet",
+                type_line="Creature - Thrull",
+                oracle_text="Sacrifice Blood Pet: Add {B}.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.BlackMana(1), new SacrificeSourceCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_source_sacrifice_cost_not_supported")
+
+    def test_conditional_simple_mana_source_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=["BasicManaEffect", "ConditionalManaEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Leafkin Druid",
+                type_line="Creature - Elemental Druid",
+                oracle_text="{T}: Add {G}. If you control four or more creatures, add {G}{G} instead.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleManaAbility(new ConditionalManaEffect("
+                "new BasicManaEffect(Mana.GreenMana(2)), new BasicManaEffect(Mana.GreenMana(1))), "
+                "new TapSourceCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_effect_class_not_simple")
+
     def test_conditional_mana_source_stays_blocked(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
