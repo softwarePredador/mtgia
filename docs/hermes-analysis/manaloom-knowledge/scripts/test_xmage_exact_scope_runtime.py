@@ -3612,6 +3612,91 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in active.hand], ["Target Food"])
         self.assertEqual([card["name"] for card in active.graveyard], ["Target Spell"])
 
+    def test_creature_etb_graveyard_to_library_puts_matching_card_on_top(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Dukhara Scavenger", "type_line": "Creature - Crocodile"}
+        active.battlefield.append(permanent)
+        active.library = [{"name": "Existing Top", "type_line": "Sorcery", "cmc": 2}]
+        active.graveyard.extend(
+            [
+                {"name": "Target Spark", "type_line": "Instant", "cmc": 1},
+                {"name": "Target Relic", "type_line": "Artifact", "cmc": 2},
+            ]
+        )
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "artifact_or_creature",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "library_top",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact", "creature"],
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=14,
+            rng=random.Random(14),
+        )
+
+        self.assertEqual([card["name"] for card in active.library], ["Target Relic", "Existing Top"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Spark"])
+        self.assertEqual(active.hand, [])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Dukhara Scavenger"
+                and data.get("recovered") == ["Target Relic"]
+                and data.get("target_type") == "artifact_or_creature"
+                and data.get("destination") == "library_top"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_graveyard_to_library_can_put_card_on_bottom(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Fixture Archivist", "type_line": "Creature - Wizard"}
+        active.battlefield.append(permanent)
+        active.library = [{"name": "Existing Top", "type_line": "Sorcery", "cmc": 2}]
+        active.graveyard.append({"name": "Bottom Target", "type_line": "Instant", "cmc": 1})
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "instant_or_sorcery",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "library_bottom",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["instant", "sorcery"],
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=15,
+            rng=random.Random(15),
+        )
+
+        self.assertEqual([card["name"] for card in active.library], ["Existing Top", "Bottom Target"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.hand, [])
+
     def test_add_plus_one_counter_spell_buffs_own_best_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

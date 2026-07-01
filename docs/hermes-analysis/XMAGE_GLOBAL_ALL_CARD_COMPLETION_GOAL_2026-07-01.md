@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG336
+thread goal remains active, but execution must use the current post-PG337
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -36,18 +36,20 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg335_battlefield_counter_recursion_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg336_activated_graveyard_to_library_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg336_activated_graveyard_to_library_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg337_etb_graveyard_to_library_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg337_etb_graveyard_to_library_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG336 counts:
+Post-PG337 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2382`
-- all-card readiness `battle_family_mapper_required`: `30165`
-- target battle-gap identities in authoritative queue: `27242`
-- XMage authoritative source resolved: `26928`
+- all-card readiness `battle_and_oracle_ready`: `2384`
+- all-card readiness `battle_family_mapper_required`: `30163`
+- target battle-gap identities in authoritative queue: `27240`
+- XMage authoritative source resolved: `26926`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26928`
+- XMage authoritative adapter required: `26926`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -144,9 +146,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG336 authoritative queue unless a newer queue exists:
+Use the post-PG337 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1924`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1922`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -157,21 +159,29 @@ Use the post-PG336 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG336:
+Immediate checkpoint after PG337:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
    `Epitaph Golem`, `Haunted Crossroads`, and `Tomb Trawler`.
-2. PG336 is applied, synced, and E2E validated. The package evidence is in
+2. PG337 promoted the exact
+   `xmage_creature_etb_put_graveyard_card_on_library_v1` subpattern for
+   `Dukhara Scavenger` and `Meldweb Curator`.
+3. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_e2e_validation.md`.
-3. The post-PG336 supported splitter recheck returned `proposal_count=0` over
-   `7949` considered supported rows. Current evidence:
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg336_supported_recheck.md`.
-4. Continue from the fresh post-PG336 queue. The top reusable work unit remains
-   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1924`, so
+4. PG337 is applied, synced, and E2E validated. The package evidence is in
+   `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_package.md`,
+   `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_pg_apply_evidence.md`,
+   and
+   `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_e2e_validation.md`.
+5. The post-PG337 supported splitter recheck returned `proposal_count=0` over
+   `7947` considered supported rows. Current evidence:
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg337_supported_recheck.md`.
+6. Continue from the fresh post-PG337 queue. The top reusable work unit remains
+   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1922`, so
    the next cycle should split another exact recursion subpattern unless a
    fresher queue changes the ranking.
 

@@ -35657,6 +35657,7 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
         )
     ]
     recovered = []
+    library_top_insert_index = 0
     for recovered_card in remove_cards_from_graveyard(
         player,
         candidates[:count],
@@ -35675,6 +35676,11 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
             if is_creature_card(recovered_card):
                 permanent["effect"] = "creature"
             player.battlefield.append(permanent)
+        elif destination == "library_top":
+            player.library.insert(library_top_insert_index, recovered_card)
+            library_top_insert_index += 1
+        elif destination == "library_bottom":
+            player.library.append(recovered_card)
         else:
             player.hand.append(recovered_card)
     emit_replay_event(

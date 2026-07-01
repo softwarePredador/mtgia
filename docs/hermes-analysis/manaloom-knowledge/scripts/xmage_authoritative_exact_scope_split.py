@@ -134,6 +134,7 @@ ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
@@ -1237,6 +1238,43 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     for pattern, result in patterns:
         if re.match(pattern, text):
             return dict(result)
+
+    generic_patterns: list[tuple[str, str]] = [
+        (
+            r"^put target (?P<phrase>.+?) card from your graveyard on top of your library\.?$",
+            "library_top",
+        ),
+        (
+            r"^put target (?P<phrase>.+?) card from your graveyard on the bottom of your library\.?$",
+            "library_bottom",
+        ),
+        (
+            r"^put up to (?P<count>one|two|three|\d+) target (?P<phrase>.+?) cards? "
+            r"from your graveyard on top of your library\.?$",
+            "library_top",
+        ),
+        (
+            r"^put up to (?P<count>one|two|three|\d+) target (?P<phrase>.+?) cards? "
+            r"from your graveyard on the bottom of your library\.?$",
+            "library_bottom",
+        ),
+    ]
+    count_words = {"one": 1, "two": 2, "three": 3}
+    for pattern, destination in generic_patterns:
+        match = re.match(pattern, text)
+        if not match:
+            continue
+        target = etb_recursion_target_from_phrase(match.group("phrase"))
+        if target is None:
+            continue
+        raw_count = match.groupdict().get("count")
+        count = count_words.get(raw_count or "", int(raw_count) if raw_count and raw_count.isdigit() else 1)
+        return {
+            "target": target,
+            "count": count,
+            "destination": destination,
+            "up_to_count": bool(raw_count),
+        }
     return None
 
 
@@ -1252,7 +1290,11 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         return "graveyard_to_library_source_target_not_supported"
     if "EachTargetPointer" in text or ".setTargetPointer" in text:
         return "graveyard_to_library_source_target_not_supported"
-    if "FILTER_CARD_CREATURES_YOUR_GRAVEYARD" in text or "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text:
+    if "FILTER_CARD_ARTIFACT_OR_CREATURE" in text:
+        target = "artifact_or_creature"
+    elif "FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD" in text:
+        target = "instant_or_sorcery"
+    elif "FILTER_CARD_CREATURES_YOUR_GRAVEYARD" in text or "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text:
         target = "creature"
     elif re.search(r"TargetCardInYourGraveyard\s*\(\s*\)", text):
         target = "any_card"
@@ -1340,6 +1382,32 @@ def activated_graveyard_to_library_from_source(source: str) -> dict[str, Any] | 
         "activation_requires_tap": "TapSourceCost" in window,
         "activation_requires_sacrifice": "SacrificeSourceCost" in window,
     }
+
+
+def etb_graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, (?:you may )?"
+    match = re.match(trigger_prefix + r"(?P<effect>put .+? from your graveyard .+? your library\.?)$", text)
+    if not match:
+        return "etb_graveyard_to_library_oracle_not_simple"
+    parsed = graveyard_to_library_from_oracle({"oracle_text": match.group("effect")})
+    if parsed is None:
+        return "etb_graveyard_to_library_oracle_not_simple"
+    return parsed
+
+
+def etb_graveyard_to_library_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if "EntersBattlefieldTriggeredAbility" not in text:
+        return "etb_graveyard_to_library_source_not_etb_trigger"
+    if "SimpleActivatedAbility" in text:
+        return "etb_graveyard_to_library_source_not_etb_trigger"
+    if len(re.findall(r"PutOnLibraryTargetEffect\s*\(", text)) != 1:
+        return "etb_graveyard_to_library_source_not_single_effect"
+    parsed_target = graveyard_to_library_from_source(text)
+    if isinstance(parsed_target, str):
+        return "etb_" + parsed_target
+    return parsed_target
 
 
 def destroy_all_types_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
@@ -1964,6 +2032,19 @@ def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
     remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
     return (
         effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_graveyard_to_library_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"PutOnLibraryTargetEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
@@ -3962,6 +4043,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
+        ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
@@ -4048,6 +4130,7 @@ def split_row(
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
+    etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
@@ -4087,6 +4170,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_graveyard_to_library_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -4119,6 +4203,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_graveyard_to_library_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -5486,6 +5571,51 @@ def split_row(
             family_id="xmage_creature_etb_graveyard_to_hand",
         ), "selected_exact_scope"
 
+    if etb_graveyard_to_library_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_graveyard_to_library_not_creature"
+        oracle_target = etb_graveyard_to_library_from_oracle(metadata)
+        if isinstance(oracle_target, str):
+            return None, oracle_target
+        source_target = etb_graveyard_to_library_from_source(source_text)
+        if isinstance(source_target, str):
+            return None, source_target
+        for key in ("target", "count", "destination", "up_to_count"):
+            if source_target.get(key) != oracle_target.get(key):
+                return None, f"etb_graveyard_to_library_source_oracle_{key}_mismatch"
+        target_type = str(oracle_target["target"])
+        count = int(oracle_target["count"])
+        destination = str(oracle_target["destination"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": target_type,
+            "etb_recursion_count": count,
+            "etb_recursion_destination": destination,
+            "target_constraints": recursion_target_constraints_for(target_type),
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "library_controller": "self",
+            "xmage_effect_class": "PutOnLibraryTargetEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        if oracle_target.get("up_to_count"):
+            effect_json["etb_recursion_up_to_count"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_graveyard_to_library",
+        ), "selected_exact_scope"
+
     if creature_tap_damage_unit and is_creature_metadata(metadata):
         oracle_damage = activated_tap_damage_from_oracle(metadata)
         source_amount = activated_tap_damage_amount_from_source(source_text)
@@ -6317,6 +6447,7 @@ def build_exact_split_report(
             and not is_creature_etb_draw_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_creature_etb_damage_unit(row)
+            and not is_creature_etb_graveyard_to_library_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
             and not is_creature_etb_add_counters_unit(row)
@@ -6375,6 +6506,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
