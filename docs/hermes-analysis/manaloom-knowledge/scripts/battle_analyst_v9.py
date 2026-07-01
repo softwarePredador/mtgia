@@ -16282,6 +16282,24 @@ def resolve_generic_permanent_etb(
                 stack=stack,
                 turn_player=player,
             )
+    if effect_data.get("etb_life_gain_amount"):
+        amount = int(effect_data.get("etb_life_gain_amount") or 0)
+        life_before = int(getattr(player, "life", 0))
+        if amount > 0:
+            gain_life(player, amount, cap=999)
+        emit_replay_event(
+            "trigger_resolved",
+            player=player.name,
+            card=permanent.get("name", "?"),
+            trigger="enters_battlefield",
+            effect="gain_life",
+            life_gain_requested=amount,
+            life_gained=max(0, int(getattr(player, "life", 0)) - life_before),
+            controller_life_before=life_before,
+            controller_life_after=int(getattr(player, "life", 0)),
+            turn=turn,
+            **replay_rule_fields(effect_data),
+        )
     resolve_etb_library_creature_tutor(player, permanent, effect_data, turn)
     if effect_data.get("etb_tutor_target"):
         resolve_etb_library_tutor_to_hand(player, opponents, permanent, effect_data, turn)

@@ -76,9 +76,9 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     Depois rode
     `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
     transformar apenas assinaturas exatas/runtime-backed em candidato PG.
-    Evidencia corrente pos-PG293:
-    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg293_static_self_keyword_creature_v2_wave.md`.
-    Resultado all-card: `30759` identidades ainda com gap, `27823` com fonte
+    Evidencia corrente pos-PG294:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg294_creature_etb_life_gain_wave.md`.
+    Resultado all-card: `30722` identidades ainda com gap, `27786` com fonte
     XMage autoritativa resolvida, `2936` excecoes sem fonte local, `0` parser
     gaps e `12038` work units de adaptador ManaLoom por assinatura/effect
     XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
@@ -94,9 +94,11 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     criatura com modificador de poder/resistencia ate o fim do turno. O PG292
     adicionou `409` criaturas com keyword estatica de combate propria. O PG293
     adicionou `85` criaturas com keyword estatica propria, incluindo multiline
-    Oracle e `hexproof`/`shroud`/`indestructible` seguros. Todos os
-    pacotes PG285-PG293 passaram postcheck PostgreSQL e E2E em
-    PG/SQLite/snapshot/runtime. O splitter pos-PG293 retorna
+    Oracle e `hexproof`/`shroud`/`indestructible` seguros. O PG294 adicionou
+    `37` criaturas com ganho de vida fixo ao entrar no campo de batalha,
+    bloqueando casos proporcionais como "for each". Todos os pacotes
+    PG285-PG294 passaram postcheck PostgreSQL e E2E em
+    PG/SQLite/snapshot/runtime. O splitter pos-PG294 retorna
     `proposal_count=0` para os escopos ja implementados; a proxima etapa exige
     novo subpadrao runtime, nao rerun do mesmo splitter.
 

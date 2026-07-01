@@ -1,0 +1,1320 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T10:03:33.679709+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg294_xmage_creature_etb_life_gain_wave_manifest.json",
+  "package_id": "pg294_xmage_creature_etb_life_gain_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 37
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Amateur Hero",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Angel of Mercy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "e67201c53659f5c13214d1a60cd8f652",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Arashin Cleric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Arborback Stomper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+          "oracle_hash": "00e8e649110944d7dbb9caed64963c9d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Aven Battle Priest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "73dfd66d4c0f4fb5bfec001e3bdae115",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Aven of Enduring Hope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "e67201c53659f5c13214d1a60cd8f652",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Bulwark Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d4be448c3bec2a64b00f8715c06a9f0",
+          "oracle_hash": "91e4ebb70108ac28b8b2aa69c368c7fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Cathedral Sanctifier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Centaur Healer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Courier Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Dawning Angel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c5f7ab0179980518450381bd1485079",
+          "oracle_hash": "d657843ed983bb78a6e0b9b873452707",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Devout Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f86776aef50052a914dda15e0b1f4e31",
+          "oracle_hash": "7cef052ccec7a163a8f0213a747ca352",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Healer of the Glade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Hill Giant Herdgorger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Honey Mammoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Inspiring Cleric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Jedit's Dragoons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326",
+          "oracle_hash": "4d1d6845d3cb2d0dddd2bb2f2216d769",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Kemba's Skyguard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Koala-Sheep",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Lone Missionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Mesa Cavalier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Mossbeard Ancient",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+          "oracle_hash": "00e8e649110944d7dbb9caed64963c9d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Peace Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Primordial Pachyderm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65",
+          "oracle_hash": "0f6491e5b9cea210c7c33662a6aec0ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Ravenous Lindwurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Savannah Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Shu Grain Caravan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Shu Soldier-Farmers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Spiritual Guardian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Springmane Cervin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Staunch Defenders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Sylvan Brushstrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Temple Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Teroh's Faithful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Tireless Missionaries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Turntimber Ascetic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Venerable Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 37
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Amateur Hero",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Angel of Mercy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "e67201c53659f5c13214d1a60cd8f652",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Arashin Cleric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Arborback Stomper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+          "oracle_hash": "00e8e649110944d7dbb9caed64963c9d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Aven Battle Priest",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "73dfd66d4c0f4fb5bfec001e3bdae115",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Aven of Enduring Hope",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+          "oracle_hash": "e67201c53659f5c13214d1a60cd8f652",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Bulwark Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3d4be448c3bec2a64b00f8715c06a9f0",
+          "oracle_hash": "91e4ebb70108ac28b8b2aa69c368c7fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Cathedral Sanctifier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Centaur Healer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Courier Griffin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Dawning Angel",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c5f7ab0179980518450381bd1485079",
+          "oracle_hash": "d657843ed983bb78a6e0b9b873452707",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Devout Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f86776aef50052a914dda15e0b1f4e31",
+          "oracle_hash": "7cef052ccec7a163a8f0213a747ca352",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Healer of the Glade",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Hill Giant Herdgorger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Honey Mammoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Inspiring Cleric",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Jedit's Dragoons",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326",
+          "oracle_hash": "4d1d6845d3cb2d0dddd2bb2f2216d769",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Kemba's Skyguard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Koala-Sheep",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Lone Missionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Mesa Cavalier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+          "oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Mossbeard Ancient",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+          "oracle_hash": "00e8e649110944d7dbb9caed64963c9d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Peace Strider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Primordial Pachyderm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65",
+          "oracle_hash": "0f6491e5b9cea210c7c33662a6aec0ac",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Ravenous Lindwurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Savannah Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Shu Grain Caravan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Shu Soldier-Farmers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Spiritual Guardian",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Springmane Cervin",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Staunch Defenders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Sylvan Brushstrider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Temple Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Teroh's Faithful",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+          "oracle_hash": "ddd5636a82f801cc850af28442261c0a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Tireless Missionaries",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Turntimber Ascetic",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+          "oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "card_name": "Venerable Monk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+          "oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 37
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Amateur Hero",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Angel of Mercy",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arashin Cleric",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arborback Stomper",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven Battle Priest",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aven of Enduring Hope",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bulwark Giant",
+          "logical_rule_key": "battle_rule_v1:3d4be448c3bec2a64b00f8715c06a9f0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cathedral Sanctifier",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Centaur Healer",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Courier Griffin",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dawning Angel",
+          "logical_rule_key": "battle_rule_v1:2c5f7ab0179980518450381bd1485079"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Devout Monk",
+          "logical_rule_key": "battle_rule_v1:f86776aef50052a914dda15e0b1f4e31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Healer of the Glade",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hill Giant Herdgorger",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Honey Mammoth",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Inspiring Cleric",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jedit's Dragoons",
+          "logical_rule_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Kemba's Skyguard",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Koala-Sheep",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lone Missionary",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mesa Cavalier",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mossbeard Ancient",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Peace Strider",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Primordial Pachyderm",
+          "logical_rule_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ravenous Lindwurm",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Savannah Sage",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shu Grain Caravan",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shu Soldier-Farmers",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Spiritual Guardian",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Springmane Cervin",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Staunch Defenders",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sylvan Brushstrider",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Temple Acolyte",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Teroh's Faithful",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tireless Missionaries",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Turntimber Ascetic",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+          "battle_rule_version": 2,
+          "card_name": "Venerable Monk",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 37
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Amateur Hero",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Angel of Mercy",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Arashin Cleric",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Arborback Stomper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Aven Battle Priest",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Aven of Enduring Hope",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bulwark Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:3d4be448c3bec2a64b00f8715c06a9f0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cathedral Sanctifier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Centaur Healer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Courier Griffin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dawning Angel",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c5f7ab0179980518450381bd1485079"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Devout Monk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f86776aef50052a914dda15e0b1f4e31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Healer of the Glade",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hill Giant Herdgorger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Honey Mammoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Inspiring Cleric",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jedit's Dragoons",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Kemba's Skyguard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Koala-Sheep",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lone Missionary",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mesa Cavalier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mossbeard Ancient",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Peace Strider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Primordial Pachyderm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ravenous Lindwurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Savannah Sage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shu Grain Caravan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shu Soldier-Farmers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Spiritual Guardian",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Springmane Cervin",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Staunch Defenders",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sylvan Brushstrider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Temple Acolyte",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Teroh's Faithful",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tireless Missionaries",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Turntimber Ascetic",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Venerable Monk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

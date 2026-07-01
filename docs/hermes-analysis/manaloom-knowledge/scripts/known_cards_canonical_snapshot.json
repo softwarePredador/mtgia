@@ -1230,6 +1230,22 @@
     "battle_rule_logical_key": "battle_rule_v1:344ee4ceca0b5f8f7d5fdabb88b47884",
     "battle_rule_oracle_hash": "c112c51f55b3d1cd548152e1391fed2b"
   },
+  "Amateur Hero": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
   "Ambush Party": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -1571,6 +1587,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
     "battle_rule_oracle_hash": "e1528476f4465cfb54a103159363cabe"
+  },
+  "Angel of Mercy": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+    "battle_rule_oracle_hash": "e67201c53659f5c13214d1a60cd8f652"
   },
   "Angel of Retribution": {
     "_keywords_are_self": true,
@@ -1968,6 +2005,22 @@
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
   },
+  "Arashin Cleric": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Arasta of the Endless Web": {
     "cmc": 4.0,
     "effect": "token_maker",
@@ -1977,6 +2030,27 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
+  },
+  "Arborback Stomper": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 5,
+    "keywords": [
+      "trample"
+    ],
+    "trample": true,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+    "battle_rule_oracle_hash": "00e8e649110944d7dbb9caed64963c9d"
   },
   "Arcane Bombardment": {
     "effect": "copy_spell",
@@ -3140,6 +3214,27 @@
     "battle_rule_logical_key": "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5",
     "battle_rule_oracle_hash": "21a711291b98f2e66a6d94a6c806945d"
   },
+  "Aven Battle Priest": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+    "battle_rule_oracle_hash": "73dfd66d4c0f4fb5bfec001e3bdae115"
+  },
   "Aven Envoy": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -3208,6 +3303,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:460e4af6bc803c971825453c4378427a",
     "battle_rule_oracle_hash": "192568b9a91b8cb2f9673d3104fdde32"
+  },
+  "Aven of Enduring Hope": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:30e3eacd02324c36a9a41cf3acd50557",
+    "battle_rule_oracle_hash": "e67201c53659f5c13214d1a60cd8f652"
   },
   "Aven Sentry": {
     "_keywords_are_self": true,
@@ -6659,6 +6775,22 @@
     "battle_rule_logical_key": "battle_rule_v1:191ce60f944e1a6e8489e7d2b7088a02",
     "battle_rule_oracle_hash": "bd41752c77cacf1d6cd6efa811a45cb8"
   },
+  "Bulwark Giant": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 5,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3d4be448c3bec2a64b00f8715c06a9f0",
+    "battle_rule_oracle_hash": "91e4ebb70108ac28b8b2aa69c368c7fe"
+  },
   "Burgeoning": {
     "effect": "ramp_engine",
     "trigger": "opponent_land_play",
@@ -7426,6 +7558,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Cathedral Sanctifier": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Caught Red-Handed": {
     "cmc": 5.0,
     "effect": "unknown",
@@ -7548,6 +7696,22 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Centaur Healer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
   },
   "Cephalid Coliseum": {
     "effect": "land",
@@ -9891,6 +10055,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Courier Griffin": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+    "battle_rule_oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c"
+  },
   "Courier Hawk": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -11363,6 +11548,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:45599a847c7127d51607bbbbb858d3b2"
   },
+  "Dawning Angel": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2c5f7ab0179980518450381bd1485079",
+    "battle_rule_oracle_hash": "d657843ed983bb78a6e0b9b873452707"
+  },
   "Dawnstrike Paladin": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -12598,6 +12804,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b9c8732f6cafef392e640b0d77d92737"
+  },
+  "Devout Monk": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 1,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f86776aef50052a914dda15e0b1f4e31",
+    "battle_rule_oracle_hash": "7cef052ccec7a163a8f0213a747ca352"
   },
   "Diabolic Intent": {
     "ability_kind": "one_shot",
@@ -22696,6 +22918,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
+  "Healer of the Glade": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Healer's Flock": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -23341,6 +23579,22 @@
     "battle_rule_logical_key": "battle_rule_v1:01bef09139cdcf340bcd15bb6d3cf6c8",
     "battle_rule_oracle_hash": "c40923f74be46ee82ffe7797242e276d"
   },
+  "Hill Giant Herdgorger": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Hinterland Harbor": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -23499,6 +23753,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:7028e0aba8409e45d6156211b87d6f8e"
+  },
+  "Honey Mammoth": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
   "Horizon Canopy": {
     "effect": "land",
@@ -24897,6 +25167,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e2f2aad6cdf9033c0bd320ff7ca47787"
   },
+  "Inspiring Cleric": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
+  },
   "Inspiring Overseer": {
     "cmc": 3.0,
     "effect": "draw_cards",
@@ -25588,6 +25874,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d3402dff750bf6369a6e50379066870b"
   },
+  "Jedit's Dragoons": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "keywords": [
+      "vigilance"
+    ],
+    "trigger": "enters_battlefield",
+    "vigilance": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b7a72609ddc5b60963738cec88f76326",
+    "battle_rule_oracle_hash": "4d1d6845d3cb2d0dddd2bb2f2216d769"
+  },
   "Jeska's Will": {
     "battle_model_scope": "choose_both_with_commander_red_by_target_opponent_hand_impulse_top_three_v1",
     "choose_both_if_control_commander": true,
@@ -26187,6 +26494,27 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Kemba's Skyguard": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+    "battle_rule_oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c"
+  },
   "Kenrith's Transformation": {
     "cmc": 2.0,
     "effect": "draw_cards",
@@ -26583,6 +26911,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9a9beaa23c31ad3d60c8c593696399cf",
     "battle_rule_oracle_hash": "c1d16fe4ac367c244d328c560c58f1dd"
+  },
+  "Koala-Sheep": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
   },
   "Kodama of the North Tree": {
     "_keywords_are_self": true,
@@ -28313,6 +28657,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:09662427b256781a39f50dd00ba9735b",
     "battle_rule_oracle_hash": "556810471067d11936662c3406a207c8"
+  },
+  "Lone Missionary": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
   "Lonely Arroyo": {
     "effect": "land",
@@ -30098,6 +30458,27 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Mesa Cavalier": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:555b4bb607ddb2350704f9a3e8af4722",
+    "battle_rule_oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c"
+  },
   "Mesa Enchantress": {
     "cmc": 3.0,
     "effect": "draw_cards",
@@ -31654,6 +32035,27 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "13cecae816b64406aa3f621ad48976b3"
+  },
+  "Mossbeard Ancient": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 5,
+    "keywords": [
+      "trample"
+    ],
+    "trample": true,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c6f31c0433a39bd78ef052af1fe0b283",
+    "battle_rule_oracle_hash": "00e8e649110944d7dbb9caed64963c9d"
   },
   "Mosscoat Goriak": {
     "_keywords_are_self": true,
@@ -34789,6 +35191,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
   },
+  "Peace Strider": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Pearl Medallion": {
     "ability_kind": "static",
     "applies_to_controller": "source_controller",
@@ -36213,6 +36631,29 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f30c522a9f02fff8ee918471a4c698ef"
+  },
+  "Primordial Pachyderm": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "keywords": [
+      "reach",
+      "trample"
+    ],
+    "reach": true,
+    "trample": true,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65",
+    "battle_rule_oracle_hash": "0f6491e5b9cea210c7c33662a6aec0ac"
   },
   "Princess Lucrezia": {
     "activation_requires_tap": true,
@@ -37871,6 +38312,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c3ae24798733d664f25235b529f57968"
+  },
+  "Ravenous Lindwurm": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
   "Ray of Distortion": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -41264,6 +41721,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Savannah Sage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
   "Saw in Half": {
     "cmc": 3.0,
     "effect": "remove_creature",
@@ -43693,6 +44166,38 @@
     "battle_rule_logical_key": "battle_rule_v1:90782f5ff4fbca308a31a3374fa8b24c",
     "battle_rule_oracle_hash": "3221cbc8b99391337488bb0a4d40175d"
   },
+  "Shu Grain Caravan": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
+  "Shu Soldier-Farmers": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
+  },
   "Siege-Gang Commander": {
     "cmc": 5.0,
     "effect": "remove_creature",
@@ -46063,6 +46568,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
+  "Spiritual Guardian": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
+  },
   "Spiteful Banditry": {
     "cmc": 2.0,
     "effect": "board_wipe",
@@ -46272,6 +46793,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b822326189437e5554828b3b6ff001c1",
     "battle_rule_oracle_hash": "bc0d67ab4c23dc0ffed1100c30eac1d5"
+  },
+  "Springmane Cervin": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
   },
   "Spymaster's Vault": {
     "effect": "land",
@@ -46598,6 +47135,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f9ae6ee172a2b1e12c6e691af9658512"
+  },
+  "Staunch Defenders": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
   "Steadfast Guard": {
     "_keywords_are_self": true,
@@ -48466,6 +49019,22 @@
     "battle_rule_logical_key": "battle_rule_v1:379008f3f03f94258292123453e3041c",
     "battle_rule_oracle_hash": "702f566e95dd477f5cf5a551e41e9df8"
   },
+  "Sylvan Brushstrider": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
+  },
   "Sylvan Caryatid": {
     "cmc": 2.0,
     "effect": "indestructible",
@@ -49536,6 +50105,22 @@
     "battle_rule_logical_key": "battle_rule_v1:2db82a716fde240884554cf0e1f5e0e8",
     "battle_rule_oracle_hash": "971f04b9d5fbb56aa10877faa3cf74a2"
   },
+  "Temple Acolyte": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Temple Bell": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -49852,6 +50437,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9ebdd456c04ec50d9efbc010ee85c689"
+  },
+  "Teroh's Faithful": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 4,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fe62479086cab43003ab8c9d27b1f7a7",
+    "battle_rule_oracle_hash": "ddd5636a82f801cc850af28442261c0a"
   },
   "Terrain Generator": {
     "effect": "land",
@@ -51740,6 +52341,22 @@
     "battle_rule_logical_key": "battle_rule_v1:af96afc668607664ff18de6e8c51a1b0",
     "battle_rule_oracle_hash": "e604ec678cf1ef5437418b9a5f1f3888"
   },
+  "Tireless Missionaries": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
   "Tireless Provisioner": {
     "cmc": 3.0,
     "effect": "ramp_engine",
@@ -52960,6 +53577,22 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e378617268163d419f2f6fa1a9d10f00"
+  },
+  "Turntimber Ascetic": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 3,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
+    "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
   },
   "Turntimber Grove": {
     "effect": "land",
@@ -54715,6 +55348,22 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Venerable Monk": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+    "effect": "creature",
+    "etb_life_gain_amount": 2,
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cf6345f2abe140852d655085e4562ae7",
+    "battle_rule_oracle_hash": "bb3fdc4473671cde3f7974fb0c0f529a"
   },
   "Venomthrope": {
     "_keywords_are_self": true,

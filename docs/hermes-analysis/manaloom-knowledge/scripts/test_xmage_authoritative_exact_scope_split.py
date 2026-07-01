@@ -15,6 +15,7 @@ def queue_row(
     card_id: str = "card-1",
     ability_kind: str = "one_shot",
     ability_classes: list[str] | None = None,
+    xmage_signals: list[str] | None = None,
 ):
     return {
         "card_id": card_id,
@@ -25,6 +26,7 @@ def queue_row(
         "effect_json": {"ability_kind": ability_kind},
         "xmage_effect_classes": effect_classes,
         "xmage_ability_classes": ability_classes or [],
+        "xmage_signals": xmage_signals or [],
         "xmage_class": "FixtureSpell",
         "xmage_path": "/tmp/FixtureSpell.java",
     }
@@ -696,6 +698,100 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_keyword_oracle_mismatch")
+
+    def test_creature_etb_gain_life_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Cleric",
+                type_line="Creature - Human Cleric",
+                oracle_text="When Fixture Cleric enters, you gain 3 life.",
+            ),
+            source_text="this.addAbility(new EntersBattlefieldTriggeredAbility(new GainLifeEffect(3)));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_LIFE_GAIN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_life_gain_amount"], 3)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_gain_life_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Angel",
+                type_line="Creature - Angel",
+                oracle_text="Flying\nWhen Fixture Angel enters the battlefield, you gain 4 life.",
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(new EntersBattlefieldTriggeredAbility(new GainLifeEffect(4)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["etb_life_gain_amount"], 4)
+
+    def test_creature_etb_gain_life_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                type_line="Creature - Cleric",
+                oracle_text="When this creature enters, you gain life equal to the number of creatures you control.",
+            ),
+            source_text="new GainLifeEffect(CreaturesYouControlCount.instance)",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
+
+    def test_creature_etb_gain_life_blocks_fixed_number_with_dynamic_multiplier(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Gate Angel",
+                type_line="Creature - Angel",
+                oracle_text="When Fixture Gate Angel enters the battlefield, you gain 2 life for each Gate you control.",
+            ),
+            source_text="new GainLifeEffect(new PermanentsOnBattlefieldCount(filter))",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
 
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(

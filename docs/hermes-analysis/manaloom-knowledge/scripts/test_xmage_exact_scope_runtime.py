@@ -314,6 +314,48 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_gain_life_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_life_gain_amount": 3,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Cleric",
+                "type_line": "Creature - Human Cleric",
+                "oracle_text": "When Fixture Cleric enters, you gain 3 life.",
+                "power": 2,
+                "toughness": 2,
+            },
+            turn=4,
+            rng=random.Random(45),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 23)
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Cleric"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Cleric"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "gain_life"
+                and data.get("life_gain_requested") == 3
+                and data.get("life_gained") == 3
+                and data.get("controller_life_after") == 23
+                for event, data in self.events
+            )
+        )
+
     def test_exile_target_spell_moves_permanent_to_exile(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

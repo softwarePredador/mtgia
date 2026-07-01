@@ -121,21 +121,21 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg293_static_self_keyword_creature_v2_wave.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg294_creature_etb_life_gain_wave.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `30759`
-- XMage authoritative source resolved: `27823`
+- target all-card battle-gap identities: `30722`
+- XMage authoritative source resolved: `27786`
 - local XMage missing-source exceptions: `2936`
 - parser gaps after XMage source resolution: `0`
 - ManaLoom adapter work-unit keys: `12038`
-- authoritative source coverage ratio: `0.9045`
+- authoritative source coverage ratio: `0.9044`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `27823` identities, card semantics are accepted from XMage; work is now
+- For `27786` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `2936` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -150,9 +150,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG293 Exact Adapter Waves
+## PG283-PG294 Exact Adapter Waves
 
-As of 2026-07-01, the PG283-PG293 all-card exact adapter waves are applied and
+As of 2026-07-01, the PG283-PG294 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -171,6 +171,10 @@ patterns:
   `xmage_destroy_target_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` ->
   `xmage_fixed_controller_gain_life_spell_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` with
+  `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
+  Oracle/source amount ->
+  `xmage_creature_etb_gain_life_v1`
 - `removal_exile::targeted_exile_variant_v1` ->
   `xmage_exile_target_spell_v1`
 - `ramp_permanent::xmage_artifact_mana_source_variant_review_v1` and
@@ -493,6 +497,52 @@ PG293 measured result:
   candidates from the largest remaining XMage work units: `recursion`,
   `draw_engine`, `grant_protection_from_chosen_color`, residual
   `direct_damage`, `life_gain`, `source_add_counters`, `removal_destroy`, and
+  `tutor`.
+
+PG294 evidence:
+
+- PG294 creature ETB life-gain package:
+  `docs/hermes-analysis/master_optimizer_reports/pg294_xmage_creature_etb_life_gain_wave_package.md`
+- PG294 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg294_xmage_creature_etb_life_gain_wave_pg_apply_evidence.md`
+- PG294 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg294_xmage_creature_etb_life_gain_wave_e2e_validation.md`
+- post-PG294 readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg294_creature_etb_life_gain_wave_recheck.md`
+- post-PG294 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg294_creature_etb_life_gain_wave.md`
+- post-PG294 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg294_existing_supported_recheck.md`
+
+PG294 measured result:
+
+- PG294 promoted `37` exact creatures whose local XMage source is
+  `GainLifeEffect(N)` behind `EntersBattlefieldTriggeredAbility`, mapped to
+  `xmage_creature_etb_gain_life_v1`.
+- Runtime now resolves `etb_life_gain_amount` after the creature enters the
+  battlefield and emits a `trigger_resolved` replay event with requested and
+  actual life gained.
+- The splitter explicitly blocks proportional ETB life-gain text such as
+  "you gain N life for each ..." by requiring both fixed Oracle text and fixed
+  `GainLifeEffect(N)` source amount.
+- PostgreSQL postcheck: `37/37` promoted rows, `37/37` verified/auto,
+  `37/37` matching Oracle hash, with `0` backup rows.
+- PG -> Hermes/SQLite sync loaded `37` PostgreSQL rows, inserted/updated `37`
+  SQLite rows, and exported `4257` canonical snapshot rows.
+- E2E package validation: PostgreSQL `37/37`, SQLite `37/37`, canonical
+  snapshot `37/37`, and runtime `get_card_effect` `37/37`.
+- Focused runtime tests cover creature ETB life gain after battlefield entry;
+  `71` focused exact-scope tests pass.
+- Global all-card authoritative queue after PG294:
+  `target_identity_count=30722`, `xmage_authoritative_source_count=27786`,
+  `xmage_missing_source_exception_count=2936`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=27786`.
+- Running the exact splitter after PG294 on supported units returns
+  `proposal_count=0` over `7414` considered supported rows. The next work must
+  implement another exact runtime-backed family/subpattern, with likely first
+  candidates from the largest remaining XMage work units: `recursion`,
+  `draw_engine`, `grant_protection_from_chosen_color`, residual
+  `direct_damage`, `source_add_counters`, `life_gain`, `removal_destroy`, and
   `tutor`.
 
 ## Why This Is The Best Current Flow

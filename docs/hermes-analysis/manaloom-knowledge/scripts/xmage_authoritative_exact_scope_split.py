@@ -68,6 +68,7 @@ DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
+ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 
 SPELL_UNITS = {
     DRAW_UNIT,
@@ -596,6 +597,19 @@ def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"GainLifeEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"triggered_ability"})
+    )
+
+
 def keywords_from_ability_classes(row: dict[str, Any]) -> set[str]:
     return {
         STATIC_SELF_KEYWORD_ABILITY_CLASSES[ability]
@@ -656,6 +670,17 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
 
 def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     match = re.match(r"^you gain (\d+) life\.?$", oracle_text(metadata))
+    if not match:
+        return None
+    return int(match.group(1))
+
+
+def etb_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
+    match = re.search(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+you gain (\d+) life(?:\.|$)",
+        text,
+    )
     if not match:
         return None
     return int(match.group(1))
@@ -756,14 +781,15 @@ def split_row(
 ) -> tuple[dict[str, Any] | None, str]:
     unit = str(row.get("adapter_work_unit") or "")
     keyword_creature_unit = is_static_keyword_creature_unit(row)
-    if unit not in SUPPORTED_UNITS and not keyword_creature_unit:
+    etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
+    if unit not in SUPPORTED_UNITS and not keyword_creature_unit and not etb_life_gain_creature_unit:
         return None, "unsupported_adapter_work_unit"
     if not metadata:
         return None, "postgres_card_metadata_missing"
     if not str(metadata.get("oracle_text") or "").strip():
         return None, "oracle_text_missing"
 
-    if unit in SPELL_UNITS:
+    if unit in SPELL_UNITS and not etb_life_gain_creature_unit:
         if not is_spell(metadata):
             return None, "not_instant_or_sorcery_spell"
         if ability_kind(row) != "one_shot":
@@ -800,6 +826,39 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_combat_keyword_creature",
+        ), "selected_exact_scope"
+
+    if etb_life_gain_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_life_gain_not_creature"
+        amount = etb_life_gain_amount_from_oracle(metadata)
+        constructor_amount = java_constructor_int(source_text, "GainLifeEffect")
+        if amount is None or amount <= 0:
+            return None, "etb_life_gain_amount_not_fixed"
+        if constructor_amount is None:
+            return None, "etb_life_gain_amount_source_not_fixed"
+        if constructor_amount != amount:
+            return None, "etb_life_gain_amount_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_LIFE_GAIN_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_life_gain_amount": amount,
+            "xmage_effect_class": "GainLifeEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_gain_life",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
@@ -1145,6 +1204,7 @@ def build_exact_split_report(
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+                "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
             ],
             "blocked_generic_review_scopes_from_pg": True,
             "max_cards": max_cards,
