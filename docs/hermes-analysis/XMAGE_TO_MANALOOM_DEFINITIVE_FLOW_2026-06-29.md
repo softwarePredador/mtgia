@@ -128,21 +128,22 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg322_boost_controlled_until_eot_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg324_permanent_fixed_tap_mana_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg325_recursion_exile_self_wave_commander_legal.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27296`
-- XMage authoritative source resolved: `26982`
+- target all-card battle-gap identities: `27293`
+- XMage authoritative source resolved: `26979`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26982`
+- XMage authoritative adapter required: `26979`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26982` identities, card semantics are accepted from XMage; work is now
+- For `26979` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -2515,6 +2516,67 @@ PG324 measured result:
 - Running the exact splitter after PG324 on supported units returns
   `proposal_count=0` over `8003` considered supported rows.
 
+PG325 evidence:
+
+- PG325 recursion exile-self package:
+  `docs/hermes-analysis/master_optimizer_reports/pg325_xmage_recursion_exile_self_wave_package.md`
+- PG325 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg325_xmage_recursion_exile_self_wave_pg_apply_evidence.md`
+- PG325 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg325_xmage_recursion_exile_self_wave_pg_to_sqlite_sync.json`
+- PG325 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg325_xmage_recursion_exile_self_wave_e2e_validation.md`
+- PG325 final alignment audits:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg325_recursion_exile_self_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg325_recursion_exile_self_wave.md`,
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg325_recursion_exile_self_wave.md`, and
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg325_recursion_exile_self_wave.md`
+- PG325 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg325_recursion_exile_self_wave.md`
+- post-PG325 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg325_recursion_exile_self_wave_commander_legal.md`
+- post-PG325 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg325_existing_supported_recheck.md`
+- post-PG325 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg325_recursion_exile_self_wave_recheck.md`
+
+PG325 measured result:
+
+- PG325 promoted `3` exact recursion spells with
+  `ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect`, no additional
+  ability class, fixed target/count Oracle text, and explicit self-exile on
+  resolution. The promoted cards are `Flood of Recollection`, `Restock`, and
+  `Treasured Find`.
+- Runtime already supported `exiles_self` on recursion resolution; PG325
+  strengthened the splitter and package manifest so `target`, `count`,
+  `destination`, `target_controller`, `target_constraints`, and `exiles_self`
+  are required by E2E checks.
+- Focused tests pass for the exact splitter (`148` tests), runtime (`82`
+  tests), and package builder (`4` tests).
+- PostgreSQL precheck found `3/3` target rows, `0` existing expected rows, and
+  `0` stale shadow rows.
+- PostgreSQL apply evidence reports `3/3` promoted rows, `3/3` verified/auto
+  rows, `3/3` matching Oracle hash rows, and `0` backup rows.
+- PG battle-rules -> Hermes/SQLite sync loaded `7198` PostgreSQL rules,
+  inserted/updated `6992` SQLite rows, and exported `4789` canonical snapshot
+  rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  no-override battle package gate under the stronger manifest checks.
+- Post-PG325 alignment audits pass for XMage strategy, operational surface,
+  PG/Hermes/SQLite contract, and legacy contamination. The only residual
+  warning is inherited SQLite cache coverage for old executable rules without
+  `oracle_hash`; PG325 rows themselves have `3/3` matching Oracle hashes.
+- Global all-card readiness after PG325:
+  `battle_and_oracle_ready=2331`, `battle_family_mapper_required=30216`, and
+  `snapshot_has_verified_rule=3479`.
+- Global all-card authoritative queue after PG325:
+  `target_identity_count=27293`, `xmage_authoritative_source_count=26979`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26979`.
+- Running the exact splitter after PG325 on supported units returns
+  `proposal_count=0` over `8000` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -3154,10 +3216,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG324 queue, the next exact runtime-backed work should be selected from
+post-PG325 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1975`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

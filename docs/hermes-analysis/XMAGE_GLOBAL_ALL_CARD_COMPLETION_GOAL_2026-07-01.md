@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG324
+thread goal remains active, but execution must use the current post-PG325
 baseline and the stop criteria below.
 
 ## Objective
@@ -20,20 +20,20 @@ promotion, Hermes/SQLite sync, and audit evidence.
 
 Source artifacts:
 
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg324_permanent_fixed_tap_mana_wave_recheck.md`
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg324_permanent_fixed_tap_mana_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg325_recursion_exile_self_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg325_recursion_exile_self_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG324 counts:
+Post-PG325 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2328`
-- all-card readiness `battle_family_mapper_required`: `30219`
-- target battle-gap identities in authoritative queue: `27296`
-- XMage authoritative source resolved: `26982`
+- all-card readiness `battle_and_oracle_ready`: `2331`
+- all-card readiness `battle_family_mapper_required`: `30216`
+- target battle-gap identities in authoritative queue: `27293`
+- XMage authoritative source resolved: `26979`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26982`
+- XMage authoritative adapter required: `26979`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -87,9 +87,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG324 authoritative queue unless a newer queue exists:
+Use the post-PG325 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1978`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1975`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -100,7 +100,7 @@ Use the post-PG324 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Next immediate work: start PG325 from
+Next immediate work: continue PG326 from
 `recursion::xmage_graveyard_return_variant_review_v1`, unless a fresh queue
 shows a larger exact package-ready lane.
 

@@ -59,6 +59,10 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
         "effect_json": {
             "effect": "topdeck_play",
             "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+            "target": "land",
+            "count": 1,
+            "destination": "play",
+            "exiles_self": False,
         },
         "review_status": "verified",
         "execution_status": "auto",
@@ -73,6 +77,10 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     assert expected["required_effect_fields"] == {
         "effect": "topdeck_play",
         "battle_model_scope": "look_top_library_play_lands_from_top_if_opponent_more_lands_v1",
+        "target": "land",
+        "count": 1,
+        "destination": "play",
+        "exiles_self": False,
     }
 
 

@@ -1766,6 +1766,56 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertTrue(effect["up_to_count"])
 
+    def test_graveyard_to_hand_exile_self_spell_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect", "ExileSpellEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Restock",
+                type_line="Sorcery",
+                oracle_text="Return two target cards from your graveyard to your hand. Exile Restock.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(2, StaticFilters.FILTER_CARD_FROM_YOUR_GRAVEYARD));
+                this.getSpellAbility().addEffect(new ExileSpellEffect());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "any_card")
+        self.assertEqual(effect["count"], 2)
+        self.assertEqual(effect["destination"], "hand")
+        self.assertTrue(effect["exiles_self"])
+        self.assertEqual(effect["xmage_additional_effect_class"], "ExileSpellEffect")
+
+    def test_graveyard_to_hand_exile_self_variable_x_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect", "ExileSpellEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wildest Dreams",
+                type_line="Sorcery",
+                oracle_text="Return X target cards from your graveyard to your hand. Exile Wildest Dreams.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard());
+                this.getSpellAbility().addEffect(new ExileSpellEffect());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_exile_self_target_not_supported")
+
     def test_graveyard_to_battlefield_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
         proposal, reason = split.split_row(

@@ -2677,6 +2677,59 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_recursion_exiles_self_after_recovery(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        first_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        second_target = {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.extend([first_target, second_target])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "scope": "any_card"},
+            "count": 2,
+            "destination": "hand",
+            "target_controller": "self",
+            "exiles_self": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Restock",
+                "type_line": "Sorcery",
+                "oracle_text": "Return two target cards from your graveyard to your hand. Exile Fixture Restock.",
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bolt", "Target Bear"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual([card["name"] for card in active.exile], ["Fixture Restock"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Restock"
+                and data.get("recovered_count") == 2
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "spell_resolved"
+                and data.get("card") == "Fixture Restock"
+                and data.get("destination") == "exile"
+                and data.get("zone_after") == "exile"
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

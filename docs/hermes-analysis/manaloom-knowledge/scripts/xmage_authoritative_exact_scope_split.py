@@ -793,6 +793,10 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
     text = re.sub(r"\s+", " ", str(text or "").strip().lower())
     patterns: list[tuple[str, tuple[str, int, bool]]] = [
         (
+            r"^return two target cards from your graveyard to your hand\.?$",
+            ("any_card", 2, False),
+        ),
+        (
             r"^return target instant or sorcery card from your graveyard to your hand\.?$",
             ("instant_or_sorcery", 1, False),
         ),
@@ -861,6 +865,24 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
 
 def recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     return recursion_to_hand_from_text(oracle_text(metadata))
+
+
+def oracle_text_without_trailing_self_exile(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    card_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if not card_name:
+        return None
+    match = re.fullmatch(rf"(?P<body>.+?)\.?\s+exile {re.escape(card_name)}\.?", text)
+    if not match:
+        return None
+    return match.group("body").strip() + "."
+
+
+def recursion_to_hand_exile_self_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
+    text = oracle_text_without_trailing_self_exile(metadata)
+    if text is None:
+        return None
+    return recursion_to_hand_from_text(text)
 
 
 def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] | None:
@@ -4714,6 +4736,40 @@ def split_row(
                 effect_json,
                 family_id="xmage_graveyard_to_battlefield_spell",
             ), "selected_exact_scope"
+        exile_self_recursion_classes = {
+            "ExileSpellEffect",
+            "ReturnFromGraveyardToHandTargetEffect",
+        }
+        if classes == exile_self_recursion_classes:
+            if ability_classes(row):
+                return None, "recursion_exile_self_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "recursion_exile_self_oracle_not_simple"
+            target = recursion_to_hand_exile_self_from_oracle(metadata)
+            if target is None:
+                return None, "recursion_exile_self_target_not_supported"
+            target_type, count, up_to = target
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": "hand",
+                "target_controller": "self",
+                "exiles_self": True,
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                "xmage_additional_effect_class": "ExileSpellEffect",
+                **flags,
+            }
+            if up_to:
+                effect_json["up_to_count"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_hand_exile_self_spell",
+            ), "selected_exact_scope"
         if classes != {"ReturnFromGraveyardToHandTargetEffect"}:
             return None, "recursion_effect_class_not_pure"
         if ability_classes(row):
@@ -5082,6 +5138,7 @@ def build_exact_split_report(
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",

@@ -19,6 +19,22 @@ import battle_rule_registry
 
 
 DEFAULT_REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
+E2E_REQUIRED_EFFECT_FIELDS = (
+    "effect",
+    "battle_model_scope",
+    "target",
+    "target_controller",
+    "target_constraints",
+    "count",
+    "up_to_count",
+    "destination",
+    "exiles_self",
+    "damage",
+    "life_gain",
+    "counter_type",
+    "counter_amount",
+    "keywords",
+)
 
 
 def utc_now() -> str:
@@ -428,7 +444,7 @@ ORDER BY p.card_name;
 def expected_rule_from_proposal(proposal: dict[str, Any]) -> dict[str, Any]:
     effect_json = proposal.get("effect_json") if isinstance(proposal.get("effect_json"), dict) else {}
     required_effect_fields = {}
-    for field in ("effect", "battle_model_scope"):
+    for field in E2E_REQUIRED_EFFECT_FIELDS:
         if effect_json.get(field) is not None:
             required_effect_fields[field] = effect_json[field]
     return {
