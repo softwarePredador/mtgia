@@ -390,14 +390,19 @@ class _QuickActions extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 108,
-      child: Row(
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) const SizedBox(width: 8),
-            Expanded(child: _QuickActionCard(data: actions[index])),
-          ],
-        ],
+      height: 112,
+      child: ListView.separated(
+        key: const Key('home-quick-actions-list'),
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: actions.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: 112,
+            child: _QuickActionCard(data: actions[index]),
+          );
+        },
       ),
     );
   }
@@ -435,7 +440,7 @@ class _QuickActionCard extends StatelessWidget {
         splashColor: data.accent.withValues(alpha: 0.08),
         highlightColor: data.accent.withValues(alpha: 0.04),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -538,7 +543,7 @@ class _RecentDeckCard extends StatelessWidget {
     final age = _relativeTime(deck.createdAt);
 
     return SizedBox(
-      width: 86,
+      width: 108,
       child: Material(
         color: AppTheme.transparent,
         child: InkWell(
@@ -627,14 +632,21 @@ class _RecentDeckCard extends StatelessWidget {
                         const SizedBox(height: 5),
                         Row(
                           children: [
-                            _ManaPips(identity: deck.colorIdentity),
-                            const Spacer(),
-                            Text(
-                              '${deck.cardCount}/$target',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: AppTheme.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: AppTheme.fontTiny,
+                            Flexible(
+                              child: _ManaPips(identity: deck.colorIdentity),
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                '${deck.cardCount}/$target',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: AppTheme.fontTiny,
+                                ),
                               ),
                             ),
                           ],
@@ -745,15 +757,15 @@ class _ManaPips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final symbols = identity.isEmpty ? const ['C'] : identity;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      spacing: 2,
+      runSpacing: 2,
       children:
           symbols.take(5).map((symbol) {
             final normalized = symbol.toUpperCase();
             return Container(
               width: 10,
               height: 10,
-              margin: const EdgeInsets.only(right: 2),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppTheme.manaPipBackground(normalized),

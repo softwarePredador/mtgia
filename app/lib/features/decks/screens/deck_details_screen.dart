@@ -29,6 +29,8 @@ import '../widgets/sample_hand_widget.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../cards/screens/card_detail_screen.dart';
 import '../../cards/widgets/card_edition_metadata.dart';
+import '../../commercial/models/manaloom_plan.dart';
+import '../../commercial/widgets/ai_usage_gate.dart';
 
 class DeckDetailsScreen extends StatefulWidget {
   final String deckId;
@@ -148,6 +150,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 case 'validate':
                   _validateDeck();
                   break;
+                case 'post_game':
+                  context.push('/decks/${widget.deckId}/post-game');
+                  break;
                 case 'toggle_public':
                   _togglePublic();
                   break;
@@ -178,6 +183,15 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                   child: ListTile(
                     leading: Icon(Icons.verified_outlined),
                     title: Text('Validar Deck'),
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'post_game',
+                  child: ListTile(
+                    leading: Icon(Icons.timeline_outlined),
+                    title: Text('Pós-jogo / evolução'),
                     contentPadding: EdgeInsets.zero,
                     dense: true,
                   ),
@@ -1177,6 +1191,11 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     BuildContext context,
     DeckCardItem card,
   ) async {
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.cardExplanation,
+    );
+    if (!hasAiQuota || !context.mounted) return;
     await showDeckAiExplanationFlow(
       context: context,
       card: card,
@@ -1458,6 +1477,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
   bool _showAllStrategies = true;
   bool _keepTheme = true;
   OptimizeIntensity _selectedIntensity = OptimizeIntensity.focused;
+  bool _preferCollection = true;
+  double _budgetLimit = 100;
+  String _rebuildIntent = 'upgraded';
 
   String? get _currentArchetype {
     final deck = context.read<DeckProvider>().selectedDeck;
@@ -1570,6 +1592,12 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
     BuildContext context,
     String archetype,
   ) async {
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.deckOptimization,
+    );
+    if (!hasAiQuota || !context.mounted) return;
+
     final deckProvider = context.read<DeckProvider>();
     bool isLoadingDialogOpen = false;
 
@@ -1593,7 +1621,23 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       bracket: _selectedBracket,
       keepTheme: _keepTheme,
       intensity: _selectedIntensity,
-      executeRequest: deckProvider.optimizeDeck,
+      executeRequest:
+          (
+            deckId,
+            archetype, {
+            required bracket,
+            required keepTheme,
+            required intensity,
+            required onProgress,
+          }) => deckProvider.optimizeDeck(
+            deckId,
+            archetype,
+            bracket: bracket,
+            keepTheme: keepTheme,
+            intensity: intensity,
+            onProgress: onProgress,
+            recommendationContext: _recommendationContext(),
+          ),
       onProgressUpdate: (state) {
         progressState.value = state;
       },
@@ -1713,6 +1757,9 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       selectedBracket: _selectedBracket,
       keepTheme: _keepTheme,
       selectedIntensity: _selectedIntensity,
+      preferCollection: _preferCollection,
+      budgetLimit: _budgetLimit,
+      rebuildIntent: _rebuildIntent,
       showAllStrategies: _showAllStrategies,
       optionsFuture: _optionsFuture,
       scrollController: widget.scrollController,
@@ -1720,6 +1767,10 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       onBracketChanged: (value) => setState(() => _selectedBracket = value),
       onKeepThemeChanged: (value) => setState(() => _keepTheme = value),
       onIntensityChanged: (value) => setState(() => _selectedIntensity = value),
+      onPreferCollectionChanged:
+          (value) => setState(() => _preferCollection = value),
+      onBudgetLimitChanged: (value) => setState(() => _budgetLimit = value),
+      onRebuildIntentChanged: (value) => setState(() => _rebuildIntent = value),
       onToggleStrategyVisibility:
           () => setState(() => _showAllStrategies = !_showAllStrategies),
       onRetryOptions: () {
@@ -1731,5 +1782,16 @@ class _OptimizationSheetState extends State<_OptimizationSheet> {
       },
       onApplyArchetype: (title) => _applyOptimization(context, title),
     );
+  }
+
+  Map<String, dynamic> _recommendationContext() {
+    return {
+      'prefer_collection': _preferCollection,
+      'budget_limit_brl': _budgetLimit.round(),
+      'rebuild_intent': _rebuildIntent,
+      'report': 'before_after_shareable',
+      'explain_swaps': true,
+      'include_price_risk_curve_bracket': true,
+    };
   }
 }

@@ -92,6 +92,121 @@ class OptimizationConfigSection extends StatelessWidget {
   }
 }
 
+class RecommendationContextSection extends StatelessWidget {
+  const RecommendationContextSection({
+    super.key,
+    required this.preferCollection,
+    required this.budgetLimit,
+    required this.rebuildIntent,
+    required this.onPreferCollectionChanged,
+    required this.onBudgetLimitChanged,
+    required this.onRebuildIntentChanged,
+  });
+
+  final bool preferCollection;
+  final double budgetLimit;
+  final String rebuildIntent;
+  final ValueChanged<bool> onPreferCollectionChanged;
+  final ValueChanged<double> onBudgetLimitChanged;
+  final ValueChanged<String> onRebuildIntentChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DialogSectionCard(
+      title: 'Diferencial da recomendação',
+      accent: AppTheme.brass400,
+      icon: Icons.psychology_alt_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SwitchListTile.adaptive(
+            key: const Key('optimize-prefer-collection-switch'),
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Priorizar minha coleção'),
+            subtitle: const Text(
+              'A IA tenta melhorar usando cartas do fichário antes de sugerir compra.',
+            ),
+            value: preferCollection,
+            onChanged: onPreferCollectionChanged,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Orçamento: R\$ ${budgetLimit.round()}',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Slider(
+            key: const Key('optimize-budget-slider'),
+            value: budgetLimit,
+            min: 0,
+            max: 500,
+            divisions: 20,
+            label: 'R\$ ${budgetLimit.round()}',
+            onChanged: onBudgetLimitChanged,
+          ),
+          const SizedBox(height: 6),
+          InputDecorator(
+            decoration: const InputDecoration(labelText: 'Intenção do rebuild'),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                key: const Key('optimize-rebuild-intent-field'),
+                value: rebuildIntent,
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(value: 'casual', child: Text('Casual')),
+                  DropdownMenuItem(value: 'upgraded', child: Text('Upgraded')),
+                  DropdownMenuItem(
+                    value: 'optimized',
+                    child: Text('Optimized'),
+                  ),
+                  DropdownMenuItem(value: 'cedh', child: Text('cEDH')),
+                ],
+                onChanged: (value) {
+                  if (value != null) onRebuildIntentChanged(value);
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          const _RecommendationTrustNote(),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecommendationTrustNote extends StatelessWidget {
+  const _RecommendationTrustNote();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceSlate,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.outlineMuted.withValues(alpha: 0.6)),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.fact_check_outlined, color: AppTheme.frost400, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'O preview explica função, risco, curva, preço e bracket quando esses dados vierem da IA. O relatório antes/depois pode ser compartilhado antes de aplicar.',
+              style: TextStyle(color: AppTheme.textSecondary, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _OptimizationIntensitySelector extends StatelessWidget {
   final OptimizeIntensity selected;
   final ValueChanged<OptimizeIntensity> onChanged;
@@ -419,6 +534,9 @@ class OptimizationSheetBody extends StatelessWidget {
   final int selectedBracket;
   final bool keepTheme;
   final OptimizeIntensity selectedIntensity;
+  final bool preferCollection;
+  final double budgetLimit;
+  final String rebuildIntent;
   final bool showAllStrategies;
   final Future<List<Map<String, dynamic>>> optionsFuture;
   final ScrollController scrollController;
@@ -426,6 +544,9 @@ class OptimizationSheetBody extends StatelessWidget {
   final ValueChanged<int> onBracketChanged;
   final ValueChanged<bool> onKeepThemeChanged;
   final ValueChanged<OptimizeIntensity> onIntensityChanged;
+  final ValueChanged<bool> onPreferCollectionChanged;
+  final ValueChanged<double> onBudgetLimitChanged;
+  final ValueChanged<String> onRebuildIntentChanged;
   final VoidCallback onToggleStrategyVisibility;
   final VoidCallback onRetryOptions;
   final ValueChanged<String> onApplyArchetype;
@@ -436,6 +557,9 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.selectedBracket,
     required this.keepTheme,
     required this.selectedIntensity,
+    required this.preferCollection,
+    required this.budgetLimit,
+    required this.rebuildIntent,
     required this.showAllStrategies,
     required this.optionsFuture,
     required this.scrollController,
@@ -443,6 +567,9 @@ class OptimizationSheetBody extends StatelessWidget {
     required this.onBracketChanged,
     required this.onKeepThemeChanged,
     required this.onIntensityChanged,
+    required this.onPreferCollectionChanged,
+    required this.onBudgetLimitChanged,
+    required this.onRebuildIntentChanged,
     required this.onToggleStrategyVisibility,
     required this.onRetryOptions,
     required this.onApplyArchetype,
@@ -502,6 +629,15 @@ class OptimizationSheetBody extends StatelessWidget {
           onBracketChanged: onBracketChanged,
           onKeepThemeChanged: onKeepThemeChanged,
           onIntensityChanged: onIntensityChanged,
+        ),
+        const SizedBox(height: 16),
+        RecommendationContextSection(
+          preferCollection: preferCollection,
+          budgetLimit: budgetLimit,
+          rebuildIntent: rebuildIntent,
+          onPreferCollectionChanged: onPreferCollectionChanged,
+          onBudgetLimitChanged: onBudgetLimitChanged,
+          onRebuildIntentChanged: onRebuildIntentChanged,
         ),
       ],
     );

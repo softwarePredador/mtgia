@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
+import '../../commercial/models/manaloom_plan.dart';
+import '../../commercial/widgets/ai_usage_gate.dart';
+import '../../commercial/widgets/ai_usage_meter.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
@@ -155,6 +158,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       );
       return;
     }
+
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.deckGeneration,
+    );
+    if (!hasAiQuota || !mounted) return;
 
     _generateCancellation?.cancel();
     final cancellation = GenerateDeckCancellation();
@@ -592,6 +601,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 16),
             const _AiTrustPanel(),
+            const SizedBox(height: 12),
+            const AiUsageMeter(compact: true),
             const SizedBox(height: 24),
 
             // Format Selector

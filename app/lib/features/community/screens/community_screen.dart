@@ -11,6 +11,8 @@ import '../../market/models/card_mover.dart';
 import '../../market/providers/market_provider.dart';
 import '../../social/providers/social_provider.dart';
 import '../../social/screens/user_profile_screen.dart';
+import '../../growth/widgets/community_trade_growth_panel.dart';
+import '../../binder/providers/binder_provider.dart';
 import 'community_deck_detail_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -32,7 +34,16 @@ class _CommunityScreenState extends State<CommunityScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CommunityProvider>().fetchPublicDecks(reset: true);
+      _fetchBinderStatsIfAvailable();
     });
+  }
+
+  void _fetchBinderStatsIfAvailable() {
+    try {
+      context.read<BinderProvider>().fetchStats();
+    } on ProviderNotFoundException {
+      return;
+    }
   }
 
   @override
@@ -174,6 +185,7 @@ class _ExploreTabState extends State<_ExploreTab>
     super.build(context);
     return Column(
       children: [
+        const CommunityTradeGrowthPanel(),
         // Search bar + filters
         Container(
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
@@ -368,8 +380,9 @@ class _ExploreTabState extends State<_ExploreTab>
         label: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppTheme.backgroundAbyss : AppTheme.textPrimary,
+            color: isSelected ? AppTheme.brass400 : AppTheme.textPrimary,
             fontSize: AppTheme.fontSm,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
         selected: isSelected,

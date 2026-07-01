@@ -549,6 +549,7 @@ class DeckProvider extends ChangeNotifier {
     int? bracket,
     bool keepTheme = true,
     OptimizeIntensity intensity = OptimizeIntensity.focused,
+    Map<String, dynamic>? recommendationContext,
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
   }) async {
     onProgress?.call('Preparando análise do deck...', 0, 5);
@@ -560,6 +561,7 @@ class DeckProvider extends ChangeNotifier {
       bracket: bracket,
       keepTheme: keepTheme,
       intensity: intensity,
+      recommendationContext: recommendationContext,
     );
 
     if (requestResult.isAsync) {
@@ -586,6 +588,8 @@ class DeckProvider extends ChangeNotifier {
         if (bracket != null) 'bracket': bracket,
         'keep_theme': keepTheme,
         'intensity': intensity.apiValue,
+        if (recommendationContext != null && recommendationContext.isNotEmpty)
+          'recommendation_context': recommendationContext,
       },
     );
     return requestResult.result!;

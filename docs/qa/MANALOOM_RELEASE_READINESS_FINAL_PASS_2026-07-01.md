@@ -171,10 +171,30 @@ Resultado:
    fora do git e rebuildar AAB/APK de distribuicao.
 3. `BLOCKED_BY_IOS_SIGNING`: executar build iOS/TestFlight assinado se iOS for
    alvo do release.
-4. `BLOCKED_BY_FINAL_ACCEPTANCE`: rodar aceite final em build assinado:
-   login/register, import/generate, details, optimize/apply, export/share.
-5. `BLOCKED_BY_COMMERCIAL_POLICY`: finalizar monetizacao, paywall/limites de IA
+4. `ACCEPTANCE_BLOCKER_IMPORT_MODAL_CLOSE`: no aceite Android, a segunda
+   importacao `replace_all` retornou `POST /import/to-deck -> 200`, mas o modal
+   `Importar Lista` nao fechou dentro do timeout.
+5. `ACCEPTANCE_BLOCKER_OPTIMIZE_NEEDS_REPAIR_UX`: no aceite Android, generate
+   async salvou o deck, mas optimize retornou `422 OPTIMIZE_NEEDS_REPAIR` e o
+   harness ficou preso em vez de concluir com rebuild guided/outcome seguro.
+6. `BLOCKED_BY_FINAL_ACCEPTANCE`: repetir aceite completo apos corrigir os dois
+   blockers acima e, idealmente, em build assinado.
+7. `BLOCKED_BY_COMMERCIAL_POLICY`: finalizar monetizacao, paywall/limites de IA
    e revisao de Fan Content Policy antes de oferta paga.
+
+## Etapas remanescentes avancadas
+
+Documento de saida:
+
+- `docs/qa/MANALOOM_REMAINING_RELEASE_STAGES_GOAL_2026-07-01.md`
+
+Resultado adicional:
+
+- Etapa 4, Observabilidade/Sentry: concluida com bloqueio de credencial.
+- Etapa 5, Signing/distribuicao: Android e iOS compilam; iOS gerou
+  `build/ios/iphoneos/Runner.app`, mas sem codesign.
+- Etapa 6, Aceite final em build: APK release reinstalado/aberto; aceite
+  completo revelou dois blockers de UX.
 
 ## Estado dos documentos
 

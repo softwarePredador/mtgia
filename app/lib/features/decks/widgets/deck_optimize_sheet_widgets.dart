@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../providers/deck_provider_support.dart';
@@ -309,6 +310,36 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
         selectedAdditionIndexes: Set<int>.from(_selectedAdditionIndexes),
       ),
     );
+  }
+
+  Future<void> _shareReport() async {
+    await Share.share(_buildShareReport());
+  }
+
+  String _buildShareReport() {
+    String names(List<Map<String, dynamic>> items, Set<int> selectedIndexes) {
+      final selected =
+          selectedIndexes
+              .where((index) => index >= 0 && index < items.length)
+              .map((index) => items[index]['name']?.toString() ?? '')
+              .where((name) => name.trim().isNotEmpty)
+              .take(12)
+              .toList();
+      return selected.isEmpty ? '-' : selected.join(', ');
+    }
+
+    return [
+      'ManaLoom - Relatório antes/depois',
+      'Plano: $_planLabel',
+      'Estratégia: ${widget.archetype}',
+      'Intensidade: $_intensityLabel',
+      'Mudanças selecionadas: $_selectedChangeCount',
+      'Remover: ${names(widget.displayRemovals, _selectedRemovalIndexes)}',
+      'Adicionar: ${names(widget.displayAdditions, _selectedAdditionIndexes)}',
+      if (widget.reasoning.isNotEmpty) 'Motivo: ${widget.reasoning}',
+      if (widget.deckAnalysis.isNotEmpty || widget.postAnalysis.isNotEmpty)
+        'Antes/depois: CMC ${widget.deckAnalysis['average_cmc'] ?? '-'} -> ${widget.postAnalysis['average_cmc'] ?? '-'}; cartas ${widget.deckAnalysis['total_cards'] ?? '-'} -> ${widget.postAnalysis['total_cards'] ?? widget.postAnalysis['card_count'] ?? '-'}.',
+    ].join('\n');
   }
 
   Widget _selectableSuggestionList({
@@ -637,6 +668,11 @@ class _OptimizationPreviewDialogState extends State<OptimizationPreviewDialog> {
             },
             child: const Text('Copiar relatório técnico'),
           ),
+        TextButton(
+          key: const Key('optimize-preview-share-report-button'),
+          onPressed: _shareReport,
+          child: const Text('Compartilhar relatório'),
+        ),
         ElevatedButton(
           key: const Key('optimize-preview-apply-button'),
           onPressed: _selectedChangeCount == 0 ? null : _confirmSelected,
@@ -1126,12 +1162,30 @@ class _SelectableSuggestionLineItem extends StatelessWidget {
     final role = item['role']?.toString() ?? item['function']?.toString() ?? '';
     final priority = item['priority']?.toString() ?? '';
     final risk = item['risk']?.toString() ?? '';
+    final curve =
+        item['curve']?.toString() ??
+        item['curve_slot']?.toString() ??
+        item['cmc']?.toString() ??
+        '';
+    final price =
+        item['price_brl']?.toString() ??
+        item['estimated_price_brl']?.toString() ??
+        item['price']?.toString() ??
+        '';
+    final bracket =
+        item['bracket']?.toString() ??
+        item['bracket_note']?.toString() ??
+        item['power_level']?.toString() ??
+        '';
     final impact =
         item['impact']?.toString() ?? item['impact_estimate']?.toString() ?? '';
     final metadata = [
       if (role.isNotEmpty) role,
       if (priority.isNotEmpty) 'prioridade $priority',
       if (risk.isNotEmpty) 'risco $risk',
+      if (curve.isNotEmpty) 'curva $curve',
+      if (price.isNotEmpty) 'preço $price',
+      if (bracket.isNotEmpty) 'bracket $bracket',
       if (impact.isNotEmpty) impact,
     ].join(' • ');
 

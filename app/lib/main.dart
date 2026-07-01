@@ -54,6 +54,12 @@ import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
+import 'features/commercial/providers/commercial_provider.dart';
+import 'features/commercial/screens/checkout_screen.dart';
+import 'features/commercial/screens/legal_screen.dart';
+import 'features/commercial/screens/plan_screen.dart';
+import 'features/commercial/screens/upgrade_screen.dart';
+import 'features/retention/screens/post_game_notes_screen.dart';
 
 final bool _debugBootIntoLifeCounter =
     kDebugMode &&
@@ -179,6 +185,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final TradeProvider _tradeProvider;
   late final MessageProvider _messageProvider;
   late final NotificationProvider _notificationProvider;
+  late final CommercialProvider _commercialProvider;
   late final RealtimeNotificationCoordinator _realtimeCoordinator;
   late final GoRouter _router;
   bool _hadAuthenticatedSession = false;
@@ -196,6 +203,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _tradeProvider = TradeProvider();
     _messageProvider = MessageProvider();
     _notificationProvider = NotificationProvider();
+    _commercialProvider = CommercialProvider();
+    unawaited(_commercialProvider.load());
 
     // Iniciar/parar polling de notificações quando autenticado
     _authProvider.addListener(_onAuthChanged);
@@ -252,6 +261,10 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/trades') ||
             location.startsWith('/messages') ||
             location.startsWith('/notifications') ||
+            location.startsWith('/plans') ||
+            location.startsWith('/upgrade') ||
+            location.startsWith('/checkout') ||
+            location.startsWith('/legal') ||
             location.startsWith('/onboarding') ||
             location.startsWith(lifeCounterRoutePath);
 
@@ -350,9 +363,32 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                         return CardScannerScreen(deckId: id);
                       },
                     ),
+                    GoRoute(
+                      path: 'post-game',
+                      builder: (context, state) {
+                        final id = state.pathParameters['id']!;
+                        return PostGameNotesScreen(deckId: id);
+                      },
+                    ),
                   ],
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/plans',
+              builder: (context, state) => const PlanScreen(),
+            ),
+            GoRoute(
+              path: '/upgrade',
+              builder: (context, state) => const UpgradeScreen(),
+            ),
+            GoRoute(
+              path: '/checkout',
+              builder: (context, state) => const CheckoutScreen(),
+            ),
+            GoRoute(
+              path: '/legal',
+              builder: (context, state) => const CommercialLegalScreen(),
             ),
             GoRoute(
               path: '/collection',
@@ -554,6 +590,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ChangeNotifierProvider.value(value: _tradeProvider),
         ChangeNotifierProvider.value(value: _messageProvider),
         ChangeNotifierProvider.value(value: _notificationProvider),
+        ChangeNotifierProvider.value(value: _commercialProvider),
       ],
       child: MaterialApp.router(
         title: 'ManaLoom - Deck Builder',
