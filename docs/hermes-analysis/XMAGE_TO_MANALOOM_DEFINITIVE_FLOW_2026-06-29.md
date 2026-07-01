@@ -24,15 +24,22 @@ Use a staged source-and-gate pipeline:
 
 1. Scryfall/MTGJSON bulk for card identity, Oracle text, layout, legality,
    rulings, and hash inputs.
-2. Local XMage as the primary open rules-engine reference.
+2. Local XMage as the authoritative open rules-engine behavior source for any
+   card with a resolvable local XMage class.
 3. Forge as a secondary implementation cross-check for ambiguous or high-risk
    scopes.
-4. XMage signal extraction into reviewable ManaLoom families.
-5. Exact-scope mapper and focused runtime tests per family/subpattern.
-6. PostgreSQL package only after exact scope, tests, and precheck evidence.
+4. XMage signal extraction into source-authoritative adapter candidates and
+   ManaLoom adapter work units.
+5. Exact-scope adapter/runtime support per family/subpattern.
+6. PostgreSQL executable package only after adapter support, tests, and
+   precheck evidence.
 7. PostgreSQL -> Hermes/SQLite sync and replay/audit validation after apply.
 
-The definitive rule: broad XMage extraction may create review candidates and family lanes, but it must not create executable battle truth or PostgreSQL promotion by itself.
+The definitive rule: resolved local XMage source is final behavior truth for
+that card. Broad XMage extraction may create source-authoritative adapter
+candidates in bulk, but a candidate becomes executable ManaLoom battle truth
+only when the matching runtime adapter exists and the PostgreSQL package passes
+precheck/apply/postcheck.
 
 ## Global All-Card Scope
 
@@ -103,24 +110,54 @@ Interpretation:
   they should be scheduled as family/subpattern units, never as a card-by-card
   backlog.
 
+## XMage Authoritative Adaptation Queue
+
+As of 2026-07-01, the project no longer treats resolved local XMage classes as
+mere review hints. For every target card where local XMage resolves a Java card
+class, XMage is the final card-behavior source and ManaLoom's remaining work is
+adapter/runtime translation.
+
+Use
+`docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
+to build this queue. Current evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap.md`
+
+Current measured queue:
+
+- target Commander-legal battle-gap identities: `28836`
+- XMage authoritative source resolved: `28522`
+- local XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- ManaLoom adapter work units: `11961`
+- authoritative source coverage ratio: `0.9891`
+
+Interpretation:
+
+- The old mental model, "review 28k cards manually", is wrong.
+- For `28522` identities, card semantics are accepted from XMage; work is now
+  adapter implementation and effect-family classification.
+- Only `314` identities remain true residual exceptions because the local
+  XMage checkout did not resolve a source class.
+- Generic `xmage_*_review_v1` scopes and fallback manual-model hints are
+  adapter work-unit names. Fallback hints must be split by real XMage Java
+  class/effect/ability signatures; they are blocked only from executable PG
+  promotion until ManaLoom has the matching runtime adapter.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
 
 ### Direct Full XMage Port
 
-Rejected as primary.
-
-Reason:
+Accepted as behavior source, rejected only as a literal Java-code transplant.
 
 - XMage is Java and tied to its own game engine, stack, priority, target,
   watcher, replacement, cost, and event model.
-- ManaLoom needs `effect_json`, `battle_model_scope`, runtime support, tests,
+- ManaLoom still needs `effect_json`, `battle_model_scope`, runtime support,
   PostgreSQL lineage, and Hermes sync.
-- Porting all XMage first touches tens of thousands of files before reducing the
-  active ManaLoom queue.
-
-Use it only as reference corpus and extractor input.
+- Therefore XMage is final behavioral truth, while ManaLoom adapters are the
+  implementation bridge.
 
 ### Card-By-Card Manual Review
 

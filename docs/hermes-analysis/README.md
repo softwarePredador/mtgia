@@ -41,10 +41,12 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 - `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
   - Status: `current_operating_standard`.
   - Fluxo operacional atual para absorver XMage/Oracle/Fonte externa em
-    ManaLoom por familias e subpadroes, sem promover escopos genericos como
-    regra executavel.
+    ManaLoom por familias e subpadroes, tratando XMage local resolvido como
+    fonte autoritativa de comportamento e bloqueando apenas a promocao
+    executavel sem adaptador runtime.
   - Define a hierarquia de fontes: regras oficiais + Scryfall/MTGJSON para
-    identidade/oracle/rulings, XMage local como referencia primaria de engine,
+    identidade/oracle/rulings, XMage local como verdade de engine para cartas
+    com classe resolvida,
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
@@ -69,6 +71,14 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     cadastrados e `232` em ready-product sao QA seeds apenas. Evidencia
     corrente:
     `master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_demand_corrected.md`.
+  - Para aplicar a decisao "XMage como verdade final" em massa, rode
+    `manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`.
+    Evidencia corrente:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap.md`.
+    Resultado: `28836` identidades Commander-legais com gap, `28522` com fonte
+    XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
+    gaps e `11961` work units de adaptador ManaLoom por assinatura/effect
+    XMage.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`

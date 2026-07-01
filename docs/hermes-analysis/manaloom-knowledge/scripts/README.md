@@ -54,6 +54,21 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/test_battle_analyst_v10_
 
 The default harness also resolves to v9.
 
+## XMage Authoritative Adaptation
+
+For all-card battle-rule acceleration, use local XMage as the authoritative
+behavior source whenever a card resolves to a local XMage Java class. Build the
+current global queue with:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap
+```
+
+This queue separates source truth from runtime execution: resolved XMage cards
+need ManaLoom adapter work by effect/signature; only missing XMage sources stay
+in the residual manual/external-source queue.
+
 ## Local Replay Audit
 
 For local Mac validation, do not trust a raw replay generated from an old

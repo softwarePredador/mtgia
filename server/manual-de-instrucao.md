@@ -80,6 +80,44 @@ python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_card_adaptation_a
   --xmage-limit 0
 ```
 
+## 2026-07-01 — XMage como fonte autoritativa de comportamento
+
+Motivo:
+
+- O fluxo anterior ainda tratava XMage como referencia/review lane e mantinha a
+  impressao incorreta de que `28835` identidades Commander-legais precisavam de
+  revisao semantica carta a carta.
+- A decisao operacional atual e: se a carta resolve para classe Java local no
+  XMage, XMage e a verdade final de comportamento da carta. O trabalho restante
+  do ManaLoom e adaptar runtime/effect_json por familia/assinatura, nao
+  redescobrir a regra da carta.
+
+Evidencia gerada:
+
+- Script:
+  `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
+- Relatorio:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap.md`
+
+Resultado real:
+
+- `target_identity_count=28836`;
+- `xmage_authoritative_source_count=28522`;
+- `xmage_missing_source_exception_count=314`;
+- `xmage_authoritative_parser_gap_count=0`;
+- `xmage_authoritative_adapter_required_count=28522`;
+- `manual_semantic_decision_units_remaining=314`;
+- `authoritative_source_coverage_ratio=0.9891`;
+- `adapter_work_unit_count=11961`, com fallback manual-model agrupado por
+  assinatura Java real do XMage em vez de virar fila manual carta a carta.
+
+Comando:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_commander_gap
+```
+
 ## 2026-06-18 — Sync focado de legalidades para fechar `needs_legality_sync`
 
 Motivo:
