@@ -247,6 +247,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["amount"], 3)
         self.assertEqual(effect["target"], "any_target")
 
+    def test_fixed_damage_gain_life_spell_maps_to_direct_damage_with_life_gain(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Drain deals 3 damage to any target and you gain 2 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "direct_damage")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["amount"], 3)
+        self.assertEqual(effect["gain_life"], 2)
+        self.assertEqual(effect["target"], "any_target")
+
+    def test_fixed_damage_gain_life_spell_allows_period_separated_life_gain(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Drain deals 2 damage to target creature. You gain 2 life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(2));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(2));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_GAIN_LIFE_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+
+    def test_fixed_damage_gain_life_spell_blocks_variable_x(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["DamageTargetEffect", "GainLifeEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Fixture Drain deals X damage to any target and you gain X life."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));"
+                "this.getSpellAbility().addEffect(new GainLifeEffect(GetXValue.instance));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_life_gain_source_not_fixed")
+
     def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(

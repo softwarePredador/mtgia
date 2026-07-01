@@ -67,6 +67,7 @@ SUPPORTED_UNITS = {
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
+DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 CREATURE_TAP_DAMAGE_SCOPE = "xmage_creature_tap_fixed_damage_target_activated_v1"
 TAP_DAMAGE_ACTIVATED_SCOPE = "xmage_tap_fixed_damage_target_activated_ability_v1"
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
@@ -1139,6 +1140,55 @@ def damage_target_from_oracle(metadata: dict[str, Any]) -> str | None:
     return None
 
 
+def fixed_damage_gain_life_from_source(source: str) -> tuple[int, int, str] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    damage_matches = re.findall(r"new\s+DamageTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    life_matches = re.findall(r"new\s+GainLifeEffect\s*\(\s*(\d+)\s*\)", text, re.S)
+    if len(damage_matches) != 1 or len(life_matches) != 1:
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    target_classes = re.findall(r"new\s+(Target\w+)\s*\(", text)
+    supported_targets = [
+        target_class
+        for target_class in target_classes
+        if target_class
+        in {
+            "TargetAnyTarget",
+            "TargetCreaturePermanent",
+            "TargetCreatureOrPlaneswalker",
+        }
+    ]
+    if len(target_classes) != 1 or len(supported_targets) != 1:
+        return None
+    target_map = {
+        "TargetAnyTarget": "any_target",
+        "TargetCreaturePermanent": "creature",
+        "TargetCreatureOrPlaneswalker": "creature_or_planeswalker",
+    }
+    return int(damage_matches[0]), int(life_matches[0]), target_map[supported_targets[0]]
+
+
+def fixed_damage_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^.+ deals (\d+) damage to "
+        r"(any target|target creature|target creature or planeswalker)"
+        r"(?: and you gain|\. you gain) (\d+) life\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target_map = {
+        "any target": "any_target",
+        "target creature": "creature",
+        "target creature or planeswalker": "creature_or_planeswalker",
+    }
+    return int(match.group(1)), int(match.group(3)), target_map[match.group(2)]
+
+
 def activated_tap_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
     text = oracle_text(metadata)
     match = re.match(
@@ -1370,6 +1420,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution creature-token maker"
+    elif scope == DAMAGE_GAIN_LIFE_SCOPE:
+        scope_kind = "fixed damage plus controller life-gain spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope in {
@@ -1888,6 +1940,37 @@ def split_row(
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
 
+    if unit == LIFE_UNIT and classes == {"DamageTargetEffect", "GainLifeEffect"}:
+        if has_oracle_complexity(metadata):
+            return None, "damage_life_gain_oracle_not_simple"
+        source_damage = fixed_damage_gain_life_from_source(source_text)
+        if source_damage is None:
+            return None, "damage_life_gain_source_not_fixed"
+        oracle_damage = fixed_damage_gain_life_from_oracle(metadata)
+        if oracle_damage is None:
+            return None, "damage_life_gain_oracle_not_exact_fixed"
+        if source_damage != oracle_damage:
+            return None, "damage_life_gain_source_oracle_mismatch"
+        amount, life_gain, target = oracle_damage
+        effect_json = {
+            "effect": "direct_damage",
+            "battle_model_scope": DAMAGE_GAIN_LIFE_SCOPE,
+            "amount": amount,
+            "damage": amount,
+            "gain_life": life_gain,
+            "controller_gain_life": life_gain,
+            "target": target,
+            "target_constraints": target_constraints_for(target),
+            "xmage_effect_classes": ["DamageTargetEffect", "GainLifeEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_damage_gain_life_spell",
+        ), "selected_exact_scope"
+
     if unit == LIFE_UNIT:
         if classes != {"GainLifeEffect"}:
             return None, "life_gain_effect_class_not_pure"
@@ -2268,6 +2351,7 @@ def build_exact_split_report(
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
+                "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",
             ],

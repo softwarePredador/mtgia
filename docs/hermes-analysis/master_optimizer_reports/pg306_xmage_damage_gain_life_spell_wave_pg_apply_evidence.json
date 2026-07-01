@@ -1,0 +1,332 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG306",
+  "generated_at": "2026-07-01T12:58:08.601968+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg306_xmage_damage_gain_life_spell_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg306_xmage_damage_gain_life_spell_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Agonizing Syphon",
+      "Dark Nourishment",
+      "Defibrillating Current",
+      "Douse in Gloom",
+      "Essence Drain",
+      "Essence Extraction",
+      "Last Kiss",
+      "Pharika's Cure",
+      "Sorin's Thirst",
+      "Vampiric Feast",
+      "Vicious Hunger",
+      "Warleader's Helix",
+      "Winter's Intervention"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 13,
+    "promoted_rule_rows": 13,
+    "promoted_verified_auto_rows": 13,
+    "row_count": 13
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Agonizing Syphon",
+      "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+      "normalized_name": "agonizing syphon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Dark Nourishment",
+      "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2",
+      "normalized_name": "dark nourishment",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Defibrillating Current",
+      "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
+      "normalized_name": "defibrillating current",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Douse in Gloom",
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "douse in gloom",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Essence Drain",
+      "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+      "normalized_name": "essence drain",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Essence Extraction",
+      "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765",
+      "normalized_name": "essence extraction",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Last Kiss",
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "last kiss",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Pharika's Cure",
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "pharika's cure",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Sorin's Thirst",
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "sorin's thirst",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Vampiric Feast",
+      "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5",
+      "normalized_name": "vampiric feast",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Vicious Hunger",
+      "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed",
+      "normalized_name": "vicious hunger",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Warleader's Helix",
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "normalized_name": "warleader's helix",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Winter's Intervention",
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "winter's intervention",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Agonizing Syphon",
+      "Dark Nourishment",
+      "Defibrillating Current",
+      "Douse in Gloom",
+      "Essence Drain",
+      "Essence Extraction",
+      "Last Kiss",
+      "Pharika's Cure",
+      "Sorin's Thirst",
+      "Vampiric Feast",
+      "Vicious Hunger",
+      "Warleader's Helix",
+      "Winter's Intervention"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 13,
+    "total_target_card_rows": 13,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "b88b71ac-01ee-4e3f-a4e2-2ee961e6e424",
+      "card_name": "Agonizing Syphon",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+      "normalized_name": "agonizing syphon",
+      "oracle_hash": "bb99dc3202d60eebefd671ebb94d5fdd",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "3675604f-8dbc-48fd-9f72-e07098423cfb",
+      "card_name": "Dark Nourishment",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2",
+      "normalized_name": "dark nourishment",
+      "oracle_hash": "9ad9181ce8b6bf194df67591eba0005d",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "5c68344c-719d-4657-89f3-257d44d7df46",
+      "card_name": "Defibrillating Current",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
+      "normalized_name": "defibrillating current",
+      "oracle_hash": "32b8aad46992cb58b5cfae49735140ca",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "96212b7a-f4c6-4ef9-92f0-9f07ebea3600",
+      "card_name": "Douse in Gloom",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "douse in gloom",
+      "oracle_hash": "790b89d001d4612f47355b6eaa3c4090",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "18c604a5-596c-403a-95f0-16857fd1a079",
+      "card_name": "Essence Drain",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+      "normalized_name": "essence drain",
+      "oracle_hash": "f7797f346011287d89fbfc7663670476",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "53985835-72d3-491a-ae11-159efc8ba71a",
+      "card_name": "Essence Extraction",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765",
+      "normalized_name": "essence extraction",
+      "oracle_hash": "d96959f3a27de4e120c64de80c6a9aaa",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "23430d93-f804-425d-8a38-0327123479fa",
+      "card_name": "Last Kiss",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "last kiss",
+      "oracle_hash": "2b9469002ffd3fc0a880f6f8c3c0cf19",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0f174145-b8e2-4838-ae8d-7829def5e7c6",
+      "card_name": "Pharika's Cure",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "pharika's cure",
+      "oracle_hash": "4a9e7997580341e5bcf6dd7fd9c1e887",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "3eb3c3a0-7e98-4613-9b92-fc7e7007601a",
+      "card_name": "Sorin's Thirst",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "sorin's thirst",
+      "oracle_hash": "1e54bf29b16bbc69cf01b968ef142778",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "37b70a15-bb88-4f05-93b4-84b2f9fa90f5",
+      "card_name": "Vampiric Feast",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5",
+      "normalized_name": "vampiric feast",
+      "oracle_hash": "b395d91294a22cd813bfe27939364c56",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "78685c85-5688-46ac-9977-bc9066121948",
+      "card_name": "Vicious Hunger",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed",
+      "normalized_name": "vicious hunger",
+      "oracle_hash": "0d8c6360af4725e1e185f7d7c48e0596",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "9c67359a-656a-452f-b02f-278b3c13d6f2",
+      "card_name": "Warleader's Helix",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+      "normalized_name": "warleader's helix",
+      "oracle_hash": "70dd7a07d63e3c7d3705cf0efdb341d6",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "bc5b5572-6d97-4eb8-b176-ceb637c13eb1",
+      "card_name": "Winter's Intervention",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+      "normalized_name": "winter's intervention",
+      "oracle_hash": "6a5018c20fad5c79a5f827f693574a27",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_damage_gain_life_spell_wave"
+}

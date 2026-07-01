@@ -1,0 +1,504 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-01T13:01:50.505972+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg306_xmage_damage_gain_life_spell_wave_manifest.json",
+  "package_id": "pg306_xmage_damage_gain_life_spell_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Agonizing Syphon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+          "oracle_hash": "bb99dc3202d60eebefd671ebb94d5fdd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Dark Nourishment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2",
+          "oracle_hash": "9ad9181ce8b6bf194df67591eba0005d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Defibrillating Current",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
+          "oracle_hash": "32b8aad46992cb58b5cfae49735140ca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Douse in Gloom",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "790b89d001d4612f47355b6eaa3c4090",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Essence Drain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+          "oracle_hash": "f7797f346011287d89fbfc7663670476",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Essence Extraction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765",
+          "oracle_hash": "d96959f3a27de4e120c64de80c6a9aaa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Last Kiss",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "2b9469002ffd3fc0a880f6f8c3c0cf19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Pharika's Cure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "4a9e7997580341e5bcf6dd7fd9c1e887",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sorin's Thirst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "1e54bf29b16bbc69cf01b968ef142778",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vampiric Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5",
+          "oracle_hash": "b395d91294a22cd813bfe27939364c56",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vicious Hunger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed",
+          "oracle_hash": "0d8c6360af4725e1e185f7d7c48e0596",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Warleader's Helix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+          "oracle_hash": "70dd7a07d63e3c7d3705cf0efdb341d6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Winter's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "6a5018c20fad5c79a5f827f693574a27",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Agonizing Syphon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+          "oracle_hash": "bb99dc3202d60eebefd671ebb94d5fdd",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Dark Nourishment",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2",
+          "oracle_hash": "9ad9181ce8b6bf194df67591eba0005d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Defibrillating Current",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
+          "oracle_hash": "32b8aad46992cb58b5cfae49735140ca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Douse in Gloom",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "790b89d001d4612f47355b6eaa3c4090",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Essence Drain",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+          "oracle_hash": "f7797f346011287d89fbfc7663670476",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Essence Extraction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765",
+          "oracle_hash": "d96959f3a27de4e120c64de80c6a9aaa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Last Kiss",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "2b9469002ffd3fc0a880f6f8c3c0cf19",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Pharika's Cure",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "4a9e7997580341e5bcf6dd7fd9c1e887",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Sorin's Thirst",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "1e54bf29b16bbc69cf01b968ef142778",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vampiric Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5",
+          "oracle_hash": "b395d91294a22cd813bfe27939364c56",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Vicious Hunger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed",
+          "oracle_hash": "0d8c6360af4725e1e185f7d7c48e0596",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Warleader's Helix",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+          "oracle_hash": "70dd7a07d63e3c7d3705cf0efdb341d6",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "card_name": "Winter's Intervention",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+          "oracle_hash": "6a5018c20fad5c79a5f827f693574a27",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Agonizing Syphon",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Nourishment",
+          "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Defibrillating Current",
+          "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Douse in Gloom",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Essence Drain",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Essence Extraction",
+          "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Last Kiss",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pharika's Cure",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sorin's Thirst",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vampiric Feast",
+          "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Vicious Hunger",
+          "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warleader's Helix",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Winter's Intervention",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Agonizing Syphon",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Nourishment",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Defibrillating Current",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Douse in Gloom",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Essence Drain",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Essence Extraction",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Last Kiss",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pharika's Cure",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sorin's Thirst",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vampiric Feast",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Vicious Hunger",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warleader's Helix",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Winter's Intervention",
+          "component_keys": [],
+          "effect": "direct_damage",
+          "logical_rule_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

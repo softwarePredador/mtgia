@@ -76,7 +76,7 @@ units into exact runtime-backed scopes:
 
 ```bash
 python3 docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py \
-  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg305_boost_keyword_spell_wave.json \
+  --queue docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg306_damage_gain_life_spell_wave.json \
   --output-prefix docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_$(date -u +%Y%m%d)_next_wave
 ```
 
@@ -85,7 +85,7 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG305. PG283 promoted and synced 312 exact one-shot
+Current applied checkpoint: PG306. PG283 promoted and synced 312 exact one-shot
 spell rules; PG284 added 53 exact utility rules; PG285 closed 8 all-card
 supported residuals; PG286 added 12 pure counterspells with stack target
 constraints; PG287 added 7 pure bounce spells with runtime `destination=hand`;
@@ -112,7 +112,8 @@ self-keyword preservation and optional draw handling; PG302 added 8 exact
 creatures with fixed enter-the-battlefield damage triggers; PG303 added 27
 exact one-shot fixed token spells from `CreateTokenEffect`; PG304 added 27
 exact creatures with fixed enter-the-battlefield token creation; PG305 added
-27 exact one-shot target-creature boost plus until-end-of-turn keyword spells.
+27 exact one-shot target-creature boost plus until-end-of-turn keyword spells;
+PG306 added 13 exact one-shot damage plus controller life-gain spells.
 The current splitter supports fixed draw, fixed direct damage, destroy target,
 fixed controller life gain, exile target, simple tap mana-source permanents,
 counter target spell, return target permanent/creature to hand, graveyard
@@ -128,7 +129,7 @@ spell token creation with literal creature token classes and safe
 `flying`/`haste` token keywords, plus fixed creature ETB token creation with
 literal creature token classes and safe token keyword preservation, plus fixed
 target-creature boost plus temporary keyword spells with until-end-of-turn
-cleanup.
+cleanup, plus fixed one-shot damage plus controller life-gain spells.
 Evidence:
 
 - `master_optimizer_reports/pg283_xmage_fixed_spell_wave_package.md`
@@ -196,15 +197,18 @@ Evidence:
 - `master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_package.md`
 - `master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_pg_apply_evidence.md`
 - `master_optimizer_reports/pg305_xmage_boost_keyword_spell_wave_e2e_validation.md`
-- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg305_boost_keyword_spell_wave.md`
-- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg305_existing_supported_recheck.md`
+- `master_optimizer_reports/pg306_xmage_damage_gain_life_spell_wave_package.md`
+- `master_optimizer_reports/pg306_xmage_damage_gain_life_spell_wave_pg_apply_evidence.md`
+- `master_optimizer_reports/pg306_xmage_damage_gain_life_spell_wave_e2e_validation.md`
+- `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg306_damage_gain_life_spell_wave.md`
+- `master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg306_existing_supported_recheck.md`
 
-After PG305, rerunning the exact splitter on supported units should return
-`proposal_count=0` over `7429` considered supported rows; continue by adding a
+After PG306, rerunning the exact splitter on supported units should return
+`proposal_count=0` over `7416` considered supported rows; continue by adding a
 new exact subpattern/runtime adapter for a remaining high-volume family from
-the current authoritative queue. The post-PG305 queue is the current scheduling
-source: `target_identity_count=27650`, `xmage_authoritative_source_count=27336`,
-`xmage_authoritative_adapter_required_count=27336`, `parser_gap=0`, and
+the current authoritative queue. The post-PG306 queue is the current scheduling
+source: `target_identity_count=27637`, `xmage_authoritative_source_count=27323`,
+`xmage_authoritative_adapter_required_count=27323`, `parser_gap=0`, and
 `xmage_missing_source_exception_count=314`.
 
 After generating a package with `xmage_batch_pg_package_builder.py`, run the

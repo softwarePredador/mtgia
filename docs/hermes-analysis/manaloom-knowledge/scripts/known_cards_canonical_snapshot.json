@@ -739,6 +739,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Agonizing Syphon": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 3,
+    "damage": 3,
+    "effect": "direct_damage",
+    "gain_life": 3,
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+    "battle_rule_oracle_hash": "bb99dc3202d60eebefd671ebb94d5fdd"
+  },
   "Air Elemental": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -12051,6 +12076,31 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Dark Nourishment": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 3,
+    "damage": 3,
+    "effect": "direct_damage",
+    "gain_life": 3,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:029f28307ce7b3b6c69a0d41cc7deab2",
+    "battle_rule_oracle_hash": "9ad9181ce8b6bf194df67591eba0005d"
+  },
   "Dark Remedy": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -12901,6 +12951,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
+  },
+  "Defibrillating Current": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 4,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": false,
+    "sorcery": true,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
+    "battle_rule_oracle_hash": "32b8aad46992cb58b5cfae49735140ca"
   },
   "Defile": {
     "cmc": 1.0,
@@ -14358,6 +14436,33 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+  },
+  "Douse in Gloom": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+    "battle_rule_oracle_hash": "790b89d001d4612f47355b6eaa3c4090"
   },
   "Dovin's Veto": {
     "cmc": 2.0,
@@ -16991,6 +17096,58 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:83dbd32fed8c770f977cd7b1fcd2883d",
     "battle_rule_oracle_hash": "d8e8e60e34140942af13aa1be250a961"
+  },
+  "Essence Drain": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 3,
+    "damage": 3,
+    "effect": "direct_damage",
+    "gain_life": 3,
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c1efa9874143362f23fce5bed164f104",
+    "battle_rule_oracle_hash": "f7797f346011287d89fbfc7663670476"
+  },
+  "Essence Extraction": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 3,
+    "damage": 3,
+    "effect": "direct_damage",
+    "gain_life": 3,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fd24ff97747cfcb1638dbf9636156765",
+    "battle_rule_oracle_hash": "d96959f3a27de4e120c64de80c6a9aaa"
   },
   "Essence Flux": {
     "cmc": 1.0,
@@ -29735,6 +29892,33 @@
     "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
     "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
   },
+  "Last Kiss": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+    "battle_rule_oracle_hash": "2b9469002ffd3fc0a880f6f8c3c0cf19"
+  },
   "Last March of the Ents": {
     "cmc": 8.0,
     "effect": "unknown",
@@ -38304,6 +38488,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "963bacdc88ebfc83725d4e33e5055d58"
+  },
+  "Pharika's Cure": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+    "battle_rule_oracle_hash": "4a9e7997580341e5bcf6dd7fd9c1e887"
   },
   "Pharika's Mender": {
     "ability_kind": "triggered",
@@ -49756,6 +49967,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:541c79b3a2db188db8c112e76a121af9"
   },
+  "Sorin's Thirst": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+    "battle_rule_oracle_hash": "1e54bf29b16bbc69cf01b968ef142778"
+  },
   "Sorrow's Path": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -59487,6 +59725,31 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Vampiric Feast": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 4,
+    "damage": 4,
+    "effect": "direct_damage",
+    "gain_life": 4,
+    "instant": false,
+    "sorcery": true,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1d56c7af6c995b8069895ee5a393b1b5",
+    "battle_rule_oracle_hash": "b395d91294a22cd813bfe27939364c56"
+  },
   "Vampiric Rites": {
     "cmc": 1.0,
     "effect": "draw_cards",
@@ -60097,6 +60360,33 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Vicious Hunger": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:afdcaac9d85814160b0c5bdc9cad24ed",
+    "battle_rule_oracle_hash": "0d8c6360af4725e1e185f7d7c48e0596"
   },
   "Victimize": {
     "cmc": 3.0,
@@ -61457,6 +61747,31 @@
     "battle_rule_logical_key": "battle_rule_v1:cc55ae76863ec402fabc99b2691625a7",
     "battle_rule_oracle_hash": "0b6b075fd5c59b4634262b2658685f1d"
   },
+  "Warleader's Helix": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 4,
+    "damage": 4,
+    "effect": "direct_damage",
+    "gain_life": 4,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b30ee9a5fcd603703d248235230ed80f",
+    "battle_rule_oracle_hash": "70dd7a07d63e3c7d3705cf0efdb341d6"
+  },
   "Warp World": {
     "cmc": 8.0,
     "count": 1,
@@ -62763,6 +63078,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0b543efc21cb5ee532062e24929c6ae1",
     "battle_rule_oracle_hash": "ba3e54dd4b164190b5fd039833a79bcc"
+  },
+  "Winter's Intervention": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+    "controller_gain_life": 2,
+    "damage": 2,
+    "effect": "direct_damage",
+    "gain_life": 2,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "GainLifeEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:788f7c2c874671de1271b7435856eb66",
+    "battle_rule_oracle_hash": "6a5018c20fad5c79a5f827f693574a27"
   },
   "Wintermoon Mesa": {
     "effect": "land",

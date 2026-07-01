@@ -275,6 +275,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_gain_life_spell_damages_target_and_gains_life(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 10
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
+            "amount": 3,
+            "damage": 3,
+            "gain_life": 2,
+            "controller_gain_life": 2,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Drain",
+                "type_line": "Instant",
+                "oracle_text": "Fixture Drain deals 3 damage to target creature and you gain 2 life.",
+            },
+            turn=2,
+            rng=random.Random(24),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 12)
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Bear"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Drain"
+                and data.get("target") == "Target Bear"
+                and data.get("result") == "creature_destroyed"
+                and data.get("life_gain_requested") == 2
+                and data.get("life_gained") == 2
+                and data.get("controller_life_before") == 10
+                and data.get("controller_life_after") == 12
+                for event, data in self.events
+            )
+        )
+
     def test_target_constraints_keep_creature_enchantment_planeswalker_scope(self) -> None:
         effect = {"target_constraints": {"card_types": ["creature", "enchantment", "planeswalker"]}}
 
