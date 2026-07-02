@@ -1,0 +1,778 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg355_xmage_destroy_restricted_target_wave_20260702_0541",
+  "deploy_id": "PG355",
+  "expected_rules": [
+    {
+      "card_name": "Bramblecrush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+      "min_rule_version": 2,
+      "normalized_name": "bramblecrush",
+      "oracle_hash": "fe6491ef278d361374788a27b740fd37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+      "min_rule_version": 2,
+      "normalized_name": "crush",
+      "oracle_hash": "844a39ce47b11aacfc64d6b0eb41eeee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dark Banishing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+      "min_rule_version": 2,
+      "normalized_name": "dark banishing",
+      "oracle_hash": "68c4c921de0e9d82a4943ef113e34c00",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dark Betrayal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+      "min_rule_version": 2,
+      "normalized_name": "dark betrayal",
+      "oracle_hash": "2b60ac003bf4b46ac39b8160e1773e5e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "B"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathmark",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+      "min_rule_version": 2,
+      "normalized_name": "deathmark",
+      "oracle_hash": "0699c47559459652c6a913285d052778",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G",
+            "W"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exorcist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+      "min_rule_version": 2,
+      "normalized_name": "exorcist",
+      "oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "B"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Go for the Throat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+      "min_rule_version": 2,
+      "normalized_name": "go for the throat",
+      "oracle_hash": "d660b2689650031cc8b27c26690921b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_card_types": [
+            "artifact"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hero's Demise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+      "min_rule_version": 2,
+      "normalized_name": "hero's demise",
+      "oracle_hash": "8aca12f0dcf5a4a057e14a4869524788",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_supertypes": [
+            "legendary"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joven",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+      "min_rule_version": 2,
+      "normalized_name": "joven",
+      "oracle_hash": "4956741e28adf6e2c08aaac6551ecc07",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Saltblast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+      "min_rule_version": 2,
+      "normalized_name": "saltblast",
+      "oracle_hash": "4bb73ac6ef9d4e06b2a38618c3ebda38",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_colors": [
+            "W"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terror // Terror",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+      "min_rule_version": 2,
+      "normalized_name": "terror // terror",
+      "oracle_hash": "45ccc162eeb4ca85514e50f6ec971e62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_card_types": [
+            "artifact"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ultimate Price",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+      "min_rule_version": 2,
+      "normalized_name": "ultimate price",
+      "oracle_hash": "17080584b8f3636e668c23397e2cd273",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "color_count_exact": 1
+        }
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_destroy_target_spell": 10,
+    "xmage_permanent_simple_activated_destroy_target": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T05:41:38+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bramblecrush"
+      },
+      "card_name": "Bramblecrush",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+      "normalized_name": "bramblecrush",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Crush"
+      },
+      "card_name": "Crush",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+      "normalized_name": "crush",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Dark Banishing"
+      },
+      "card_name": "Dark Banishing",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+      "normalized_name": "dark banishing",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Dark Betrayal"
+      },
+      "card_name": "Dark Betrayal",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+      "normalized_name": "dark betrayal",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "B"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Deathmark"
+      },
+      "card_name": "Deathmark",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+      "normalized_name": "deathmark",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "G",
+            "W"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Exorcist"
+      },
+      "card_name": "Exorcist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+      "normalized_name": "exorcist",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "target_colors": [
+            "B"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Go for the Throat"
+      },
+      "card_name": "Go for the Throat",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+      "normalized_name": "go for the throat",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_card_types": [
+            "artifact"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Hero's Demise"
+      },
+      "card_name": "Hero's Demise",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+      "normalized_name": "hero's demise",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_supertypes": [
+            "legendary"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Joven"
+      },
+      "card_name": "Joven",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+      "normalized_name": "joven",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+        "destination": "graveyard",
+        "effect": "creature",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "exclude_card_types": [
+            "creature"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Saltblast"
+      },
+      "card_name": "Saltblast",
+      "effect": "remove_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+      "normalized_name": "saltblast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_permanent",
+        "target": "permanent",
+        "target_constraints": {
+          "card_types": [
+            "permanent"
+          ],
+          "exclude_colors": [
+            "W"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Terror // Terror"
+      },
+      "card_name": "Terror // Terror",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+      "normalized_name": "terror // terror",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "exclude_card_types": [
+            "artifact"
+          ],
+          "exclude_colors": [
+            "B"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Ultimate Price"
+      },
+      "card_name": "Ultimate Price",
+      "effect": "remove_creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+      "normalized_name": "ultimate price",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1",
+        "destination": "graveyard",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "color_count_exact": 1
+        }
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bramblecrush",
+    "Crush",
+    "Dark Banishing",
+    "Dark Betrayal",
+    "Deathmark",
+    "Exorcist",
+    "Go for the Throat",
+    "Hero's Demise",
+    "Joven",
+    "Saltblast",
+    "Terror // Terror",
+    "Ultimate Price"
+  ],
+  "selected_count": 12,
+  "slug": "xmage_destroy_restricted_target_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Bramblecrush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+      "min_rule_version": 2,
+      "normalized_name": "bramblecrush",
+      "oracle_hash": "fe6491ef278d361374788a27b740fd37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+      "min_rule_version": 2,
+      "normalized_name": "crush",
+      "oracle_hash": "844a39ce47b11aacfc64d6b0eb41eeee",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dark Banishing",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+      "min_rule_version": 2,
+      "normalized_name": "dark banishing",
+      "oracle_hash": "68c4c921de0e9d82a4943ef113e34c00",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dark Betrayal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+      "min_rule_version": 2,
+      "normalized_name": "dark betrayal",
+      "oracle_hash": "2b60ac003bf4b46ac39b8160e1773e5e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Deathmark",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+      "min_rule_version": 2,
+      "normalized_name": "deathmark",
+      "oracle_hash": "0699c47559459652c6a913285d052778",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Exorcist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+      "min_rule_version": 2,
+      "normalized_name": "exorcist",
+      "oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Go for the Throat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+      "min_rule_version": 2,
+      "normalized_name": "go for the throat",
+      "oracle_hash": "d660b2689650031cc8b27c26690921b8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hero's Demise",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+      "min_rule_version": 2,
+      "normalized_name": "hero's demise",
+      "oracle_hash": "8aca12f0dcf5a4a057e14a4869524788",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Joven",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+      "min_rule_version": 2,
+      "normalized_name": "joven",
+      "oracle_hash": "4956741e28adf6e2c08aaac6551ecc07",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Saltblast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+      "min_rule_version": 2,
+      "normalized_name": "saltblast",
+      "oracle_hash": "4bb73ac6ef9d4e06b2a38618c3ebda38",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terror // Terror",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+      "min_rule_version": 2,
+      "normalized_name": "terror // terror",
+      "oracle_hash": "45ccc162eeb4ca85514e50f6ec971e62",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ultimate Price",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+      "min_rule_version": 2,
+      "normalized_name": "ultimate price",
+      "oracle_hash": "17080584b8f3636e668c23397e2cd273",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_destroy_target_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

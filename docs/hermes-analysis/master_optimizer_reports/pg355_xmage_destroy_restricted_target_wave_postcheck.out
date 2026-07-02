@@ -1,0 +1,15 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Bramblecrush      | bramblecrush      | battle_rule_v1:79265e727ee6e920df659c74947096a2 |                  1 |                           1 |                         1 |           2
+ Crush             | crush             | battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2 |                  1 |                           1 |                         1 |           2
+ Dark Banishing    | dark banishing    | battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4 |                  1 |                           1 |                         1 |           2
+ Dark Betrayal     | dark betrayal     | battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1 |                  1 |                           1 |                         1 |           2
+ Deathmark         | deathmark         | battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164 |                  1 |                           1 |                         1 |           2
+ Exorcist          | exorcist          | battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1 |                  1 |                           1 |                         1 |           2
+ Go for the Throat | go for the throat | battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9 |                  1 |                           1 |                         1 |           2
+ Hero's Demise     | hero's demise     | battle_rule_v1:759687ccde0f5cdbaee41e17619315e9 |                  1 |                           1 |                         1 |           2
+ Joven             | joven             | battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4 |                  1 |                           1 |                         1 |           2
+ Saltblast         | saltblast         | battle_rule_v1:4db418f86ab5604a6f03745f99f8691f |                  1 |                           1 |                         1 |           2
+ Terror // Terror  | terror // terror  | battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015 |                  1 |                           1 |                         1 |           2
+ Ultimate Price    | ultimate price    | battle_rule_v1:49e3e90cd87848c2690e8700de3454aa |                  1 |                           1 |                         1 |           2
+(12 rows)

@@ -10733,6 +10733,16 @@ def card_has_color(card, color):
     return bool(symbol) and (f"{{{symbol}}}" in mana_cost or f"{{{symbol}/" in mana_cost or f"/{symbol}}}" in mana_cost)
 
 
+def card_color_symbol_set(card):
+    if not isinstance(card, dict):
+        return set()
+    return {
+        symbol
+        for symbol in ("W", "U", "B", "R", "G")
+        if card_has_color(card, symbol)
+    }
+
+
 def target_constraint_source(source, effect_data):
     if not isinstance(effect_data, dict):
         return source
@@ -10827,6 +10837,22 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     ]
     if excluded_colors and any(card_has_color(target, color) for color in excluded_colors):
         return False
+    required_supertypes = {
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("required_supertypes") or constraints.get("target_supertypes"))
+        if str(value or "").strip()
+    }
+    if "legendary" in required_supertypes:
+        type_line = str(target.get("type_line") or "").lower()
+        if "legendary" not in type_line and not bool(target.get("legendary")):
+            return False
+    color_count_exact = first_present_value(constraints, ("color_count_exact", "target_color_count_exact"))
+    if color_count_exact is not None:
+        try:
+            if len(card_color_symbol_set(target)) != int(float(color_count_exact)):
+                return False
+        except Exception:
+            return False
     power_min = first_present_value(constraints, ("power_min", "target_power_min"))
     if power_min is not None:
         try:

@@ -2015,6 +2015,102 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
         self.assertEqual(effect["target"], "creature")
 
+    def test_destroy_target_spell_maps_color_and_type_restricted_targets(self) -> None:
+        cases = [
+            (
+                "Destroy target noncreature permanent.",
+                "StaticFilters.FILTER_PERMANENT_NON_CREATURE",
+                "permanent",
+                {"card_types": ["permanent"], "exclude_card_types": ["creature"]},
+            ),
+            (
+                "Destroy target noncreature artifact.",
+                'new FilterArtifactPermanent("noncreature artifact")',
+                "artifact",
+                {"card_types": ["artifact"], "exclude_card_types": ["creature"]},
+            ),
+            (
+                "Destroy target nonblack creature. It can't be regenerated.",
+                "FILTER_PERMANENT_CREATURE_NON_BLACK",
+                "creature",
+                {"card_types": ["creature"], "exclude_colors": ["B"]},
+            ),
+            (
+                "Destroy target black creature.",
+                'new FilterCreaturePermanent("black creature")',
+                "creature",
+                {"card_types": ["creature"], "target_colors": ["B"]},
+            ),
+            (
+                "Destroy target green or white creature.",
+                'new FilterCreaturePermanent("green or white creature")',
+                "creature",
+                {"card_types": ["creature"], "target_colors": ["G", "W"]},
+            ),
+            (
+                "Destroy target nonartifact creature.",
+                'new FilterCreaturePermanent("nonartifact creature")',
+                "creature",
+                {"card_types": ["creature"], "exclude_card_types": ["artifact"]},
+            ),
+            (
+                "Destroy target legendary creature.",
+                'new FilterCreaturePermanent("legendary creature")',
+                "creature",
+                {"card_types": ["creature"], "required_supertypes": ["legendary"]},
+            ),
+            (
+                "Destroy target nonwhite permanent.",
+                'new FilterPermanent("nonwhite permanent")',
+                "permanent",
+                {"card_types": ["permanent"], "exclude_colors": ["W"]},
+            ),
+            (
+                "Destroy target nonartifact, nonblack creature. It can't be regenerated.",
+                'new FilterCreaturePermanent("nonartifact, nonblack creature")',
+                "creature",
+                {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]},
+            ),
+            (
+                "Destroy target monocolored creature.",
+                'new FilterCreaturePermanent("monocolored creature")',
+                "creature",
+                {"card_types": ["creature"], "color_count_exact": 1},
+            ),
+        ]
+        for oracle, source_filter, target, constraints in cases:
+            with self.subTest(oracle=oracle):
+                row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(oracle_text=oracle),
+                    source_text=(
+                        f"{source_filter};"
+                        "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                        "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                    ),
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+                self.assertEqual(effect["target"], target)
+                self.assertEqual(effect["target_constraints"], constraints)
+
+    def test_destroy_target_spell_blocks_color_restricted_source_mismatch(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target black creature."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_target_source_mismatch")
+
     def test_additional_cost_blocks_first_wave_package_candidate(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(

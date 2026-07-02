@@ -1,0 +1,470 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T05:43:13.608742+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_manifest.json",
+  "package_id": "pg355_xmage_destroy_restricted_target_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bramblecrush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+          "oracle_hash": "fe6491ef278d361374788a27b740fd37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Crush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+          "oracle_hash": "844a39ce47b11aacfc64d6b0eb41eeee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Dark Banishing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+          "oracle_hash": "68c4c921de0e9d82a4943ef113e34c00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Dark Betrayal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+          "oracle_hash": "2b60ac003bf4b46ac39b8160e1773e5e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Deathmark",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+          "oracle_hash": "0699c47559459652c6a913285d052778",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Exorcist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+          "oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Go for the Throat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+          "oracle_hash": "d660b2689650031cc8b27c26690921b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Hero's Demise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+          "oracle_hash": "8aca12f0dcf5a4a057e14a4869524788",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Joven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+          "oracle_hash": "4956741e28adf6e2c08aaac6551ecc07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Saltblast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+          "oracle_hash": "4bb73ac6ef9d4e06b2a38618c3ebda38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Terror // Terror",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+          "oracle_hash": "45ccc162eeb4ca85514e50f6ec971e62",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Ultimate Price",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+          "oracle_hash": "17080584b8f3636e668c23397e2cd273",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Bramblecrush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+          "oracle_hash": "fe6491ef278d361374788a27b740fd37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Crush",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+          "oracle_hash": "844a39ce47b11aacfc64d6b0eb41eeee",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Dark Banishing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+          "oracle_hash": "68c4c921de0e9d82a4943ef113e34c00",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Dark Betrayal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+          "oracle_hash": "2b60ac003bf4b46ac39b8160e1773e5e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Deathmark",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+          "oracle_hash": "0699c47559459652c6a913285d052778",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Exorcist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+          "oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Go for the Throat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+          "oracle_hash": "d660b2689650031cc8b27c26690921b8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Hero's Demise",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+          "oracle_hash": "8aca12f0dcf5a4a057e14a4869524788",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "card_name": "Joven",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+          "oracle_hash": "4956741e28adf6e2c08aaac6551ecc07",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Saltblast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+          "oracle_hash": "4bb73ac6ef9d4e06b2a38618c3ebda38",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Terror // Terror",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+          "oracle_hash": "45ccc162eeb4ca85514e50f6ec971e62",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "card_name": "Ultimate Price",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+          "oracle_hash": "17080584b8f3636e668c23397e2cd273",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bramblecrush",
+          "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Crush",
+          "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Banishing",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dark Betrayal",
+          "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathmark",
+          "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Exorcist",
+          "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Go for the Throat",
+          "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hero's Demise",
+          "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+          "battle_rule_version": 2,
+          "card_name": "Joven",
+          "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Saltblast",
+          "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Terror // Terror",
+          "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_destroy_target_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ultimate Price",
+          "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bramblecrush",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Crush",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Banishing",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dark Betrayal",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathmark",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Exorcist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Go for the Throat",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hero's Demise",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Joven",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Saltblast",
+          "component_keys": [],
+          "effect": "remove_permanent",
+          "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Terror // Terror",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ultimate Price",
+          "component_keys": [],
+          "effect": "remove_creature",
+          "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

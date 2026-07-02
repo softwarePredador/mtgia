@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG354
+thread goal remains active, but execution must use the current post-PG355
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -72,25 +72,27 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg355_destroy_restricted_target_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg355_destroy_restricted_target_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG354 counts:
+Post-PG355 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2482`
-- all-card readiness `battle_family_mapper_required`: `30065`
-- all-card readiness `snapshot_has_verified_rule`: `3630`
-- target battle-gap identities in authoritative queue: `27142`
-- XMage authoritative source resolved: `26828`
+- all-card readiness `battle_and_oracle_ready`: `2494`
+- all-card readiness `battle_family_mapper_required`: `30053`
+- all-card readiness `snapshot_has_verified_rule`: `3642`
+- target battle-gap identities in authoritative queue: `27130`
+- XMage authoritative source resolved: `26816`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26828`
+- XMage authoritative adapter required: `26816`
 - adapter work-unit keys: `11429`
 
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG354 queue above.
+historical only. The active execution baseline is the post-PG355 queue above.
 
 Fresh alignment evidence:
 
@@ -106,9 +108,17 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg354_permanent_activated_damage_restricted_target_wave.md`
   passed with `48` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg355_destroy_restricted_target_wave_docs_final.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg355_destroy_restricted_target_wave_docs_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg355_destroy_restricted_target_wave_docs_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg355_destroy_restricted_target_wave.md`
+  passed with `48` pass and `1` inherited warning.
 
 The next executable work starts from
-`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_commander_legal.json`.
+`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg355_destroy_restricted_target_wave_commander_legal.json`.
 The first priority is still
 `recursion::xmage_graveyard_return_variant_review_v1` with `1860` remaining
 identities, but that broad work unit must be split by exact XMage
@@ -208,7 +218,7 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG354 authoritative queue unless a newer queue exists:
+Use the post-PG355 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1860`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
@@ -217,11 +227,11 @@ Use the post-PG354 authoritative queue unless a newer queue exists:
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
 7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`
-8. `removal_destroy::targeted_destroy_variant_v1` - `636`
+8. `removal_destroy::targeted_destroy_variant_v1` - `624`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG354:
+Immediate checkpoint after PG355:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
@@ -297,6 +307,10 @@ Immediate checkpoint after PG354:
     `Heavy Ballista`, `Lady Caleria`, `Sacellum Archers`, `Scalding Devil`,
     `Soldier Replica`, `Telim'Tor's Darts`, `Tor Wauki`, `Viridian Scout`,
     `Volcanic Rambler`, `Vulshok Replica`, and `War-Torch Goblin`.
+20. PG355 promoted exact destroy restricted-target extensions for
+    `Bramblecrush`, `Crush`, `Dark Banishing`, `Dark Betrayal`, `Deathmark`,
+    `Exorcist`, `Go for the Throat`, `Hero's Demise`, `Joven`, `Saltblast`,
+    `Terror // Terror`, and `Ultimate Price`.
 18. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
@@ -392,6 +406,11 @@ Immediate checkpoint after PG354:
     `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_e2e_validation.md`.
+37. PG355 is applied, synced, and E2E validated. The package evidence is in
+    `docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_package.md`,
+    `docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_apply_evidence.md`,
+    and
+    `docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_e2e_validation.md`.
 36. The post-PG344 supported splitter recheck returned `proposal_count=0` over
     `7952` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg344_supported_recheck.md`.
@@ -425,7 +444,10 @@ Immediate checkpoint after PG354:
 46. The post-PG354 supported splitter recheck returned `proposal_count=0` over
     `7899` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg354_supported_recheck.md`.
-47. Continue from the fresh post-PG354 queue. The top reusable work unit remains
+47. The post-PG355 supported splitter recheck returned `proposal_count=0` over
+    `7887` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg355_supported_recheck.md`.
+48. Continue from the fresh post-PG355 queue. The top reusable work unit remains
     `recursion::xmage_graveyard_return_variant_review_v1`, now at `1860`, so
     the next cycle should split another exact recursion subpattern unless a
     fresher queue changes the ranking.

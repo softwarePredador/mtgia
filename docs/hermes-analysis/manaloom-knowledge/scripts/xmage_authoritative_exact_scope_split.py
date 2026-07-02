@@ -3031,13 +3031,21 @@ def restricted_target_base(target: str) -> str:
         "untapped_creature",
         "flying_creature",
         "nonblack_creature",
+        "black_creature",
+        "green_or_white_creature",
+        "nonartifact_creature",
+        "nonartifact_nonblack_creature",
+        "legendary_creature",
+        "monocolored_creature",
         "blue_or_black_flying_creature",
         "creature_power_4_or_greater",
         "creature_mana_value_3_or_greater",
     }:
         return "creature"
-    if target == "black_or_red_permanent":
+    if target in {"black_or_red_permanent", "nonwhite_permanent", "noncreature_permanent"}:
         return "permanent"
+    if target == "noncreature_artifact":
+        return "artifact"
     return target
 
 
@@ -3061,9 +3069,18 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target tapped creature", "tapped_creature"),
         (r"target untapped creature", "untapped_creature"),
         (r"target creature with flying", "flying_creature"),
-        (r"target nonblack creature", "nonblack_creature"),
+        (r"target nonartifact, nonblack creature(?:\. it can't be regenerated)?", "nonartifact_nonblack_creature"),
+        (r"target nonartifact creature", "nonartifact_creature"),
+        (r"target nonblack creature(?:\. it can't be regenerated)?", "nonblack_creature"),
+        (r"target black creature", "black_creature"),
+        (r"target green or white creature", "green_or_white_creature"),
+        (r"target legendary creature", "legendary_creature"),
+        (r"target monocolored creature", "monocolored_creature"),
+        (r"target noncreature permanent", "noncreature_permanent"),
+        (r"target noncreature artifact", "noncreature_artifact"),
         (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
         (r"target black or red permanent", "black_or_red_permanent"),
+        (r"target nonwhite permanent", "nonwhite_permanent"),
         (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
         (r"target creature with (?:mana value|converted mana cost) 3 or greater", "creature_mana_value_3_or_greater"),
     ]
@@ -3086,11 +3103,34 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
     if "TappedPredicate.UNTAPPED" in text:
         return "untapped_creature"
     if (
+        "FilterCreaturePermanent(\"nonartifact, nonblack creature\")" in text
+        or "nonartifact, nonblack creature" in text
+    ):
+        return "nonartifact_nonblack_creature"
+    if (
+        "FilterCreaturePermanent(\"nonartifact creature\")" in text
+        or "nonartifact creature" in text
+    ):
+        return "nonartifact_creature"
+    if (
         "FILTER_PERMANENT_CREATURE_NON_BLACK" in text
         or "FILTER_CREATURE_NON_BLACK" in text
         or 'FilterCreaturePermanent("nonblack creature")' in text
+        or "nonblack creature" in text
     ):
         return "nonblack_creature"
+    if 'FilterCreaturePermanent("black creature")' in text or "black creature" in text:
+        return "black_creature"
+    if 'FilterCreaturePermanent("green or white creature")' in text or "green or white creature" in text:
+        return "green_or_white_creature"
+    if 'FilterCreaturePermanent("legendary creature")' in text or "legendary creature" in text:
+        return "legendary_creature"
+    if 'FilterCreaturePermanent("monocolored creature")' in text or "monocolored creature" in text:
+        return "monocolored_creature"
+    if "FILTER_PERMANENT_NON_CREATURE" in text or "noncreature permanent" in text:
+        return "noncreature_permanent"
+    if 'FilterArtifactPermanent("noncreature artifact")' in text or "noncreature artifact" in text:
+        return "noncreature_artifact"
     if (
         "ObjectColor.BLUE" in text
         and "ObjectColor.BLACK" in text
@@ -3101,6 +3141,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "flying_creature"
     if "ObjectColor.BLACK" in text and "ObjectColor.RED" in text and "FilterPermanent(\"black or red permanent\")" in text:
         return "black_or_red_permanent"
+    if 'FilterPermanent("nonwhite permanent")' in text or "nonwhite permanent" in text:
+        return "nonwhite_permanent"
     if "PowerPredicate(ComparisonType.MORE_THAN, 3)" in text:
         return "creature_power_4_or_greater"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
@@ -5416,10 +5458,28 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature"], "required_keywords": ["flying"]}
     if target == "nonblack_creature":
         return {"card_types": ["creature"], "exclude_colors": ["B"]}
+    if target == "black_creature":
+        return {"card_types": ["creature"], "target_colors": ["B"]}
+    if target == "green_or_white_creature":
+        return {"card_types": ["creature"], "target_colors": ["G", "W"]}
+    if target == "nonartifact_creature":
+        return {"card_types": ["creature"], "exclude_card_types": ["artifact"]}
+    if target == "nonartifact_nonblack_creature":
+        return {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]}
+    if target == "legendary_creature":
+        return {"card_types": ["creature"], "required_supertypes": ["legendary"]}
+    if target == "monocolored_creature":
+        return {"card_types": ["creature"], "color_count_exact": 1}
     if target == "blue_or_black_flying_creature":
         return {"card_types": ["creature"], "target_colors": ["U", "B"], "required_keywords": ["flying"]}
     if target == "black_or_red_permanent":
         return {"card_types": ["permanent"], "target_colors": ["B", "R"]}
+    if target == "nonwhite_permanent":
+        return {"card_types": ["permanent"], "exclude_colors": ["W"]}
+    if target == "noncreature_permanent":
+        return {"card_types": ["permanent"], "exclude_card_types": ["creature"]}
+    if target == "noncreature_artifact":
+        return {"card_types": ["artifact"], "exclude_card_types": ["creature"]}
     if target == "creature_power_4_or_greater":
         return {"card_types": ["creature"], "power_min": 4}
     if target == "creature_mana_value_3_or_greater":

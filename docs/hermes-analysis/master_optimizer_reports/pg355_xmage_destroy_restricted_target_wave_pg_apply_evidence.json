@@ -1,0 +1,309 @@
+{
+  "database_target": "143.198.230.247:5433/halder",
+  "deploy_id": "PG355",
+  "generated_at": "2026-07-02T05:42:11.983111+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg355_xmage_destroy_restricted_target_wave_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg355_xmage_destroy_restricted_target_wave"
+  ],
+  "postcheck": {
+    "backup_rows": 2,
+    "cards": [
+      "Bramblecrush",
+      "Crush",
+      "Dark Banishing",
+      "Dark Betrayal",
+      "Deathmark",
+      "Exorcist",
+      "Go for the Throat",
+      "Hero's Demise",
+      "Joven",
+      "Saltblast",
+      "Terror // Terror",
+      "Ultimate Price"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 12,
+    "promoted_rule_rows": 12,
+    "promoted_verified_auto_rows": 12,
+    "row_count": 12
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 2,
+      "card_name": "Bramblecrush",
+      "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+      "normalized_name": "bramblecrush",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Crush",
+      "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+      "normalized_name": "crush",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Dark Banishing",
+      "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+      "normalized_name": "dark banishing",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Dark Betrayal",
+      "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+      "normalized_name": "dark betrayal",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Deathmark",
+      "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+      "normalized_name": "deathmark",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Exorcist",
+      "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+      "normalized_name": "exorcist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Go for the Throat",
+      "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+      "normalized_name": "go for the throat",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Hero's Demise",
+      "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+      "normalized_name": "hero's demise",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Joven",
+      "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+      "normalized_name": "joven",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Saltblast",
+      "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+      "normalized_name": "saltblast",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Terror // Terror",
+      "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+      "normalized_name": "terror // terror",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 2,
+      "card_name": "Ultimate Price",
+      "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+      "normalized_name": "ultimate price",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Bramblecrush",
+      "Crush",
+      "Dark Banishing",
+      "Dark Betrayal",
+      "Deathmark",
+      "Exorcist",
+      "Go for the Throat",
+      "Hero's Demise",
+      "Joven",
+      "Saltblast",
+      "Terror // Terror",
+      "Ultimate Price"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 12,
+    "total_target_card_rows": 12,
+    "would_deprecate_shadow_rows": 2
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "16d3b2af-d6ee-40e2-9d1f-58ec83462fab",
+      "card_name": "Bramblecrush",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:79265e727ee6e920df659c74947096a2",
+      "normalized_name": "bramblecrush",
+      "oracle_hash": "fe6491ef278d361374788a27b740fd37",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "51b39445-89f9-4e3e-a9e4-1b4498ac0022",
+      "card_name": "Crush",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:d0fc8434b2ac621ca3607b4e216b17d2",
+      "normalized_name": "crush",
+      "oracle_hash": "844a39ce47b11aacfc64d6b0eb41eeee",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "d1c831c0-ca68-4b8a-907d-a89faadc55dd",
+      "card_name": "Dark Banishing",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:168dcdc18248bd9b8dcd053f2113a0b4",
+      "normalized_name": "dark banishing",
+      "oracle_hash": "68c4c921de0e9d82a4943ef113e34c00",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "a8d1673d-7840-4f37-862f-72cc8db48a3f",
+      "card_name": "Dark Betrayal",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4b5bb6b237e872c84fbc0c18373bf2f1",
+      "normalized_name": "dark betrayal",
+      "oracle_hash": "2b60ac003bf4b46ac39b8160e1773e5e",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "647fdfe2-d16f-4076-901e-148ccf69ca87",
+      "card_name": "Deathmark",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b3a7e7b19f0e9ae8b9c68ec3066b1164",
+      "normalized_name": "deathmark",
+      "oracle_hash": "0699c47559459652c6a913285d052778",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "0d444f80-72aa-4ca7-8741-a668a83be803",
+      "card_name": "Exorcist",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:f0ac49ca156fa580353c5a46c7e259c1",
+      "normalized_name": "exorcist",
+      "oracle_hash": "76f53944b3d17a8a5820ee2a6f5edc32",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "f6d59f80-5da0-4025-921c-1cdd8b40e7e3",
+      "card_name": "Go for the Throat",
+      "existing_rule_rows": 2,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:c708d1a0359745a6eb1e1a5136acbfe9",
+      "normalized_name": "go for the throat",
+      "oracle_hash": "d660b2689650031cc8b27c26690921b8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 2
+    },
+    {
+      "canonical_card_id": "11022153-034b-4dad-b8cf-48613eb89801",
+      "card_name": "Hero's Demise",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:759687ccde0f5cdbaee41e17619315e9",
+      "normalized_name": "hero's demise",
+      "oracle_hash": "8aca12f0dcf5a4a057e14a4869524788",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "d106bd51-0eda-4aee-8616-ee93d5f34a60",
+      "card_name": "Joven",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
+      "normalized_name": "joven",
+      "oracle_hash": "4956741e28adf6e2c08aaac6551ecc07",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7e24f13a-077f-4771-bc0c-a738f4a850b3",
+      "card_name": "Saltblast",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:4db418f86ab5604a6f03745f99f8691f",
+      "normalized_name": "saltblast",
+      "oracle_hash": "4bb73ac6ef9d4e06b2a38618c3ebda38",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "7a73c690-2c5c-4a3a-b4f7-b1167b8e1fcf",
+      "card_name": "Terror // Terror",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:9811339b3ee6bf8bf1a584db8dfd5015",
+      "normalized_name": "terror // terror",
+      "oracle_hash": "45ccc162eeb4ca85514e50f6ec971e62",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "ea7c42c9-6152-47b5-ac15-ded493f98d85",
+      "card_name": "Ultimate Price",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:49e3e90cd87848c2690e8700de3454aa",
+      "normalized_name": "ultimate price",
+      "oracle_hash": "17080584b8f3636e668c23397e2cd273",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_destroy_restricted_target_wave"
+}

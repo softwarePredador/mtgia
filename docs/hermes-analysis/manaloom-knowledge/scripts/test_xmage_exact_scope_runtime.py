@@ -1780,6 +1780,109 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in opponent.battlefield], ["Tapped Bear"])
         self.assertEqual([card["name"] for card in opponent.graveyard], ["Untapped Bear"])
 
+    def test_destroy_target_spell_respects_color_type_and_supertype_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        black_bear = {
+            "name": "Black Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["B"],
+            "power": 5,
+            "toughness": 5,
+        }
+        artifact_bear = {
+            "name": "Artifact Bear",
+            "type_line": "Artifact Creature - Bear",
+            "colors": ["G"],
+            "power": 4,
+            "toughness": 4,
+        }
+        legal_bear = {
+            "name": "Legal Bear",
+            "type_line": "Creature - Bear",
+            "colors": ["G"],
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.extend([black_bear, artifact_bear, legal_bear])
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "exclude_card_types": ["artifact"], "exclude_colors": ["B"]},
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Terror",
+                "type_line": "Instant",
+                "oracle_text": "Destroy target nonartifact, nonblack creature.",
+            },
+            turn=3,
+            rng=random.Random(36),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Black Bear", "Artifact Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Legal Bear"])
+
+        opponent.battlefield = [
+            {"name": "Big Nonlegend", "type_line": "Creature - Giant", "power": 8, "toughness": 8},
+            {"name": "Small Legend", "type_line": "Legendary Creature - Human", "power": 1, "toughness": 1},
+        ]
+        opponent.graveyard = []
+        legendary_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "required_supertypes": ["legendary"]},
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Demise", "type_line": "Instant", "oracle_text": "Destroy target legendary creature."},
+            turn=4,
+            rng=random.Random(37),
+            effect_data_override=legendary_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Big Nonlegend"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Small Legend"])
+
+        opponent.battlefield = [
+            {"name": "Colorless Construct", "type_line": "Artifact Creature - Construct", "power": 5, "toughness": 5},
+            {"name": "Multicolor Bear", "type_line": "Creature - Bear", "colors": ["B", "G"], "power": 4, "toughness": 4},
+            {"name": "Monocolor Bear", "type_line": "Creature - Bear", "colors": ["G"], "power": 2, "toughness": 2},
+        ]
+        opponent.graveyard = []
+        monocolor_effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "color_count_exact": 1},
+            "destination": "graveyard",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Price", "type_line": "Instant", "oracle_text": "Destroy target monocolored creature."},
+            turn=5,
+            rng=random.Random(38),
+            effect_data_override=monocolor_effect,
+        )
+
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Colorless Construct", "Multicolor Bear"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Monocolor Bear"])
+
     def test_exile_target_spell_respects_power_and_color_constraints(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -2684,6 +2787,105 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 for event, data in self.events
             )
         )
+
+    def test_simple_activated_destroy_respects_color_and_noncreature_artifact_constraints(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("white", 1)
+        active.mana_pool.add("colorless", 1)
+        green_threat = {
+            "name": "Green Giant",
+            "type_line": "Creature - Giant",
+            "colors": ["G"],
+            "power": 8,
+            "toughness": 8,
+        }
+        black_target = {
+            "name": "Black Piker",
+            "type_line": "Creature - Zombie",
+            "colors": ["B"],
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.extend([green_threat, black_target])
+        permanent = {
+            "name": "Fixture Exorcist",
+            "type_line": "Creature - Cleric",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_creature",
+            "activated_remove_target": "black_creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"], "target_colors": ["B"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{1}{W}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["W"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            permanent,
+            turn=17,
+            rng=random.Random(117),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(green_threat, opponent.battlefield)
+        self.assertNotIn(black_target, opponent.battlefield)
+        self.assertIn(black_target, opponent.graveyard)
+        self.assertTrue(permanent.get("tapped"))
+
+        active.mana_pool.add("red", 3)
+        opponent.battlefield = [
+            {"name": "Artifact Golem", "type_line": "Artifact Creature - Golem", "power": 7, "toughness": 7},
+            {"name": "Plain Relic", "type_line": "Artifact", "cmc": 1},
+        ]
+        opponent.graveyard = []
+        joven = {
+            "name": "Fixture Joven",
+            "type_line": "Creature - Human Rogue",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_effect": "destroy_target",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_destroy_target_v1",
+            "activated_remove_effect": "remove_permanent",
+            "activated_remove_target": "noncreature_artifact",
+            "target": "artifact",
+            "target_constraints": {"card_types": ["artifact"], "exclude_card_types": ["creature"]},
+            "destination": "graveyard",
+            "activation_cost_mana": "{R}{R}{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R", "R", "R"],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(joven)
+
+        activated = self.battle.activate_generic_destroy_permanent(
+            active,
+            [opponent],
+            [active, opponent],
+            joven,
+            turn=18,
+            rng=random.Random(118),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertEqual([card["name"] for card in opponent.battlefield], ["Artifact Golem"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Plain Relic"])
+        self.assertTrue(joven.get("tapped"))
 
     def test_simple_activated_destroy_blocks_summoning_sick_tap_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
