@@ -26715,8 +26715,20 @@ def activate_graveyard_recycling_artifacts(
                 permanent.get("battle_model_scope") == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
                 or permanent.get("activated_battle_model_scope")
                 == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
+                or permanent.get("battle_model_scope")
+                == "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
+                or permanent.get("activated_battle_model_scope")
+                == "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
+            )
+            destination = permanent.get("graveyard_to_hand_destination") or "hand"
+            simple_battlefield_scope = (
+                simple_activated_scope
+                and str(destination) == "battlefield"
             )
             activation_kind = (
+                "simple_activated_graveyard_to_battlefield"
+                if simple_battlefield_scope
+                else
                 "simple_activated_graveyard_to_hand"
                 if simple_activated_scope
                 else "tap_sacrifice_return_graveyard_to_hand"
@@ -26764,16 +26776,38 @@ def activate_graveyard_recycling_artifacts(
                     player.graveyard.append(permanent)
                     player.record_permanent_sacrificed(permanent, turn)
                 recovered = []
+                returned_to_battlefield = []
                 for recovered_card in remove_cards_from_graveyard(
                     player,
                     targets,
                     turn=turn,
-                    source_event="graveyard_to_hand_permanent" if simple_activated_scope else "graveyard_to_hand_artifact",
+                    source_event=(
+                        "graveyard_to_battlefield_permanent"
+                        if simple_battlefield_scope
+                        else "graveyard_to_hand_permanent"
+                        if simple_activated_scope
+                        else "graveyard_to_hand_artifact"
+                    ),
                 ):
-                    player.hand.append(recovered_card)
+                    if destination == "battlefield":
+                        permanent_payload = {
+                            **recovered_card,
+                            **get_card_effect(recovered_card),
+                        }
+                        if permanent.get("enters_tapped"):
+                            permanent_payload["enters_tapped"] = True
+                        returned_permanent = prepare_entering_permanent(
+                            enrich_card(permanent_payload),
+                            controller=player,
+                            all_players=all_players,
+                            turn=turn,
+                        )
+                        player.battlefield.append(returned_permanent)
+                        returned_to_battlefield.append(returned_permanent)
+                    else:
+                        player.hand.append(recovered_card)
                     recovered.append(recovered_card)
                 target_type = permanent.get("graveyard_to_hand_target") or "any_card"
-                destination = permanent.get("graveyard_to_hand_destination") or "hand"
                 emit_decision_trace(
                     decision_type="utility_artifact_activation",
                     player=player,
@@ -26784,7 +26818,11 @@ def activate_graveyard_recycling_artifacts(
                             target,
                             get_card_effect(target),
                             score=graveyard_recycle_candidate_score(target, player, all_players, turn),
-                            action="return_graveyard_card_to_hand",
+                            action=(
+                                "return_graveyard_card_to_battlefield"
+                                if destination == "battlefield"
+                                else "return_graveyard_card_to_hand"
+                            ),
                             target_type=target_type,
                             destination=destination,
                         )
@@ -26796,9 +26834,13 @@ def activate_graveyard_recycling_artifacts(
                         score=graveyard_recycle_candidate_score(recovered[0], player, all_players, turn)
                         if recovered
                         else 0,
-                            action="activate_graveyard_to_hand_permanent"
-                            if simple_activated_scope
-                            else "activate_graveyard_to_hand_artifact",
+                            action=(
+                                "activate_graveyard_to_battlefield_permanent"
+                                if destination == "battlefield"
+                                else "activate_graveyard_to_hand_permanent"
+                                if simple_activated_scope
+                                else "activate_graveyard_to_hand_artifact"
+                            ),
                             target_type=target_type,
                             destination=destination,
                         ),
@@ -26812,6 +26854,9 @@ def activate_graveyard_recycling_artifacts(
                         "sacrificed_source": requires_sacrifice,
                     },
                     rule_source=(
+                        "simple_activated_graveyard_to_battlefield_permanent_v1"
+                        if simple_battlefield_scope
+                        else
                         "simple_activated_graveyard_to_hand_permanent_v1"
                         if simple_activated_scope
                         else "utility_artifact_activation_v1"
@@ -26830,7 +26875,8 @@ def activate_graveyard_recycling_artifacts(
                     heuristic_version=DECISION_STRATEGY_VERSION,
                     resource_delta={
                         "mana": -mana_paid,
-                        "cards_to_hand": len(recovered),
+                        "cards_to_hand": len(recovered) if destination != "battlefield" else 0,
+                        "permanents_to_battlefield": len(returned_to_battlefield),
                         "permanents": -1 if requires_sacrifice else 0,
                         "graveyard": -len(recovered) + (1 if requires_sacrifice else 0),
                         "returned": [card.get("name", "?") for card in recovered],
@@ -26842,7 +26888,8 @@ def activate_graveyard_recycling_artifacts(
                             "sacrifice_artifact": requires_sacrifice and not simple_activated_scope,
                             "tap_ability": requires_tap and simple_activated_scope,
                             "sacrifice_source": requires_sacrifice and simple_activated_scope,
-                            "graveyard_to_hand": True,
+                            "graveyard_to_battlefield": destination == "battlefield",
+                            "graveyard_to_hand": destination != "battlefield",
                         }.items()
                         if active
                     ],
@@ -26856,7 +26903,11 @@ def activate_graveyard_recycling_artifacts(
                     "target_type": target_type,
                     "destination": destination,
                     "recovered": [card.get("name", "?") for card in recovered],
+                    "returned_to_battlefield": [
+                        card.get("name", "?") for card in returned_to_battlefield
+                    ],
                     "recovered_count": len(recovered),
+                    "returned_to_battlefield_count": len(returned_to_battlefield),
                     "mana_paid": mana_paid,
                     "tapped": bool(permanent.get("tapped")),
                     "sacrificed_self": requires_sacrifice,
@@ -26873,7 +26924,11 @@ def activate_graveyard_recycling_artifacts(
                     activation_cost=activation_cost_text,
                     mana_paid=mana_paid,
                     recovered=[card.get("name", "?") for card in recovered],
+                    returned_to_battlefield=[
+                        card.get("name", "?") for card in returned_to_battlefield
+                    ],
                     recovered_count=len(recovered),
+                    returned_to_battlefield_count=len(returned_to_battlefield),
                     target_type=target_type,
                     destination=destination,
                     tapped=bool(permanent.get("tapped")),
