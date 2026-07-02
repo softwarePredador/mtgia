@@ -5384,6 +5384,100 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_self_return_to_hand_pays_discard_creature_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("black", 1)
+        discard_creature = {"name": "Spare Zombie", "type_line": "Creature - Zombie", "cmc": 2}
+        keep_spell = {"name": "Important Spell", "type_line": "Sorcery", "cmc": 4}
+        active.hand.extend([keep_spell, discard_creature])
+        source = {
+            "name": "Kraul Swarm",
+            "type_line": "Creature - Insect Warrior",
+            "cmc": 5,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+            "graveyard_self_return_to_hand": True,
+            "graveyard_self_return_destination": "hand",
+            "graveyard_self_return_activation_cost_mana": "{2}{B}",
+            "graveyard_self_return_activation_cost_generic": 2,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "graveyard_self_return_activation_discard_count": 1,
+            "graveyard_self_return_activation_discard_target": "creature_card",
+            "activation_discard_count": 1,
+            "activation_discard_target": "creature_card",
+            "_rule_logical_key": "battle_rule_v1:fixture_kraul_swarm",
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Important Spell", "Kraul Swarm"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Spare Zombie"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Kraul Swarm"
+                and data.get("activation_kind") == "graveyard_self_return_to_hand"
+                and data.get("discarded") == ["Spare Zombie"]
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "creature_card"
+                and data.get("returned") == ["Kraul Swarm"]
+                and data.get("mana_paid") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_self_return_to_hand_does_not_pay_when_discard_creature_cost_unavailable(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("black", 1)
+        noncreature = {"name": "Only Spell", "type_line": "Instant", "cmc": 1}
+        active.hand.append(noncreature)
+        source = {
+            "name": "Kraul Swarm",
+            "type_line": "Creature - Insect Warrior",
+            "cmc": 5,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+            "graveyard_self_return_to_hand": True,
+            "graveyard_self_return_destination": "hand",
+            "graveyard_self_return_activation_cost_mana": "{2}{B}",
+            "graveyard_self_return_activation_cost_generic": 2,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "graveyard_self_return_activation_discard_count": 1,
+            "graveyard_self_return_activation_discard_target": "creature_card",
+            "activation_discard_count": 1,
+            "activation_discard_target": "creature_card",
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.hand, [noncreature])
+        self.assertEqual(active.graveyard, [source])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
     def test_simple_activated_graveyard_exile_pays_mana_and_exiles_opponent_card(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

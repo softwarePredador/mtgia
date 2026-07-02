@@ -15003,11 +15003,16 @@ def _choose_currency_converter_discard(player):
     )
 
 
-def _choose_graveyard_self_return_discard_cards(player, count):
+def _choose_graveyard_self_return_discard_cards(player, count, target_type="any_card"):
     count = max(0, int(count or 0))
     if count <= 0:
         return []
-    candidates = [card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)]
+    candidates = [
+        card
+        for card in getattr(player, "hand", []) or []
+        if isinstance(card, dict)
+        and graveyard_card_matches_recursion_target(card, target_type or "any_card")
+    ]
     if len(candidates) < count:
         return []
     return sorted(
@@ -26419,6 +26424,11 @@ def activate_graveyard_self_return_cards(
             or effect_data.get("activation_discard_count")
             or 0
         )
+        activation_discard_target = (
+            effect_data.get("graveyard_self_return_activation_discard_target")
+            or effect_data.get("activation_discard_target")
+            or "any_card"
+        )
         activation_exile_count = int(
             effect_data.get("graveyard_self_return_activation_exile_from_graveyard_count")
             or effect_data.get("activation_exile_from_graveyard_count")
@@ -26429,7 +26439,11 @@ def activate_graveyard_self_return_cards(
             or effect_data.get("activation_exile_from_graveyard_target")
             or "any_card"
         )
-        discard_cards = _choose_graveyard_self_return_discard_cards(player, activation_discard_count)
+        discard_cards = _choose_graveyard_self_return_discard_cards(
+            player,
+            activation_discard_count,
+            activation_discard_target,
+        )
         if activation_discard_count and len(discard_cards) != activation_discard_count:
             continue
         exile_cost_cards = _choose_graveyard_self_return_exile_cost_cards(
@@ -26456,6 +26470,7 @@ def activate_graveyard_self_return_cards(
                 "activation_cost_generic": activation_cost_generic,
                 "activation_cost_colors": activation_cost_colors,
                 "activation_discard_count": activation_discard_count,
+                "activation_discard_target": activation_discard_target,
                 "discard_cards": discard_cards,
                 "activation_exile_count": activation_exile_count,
                 "activation_exile_target": activation_exile_target,
@@ -26480,6 +26495,7 @@ def activate_graveyard_self_return_cards(
     activation_cost_generic = selected["activation_cost_generic"]
     activation_cost_colors = selected["activation_cost_colors"]
     activation_discard_count = int(selected.get("activation_discard_count") or 0)
+    activation_discard_target = selected.get("activation_discard_target") or "any_card"
     discard_cards = list(selected.get("discard_cards") or [])
     activation_exile_count = int(selected.get("activation_exile_count") or 0)
     activation_exile_target = selected.get("activation_exile_target") or "any_card"
@@ -26575,6 +26591,7 @@ def activate_graveyard_self_return_cards(
                 action=f"return_self_from_graveyard_to_{item['destination']}",
                 destination=item["destination"],
                 discard_count=item.get("activation_discard_count", 0),
+                discard_target=item.get("activation_discard_target"),
                 exile_cost_count=item.get("activation_exile_count", 0),
                 exile_cost_target=item.get("activation_exile_target"),
             )
@@ -26587,6 +26604,7 @@ def activate_graveyard_self_return_cards(
             action=f"return_self_from_graveyard_to_{destination}",
             destination=destination,
             discard_count=activation_discard_count,
+            discard_target=activation_discard_target,
             exile_cost_count=activation_exile_count,
             exile_cost_target=activation_exile_target,
         ),
@@ -26595,6 +26613,7 @@ def activate_graveyard_self_return_cards(
             "activation_cost_generic": activation_cost_generic,
             "activation_cost_colors": activation_cost_colors,
             "discard_count": activation_discard_count,
+            "discard_target": activation_discard_target,
             "exile_cost_count": activation_exile_count,
             "exile_cost_target": activation_exile_target,
         },
@@ -26635,6 +26654,7 @@ def activate_graveyard_self_return_cards(
         returned_count=1,
         discarded=[card.get("name", "?") for card in discard_cards],
         discarded_count=activation_discard_count,
+        discard_target=activation_discard_target,
         exiled_cost=[card.get("name", "?") for card in exiled_cost_cards],
         exiled_cost_count=activation_exile_count,
         exile_cost_target=activation_exile_target,

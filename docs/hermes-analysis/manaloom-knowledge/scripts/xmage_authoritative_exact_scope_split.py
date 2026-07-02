@@ -3201,7 +3201,7 @@ def graveyard_self_return_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[
         enters_tapped = True
         text = text.removeprefix("this creature enters tapped. ").strip()
     match = re.fullmatch(
-        r"(?P<cost>(?:\{[0-9wubrg]\})+): return this card from your graveyard to your hand\.?",
+        r"(?P<cost>(?:\{[0-9wubrg]\})+)(?:,\s*discard (?P<discard_target>a creature card))?: return this card from your graveyard to your hand(?:\.?\s*activate (?:this ability )?only (?P<timing>as a sorcery|any time you could cast a sorcery))?\.?",
         text,
     )
     if not match:
@@ -3216,6 +3216,9 @@ def graveyard_self_return_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
         "enters_tapped": enters_tapped,
+        "activation_timing": "sorcery" if match.group("timing") else None,
+        "activation_discard_count": 1 if match.group("discard_target") else 0,
+        "activation_discard_target": "creature_card" if match.group("discard_target") else None,
     }
 
 
@@ -3283,16 +3286,19 @@ def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | s
     if len(effect_matches) != 1:
         return "graveyard_self_return_source_not_single_effect"
     effect_index = effect_matches[0].start()
-    ability_index = text.rfind("new SimpleActivatedAbility", 0, effect_index)
+    ability_matches = list(
+        re.finditer(r"new\s+(SimpleActivatedAbility|ActivateAsSorceryActivatedAbility)\b", text[:effect_index])
+    )
+    ability_index = ability_matches[-1].start() if ability_matches else -1
     if ability_index < 0:
         return "graveyard_self_return_source_not_simple_activated"
+    ability_class = ability_matches[-1].group(1)
     window = text[ability_index : effect_index + 1400]
     if "Zone.GRAVEYARD" not in window:
         return "graveyard_self_return_source_not_graveyard_zone"
     risky_cost_classes = {
         "CompositeCost",
         "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
@@ -3319,6 +3325,17 @@ def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | s
     present_risky = sorted(present_risky)
     if present_risky:
         return "graveyard_self_return_source_cost_not_supported"
+    discard_count = 0
+    discard_target = None
+    if "DiscardTargetCost" in window:
+        discard_matches = re.findall(
+            r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*StaticFilters\.FILTER_CARD_CREATURE_A\s*\)\s*\)",
+            window,
+        )
+        if len(discard_matches) != 1:
+            return "graveyard_self_return_source_cost_not_supported"
+        discard_count = 1
+        discard_target = "creature_card"
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
     if len(mana_matches) + len(generic_matches) != 1:
@@ -3334,6 +3351,9 @@ def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | s
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
+        "activation_timing": "sorcery" if ability_class == "ActivateAsSorceryActivatedAbility" else None,
+        "activation_discard_count": discard_count,
+        "activation_discard_target": discard_target,
     }
 
 
@@ -5461,7 +5481,7 @@ def split_row(
     graveyard_self_return_to_hand_unit = (
         unit == RECURSION_UNIT
         and effect_classes(row) == {"ReturnSourceFromGraveyardToHandEffect"}
-        and "SimpleActivatedAbility" in ability_classes(row)
+        and bool({"SimpleActivatedAbility", "ActivateAsSorceryActivatedAbility"} & ability_classes(row))
     )
     graveyard_self_return_to_battlefield_unit = (
         unit == RECURSION_UNIT
@@ -6602,10 +6622,10 @@ def split_row(
     if unit == RECURSION_UNIT and classes == {"ReturnSourceFromGraveyardToHandEffect"}:
         abilities = ability_classes(row)
         allowed_abilities = (
-            {"SimpleActivatedAbility", "EntersBattlefieldTappedAbility"}
+            {"SimpleActivatedAbility", "ActivateAsSorceryActivatedAbility", "EntersBattlefieldTappedAbility"}
             | set(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         )
-        if "SimpleActivatedAbility" not in abilities or abilities - allowed_abilities:
+        if not ({"SimpleActivatedAbility", "ActivateAsSorceryActivatedAbility"} & abilities) or abilities - allowed_abilities:
             return None, "graveyard_self_return_ability_class_not_simple"
         if not is_permanent_metadata(metadata) or is_spell(metadata):
             return None, "graveyard_self_return_not_permanent"
@@ -6615,7 +6635,14 @@ def split_row(
         source_activation = graveyard_self_return_to_hand_from_source(source_text)
         if isinstance(source_activation, str):
             return None, source_activation
-        for key in ("activation_cost_mana", "activation_cost_generic", "activation_cost_colors"):
+        for key in (
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_timing",
+            "activation_discard_count",
+            "activation_discard_target",
+        ):
             if source_activation[key] != oracle_activation[key]:
                 return None, "graveyard_self_return_source_oracle_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
@@ -6648,8 +6675,24 @@ def split_row(
             "activation_cost_generic": oracle_activation["activation_cost_generic"],
             "activation_cost_colors": oracle_activation["activation_cost_colors"],
             "xmage_effect_class": "ReturnSourceFromGraveyardToHandEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": (
+                "ActivateAsSorceryActivatedAbility"
+                if oracle_activation["activation_timing"] == "sorcery"
+                else "SimpleActivatedAbility"
+            ),
         }
+        if oracle_activation["activation_timing"]:
+            effect_json["activation_timing"] = oracle_activation["activation_timing"]
+        if oracle_activation["activation_discard_count"]:
+            effect_json["graveyard_self_return_activation_discard_count"] = oracle_activation[
+                "activation_discard_count"
+            ]
+            effect_json["graveyard_self_return_activation_discard_target"] = oracle_activation[
+                "activation_discard_target"
+            ]
+            effect_json["activation_discard_count"] = oracle_activation["activation_discard_count"]
+            effect_json["activation_discard_target"] = oracle_activation["activation_discard_target"]
+            effect_json["activation_additional_cost"] = "discard_cards"
         if keywords:
             effect_json["keywords"] = ordered_keywords(keywords)
             effect_json["_keywords_are_self"] = True

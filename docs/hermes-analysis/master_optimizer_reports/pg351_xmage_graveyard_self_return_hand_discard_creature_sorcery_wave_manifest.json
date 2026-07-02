@@ -1,0 +1,165 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg351_xmage_graveyard_self_return_hand_discard_creature_",
+  "deploy_id": "PG351",
+  "expected_rules": [
+    {
+      "card_name": "Kraul Swarm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78623fce867f2ee487ca4e676e1ee24c",
+      "min_rule_version": 2,
+      "normalized_name": "kraul swarm",
+      "oracle_hash": "ce6487ec0c9390b671f943218a3d91d4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "graveyard_self_return_activation_cost_colors": [
+          "B"
+        ],
+        "graveyard_self_return_activation_cost_generic": 2,
+        "graveyard_self_return_activation_cost_mana": "{2}{B}",
+        "graveyard_self_return_destination": "hand",
+        "graveyard_self_return_to_hand": true,
+        "keywords": [
+          "flying"
+        ],
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Summoned Dromedary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7ba166ab2496e64c7384c93e91d03e44",
+      "min_rule_version": 2,
+      "normalized_name": "summoned dromedary",
+      "oracle_hash": "13fc3d6984775175dc610ecae995640a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "graveyard_self_return_activation_cost_colors": [
+          "W"
+        ],
+        "graveyard_self_return_activation_cost_generic": 1,
+        "graveyard_self_return_activation_cost_mana": "{1}{W}",
+        "graveyard_self_return_destination": "hand",
+        "graveyard_self_return_to_hand": true,
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_graveyard_simple_activated_self_return_to_hand": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg351_xmage_graveyard_self_return_hand_discard_creature_sorcery_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T04:21:24+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Kraul Swarm"
+      },
+      "card_name": "Kraul Swarm",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78623fce867f2ee487ca4e676e1ee24c",
+      "normalized_name": "kraul swarm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "graveyard_self_return_activation_cost_colors": [
+          "B"
+        ],
+        "graveyard_self_return_activation_cost_generic": 2,
+        "graveyard_self_return_activation_cost_mana": "{2}{B}",
+        "graveyard_self_return_destination": "hand",
+        "graveyard_self_return_to_hand": true,
+        "keywords": [
+          "flying"
+        ],
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Summoned Dromedary"
+      },
+      "card_name": "Summoned Dromedary",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7ba166ab2496e64c7384c93e91d03e44",
+      "normalized_name": "summoned dromedary",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1",
+        "destination": "hand",
+        "effect": "creature",
+        "graveyard_self_return_activation_cost_colors": [
+          "W"
+        ],
+        "graveyard_self_return_activation_cost_generic": 1,
+        "graveyard_self_return_activation_cost_mana": "{1}{W}",
+        "graveyard_self_return_destination": "hand",
+        "graveyard_self_return_to_hand": true,
+        "keywords": [
+          "vigilance"
+        ],
+        "target": "self",
+        "target_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Kraul Swarm",
+    "Summoned Dromedary"
+  ],
+  "selected_count": 2,
+  "slug": "xmage_graveyard_self_return_hand_discard_creature_sorcery_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Kraul Swarm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:78623fce867f2ee487ca4e676e1ee24c",
+      "min_rule_version": 2,
+      "normalized_name": "kraul swarm",
+      "oracle_hash": "ce6487ec0c9390b671f943218a3d91d4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Summoned Dromedary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7ba166ab2496e64c7384c93e91d03e44",
+      "min_rule_version": 2,
+      "normalized_name": "summoned dromedary",
+      "oracle_hash": "13fc3d6984775175dc610ecae995640a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

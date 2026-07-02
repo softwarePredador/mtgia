@@ -3631,6 +3631,117 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["source_zone"], "graveyard")
         self.assertEqual(effect["destination"], "hand")
 
+    def test_graveyard_self_return_to_hand_accepts_discard_creature_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kraul Swarm",
+                type_line="Creature - Insect Warrior",
+                oracle_text=(
+                    "Flying\n"
+                    "{2}{B}, Discard a creature card: Return this card from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{2}{B}")
+                );
+                ability.addCost(new DiscardTargetCost(
+                    new TargetCardInHand(StaticFilters.FILTER_CARD_CREATURE_A)
+                ));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_RETURN_TO_HAND_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{2}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(effect["graveyard_self_return_activation_discard_count"], 1)
+        self.assertEqual(effect["graveyard_self_return_activation_discard_target"], "creature_card")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "creature_card")
+        self.assertEqual(effect["activation_additional_cost"], "discard_cards")
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_graveyard_self_return_to_hand_accepts_activate_as_sorcery_mana_only(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["ActivateAsSorceryActivatedAbility", "VigilanceAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Summoned Dromedary",
+                type_line="Creature - Spirit Camel",
+                oracle_text=(
+                    "Vigilance\n"
+                    "{1}{W}: Return this card from your graveyard to your hand. Activate only as a sorcery."
+                ),
+            ),
+            source_text="""
+                this.addAbility(VigilanceAbility.getInstance());
+                this.addAbility(new ActivateAsSorceryActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{1}{W}")
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{1}{W}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["W"])
+        self.assertEqual(effect["activation_timing"], "sorcery")
+        self.assertEqual(effect["xmage_ability_class"], "ActivateAsSorceryActivatedAbility")
+        self.assertEqual(effect["keywords"], ["vigilance"])
+
+    def test_graveyard_self_return_to_hand_blocks_discard_target_mismatch(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToHandEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Kraul Swarm",
+                type_line="Creature - Insect Warrior",
+                oracle_text="{2}{B}, Discard a creature card: Return this card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToHandEffect(),
+                    new ManaCostsImpl<>("{2}{B}")
+                );
+                ability.addCost(new DiscardTargetCost(new TargetCardInHand(1, StaticFilters.FILTER_CARD_CARDS)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_self_return_source_cost_not_supported")
+
     def test_graveyard_self_return_preserves_static_keyword_and_enters_tapped(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
