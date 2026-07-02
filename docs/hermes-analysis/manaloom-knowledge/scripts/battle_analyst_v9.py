@@ -17757,6 +17757,87 @@ def is_enchantment_permanent(card):
     return isinstance(card, dict) and "enchantment" in str(card.get("type_line") or "").lower()
 
 
+def activation_sacrifice_target_matches(permanent, target_type):
+    if not isinstance(permanent, dict):
+        return False
+    target = str(target_type or "").strip().lower()
+    if target in {"", "permanent", "any_permanent"}:
+        return True
+    if target == "creature":
+        return is_battlefield_creature(permanent)
+    if target == "artifact":
+        return is_artifact_permanent(permanent)
+    if target == "enchantment":
+        return is_enchantment_permanent(permanent)
+    if target == "land":
+        return is_effective_land(permanent)
+    if target == "artifact_or_creature":
+        return is_artifact_permanent(permanent) or is_battlefield_creature(permanent)
+    if target == "artifact_or_land":
+        return is_artifact_permanent(permanent) or is_effective_land(permanent)
+    if target == "creature_or_land":
+        return is_battlefield_creature(permanent) or is_effective_land(permanent)
+    if target == "token":
+        return is_token_permanent(permanent)
+    if target == "nontoken_permanent":
+        return not is_token_permanent(permanent)
+    return False
+
+
+def activation_sacrifice_candidate_score(player, permanent):
+    if not isinstance(permanent, dict):
+        return 10_000
+    score = 0
+    if is_token_permanent(permanent):
+        score -= 30
+    if is_effective_land(permanent):
+        score += 20 if controlled_land_count(player) <= 5 else 4
+    if is_battlefield_creature(permanent):
+        try:
+            score += int(permanent.get("power") or 0) + int(permanent.get("toughness") or 0)
+        except Exception:
+            score += 4
+        score += 8
+    if is_artifact_permanent(permanent):
+        score += 3
+    if is_enchantment_permanent(permanent):
+        score += 8
+    score += int(float(card_mana_value(permanent) or permanent.get("cmc") or 0))
+    return score
+
+
+def choose_activation_sacrifice_target(player, source, target_type):
+    candidates = [
+        permanent
+        for permanent in list(getattr(player, "battlefield", []) or [])
+        if permanent is not source
+        and activation_sacrifice_target_matches(permanent, target_type)
+    ]
+    candidates.sort(
+        key=lambda permanent: (
+            activation_sacrifice_candidate_score(player, permanent),
+            str(permanent.get("name") or ""),
+        )
+    )
+    return candidates[0] if candidates else None, candidates
+
+
+def sacrifice_permanent_for_activation(player, permanent, turn):
+    if permanent in getattr(player, "battlefield", []) or []:
+        player.battlefield.remove(permanent)
+    if is_token_permanent(permanent):
+        emit_replay_event(
+            "token_ceased_to_exist",
+            player=player.name,
+            token=permanent.get("name", "?"),
+            from_zone="battlefield",
+            turn=turn,
+        )
+    else:
+        player.graveyard.append(permanent)
+    player.record_permanent_sacrificed(permanent, turn)
+
+
 def is_colored_permanent(card):
     if not isinstance(card, dict):
         return False
@@ -29008,6 +29089,25 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 activation_cost,
                 permanent.get("activation_cost_colors") or [],
             )
+            life_cost = max(0, int(permanent.get("activation_life_cost") or 0))
+            sacrifice_target_type = str(permanent.get("activation_sacrifice_target") or "").strip()
+            sacrifice_target = None
+            sacrifice_options = []
+            if sacrifice_target_type:
+                sacrifice_target, sacrifice_options = choose_activation_sacrifice_target(
+                    player,
+                    permanent,
+                    sacrifice_target_type,
+                )
+                if sacrifice_target is None:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "no_valid_sacrifice_target_for_activated_draw",
+                        phase=phase,
+                    )
+                    continue
             if permanent.get("activation_requires_tap") and permanent.get("tapped"):
                 _utility_artifact_skip_event(
                     player,
@@ -29049,6 +29149,16 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
+            if life_cost and (getattr(player, "life_cant_change", False) or player.life <= life_cost + 1):
+                _utility_artifact_skip_event(
+                    player,
+                    permanent,
+                    turn,
+                    "life_too_low_for_activated_draw_cost",
+                    phase=phase,
+                    risk_flags=["low_life", "life_payment"],
+                )
+                continue
             if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
                 _utility_artifact_skip_event(
                     player,
@@ -29060,6 +29170,13 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 continue
             if permanent.get("activation_requires_tap"):
                 permanent["tapped"] = True
+            life_before = player.life
+            if life_cost:
+                change_life(player, -life_cost)
+            sacrificed_name = None
+            if sacrifice_target is not None:
+                sacrificed_name = sacrifice_target.get("name", "?")
+                sacrifice_permanent_for_activation(player, sacrifice_target, turn)
             permanent["utility_artifact_used_this_turn"] = True
             draw_count = int(
                 permanent.get("activated_draw_count")
@@ -29079,6 +29196,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         action="activate_draw",
                         effect=permanent.get("effect", "draw_engine"),
                         score=22 + len(drawn) * 4,
+                        sacrifice_target=sacrifice_target_type or None,
+                        sacrificed=sacrificed_name,
                     )
                 ],
                 chosen_option=decision_card_option(
@@ -29086,6 +29205,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     action="activate_draw",
                     effect=permanent.get("effect", "draw_engine"),
                     score=22 + len(drawn) * 4,
+                    sacrifice_target=sacrifice_target_type or None,
+                    sacrificed=sacrificed_name,
                 ),
                 score_components={
                     "activation_cost": activation_cost_text,
@@ -29093,6 +29214,15 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "hand_before": hand_size,
                     "hand_after": len(player.hand),
                     "tapped": bool(permanent.get("activation_requires_tap")),
+                    "life_cost": life_cost,
+                    "life_before": life_before,
+                    "life_after": player.life,
+                    "sacrifice_target": sacrifice_target_type or None,
+                    "sacrificed": sacrificed_name,
+                    "sacrifice_options": [
+                        option.get("name", "?")
+                        for option in sacrifice_options[:6]
+                    ],
                 },
                 rule_source="simple_activated_draw_permanent_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -29105,8 +29235,20 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     "cards": len(drawn),
                     "mana": -activation_cost,
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
+                    "life": -life_cost,
+                    "permanents": -1 if sacrificed_name else 0,
+                    "graveyard": 0 if sacrifice_target is None or is_token_permanent(sacrifice_target) else 1,
                 },
-                risk_flags=["activated_draw"],
+                risk_flags=[
+                    flag
+                    for flag, active in {
+                        "activated_draw": True,
+                        "life_payment": life_cost > 0,
+                        "sacrifice_permanent": sacrificed_name is not None,
+                        "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
+                    }.items()
+                    if active
+                ],
             )
             emit_replay_event(
                 "utility_artifact_activated",
@@ -29119,6 +29261,11 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 hand_before=hand_size,
                 hand_after=len(player.hand),
                 tapped=bool(permanent.get("tapped")),
+                life_paid=life_cost,
+                life_before=life_before,
+                life_after=player.life,
+                sacrifice_target=sacrifice_target_type or None,
+                sacrificed=sacrificed_name,
                 phase=phase,
                 turn=turn,
                 **replay_rule_fields(permanent),

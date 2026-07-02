@@ -3715,6 +3715,80 @@ def activated_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.removeprefix("a ").removeprefix("an ")
+    normalized = normalized.removeprefix("another ")
+    mapping = {
+        "artifact or creature": "artifact_or_creature",
+        "artifact or land": "artifact_or_land",
+        "creature or land": "creature_or_land",
+        "nontoken permanent": "nontoken_permanent",
+        "non-token permanent": "nontoken_permanent",
+        "token": "token",
+        "creature": "creature",
+        "artifact": "artifact",
+        "enchantment": "enchantment",
+        "land": "land",
+        "permanent": "permanent",
+    }
+    return mapping.get(normalized)
+
+
+def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if text.count(":") != 1:
+        return "activated_draw_oracle_not_simple"
+    cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    match = re.fullmatch(r"draw (a|one|two|three|four|five|\d+) cards?\.?", effect_text)
+    if not match:
+        return "activated_draw_oracle_not_simple"
+    value = match.group(1)
+    words = {"a": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    count = words.get(value, int(value) if value.isdigit() else 0)
+    if count <= 0:
+        return "activated_draw_oracle_not_simple"
+
+    normalized_cost = cost_text
+    life_cost = 0
+    life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
+    life_matches = list(re.finditer(life_pattern, normalized_cost))
+    if len(life_matches) > 1:
+        return "activated_draw_oracle_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0].group("life"))
+        normalized_cost = re.sub(life_pattern, ",", normalized_cost).strip(" ,")
+
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:artifact or creature|artifact or land|creature or land|"
+        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_draw_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+        if sacrifice_target is None:
+            return "activated_draw_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+
+    activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace("activated_self_boost", "activated_draw")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_draw_oracle_cost_not_supported"
+    activation["count"] = count
+    if life_cost:
+        activation["activation_life_cost"] = life_cost
+    if sacrifice_target:
+        activation["activation_sacrifice_target"] = sacrifice_target
+        activation["activation_requires_sacrifice_target"] = True
+    return activation
+
+
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
@@ -4723,24 +4797,8 @@ def activated_destroy_from_source(source: str) -> dict[str, Any] | str:
 
 def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
-    risky_cost_classes = {
-        "DiscardCardCost",
-        "DiscardTargetCost",
-        "ExileFrom",
-        "ExileSourceFromGraveCost",
-        "MillCardsCost",
-        "PayLifeCost",
-        "RemoveCounterCost",
-        "ReturnToHandSourceCost",
-        "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
-        "TapTargetCost",
-    }
     if "Zone.GRAVEYARD" in text:
         return "activated_draw_source_not_battlefield"
-    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
-    if present_risky:
-        return "activated_draw_source_cost_not_supported"
     draw_matches = re.findall(r"DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)", text)
     if len(draw_matches) != 1:
         return "activated_draw_source_count_not_fixed"
@@ -4748,7 +4806,21 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     if count <= 0:
         return "activated_draw_source_count_not_fixed"
     draw_index = text.find("DrawCardSourceControllerEffect")
-    window = text[max(0, draw_index - 300) : draw_index + 1400]
+    window = text[max(0, draw_index - 500) : draw_index + 1800]
+    risky_cost_classes = {
+        "DiscardCardCost",
+        "DiscardTargetCost",
+        "ExileFrom",
+        "ExileSourceFromGraveCost",
+        "MillCardsCost",
+        "RemoveCounterCost",
+        "ReturnToHandSourceCost",
+        "RevealTargetFromHandCost",
+        "TapTargetCost",
+    }
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_draw_source_cost_not_supported"
     if "SimpleActivatedAbility" not in window:
         return "activated_draw_source_not_simple_activated"
     cost_text = "{0}"
@@ -4764,6 +4836,22 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     activation_cost_generic, activation_cost_colors = parsed_cost
     requires_tap = "TapSourceCost" in window
     requires_sacrifice = "SacrificeSourceCost" in window
+    life_cost = None
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if len(life_matches) > 1:
+        return "activated_draw_source_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0])
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        sacrifice_cost_constructors = re.findall(r"new\s+SacrificeTargetCost\s*\(", window)
+        if len(sacrifice_cost_constructors) > 1:
+            return "activated_draw_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_source(text, window)
+        if sacrifice_target is None:
+            return "activated_draw_source_cost_not_supported"
+    if requires_sacrifice and sacrifice_target:
+        return "activated_draw_source_cost_not_supported"
     return {
         "count": count,
         "activation_cost_mana": cost_text,
@@ -4771,7 +4859,44 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
+        **({"activation_life_cost": life_cost} if life_cost else {}),
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target
+            else {}
+        ),
     }
+
+
+def activation_sacrifice_target_from_source(source: str, window: str) -> str | None:
+    text = source or ""
+    relevant = (window or "") + "\n" + text
+    if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant:
+        return "artifact_or_creature"
+    if "FILTER_PERMANENT_CREATURE" in relevant or "TargetControlledCreaturePermanent" in relevant:
+        return "creature"
+    if "FILTER_PERMANENT_ARTIFACT" in relevant:
+        return "artifact"
+    if "FILTER_CONTROLLED_LAND" in relevant or "FILTER_LANDS" in relevant:
+        return "land"
+    if "TokenPredicate.TRUE" in relevant:
+        return "token"
+    if "TokenPredicate.FALSE" in relevant:
+        return "nontoken_permanent"
+    if "CardType.ARTIFACT.getPredicate()" in relevant and "CardType.LAND.getPredicate()" in relevant:
+        return "artifact_or_land"
+    if "CardType.CREATURE.getPredicate()" in relevant and "CardType.LAND.getPredicate()" in relevant:
+        return "creature_or_land"
+    filter_match = re.search(r'new\s+FilterControlledPermanent\s*\(\s*"([^"]+)"\s*\)', relevant)
+    if filter_match:
+        return activation_sacrifice_target_from_phrase(filter_match.group(1))
+    filter_match = re.search(r'new\s+FilterPermanent\s*\(\s*"([^"]+)"\s*\)', relevant)
+    if filter_match:
+        return activation_sacrifice_target_from_phrase(filter_match.group(1))
+    return None
 
 
 def spell_cast_draw_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -6230,14 +6355,25 @@ def split_row(
     if permanent_activated_draw_unit:
         if not is_permanent_metadata(metadata) or is_spell(metadata):
             return None, "activated_draw_not_permanent"
-        oracle_count = activated_draw_count_from_oracle(metadata)
-        if oracle_count is None:
-            return None, "activated_draw_oracle_not_simple"
+        oracle_activation = activated_draw_from_oracle(metadata)
+        if isinstance(oracle_activation, str):
+            return None, oracle_activation
         parsed_activation = activated_draw_from_source(source_text)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
-        if int(parsed_activation["count"]) != int(oracle_count):
-            return None, "activated_draw_source_oracle_mismatch"
+        for key in (
+            "count",
+            "activation_cost_mana",
+            "activation_cost_generic",
+            "activation_cost_colors",
+            "activation_requires_tap",
+            "activation_requires_sacrifice",
+            "activation_life_cost",
+            "activation_sacrifice_target",
+        ):
+            if parsed_activation.get(key) != oracle_activation.get(key):
+                return None, "activated_draw_source_oracle_mismatch"
+        oracle_count = int(oracle_activation["count"])
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_type = (
             "creature"

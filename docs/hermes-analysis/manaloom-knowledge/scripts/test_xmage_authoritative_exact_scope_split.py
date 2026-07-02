@@ -1128,6 +1128,98 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertTrue(effect["activation_requires_sacrifice"])
 
+    def test_permanent_activated_draw_maps_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Chef",
+                type_line="Enchantment Creature - Human Citizen",
+                oracle_text="{1}{B}, Sacrifice an artifact or creature: Draw a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new ManaCostsImpl<>("{1}{B}")
+                );
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["activated_draw_count"], 1)
+        self.assertEqual(effect["activation_sacrifice_target"], "artifact_or_creature")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_draw_maps_pay_life_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Greed",
+                type_line="Enchantment",
+                oracle_text="{B}, Pay 2 life: Draw a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new ManaCostsImpl<>("{B}")
+                );
+                ability.addCost(new PayLifeCost(2));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["activated_draw_count"], 1)
+        self.assertEqual(effect["activation_life_cost"], 2)
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_draw_blocks_source_and_target_sacrifice_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Unsafe Altar",
+                type_line="Artifact",
+                oracle_text="{1}, Sacrifice a creature: Draw a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1), new GenericManaCost(1)
+                );
+                ability.addCost(new SacrificeSourceCost());
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "activated_draw_source_cost_not_supported")
+
     def test_permanent_activated_draw_blocks_discard_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
@@ -1155,7 +1247,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_draw_source_cost_not_supported")
+        self.assertEqual(reason, "activated_draw_oracle_cost_not_supported")
 
     def test_permanent_activated_draw_blocks_dynamic_count(self) -> None:
         row = queue_row(

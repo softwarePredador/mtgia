@@ -1432,6 +1432,115 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_draw_sacrifices_target_permanent_cost(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        source = {
+            "name": "Fixture Chef",
+            "type_line": "Creature - Vampire",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{1}{B}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": ["B"],
+            "activation_sacrifice_target": "artifact_or_creature",
+            "activation_requires_sacrifice_target": True,
+            "summoning_sick": False,
+        }
+        servo = {
+            "name": "Servo Token",
+            "type_line": "Artifact Creature - Servo",
+            "power": 1,
+            "toughness": 1,
+            "token": True,
+        }
+        active.battlefield.extend([source, servo])
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=5,
+            rng=random.Random(5),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertIn(source, active.battlefield)
+        self.assertNotIn(servo, active.battlefield)
+        self.assertNotIn(servo, active.graveyard)
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(len(active.library), 1)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw"
+                and data.get("card") == "Fixture Chef"
+                and data.get("cards_drawn") == 1
+                and data.get("sacrifice_target") == "artifact_or_creature"
+                and data.get("sacrificed") == "Servo Token"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "token_ceased_to_exist"
+                and data.get("token") == "Servo Token"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_draw_pays_life_cost(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Card A"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        permanent = {
+            "name": "Fixture Greed",
+            "type_line": "Enchantment",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{B}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["B"],
+            "activation_life_cost": 2,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=6,
+            rng=random.Random(6),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.life, 38)
+        self.assertEqual(len(active.hand), 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw"
+                and data.get("card") == "Fixture Greed"
+                and data.get("life_paid") == 2
+                and data.get("life_before") == 40
+                and data.get("life_after") == 38
+                for event, data in self.events
+            )
+        )
+
     def test_spell_cast_draw_engine_draws_for_matching_creature_spell(self) -> None:
         active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
         opponent = self.battle.Player("Opponent", None, [])

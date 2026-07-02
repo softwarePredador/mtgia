@@ -1,0 +1,470 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T09:08:47.308731+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg366_activated_draw_costs_wave_manifest.json",
+  "package_id": "pg366_activated_draw_costs_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Akki Scrapchomper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3485aef23b704b1ca90d3e6a21e05f55",
+          "oracle_hash": "24fcb807be99d2fd01b4040d1edb256a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Book of Rass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f7e4a9f98f28ef843160d20547ed94c",
+          "oracle_hash": "e09a533358c56c2b47e68176f5db20a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Carnage Altar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1463b94fcdda38c1ec23004d7b7fdeb9",
+          "oracle_hash": "0cf8ca940ba1b386bcbaef4cad500a75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Destructive Digger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5c34b9957826f0f555d2893a737044e",
+          "oracle_hash": "5c6fa6b46ed236a3239b9741b65daa52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Dockside Chef",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0cca20ba9a9ac803894373bc1262e76d",
+          "oracle_hash": "65e262f933832f63f3e3738ec5e9fb73",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Greed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4ae349968feb269ed6923ec6f60c71b",
+          "oracle_hash": "804063a678dfc1db5557ce0fb7dd3b8d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Hardened Tactician",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38606e4ddc90bda91cc2846333cbd4ea",
+          "oracle_hash": "9d17bc66173505ff47c29fd3f2db496a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Infernal Tribute",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:582b72d3559f756d8624f81bad04c13f",
+          "oracle_hash": "fbbae61191f45b8c8da6a571b9c85767",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Phyrexian Vault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00dfa41028534c37da611e078dea84fe",
+          "oracle_hash": "c2c4d9788ca3de9502f2af5bc663753e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Slagdrill Scrapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17714e7ace1d061fd32277c65756d34c",
+          "oracle_hash": "f0b6839479a4288f5ced369bc662f32c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Soulreaper of Mogis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9dc23c5ed28565aec8ec5e69d566a630",
+          "oracle_hash": "86434ce3ef4b90e57e2e4392cea1eb5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Thallid Soothsayer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9414c3f52f98f8ad6dcd54b13e4c3057",
+          "oracle_hash": "e0f0a65e67de405a27b848ea9280399c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 12
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Akki Scrapchomper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3485aef23b704b1ca90d3e6a21e05f55",
+          "oracle_hash": "24fcb807be99d2fd01b4040d1edb256a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Book of Rass",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f7e4a9f98f28ef843160d20547ed94c",
+          "oracle_hash": "e09a533358c56c2b47e68176f5db20a2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Carnage Altar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1463b94fcdda38c1ec23004d7b7fdeb9",
+          "oracle_hash": "0cf8ca940ba1b386bcbaef4cad500a75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Destructive Digger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b5c34b9957826f0f555d2893a737044e",
+          "oracle_hash": "5c6fa6b46ed236a3239b9741b65daa52",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Dockside Chef",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:0cca20ba9a9ac803894373bc1262e76d",
+          "oracle_hash": "65e262f933832f63f3e3738ec5e9fb73",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Greed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4ae349968feb269ed6923ec6f60c71b",
+          "oracle_hash": "804063a678dfc1db5557ce0fb7dd3b8d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Hardened Tactician",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:38606e4ddc90bda91cc2846333cbd4ea",
+          "oracle_hash": "9d17bc66173505ff47c29fd3f2db496a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Infernal Tribute",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:582b72d3559f756d8624f81bad04c13f",
+          "oracle_hash": "fbbae61191f45b8c8da6a571b9c85767",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Phyrexian Vault",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00dfa41028534c37da611e078dea84fe",
+          "oracle_hash": "c2c4d9788ca3de9502f2af5bc663753e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Slagdrill Scrapper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17714e7ace1d061fd32277c65756d34c",
+          "oracle_hash": "f0b6839479a4288f5ced369bc662f32c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Soulreaper of Mogis",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9dc23c5ed28565aec8ec5e69d566a630",
+          "oracle_hash": "86434ce3ef4b90e57e2e4392cea1eb5f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "card_name": "Thallid Soothsayer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9414c3f52f98f8ad6dcd54b13e4c3057",
+          "oracle_hash": "e0f0a65e67de405a27b848ea9280399c",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Akki Scrapchomper",
+          "logical_rule_key": "battle_rule_v1:3485aef23b704b1ca90d3e6a21e05f55"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Book of Rass",
+          "logical_rule_key": "battle_rule_v1:5f7e4a9f98f28ef843160d20547ed94c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Carnage Altar",
+          "logical_rule_key": "battle_rule_v1:1463b94fcdda38c1ec23004d7b7fdeb9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Destructive Digger",
+          "logical_rule_key": "battle_rule_v1:b5c34b9957826f0f555d2893a737044e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dockside Chef",
+          "logical_rule_key": "battle_rule_v1:0cca20ba9a9ac803894373bc1262e76d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Greed",
+          "logical_rule_key": "battle_rule_v1:b4ae349968feb269ed6923ec6f60c71b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hardened Tactician",
+          "logical_rule_key": "battle_rule_v1:38606e4ddc90bda91cc2846333cbd4ea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Infernal Tribute",
+          "logical_rule_key": "battle_rule_v1:582b72d3559f756d8624f81bad04c13f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Phyrexian Vault",
+          "logical_rule_key": "battle_rule_v1:00dfa41028534c37da611e078dea84fe"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slagdrill Scrapper",
+          "logical_rule_key": "battle_rule_v1:17714e7ace1d061fd32277c65756d34c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soulreaper of Mogis",
+          "logical_rule_key": "battle_rule_v1:9dc23c5ed28565aec8ec5e69d566a630"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thallid Soothsayer",
+          "logical_rule_key": "battle_rule_v1:9414c3f52f98f8ad6dcd54b13e4c3057"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 12
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Akki Scrapchomper",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:3485aef23b704b1ca90d3e6a21e05f55"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Book of Rass",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:5f7e4a9f98f28ef843160d20547ed94c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Carnage Altar",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:1463b94fcdda38c1ec23004d7b7fdeb9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Destructive Digger",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:b5c34b9957826f0f555d2893a737044e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dockside Chef",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:0cca20ba9a9ac803894373bc1262e76d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Greed",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:b4ae349968feb269ed6923ec6f60c71b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hardened Tactician",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:38606e4ddc90bda91cc2846333cbd4ea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Infernal Tribute",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:582b72d3559f756d8624f81bad04c13f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Phyrexian Vault",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:00dfa41028534c37da611e078dea84fe"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slagdrill Scrapper",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:17714e7ace1d061fd32277c65756d34c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soulreaper of Mogis",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:9dc23c5ed28565aec8ec5e69d566a630"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thallid Soothsayer",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:9414c3f52f98f8ad6dcd54b13e4c3057"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
