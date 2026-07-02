@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T03:49:21.321514+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg349_xmage_graveyard_self_return_discard_battlefield_wave_manifest.json",
+  "package_id": "pg349_xmage_graveyard_self_return_discard_battlefield_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Advanced Stitchwing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48",
+          "oracle_hash": "c9276c16fe79a207f14b0d2cfce820d2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Ghoulsteed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57d0e158ef6f3bb936ac09a64ba1141b",
+          "oracle_hash": "85a6ebe806fc422f895e6010f766c5b7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Stitchwing Skaab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558",
+          "oracle_hash": "0c5c60d1c06788f80a724d4f62e365cf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Advanced Stitchwing",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48",
+          "oracle_hash": "c9276c16fe79a207f14b0d2cfce820d2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Ghoulsteed",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:57d0e158ef6f3bb936ac09a64ba1141b",
+          "oracle_hash": "85a6ebe806fc422f895e6010f766c5b7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "card_name": "Stitchwing Skaab",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558",
+          "oracle_hash": "0c5c60d1c06788f80a724d4f62e365cf",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Advanced Stitchwing",
+          "logical_rule_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ghoulsteed",
+          "logical_rule_key": "battle_rule_v1:57d0e158ef6f3bb936ac09a64ba1141b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Stitchwing Skaab",
+          "logical_rule_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Advanced Stitchwing",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ghoulsteed",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:57d0e158ef6f3bb936ac09a64ba1141b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Stitchwing Skaab",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

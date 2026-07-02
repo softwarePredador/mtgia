@@ -829,6 +829,47 @@
     "battle_rule_logical_key": "battle_rule_v1:b8cc41f870a0cf26097717df50bf66e9",
     "battle_rule_oracle_hash": "148a03732a37709ae78d4bac0c347a8f"
   },
+  "Advanced Stitchwing": {
+    "_keywords_are_self": true,
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_additional_cost": "discard_cards",
+    "activation_cost_colors": [
+      "U"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{U}",
+    "activation_discard_count": 2,
+    "activation_discard_target": "any_card",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "U"
+    ],
+    "graveyard_self_return_activation_cost_generic": 2,
+    "graveyard_self_return_activation_cost_mana": "{2}{U}",
+    "graveyard_self_return_activation_discard_count": 2,
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "keywords": [
+      "flying"
+    ],
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48",
+    "battle_rule_oracle_hash": "c9276c16fe79a207f14b0d2cfce820d2"
+  },
   "Adventurer's Inn": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -29525,6 +29566,43 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ed71ecbf3fdf66b1cdb2d10aad9d3e65",
     "battle_rule_oracle_hash": "4535ec92f19844162f8fe290541ca60e"
+  },
+  "Ghoulsteed": {
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_additional_cost": "discard_cards",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{B}",
+    "activation_discard_count": 2,
+    "activation_discard_target": "any_card",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_self_return_activation_cost_generic": 2,
+    "graveyard_self_return_activation_cost_mana": "{2}{B}",
+    "graveyard_self_return_activation_discard_count": 2,
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:57d0e158ef6f3bb936ac09a64ba1141b",
+    "battle_rule_oracle_hash": "85a6ebe806fc422f895e6010f766c5b7"
   },
   "Giada, Font of Hope": {
     "cmc": 2.0,
@@ -68717,6 +68795,47 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:96aaf3627d3740cec22086acb290065e"
+  },
+  "Stitchwing Skaab": {
+    "_keywords_are_self": true,
+    "ability_kind": "graveyard_activated",
+    "activated_battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activation_additional_cost": "discard_cards",
+    "activation_cost_colors": [
+      "U"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{U}",
+    "activation_discard_count": 2,
+    "activation_discard_target": "any_card",
+    "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_self_return_activation_cost_colors": [
+      "U"
+    ],
+    "graveyard_self_return_activation_cost_generic": 1,
+    "graveyard_self_return_activation_cost_mana": "{1}{U}",
+    "graveyard_self_return_activation_discard_count": 2,
+    "graveyard_self_return_destination": "battlefield",
+    "graveyard_self_return_to_battlefield": true,
+    "keywords": [
+      "flying"
+    ],
+    "source_zone": "graveyard",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5dc1b5fcfe5ba33c0ae895a3eec6d558",
+    "battle_rule_oracle_hash": "0c5c60d1c06788f80a724d4f62e365cf"
   },
   "Stock Up": {
     "cmc": 3.0,

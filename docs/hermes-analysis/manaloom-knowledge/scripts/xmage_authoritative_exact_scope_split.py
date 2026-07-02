@@ -3222,7 +3222,7 @@ def graveyard_self_return_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[
 def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
     match = re.fullmatch(
-        r"(?P<cost>(?:\{[0-9wubrg]\})+): return this card from your graveyard to the battlefield(?P<tapped> tapped)?\.?",
+        r"(?P<cost>(?:\{[0-9wubrg]\})+)(?:,\s*discard (?P<discard_count>two) cards?)?: return this card from your graveyard to the battlefield(?P<tapped> tapped)?\.?",
         text,
     )
     if not match:
@@ -3232,12 +3232,19 @@ def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -
     if parsed_cost is None:
         return "graveyard_self_return_battlefield_oracle_mana_cost_not_supported"
     activation_cost_generic, activation_cost_colors = parsed_cost
-    return {
+    result = {
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
         "enters_tapped": bool(match.group("tapped")),
     }
+    if match.group("discard_count"):
+        result["activation_discard_count"] = 2
+        result["activation_discard_target"] = "any_card"
+    else:
+        result["activation_discard_count"] = 0
+        result["activation_discard_target"] = None
+    return result
 
 
 def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | str:
@@ -3309,7 +3316,6 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
     risky_cost_classes = {
         "CompositeCost",
         "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
@@ -3328,6 +3334,19 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
         return "graveyard_self_return_battlefield_source_cost_not_supported"
+    discard_count = 0
+    discard_target = None
+    if "DiscardTargetCost" in window:
+        discard_matches = re.findall(
+            r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*(\d+)\s*,\s*StaticFilters\.FILTER_CARD_CARDS\s*\)\s*\)",
+            window,
+        )
+        if len(discard_matches) != 1:
+            return "graveyard_self_return_battlefield_source_cost_not_supported"
+        discard_count = int(discard_matches[0])
+        if discard_count != 2:
+            return "graveyard_self_return_battlefield_source_cost_not_supported"
+        discard_target = "any_card"
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
     if len(mana_matches) + len(generic_matches) != 1:
@@ -3344,6 +3363,8 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
         "enters_tapped": True,
+        "activation_discard_count": discard_count,
+        "activation_discard_target": discard_target,
     }
 
 
@@ -6420,6 +6441,8 @@ def split_row(
             "activation_cost_generic",
             "activation_cost_colors",
             "enters_tapped",
+            "activation_discard_count",
+            "activation_discard_target",
         ):
             if source_activation[key] != oracle_activation[key]:
                 return None, "graveyard_self_return_battlefield_source_oracle_mismatch"
@@ -6456,6 +6479,13 @@ def split_row(
             "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
             "xmage_ability_class": "SimpleActivatedAbility",
         }
+        if oracle_activation["activation_discard_count"]:
+            effect_json["graveyard_self_return_activation_discard_count"] = oracle_activation[
+                "activation_discard_count"
+            ]
+            effect_json["activation_discard_count"] = oracle_activation["activation_discard_count"]
+            effect_json["activation_discard_target"] = oracle_activation["activation_discard_target"]
+            effect_json["activation_additional_cost"] = "discard_cards"
         if keywords:
             effect_json["keywords"] = ordered_keywords(keywords)
             effect_json["_keywords_are_self"] = True

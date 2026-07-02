@@ -5490,6 +5490,111 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_self_return_to_battlefield_pays_mana_discards_two_and_enters_tapped(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("blue", 1)
+        discard_one = {"name": "Spare Plains", "type_line": "Basic Land - Plains", "cmc": 0}
+        discard_two = {"name": "Minor Artifact", "type_line": "Artifact", "cmc": 1}
+        keep_card = {"name": "Valuable Instant", "type_line": "Instant", "cmc": 3, "effect": "draw_cards"}
+        active.hand.extend([keep_card, discard_two, discard_one])
+        source = {
+            "name": "Advanced Stitchwing",
+            "type_line": "Creature - Zombie Horror",
+            "cmc": 5,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{2}{U}",
+            "graveyard_self_return_activation_cost_generic": 2,
+            "graveyard_self_return_activation_cost_colors": ["U"],
+            "graveyard_self_return_activation_discard_count": 2,
+            "activation_discard_count": 2,
+            "activation_discard_target": "any_card",
+            "enters_tapped": True,
+            "keywords": ["flying"],
+            "_rule_logical_key": "battle_rule_v1:fixture_advanced_stitchwing",
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Valuable Instant"])
+        self.assertCountEqual(
+            [card["name"] for card in active.graveyard],
+            ["Spare Plains", "Minor Artifact"],
+        )
+        self.assertEqual([card["name"] for card in active.battlefield], ["Advanced Stitchwing"])
+        self.assertTrue(active.battlefield[0].get("tapped"))
+        self.assertTrue(active.battlefield[0].get("summoning_sick"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Advanced Stitchwing"
+                and data.get("activation_kind") == "graveyard_self_return_to_battlefield"
+                and data.get("activation_cost") == "{2}{U}"
+                and data.get("destination") == "battlefield"
+                and data.get("returned") == ["Advanced Stitchwing"]
+                and data.get("discarded_count") == 2
+                and set(data.get("discarded") or []) == {"Spare Plains", "Minor Artifact"}
+                and set(data.get("discard_to_graveyard") or []) == {"Spare Plains", "Minor Artifact"}
+                and data.get("mana_paid") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_self_return_to_battlefield_does_not_pay_when_discard_cost_unavailable(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("blue", 1)
+        only_card = {"name": "Only Hand Card", "type_line": "Sorcery", "cmc": 2}
+        active.hand.append(only_card)
+        source = {
+            "name": "Stitchwing Skaab",
+            "type_line": "Creature - Zombie Horror",
+            "cmc": 4,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{1}{U}",
+            "graveyard_self_return_activation_cost_generic": 1,
+            "graveyard_self_return_activation_cost_colors": ["U"],
+            "graveyard_self_return_activation_discard_count": 2,
+            "activation_discard_count": 2,
+            "activation_discard_target": "any_card",
+            "enters_tapped": True,
+        }
+        active.graveyard.append(source)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=18,
+            rng=random.Random(18),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.available_mana(), 3)
+        self.assertEqual(active.hand, [only_card])
+        self.assertEqual(active.battlefield, [])
+        self.assertEqual(active.graveyard, [source])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
     def test_simple_activated_graveyard_exile_single_graveyard_exiles_multiple_and_sacrifices_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
