@@ -1,0 +1,6 @@
+   card_name    | normalized_name |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------+-----------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Back in Town   | back in town    | battle_rule_v1:4dbb7fab82dc6aa0bee9310921c10add |                  1 |                           1 |                         1 |           0
+ Death Denied   | death denied    | battle_rule_v1:7f2b1cf93136c4e6f40016e5392a7451 |                  1 |                           1 |                         1 |           0
+ Stir the Grave | stir the grave  | battle_rule_v1:d964ccf44fc72f3a06c632b646920e6a |                  1 |                           1 |                         1 |           0
+(3 rows)

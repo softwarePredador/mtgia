@@ -1864,7 +1864,16 @@ def runtime_cast_plan_for_card(player, card, effect_data, *, additional_generic=
         x_value = int(blight_plan.get("x_value") or 0)
         cost_context["blight"] = blight_plan
         additional_costs.append(f"blight:{x_value}")
-    if effect_data.get("target_mana_value_max_from_x"):
+    uses_x_cast_value = any(
+        effect_data.get(key)
+        for key in (
+            "target_mana_value_max_from_x",
+            "count_from_x",
+            "target_count_from_x",
+            "recursion_count_from_x",
+        )
+    )
+    if uses_x_cast_value:
         max_candidate_x = max(0, int(player.available_mana() or 0))
         chosen_x = None
         for candidate_x in range(max_candidate_x, -1, -1):
@@ -35527,6 +35536,11 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "elf" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("ally_creature", "ally_creature_card", "ally"):
         return is_creature_card(card) and "ally" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("outlaw_creature", "outlaw_creature_card", "outlaw"):
+        outlaw_subtypes = {"assassin", "mercenary", "pirate", "rogue", "warlock"}
+        return is_creature_card(card) and bool(
+            outlaw_subtypes.intersection(type_line.replace("-", " ").replace("—", " ").split())
+        )
     if target in ("human_creature", "human"):
         return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
@@ -35640,6 +35654,12 @@ def choose_shared_creature_type_cards(cards, count, *, require_full_count=True):
 
 
 def recursion_mana_value_max(effect_data, *keys):
+    if effect_data.get("target_mana_value_max_from_x") or effect_data.get("recursion_mana_value_max_from_x"):
+        cast_context = effect_data.get("_cast_context") or {}
+        try:
+            return int(float(cast_context.get("x_value") or effect_data.get("x_value") or 0))
+        except (TypeError, ValueError):
+            return 0
     for key in keys:
         if effect_data.get(key) is not None:
             return effect_data.get(key)
@@ -49206,7 +49226,19 @@ def apply_effect_immediate(
                 return source_participant
             return source_participant
 
+        def recursion_x_value(default=0):
+            cast_context = effect_data.get("_cast_context") or {}
+            try:
+                return max(0, int(float(cast_context.get("x_value") or effect_data.get("x_value") or default or 0)))
+            except (TypeError, ValueError):
+                return max(0, int(default or 0))
+
         def component_count(component_data):
+            if any(
+                component_data.get(key) or effect_data.get(key)
+                for key in ("count_from_x", "target_count_from_x", "recursion_count_from_x")
+            ):
+                return recursion_x_value()
             return (
                 len(player.graveyard)
                 if return_all_matching or component_data.get("return_all_matching")
@@ -49477,6 +49509,9 @@ def apply_effect_immediate(
             counter_amount=effect_data.get("counter_amount"),
             total_mana_value_max=effect_data.get("recursion_total_mana_value_max")
             or effect_data.get("total_mana_value_max"),
+            x_value=recursion_x_value(None)
+            if any(effect_data.get(key) for key in ("count_from_x", "target_count_from_x", "recursion_count_from_x", "target_mana_value_max_from_x"))
+            else None,
             requires_different_names=bool(effect_data.get("requires_different_names")),
             graveyard_from_battlefield_this_turn=bool(effect_data.get("graveyard_from_battlefield_this_turn")),
             return_all_matching=return_all_matching,

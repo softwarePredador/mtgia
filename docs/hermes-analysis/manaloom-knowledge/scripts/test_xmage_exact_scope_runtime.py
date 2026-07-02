@@ -4177,6 +4177,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_recursion_uses_x_count(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Bear A", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Wrong Bolt", "type_line": "Instant", "cmc": 1},
+                {"name": "Target Bear B", "type_line": "Creature - Bear", "cmc": 3},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 0,
+            "count_from_x": True,
+            "destination": "hand",
+            "target_controller": "self",
+            "_cast_context": {"x_value": 2},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Death Denied",
+                "type_line": "Instant",
+                "oracle_text": "Return X target creature cards from your graveyard to your hand.",
+            },
+            turn=8,
+            rng=random.Random(108),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bear A", "Target Bear B"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Bolt", "Death Denied"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Death Denied"
+                and data.get("recovered_count") == 2
+                and data.get("x_value") == 2
+                for event, data in self.events
+            )
+        )
+
     def test_mill_then_return_recursion_can_return_freshly_milled_creature(self) -> None:
         active = self.battle.Player(
             "Active",
@@ -4717,6 +4765,116 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("recovered") == ["Target Bear"]
                 and data.get("target_type") == "creature"
                 and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_battlefield_recursion_uses_x_mana_value_limit(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Too Large", "type_line": "Creature - Giant", "cmc": 4, "power": 4, "toughness": 4},
+                {"name": "Legal Bear", "type_line": "Creature - Bear", "cmc": 3, "power": 3, "toughness": 3},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max_source": "x_value",
+            },
+            "count": 1,
+            "destination": "battlefield",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "target_mana_value_max_from_x": True,
+            "_cast_context": {"x_value": 3},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Stir the Grave",
+                "type_line": "Sorcery",
+                "oracle_text": "Return target creature card with mana value X or less from your graveyard to the battlefield.",
+            },
+            turn=9,
+            rng=random.Random(109),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Legal Bear"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Too Large", "Stir the Grave"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Stir the Grave"
+                and data.get("mana_value_max") == 3
+                and data.get("x_value") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_battlefield_recursion_uses_x_outlaw_count(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Rogue", "type_line": "Creature - Human Rogue", "cmc": 2, "power": 2, "toughness": 2},
+                {"name": "Wrong Soldier", "type_line": "Creature - Human Soldier", "cmc": 2, "power": 2, "toughness": 2},
+                {"name": "Target Pirate", "type_line": "Creature - Goblin Pirate", "cmc": 3, "power": 3, "toughness": 2},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "outlaw_creature",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "subtype_group": "outlaw",
+                "subtypes": ["assassin", "mercenary", "pirate", "rogue", "warlock"],
+            },
+            "count": 0,
+            "count_from_x": True,
+            "destination": "battlefield",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "_cast_context": {"x_value": 2},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Back in Town",
+                "type_line": "Sorcery",
+                "oracle_text": "Return X target outlaw creature cards from your graveyard to the battlefield.",
+            },
+            turn=9,
+            rng=random.Random(110),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Target Rogue", "Target Pirate"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Soldier", "Back in Town"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Back in Town"
+                and data.get("recovered") == ["Target Rogue", "Target Pirate"]
+                and data.get("x_value") == 2
                 for event, data in self.events
             )
         )

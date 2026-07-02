@@ -2809,6 +2809,53 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["count"], 2)
         self.assertNotIn("up_to_count", effect)
 
+    def test_graveyard_to_hand_x_creatures_maps_count_from_x(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Death Denied",
+                type_line="Instant",
+                oracle_text="Return X target creature cards from your graveyard to your hand.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+                this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 0)
+        self.assertTrue(effect["count_from_x"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+        )
+
+    def test_graveyard_to_hand_x_creatures_requires_xmage_adjuster(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Death Denied",
+                type_line="Instant",
+                oracle_text="Return X target creature cards from your graveyard to your hand.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_source_x_count_not_supported")
+
     def test_graveyard_to_hand_color_and_subtype_targets_map(self) -> None:
         cases = [
             (
@@ -3172,6 +3219,77 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 "controller": "self",
                 "card_types": ["creature"],
                 "mana_value_max": 3,
+            },
+        )
+
+    def test_graveyard_to_battlefield_x_mana_value_limit_maps_from_x_adjuster(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Stir the Grave",
+                type_line="Sorcery",
+                oracle_text="Return target creature card with mana value X or less from your graveyard to the battlefield.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect()
+                    .setText("return target creature card with mana value X or less from your graveyard to the battlefield"));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.getSpellAbility().setTargetAdjuster(new XManaValueTargetAdjuster(ComparisonType.OR_LESS));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["target_mana_value_max_from_x"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max_source": "x_value",
+            },
+        )
+
+    def test_graveyard_to_battlefield_x_outlaw_count_maps_from_x_adjuster(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Back in Town",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return X target outlaw creature cards from your graveyard to the battlefield. "
+                    "(Assassins, Mercenaries, Pirates, Rogues, and Warlocks are outlaws.)"
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard("outlaw cards");
+                filter.add(OutlawPredicate.instance);
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter));
+                this.getSpellAbility().setTargetAdjuster(new TargetsCountAdjuster(GetXValue.instance));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "outlaw_creature")
+        self.assertEqual(effect["count"], 0)
+        self.assertTrue(effect["count_from_x"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "subtype_group": "outlaw",
+                "subtypes": ["assassin", "mercenary", "pirate", "rogue", "warlock"],
             },
         )
 

@@ -5202,6 +5202,42 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "048b9bf3b682c1945ee0d6cf7218405b"
   },
+  "Back in Town": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 0,
+    "count_from_x": true,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "outlaw_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtype_group": "outlaw",
+      "subtypes": [
+        "assassin",
+        "mercenary",
+        "pirate",
+        "rogue",
+        "warlock"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4dbb7fab82dc6aa0bee9310921c10add",
+    "battle_rule_oracle_hash": "29486ab65ba91af38683cb407532a6d9"
+  },
   "Back to Nature": {
     "battle_model_scope": "xmage_destroy_all_matching_permanents_spell_v1",
     "destination": "graveyard",
@@ -17147,6 +17183,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:3acd8f1cd0385cea4d18af84cb76b7bf",
     "battle_rule_oracle_hash": "7ee68f02b4a79a4c3e00fbe14caceda1"
+  },
+  "Death Denied": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 0,
+    "count_from_x": true,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7f2b1cf93136c4e6f40016e5392a7451",
+    "battle_rule_oracle_hash": "11326914a120abaf48b741c8f9d80034"
   },
   "Death Stroke": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -70613,6 +70675,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+  },
+  "Stir the Grave": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "mana_value_max_source": "x_value",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "target_mana_value_max_from_x": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d964ccf44fc72f3a06c632b646920e6a",
+    "battle_rule_oracle_hash": "705c519d4397f4ebda5ec77a18c33c87"
   },
   "Stirring Wildwood": {
     "effect": "land",
