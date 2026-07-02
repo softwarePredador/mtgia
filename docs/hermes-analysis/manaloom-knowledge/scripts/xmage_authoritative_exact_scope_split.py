@@ -1128,6 +1128,10 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
             ("creature", 3, True),
         ),
         (
+            r"^return up to three target creature cards of the creature type of your choice from your graveyard to your hand\.?$",
+            ("shared_creature_type", 3, True),
+        ),
+        (
             r"^return up to two target creature cards from your graveyard to your hand\.?$",
             ("creature", 2, True),
         ),
@@ -8411,6 +8415,12 @@ def split_row(
         if target is None:
             return None, "recursion_target_not_supported"
         target_type, count, up_to = target
+        if target_type == "shared_creature_type" and not (
+            "ChoiceCreatureType" in source_text
+            and "FilterCreatureCard" in source_text
+            and re.search(r"TargetCardInYourGraveyard\s*\(\s*0\s*,\s*3\s*,", source_text, re.S)
+        ):
+            return None, "recursion_source_target_not_supported"
         effect_json = {
             "effect": "recursion",
             "battle_model_scope": RECURSION_SCOPE,

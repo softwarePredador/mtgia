@@ -4342,6 +4342,58 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in active.hand], ["Target Wizard A", "Target Wizard B"])
         self.assertEqual([card["name"] for card in active.graveyard], ["Target Soldier", "Fixture Unbury"])
 
+    def test_graveyard_to_hand_shared_type_up_to_count_returns_partial_group(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Wizard A", "type_line": "Creature - Human Wizard"},
+                {"name": "Target Wizard B", "type_line": "Creature - Vedalken Wizard"},
+                {"name": "Target Soldier", "type_line": "Creature - Soldier"},
+                {"name": "Target Relic", "type_line": "Artifact"},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "shared_creature_type",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "shared_subtype_group": "creature_type",
+            },
+            "shared_subtype_group": "creature_type",
+            "count": 3,
+            "up_to_count": True,
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Aphetto Dredging", "type_line": "Sorcery"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Wizard A", "Target Wizard B"])
+        self.assertEqual(
+            [card["name"] for card in active.graveyard],
+            ["Target Soldier", "Target Relic", "Fixture Aphetto Dredging"],
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("target_type") == "shared_creature_type"
+                and data.get("recovered") == ["Target Wizard A", "Target Wizard B"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_hand_exile_self_components_return_noncreature_permanent(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

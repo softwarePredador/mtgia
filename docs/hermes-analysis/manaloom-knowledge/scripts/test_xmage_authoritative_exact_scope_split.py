@@ -2625,6 +2625,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 self.assertEqual(effect["target"], target)
                 self.assertEqual(effect["target_constraints"], constraints)
 
+    def test_graveyard_to_hand_maps_up_to_three_chosen_creature_type(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aphetto Dredging",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to three target creature cards of the creature type of your choice "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                Effect effect = new ReturnFromGraveyardToHandTargetEffect();
+                Choice typeChoice = new ChoiceCreatureType(game, ability);
+                FilterCreatureCard filter = new FilterCreatureCard(chosenType + " cards");
+                filter.add(SubType.byDescription(chosenType).getPredicate());
+                ability.addTarget(new TargetCardInYourGraveyard(0, 3, filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "shared_creature_type")
+        self.assertEqual(effect["count"], 3)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "shared_subtype_group": "creature_type",
+            },
+        )
+
+    def test_graveyard_to_hand_blocks_chosen_creature_type_without_xmage_choice_source(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aphetto Dredging",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to three target creature cards of the creature type of your choice "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text="this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_source_target_not_supported")
+
     def test_graveyard_to_hand_choose_one_or_both_maps_components(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
         proposal, reason = split.split_row(

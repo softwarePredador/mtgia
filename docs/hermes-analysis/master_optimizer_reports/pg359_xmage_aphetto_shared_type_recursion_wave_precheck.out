@@ -1,0 +1,4 @@
+    card_name     | normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+------------------+------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Aphetto Dredging | aphetto dredging | 2ef7ae9863a8d2eee1551030d7d5ea35 | battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6 | deprecate_nonmatching_rows |                1 | a84f455e-fbdf-478d-8f2c-9e7981959f3c |                  0 |                         0 |                           0
+(1 row)

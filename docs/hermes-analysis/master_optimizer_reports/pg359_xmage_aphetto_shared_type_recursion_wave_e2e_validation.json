@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T06:50:27.078824+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_manifest.json",
+  "package_id": "pg359_xmage_aphetto_shared_type_recursion_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Aphetto Dredging",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+          "oracle_hash": "2ef7ae9863a8d2eee1551030d7d5ea35",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "card_name": "Aphetto Dredging",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+          "oracle_hash": "2ef7ae9863a8d2eee1551030d7d5ea35",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Aphetto Dredging",
+          "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Aphetto Dredging",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

@@ -1,0 +1,97 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg359_xmage_aphetto_shared_type_recursion_wave_20260702_",
+  "deploy_id": "PG359",
+  "expected_rules": [
+    {
+      "card_name": "Aphetto Dredging",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+      "min_rule_version": 2,
+      "normalized_name": "aphetto dredging",
+      "oracle_hash": "2ef7ae9863a8d2eee1551030d7d5ea35",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "recursion",
+        "target": "shared_creature_type",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "shared_subtype_group": "creature_type",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_graveyard_to_hand_spell": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T06:48:50+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Aphetto Dredging"
+      },
+      "card_name": "Aphetto Dredging",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+      "normalized_name": "aphetto dredging",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 3,
+        "destination": "hand",
+        "effect": "recursion",
+        "target": "shared_creature_type",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "shared_subtype_group": "creature_type",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Aphetto Dredging"
+  ],
+  "selected_count": 1,
+  "slug": "xmage_aphetto_shared_type_recursion_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Aphetto Dredging",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+      "min_rule_version": 2,
+      "normalized_name": "aphetto dredging",
+      "oracle_hash": "2ef7ae9863a8d2eee1551030d7d5ea35",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

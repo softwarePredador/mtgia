@@ -153,21 +153,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg357_dies_recursion_keyword_fix_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg358_returned_pastcaller_recursion_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg358_returned_pastcaller_recursion_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg359_aphetto_shared_type_recursion_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg359_aphetto_shared_type_recursion_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27124`
-- XMage authoritative source resolved: `26810`
+- target all-card battle-gap identities: `27123`
+- XMage authoritative source resolved: `26809`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26810`
+- XMage authoritative adapter required: `26809`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26816` identities, card semantics are accepted from XMage; work is now
+- For `26809` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -186,9 +188,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG358 Exact Adapter Waves
+## PG283-PG359 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG358 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG359 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -4824,6 +4826,75 @@ PG358 measured result:
   should continue from the fresh post-PG358 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1854`.
 
+PG359 evidence:
+
+- PG359 Aphetto shared-type recursion package:
+  `docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_package.md`
+- PG359 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_apply_evidence.md`
+- PG359 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_pg_to_sqlite_sync.json`
+- PG359 PG card metadata -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_pg_metadata_sync.json`
+- PG359 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg359_xmage_aphetto_shared_type_recursion_wave_e2e_validation.md`
+- post-PG359 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg359_aphetto_shared_type_recursion_wave_docs_updated.md`
+- post-PG359 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg359_aphetto_shared_type_recursion_wave.md`
+- post-PG359 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg359_aphetto_shared_type_recursion_wave_docs_updated.md`
+- post-PG359 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg359_aphetto_shared_type_recursion_wave_docs_updated.md`
+- PG359 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg359_aphetto_shared_type_recursion_wave.md`
+- post-PG359 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg359_aphetto_shared_type_recursion_wave_commander_legal.md`
+- post-PG359 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg359_supported_recheck.md`
+- post-PG359 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg359_aphetto_shared_type_recursion_wave_recheck.md`
+
+PG359 measured result:
+
+- PG359 promoted `1` exact graveyard-to-hand recursion spell rule for
+  `Aphetto Dredging`.
+- The exact scope extends
+  `xmage_return_target_graveyard_card_to_hand_spell_v1` with
+  `shared_creature_type`, `count=3`, and `up_to_count=true`, matching the XMage
+  `ChoiceCreatureType` + `TargetCardInYourGraveyard(0, 3, ...)` source
+  signature.
+- Runtime now preserves exact-count shared-type behavior while allowing
+  partial groups for `up_to_count` shared creature type recursion.
+- Focused splitter/runtime/package suites report `387` passing unittest tests.
+- PostgreSQL precheck found `1/1` target card row, `0` expected rule rows before
+  apply, and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `1/1` promoted row, `1/1` verified/auto row,
+  `1/1` matching Oracle hash row, and `0` backup shadow rows.
+- PG -> Hermes/SQLite metadata sync matched `5949` PostgreSQL card rows and
+  refreshed `5876` SQLite cache alias rows. Battle-rules sync loaded `7368`
+  PostgreSQL rows, inserted/updated `7163` SQLite rows, and exported `4942`
+  canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG359 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG359:
+  `battle_and_oracle_ready=2501`, `battle_family_mapper_required=30046`, and
+  `snapshot_has_verified_rule=3649`.
+- Global all-card authoritative queue after PG359:
+  `target_identity_count=27123`, `xmage_authoritative_source_count=26809`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26809`.
+- Running the exact splitter after PG359 on supported units returns
+  `proposal_count=0` over `7880` considered supported rows. The next cycle
+  should continue from the fresh post-PG359 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1853`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -5463,10 +5534,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG358 queue, the next exact runtime-backed work should be selected from
+post-PG359 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1854`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1853`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`

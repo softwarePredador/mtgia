@@ -2888,6 +2888,33 @@
     "battle_rule_logical_key": "battle_rule_v1:004d74004b508bf2db079c98a0491aed",
     "battle_rule_oracle_hash": "e1f711cde6a3152bc4cdc84135ca7707"
   },
+  "Aphetto Dredging": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "shared_creature_type",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "shared_subtype_group": "creature_type",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dcfdbb64509d1e908873dbc2bc7376c6",
+    "battle_rule_oracle_hash": "2ef7ae9863a8d2eee1551030d7d5ea35"
+  },
   "Apocalypse": {
     "cmc": 5.0,
     "effect": "board_wipe",

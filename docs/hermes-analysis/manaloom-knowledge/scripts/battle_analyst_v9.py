@@ -35614,7 +35614,7 @@ def creature_subtype_tokens(card):
     ]
 
 
-def choose_shared_creature_type_cards(cards, count):
+def choose_shared_creature_type_cards(cards, count, *, require_full_count=True):
     groups = {}
     for card in cards:
         if not is_creature_card(card):
@@ -35625,7 +35625,9 @@ def choose_shared_creature_type_cards(cards, count):
     for group in groups.values():
         if len(group) > len(best_group):
             best_group = group
-    return best_group[:count] if len(best_group) >= count else []
+    if require_full_count and len(best_group) < count:
+        return []
+    return best_group[:count]
 
 
 def recursion_mana_value_max(effect_data, *keys):
@@ -49209,7 +49211,13 @@ def apply_effect_immediate(
                 "shared_creature_type",
                 "creature_share_type",
             ):
-                return choose_shared_creature_type_cards(participant.graveyard, count)
+                return choose_shared_creature_type_cards(
+                    participant.graveyard,
+                    count,
+                    require_full_count=not bool(
+                        component_data.get("up_to_count") or effect_data.get("up_to_count")
+                    ),
+                )
             component_mana_value_max = recursion_mana_value_max(component_data)
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
