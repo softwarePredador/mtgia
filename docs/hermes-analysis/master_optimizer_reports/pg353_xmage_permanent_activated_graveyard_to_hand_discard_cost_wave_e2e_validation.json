@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T04:59:12.191774+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_manifest.json",
+  "package_id": "pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Tortured Existence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05299740e91bdbe1ada273d07f09c035",
+          "oracle_hash": "6f6d8640e8e53168b50e7e8d709c05a8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Undertaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1aa5ea7c3bab32dc4ada45f1127c8022",
+          "oracle_hash": "ad9d898ad783bd2752c50eebbda36ed2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Tortured Existence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:05299740e91bdbe1ada273d07f09c035",
+          "oracle_hash": "6f6d8640e8e53168b50e7e8d709c05a8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Undertaker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1aa5ea7c3bab32dc4ada45f1127c8022",
+          "oracle_hash": "ad9d898ad783bd2752c50eebbda36ed2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tortured Existence",
+          "logical_rule_key": "battle_rule_v1:05299740e91bdbe1ada273d07f09c035"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Undertaker",
+          "logical_rule_key": "battle_rule_v1:1aa5ea7c3bab32dc4ada45f1127c8022"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Tortured Existence",
+          "component_keys": [],
+          "effect": "enchantment",
+          "logical_rule_key": "battle_rule_v1:05299740e91bdbe1ada273d07f09c035"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Undertaker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:1aa5ea7c3bab32dc4ada45f1127c8022"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

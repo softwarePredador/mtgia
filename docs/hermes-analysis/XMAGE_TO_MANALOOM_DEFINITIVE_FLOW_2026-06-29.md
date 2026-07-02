@@ -141,14 +141,16 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg351_graveyard_self_return_hand_discard_creature_sorcery_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27166`
-- XMage authoritative source resolved: `26852`
+- target all-card battle-gap identities: `27164`
+- XMage authoritative source resolved: `26850`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26852`
+- XMage authoritative adapter required: `26850`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
@@ -174,9 +176,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG352 Exact Adapter Waves
+## PG283-PG353 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG352 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG353 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -304,7 +306,8 @@ patterns:
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnFromGraveyardToHandTargetEffect + SimpleActivatedAbility` on
   permanents, exact Oracle activated graveyard-to-hand text, mana/tap/source
-  self-sacrifice costs only, no discard/exile/OrCost/CompositeCost, and
+  self-sacrifice costs only, exact `DiscardCardCost` or creature-card discard
+  cost only when source and Oracle agree, no exile/OrCost/CompositeCost, and
   supported graveyard targets including creature, artifact, enchantment,
   artifact creature, basic land, permanent, instant/sorcery, artifact or
   enchantment, and any card when source and Oracle agree ->
@@ -4400,6 +4403,73 @@ PG352 measured result:
   should continue from the fresh post-PG352 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1862`.
 
+PG353 evidence:
+
+- PG353 permanent activated graveyard-to-hand discard-cost package:
+  `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_package.md`
+- PG353 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_apply_evidence.md`
+- PG353 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_pg_to_sqlite_sync.json`
+- PG353 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_e2e_validation.md`
+- post-PG353 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_docs_final.md`
+- post-PG353 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_docs_final.md`
+- post-PG353 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_docs_final.md`
+- post-PG353 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_docs_final.md`
+- PG353 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave.md`
+- post-PG353 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.md`
+- post-PG353 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg353_supported_recheck.md`
+- post-PG353 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_recheck.md`
+
+PG353 measured result:
+
+- PG353 promoted `2` exact permanent activated graveyard-to-hand rules with
+  discard costs: `Tortured Existence` and `Undertaker`.
+- The splitter/runtime now support exact
+  `ReturnFromGraveyardToHandTargetEffect + SimpleActivatedAbility` permanents
+  where source and Oracle agree on `{B}` mana, optional tap, and a single
+  `DiscardCardCost` for any card or creature card.
+- Runtime pays the discard cost before resolving the graveyard-to-hand
+  activation, records discard replacement metadata, and skips activation when
+  no valid discard card exists.
+- Focused splitter/runtime suites report `230` and `140` tests passing,
+  respectively; package/E2E pytest checks report `6` passing tests.
+- PostgreSQL precheck found `2/2` target card rows, `0` existing expected rows,
+  and `2` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `2` upserted rows, `2` deprecated shadow
+  rows, `2/2` promoted rows, `2/2` verified/auto rows, and `2/2` matching
+  Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7327` PostgreSQL rows, inserted/updated
+  `7121` SQLite rows, and exported `4903` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG353 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG353:
+  `battle_and_oracle_ready=2460`, `battle_family_mapper_required=30087`, and
+  `snapshot_has_verified_rule=3608`.
+- Global all-card authoritative queue after PG353:
+  `target_identity_count=27164`, `xmage_authoritative_source_count=26850`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26850`.
+- Running the exact splitter after PG353 on supported units returns
+  `proposal_count=0` over `7921` considered supported rows. The next cycle
+  should continue from the fresh post-PG353 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1860`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -5039,10 +5109,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG352 queue, the next exact runtime-backed work should be selected from
+post-PG353 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1862`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1860`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

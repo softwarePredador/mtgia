@@ -5178,6 +5178,110 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_recursion_permanent_pays_discard_creature_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        target = {"name": "Returned Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.append(target)
+        keep_spell = {"name": "Valuable Spell", "type_line": "Sorcery", "cmc": 4}
+        discard_creature = {"name": "Spare Zombie", "type_line": "Creature - Zombie", "cmc": 1}
+        active.hand.extend([keep_spell, discard_creature])
+        permanent = {
+            "name": "Tortured Existence",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{B}",
+            "graveyard_to_hand_activation_cost_generic": 0,
+            "graveyard_to_hand_activation_cost_colors": ["B"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "graveyard_to_hand_activation_discard_count": 1,
+            "graveyard_to_hand_activation_discard_target": "creature_card",
+            "activation_discard_count": 1,
+            "activation_discard_target": "creature_card",
+            "_rule_logical_key": "battle_rule_v1:fixture_tortured_existence",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=12,
+            rng=random.Random(12),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertIn(permanent, active.battlefield)
+        self.assertEqual([card["name"] for card in active.hand], ["Valuable Spell", "Returned Bear"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Spare Zombie"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Tortured Existence"
+                and data.get("activation_kind") == "simple_activated_graveyard_to_hand"
+                and data.get("activation_cost") == "{B}"
+                and data.get("recovered") == ["Returned Bear"]
+                and data.get("discarded") == ["Spare Zombie"]
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "creature_card"
+                and data.get("mana_paid") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_recursion_permanent_does_not_pay_when_discard_creature_cost_unavailable(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 1)
+        target = {"name": "Returned Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.append(target)
+        only_spell = {"name": "Only Spell", "type_line": "Instant", "cmc": 1}
+        active.hand.append(only_spell)
+        permanent = {
+            "name": "Tortured Existence",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{B}",
+            "graveyard_to_hand_activation_cost_generic": 0,
+            "graveyard_to_hand_activation_cost_colors": ["B"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "graveyard_to_hand_activation_discard_count": 1,
+            "graveyard_to_hand_activation_discard_target": "creature_card",
+            "activation_discard_count": 1,
+            "activation_discard_target": "creature_card",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=13,
+            rng=random.Random(13),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(active.hand, [only_spell])
+        self.assertEqual(active.graveyard, [target])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
     def test_simple_activated_recursion_self_sacrifice_selects_target_before_sacrificing_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

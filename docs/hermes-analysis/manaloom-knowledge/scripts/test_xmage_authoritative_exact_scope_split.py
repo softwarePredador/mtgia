@@ -3319,7 +3319,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["land"], "supertypes": ["basic"]},
         )
 
-    def test_permanent_activated_recursion_blocks_discard_cost(self) -> None:
+    def test_permanent_activated_recursion_accepts_discard_creature_cost(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
@@ -3339,14 +3339,61 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                     new ReturnFromGraveyardToHandTargetEffect(),
                     new ManaCostsImpl<>("{B}")
                 );
-                ability.addCost(new DiscardCardCost());
+                ability.addCost(new DiscardCardCost(StaticFilters.FILTER_CARD_CREATURE_A));
                 ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
                 this.addAbility(ability);
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_recursion_source_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE)
+        self.assertEqual(effect["activation_cost_mana"], "{B}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "creature_card")
+        self.assertEqual(effect["graveyard_to_hand_activation_discard_count"], 1)
+        self.assertEqual(effect["graveyard_to_hand_activation_discard_target"], "creature_card")
+        self.assertEqual(effect["activation_additional_cost"], "discard_cards")
+        self.assertIn("permanent with a simple activated graveyard-to-hand ability", proposal["notes"])
+        self.assertNotIn("narrow instant/sorcery spell", proposal["notes"])
+
+    def test_permanent_activated_recursion_accepts_tap_discard_any_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Undertaker",
+                type_line="Creature - Human Spellshaper",
+                oracle_text="{B}, {T}, Discard a card: Return target creature card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToHandTargetEffect(),
+                    new ManaCostsImpl<>("{B}")
+                );
+                ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new DiscardCardCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_discard_target"], "any_card")
+        self.assertIn("permanent with a simple activated graveyard-to-hand ability", proposal["notes"])
+        self.assertNotIn("narrow instant/sorcery spell", proposal["notes"])
 
     def test_permanent_activated_recursion_blocks_or_cost(self) -> None:
         row = queue_row(
@@ -3374,7 +3421,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_recursion_source_cost_not_supported")
+        self.assertEqual(reason, "activated_recursion_oracle_cost_not_supported")
 
     def test_permanent_activated_recursion_blocks_multiple_distinct_targets(self) -> None:
         row = queue_row(

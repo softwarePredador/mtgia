@@ -26893,6 +26893,16 @@ def activate_graveyard_recycling_artifacts(
                     permanent.get("activation_requires_sacrifice", True),
                 )
             )
+            activation_discard_count = int(
+                permanent.get("graveyard_to_hand_activation_discard_count")
+                or permanent.get("activation_discard_count")
+                or 0
+            )
+            activation_discard_target = (
+                permanent.get("graveyard_to_hand_activation_discard_target")
+                or permanent.get("activation_discard_target")
+                or "any_card"
+            )
             simple_activated_scope = (
                 permanent.get("battle_model_scope") == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
                 or permanent.get("activated_battle_model_scope")
@@ -26917,6 +26927,20 @@ def activate_graveyard_recycling_artifacts(
             )
             targets = graveyard_to_hand_targets(player, permanent, all_players, turn)
             if targets:
+                discard_cards = _choose_graveyard_self_return_discard_cards(
+                    player,
+                    activation_discard_count,
+                    activation_discard_target,
+                )
+                if activation_discard_count and len(discard_cards) != activation_discard_count:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "missing_discard_cost_for_graveyard_to_hand_activation",
+                        phase=phase,
+                    )
+                    continue
                 if requires_tap and permanent.get("tapped"):
                     _utility_artifact_skip_event(
                         player,
@@ -26957,6 +26981,24 @@ def activate_graveyard_recycling_artifacts(
                         player.battlefield.remove(permanent)
                     player.graveyard.append(permanent)
                     player.record_permanent_sacrificed(permanent, turn)
+                discard_result = {
+                    "to_top": [],
+                    "to_graveyard": [],
+                    "used_replacement": False,
+                    "trigger_events": [],
+                }
+                if activation_discard_count:
+                    removed_from_hand = _remove_exact_cards_from_hand(player, discard_cards)
+                    if len(removed_from_hand) != activation_discard_count:
+                        continue
+                    discard_result = resolve_effect_discard_cards(
+                        player,
+                        removed_from_hand,
+                        opponents=opponents,
+                        turn=turn,
+                        phase=phase,
+                        rng=rng,
+                    )
                 recovered = []
                 returned_to_battlefield = []
                 for recovered_card in remove_cards_from_graveyard(
@@ -27034,6 +27076,8 @@ def activate_graveyard_recycling_artifacts(
                         "recovered_count": len(recovered),
                         "requires_tap": requires_tap,
                         "sacrificed_source": requires_sacrifice,
+                        "discard_count": activation_discard_count,
+                        "discard_target": activation_discard_target,
                     },
                     rule_source=(
                         "simple_activated_graveyard_to_battlefield_permanent_v1"
@@ -27060,7 +27104,12 @@ def activate_graveyard_recycling_artifacts(
                         "cards_to_hand": len(recovered) if destination != "battlefield" else 0,
                         "permanents_to_battlefield": len(returned_to_battlefield),
                         "permanents": -1 if requires_sacrifice else 0,
-                        "graveyard": -len(recovered) + (1 if requires_sacrifice else 0),
+                        "graveyard": (
+                            -len(recovered)
+                            + (1 if requires_sacrifice else 0)
+                            + len(discard_result.get("to_graveyard") or [])
+                        ),
+                        "cards_discarded": activation_discard_count,
                         "returned": [card.get("name", "?") for card in recovered],
                     },
                     risk_flags=[
@@ -27072,6 +27121,7 @@ def activate_graveyard_recycling_artifacts(
                             "sacrifice_source": requires_sacrifice and simple_activated_scope,
                             "graveyard_to_battlefield": destination == "battlefield",
                             "graveyard_to_hand": destination != "battlefield",
+                            "discard_cost": activation_discard_count > 0,
                         }.items()
                         if active
                     ],
@@ -27091,6 +27141,16 @@ def activate_graveyard_recycling_artifacts(
                     "recovered_count": len(recovered),
                     "returned_to_battlefield_count": len(returned_to_battlefield),
                     "mana_paid": mana_paid,
+                    "discarded": [card.get("name", "?") for card in discard_cards],
+                    "discarded_count": activation_discard_count,
+                    "discard_target": activation_discard_target,
+                    "discard_to_graveyard": [
+                        card.get("name", "?") for card in discard_result.get("to_graveyard") or []
+                    ],
+                    "discard_to_library_top": [
+                        card.get("name", "?") for card in discard_result.get("to_top") or []
+                    ],
+                    "discard_replacement_used": bool(discard_result.get("used_replacement")),
                     "tapped": bool(permanent.get("tapped")),
                     "sacrificed_self": requires_sacrifice,
                     "turn": turn,
@@ -27105,6 +27165,9 @@ def activate_graveyard_recycling_artifacts(
                     activation_kind=activation_kind,
                     activation_cost=activation_cost_text,
                     mana_paid=mana_paid,
+                    discarded=[card.get("name", "?") for card in discard_cards],
+                    discarded_count=activation_discard_count,
+                    discard_target=activation_discard_target,
                     recovered=[card.get("name", "?") for card in recovered],
                     returned_to_battlefield=[
                         card.get("name", "?") for card in returned_to_battlefield

@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG352
+thread goal remains active, but execution must use the current post-PG353
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -68,25 +68,27 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg351_graveyard_self_return_hand_discard_creature_sorcery_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG352 counts:
+Post-PG353 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2458`
-- all-card readiness `battle_family_mapper_required`: `30089`
-- all-card readiness `snapshot_has_verified_rule`: `3606`
-- target battle-gap identities in authoritative queue: `27166`
-- XMage authoritative source resolved: `26852`
+- all-card readiness `battle_and_oracle_ready`: `2460`
+- all-card readiness `battle_family_mapper_required`: `30087`
+- all-card readiness `snapshot_has_verified_rule`: `3608`
+- target battle-gap identities in authoritative queue: `27164`
+- XMage authoritative source resolved: `26850`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26852`
+- XMage authoritative adapter required: `26850`
 - adapter work-unit keys: `11429`
 
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG352 queue above.
+historical only. The active execution baseline is the post-PG353 queue above.
 
 Fresh alignment evidence:
 
@@ -96,9 +98,9 @@ Fresh alignment evidence:
   passed with `35/35` checks.
 
 The next executable work starts from
-`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.json`.
+`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.json`.
 The first priority is still
-`recursion::xmage_graveyard_return_variant_review_v1` with `1862` remaining
+`recursion::xmage_graveyard_return_variant_review_v1` with `1860` remaining
 identities, but that broad work unit must be split by exact XMage
 effect/ability/source signatures before any PostgreSQL promotion.
 
@@ -196,9 +198,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG352 authoritative queue unless a newer queue exists:
+Use the post-PG353 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1862`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1860`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -209,7 +211,7 @@ Use the post-PG352 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG352:
+Immediate checkpoint after PG353:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
@@ -274,6 +276,9 @@ Immediate checkpoint after PG352:
 17. PG352 promoted the exact target-player graveyard shuffle-to-library spell
     subpattern for `Dwell on the Past`, `Krosan Reclamation`,
     `Memory's Journey`, and `Stream of Consciousness`.
+18. PG353 promoted the exact permanent activated graveyard-to-hand subpattern
+    with discard costs for `Tortured Existence` and `Undertaker`, including
+    `{B}`, optional tap, and exact any-card or creature-card discard costs.
 18. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
@@ -359,37 +364,45 @@ Immediate checkpoint after PG352:
     `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_e2e_validation.md`.
-35. The post-PG344 supported splitter recheck returned `proposal_count=0` over
+35. PG353 is applied, synced, and E2E validated. The package evidence is in
+    `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_package.md`,
+    `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_apply_evidence.md`,
+    and
+    `docs/hermes-analysis/master_optimizer_reports/pg353_xmage_permanent_activated_graveyard_to_hand_discard_cost_wave_e2e_validation.md`.
+36. The post-PG344 supported splitter recheck returned `proposal_count=0` over
     `7952` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg344_supported_recheck.md`.
-36. The post-PG345 supported splitter recheck returned `proposal_count=0` over
+37. The post-PG345 supported splitter recheck returned `proposal_count=0` over
     `7945` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg345_supported_recheck.md`.
-37. The post-PG346 supported splitter recheck returned `proposal_count=0` over
+38. The post-PG346 supported splitter recheck returned `proposal_count=0` over
     `7942` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg346_supported_recheck.md`.
-38. The post-PG347 supported splitter recheck returned `proposal_count=0` over
+39. The post-PG347 supported splitter recheck returned `proposal_count=0` over
     `7937` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg347_supported_recheck.md`.
-39. The post-PG348 supported splitter recheck returned `proposal_count=0` over
+40. The post-PG348 supported splitter recheck returned `proposal_count=0` over
     `7935` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg348_supported_recheck.md`.
-40. The post-PG349 supported splitter recheck returned `proposal_count=0` over
+41. The post-PG349 supported splitter recheck returned `proposal_count=0` over
     `7932` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg349_supported_recheck.md`.
-41. The post-PG350 supported splitter recheck returned `proposal_count=0` over
+42. The post-PG350 supported splitter recheck returned `proposal_count=0` over
     `7929` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg350_supported_recheck.md`.
-42. The post-PG351 supported splitter recheck returned `proposal_count=0` over
+43. The post-PG351 supported splitter recheck returned `proposal_count=0` over
     `7927` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg351_supported_recheck.md`.
-43. The post-PG352 supported splitter recheck returned `proposal_count=0` over
+44. The post-PG352 supported splitter recheck returned `proposal_count=0` over
     `7923` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg352_supported_recheck.md`.
-44. Continue from the fresh post-PG352 queue. The top reusable work unit remains
-   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1862`, so
-   the next cycle should split another exact recursion subpattern unless a
-   fresher queue changes the ranking.
+45. The post-PG353 supported splitter recheck returned `proposal_count=0` over
+    `7921` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg353_supported_recheck.md`.
+46. Continue from the fresh post-PG353 queue. The top reusable work unit remains
+    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1860`, so
+    the next cycle should split another exact recursion subpattern unless a
+    fresher queue changes the ranking.
 
 ## Non-Goals
 
