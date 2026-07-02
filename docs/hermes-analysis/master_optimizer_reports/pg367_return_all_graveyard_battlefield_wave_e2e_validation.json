@@ -1,0 +1,96 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T09:30:41.175584+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_manifest.json",
+  "package_id": "pg367_return_all_graveyard_battlefield_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1",
+          "card_name": "Raise the Past",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a807ac700fa558d6a33e9ab1881f728e",
+          "oracle_hash": "fe4a3a4d7bb1c50d8a53eeae71d62860",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 1
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1",
+          "card_name": "Raise the Past",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a807ac700fa558d6a33e9ab1881f728e",
+          "oracle_hash": "fe4a3a4d7bb1c50d8a53eeae71d62860",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raise the Past",
+          "logical_rule_key": "battle_rule_v1:a807ac700fa558d6a33e9ab1881f728e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 1
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Raise the Past",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:a807ac700fa558d6a33e9ab1881f728e"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

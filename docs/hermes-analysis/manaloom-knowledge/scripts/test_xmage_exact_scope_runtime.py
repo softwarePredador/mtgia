@@ -5117,6 +5117,63 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_return_all_matching_graveyard_cards_to_battlefield_respects_filters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Legal Bear", "type_line": "Creature - Bear", "cmc": 2, "power": 2, "toughness": 2},
+                {"name": "Too Large Giant", "type_line": "Creature - Giant", "cmc": 4, "power": 4, "toughness": 4},
+                {"name": "Legal Elf", "type_line": "Creature - Elf", "cmc": 1, "power": 1, "toughness": 1},
+                {"name": "Wrong Aura", "type_line": "Enchantment - Aura", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1",
+            "target": "creature",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max": 2,
+            },
+            "return_all_matching": True,
+            "recursion_mana_value_max": 2,
+            "destination": "battlefield",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Raise the Past",
+                "type_line": "Sorcery",
+                "oracle_text": "Return all creature cards with mana value 2 or less from your graveyard to the battlefield.",
+            },
+            turn=8,
+            rng=random.Random(208),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Legal Bear", "Legal Elf"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Too Large Giant", "Wrong Aura", "Raise the Past"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Raise the Past"
+                and data.get("recovered") == ["Legal Bear", "Legal Elf"]
+                and data.get("return_all_matching") is True
+                and data.get("mana_value_max") == 2
+                and data.get("destination") == "battlefield"
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_battlefield_recursion_uses_x_mana_value_limit(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -110,6 +110,7 @@ BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+RECURSION_BATTLEFIELD_ALL_SCOPE = "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1"
 RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
 )
@@ -879,6 +880,8 @@ def recursion_target_constraints_for(
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature":
         constraints["card_types"] = ["artifact", "creature"]
+    elif target == "artifact_or_enchantment_or_planeswalker":
+        constraints["card_types"] = ["artifact", "enchantment", "planeswalker"]
     elif target == "creature_or_land":
         constraints["card_types"] = ["creature", "land"]
     elif target == "creature_or_enchantment":
@@ -1647,6 +1650,119 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
                 result[flag] = True
         return result
     return None
+
+
+def recursion_all_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text(metadata)
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (
+            r"^return all enchantment cards from your graveyard to the battlefield(?P<tapped> tapped)?\.?$",
+            {"target": "enchantment"},
+        ),
+        (
+            r"^return all creature cards with mana value (?P<mana_value_max>\d+) or less from your graveyard to the battlefield(?P<tapped> tapped)?\.?$",
+            {"target": "creature"},
+        ),
+        (
+            r"^return all artifact and enchantment cards from your graveyard to the battlefield(?P<tapped> tapped)?\.?$",
+            {"target": "artifact_or_enchantment"},
+        ),
+        (
+            r"^return all artifact, enchantment, and planeswalker cards from your graveyard to the battlefield(?P<tapped> tapped)?\.?$",
+            {"target": "artifact_or_enchantment_or_planeswalker"},
+        ),
+    ]
+    for pattern, spec in patterns:
+        match = re.match(pattern, text)
+        if not match:
+            continue
+        result = {
+            "target": spec["target"],
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "return_all_matching": True,
+            "enters_tapped": bool(match.groupdict().get("tapped")),
+        }
+        if match.groupdict().get("mana_value_max"):
+            result["mana_value_max"] = int(match.group("mana_value_max"))
+        return result
+    if re.match(
+        r"^return each artifact and creature card with mana value x from your graveyard to the battlefield\.?$",
+        text,
+    ):
+        return {
+            "target": "artifact_or_creature",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "return_all_matching": True,
+            "mana_value_exact_from_x": True,
+        }
+    return None
+
+
+def recursion_all_to_battlefield_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    constructors = re.findall(r"new\s+ReturnFromYourGraveyardToBattlefieldAllEffect\s*\(", text)
+    if len(constructors) != 1:
+        return "recursion_battlefield_all_source_not_single_effect"
+    if has_additional_cost(text):
+        return "recursion_battlefield_all_source_additional_cost_not_supported"
+    if "PayVariableLifeCost" in text:
+        return "recursion_battlefield_all_source_variable_life_cost_not_supported"
+    enters_tapped = bool(
+        re.search(r"ReturnFromYourGraveyardToBattlefieldAllEffect\s*\([^;]*,\s*true\s*\)", text, re.S)
+    )
+    target: str | None = None
+    mana_value_max: int | None = None
+    mana_value_exact_from_x = False
+    lowered = text.lower()
+    if (
+        "FILTER_CARD_ENCHANTMENTS" in text
+        or "FILTER_CARD_ENCHANTMENT" in text
+        or "FilterEnchantmentCard" in text
+        or "enchantment cards" in lowered
+    ):
+        target = "enchantment"
+    if "FilterCreatureCard" in text or "FILTER_CARD_CREATURE" in text or "creature cards" in lowered:
+        if target is not None:
+            return "recursion_battlefield_all_source_target_not_supported"
+        target = "creature"
+    if "FilterArtifactOrEnchantmentCard" in text or "artifact and enchantment cards" in lowered:
+        target = "artifact_or_enchantment"
+    if (
+        "CardType.ARTIFACT.getPredicate" in text
+        and "CardType.ENCHANTMENT.getPredicate" in text
+        and "CardType.PLANESWALKER.getPredicate" in text
+    ):
+        target = "artifact_or_enchantment_or_planeswalker"
+    if (
+        "CardType.ARTIFACT.getPredicate" in text
+        and "CardType.CREATURE.getPredicate" in text
+        and "GetXValue.instance" in text
+        and "getManaValue() ==" in text
+    ):
+        target = "artifact_or_creature"
+        mana_value_exact_from_x = True
+    mana_value_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if mana_value_match:
+        mana_value_max = int(mana_value_match.group(1)) - 1
+    if target is None:
+        return "recursion_battlefield_all_source_target_not_supported"
+    result = {
+        "target": target,
+        "target_graveyard_controller": "self",
+        "battlefield_controller": "self",
+        "return_all_matching": True,
+        "enters_tapped": enters_tapped,
+    }
+    if mana_value_max is not None:
+        result["mana_value_max"] = mana_value_max
+    if mana_value_exact_from_x:
+        result["mana_value_exact_from_x"] = True
+    return result
 
 
 def recursion_to_battlefield_with_counter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -6154,6 +6270,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated draw ability"
     elif scope == SPELL_CAST_DRAW_ENGINE_SCOPE:
         scope_kind = "permanent with a triggered draw ability on casting matching spells"
+    elif scope == RECURSION_BATTLEFIELD_ALL_SCOPE:
+        scope_kind = "return-all matching graveyard cards to battlefield spell"
     elif scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
         scope_kind = "permanent with a simple activated fixed life-gain ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE:
@@ -8727,6 +8845,57 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_battlefield_with_counter_spell",
+            ), "selected_exact_scope"
+        if classes == {"ReturnFromYourGraveyardToBattlefieldAllEffect"}:
+            if ability_classes(row):
+                return None, "recursion_battlefield_all_ability_class_not_simple"
+            oracle_target = recursion_all_to_battlefield_from_oracle(metadata)
+            if oracle_target is None:
+                return None, "recursion_battlefield_all_oracle_not_supported"
+            if oracle_target.get("mana_value_exact_from_x"):
+                return None, "recursion_battlefield_all_exact_x_mana_value_not_supported"
+            source_target = recursion_all_to_battlefield_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            if source_target.get("mana_value_exact_from_x"):
+                return None, "recursion_battlefield_all_exact_x_mana_value_not_supported"
+            for key in (
+                "target",
+                "target_graveyard_controller",
+                "battlefield_controller",
+                "mana_value_max",
+                "enters_tapped",
+            ):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"recursion_battlefield_all_source_oracle_{key}_mismatch"
+            target_type = str(oracle_target["target"])
+            mana_value_max = oracle_target.get("mana_value_max")
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_BATTLEFIELD_ALL_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    controller="self",
+                    mana_value_max=mana_value_max,
+                ),
+                "return_all_matching": True,
+                "destination": "battlefield",
+                "target_controller": "self",
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+                "xmage_effect_class": "ReturnFromYourGraveyardToBattlefieldAllEffect",
+                **flags,
+            }
+            if mana_value_max is not None:
+                effect_json["recursion_mana_value_max"] = mana_value_max
+            if oracle_target.get("enters_tapped"):
+                effect_json["enters_tapped"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_return_all_graveyard_cards_to_battlefield_spell",
             ), "selected_exact_scope"
         if classes == {"MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"}:
             if ability_classes(row):

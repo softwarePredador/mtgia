@@ -169,21 +169,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg365_battlefield_recursion_constraints_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg366_activated_draw_costs_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg366_activated_draw_costs_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg367_return_all_graveyard_battlefield_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg367_return_all_graveyard_battlefield_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27092`
-- XMage authoritative source resolved: `26778`
+- target all-card battle-gap identities: `27091`
+- XMage authoritative source resolved: `26777`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26778`
+- XMage authoritative adapter required: `26777`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26778` identities, card semantics are accepted from XMage; work is now
+- For `26777` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -202,9 +204,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG366 Exact Adapter Waves
+## PG283-PG367 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG366 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG367 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -5374,6 +5376,22 @@ PG366 evidence:
   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg366_supported_recheck.md`
 - post-PG366 all-card readiness:
   `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg366_activated_draw_costs_wave_recheck.md`
+- PG367 return-all graveyard battlefield package:
+  `docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_package.md`
+- PG367 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_apply_evidence.md`
+- PG367 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_pg_to_sqlite_sync.json`
+- PG367 PG card metadata -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_pg_metadata_sync.json`
+- PG367 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg367_return_all_graveyard_battlefield_wave_e2e_validation.md`
+- post-PG367 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg367_return_all_graveyard_battlefield_wave_commander_legal.md`
+- post-PG367 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg367_supported_recheck.md`
+- post-PG367 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg367_return_all_graveyard_battlefield_wave_recheck.md`
 
 PG366 measured result:
 
@@ -5415,6 +5433,49 @@ PG366 measured result:
   `proposal_count=0` over `7849` considered supported rows. The next cycle
   should continue from the fresh post-PG366 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1834`.
+
+PG367 measured result:
+
+- PG367 promoted `1` exact return-all graveyard-to-battlefield spell rule for
+  `Raise the Past`.
+- The splitter now supports the exact
+  `ReturnFromYourGraveyardToBattlefieldAllEffect` one-shot spell subpattern
+  only when XMage source and Oracle agree on self graveyard, battlefield under
+  self, fixed target filter, optional tapped entry, and optional fixed mana
+  value ceiling.
+- Runtime support reuses the existing `recursion` executor with
+  `return_all_matching=true`, destination `battlefield`, target filters, and
+  focused replay evidence.
+- Focused splitter/runtime tests cover return-all enchantment parsing,
+  return-all creature mana-value ceilings, exact-X blocking, and battlefield
+  resolution for all matching cards.
+- PostgreSQL precheck found `1/1` target card row, `0` existing expected rows,
+  and `0` nonmatching shadow rows.
+- PostgreSQL apply upserted `1` row and deprecated `0` shadow rows.
+- PostgreSQL postcheck verified `1/1` promoted rows, `1/1` verified/auto rows,
+  and `1/1` matching Oracle hashes.
+- PG -> Hermes/SQLite sync loaded `7400` PG rows, updated `7195` SQLite rows,
+  and exported `4973` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `Raise the Past`.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning.
+- `Replenish` remains blocked because current Oracle text includes Aura
+  attachment behavior that the simple return-all battlefield runtime does not
+  model. `Fix What's Broken` remains blocked by additional cost plus exact
+  `mana value X` matching, which is not equivalent to X-or-less support.
+- Global all-card readiness after PG367:
+  `battle_and_oracle_ready=2533`, `battle_family_mapper_required=30014`, and
+  `snapshot_has_verified_rule=3681`.
+- Global all-card authoritative queue after PG367:
+  `target_identity_count=27091`, `xmage_authoritative_source_count=26777`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26777`.
+- Running the exact splitter after PG367 on supported units returns
+  `proposal_count=0` over `7848` considered supported rows. The next cycle
+  should continue from the fresh post-PG367 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1833`.
 
 ## Why This Is The Best Current Flow
 
@@ -6055,10 +6116,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG366 queue, the next exact runtime-backed work should be selected from
+post-PG367 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1834`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1833`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`

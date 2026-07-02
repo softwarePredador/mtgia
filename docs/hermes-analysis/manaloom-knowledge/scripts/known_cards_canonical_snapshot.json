@@ -56935,6 +56935,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b0ccc811be3022e88f1338ff5dbeb676"
   },
+  "Raise the Past": {
+    "battle_model_scope": "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "recursion_mana_value_max": 2,
+    "return_all_matching": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "mana_value_max": 2,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_class": "ReturnFromYourGraveyardToBattlefieldAllEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a807ac700fa558d6a33e9ab1881f728e",
+    "battle_rule_oracle_hash": "fe4a3a4d7bb1c50d8a53eeae71d62860"
+  },
   "Rakdos Carnarium": {
     "effect": "land",
     "battle_rule_source": "curated",

@@ -43,6 +43,103 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_return_all_graveyard_enchantments_to_battlefield_spell_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Replenish",
+                type_line="Sorcery",
+                oracle_text="Return all enchantment cards from your graveyard to the battlefield.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromYourGraveyardToBattlefieldAllEffect(
+                    StaticFilters.FILTER_CARD_ENCHANTMENTS));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_ALL_SCOPE)
+        self.assertEqual(effect["target"], "enchantment")
+        self.assertTrue(effect["return_all_matching"])
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertEqual(effect["target_graveyard_controller"], "self")
+        self.assertEqual(effect["battlefield_controller"], "self")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["enchantment"]},
+        )
+
+    def test_return_all_graveyard_creatures_with_mana_value_limit_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Raise the Past",
+                type_line="Sorcery",
+                oracle_text="Return all creature cards with mana value 2 or less from your graveyard to the battlefield.",
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard(
+                    "creature cards with mana value 2 or less");
+                static { filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 3)); }
+                this.getSpellAbility().addEffect(new ReturnFromYourGraveyardToBattlefieldAllEffect(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_ALL_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["return_all_matching"])
+        self.assertEqual(effect["recursion_mana_value_max"], 2)
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["creature"],
+                "mana_value_max": 2,
+            },
+        )
+
+    def test_return_all_graveyard_exact_x_mana_value_is_blocked(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromYourGraveyardToBattlefieldAllEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Exact X",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return each artifact and creature card with mana value X "
+                    "from your graveyard to the battlefield."
+                ),
+            ),
+            source_text="""
+                filter.add(Predicates.or(CardType.ARTIFACT.getPredicate(), CardType.CREATURE.getPredicate()));
+                enum FixturePredicate implements ObjectSourcePlayerPredicate<Card> {
+                    instance;
+                    public boolean apply(ObjectSourcePlayer<Card> input, Game game) {
+                        return input.getObject().getManaValue() == GetXValue.instance.calculate(game, input.getSource(), null);
+                    }
+                }
+                this.getSpellAbility().addEffect(new ReturnFromYourGraveyardToBattlefieldAllEffect(filter));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_battlefield_all_exact_x_mana_value_not_supported")
+
     def test_recursion_battlefield_total_mana_value_limit_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
