@@ -5643,6 +5643,121 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_graveyard_to_owner_library_can_target_opponent_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Active Top", "type_line": "Land", "cmc": 0}])
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [{"name": "Opponent Top", "type_line": "Creature - Human", "cmc": 1}],
+        )
+        active.mana_pool.add_generic(2)
+        target = {"name": "Opponent Flashback Spell", "type_line": "Sorcery", "cmc": 4}
+        opponent.graveyard.append(target)
+        permanent = {
+            "name": "Cogwork Archivist",
+            "type_line": "Artifact Creature - Construct",
+            "effect": "creature",
+            "reach": True,
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "any_card",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_bottom",
+            "target_controller": "any",
+            "target_graveyard_controller": "any",
+            "library_controller": "owner",
+            "graveyard_to_library_activation_cost_mana": "{2}",
+            "graveyard_to_library_activation_cost_generic": 2,
+            "graveyard_to_library_activation_cost_colors": [],
+            "graveyard_to_library_activation_requires_tap": True,
+            "graveyard_to_library_activation_requires_sacrifice": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_cogwork_archivist",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=21,
+            rng=random.Random(21),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in opponent.library], ["Opponent Top", "Opponent Flashback Spell"])
+        self.assertEqual([card["name"] for card in active.library], ["Active Top"])
+        self.assertTrue(permanent["tapped"])
+        self.assertTrue(
+            any(
+                event == "graveyard_to_library_activated"
+                and data.get("card") == "Cogwork Archivist"
+                and data.get("destination") == "library_bottom"
+                and data.get("target_graveyard_controller") == "any"
+                and data.get("library_controller") == "owner"
+                and data.get("target_owners") == ["Opponent"]
+                and data.get("library_owners") == ["Opponent"]
+                and data.get("moved") == ["Opponent Flashback Spell"]
+                and data.get("mana_paid") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_graveyard_to_owner_library_supports_zero_mana_tap_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Opponent Escape Card", "type_line": "Instant", "cmc": 3}
+        opponent.graveyard.append(target)
+        permanent = {
+            "name": "Junktroller",
+            "type_line": "Artifact Creature - Golem",
+            "effect": "creature",
+            "defender": True,
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "activated_effect": "graveyard_to_library",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+            "graveyard_to_library_target": "any_card",
+            "graveyard_to_library_target_count": 1,
+            "graveyard_to_library_destination": "library_bottom",
+            "target_controller": "any",
+            "target_graveyard_controller": "any",
+            "library_controller": "owner",
+            "graveyard_to_library_activation_cost_mana": "{0}",
+            "graveyard_to_library_activation_cost_generic": 0,
+            "graveyard_to_library_activation_cost_colors": [],
+            "graveyard_to_library_activation_requires_tap": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_junktroller",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=22,
+            rng=random.Random(22),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in opponent.library], ["Opponent Escape Card"])
+        self.assertTrue(permanent["tapped"])
+        self.assertTrue(
+            any(
+                event == "graveyard_to_library_activated"
+                and data.get("card") == "Junktroller"
+                and data.get("activation_cost") == "{0}"
+                and data.get("target_owners") == ["Opponent"]
+                and data.get("library_owners") == ["Opponent"]
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_graveyard_to_library_top_filters_creature(self) -> None:
         active = self.battle.Player(
             "Active",

@@ -1,0 +1,413 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg347_xmage_activated_graveyard_to_owner_library_wave_20",
+  "deploy_id": "PG347",
+  "expected_rules": [
+    {
+      "card_name": "Cogwork Archivist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "cogwork archivist",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jade-Cast Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "jade-cast sentinel",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Junktroller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a392db3a674e479dd61e8eba7379f64",
+      "min_rule_version": 2,
+      "normalized_name": "junktroller",
+      "oracle_hash": "30284983e5a4c2290724f68e2e91d7f1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 0,
+        "graveyard_to_library_activation_cost_mana": "{0}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "defender"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Archivist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian archivist",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reito Lantern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c3a746488b6593a3a50eee55ff2ecf06",
+      "min_rule_version": 2,
+      "normalized_name": "reito lantern",
+      "oracle_hash": "7d614dc5f48178acc94c07a17161be68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "artifact",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 3,
+        "graveyard_to_library_activation_cost_mana": "{3}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_graveyard_to_library": 5
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg347_xmage_activated_graveyard_to_owner_library_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T02:58:54+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Cogwork Archivist"
+      },
+      "card_name": "Cogwork Archivist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "normalized_name": "cogwork archivist",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      }
+    },
+    {
+      "card": {
+        "name": "Jade-Cast Sentinel"
+      },
+      "card_name": "Jade-Cast Sentinel",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "normalized_name": "jade-cast sentinel",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      }
+    },
+    {
+      "card": {
+        "name": "Junktroller"
+      },
+      "card_name": "Junktroller",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a392db3a674e479dd61e8eba7379f64",
+      "normalized_name": "junktroller",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 0,
+        "graveyard_to_library_activation_cost_mana": "{0}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "defender"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      }
+    },
+    {
+      "card": {
+        "name": "Phyrexian Archivist"
+      },
+      "card_name": "Phyrexian Archivist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "normalized_name": "phyrexian archivist",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "creature",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 2,
+        "graveyard_to_library_activation_cost_mana": "{2}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "keywords": [
+          "reach"
+        ],
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      }
+    },
+    {
+      "card": {
+        "name": "Reito Lantern"
+      },
+      "card_name": "Reito Lantern",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c3a746488b6593a3a50eee55ff2ecf06",
+      "normalized_name": "reito lantern",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1",
+        "effect": "artifact",
+        "graveyard_to_library_activation_cost_colors": [],
+        "graveyard_to_library_activation_cost_generic": 3,
+        "graveyard_to_library_activation_cost_mana": "{3}",
+        "graveyard_to_library_destination": "library_bottom",
+        "graveyard_to_library_target": "any_card",
+        "graveyard_to_library_target_count": 1,
+        "library_controller": "owner",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Cogwork Archivist",
+    "Jade-Cast Sentinel",
+    "Junktroller",
+    "Phyrexian Archivist",
+    "Reito Lantern"
+  ],
+  "selected_count": 5,
+  "slug": "xmage_activated_graveyard_to_owner_library_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Cogwork Archivist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "cogwork archivist",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jade-Cast Sentinel",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "jade-cast sentinel",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Junktroller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a392db3a674e479dd61e8eba7379f64",
+      "min_rule_version": 2,
+      "normalized_name": "junktroller",
+      "oracle_hash": "30284983e5a4c2290724f68e2e91d7f1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Phyrexian Archivist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d05003e38a6b3d274e08dc5154cac346",
+      "min_rule_version": 2,
+      "normalized_name": "phyrexian archivist",
+      "oracle_hash": "1482657c89ba046a75f2ed25baaa3ccb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Reito Lantern",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c3a746488b6593a3a50eee55ff2ecf06",
+      "min_rule_version": 2,
+      "normalized_name": "reito lantern",
+      "oracle_hash": "7d614dc5f48178acc94c07a17161be68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_library_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

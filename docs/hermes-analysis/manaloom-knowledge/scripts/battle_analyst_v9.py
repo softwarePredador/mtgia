@@ -25726,6 +25726,60 @@ def graveyard_to_library_target_cards(player, permanent, effect_data, all_player
     return candidates[:target_count], candidates
 
 
+def graveyard_to_library_candidate_score(card, owner, player, all_players, turn):
+    if owner is player:
+        return graveyard_recycle_candidate_score(card, player, all_players, turn)
+    return graveyard_exile_candidate_score(card, owner, player, all_players, turn)
+
+
+def graveyard_to_library_target_pairs(player, permanent, effect_data, all_players, turn):
+    target_count = max(
+        1,
+        int(
+            effect_data.get("graveyard_to_library_target_count")
+            or effect_data.get("count")
+            or permanent.get("graveyard_to_library_target_count")
+            or 1
+        ),
+    )
+    target_type = (
+        effect_data.get("graveyard_to_library_target")
+        or effect_data.get("target")
+        or permanent.get("graveyard_to_library_target")
+        or "any_card"
+    )
+    target_controller = str(
+        effect_data.get("target_graveyard_controller")
+        or effect_data.get("target_controller")
+        or permanent.get("target_graveyard_controller")
+        or permanent.get("target_controller")
+        or "self"
+    )
+    if target_controller == "self":
+        candidate_players = [player]
+    elif target_controller in {"opponent", "opponents"}:
+        candidate_players = [p for p in all_players or [] if p is not player and p.is_alive()]
+    else:
+        candidate_players = [p for p in all_players or [player] if p.is_alive()]
+
+    all_options = []
+    for owner in candidate_players:
+        for grave_card in list(getattr(owner, "graveyard", []) or []):
+            if not graveyard_card_matches_recursion_target(grave_card, target_type):
+                continue
+            score = graveyard_to_library_candidate_score(grave_card, owner, player, all_players, turn)
+            all_options.append((score, owner, grave_card))
+    all_options.sort(
+        key=lambda item: (
+            item[0],
+            1 if item[1] is not player else 0,
+            str(item[2].get("name") or ""),
+        ),
+        reverse=True,
+    )
+    return [(owner, card) for _score, owner, card in all_options[:target_count]], all_options
+
+
 def graveyard_exile_candidate_score(card, owner, player, all_players, turn):
     if not isinstance(card, dict):
         return -1000
@@ -26082,14 +26136,14 @@ def activate_graveyard_to_library_permanents(
             continue
         if not player.can_pay(activation_cost_text):
             continue
-        targets, all_options = graveyard_to_library_target_cards(
+        target_pairs, all_options = graveyard_to_library_target_pairs(
             player,
             permanent,
             effect_data,
             all_players,
             turn,
         )
-        if not targets:
+        if not target_pairs:
             continue
         if not player.spend_mana(activation_cost_text):
             continue
@@ -26102,27 +26156,52 @@ def activate_graveyard_to_library_permanents(
             player.graveyard.append(permanent)
             player.record_permanent_sacrificed(permanent, turn)
 
-        moved = remove_cards_from_graveyard(
-            player,
-            targets,
-            turn=turn,
-            source_event="activated_graveyard_to_library",
+        moved = []
+        moved_pairs = []
+        target_owner_names = []
+        library_owner_names = []
+        by_owner = defaultdict(list)
+        for owner, target in target_pairs:
+            by_owner[owner].append(target)
+        library_controller = str(
+            effect_data.get("library_controller")
+            or permanent.get("library_controller")
+            or "self"
         )
-        if not moved:
-            continue
         destination = str(
             effect_data.get("graveyard_to_library_destination")
             or effect_data.get("destination")
             or "library_top"
         )
-        if destination == "library_bottom":
-            player.library.extend(moved)
-        else:
-            destination = "library_top"
-            for moved_card in reversed(moved):
-                player.library.insert(0, moved_card)
+        for owner, targets in by_owner.items():
+            removed = remove_cards_from_graveyard(
+                owner,
+                targets,
+                turn=turn,
+                source_event="activated_graveyard_to_library",
+            )
+            for moved_card in removed:
+                library_owner = owner if library_controller == "owner" else player
+                if destination == "library_bottom":
+                    library_owner.library.append(moved_card)
+                else:
+                    destination = "library_top"
+                    library_owner.library.insert(0, moved_card)
+                moved.append(moved_card)
+                moved_pairs.append((owner, library_owner, moved_card))
+                target_owner_names.append(owner.name)
+                library_owner_names.append(library_owner.name)
+        if not moved:
+            continue
 
         target_type = effect_data.get("graveyard_to_library_target") or effect_data.get("target") or "any_card"
+        target_graveyard_controller = str(
+            effect_data.get("target_graveyard_controller")
+            or effect_data.get("target_controller")
+            or permanent.get("target_graveyard_controller")
+            or permanent.get("target_controller")
+            or "self"
+        )
         fields = replay_rule_fields(effect_data)
         mana_paid = activation_cost_generic + len(activation_cost_colors)
         emit_decision_trace(
@@ -26134,18 +26213,28 @@ def activate_graveyard_to_library_permanents(
                 decision_card_option(
                     card,
                     get_card_effect(card),
-                    score=graveyard_recycle_candidate_score(card, player, all_players, turn),
+                    score=score,
                     action="move_graveyard_card_to_library",
+                    target_owner=owner.name,
+                    library_owner=(owner.name if library_controller == "owner" else player.name),
                     target_type=target_type,
                     destination=destination,
                 )
-                for card in all_options[:8]
+                for score, owner, card in all_options[:8]
             ],
             chosen_option=decision_card_option(
                 moved[0],
                 get_card_effect(moved[0]),
-                score=graveyard_recycle_candidate_score(moved[0], player, all_players, turn),
+                score=graveyard_to_library_candidate_score(
+                    moved[0],
+                    moved_pairs[0][0] if moved_pairs else player,
+                    player,
+                    all_players,
+                    turn,
+                ),
                 action="activate_graveyard_to_library",
+                target_owner=target_owner_names[0] if target_owner_names else None,
+                library_owner=library_owner_names[0] if library_owner_names else None,
                 target_type=target_type,
                 destination=destination,
             ),
@@ -26155,6 +26244,8 @@ def activate_graveyard_to_library_permanents(
                 "activation_cost_generic": activation_cost_generic,
                 "activation_cost_colors": activation_cost_colors,
                 "target_type": target_type,
+                "target_graveyard_controller": target_graveyard_controller,
+                "library_controller": library_controller,
                 "destination": destination,
                 "moved_count": len(moved),
                 "requires_tap": requires_tap,
@@ -26193,10 +26284,14 @@ def activate_graveyard_to_library_permanents(
             "activation_kind": "simple_activated_graveyard_to_library",
             "activation_cost": activation_cost_text,
             "target_type": target_type,
+            "target_graveyard_controller": target_graveyard_controller,
+            "library_controller": library_controller,
             "destination": destination,
             "recovered": [card.get("name", "?") for card in moved],
             "moved": [card.get("name", "?") for card in moved],
             "moved_count": len(moved),
+            "target_owners": target_owner_names,
+            "library_owners": library_owner_names,
             "mana_paid": mana_paid,
             "tapped": bool(permanent.get("tapped")),
             "sacrificed_self": requires_sacrifice,
@@ -26215,6 +26310,8 @@ def activate_graveyard_to_library_permanents(
             activation_cost=activation_cost_text,
             mana_paid=mana_paid,
             moved_count=len(moved),
+            target_owners=target_owner_names,
+            library_owners=library_owner_names,
             destination=destination,
             turn=turn,
             phase=phase,

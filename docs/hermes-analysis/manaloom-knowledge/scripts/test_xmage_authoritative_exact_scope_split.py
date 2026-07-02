@@ -2981,32 +2981,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
         )
 
-    def test_permanent_activated_graveyard_to_library_blocks_any_graveyard_owner_library(self) -> None:
+    def test_permanent_activated_graveyard_to_library_maps_any_graveyard_owner_library(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["PutOnLibraryTargetEffect"],
             ability_kind="activated",
-            ability_classes=["SimpleActivatedAbility"],
+            ability_classes=["ReachAbility", "SimpleActivatedAbility"],
             xmage_signals=["targeting", "activated_ability"],
         )
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Reito Lantern",
-                type_line="Artifact",
-                oracle_text="{3}: Put target card from a graveyard on the bottom of its owner's library.",
+                name="Cogwork Archivist",
+                type_line="Artifact Creature - Construct",
+                oracle_text="{2}, {T}: Put target card from a graveyard on the bottom of its owner's library.",
             ),
             source_text="""
+                this.addAbility(ReachAbility.getInstance());
                 Ability ability = new SimpleActivatedAbility(
                     new PutOnLibraryTargetEffect(false),
-                    new GenericManaCost(3));
+                    new GenericManaCost(2));
+                ability.addCost(new TapSourceCost());
                 ability.addTarget(new TargetCardInGraveyard());
                 this.addAbility(ability);
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_graveyard_to_library_oracle_not_simple")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE)
+        self.assertEqual(effect["graveyard_to_library_target"], "any_card")
+        self.assertEqual(effect["graveyard_to_library_target_count"], 1)
+        self.assertEqual(effect["graveyard_to_library_destination"], "library_bottom")
+        self.assertEqual(effect["target_graveyard_controller"], "any")
+        self.assertEqual(effect["library_controller"], "owner")
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["target_constraints"], {"zone": "graveyard", "controller": "any", "scope": "any_card"})
+        self.assertEqual(effect["activation_cost_mana"], "{2}")
+        self.assertEqual(effect["activation_cost_generic"], 2)
+        self.assertEqual(effect["activation_cost_colors"], [])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertEqual(effect["keywords"], ["reach"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["reach"])
+        activated = effect["_activated_rule_effects"][0]
+        self.assertEqual(activated["target_graveyard_controller"], "any")
+        self.assertEqual(activated["library_controller"], "owner")
+
+    def test_permanent_activated_graveyard_to_library_maps_tap_cost_constructor(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["DefenderAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Junktroller",
+                type_line="Artifact Creature - Golem",
+                oracle_text="{T}: Put target card from a graveyard on the bottom of its owner's library.",
+            ),
+            source_text="""
+                this.addAbility(DefenderAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    new PutOnLibraryTargetEffect(false), new TapSourceCost());
+                ability.addTarget(new TargetCardInGraveyard());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["graveyard_to_library_activation_cost_mana"], "{0}")
+        self.assertEqual(effect["graveyard_to_library_activation_cost_generic"], 0)
+        self.assertEqual(effect["graveyard_to_library_activation_cost_colors"], [])
+        self.assertTrue(effect["graveyard_to_library_activation_requires_tap"])
+        self.assertEqual(effect["target_graveyard_controller"], "any")
+        self.assertEqual(effect["library_controller"], "owner")
+        self.assertEqual(effect["keywords"], ["defender"])
+        self.assertTrue(effect["defender"])
 
     def test_graveyard_to_hand_modal_spell_stays_blocked(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])

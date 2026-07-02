@@ -1552,7 +1552,25 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
         ),
         (
             r"^put target card from your graveyard on the bottom of your library\.?$",
-            {"target": "any_card", "count": 1, "destination": "library_bottom", "up_to_count": False},
+            {
+                "target": "any_card",
+                "count": 1,
+                "destination": "library_bottom",
+                "up_to_count": False,
+                "target_graveyard_controller": "self",
+                "library_controller": "self",
+            },
+        ),
+        (
+            r"^put target card from a graveyard on the bottom of its owner's library\.?$",
+            {
+                "target": "any_card",
+                "count": 1,
+                "destination": "library_bottom",
+                "up_to_count": False,
+                "target_graveyard_controller": "any",
+                "library_controller": "owner",
+            },
         ),
         (
             r"^put target creature card from your graveyard on top of your library\.?$",
@@ -1573,7 +1591,10 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     ]
     for pattern, result in patterns:
         if re.match(pattern, text):
-            return dict(result)
+            parsed = dict(result)
+            parsed.setdefault("target_graveyard_controller", "self")
+            parsed.setdefault("library_controller", "self")
+            return parsed
 
     generic_patterns: list[tuple[str, str]] = [
         (
@@ -1610,6 +1631,8 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
             "count": count,
             "destination": destination,
             "up_to_count": bool(raw_count),
+            "target_graveyard_controller": "self",
+            "library_controller": "self",
         }
     return None
 
@@ -1620,13 +1643,17 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
     if len(effect_matches) != 1:
         return "graveyard_to_library_source_not_single_effect"
     destination = "library_top" if effect_matches[0] == "true" else "library_bottom"
-    if "TargetCardInYourGraveyard" not in text:
-        return "graveyard_to_library_source_target_not_supported"
-    if "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text:
-        return "graveyard_to_library_source_target_not_supported"
     if "EachTargetPointer" in text or ".setTargetPointer" in text:
         return "graveyard_to_library_source_target_not_supported"
-    if "FILTER_CARD_ARTIFACT_OR_CREATURE" in text:
+    target_graveyard_controller = "self"
+    library_controller = "self"
+    if "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text:
+        if not re.search(r"TargetCardInGraveyard\s*\(\s*\)", text):
+            return "graveyard_to_library_source_target_not_supported"
+        target = "any_card"
+        target_graveyard_controller = "any"
+        library_controller = "owner"
+    elif "FILTER_CARD_ARTIFACT_OR_CREATURE" in text:
         target = "artifact_or_creature"
     elif "FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD" in text:
         target = "instant_or_sorcery"
@@ -1647,6 +1674,8 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         "count": count,
         "destination": destination,
         "up_to_count": up_to,
+        "target_graveyard_controller": target_graveyard_controller,
+        "library_controller": library_controller,
     }
 
 
@@ -2672,9 +2701,12 @@ def is_permanent_activated_graveyard_exile_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_graveyard_to_library_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleActivatedAbility"}
     return (
         effect_classes(row) == {"PutOnLibraryTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and "SimpleActivatedAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "activated_ability"}
     )
 
@@ -5927,7 +5959,7 @@ def split_row(
         parsed_activation = activated_graveyard_to_library_from_source(source_text)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
-        for key in ("target", "count", "destination", "up_to_count"):
+        for key in ("target", "count", "destination", "up_to_count", "target_graveyard_controller", "library_controller"):
             if parsed_activation.get(key) != oracle_target.get(key):
                 return None, f"activated_graveyard_to_library_source_oracle_{key}_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
@@ -5943,7 +5975,13 @@ def split_row(
         target_type = str(oracle_target["target"])
         target_count = int(oracle_target["count"])
         destination = str(oracle_target["destination"])
-        target_constraints = recursion_target_constraints_for(target_type)
+        target_graveyard_controller = str(oracle_target.get("target_graveyard_controller") or "self")
+        library_controller = str(oracle_target.get("library_controller") or "self")
+        target_constraints = recursion_target_constraints_for(
+            target_type,
+            controller=target_graveyard_controller,
+        )
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
         activated_effect = {
             "effect": "recursion",
             "battle_model_scope": PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE,
@@ -5953,9 +5991,9 @@ def split_row(
             "target_constraints": target_constraints,
             "count": target_count,
             "destination": destination,
-            "target_controller": "self",
-            "target_graveyard_controller": "self",
-            "library_controller": "self",
+            "target_controller": target_graveyard_controller,
+            "target_graveyard_controller": target_graveyard_controller,
+            "library_controller": library_controller,
             "graveyard_to_library_target": target_type,
             "graveyard_to_library_target_count": target_count,
             "graveyard_to_library_destination": destination,
@@ -5983,9 +6021,9 @@ def split_row(
             "graveyard_to_library_target": target_type,
             "graveyard_to_library_target_count": target_count,
             "graveyard_to_library_destination": destination,
-            "target_controller": "self",
-            "target_graveyard_controller": "self",
-            "library_controller": "self",
+            "target_controller": target_graveyard_controller,
+            "target_graveyard_controller": target_graveyard_controller,
+            "library_controller": library_controller,
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "PutOnLibraryTargetEffect",
             "xmage_ability_class": "SimpleActivatedAbility",
@@ -6010,6 +6048,11 @@ def split_row(
             activated_effect["graveyard_to_library_up_to_count"] = True
             effect_json["up_to_count"] = True
             effect_json["graveyard_to_library_up_to_count"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_graveyard_to_library"] = True
             activated_effect["activated_self_sacrifice_graveyard_to_library"] = True
