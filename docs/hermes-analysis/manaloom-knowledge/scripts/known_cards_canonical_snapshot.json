@@ -13605,6 +13605,38 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
   },
+  "Coffin Purge": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 1,
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "flashback_cost": "{B}",
+    "flashback_status": "runtime_executor_v1",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": false,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+    "battle_rule_oracle_hash": "b8c13734632e6aa5f94766f94c7b0663"
+  },
   "Cognivore": {
     "_keywords_are_self": true,
     "ability_kind": "static",
@@ -17507,6 +17539,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:96c08a0582c9ddf638096214e8d1b198",
     "battle_rule_oracle_hash": "d7d12544955ee158025cd75e17bfad77"
+  },
+  "Decompose": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 3,
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 3,
+    "graveyard_exile_up_to_count": true,
+    "instant": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+    "battle_rule_oracle_hash": "574498b9832411fc894cdafd0a1459eb"
   },
   "Decree of Annihilation": {
     "cmc": 10.0,
@@ -24765,6 +24826,38 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b5c5def7cc8d30af6e2c293ea0854a5c",
     "battle_rule_oracle_hash": "da85cd126972897c37373ad25ec5f867"
+  },
+  "Fade from Memory": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 1,
+    "cycling_cost": "{B}",
+    "cycling_status": "runtime_executor_v1",
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": false,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_auxiliary_ability_classes": [
+      "CyclingAbility"
+    ],
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+    "battle_rule_oracle_hash": "d849e131a7d83a356c5a209eacecc9ed"
   },
   "Fade into Antiquity": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -55811,6 +55904,38 @@
     "battle_rule_logical_key": "battle_rule_v1:31ebc4bbef8f5dc49e9cc263f7d391eb",
     "battle_rule_oracle_hash": "ef96e1d39749b1410f22cc6e03e6a2e8"
   },
+  "Purify the Grave": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 1,
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "flashback_cost": "{W}",
+    "flashback_status": "runtime_executor_v1",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": false,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+    "battle_rule_oracle_hash": "e7643d7c704fb3390c6f6cc2cbef811b"
+  },
   "Purphoros, God of the Forge": {
     "ability_kind": "triggered",
     "battle_model_scope": "controlled_creature_enters_damage_each_opponent_v1",
@@ -57379,6 +57504,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5042d0f98cd633e87dbc36e9540039b3"
   },
+  "Rapid Decay": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 3,
+    "cycling_cost": "{2}",
+    "cycling_status": "runtime_executor_v1",
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 3,
+    "graveyard_exile_up_to_count": true,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_auxiliary_ability_classes": [
+      "CyclingAbility"
+    ],
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+    "battle_rule_oracle_hash": "236d5189bf9ad6285f7eeb432514426c"
+  },
   "Rapid Hybridization": {
     "effect": "remove_creature",
     "instant": true,
@@ -57400,6 +57559,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "9536850691dfb04a14143b301a982558"
+  },
+  "Rats' Feast": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 1,
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 1,
+    "graveyard_exile_target_count_from_x": true,
+    "instant": false,
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "target_count_from_x": true,
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+    "battle_rule_oracle_hash": "676bd982b2fdb904153179fd14904fc8"
   },
   "Raucous Carnival": {
     "effect": "land",
@@ -63652,6 +63840,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:eed840032344df0fc06d337052c1dae7",
     "battle_rule_oracle_hash": "53c8b48a1b03617cb95fe3dadb7b508e"
+  },
+  "Scarab Feast": {
+    "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+    "count": 3,
+    "cycling_cost": "{B}",
+    "cycling_status": "runtime_executor_v1",
+    "destination": "exile",
+    "effect": "graveyard_exile",
+    "graveyard_exile_destination": "exile",
+    "graveyard_exile_single_graveyard": true,
+    "graveyard_exile_target": "any_card",
+    "graveyard_exile_target_count": 3,
+    "graveyard_exile_up_to_count": true,
+    "instant": true,
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "up_to_count": true,
+    "xmage_auxiliary_ability_classes": [
+      "CyclingAbility"
+    ],
+    "xmage_effect_class": "ExileTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+    "battle_rule_oracle_hash": "5bbe7a0b8d550e9b403c2bf4827aa320"
   },
   "Scare Tactics": {
     "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",

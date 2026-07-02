@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T09:50:32.120718+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_manifest.json",
+  "package_id": "pg368_graveyard_exile_spell_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Coffin Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+          "oracle_hash": "b8c13734632e6aa5f94766f94c7b0663",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Decompose",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+          "oracle_hash": "574498b9832411fc894cdafd0a1459eb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Fade from Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+          "oracle_hash": "d849e131a7d83a356c5a209eacecc9ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Purify the Grave",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+          "oracle_hash": "e7643d7c704fb3390c6f6cc2cbef811b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Rapid Decay",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+          "oracle_hash": "236d5189bf9ad6285f7eeb432514426c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Rats' Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+          "oracle_hash": "676bd982b2fdb904153179fd14904fc8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Scarab Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+          "oracle_hash": "5bbe7a0b8d550e9b403c2bf4827aa320",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Coffin Purge",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+          "oracle_hash": "b8c13734632e6aa5f94766f94c7b0663",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Decompose",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+          "oracle_hash": "574498b9832411fc894cdafd0a1459eb",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Fade from Memory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+          "oracle_hash": "d849e131a7d83a356c5a209eacecc9ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Purify the Grave",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+          "oracle_hash": "e7643d7c704fb3390c6f6cc2cbef811b",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Rapid Decay",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+          "oracle_hash": "236d5189bf9ad6285f7eeb432514426c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Rats' Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+          "oracle_hash": "676bd982b2fdb904153179fd14904fc8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "card_name": "Scarab Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+          "oracle_hash": "5bbe7a0b8d550e9b403c2bf4827aa320",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Coffin Purge",
+          "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Decompose",
+          "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fade from Memory",
+          "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Purify the Grave",
+          "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rapid Decay",
+          "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rats' Feast",
+          "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scarab Feast",
+          "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Coffin Purge",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Decompose",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fade from Memory",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Purify the Grave",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rapid Decay",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rats' Feast",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scarab Feast",
+          "component_keys": [],
+          "effect": "graveyard_exile",
+          "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

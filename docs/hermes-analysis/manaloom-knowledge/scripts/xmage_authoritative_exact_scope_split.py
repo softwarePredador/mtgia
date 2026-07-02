@@ -111,6 +111,7 @@ RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
 RECURSION_BATTLEFIELD_ALL_SCOPE = "xmage_return_all_matching_graveyard_cards_to_battlefield_spell_v1"
+GRAVEYARD_EXILE_SPELL_SCOPE = "xmage_exile_target_graveyard_card_spell_v1"
 RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
 )
@@ -194,6 +195,19 @@ SPELL_COMPLEXITY_TOKENS = {
 AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES = {
     "FlashbackAbility",
     "CyclingAbility",
+}
+
+NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
 }
 
 SAFE_MANA_ABILITY_CLASSES = {
@@ -2085,6 +2099,103 @@ def auxiliary_recursion_spell_fields_from_source(
         fields["cycling_cost"] = source_cost
         fields["cycling_status"] = "runtime_executor_v1"
     return fields
+
+
+def _count_word_to_int(value: str) -> int | None:
+    text = str(value or "").strip().lower()
+    if text.isdigit():
+        return int(text)
+    return NUMBER_WORDS.get(text)
+
+
+def primary_graveyard_exile_text_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    if not text:
+        return None
+    for sentence in re.split(r"(?<=\.)\s+", text):
+        candidate = sentence.strip()
+        if not candidate:
+            continue
+        if not candidate.endswith("."):
+            candidate = candidate + "."
+        if candidate.startswith("exile ") and "graveyard" in candidate:
+            return candidate
+    return None
+
+
+def graveyard_exile_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = primary_graveyard_exile_text_from_oracle(metadata)
+    if text is None:
+        return "graveyard_exile_oracle_not_simple"
+    if re.match(r"^exile target card from a graveyard\.?$", text):
+        return {
+            "target": "any_card",
+            "count": 1,
+            "target_controller": "any",
+            "single_graveyard": False,
+            "up_to_count": False,
+            "target_count_from_x": False,
+        }
+    match = re.match(
+        r"^exile up to (?P<count>[a-z0-9]+) target cards from a single graveyard\.?$",
+        text,
+    )
+    if match:
+        count = _count_word_to_int(match.group("count"))
+        if count is None:
+            return "graveyard_exile_oracle_count_not_supported"
+        return {
+            "target": "any_card",
+            "count": count,
+            "target_controller": "any",
+            "single_graveyard": True,
+            "up_to_count": True,
+            "target_count_from_x": False,
+        }
+    if re.match(r"^exile x target cards from a single graveyard\.?$", text):
+        return {
+            "target": "any_card",
+            "count": 1,
+            "target_controller": "any",
+            "single_graveyard": True,
+            "up_to_count": False,
+            "target_count_from_x": True,
+        }
+    return "graveyard_exile_oracle_not_simple"
+
+
+def graveyard_exile_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if len(re.findall(r"new\s+ExileTargetEffect\s*\(", text)) != 1:
+        return "graveyard_exile_source_not_single_effect"
+    if "TargetCardInASingleGraveyard" in text:
+        match = re.search(
+            r"TargetCardInASingleGraveyard\s*\(\s*(?P<min>\d+)\s*,\s*(?P<max>\d+)\s*,",
+            text,
+            re.S,
+        )
+        if not match:
+            return "graveyard_exile_source_target_not_supported"
+        min_count = int(match.group("min"))
+        max_count = int(match.group("max"))
+        return {
+            "target": "any_card",
+            "count": max_count,
+            "target_controller": "any",
+            "single_graveyard": True,
+            "up_to_count": min_count == 0,
+            "target_count_from_x": "XTargetsCountAdjuster" in text,
+        }
+    if "TargetCardInGraveyard" in text:
+        return {
+            "target": "any_card",
+            "count": 1,
+            "target_controller": "any",
+            "single_graveyard": False,
+            "up_to_count": False,
+            "target_count_from_x": False,
+        }
+    return "graveyard_exile_source_target_not_supported"
 
 
 def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -6272,6 +6383,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a triggered draw ability on casting matching spells"
     elif scope == RECURSION_BATTLEFIELD_ALL_SCOPE:
         scope_kind = "return-all matching graveyard cards to battlefield spell"
+    elif scope == GRAVEYARD_EXILE_SPELL_SCOPE:
+        scope_kind = "exile target graveyard card spell"
     elif scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
         scope_kind = "permanent with a simple activated fixed life-gain ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE:
@@ -8896,6 +9009,60 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_return_all_graveyard_cards_to_battlefield_spell",
+            ), "selected_exact_scope"
+        if classes == {"ExileTargetEffect"}:
+            abilities = ability_classes(row)
+            if abilities - AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES:
+                return None, "graveyard_exile_ability_class_not_supported"
+            oracle_target = graveyard_exile_from_oracle(metadata)
+            if isinstance(oracle_target, str):
+                return None, oracle_target
+            source_target = graveyard_exile_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in (
+                "target",
+                "count",
+                "target_controller",
+                "single_graveyard",
+                "up_to_count",
+                "target_count_from_x",
+            ):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"graveyard_exile_source_oracle_{key}_mismatch"
+            aux_fields = auxiliary_recursion_spell_fields_from_source(metadata, source_text, abilities)
+            if isinstance(aux_fields, str):
+                return None, aux_fields
+            effect_json = {
+                "effect": "graveyard_exile",
+                "battle_model_scope": GRAVEYARD_EXILE_SPELL_SCOPE,
+                "target": str(oracle_target["target"]),
+                "target_constraints": recursion_target_constraints_for(
+                    str(oracle_target["target"]),
+                    controller=str(oracle_target["target_controller"]),
+                ),
+                "count": int(oracle_target["count"]),
+                "destination": "exile",
+                "target_controller": str(oracle_target["target_controller"]),
+                "graveyard_exile_target": str(oracle_target["target"]),
+                "graveyard_exile_target_count": int(oracle_target["count"]),
+                "graveyard_exile_destination": "exile",
+                "graveyard_exile_single_graveyard": bool(oracle_target["single_graveyard"]),
+                "xmage_effect_class": "ExileTargetEffect",
+                **aux_fields,
+                **flags,
+            }
+            if oracle_target["up_to_count"]:
+                effect_json["up_to_count"] = True
+                effect_json["graveyard_exile_up_to_count"] = True
+            if oracle_target["target_count_from_x"]:
+                effect_json["target_count_from_x"] = True
+                effect_json["graveyard_exile_target_count_from_x"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_exile_spell",
             ), "selected_exact_scope"
         if classes == {"MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"}:
             if ability_classes(row):

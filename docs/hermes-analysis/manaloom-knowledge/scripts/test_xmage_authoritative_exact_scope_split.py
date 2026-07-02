@@ -140,6 +140,99 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "recursion_battlefield_all_exact_x_mana_value_not_supported")
 
+    def test_graveyard_exile_target_card_spell_with_flashback_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_classes=["FlashbackAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Coffin Purge",
+                type_line="Instant",
+                oracle_text=(
+                    "Exile target card from a graveyard.\n"
+                    "Flashback {B} (You may cast this card from your graveyard for its flashback cost. "
+                    "Then exile it.)"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInGraveyard());
+                this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>("{B}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "graveyard_exile")
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_EXILE_SPELL_SCOPE)
+        self.assertEqual(effect["graveyard_exile_target"], "any_card")
+        self.assertEqual(effect["graveyard_exile_target_count"], 1)
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertFalse(effect["graveyard_exile_single_graveyard"])
+        self.assertEqual(effect["flashback_cost"], "{B}")
+
+    def test_graveyard_exile_up_to_three_single_graveyard_with_cycling_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_classes=["CyclingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rapid Decay",
+                type_line="Instant",
+                oracle_text=(
+                    "Exile up to three target cards from a single graveyard.\n"
+                    "Cycling {2} ({2}, Discard this card: Draw a card.)"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInASingleGraveyard(
+                    0, 3, StaticFilters.FILTER_CARD_CARDS));
+                this.addAbility(new CyclingAbility(new GenericManaCost(2)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_EXILE_SPELL_SCOPE)
+        self.assertEqual(effect["graveyard_exile_target_count"], 3)
+        self.assertTrue(effect["graveyard_exile_single_graveyard"])
+        self.assertTrue(effect["graveyard_exile_up_to_count"])
+        self.assertEqual(effect["cycling_cost"], "{2}")
+
+    def test_graveyard_exile_spell_blocks_unsupported_transmute_auxiliary(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ExileTargetEffect"],
+            ability_classes=["TransmuteAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Shred Memory",
+                type_line="Instant",
+                oracle_text=(
+                    "Exile up to four target cards from a single graveyard.\n"
+                    "Transmute {1}{B}{B}"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ExileTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInASingleGraveyard(
+                    0, 4, StaticFilters.FILTER_CARD_CARDS));
+                this.addAbility(new TransmuteAbility("{1}{B}{B}"));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_exile_ability_class_not_supported")
+
     def test_recursion_battlefield_total_mana_value_limit_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

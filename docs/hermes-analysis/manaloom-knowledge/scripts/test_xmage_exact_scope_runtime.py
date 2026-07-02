@@ -7120,6 +7120,54 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_exile_spell_exiles_multiple_cards_from_single_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.append({"name": "Own Flashback", "type_line": "Sorcery", "cmc": 5})
+        opponent.graveyard.extend(
+            [
+                {"name": "Opponent Reanimate", "type_line": "Sorcery", "cmc": 4},
+                {"name": "Opponent Escape", "type_line": "Creature - Horror", "cmc": 2},
+                {"name": "Opponent Small", "type_line": "Creature - Rat", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "graveyard_exile",
+            "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "any", "scope": "any_card"},
+            "count": 2,
+            "destination": "exile",
+            "target_controller": "any",
+            "graveyard_exile_target": "any_card",
+            "graveyard_exile_target_count": 2,
+            "graveyard_exile_destination": "exile",
+            "graveyard_exile_single_graveyard": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Graveyard Hate", "type_line": "Instant"},
+            turn=17,
+            rng=random.Random(17),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard], ["Own Flashback", "Fixture Graveyard Hate"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opponent Small"])
+        self.assertEqual([card["name"] for card in opponent.exile], ["Opponent Reanimate", "Opponent Escape"])
+        self.assertTrue(
+            any(
+                event == "graveyard_exile_resolved"
+                and data.get("card") == "Fixture Graveyard Hate"
+                and data.get("exiled") == ["Opponent Reanimate", "Opponent Escape"]
+                and data.get("target_owners") == ["Opponent", "Opponent"]
+                and data.get("single_graveyard") is True
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_self_return_to_battlefield_pays_mana_and_enters_tapped(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

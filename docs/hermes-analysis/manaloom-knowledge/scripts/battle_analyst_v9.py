@@ -25990,6 +25990,16 @@ def graveyard_exile_target_pairs(player, permanent, effect_data, all_players, tu
             or 1
         ),
     )
+    if (
+        effect_data.get("graveyard_exile_target_count_from_x")
+        or effect_data.get("target_count_from_x")
+        or effect_data.get("count_from_x")
+    ):
+        cast_context = effect_data.get("_cast_context") or effect_data.get("_resolution_context") or {}
+        try:
+            target_count = max(1, int(float(cast_context.get("x_value") or effect_data.get("x_value") or 1)))
+        except (TypeError, ValueError):
+            target_count = 1
     target_type = (
         effect_data.get("graveyard_exile_target")
         or effect_data.get("target")
@@ -26053,6 +26063,114 @@ def graveyard_exile_target_pairs(player, permanent, effect_data, all_players, tu
         reverse=True,
     )
     return [(owner, card) for _score, owner, card in all_options[:target_count]], all_options
+
+
+def resolve_graveyard_exile_spell(player, opponents, all_players, card, effect_data, turn, *, phase=None):
+    participants = all_players or [player] + list(opponents or [])
+    target_pairs, all_options = graveyard_exile_target_pairs(
+        player,
+        card,
+        effect_data,
+        participants,
+        turn,
+    )
+    fields = replay_rule_fields(effect_data)
+    if not target_pairs:
+        emit_replay_event(
+            "graveyard_exile_resolved",
+            player=player.name,
+            card=card.get("name", "?"),
+            result="no_legal_graveyard_target",
+            target_type=effect_data.get("graveyard_exile_target") or effect_data.get("target") or "any_card",
+            turn=turn,
+            phase=phase or "resolution",
+            **fields,
+        )
+        return []
+
+    exiled = []
+    exiled_pairs = []
+    by_owner = defaultdict(list)
+    for owner, target in target_pairs:
+        by_owner[owner].append(target)
+    for owner, targets in by_owner.items():
+        removed = remove_cards_from_graveyard(
+            owner,
+            targets,
+            turn=turn,
+            source_event="graveyard_exile_spell",
+        )
+        for removed_card in removed:
+            move_to_exile(
+                owner,
+                removed_card,
+                reason="graveyard_exile_spell",
+                turn=turn,
+            )
+            exiled.append(removed_card)
+            exiled_pairs.append((owner, removed_card))
+
+    target_type = effect_data.get("graveyard_exile_target") or effect_data.get("target") or "any_card"
+    emit_decision_trace(
+        decision_type="graveyard_exile_spell",
+        player=player,
+        turn=turn,
+        phase=phase or "resolution",
+        available_options=[
+            decision_card_option(
+                option_card,
+                get_card_effect(option_card),
+                score=score,
+                action="exile_graveyard_card",
+                target_owner=owner.name,
+                target_type=target_type,
+            )
+            for score, owner, option_card in all_options[:8]
+        ],
+        chosen_option=(
+            decision_card_option(
+                exiled[0],
+                get_card_effect(exiled[0]),
+                score=graveyard_exile_candidate_score(exiled[0], exiled_pairs[0][0], player, participants, turn),
+                action="resolve_graveyard_exile_spell",
+                target_owner=exiled_pairs[0][0].name,
+                target_type=target_type,
+            )
+            if exiled and exiled_pairs
+            else {"action": "no_legal_graveyard_target"}
+        ),
+        rejected_options=[],
+        score_components={
+            "target_type": target_type,
+            "requested_count": effect_data.get("graveyard_exile_target_count") or effect_data.get("count") or 1,
+            "exiled_count": len(exiled),
+            "single_graveyard": bool(effect_data.get("graveyard_exile_single_graveyard")),
+        },
+        rule_source=fields.get("rule_source", "xmage_graveyard_exile_spell_v1"),
+        rule_status=fields.get("rule_review_status", "verified"),
+        confidence="medium",
+        expected_benefit_score=14 + len(exiled) * 4,
+        actual_outcome="graveyard_exile_spell_resolved" if exiled else "no_legal_graveyard_target",
+        reason="resolve_graveyard_exile_spell_when_target_available",
+        heuristic_version=DECISION_STRATEGY_VERSION,
+        resource_delta={"graveyard_cards_exiled": len(exiled)},
+        risk_flags=["graveyard_hate"],
+    )
+    emit_replay_event(
+        "graveyard_exile_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        target_type=target_type,
+        destination="exile",
+        exiled=[exiled_card.get("name", "?") for exiled_card in exiled],
+        exiled_count=len(exiled),
+        target_owners=[owner.name for owner, _card in exiled_pairs],
+        single_graveyard=bool(effect_data.get("graveyard_exile_single_graveyard")),
+        turn=turn,
+        phase=phase or "resolution",
+        **fields,
+    )
+    return exiled
 
 
 def activate_graveyard_exile_permanents(
@@ -48477,6 +48595,17 @@ def apply_effect_immediate(
     elif effect == "graveyard_flashback_grant":
         grant_graveyard_flashback_until_eot(player, card, effect_data, turn)
         finish_resolved_spell(player, card, turn=turn)
+    elif effect == "graveyard_exile":
+        resolve_graveyard_exile_spell(
+            player,
+            opponents,
+            all_players_for_entry,
+            card,
+            effect_data,
+            turn,
+            phase=phase,
+        )
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect == "free_cast":
         if (
             effect_data.get("battle_model_scope")

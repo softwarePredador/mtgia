@@ -1,0 +1,569 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg368_graveyard_exile_spell_wave_20260702_094901",
+  "deploy_id": "PG368",
+  "expected_rules": [
+    {
+      "card_name": "Coffin Purge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+      "min_rule_version": 2,
+      "normalized_name": "coffin purge",
+      "oracle_hash": "b8c13734632e6aa5f94766f94c7b0663",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "flashback_cost": "{B}",
+        "flashback_status": "runtime_executor_v1",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Decompose",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+      "min_rule_version": 2,
+      "normalized_name": "decompose",
+      "oracle_hash": "574498b9832411fc894cdafd0a1459eb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fade from Memory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+      "min_rule_version": 2,
+      "normalized_name": "fade from memory",
+      "oracle_hash": "d849e131a7d83a356c5a209eacecc9ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Purify the Grave",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+      "min_rule_version": 2,
+      "normalized_name": "purify the grave",
+      "oracle_hash": "e7643d7c704fb3390c6f6cc2cbef811b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "flashback_cost": "{W}",
+        "flashback_status": "runtime_executor_v1",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rapid Decay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+      "min_rule_version": 2,
+      "normalized_name": "rapid decay",
+      "oracle_hash": "236d5189bf9ad6285f7eeb432514426c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rats' Feast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+      "min_rule_version": 2,
+      "normalized_name": "rats' feast",
+      "oracle_hash": "676bd982b2fdb904153179fd14904fc8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_count_from_x": true
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scarab Feast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+      "min_rule_version": 2,
+      "normalized_name": "scarab feast",
+      "oracle_hash": "5bbe7a0b8d550e9b403c2bf4827aa320",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_graveyard_exile_spell": 7
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg368_graveyard_exile_spell_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T09:49:01+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Coffin Purge"
+      },
+      "card_name": "Coffin Purge",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+      "normalized_name": "coffin purge",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "flashback_cost": "{B}",
+        "flashback_status": "runtime_executor_v1",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Decompose"
+      },
+      "card_name": "Decompose",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+      "normalized_name": "decompose",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true
+      }
+    },
+    {
+      "card": {
+        "name": "Fade from Memory"
+      },
+      "card_name": "Fade from Memory",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+      "normalized_name": "fade from memory",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Purify the Grave"
+      },
+      "card_name": "Purify the Grave",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+      "normalized_name": "purify the grave",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "flashback_cost": "{W}",
+        "flashback_status": "runtime_executor_v1",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": false,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Rapid Decay"
+      },
+      "card_name": "Rapid Decay",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+      "normalized_name": "rapid decay",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "cycling_cost": "{2}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Rats' Feast"
+      },
+      "card_name": "Rats' Feast",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+      "normalized_name": "rats' feast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 1,
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 1,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_count_from_x": true
+      }
+    },
+    {
+      "card": {
+        "name": "Scarab Feast"
+      },
+      "card_name": "Scarab Feast",
+      "effect": "graveyard_exile",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+      "normalized_name": "scarab feast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
+        "count": 3,
+        "cycling_cost": "{B}",
+        "cycling_status": "runtime_executor_v1",
+        "destination": "exile",
+        "effect": "graveyard_exile",
+        "graveyard_exile_destination": "exile",
+        "graveyard_exile_single_graveyard": true,
+        "graveyard_exile_target": "any_card",
+        "graveyard_exile_target_count": 3,
+        "graveyard_exile_up_to_count": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "CyclingAbility"
+        ]
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Coffin Purge",
+    "Decompose",
+    "Fade from Memory",
+    "Purify the Grave",
+    "Rapid Decay",
+    "Rats' Feast",
+    "Scarab Feast"
+  ],
+  "selected_count": 7,
+  "slug": "graveyard_exile_spell_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Coffin Purge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:329f79a646d66432a7ba41e0c0f4a0f1",
+      "min_rule_version": 2,
+      "normalized_name": "coffin purge",
+      "oracle_hash": "b8c13734632e6aa5f94766f94c7b0663",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Decompose",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:42fb18be92bf3dd4236e16a53e22e7ab",
+      "min_rule_version": 2,
+      "normalized_name": "decompose",
+      "oracle_hash": "574498b9832411fc894cdafd0a1459eb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fade from Memory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:615cff671d9dde0bc0af79898851acda",
+      "min_rule_version": 2,
+      "normalized_name": "fade from memory",
+      "oracle_hash": "d849e131a7d83a356c5a209eacecc9ed",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Purify the Grave",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:72dfb24ccd0d65f221c49bbc343f94f8",
+      "min_rule_version": 2,
+      "normalized_name": "purify the grave",
+      "oracle_hash": "e7643d7c704fb3390c6f6cc2cbef811b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rapid Decay",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b92371161b491e6dacb50588a98be1ad",
+      "min_rule_version": 2,
+      "normalized_name": "rapid decay",
+      "oracle_hash": "236d5189bf9ad6285f7eeb432514426c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rats' Feast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a3272655216713a20cc870b7a484c55d",
+      "min_rule_version": 2,
+      "normalized_name": "rats' feast",
+      "oracle_hash": "676bd982b2fdb904153179fd14904fc8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scarab Feast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cfe9f926e6666c66b6e564d000906d3f",
+      "min_rule_version": 2,
+      "normalized_name": "scarab feast",
+      "oracle_hash": "5bbe7a0b8d550e9b403c2bf4827aa320",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
