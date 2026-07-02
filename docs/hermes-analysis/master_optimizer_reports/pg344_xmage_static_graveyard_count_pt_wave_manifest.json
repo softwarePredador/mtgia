@@ -1,0 +1,555 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg344_xmage_static_graveyard_count_pt_wave_20260702_0149",
+  "deploy_id": "PG344",
+  "expected_rules": [
+    {
+      "card_name": "Boneyard Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+      "min_rule_version": 2,
+      "normalized_name": "boneyard wurm",
+      "oracle_hash": "868db55b4c54a9775793499c3b172f50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cantivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+      "min_rule_version": 2,
+      "normalized_name": "cantivore",
+      "oracle_hash": "3adff21ac37d8460783bc26d29fe7952",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "enchantment"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "vigilance"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cognivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+      "min_rule_version": 2,
+      "normalized_name": "cognivore",
+      "oracle_hash": "c6e6afdc059fb07d89c674364b55e2d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "instant"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lord of Extinction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+      "min_rule_version": 2,
+      "normalized_name": "lord of extinction",
+      "oracle_hash": "4ad2f40f824019f50855ca4422e1bc8a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magnivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+      "min_rule_version": 2,
+      "normalized_name": "magnivore",
+      "oracle_hash": "6937ec01983fb5f782b75c9b8a674ea9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "sorcery"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "haste"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+      "min_rule_version": 2,
+      "normalized_name": "revenant",
+      "oracle_hash": "12c2d3cd639198b6abb2d318fd963827",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slag Fiend",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+      "min_rule_version": 2,
+      "normalized_name": "slag fiend",
+      "oracle_hash": "b5c07008c68627664343cef40a6d7da9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "artifact"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terravore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+      "min_rule_version": 2,
+      "normalized_name": "terravore",
+      "oracle_hash": "4d0cfe4cd8a6ae904d654899166a0fca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "land"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_source_power_toughness_equal_graveyard_count": 8
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T01:49:30+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Boneyard Wurm"
+      },
+      "card_name": "Boneyard Wurm",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+      "normalized_name": "boneyard wurm",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Cantivore"
+      },
+      "card_name": "Cantivore",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+      "normalized_name": "cantivore",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "enchantment"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "vigilance"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Cognivore"
+      },
+      "card_name": "Cognivore",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+      "normalized_name": "cognivore",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "instant"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Lord of Extinction"
+      },
+      "card_name": "Lord of Extinction",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+      "normalized_name": "lord of extinction",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "card"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Magnivore"
+      },
+      "card_name": "Magnivore",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+      "normalized_name": "magnivore",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "sorcery"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "haste"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Revenant"
+      },
+      "card_name": "Revenant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+      "normalized_name": "revenant",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "creature"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "flying"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Slag Fiend"
+      },
+      "card_name": "Slag Fiend",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+      "normalized_name": "slag fiend",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "artifact"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Terravore"
+      },
+      "card_name": "Terravore",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+      "normalized_name": "terravore",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+        "dynamic_power_equals_graveyard_count": true,
+        "dynamic_toughness_equals_graveyard_count": true,
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "land"
+        ],
+        "graveyard_count_scope": "all_graveyards",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "source_power_toughness_equal_graveyard_count",
+        "static_power_toughness_source": "graveyard_count",
+        "target": "self",
+        "target_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Boneyard Wurm",
+    "Cantivore",
+    "Cognivore",
+    "Lord of Extinction",
+    "Magnivore",
+    "Revenant",
+    "Slag Fiend",
+    "Terravore"
+  ],
+  "selected_count": 8,
+  "slug": "xmage_static_graveyard_count_pt_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Boneyard Wurm",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+      "min_rule_version": 2,
+      "normalized_name": "boneyard wurm",
+      "oracle_hash": "868db55b4c54a9775793499c3b172f50",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cantivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+      "min_rule_version": 2,
+      "normalized_name": "cantivore",
+      "oracle_hash": "3adff21ac37d8460783bc26d29fe7952",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cognivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+      "min_rule_version": 2,
+      "normalized_name": "cognivore",
+      "oracle_hash": "c6e6afdc059fb07d89c674364b55e2d8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lord of Extinction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+      "min_rule_version": 2,
+      "normalized_name": "lord of extinction",
+      "oracle_hash": "4ad2f40f824019f50855ca4422e1bc8a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Magnivore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+      "min_rule_version": 2,
+      "normalized_name": "magnivore",
+      "oracle_hash": "6937ec01983fb5f782b75c9b8a674ea9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Revenant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+      "min_rule_version": 2,
+      "normalized_name": "revenant",
+      "oracle_hash": "12c2d3cd639198b6abb2d318fd963827",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slag Fiend",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+      "min_rule_version": 2,
+      "normalized_name": "slag fiend",
+      "oracle_hash": "b5c07008c68627664343cef40a6d7da9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Terravore",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+      "min_rule_version": 2,
+      "normalized_name": "terravore",
+      "oracle_hash": "4d0cfe4cd8a6ae904d654899166a0fca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

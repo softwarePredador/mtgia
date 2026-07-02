@@ -8006,6 +8006,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:8d894b8ac88621263796d007b72ee158"
   },
+  "Boneyard Wurm": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+    "battle_rule_oracle_hash": "868db55b4c54a9775793499c3b172f50"
+  },
   "Bontu's Monument": {
     "cmc": 3.0,
     "effect": "ramp_permanent",
@@ -10191,6 +10215,35 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Cantivore": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "enchantment"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "keywords": [
+      "vigilance"
+    ],
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "vigilance": true,
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+    "battle_rule_oracle_hash": "3adff21ac37d8460783bc26d29fe7952"
   },
   "Canyon Slough": {
     "effect": "land",
@@ -12837,6 +12890,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f8f20bdd5d2082bd6557a19bdd6567fe"
+  },
+  "Cognivore": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "flying": true,
+    "graveyard_count_card_types": [
+      "instant"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+    "battle_rule_oracle_hash": "c6e6afdc059fb07d89c674364b55e2d8"
   },
   "Coiled Tinviper": {
     "_keywords_are_self": true,
@@ -41234,6 +41316,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d37f5b6d39e91d4584e5a0e83b91b026"
   },
+  "Lord of Extinction": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+    "battle_rule_oracle_hash": "4ad2f40f824019f50855ca4422e1bc8a"
+  },
   "Lord Skitter, Sewer King": {
     "cmc": 3.0,
     "effect": "token_maker",
@@ -41830,6 +41936,35 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ba65c75fe72d2fdfad569fa0096f1972",
     "battle_rule_oracle_hash": "b2f28fd30e7447849076c50e188370ed"
+  },
+  "Magnivore": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "sorcery"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+    "battle_rule_oracle_hash": "6937ec01983fb5f782b75c9b8a674ea9"
   },
   "Magosi, the Waterveil": {
     "effect": "land",
@@ -56043,6 +56178,35 @@
     "battle_rule_logical_key": "battle_rule_v1:bcab1095f6d908cb9efe36d5ea4ed185",
     "battle_rule_oracle_hash": "d00621899997cc893fd3a254b0b1af57"
   },
+  "Revenant": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "flying": true,
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+    "battle_rule_oracle_hash": "12c2d3cd639198b6abb2d318fd963827"
+  },
   "Reverberate": {
     "battle_model_scope": "copy_stack_instant_or_sorcery_new_targets_runtime_v1",
     "choose_new_targets_status": "runtime_executor_v1",
@@ -63837,6 +64001,30 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Slag Fiend": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "artifact"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+    "battle_rule_oracle_hash": "b5c07008c68627664343cef40a6d7da9"
+  },
   "Slagstorm": {
     "cmc": 3.0,
     "effect": "damage_wipe",
@@ -70592,6 +70780,35 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:99151859bece89ba3ead032e05b1f65a"
+  },
+  "Terravore": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+    "dynamic_power_equals_graveyard_count": true,
+    "dynamic_toughness_equals_graveyard_count": true,
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "land"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "keywords": [
+      "trample"
+    ],
+    "static_effect": "source_power_toughness_equal_graveyard_count",
+    "static_power_toughness_source": "graveyard_count",
+    "target": "self",
+    "target_controller": "self",
+    "trample": true,
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+    "battle_rule_oracle_hash": "4d0cfe4cd8a6ae904d654899166a0fca"
   },
   "Territorial Roc": {
     "_keywords_are_self": true,

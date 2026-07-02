@@ -130,6 +130,7 @@ TARGET_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_boost_un
 TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keyword_until_eot_v1"
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
+STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
@@ -2086,6 +2087,97 @@ def static_controlled_pt_from_source(source: str) -> dict[str, Any] | str | None
     }
 
 
+STATIC_GRAVEYARD_COUNT_PT_FILTERS = {
+    "StaticFilters.FILTER_CARD_ARTIFACTS": ["artifact"],
+    "StaticFilters.FILTER_CARD_CREATURES": ["creature"],
+    "StaticFilters.FILTER_CARD_ENCHANTMENTS": ["enchantment"],
+    "StaticFilters.FILTER_CARD_INSTANTS": ["instant"],
+    "StaticFilters.FILTER_CARD_LANDS": ["land"],
+    "StaticFilters.FILTER_CARD_SORCERIES": ["sorcery"],
+}
+
+
+def static_graveyard_count_pt_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    match = re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of "
+        r"(?P<card_type>artifact|creature|enchantment|instant|land|sorcery) cards in "
+        r"(?P<scope>your graveyard|all graveyards)\.?$",
+        text,
+    )
+    if match:
+        return {
+            "graveyard_count_scope": (
+                "controller_graveyard"
+                if match.group("scope") == "your graveyard"
+                else "all_graveyards"
+            ),
+            "graveyard_count_card_types": [match.group("card_type")],
+        }
+    if re.match(
+        r"^[a-z0-9' ,./-]+ power and toughness are each equal to the number of cards in all graveyards\.?$",
+        text,
+    ):
+        return {
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_types": ["card"],
+        }
+    return None
+
+
+def static_graveyard_count_filter_types_from_source(source: str, filter_name: str | None) -> list[str] | str:
+    text = source or ""
+    if not filter_name:
+        return ["card"]
+    if filter_name in STATIC_GRAVEYARD_COUNT_PT_FILTERS:
+        return list(STATIC_GRAVEYARD_COUNT_PT_FILTERS[filter_name])
+    if filter_name == "new FilterLandCard":
+        return ["land"]
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", filter_name):
+        return "static_graveyard_count_pt_source_filter_not_supported"
+    type_tokens = re.findall(
+        rf"{re.escape(filter_name)}\.add\s*\(\s*CardType\.([A-Z0-9_]+)\.getPredicate\s*\(\s*\)\s*\)",
+        text,
+    )
+    if len(type_tokens) == 1:
+        return [type_tokens[0].lower().replace("_", " ")]
+    return "static_graveyard_count_pt_source_filter_not_supported"
+
+
+def static_graveyard_count_pt_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if (
+        "AdditiveDynamicValue" in text
+        or "PermanentsOnBattlefieldCount" in text
+        or "game.getBattlefield().count" in text
+    ):
+        return "static_graveyard_count_pt_source_not_direct_graveyard_count"
+    if len(re.findall(r"new\s+SetBasePowerToughnessSourceEffect\s*\(", text)) != 1:
+        return None
+    if "CardsInControllerGraveyardCount" in text:
+        scope = "controller_graveyard"
+        match = re.search(r"new\s+CardsInControllerGraveyardCount\s*\(\s*([^)]+?)\s*\)", text, re.S)
+        filter_name = match.group(1).strip() if match else None
+    elif "CardsInAllGraveyardsCount" in text:
+        scope = "all_graveyards"
+        match = re.search(r"new\s+CardsInAllGraveyardsCount\s*\(\s*(?:new\s+)?([^)]+?)\s*\)", text, re.S)
+        filter_name = match.group(1).strip() if match else None
+        if filter_name and filter_name.startswith("FilterLandCard"):
+            filter_name = "new FilterLandCard"
+    elif re.search(r"getMessage\s*\(\s*\).*?cards in all graveyards", text, re.S):
+        scope = "all_graveyards"
+        filter_name = None
+    else:
+        return None
+    card_types = static_graveyard_count_filter_types_from_source(text, filter_name)
+    if isinstance(card_types, str):
+        return card_types
+    return {
+        "graveyard_count_scope": scope,
+        "graveyard_count_card_types": card_types or ["card"],
+    }
+
+
 def strip_leading_parenthetical_reminders(text: str) -> str:
     cleaned = str(text or "").strip()
     while True:
@@ -2278,6 +2370,17 @@ def is_static_controlled_pt_unit(row: dict[str, Any]) -> bool:
         str(row.get("adapter_work_unit") or "") == STATIC_CONTROLLED_PT_UNIT
         and effect_classes(row) == {"BoostControlledEffect"}
         and ability_classes(row) == {"SimpleStaticAbility"}
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
+    )
+
+
+def is_static_graveyard_count_pt_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleStaticAbility"}
+    return (
+        effect_classes(row) == {"SetBasePowerToughnessSourceEffect"}
+        and "SimpleStaticAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"static_ability"}
     )
 
@@ -4720,6 +4823,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent simple activated target-creature keyword until end of turn"
     elif scope == STATIC_CONTROLLED_PT_SCOPE:
         scope_kind = "permanent static controlled-creature power/toughness boost"
+    elif scope == STATIC_GRAVEYARD_COUNT_PT_SCOPE:
+        scope_kind = "creature static source power/toughness equal to graveyard card count"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -4834,6 +4939,7 @@ def split_row(
     permanent_activated_target_boost_unit = is_permanent_activated_target_boost_unit(row)
     permanent_activated_target_keyword_unit = is_permanent_activated_target_keyword_unit(row)
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
+    static_graveyard_count_pt_unit = is_static_graveyard_count_pt_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     permanent_activated_graveyard_exile_unit = is_permanent_activated_graveyard_exile_unit(row)
     permanent_activated_graveyard_to_library_unit = is_permanent_activated_graveyard_to_library_unit(row)
@@ -4877,6 +4983,7 @@ def split_row(
         and not permanent_activated_target_boost_unit
         and not permanent_activated_target_keyword_unit
         and not static_controlled_pt_unit
+        and not static_graveyard_count_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
@@ -4912,6 +5019,7 @@ def split_row(
         and not permanent_activated_self_boost_unit
         and not permanent_activated_target_keyword_unit
         and not static_controlled_pt_unit
+        and not static_graveyard_count_pt_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
@@ -6033,6 +6141,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_controlled_power_toughness_boost",
+        ), "selected_exact_scope"
+
+    if static_graveyard_count_pt_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_graveyard_count_pt_not_creature"
+        oracle_static = static_graveyard_count_pt_from_oracle(metadata)
+        if oracle_static is None:
+            return None, "static_graveyard_count_pt_oracle_not_exact"
+        source_static = static_graveyard_count_pt_from_source(source_text)
+        if isinstance(source_static, str):
+            return None, source_static
+        if source_static is None:
+            return None, "static_graveyard_count_pt_source_not_exact"
+        if source_static != oracle_static:
+            return None, "static_graveyard_count_pt_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_GRAVEYARD_COUNT_PT_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "source_power_toughness_equal_graveyard_count",
+            "static_power_toughness_source": "graveyard_count",
+            "target": "self",
+            "target_controller": "self",
+            "dynamic_power_equals_graveyard_count": True,
+            "dynamic_toughness_equals_graveyard_count": True,
+            "xmage_effect_class": "SetBasePowerToughnessSourceEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            **source_static,
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_source_power_toughness_equal_graveyard_count",
         ), "selected_exact_scope"
 
     if keyword_creature_unit:
@@ -7480,6 +7628,7 @@ def build_exact_split_report(
             and not is_permanent_activated_target_boost_unit(row)
             and not is_permanent_activated_target_keyword_unit(row)
             and not is_static_controlled_pt_unit(row)
+            and not is_static_graveyard_count_pt_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_permanent_activated_graveyard_exile_unit(row)
             and not is_boost_keyword_spell_unit(row)
@@ -7538,6 +7687,7 @@ def build_exact_split_report(
                 "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
+                "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, exact mill-then-return Oracle/source agreement, and no additional ability class",

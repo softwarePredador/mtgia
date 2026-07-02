@@ -1,0 +1,334 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T01:50:37.105550+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_manifest.json",
+  "package_id": "pg344_xmage_static_graveyard_count_pt_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Boneyard Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+          "oracle_hash": "868db55b4c54a9775793499c3b172f50",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Cantivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+          "oracle_hash": "3adff21ac37d8460783bc26d29fe7952",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Cognivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+          "oracle_hash": "c6e6afdc059fb07d89c674364b55e2d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Lord of Extinction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+          "oracle_hash": "4ad2f40f824019f50855ca4422e1bc8a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Magnivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+          "oracle_hash": "6937ec01983fb5f782b75c9b8a674ea9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Revenant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+          "oracle_hash": "12c2d3cd639198b6abb2d318fd963827",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Slag Fiend",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+          "oracle_hash": "b5c07008c68627664343cef40a6d7da9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Terravore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+          "oracle_hash": "4d0cfe4cd8a6ae904d654899166a0fca",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Boneyard Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8",
+          "oracle_hash": "868db55b4c54a9775793499c3b172f50",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Cantivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2",
+          "oracle_hash": "3adff21ac37d8460783bc26d29fe7952",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Cognivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7",
+          "oracle_hash": "c6e6afdc059fb07d89c674364b55e2d8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Lord of Extinction",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643",
+          "oracle_hash": "4ad2f40f824019f50855ca4422e1bc8a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Magnivore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde",
+          "oracle_hash": "6937ec01983fb5f782b75c9b8a674ea9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Revenant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc",
+          "oracle_hash": "12c2d3cd639198b6abb2d318fd963827",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Slag Fiend",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287",
+          "oracle_hash": "b5c07008c68627664343cef40a6d7da9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "card_name": "Terravore",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d",
+          "oracle_hash": "4d0cfe4cd8a6ae904d654899166a0fca",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Boneyard Wurm",
+          "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cantivore",
+          "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cognivore",
+          "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lord of Extinction",
+          "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Magnivore",
+          "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Revenant",
+          "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slag Fiend",
+          "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Terravore",
+          "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Boneyard Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ffedf5481ab19e7e4456d7d4cefa88e8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cantivore",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:49c405fb50f9657a736715ece58c1cf2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cognivore",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:68aa0a5a89c35b136144ea06eda2b2e7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lord of Extinction",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d97a0e25b307046d4efbf53fd7bd1643"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Magnivore",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ad96db5904f1b3dae2fbbad9858c9cde"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Revenant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:45d2bc9afccf65066bbf30329eaf1ecc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slag Fiend",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:9409b61e3a26aa64382a8dd06a768287"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Terravore",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ffa2d1bd2c22db6e3464b84bc934017d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

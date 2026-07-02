@@ -100,6 +100,12 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "cycling_cost",
     "cycling_status",
     "xmage_auxiliary_ability_classes",
+    "static_effect",
+    "static_power_toughness_source",
+    "graveyard_count_scope",
+    "graveyard_count_card_types",
+    "dynamic_power_equals_graveyard_count",
+    "dynamic_toughness_equals_graveyard_count",
 )
 
 

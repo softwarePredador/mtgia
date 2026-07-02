@@ -123,23 +123,23 @@ Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`
 to build this queue. Current evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg342_recursion_exile_self_spell_wave_commander_legal.md`
-- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg342_recursion_exile_self_spell_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg344_static_graveyard_count_pt_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg344_static_graveyard_count_pt_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27208`
-- XMage authoritative source resolved: `26894`
+- target all-card battle-gap identities: `27195`
+- XMage authoritative source resolved: `26881`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26894`
+- XMage authoritative adapter required: `26881`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9885`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26894` identities, card semantics are accepted from XMage; work is now
+- For `26881` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG343 Exact Adapter Waves
+## PG283-PG344 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG343 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG344 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -202,6 +202,12 @@ patterns:
   simple creature/artifact/subtype/legendary filters, exact Oracle/source
   agreement, and runtime refresh that avoids cumulative static deltas ->
   `xmage_static_controlled_power_toughness_boost_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` /
+  `xmage_signature::SetBasePowerToughnessSourceEffect::SimpleStaticAbility::*`
+  with direct XMage graveyard card-count dynamic values, exact Oracle text
+  saying source power and toughness are each equal to matching controller or
+  all-graveyard card counts, and only optional self combat keywords ->
+  `xmage_static_source_power_toughness_equal_graveyard_count_v1`
 - `draw_engine::xmage_draw_card_variant_review_v1` with
   `DrawCardSourceControllerEffect + EntersBattlefieldTriggeredAbility` on
   creatures and fixed Oracle/source draw count ->
@@ -3725,9 +3731,75 @@ PG343 measured result:
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=26889`.
 - Running the exact splitter after PG343 on supported units returns
-  `proposal_count=0` over `7928` considered supported rows. The next cycle
-  should continue from the fresh post-PG343 queue; the top reusable work unit
-  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1899`.
+  `proposal_count=0` over `7928` considered supported rows. That checkpoint is
+  superseded by PG344 below; the current queue is the post-PG344 queue.
+
+PG344 evidence:
+
+- PG344 static graveyard-count P/T package:
+  `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_package.md`
+- PG344 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_apply_evidence.md`
+- PG344 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_pg_to_sqlite_sync.json`
+- PG344 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_e2e_validation.md`
+- post-PG344 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg344_static_graveyard_count_pt_wave.md`
+- post-PG344 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg344_static_graveyard_count_pt_wave.md`
+- post-PG344 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg344_static_graveyard_count_pt_wave.md`
+- post-PG344 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg344_static_graveyard_count_pt_wave.md`
+- PG344 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_static_graveyard_count_pt_wave.md`
+- post-PG344 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg344_static_graveyard_count_pt_wave_commander_legal.md`
+- post-PG344 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg344_supported_recheck.md`
+- post-PG344 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg344_static_graveyard_count_pt_wave_recheck.md`
+
+PG344 measured result:
+
+- PG344 promoted `8` exact static graveyard-count power/toughness rules:
+  `Boneyard Wurm`, `Cantivore`, `Cognivore`, `Lord of Extinction`,
+  `Magnivore`, `Revenant`, `Slag Fiend`, and `Terravore`.
+- The splitter now accepts `SetBasePowerToughnessSourceEffect` static rows only
+  when XMage uses a direct controller/all-graveyard card-count dynamic value,
+  Oracle text says source power and toughness are each equal to that same
+  count, and the only extra rules are optional self combat keywords.
+- Runtime now refreshes dynamic source power/toughness from graveyard counts,
+  preserves simple +/- counters on top of the dynamic base, and applies the
+  zero-toughness state-based graveyard move after refresh.
+- Focused splitter and runtime suites report `330` tests passing.
+- PostgreSQL precheck found `8/8` target rows, `0/8` expected rules already
+  present, and `0` nonmatching shadow rows to deprecate.
+- PostgreSQL apply inserted/updated `8` rules and deprecated `0` shadow rows.
+- PostgreSQL postcheck reports `8/8` promoted rows, `8/8` verified/auto rows,
+  and `8/8` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7296` PostgreSQL rows, inserted/updated
+  `7090` SQLite rows, and exported `4873` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` warning for the
+  pre-existing residual trusted SQLite rules without Oracle hash; PG344 rows
+  all carry matching Oracle hashes.
+- Global all-card readiness after PG344:
+  `battle_and_oracle_ready=2429`, `battle_family_mapper_required=30118`, and
+  `snapshot_has_verified_rule=3577`.
+- Global all-card authoritative queue after PG344:
+  `target_identity_count=27195`, `xmage_authoritative_source_count=26881`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26881`.
+- Running the exact splitter after PG344 on supported units returns
+  `proposal_count=0` over `7952` considered supported rows. The next cycle
+  should continue from the fresh post-PG344 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1891`.
 
 ## Why This Is The Best Current Flow
 
@@ -4368,10 +4440,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG343 queue, the next exact runtime-backed work should be selected from
+post-PG344 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1899`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1891`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

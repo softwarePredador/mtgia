@@ -177,6 +177,105 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_controlled_pt_oracle_filter_not_supported")
 
+    def test_static_graveyard_count_power_toughness_controller_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Boneyard Wurm",
+                type_line="Creature - Wurm",
+                oracle_text=(
+                    "Boneyard Wurm's power and toughness are each equal to "
+                    "the number of creature cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "DynamicValue value = new CardsInControllerGraveyardCount("
+                "StaticFilters.FILTER_CARD_CREATURES);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(value)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_PT_SCOPE)
+        self.assertEqual(effect["static_power_toughness_source"], "graveyard_count")
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertTrue(effect["dynamic_power_equals_graveyard_count"])
+        self.assertTrue(effect["dynamic_toughness_equals_graveyard_count"])
+
+    def test_static_graveyard_count_power_toughness_all_graveyards_with_keyword_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["HasteAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Magnivore",
+                type_line="Creature - Lhurgoyf",
+                oracle_text=(
+                    "Haste\n"
+                    "Magnivore's power and toughness are each equal to "
+                    "the number of sorcery cards in all graveyards."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter = new FilterCard(\"sorcery cards\");"
+                "filter.add(CardType.SORCERY.getPredicate());"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new CardsInAllGraveyardsCount(filter))));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["graveyard_count_scope"], "all_graveyards")
+        self.assertEqual(effect["graveyard_count_card_types"], ["sorcery"])
+        self.assertEqual(effect["keywords"], ["haste"])
+        self.assertTrue(effect["haste"])
+
+    def test_static_graveyard_count_power_toughness_blocks_battlefield_plus_graveyard_formula(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["SetBasePowerToughnessSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Soulless One",
+                type_line="Creature - Zombie Avatar",
+                oracle_text=(
+                    "Soulless One's power and toughness are each equal to "
+                    "the number of Zombies on the battlefield plus the number "
+                    "of Zombie cards in all graveyards."
+                ),
+            ),
+            source_text=(
+                "int count = game.getBattlefield().count(zombiesBattlefield, "
+                "sourceAbility.getControllerId(), sourceAbility, game);"
+                "this.addAbility(new SimpleStaticAbility(Zone.ALL, "
+                "new SetBasePowerToughnessSourceEffect(new SoullessOneDynamicCount())));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_graveyard_count_pt_oracle_not_exact")
+
     def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

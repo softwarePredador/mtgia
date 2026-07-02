@@ -154,6 +154,96 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(goblin["power"], 1)
         self.assertEqual(goblin["toughness"], 1)
 
+    def test_static_graveyard_count_power_toughness_counts_controller_graveyard_and_counters(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+            {"name": "Creature B", "type_line": "Artifact Creature - Construct"},
+            {"name": "Instant A", "type_line": "Instant"},
+        ]
+        wurm = {
+            "name": "Boneyard Wurm",
+            "type_line": "Creature - Wurm",
+            "effect": "creature",
+            "power": 0,
+            "toughness": 0,
+            "plus_one_counters": 1,
+            "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_equal_graveyard_count",
+            "static_power_toughness_source": "graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+        }
+        active.battlefield = [wurm]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+
+        self.assertEqual(wurm["static_graveyard_count_power_toughness_current"], 2)
+        self.assertEqual(wurm["power"], 3)
+        self.assertEqual(wurm["toughness"], 3)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_count_power_toughness_changed"
+                and data.get("card") == "Boneyard Wurm"
+                and data.get("graveyard_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_static_graveyard_count_power_toughness_counts_all_graveyards_and_zero_toughness_sba(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard = [{"name": "Active Artifact", "type_line": "Artifact"}]
+        opponent.graveyard = [{"name": "Opponent Artifact Creature", "type_line": "Artifact Creature - Construct"}]
+        fiend = {
+            "name": "Slag Fiend",
+            "type_line": "Creature - Phyrexian Construct",
+            "effect": "creature",
+            "power": 0,
+            "toughness": 0,
+            "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_equal_graveyard_count",
+            "static_power_toughness_source": "graveyard_count",
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_types": ["artifact"],
+        }
+        active.battlefield = [fiend]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=2,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(fiend["power"], 2)
+        self.assertEqual(fiend["toughness"], 2)
+        active.graveyard.clear()
+        opponent.graveyard.clear()
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+            all_players=[active, opponent],
+        )
+
+        self.assertNotIn(fiend, active.battlefield)
+        self.assertIn(fiend, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "state_based_action_zero_toughness"
+                and data.get("card") == "Slag Fiend"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_source_controller_draw_spell_draws_requested_cards(self) -> None:
         active = self.battle.Player(
             "Active",
