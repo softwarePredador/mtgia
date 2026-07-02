@@ -132,6 +132,7 @@ STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
+STATIC_GRAVEYARD_COUNT_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
@@ -2265,6 +2266,158 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
     }
 
 
+def static_graveyard_count_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    match = re.match(
+        r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) for each "
+        r"(?P<card_type>artifact|creature) card in (?P<scope>your graveyard|your opponents' graveyards)\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power_bonus = signed_int_from_oracle(match.group("power"))
+    toughness_bonus = signed_int_from_oracle(match.group("toughness"))
+    if power_bonus is None or toughness_bonus is None:
+        return None
+    return {
+        "graveyard_count_scope": (
+            "controller_graveyard"
+            if match.group("scope") == "your graveyard"
+            else "opponents_graveyards"
+        ),
+        "graveyard_count_card_types": [match.group("card_type")],
+        "static_power_bonus_per_graveyard_count": power_bonus,
+        "static_toughness_bonus_per_graveyard_count": toughness_bonus,
+    }
+
+
+def static_graveyard_count_boost_source_filter_types(source: str, expr: str) -> list[str] | str:
+    text = source or ""
+    value = str(expr or "").strip()
+    if "FilterArtifactCard" in value:
+        return ["artifact"]
+    if "FILTER_CARD_CREATURE" in value or "FilterCreatureCard" in value:
+        return ["creature"]
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", value):
+        assignment = re.search(
+            rf"(?:FilterCard|FilterCreatureCard|FilterArtifactCard)\s+{re.escape(value)}\s*=([^;]+);",
+            text,
+            re.S,
+        )
+        if assignment:
+            return static_graveyard_count_boost_source_filter_types(text, assignment.group(1))
+    return "static_graveyard_count_boost_source_filter_not_supported"
+
+
+def static_graveyard_count_boost_source_dynamic_spec(source: str, expr: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    value = str(expr or "").strip()
+    if value == "StaticValue.get(0)":
+        return {"static_value": 0}
+    if value in {"amount", "boost"}:
+        assignment = re.search(
+            rf"(?:DynamicValue\s+)?{re.escape(value)}\s*=\s*new\s+"
+            r"(CardsInControllerGraveyardCount|CardsInOpponentGraveyardsCount)\s*\((.*?)\)\s*;",
+            text,
+            re.S,
+        )
+        if assignment:
+            scope = (
+                "controller_graveyard"
+                if assignment.group(1) == "CardsInControllerGraveyardCount"
+                else "opponents_graveyards"
+            )
+            card_types = static_graveyard_count_boost_source_filter_types(text, assignment.group(2))
+            if isinstance(card_types, str):
+                return card_types
+            return {
+                "graveyard_count_scope": scope,
+                "graveyard_count_card_types": card_types,
+            }
+    direct = re.match(r"^new\s+CardsInControllerGraveyardCount\s*\((.*)\)$", value, re.S)
+    if direct:
+        card_types = static_graveyard_count_boost_source_filter_types(text, direct.group(1))
+        if isinstance(card_types, str):
+            return card_types
+        return {
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": card_types,
+        }
+    return "static_graveyard_count_boost_source_dynamic_not_supported"
+
+
+def split_top_level_args(arg_text: str) -> list[str]:
+    args: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for char in str(arg_text or ""):
+        if char == "," and depth == 0:
+            args.append("".join(current).strip())
+            current = []
+            continue
+        current.append(char)
+        if char == "(":
+            depth += 1
+        elif char == ")" and depth > 0:
+            depth -= 1
+    if current:
+        args.append("".join(current).strip())
+    return args
+
+
+def extract_constructor_args(source: str, constructor: str) -> str | None:
+    needle = f"new {constructor}"
+    start = str(source or "").find(needle)
+    if start < 0:
+        return None
+    open_index = str(source or "").find("(", start + len(needle))
+    if open_index < 0:
+        return None
+    depth = 0
+    for index in range(open_index, len(source)):
+        char = source[index]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return source[open_index + 1 : index]
+    return None
+
+
+def static_graveyard_count_boost_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    constructor_args = extract_constructor_args(text, "BoostSourceEffect")
+    if constructor_args is None:
+        return None
+    args = split_top_level_args(constructor_args)
+    if len(args) < 3 or args[2] != "Duration.WhileOnBattlefield":
+        return "static_graveyard_count_boost_source_not_while_on_battlefield"
+    power_spec = static_graveyard_count_boost_source_dynamic_spec(text, args[0])
+    toughness_spec = static_graveyard_count_boost_source_dynamic_spec(text, args[1])
+    if isinstance(power_spec, str):
+        return power_spec
+    if isinstance(toughness_spec, str):
+        return toughness_spec
+    if power_spec is None or toughness_spec is None:
+        return "static_graveyard_count_boost_source_dynamic_not_supported"
+    count_spec = power_spec if power_spec.get("static_value") is None else toughness_spec
+    if count_spec.get("static_value") is not None:
+        return "static_graveyard_count_boost_source_dynamic_not_supported"
+    for spec in (power_spec, toughness_spec):
+        if spec.get("static_value") is None and (
+            spec.get("graveyard_count_scope") != count_spec.get("graveyard_count_scope")
+            or spec.get("graveyard_count_card_types") != count_spec.get("graveyard_count_card_types")
+        ):
+            return "static_graveyard_count_boost_source_mixed_counts_not_supported"
+    return {
+        "graveyard_count_scope": count_spec["graveyard_count_scope"],
+        "graveyard_count_card_types": count_spec["graveyard_count_card_types"],
+        "static_power_bonus_per_graveyard_count": 0 if power_spec.get("static_value") == 0 else 1,
+        "static_toughness_bonus_per_graveyard_count": 0 if toughness_spec.get("static_value") == 0 else 1,
+    }
+
+
 def strip_leading_parenthetical_reminders(text: str) -> str:
     cleaned = str(text or "").strip()
     while True:
@@ -2481,6 +2634,18 @@ def is_static_graveyard_threshold_boost_unit(row: dict[str, Any]) -> bool:
         and "SimpleStaticAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"condition", "static_ability"}
+    )
+
+
+def is_static_graveyard_count_boost_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"SimpleStaticAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
+        and effect_classes(row) == {"BoostSourceEffect"}
+        and "SimpleStaticAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"static_ability"}
     )
 
 
@@ -4926,6 +5091,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature static source power/toughness equal to graveyard card count"
     elif scope == STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE:
         scope_kind = "creature static source power/toughness boost gated by graveyard card count"
+    elif scope == STATIC_GRAVEYARD_COUNT_BOOST_SCOPE:
+        scope_kind = "creature static source power/toughness boost equal to graveyard card count"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -5042,6 +5209,7 @@ def split_row(
     static_controlled_pt_unit = is_static_controlled_pt_unit(row)
     static_graveyard_count_pt_unit = is_static_graveyard_count_pt_unit(row)
     static_graveyard_threshold_boost_unit = is_static_graveyard_threshold_boost_unit(row)
+    static_graveyard_count_boost_unit = is_static_graveyard_count_boost_unit(row)
     permanent_activated_recursion_to_hand_unit = is_permanent_activated_recursion_to_hand_unit(row)
     permanent_activated_graveyard_exile_unit = is_permanent_activated_graveyard_exile_unit(row)
     permanent_activated_graveyard_to_library_unit = is_permanent_activated_graveyard_to_library_unit(row)
@@ -5087,6 +5255,7 @@ def split_row(
         and not static_controlled_pt_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
+        and not static_graveyard_count_boost_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
@@ -5124,6 +5293,7 @@ def split_row(
         and not static_controlled_pt_unit
         and not static_graveyard_count_pt_unit
         and not static_graveyard_threshold_boost_unit
+        and not static_graveyard_count_boost_unit
         and not permanent_activated_recursion_to_hand_unit
         and not permanent_activated_graveyard_exile_unit
         and not permanent_activated_graveyard_to_library_unit
@@ -6322,6 +6492,43 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_source_boost_if_graveyard_threshold",
+        ), "selected_exact_scope"
+
+    if static_graveyard_count_boost_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_graveyard_count_boost_not_creature"
+        oracle_static = static_graveyard_count_boost_from_oracle(metadata)
+        if oracle_static is None:
+            return None, "static_graveyard_count_boost_oracle_not_exact"
+        source_static = static_graveyard_count_boost_from_source(source_text)
+        if isinstance(source_static, str):
+            return None, source_static
+        if source_static is None:
+            return None, "static_graveyard_count_boost_source_not_exact"
+        if source_static != oracle_static:
+            return None, "static_graveyard_count_boost_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_GRAVEYARD_COUNT_BOOST_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "target": "self",
+            "target_controller": "self",
+            "xmage_effect_class": "BoostSourceEffect",
+            "xmage_ability_class": "SimpleStaticAbility",
+            **source_static,
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_source_boost_equal_graveyard_count",
         ), "selected_exact_scope"
 
     if keyword_creature_unit:
@@ -7771,6 +7978,7 @@ def build_exact_split_report(
             and not is_static_controlled_pt_unit(row)
             and not is_static_graveyard_count_pt_unit(row)
             and not is_static_graveyard_threshold_boost_unit(row)
+            and not is_static_graveyard_count_boost_unit(row)
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_permanent_activated_graveyard_exile_unit(row)
             and not is_boost_keyword_spell_unit(row)

@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG345
+thread goal remains active, but execution must use the current post-PG346
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -54,19 +54,21 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg344_static_graveyard_count_pt_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg345_static_graveyard_threshold_boost_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg345_static_graveyard_threshold_boost_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg346_static_graveyard_count_boost_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg346_static_graveyard_count_boost_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG345 counts:
+Post-PG346 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2436`
-- all-card readiness `battle_family_mapper_required`: `30111`
-- all-card readiness `snapshot_has_verified_rule`: `3584`
-- target battle-gap identities in authoritative queue: `27188`
-- XMage authoritative source resolved: `26874`
+- all-card readiness `battle_and_oracle_ready`: `2439`
+- all-card readiness `battle_family_mapper_required`: `30108`
+- all-card readiness `snapshot_has_verified_rule`: `3587`
+- target battle-gap identities in authoritative queue: `27185`
+- XMage authoritative source resolved: `26871`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26874`
+- XMage authoritative adapter required: `26871`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -163,9 +165,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG345 authoritative queue unless a newer queue exists:
+Use the post-PG346 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1884`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1881`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
@@ -176,7 +178,7 @@ Use the post-PG345 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG345:
+Immediate checkpoint after PG346:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
@@ -219,64 +221,75 @@ Immediate checkpoint after PG345:
    `Anurid Barkripper`, `Basking Capybara`, `Frilled Cave-Wurm`,
    `Krosan Beast`, `Metamorphic Wurm`, `Seton's Scout`, and
    `Springing Tiger`.
-11. PG336 is applied, synced, and E2E validated. The package evidence is in
+11. PG346 promoted the exact
+    `xmage_static_source_boost_equal_graveyard_count_v1` subpattern for
+    `Liliana's Elite`, `Salvage Slasher`, and `Wight of Precinct Six`.
+12. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_e2e_validation.md`.
-12. PG337 is applied, synced, and E2E validated. The package evidence is in
+13. PG337 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_e2e_validation.md`.
-13. PG338 is applied, synced, and E2E validated. The package evidence is in
+14. PG338 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_e2e_validation.md`.
-14. PG339 is applied, synced, and E2E validated. The package evidence is in
+15. PG339 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_e2e_validation.md`.
-15. PG340 is applied, synced, and E2E validated. The package evidence is in
+16. PG340 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_pg_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_e2e_validation.md`.
-16. PG341 is applied, synced, and E2E validated. The package evidence is in
+17. PG341 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg341_xmage_recursion_auxiliary_spell_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg341_xmage_recursion_auxiliary_spell_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg341_xmage_recursion_auxiliary_spell_wave_e2e_validation.md`.
-17. PG342 is applied, synced, and E2E validated. The package evidence is in
+18. PG342 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg342_xmage_recursion_exile_self_spell_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg342_xmage_recursion_exile_self_spell_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg342_xmage_recursion_exile_self_spell_wave_e2e_validation.md`.
-18. PG343 is applied, synced, and E2E validated. The package evidence is in
+19. PG343 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_e2e_validation.md`.
-19. PG344 is applied, synced, and E2E validated. The package evidence is in
+20. PG344 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg344_xmage_static_graveyard_count_pt_wave_e2e_validation.md`.
-20. PG345 is applied, synced, and E2E validated. The package evidence is in
+21. PG345 is applied, synced, and E2E validated. The package evidence is in
     `docs/hermes-analysis/master_optimizer_reports/pg345_xmage_static_graveyard_threshold_boost_wave_package.md`,
     `docs/hermes-analysis/master_optimizer_reports/pg345_xmage_static_graveyard_threshold_boost_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg345_xmage_static_graveyard_threshold_boost_wave_e2e_validation.md`.
-21. The post-PG344 supported splitter recheck returned `proposal_count=0` over
+22. PG346 is applied, synced, and E2E validated. The package evidence is in
+    `docs/hermes-analysis/master_optimizer_reports/pg346_xmage_static_graveyard_count_boost_wave_package.md`,
+    `docs/hermes-analysis/master_optimizer_reports/pg346_xmage_static_graveyard_count_boost_wave_apply_evidence.md`,
+    and
+    `docs/hermes-analysis/master_optimizer_reports/pg346_xmage_static_graveyard_count_boost_wave_e2e_validation.md`.
+23. The post-PG344 supported splitter recheck returned `proposal_count=0` over
     `7952` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg344_supported_recheck.md`.
-22. The post-PG345 supported splitter recheck returned `proposal_count=0` over
+24. The post-PG345 supported splitter recheck returned `proposal_count=0` over
     `7945` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg345_supported_recheck.md`.
-23. Continue from the fresh post-PG345 queue. The top reusable work unit remains
-   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1884`, so
+25. The post-PG346 supported splitter recheck returned `proposal_count=0` over
+    `7942` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg346_supported_recheck.md`.
+26. Continue from the fresh post-PG346 queue. The top reusable work unit remains
+   `recursion::xmage_graveyard_return_variant_review_v1`, now at `1881`, so
    the next cycle should split another exact recursion subpattern unless a
    fresher queue changes the ranking.
 

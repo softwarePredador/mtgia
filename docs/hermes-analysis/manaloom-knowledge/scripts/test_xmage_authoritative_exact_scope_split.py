@@ -373,6 +373,127 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_graveyard_threshold_boost_oracle_not_exact")
 
+    def test_static_graveyard_count_boost_controller_creatures_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Liliana's Elite",
+                type_line="Creature - Zombie",
+                oracle_text="This creature gets +1/+1 for each creature card in your graveyard.",
+            ),
+            source_text=(
+                "DynamicValue amount = new CardsInControllerGraveyardCount(StaticFilters.FILTER_CARD_CREATURE);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "amount, amount, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_BOOST_SCOPE)
+        self.assertEqual(effect["static_effect"], "source_power_toughness_boost_equal_graveyard_count")
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
+        self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 1)
+
+    def test_static_graveyard_count_boost_controller_artifacts_power_only_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Salvage Slasher",
+                type_line="Artifact Creature - Human Rogue",
+                oracle_text="This creature gets +1/+0 for each artifact card in your graveyard.",
+            ),
+            source_text=(
+                "BoostSourceEffect effect = new BoostSourceEffect("
+                "new CardsInControllerGraveyardCount(new FilterArtifactCard()), "
+                "StaticValue.get(0), Duration.WhileOnBattlefield);"
+                "this.addAbility(new SimpleStaticAbility(effect));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["artifact"])
+        self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
+        self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 0)
+
+    def test_static_graveyard_count_boost_opponents_graveyards_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wight of Precinct Six",
+                type_line="Creature - Zombie",
+                oracle_text=(
+                    "This creature gets +1/+1 for each creature card "
+                    "in your opponents' graveyards."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter = new FilterCreatureCard("
+                "\"creature card in your opponents' graveyards\");"
+                "DynamicValue boost = new CardsInOpponentGraveyardsCount(filter);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "boost, boost, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "opponents_graveyards")
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
+        self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 1)
+
+    def test_static_graveyard_count_boost_blocks_fixed_boost_source_effect(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Bear",
+                type_line="Creature - Bear",
+                oracle_text="This creature gets +1/+1.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "1, 1, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_graveyard_count_boost_oracle_not_exact")
+
     def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

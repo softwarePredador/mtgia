@@ -40858,6 +40858,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:d060f39142261847d31b48c0088866a1"
   },
+  "Liliana's Elite": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+    "static_power_bonus_per_graveyard_count": 1,
+    "static_toughness_bonus_per_graveyard_count": 1,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:124626c61ac3f48ff46db14909e9681f",
+    "battle_rule_oracle_hash": "0e5c88060b6b53bbb24c8fca3d83a82f"
+  },
   "Liliana, Death's Majesty": {
     "cmc": 5.0,
     "effect": "board_wipe",
@@ -58848,6 +58871,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1b32f19e01649978f52821ba954faa9c",
     "battle_rule_oracle_hash": "fc86af9610204d113e4710792ba4f880"
+  },
+  "Salvage Slasher": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "artifact"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+    "static_power_bonus_per_graveyard_count": 1,
+    "static_toughness_bonus_per_graveyard_count": 0,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:72d8bb5d5b6e8f637c637aee8d2ba831",
+    "battle_rule_oracle_hash": "4e36ff100ca10bd502ce20633c7ce415"
   },
   "Salvager of Secrets": {
     "ability_kind": "triggered",
@@ -80419,6 +80465,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ec13fde6127a2905cc827d079ad42812",
     "battle_rule_oracle_hash": "c1af8913a641802fe90d30bb8c866365"
+  },
+  "Wight of Precinct Six": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "opponents_graveyards",
+    "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+    "static_power_bonus_per_graveyard_count": 1,
+    "static_toughness_bonus_per_graveyard_count": 1,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:02c4275c60f5bb144bd4db5b98f1deba",
+    "battle_rule_oracle_hash": "721b083840f7456c239247f2df849056"
   },
   "Wight of the Reliquary": {
     "cmc": 2.0,

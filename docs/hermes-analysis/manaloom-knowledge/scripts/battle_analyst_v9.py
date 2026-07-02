@@ -33675,6 +33675,24 @@ def refresh_graveyard_count_creature_statics_for_player(
                 }
             )
             touched = True
+        if permanent.get("battle_model_scope") == STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE:
+            active = apply_static_graveyard_count_source_boost(
+                permanent,
+                player,
+                all_players=participants,
+                turn=turn,
+                phase=phase,
+                emit_event=emit_events,
+            )
+            row.update(
+                {
+                    "graveyard_count_source_boost_active": active,
+                    "graveyard_count": permanent.get("static_graveyard_count_boost_current"),
+                    "power": permanent.get("power"),
+                    "toughness": permanent.get("toughness"),
+                }
+            )
+            touched = True
         if touched:
             refreshed.append(row)
     return refreshed
@@ -33855,6 +33873,7 @@ def refresh_all_controlled_static_indestructible(
 STATIC_CONTROLLED_POWER_TOUGHNESS_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_POWER_TOUGHNESS_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
+STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE = "xmage_static_source_boost_equal_graveyard_count_v1"
 
 
 def _static_pt_int(value, default=0):
@@ -33996,6 +34015,116 @@ def static_graveyard_threshold_boost_count(permanent, controller, all_players=No
             if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types):
                 count += 1
     return count
+
+
+def static_graveyard_count_source_boost_count(permanent, controller, all_players=None):
+    if not isinstance(permanent, dict):
+        return None
+    if (
+        permanent.get("battle_model_scope") != STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE
+        or permanent.get("static_effect") != "source_power_toughness_boost_equal_graveyard_count"
+    ):
+        return None
+    scope = str(permanent.get("graveyard_count_scope") or "controller_graveyard")
+    if scope == "opponents_graveyards":
+        participants = [
+            player
+            for player in (all_players or [])
+            if player is not None and (controller is None or id(player) != id(controller))
+        ]
+    elif scope == "all_graveyards":
+        participants = [player for player in (all_players or []) if player is not None]
+        if controller is not None and all(id(player) != id(controller) for player in participants):
+            participants.insert(0, controller)
+    else:
+        participants = [controller] if controller is not None else []
+    allowed_types = permanent.get("graveyard_count_card_types") or ["card"]
+    count = 0
+    for participant in participants:
+        for card in getattr(participant, "graveyard", []) or []:
+            if isinstance(card, dict) and _static_graveyard_count_card_matches(card, allowed_types):
+                count += 1
+    return count
+
+
+def apply_static_graveyard_count_source_boost(
+    permanent,
+    controller,
+    all_players=None,
+    *,
+    turn=None,
+    phase=None,
+    emit_event=False,
+):
+    if not isinstance(permanent, dict) or controller is None or not is_battlefield_creature(permanent):
+        return False
+    if (
+        permanent.get("battle_model_scope") != STATIC_GRAVEYARD_COUNT_SOURCE_BOOST_SCOPE
+        or permanent.get("static_effect") != "source_power_toughness_boost_equal_graveyard_count"
+    ):
+        return False
+    count = static_graveyard_count_source_boost_count(
+        permanent,
+        controller,
+        all_players=all_players,
+    )
+    if count is None:
+        return False
+    old_power_bonus = _static_pt_int(permanent.get("_static_graveyard_count_boost_power_bonus"), default=0)
+    old_toughness_bonus = _static_pt_int(permanent.get("_static_graveyard_count_boost_toughness_bonus"), default=0)
+    current_power = _static_pt_int(permanent.get("power", permanent.get("base_power")), default=1)
+    current_toughness = _static_pt_int(
+        permanent.get("toughness", permanent.get("base_toughness")),
+        default=current_power or 1,
+    )
+    base_power = current_power - old_power_bonus
+    base_toughness = current_toughness - old_toughness_bonus
+    power_per = _static_pt_int(permanent.get("static_power_bonus_per_graveyard_count"), default=0)
+    toughness_per = _static_pt_int(permanent.get("static_toughness_bonus_per_graveyard_count"), default=0)
+    power_bonus = int(count) * power_per
+    toughness_bonus = int(count) * toughness_per
+    before = {
+        "power": permanent.get("power"),
+        "toughness": permanent.get("toughness"),
+        "count": permanent.get("static_graveyard_count_boost_current"),
+    }
+    if power_bonus or toughness_bonus:
+        permanent["power"] = base_power + power_bonus
+        permanent["toughness"] = base_toughness + toughness_bonus
+        permanent["_static_graveyard_count_boost_power_bonus"] = power_bonus
+        permanent["_static_graveyard_count_boost_toughness_bonus"] = toughness_bonus
+    else:
+        permanent["power"] = base_power
+        permanent["toughness"] = base_toughness
+        permanent.pop("_static_graveyard_count_boost_power_bonus", None)
+        permanent.pop("_static_graveyard_count_boost_toughness_bonus", None)
+    permanent["static_graveyard_count_boost_current"] = int(count)
+    permanent["static_graveyard_count_boost_scope"] = str(permanent.get("graveyard_count_scope") or "controller_graveyard")
+    permanent["static_graveyard_count_boost_card_types"] = list(permanent.get("graveyard_count_card_types") or ["card"])
+    changed = (
+        before["power"] != permanent.get("power")
+        or before["toughness"] != permanent.get("toughness")
+        or before["count"] != int(count)
+    )
+    if emit_event and changed:
+        emit_replay_event(
+            "static_graveyard_count_source_boost_changed",
+            player=getattr(controller, "name", "?"),
+            card=permanent.get("name", "?"),
+            graveyard_count=int(count),
+            graveyard_count_scope=permanent.get("static_graveyard_count_boost_scope"),
+            graveyard_count_card_types=permanent.get("static_graveyard_count_boost_card_types"),
+            power_before=before["power"],
+            toughness_before=before["toughness"],
+            power_after=permanent.get("power"),
+            toughness_after=permanent.get("toughness"),
+            power_bonus=power_bonus,
+            toughness_bonus=toughness_bonus,
+            turn=turn,
+            phase=phase,
+            **replay_rule_fields(permanent),
+        )
+    return bool(power_bonus or toughness_bonus)
 
 
 def static_graveyard_threshold_boost_is_active(permanent, controller, all_players=None):
@@ -34559,6 +34688,14 @@ def prepare_entering_permanent(permanent, controller=None, all_players=None, tur
             emit_event=True,
         )
         apply_static_graveyard_threshold_source_boost(
+            permanent,
+            controller,
+            all_players=all_players,
+            turn=turn,
+            phase="enter_battlefield",
+            emit_event=True,
+        )
+        apply_static_graveyard_count_source_boost(
             permanent,
             controller,
             all_players=all_players,

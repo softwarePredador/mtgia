@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T02:32:02.339504+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg346_xmage_static_graveyard_count_boost_wave_manifest.json",
+  "package_id": "pg346_xmage_static_graveyard_count_boost_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Liliana's Elite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:124626c61ac3f48ff46db14909e9681f",
+          "oracle_hash": "0e5c88060b6b53bbb24c8fca3d83a82f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Salvage Slasher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72d8bb5d5b6e8f637c637aee8d2ba831",
+          "oracle_hash": "4e36ff100ca10bd502ce20633c7ce415",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Wight of Precinct Six",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02c4275c60f5bb144bd4db5b98f1deba",
+          "oracle_hash": "721b083840f7456c239247f2df849056",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Liliana's Elite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:124626c61ac3f48ff46db14909e9681f",
+          "oracle_hash": "0e5c88060b6b53bbb24c8fca3d83a82f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Salvage Slasher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:72d8bb5d5b6e8f637c637aee8d2ba831",
+          "oracle_hash": "4e36ff100ca10bd502ce20633c7ce415",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "card_name": "Wight of Precinct Six",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:02c4275c60f5bb144bd4db5b98f1deba",
+          "oracle_hash": "721b083840f7456c239247f2df849056",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Liliana's Elite",
+          "logical_rule_key": "battle_rule_v1:124626c61ac3f48ff46db14909e9681f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Salvage Slasher",
+          "logical_rule_key": "battle_rule_v1:72d8bb5d5b6e8f637c637aee8d2ba831"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wight of Precinct Six",
+          "logical_rule_key": "battle_rule_v1:02c4275c60f5bb144bd4db5b98f1deba"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Liliana's Elite",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:124626c61ac3f48ff46db14909e9681f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Salvage Slasher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:72d8bb5d5b6e8f637c637aee8d2ba831"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wight of Precinct Six",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:02c4275c60f5bb144bd4db5b98f1deba"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

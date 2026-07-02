@@ -338,6 +338,117 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(capybara["power"], 6)
         self.assertEqual(capybara["toughness"], 2)
 
+    def test_static_graveyard_count_source_boost_counts_controller_graveyard_without_cumulative_bonus(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+            {"name": "Artifact Creature A", "type_line": "Artifact Creature - Construct"},
+            {"name": "Instant A", "type_line": "Instant"},
+        ]
+        elite = {
+            "name": "Liliana's Elite",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+            "static_power_bonus_per_graveyard_count": 1,
+            "static_toughness_bonus_per_graveyard_count": 1,
+        }
+        active.battlefield = [elite]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=2,
+            phase="test",
+            emit_events=True,
+        )
+        self.assertEqual(elite["static_graveyard_count_boost_current"], 2)
+        self.assertEqual(elite["power"], 3)
+        self.assertEqual(elite["toughness"], 3)
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=3, phase="test")
+        self.assertEqual(elite["power"], 3)
+        self.assertEqual(elite["toughness"], 3)
+
+        active.graveyard.pop(0)
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=4, phase="test")
+        self.assertEqual(elite["static_graveyard_count_boost_current"], 1)
+        self.assertEqual(elite["power"], 2)
+        self.assertEqual(elite["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_count_source_boost_changed"
+                and data.get("card") == "Liliana's Elite"
+                and data.get("graveyard_count") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_static_graveyard_count_source_boost_counts_artifacts_power_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Artifact A", "type_line": "Artifact"},
+            {"name": "Artifact Creature A", "type_line": "Artifact Creature - Construct"},
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+        ]
+        slasher = {
+            "name": "Salvage Slasher",
+            "type_line": "Artifact Creature - Human Rogue",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["artifact"],
+            "static_power_bonus_per_graveyard_count": 1,
+            "static_toughness_bonus_per_graveyard_count": 0,
+        }
+        active.battlefield = [slasher]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertEqual(slasher["static_graveyard_count_boost_current"], 2)
+        self.assertEqual(slasher["power"], 3)
+        self.assertEqual(slasher["toughness"], 1)
+
+    def test_static_graveyard_count_source_boost_counts_opponents_graveyards(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard = [{"name": "Own Creature", "type_line": "Creature - Bear"}]
+        opponent.graveyard = [
+            {"name": "Opponent Creature A", "type_line": "Creature - Zombie"},
+            {"name": "Opponent Artifact Creature", "type_line": "Artifact Creature - Construct"},
+            {"name": "Opponent Artifact", "type_line": "Artifact"},
+        ]
+        wight = {
+            "name": "Wight of Precinct Six",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+            "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "graveyard_count_scope": "opponents_graveyards",
+            "graveyard_count_card_types": ["creature"],
+            "static_power_bonus_per_graveyard_count": 1,
+            "static_toughness_bonus_per_graveyard_count": 1,
+        }
+        active.battlefield = [wight]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=2,
+            phase="test",
+            all_players=[active, opponent],
+        )
+        self.assertEqual(wight["static_graveyard_count_boost_current"], 2)
+        self.assertEqual(wight["power"], 3)
+        self.assertEqual(wight["toughness"], 3)
+
     def test_fixed_source_controller_draw_spell_draws_requested_cards(self) -> None:
         active = self.battle.Player(
             "Active",
