@@ -4023,9 +4023,16 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | 
     if text.count(":") != 1:
         return None
     effect_text = text.rsplit(":", 1)[1].strip()
+    restricted = restricted_battlefield_target_from_oracle({"oracle_text": effect_text}, "damage")
+    if restricted is not None:
+        match = re.match(
+            r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to ",
+            effect_text,
+        )
+        return (int(match.group(1)), restricted) if match else None
     match = re.match(
         r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to "
-        r"(any target|target creature)\.?$",
+        r"(any target|target creature|target player or planeswalker)\.?$",
         effect_text,
     )
     if not match:
@@ -4033,6 +4040,7 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | 
     target_map = {
         "any target": "any_target",
         "target creature": "creature",
+        "target player or planeswalker": "player_or_planeswalker",
     }
     return int(match.group(1)), target_map[match.group(2)]
 
@@ -4064,8 +4072,13 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     count = int(damage_matches[0] or "0")
     if count <= 0:
         return "activated_damage_source_count_not_fixed"
-    if "new TargetAnyTarget(" in text:
+    restricted = restricted_battlefield_target_from_source(text)
+    if restricted is not None:
+        target = restricted
+    elif "new TargetAnyTarget(" in text:
         target = "any_target"
+    elif "new TargetPlayerOrPlaneswalker(" in text:
+        target = "player_or_planeswalker"
     elif "new TargetCreaturePermanent(" in text:
         target = "creature"
     else:
@@ -5417,6 +5430,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["creature", "planeswalker"]}
     if target == "player":
         return {"scope": "player"}
+    if target == "player_or_planeswalker":
+        return {"scope": "player_or_planeswalker"}
     if target == "opponent":
         return {"scope": "opponent"}
     if target in {"artifact", "enchantment", "land", "permanent", "nonland_permanent"}:

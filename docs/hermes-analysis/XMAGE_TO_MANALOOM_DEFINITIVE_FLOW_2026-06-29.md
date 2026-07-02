@@ -143,14 +143,16 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg353_permanent_activated_graveyard_to_hand_discard_cost_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27164`
-- XMage authoritative source resolved: `26850`
+- target all-card battle-gap identities: `27142`
+- XMage authoritative source resolved: `26828`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26850`
+- XMage authoritative adapter required: `26828`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
@@ -176,9 +178,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG353 Exact Adapter Waves
+## PG283-PG354 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG353 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG354 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -295,7 +297,9 @@ patterns:
 - `direct_damage::targeted_damage_variant_v1` with
   `DamageTargetEffect + SimpleActivatedAbility` on permanents, exact fixed
   activated damage Oracle text, mana/tap/self-sacrifice source costs only, and
-  simple `any target` or `target creature` targets ->
+  simple `any target`, `target creature`, `target player or planeswalker`, or
+  exact source/Oracle-matched restricted battlefield targets for
+  attacking/blocking creatures, blocking creatures, and creatures with flying ->
   `xmage_permanent_simple_activated_damage_v1`
 - `removal_destroy::targeted_destroy_variant_v1` with
   `DestroyTargetEffect + SimpleActivatedAbility` on permanents, exact activated
@@ -4466,8 +4470,75 @@ PG353 measured result:
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=26850`.
 - Running the exact splitter after PG353 on supported units returns
-  `proposal_count=0` over `7921` considered supported rows. The next cycle
-  should continue from the fresh post-PG353 queue; the top reusable work unit
+  `proposal_count=0` over `7921` considered supported rows. This checkpoint
+  was superseded by PG354 below; at the PG353 checkpoint the top reusable work
+  unit remained `recursion::xmage_graveyard_return_variant_review_v1` at
+  `1860`.
+
+PG354 evidence:
+
+- PG354 permanent activated damage restricted-target package:
+  `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_package.md`
+- PG354 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_apply_evidence.md`
+- PG354 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_pg_to_sqlite_sync.json`
+- PG354 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_e2e_validation.md`
+- post-PG354 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_docs_final.md`
+- post-PG354 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg354_permanent_activated_damage_restricted_target_wave.md`
+- post-PG354 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_docs_final.md`
+- post-PG354 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_docs_final.md`
+- PG354 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg354_permanent_activated_damage_restricted_target_wave.md`
+- post-PG354 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_commander_legal.md`
+- post-PG354 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg354_supported_recheck.md`
+- post-PG354 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_recheck.md`
+
+PG354 measured result:
+
+- PG354 promoted `22` exact permanent activated damage rules with
+  source/Oracle-matched restricted targets: `8` player-or-planeswalker,
+  `10` attacking-or-blocking creature, `3` flying creature, and `1` blocking
+  creature target.
+- The splitter/runtime now support `TargetPlayerOrPlaneswalker`,
+  `TargetPermanent(StaticFilters.FILTER_CREATURE_FLYING)`,
+  `TargetAttackingOrBlockingCreature`, and `TargetBlockingCreature` for exact
+  permanent activated damage rules in
+  `xmage_permanent_simple_activated_damage_v1`.
+- Focused splitter/runtime suites report `233` and `142` tests passing,
+  respectively; package/E2E pytest checks report `6` passing tests.
+- PostgreSQL precheck found `22/22` target card rows, `0` existing expected
+  rows, and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `22` upserted rows, `22/22` promoted
+  rows, `22/22` verified/auto rows, and `22/22` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7349` PostgreSQL rows, inserted/updated
+  `7143` SQLite rows, and exported `4925` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG354 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG354:
+  `battle_and_oracle_ready=2482`, `battle_family_mapper_required=30065`, and
+  `snapshot_has_verified_rule=3630`.
+- Global all-card authoritative queue after PG354:
+  `target_identity_count=27142`, `xmage_authoritative_source_count=26828`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26828`.
+- Running the exact splitter after PG354 on supported units returns
+  `proposal_count=0` over `7899` considered supported rows. The next cycle
+  should continue from the fresh post-PG354 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1860`.
 
 ## Why This Is The Best Current Flow
@@ -5109,13 +5180,13 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG353 queue, the next exact runtime-backed work should be selected from
+post-PG354 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1860`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
-4. `direct_damage::targeted_damage_variant_v1` - `928`
+4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
 7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`

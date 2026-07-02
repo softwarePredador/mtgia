@@ -1,0 +1,1225 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg354_xmage_permanent_activated_damage_restricted_target",
+  "deploy_id": "PG354",
+  "expected_rules": [
+    {
+      "card_name": "Centaur Archer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "min_rule_version": 2,
+      "normalized_name": "centaur archer",
+      "oracle_hash": "71b2b794a72090895e177bff0d9397db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chandra's Magmutt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "min_rule_version": 2,
+      "normalized_name": "chandra's magmutt",
+      "oracle_hash": "c0cfa72ca7f9a18bb4a11fe77a4d24a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crossbow Infantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "min_rule_version": 2,
+      "normalized_name": "crossbow infantry",
+      "oracle_hash": "e74d452d796cde2e76f8c9053a5859bb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "D'Avenant Archer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "min_rule_version": 2,
+      "normalized_name": "d'avenant archer",
+      "oracle_hash": "e74d452d796cde2e76f8c9053a5859bb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duergar Assailant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b7bf7c6c0468a83a8c33a1a2f77f412",
+      "min_rule_version": 2,
+      "normalized_name": "duergar assailant",
+      "oracle_hash": "165d6685cfba4d00f915f27f2110dbfb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Archers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "min_rule_version": 2,
+      "normalized_name": "elite archers",
+      "oracle_hash": "99130e293359f234f88b17d926c3bb8e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Expendable Troops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de54881048cc048f58f08f665066cd9b",
+      "min_rule_version": 2,
+      "normalized_name": "expendable troops",
+      "oracle_hash": "0aa54078e549657ee80ad6053cbb34cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamewave Invoker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:716c80e737bac4ff57beddeefa3efb8b",
+      "min_rule_version": 2,
+      "normalized_name": "flamewave invoker",
+      "oracle_hash": "1fdb775332f22cf1060ec80c29e199d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Font of Ire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b6badbe8c20c3f449aa945c11669067",
+      "min_rule_version": 2,
+      "normalized_name": "font of ire",
+      "oracle_hash": "b8d2d73072094f3d34e03a8f7fb4c9a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Fireslinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "min_rule_version": 2,
+      "normalized_name": "goblin fireslinger",
+      "oracle_hash": "c0cfa72ca7f9a18bb4a11fe77a4d24a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grapeshot Catapult",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "min_rule_version": 2,
+      "normalized_name": "grapeshot catapult",
+      "oracle_hash": "71b2b794a72090895e177bff0d9397db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heavy Ballista",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "min_rule_version": 2,
+      "normalized_name": "heavy ballista",
+      "oracle_hash": "602055e38070d734a63ea2021af5775f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lady Caleria",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "min_rule_version": 2,
+      "normalized_name": "lady caleria",
+      "oracle_hash": "8601ca13e729e145c6592714db1b1a92",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacellum Archers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de2876d1d865f9c49aa4c9e91e657696",
+      "min_rule_version": 2,
+      "normalized_name": "sacellum archers",
+      "oracle_hash": "9ee28972d62769b8b50129f3fbe7c62d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scalding Devil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "min_rule_version": 2,
+      "normalized_name": "scalding devil",
+      "oracle_hash": "57d725fdb7fd22d6eb6c953d743081f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soldier Replica",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47fffd5cbead3eeb840d0aecd3d7dac0",
+      "min_rule_version": 2,
+      "normalized_name": "soldier replica",
+      "oracle_hash": "afe1e071fcb6ef9f11d7601d2591e664",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Telim'Tor's Darts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16f76652b66d85b65773c70f4402ad7b",
+      "min_rule_version": 2,
+      "normalized_name": "telim'tor's darts",
+      "oracle_hash": "1b214d5d456e11eb38c47444945cfa9d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tor Wauki",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "min_rule_version": 2,
+      "normalized_name": "tor wauki",
+      "oracle_hash": "98aa875535d8c814846880fc9c1d5900",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Scout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4d2d5c02f1a794b0b01674ac5162918",
+      "min_rule_version": 2,
+      "normalized_name": "viridian scout",
+      "oracle_hash": "7172cc2ab530b8d1fde76f219f685482",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Volcanic Rambler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "min_rule_version": 2,
+      "normalized_name": "volcanic rambler",
+      "oracle_hash": "57d725fdb7fd22d6eb6c953d743081f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Replica",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99365c102acc02481cb6ab18c2d131a6",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok replica",
+      "oracle_hash": "7ec4a9423850acce187f343f1b70c8a3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "War-Torch Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a106bed8fa94ac8f526c4fdf8f0c731",
+      "min_rule_version": 2,
+      "normalized_name": "war-torch goblin",
+      "oracle_hash": "a22cbce171ef0a606c8a8bd7539f1a84",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking"
+        }
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 22
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg354_xmage_permanent_activated_damage_restricted_target_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T05:16:36+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Centaur Archer"
+      },
+      "card_name": "Centaur Archer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "normalized_name": "centaur archer",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Chandra's Magmutt"
+      },
+      "card_name": "Chandra's Magmutt",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "normalized_name": "chandra's magmutt",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Crossbow Infantry"
+      },
+      "card_name": "Crossbow Infantry",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "normalized_name": "crossbow infantry",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "D'Avenant Archer"
+      },
+      "card_name": "D'Avenant Archer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "normalized_name": "d'avenant archer",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Duergar Assailant"
+      },
+      "card_name": "Duergar Assailant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b7bf7c6c0468a83a8c33a1a2f77f412",
+      "normalized_name": "duergar assailant",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Elite Archers"
+      },
+      "card_name": "Elite Archers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "normalized_name": "elite archers",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Expendable Troops"
+      },
+      "card_name": "Expendable Troops",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de54881048cc048f58f08f665066cd9b",
+      "normalized_name": "expendable troops",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Flamewave Invoker"
+      },
+      "card_name": "Flamewave Invoker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:716c80e737bac4ff57beddeefa3efb8b",
+      "normalized_name": "flamewave invoker",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Font of Ire"
+      },
+      "card_name": "Font of Ire",
+      "effect": "enchantment",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b6badbe8c20c3f449aa945c11669067",
+      "normalized_name": "font of ire",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "enchantment",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Fireslinger"
+      },
+      "card_name": "Goblin Fireslinger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "normalized_name": "goblin fireslinger",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Grapeshot Catapult"
+      },
+      "card_name": "Grapeshot Catapult",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "normalized_name": "grapeshot catapult",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Heavy Ballista"
+      },
+      "card_name": "Heavy Ballista",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "normalized_name": "heavy ballista",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Lady Caleria"
+      },
+      "card_name": "Lady Caleria",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "normalized_name": "lady caleria",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Sacellum Archers"
+      },
+      "card_name": "Sacellum Archers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de2876d1d865f9c49aa4c9e91e657696",
+      "normalized_name": "sacellum archers",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Scalding Devil"
+      },
+      "card_name": "Scalding Devil",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "normalized_name": "scalding devil",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Soldier Replica"
+      },
+      "card_name": "Soldier Replica",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47fffd5cbead3eeb840d0aecd3d7dac0",
+      "normalized_name": "soldier replica",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Telim'Tor's Darts"
+      },
+      "card_name": "Telim'Tor's Darts",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16f76652b66d85b65773c70f4402ad7b",
+      "normalized_name": "telim'tor's darts",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Tor Wauki"
+      },
+      "card_name": "Tor Wauki",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "normalized_name": "tor wauki",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Viridian Scout"
+      },
+      "card_name": "Viridian Scout",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4d2d5c02f1a794b0b01674ac5162918",
+      "normalized_name": "viridian scout",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Volcanic Rambler"
+      },
+      "card_name": "Volcanic Rambler",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "normalized_name": "volcanic rambler",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "Vulshok Replica"
+      },
+      "card_name": "Vulshok Replica",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99365c102acc02481cb6ab18c2d131a6",
+      "normalized_name": "vulshok replica",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        }
+      }
+    },
+    {
+      "card": {
+        "name": "War-Torch Goblin"
+      },
+      "card_name": "War-Torch Goblin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a106bed8fa94ac8f526c4fdf8f0c731",
+      "normalized_name": "war-torch goblin",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "creature",
+        "target": "blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "blocking"
+        }
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Centaur Archer",
+    "Chandra's Magmutt",
+    "Crossbow Infantry",
+    "D'Avenant Archer",
+    "Duergar Assailant",
+    "Elite Archers",
+    "Expendable Troops",
+    "Flamewave Invoker",
+    "Font of Ire",
+    "Goblin Fireslinger",
+    "Grapeshot Catapult",
+    "Heavy Ballista",
+    "Lady Caleria",
+    "Sacellum Archers",
+    "Scalding Devil",
+    "Soldier Replica",
+    "Telim'Tor's Darts",
+    "Tor Wauki",
+    "Viridian Scout",
+    "Volcanic Rambler",
+    "Vulshok Replica",
+    "War-Torch Goblin"
+  ],
+  "selected_count": 22,
+  "slug": "xmage_permanent_activated_damage_restricted_target_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Centaur Archer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "min_rule_version": 2,
+      "normalized_name": "centaur archer",
+      "oracle_hash": "71b2b794a72090895e177bff0d9397db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Chandra's Magmutt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "min_rule_version": 2,
+      "normalized_name": "chandra's magmutt",
+      "oracle_hash": "c0cfa72ca7f9a18bb4a11fe77a4d24a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crossbow Infantry",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "min_rule_version": 2,
+      "normalized_name": "crossbow infantry",
+      "oracle_hash": "e74d452d796cde2e76f8c9053a5859bb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "D'Avenant Archer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:48c641c7641ff222cdde309a2330fcec",
+      "min_rule_version": 2,
+      "normalized_name": "d'avenant archer",
+      "oracle_hash": "e74d452d796cde2e76f8c9053a5859bb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Duergar Assailant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:3b7bf7c6c0468a83a8c33a1a2f77f412",
+      "min_rule_version": 2,
+      "normalized_name": "duergar assailant",
+      "oracle_hash": "165d6685cfba4d00f915f27f2110dbfb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Archers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "min_rule_version": 2,
+      "normalized_name": "elite archers",
+      "oracle_hash": "99130e293359f234f88b17d926c3bb8e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Expendable Troops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de54881048cc048f58f08f665066cd9b",
+      "min_rule_version": 2,
+      "normalized_name": "expendable troops",
+      "oracle_hash": "0aa54078e549657ee80ad6053cbb34cb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Flamewave Invoker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:716c80e737bac4ff57beddeefa3efb8b",
+      "min_rule_version": 2,
+      "normalized_name": "flamewave invoker",
+      "oracle_hash": "1fdb775332f22cf1060ec80c29e199d6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Font of Ire",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:7b6badbe8c20c3f449aa945c11669067",
+      "min_rule_version": 2,
+      "normalized_name": "font of ire",
+      "oracle_hash": "b8d2d73072094f3d34e03a8f7fb4c9a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Fireslinger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b51b211efea91ef1da9b6c18749f460c",
+      "min_rule_version": 2,
+      "normalized_name": "goblin fireslinger",
+      "oracle_hash": "c0cfa72ca7f9a18bb4a11fe77a4d24a4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grapeshot Catapult",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16031f6067f2e4600ae5dc8bc4d6dff4",
+      "min_rule_version": 2,
+      "normalized_name": "grapeshot catapult",
+      "oracle_hash": "71b2b794a72090895e177bff0d9397db",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heavy Ballista",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "min_rule_version": 2,
+      "normalized_name": "heavy ballista",
+      "oracle_hash": "602055e38070d734a63ea2021af5775f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lady Caleria",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
+      "min_rule_version": 2,
+      "normalized_name": "lady caleria",
+      "oracle_hash": "8601ca13e729e145c6592714db1b1a92",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sacellum Archers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:de2876d1d865f9c49aa4c9e91e657696",
+      "min_rule_version": 2,
+      "normalized_name": "sacellum archers",
+      "oracle_hash": "9ee28972d62769b8b50129f3fbe7c62d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scalding Devil",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "min_rule_version": 2,
+      "normalized_name": "scalding devil",
+      "oracle_hash": "57d725fdb7fd22d6eb6c953d743081f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Soldier Replica",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:47fffd5cbead3eeb840d0aecd3d7dac0",
+      "min_rule_version": 2,
+      "normalized_name": "soldier replica",
+      "oracle_hash": "afe1e071fcb6ef9f11d7601d2591e664",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Telim'Tor's Darts",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:16f76652b66d85b65773c70f4402ad7b",
+      "min_rule_version": 2,
+      "normalized_name": "telim'tor's darts",
+      "oracle_hash": "1b214d5d456e11eb38c47444945cfa9d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Tor Wauki",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:db22bbe7daf99bf06910f9cf27163ae6",
+      "min_rule_version": 2,
+      "normalized_name": "tor wauki",
+      "oracle_hash": "98aa875535d8c814846880fc9c1d5900",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Scout",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e4d2d5c02f1a794b0b01674ac5162918",
+      "min_rule_version": 2,
+      "normalized_name": "viridian scout",
+      "oracle_hash": "7172cc2ab530b8d1fde76f219f685482",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Volcanic Rambler",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9a33f3b5ba1f8a67581039da082de4df",
+      "min_rule_version": 2,
+      "normalized_name": "volcanic rambler",
+      "oracle_hash": "57d725fdb7fd22d6eb6c953d743081f4",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Vulshok Replica",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:99365c102acc02481cb6ab18c2d131a6",
+      "min_rule_version": 2,
+      "normalized_name": "vulshok replica",
+      "oracle_hash": "7ec4a9423850acce187f343f1b70c8a3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "War-Torch Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a106bed8fa94ac8f526c4fdf8f0c731",
+      "min_rule_version": 2,
+      "normalized_name": "war-torch goblin",
+      "oracle_hash": "a22cbce171ef0a606c8a8bd7539f1a84",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

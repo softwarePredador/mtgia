@@ -2415,6 +2415,117 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_damage_respects_flying_creature_target_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        ground = {"name": "Ground Piker", "type_line": "Creature - Goblin", "power": 2, "toughness": 1}
+        flyer = {
+            "name": "Flying Drake",
+            "type_line": "Creature - Drake",
+            "power": 2,
+            "toughness": 1,
+            "keywords": ["flying"],
+        }
+        opponent.battlefield.extend([ground, flyer])
+        permanent = {
+            "name": "Centaur Archer",
+            "type_line": "Creature - Centaur Archer",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 1,
+            "target": "flying_creature",
+            "target_constraints": {"card_types": ["creature"], "required_keywords": ["flying"]},
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_centaur_archer",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(55),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(ground, opponent.battlefield)
+        self.assertNotIn(flyer, opponent.battlefield)
+        self.assertIn(flyer, opponent.graveyard)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Centaur Archer"
+                and data.get("target") == "Flying Drake"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_respects_blocking_creature_target_constraint(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        non_blocker = {"name": "Loose Goblin", "type_line": "Creature - Goblin", "power": 2, "toughness": 1}
+        blocker = {
+            "name": "Blocking Soldier",
+            "type_line": "Creature - Soldier",
+            "power": 2,
+            "toughness": 2,
+            "blocking": True,
+        }
+        opponent.battlefield.extend([non_blocker, blocker])
+        permanent = {
+            "name": "War-Torch Goblin",
+            "type_line": "Creature - Goblin Warrior",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "blocking_creature",
+            "target_constraints": {"card_types": ["creature"], "combat_state": "blocking"},
+            "activation_cost_mana": "{0}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": [],
+            "activation_requires_tap": False,
+            "activation_requires_sacrifice": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_war_torch_goblin",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(56),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(non_blocker, opponent.battlefield)
+        self.assertNotIn(blocker, opponent.battlefield)
+        self.assertIn(blocker, opponent.graveyard)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "War-Torch Goblin"
+                and data.get("target") == "Blocking Soldier"
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_damage_blocks_when_mana_is_missing(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

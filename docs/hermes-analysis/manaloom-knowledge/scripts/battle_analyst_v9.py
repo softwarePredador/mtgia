@@ -10977,7 +10977,7 @@ def direct_damage_targets_player(effect_data):
     if str(constraints.get("scope") or "").lower() == "any_target":
         return True
     target = str((effect_data or {}).get("target") or "").lower()
-    if target in {"player", "opponent", "any_target"}:
+    if target in {"player", "opponent", "any_target", "player_or_planeswalker"}:
         return True
     return False
 
