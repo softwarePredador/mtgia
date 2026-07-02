@@ -106,6 +106,7 @@ LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
+BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
@@ -777,6 +778,68 @@ def fixed_destroy_draw_from_source(source: str) -> int | None:
     return draw_count
 
 
+def fixed_bounce_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(return target .+? to its owner's hand)\. (?:then )?draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = bounce_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, 1
+
+
+def fixed_bounce_draw_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    bounce_matches = list(re.finditer(r"new\s+ReturnToHandTargetEffect\s*\(\s*\)", text, re.S))
+    if len(bounce_matches) != 1:
+        return None
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return None
+    if bounce_matches[0].start() > draw_matches[0].start():
+        return None
+    return draw_count
+
+
+def source_matches_bounce_target(source: str, target: str) -> bool:
+    if target in {"tapped_creature", "untapped_creature"}:
+        return source_matches_target_constraint(source, target)
+    text = source or ""
+    if target == "creature":
+        return "TargetCreaturePermanent" in text or "FilterCreaturePermanent" in text
+    if target == "nonland_permanent":
+        return "TargetNonlandPermanent" in text or "FilterNonlandPermanent" in text or "nonland permanent" in text
+    if target == "permanent":
+        return "TargetPermanent" in text or "FilterPermanent" in text
+    if target == "artifact":
+        return "TargetArtifactPermanent" in text or "FilterArtifactPermanent" in text or "artifact" in text
+    if target == "enchantment":
+        return "TargetEnchantmentPermanent" in text or "FilterEnchantmentPermanent" in text or "enchantment" in text
+    if target == "land":
+        return "TargetLandPermanent" in text or "FilterLandPermanent" in text or "land" in text
+    return source_matches_target_constraint(source, target)
+
+
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = oracle_text(metadata)
     restricted = restricted_battlefield_target_from_oracle(metadata, "exile")
@@ -802,6 +865,8 @@ def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None
 def bounce_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = oracle_text(metadata)
     patterns: list[tuple[str, tuple[str, str]]] = [
+        (r"^return target tapped creature to its owner's hand\.?$", ("remove_creature", "tapped_creature")),
+        (r"^return target untapped creature to its owner's hand\.?$", ("remove_creature", "untapped_creature")),
         (
             r"^return target artifact or enchantment to its owner's hand\.?$",
             ("remove_permanent", "artifact_or_enchantment"),
@@ -6602,6 +6667,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed target-creature boost plus draw-card spell"
     elif scope == DESTROY_DRAW_SCOPE:
         scope_kind = "fixed destroy-target plus draw-card spell"
+    elif scope == BOUNCE_DRAW_SCOPE:
+        scope_kind = "fixed return-target-to-hand plus draw-card spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
@@ -8972,6 +9039,58 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_destroy_target_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"}:
+            if ability_classes(row):
+                return None, "bounce_draw_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "bounce_draw_oracle_not_simple"
+            oracle_bounce = fixed_bounce_draw_from_oracle(metadata)
+            if oracle_bounce is None:
+                return None, "bounce_draw_oracle_not_exact_fixed"
+            source_draw_count = fixed_bounce_draw_from_source(source_text)
+            if source_draw_count is None:
+                return None, "bounce_draw_source_not_fixed"
+            effect, target_type, draw_count = oracle_bounce
+            if source_draw_count != draw_count:
+                return None, "bounce_draw_source_oracle_mismatch"
+            if not source_matches_bounce_target(source_text, target_type):
+                return None, "bounce_draw_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            bounce_component = {
+                "effect": effect,
+                "battle_model_scope": BOUNCE_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "hand",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ReturnToHandTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": BOUNCE_DRAW_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "hand",
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [bounce_component, draw_component],
+                "xmage_effect_classes": ["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_bounce_draw_card_spell",
             ), "selected_exact_scope"
 
         if classes != {"DrawCardSourceControllerEffect"}:

@@ -47573,12 +47573,17 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                             **decision,
                         )
                         break
-                    destination = move_creature_from_battlefield(
+                    destination = removal_destination(component)
+                    move_removed_permanent_to_destination(
                         opp,
                         target,
-                        reason=component_effect,
-                        source=card,
+                        card,
+                        component,
+                        turn,
+                        rng,
+                        all_players=participants,
                     )
+                    create_removal_compensation_tokens(component, opp, card, turn)
                     emit_replay_event(
                         "removal_resolved",
                         player=player.name,

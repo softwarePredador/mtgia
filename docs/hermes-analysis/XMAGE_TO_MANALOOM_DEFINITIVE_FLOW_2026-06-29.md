@@ -175,21 +175,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg368_graveyard_exile_spell_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg369_activated_recursion_costs_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg369_activated_recursion_costs_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg374_bounce_draw_spell_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg374_bounce_draw_spell_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27050`
-- XMage authoritative source resolved: `26736`
+- target all-card battle-gap identities: `27045`
+- XMage authoritative source resolved: `26731`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26736`
+- XMage authoritative adapter required: `26731`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26736` identities, card semantics are accepted from XMage; work is now
+- For `26731` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -208,9 +210,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG373 Exact Adapter Waves
+## PG283-PG374 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG373 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG374 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -252,6 +254,13 @@ patterns:
   battlefield target constraint, and composite runtime resolution without
   double-finishing the spell ->
   `xmage_destroy_target_and_draw_card_spell_v1`
+- `draw_cards::xmage_draw_card_variant_review_v1` with
+  `ReturnToHandTargetEffect + DrawCardSourceControllerEffect`, exact fixed
+  "Return target ... to its owner's hand. Draw a card." Oracle/source text, a
+  supported single battlefield target constraint, and composite runtime
+  resolution using the removal destination helper so the target moves to hand
+  rather than graveyard ->
+  `xmage_return_target_to_hand_and_draw_card_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
@@ -5657,6 +5666,33 @@ PG371-PG372 measured result:
   `proposal_count=0` over `7814` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG373-PG374 measured result:
+
+- PG373 promoted `7` fixed destroy-target plus draw-card spells into
+  `xmage_destroy_target_and_draw_card_spell_v1`.
+- PG374 promoted `5` fixed return-target-to-hand plus draw-card spells into
+  `xmage_return_target_to_hand_and_draw_card_spell_v1`: `Drag Under`,
+  `Galestrike`, `Leave in the Dust`, `Repulse`, and
+  `Symbol of Unsummoning`.
+- The runtime now routes composite removal components through the shared
+  removal destination helper, so `destination=hand` bounce components move the
+  target to hand rather than falling through to graveyard.
+- Focused splitter/runtime tests passed with `458` tests, `OK`.
+- PostgreSQL postcheck verified `5/5` PG374 rows as promoted, `verified`,
+  `auto`, and hash-backed.
+- PG -> Hermes/SQLite final sync exported `5017` canonical snapshot rows and
+  updated `7241` SQLite rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `5/5` cards.
+- Final PG-Hermes-SQLite contract audit passed with `49/49` checks.
+- Global all-card authoritative queue after PG374:
+  `target_identity_count=27045`, `xmage_authoritative_source_count=26731`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26731`.
+- Running the exact splitter after PG374 on supported units returns
+  `proposal_count=0` over `7802` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6296,7 +6332,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG372 queue, the next exact runtime-backed work should be selected from
+post-PG374 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
@@ -6305,7 +6341,7 @@ these largest reusable work units, not from deck intuition:
 4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `666`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `654`
 8. `removal_destroy::targeted_destroy_variant_v1` - `624`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`

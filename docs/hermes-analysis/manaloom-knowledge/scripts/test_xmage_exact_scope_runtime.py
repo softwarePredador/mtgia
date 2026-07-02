@@ -2663,6 +2663,78 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_bounce_draw_spell_moves_target_to_hand_and_draws_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.battlefield = [
+            {
+                "name": "Target Bear",
+                "type_line": "Creature - Bear",
+                "power": 2,
+                "toughness": 2,
+                "tapped": True,
+            }
+        ]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_creature",
+                    "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"], "tapped_state": "tapped"},
+                    "destination": "hand",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Galestrike",
+            "type_line": "Instant",
+            "oracle_text": "Return target tapped creature to its owner's hand. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(50),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.hand], ["Target Bear"])
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Galestrike"])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Galestrike"
+                and data.get("target") == "Target Bear"
+                and data.get("destination") == "hand"
+                and data.get("component_index") == 0
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Galestrike"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

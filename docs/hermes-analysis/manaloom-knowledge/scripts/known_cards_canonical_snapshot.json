@@ -4772,7 +4772,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "enchantment",
@@ -9844,7 +9844,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -20342,6 +20342,54 @@
     "battle_rule_logical_key": "battle_rule_v1:cc6472595f2f60ee860c1ff9bee7a766",
     "battle_rule_oracle_hash": "14c3b256b0931e55d61cbff122cfcf8b"
   },
+  "Drag Under": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "hand",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "ReturnToHandTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f862445930f198fc3c6dc8a3d59362bb",
+    "battle_rule_oracle_hash": "6dd402431d3b7fb848824229d033614a"
+  },
   "Dragon Engine": {
     "_activated_rule_effects": [
       {
@@ -30374,6 +30422,56 @@
     "battle_rule_logical_key": "battle_rule_v1:e378617268163d419f2f6fa1a9d10f00",
     "battle_rule_oracle_hash": "896c2783de327d3db7a76a55663bdc31"
   },
+  "Galestrike": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "hand",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "tapped_state": "tapped"
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "tapped_state": "tapped"
+    },
+    "xmage_effect_classes": [
+      "ReturnToHandTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d6525baec4c35d68b522fb1fa2a96b9f",
+    "battle_rule_oracle_hash": "e17ba3ddaf7febad91161213aad18a2a"
+  },
   "Gallant Citizen": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_draw_cards_v1",
@@ -38381,7 +38479,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_permanent",
     "instant": false,
     "sorcery": true,
     "target": "land",
@@ -43649,6 +43747,54 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
+  "Leave in the Dust": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "hand",
+        "effect": "remove_permanent",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "nonland_permanent"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "sorcery": false,
+    "target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "nonland_permanent"
+      ]
+    },
+    "xmage_effect_classes": [
+      "ReturnToHandTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1db4bbcee08be05bdcfcdbc8c3503ab1",
+    "battle_rule_oracle_hash": "e0aea105a62d82d27328b92b26231700"
+  },
   "Ledger Shredder": {
     "cmc": 2.0,
     "effect": "draw_cards",
@@ -47919,7 +48065,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_creature",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -60398,6 +60544,54 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "f1d632a67cde89fc96f3059ced2d0c54"
   },
+  "Repulse": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "hand",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "ReturnToHandTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c26825e6148a1ceed1bb1f5236af63de",
+    "battle_rule_oracle_hash": "6dd402431d3b7fb848824229d033614a"
+  },
   "Repurposing Bay": {
     "effect": "passive",
     "battle_rule_source": "curated",
@@ -69961,7 +70155,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "artifact_or_enchantment",
@@ -70124,7 +70318,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "artifact",
@@ -75642,6 +75836,54 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b12566362248c2d5bca28ecc66334b7f",
     "battle_rule_oracle_hash": "0df5927e6bd8aefdfcb8cf7cbfc9e615"
+  },
+  "Symbol of Unsummoning": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_return_target_to_hand_spell_v1",
+        "compose_on_resolution": true,
+        "destination": "hand",
+        "effect": "remove_creature",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_effect_class": "ReturnToHandTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_return_target_to_hand_and_draw_card_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "ReturnToHandTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f862445930f198fc3c6dc8a3d59362bb",
+    "battle_rule_oracle_hash": "6dd402431d3b7fb848824229d033614a"
   },
   "Syphon Mind": {
     "cmc": 4.0,
@@ -89410,7 +89652,7 @@
     "count": 1,
     "destination": "graveyard",
     "draw_count": 1,
-    "effect": "composite_resolution",
+    "effect": "remove_creature",
     "instant": true,
     "sorcery": false,
     "target": "creature",

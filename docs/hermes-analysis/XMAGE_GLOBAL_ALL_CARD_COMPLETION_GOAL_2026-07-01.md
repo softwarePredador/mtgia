@@ -151,10 +151,26 @@ Post-PG373 update:
 - final PG-Hermes-SQLite contract audit: `49/49` pass
 - delta since post-PG372: `7` identities promoted
 
+Post-PG374 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg374_bounce_draw_spell_wave_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg374_bounce_draw_spell_wave_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg374_supported_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg374_bounce_draw_spell_wave_apply_evidence.md`
+- target battle-gap identities in authoritative queue: `27045`
+- XMage authoritative source resolved: `26731`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26731`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `49/49` pass
+- delta since post-PG373: `5` identities promoted
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG373 queue above.
+historical only. The active execution baseline is the post-PG374 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -162,13 +178,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG373 control numbers:
+Current post-PG374 control numbers:
 
-- target battle-gap identities: `27050`
-- XMage-resolved authoritative source identities: `26736`
+- target battle-gap identities: `27045`
+- XMage-resolved authoritative source identities: `26731`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26736`
+- XMage authoritative adapter required: `26731`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -188,12 +204,12 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg373_destroy_draw_spell_wave_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG373, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg374_bounce_draw_spell_wave_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG374, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
-   `draw_effect_class_not_pure` composite draw spells (`532` blockers),
+   `draw_effect_class_not_pure` composite draw spells (`522` blockers),
    `mana_source_effect_class_not_simple` artifact/creature mana permanents
    (`303` blockers), and then non-spell/triggered permanent families currently
    blocked by `not_instant_or_sorcery_spell`.
@@ -203,13 +219,20 @@ Next executable cycle:
    blocker counts and move to the next lane without creating manual per-card
    rules.
 
-PG373 completion and PG374 starting hypothesis:
+PG374 completion and PG375 starting hypothesis:
 
 1. PG373 promoted the exact
    `DestroyTargetEffect + DrawCardSourceControllerEffect` subset as
    `xmage_destroy_target_and_draw_card_spell_v1`, covering `7` fixed
    destroy-target plus draw-card spells.
-2. The lane must still be split by XMage effect signature before any PostgreSQL
+2. PG374 promoted the exact
+   `ReturnToHandTargetEffect + DrawCardSourceControllerEffect` subset as
+   `xmage_return_target_to_hand_and_draw_card_spell_v1`, covering `5` fixed
+   return-target-to-hand plus draw-card spells. The promoted cards were
+   `Drag Under`, `Galestrike`, `Leave in the Dust`, `Repulse`, and
+   `Symbol of Unsummoning`. `Read the Tides` remained blocked as modal/up-to,
+   and `Repeal` remained blocked as an X/target-adjusted spell.
+3. The lane must still be split by XMage effect signature before any PostgreSQL
    package. Current measured subpatterns from the post-PG372 analysis included:
    `DiscardControllerEffect + DrawCardSourceControllerEffect` (`13` rows),
    `DestroyTargetEffect + DrawCardSourceControllerEffect` (`12` rows),
@@ -218,12 +241,14 @@ PG373 completion and PG374 starting hypothesis:
    `DrawCardSourceControllerEffect + ScryEffect` (`8` rows), and
    `DrawCardSourceControllerEffect + ReturnToHandTargetEffect` (`7` rows).
    After PG373, the exact destroy-target subset is exhausted in the supported
-   splitter and `draw_effect_class_not_pure` stands at `532`.
-3. Promote only exact fixed subsets from those signatures. Variable `X`, modal
+   splitter. After PG374, the exact return-target-to-hand plus draw-card subset
+   is exhausted in the supported splitter and `draw_effect_class_not_pure`
+   stands at `522`.
+4. Promote only exact fixed subsets from those signatures. Variable `X`, modal
    spells, dynamic card counts, optional discard clauses, unsupported target
    restrictions, and conditionally-derived amounts remain blocked until their
    own mapper/runtime subpattern exists.
-4. The first PG374 candidate should be the highest-confidence subpattern whose
+5. The first PG375 candidate should be the highest-confidence subpattern whose
    component effects are already supported by `composite_resolution` or can be
    added with a focused runtime test in the same cycle. If that fails, preserve
    blocker evidence and try the next measured subpattern; do not hand-write
@@ -231,6 +256,14 @@ PG373 completion and PG374 starting hypothesis:
 
 Fresh alignment evidence:
 
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg374_bounce_draw_spell_wave_final.md`
+  passed with `49/49` checks.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg374_bounce_draw_spell_wave_docs_after_update.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg374_bounce_draw_spell_wave_docs_after_update.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg374_bounce_draw_spell_wave_docs_after_update.md`
+  passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg373_destroy_draw_spell_wave_final.md`
   passed with `49/49` checks.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg373_destroy_draw_spell_wave_docs_final.md`

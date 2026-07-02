@@ -2050,6 +2050,132 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "destroy_draw_oracle_not_exact_fixed")
 
+    def test_fixed_bounce_draw_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target creature to its owner's hand. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["remove_creature", "draw_cards"],
+        )
+        self.assertEqual(effect["_composite_rule_components"][0]["destination"], "hand")
+
+    def test_fixed_bounce_draw_spell_maps_nonland_permanent_target(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target nonland permanent to its owner's hand. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetNonlandPermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["nonland_permanent"]})
+        self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
+
+    def test_fixed_bounce_draw_spell_maps_tapped_creature_constraint(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target tapped creature to its owner's hand. Draw a card."),
+            source_text=(
+                "filter.add(TappedPredicate.TAPPED);"
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(filter));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "tapped_state": "tapped"})
+
+    def test_fixed_bounce_draw_spell_blocks_dynamic_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target creature to its owner's hand. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "bounce_draw_source_not_fixed")
+
+    def test_fixed_bounce_draw_spell_blocks_modal_oracle(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Choose one — Draw three cards. Return up to two target creatures to their owners' hands."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+                "Mode mode = new Mode(new ReturnToHandTargetEffect());"
+                "mode.addTarget(new TargetCreaturePermanent(0, 2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "bounce_draw_oracle_not_simple")
+
+    def test_fixed_bounce_draw_spell_blocks_x_target_adjuster(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ReturnToHandTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target nonland permanent with mana value X to its owner's hand. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(new FilterNonlandPermanent(\"nonland permanent with mana value X\")));"
+                "this.getSpellAbility().setTargetAdjuster(new XManaValueTargetAdjuster());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "bounce_draw_oracle_not_exact_fixed")
+
     def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
