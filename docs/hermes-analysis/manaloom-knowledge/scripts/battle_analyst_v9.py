@@ -34646,6 +34646,11 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
             kind in type_line
             for kind in ("artifact", "creature", "enchantment", "planeswalker", "battle")
         )
+    if target in ("noncreature_permanent", "noncreature_permanent_card"):
+        return not is_creature_card(card) and (
+            is_land(card)
+            or any(kind in type_line for kind in ("artifact", "enchantment", "planeswalker", "battle"))
+        )
     if target in ("land", "land_card"):
         return is_land(card)
     if target in ("basic_land", "basic_land_card"):

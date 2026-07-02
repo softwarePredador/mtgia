@@ -54331,15 +54331,95 @@
     "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
   },
   "Reconstruct History": {
-    "cmc": 4.0,
-    "count": 2,
+    "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_exile_self_spell_v1",
+    "destination": "hand",
     "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:bae0bddaa64a2f72a2565a04a8680035"
+    "exiles_self": true,
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "artifact",
+        "target_constraints": {
+          "card_types": [
+            "artifact"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "instant",
+        "target_constraints": {
+          "card_types": [
+            "instant"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "sorcery",
+        "target_constraints": {
+          "card_types": [
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "planeswalker",
+        "target_constraints": {
+          "card_types": [
+            "planeswalker"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_additional_effect_class": "ExileSpellEffect",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5891f73a4c159c6a7e04ab4a73194bb2",
+    "battle_rule_oracle_hash": "fef076b46b9660e2f9eb20dbce095b86"
   },
   "Reconstruction": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -55557,6 +55637,62 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3fa2af734f9bfba0c4394af2a416f870",
     "battle_rule_oracle_hash": "99ea0cf39b2608fba87944153f661453"
+  },
+  "Retrieve": {
+    "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_exile_self_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "exiles_self": true,
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "noncreature_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "exclude_card_types": [
+            "creature"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_additional_effect_class": "ExileSpellEffect",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3fb7ce15a27a11482bfeb0a35cc5e088",
+    "battle_rule_oracle_hash": "18bc4cc44ffd6382912e0c7fe24e7335"
   },
   "Return from Extinction": {
     "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
@@ -77610,6 +77746,32 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Vivid Revival": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 3,
+    "destination": "hand",
+    "effect": "recursion",
+    "exiles_self": true,
+    "instant": false,
+    "sorcery": true,
+    "target": "multicolored_card",
+    "target_constraints": {
+      "controller": "self",
+      "min_colors": 2,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_additional_effect_class": "ExileSpellEffect",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0eaec04572207c2751454d4b4793493b",
+    "battle_rule_oracle_hash": "9f4629b135cb2888979404fca4a71cea"
   },
   "Vizkopa Vampire": {
     "_keywords_are_self": true,

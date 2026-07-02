@@ -3586,6 +3586,79 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual([card["name"] for card in active.hand], ["Target Wizard A", "Target Wizard B"])
         self.assertEqual([card["name"] for card in active.graveyard], ["Target Soldier", "Fixture Unbury"])
 
+    def test_graveyard_to_hand_exile_self_components_return_noncreature_permanent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Target Relic", "type_line": "Artifact", "cmc": 3},
+                {"name": "Wrong Bolt", "type_line": "Instant", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_exile_self_spell_v1",
+            "mode_selection": "all_components",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "noncreature_permanent",
+                    "target_constraints": {
+                        "zone": "graveyard",
+                        "controller": "self",
+                        "card_types": ["artifact", "enchantment", "planeswalker", "battle", "land"],
+                        "exclude_card_types": ["creature"],
+                    },
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+            "destination": "hand",
+            "target_controller": "self",
+            "exiles_self": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Retrieve",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Return up to one target creature card and up to one target noncreature permanent card "
+                    "from your graveyard to your hand. Exile Fixture Retrieve."
+                ),
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bear", "Target Relic"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Bolt"])
+        self.assertEqual([card["name"] for card in active.exile], ["Fixture Retrieve"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("mode_selection") == "all_components"
+                and data.get("recovered_count") == 2
+                and [item["target_type"] for item in data.get("recovered_by_component", [])]
+                == ["creature", "noncreature_permanent"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

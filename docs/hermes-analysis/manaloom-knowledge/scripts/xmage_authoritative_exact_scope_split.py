@@ -813,6 +813,9 @@ def recursion_target_constraints_for(
         constraints["card_types"] = [target]
     elif target == "planeswalker":
         constraints["card_types"] = ["planeswalker"]
+    elif target == "noncreature_permanent":
+        constraints["card_types"] = ["artifact", "enchantment", "planeswalker", "battle", "land"]
+        constraints["exclude_card_types"] = ["creature"]
     elif target == "human_creature":
         constraints["card_types"] = ["creature"]
         constraints["subtypes"] = ["human"]
@@ -907,6 +910,87 @@ def recursion_choose_one_or_both_from_text(text: str) -> list[dict[str, Any]] | 
     return components
 
 
+def recursion_component_up_to_one(target: str) -> dict[str, Any]:
+    component = recursion_component(target, 1)
+    component["up_to_count"] = True
+    return component
+
+
+def recursion_exile_self_components_from_text(text: str) -> list[dict[str, Any]] | None:
+    text = re.sub(r"\s+", " ", str(text or "").strip().lower())
+    if not text.startswith("return up to one target "):
+        return None
+    if not text.endswith(" from your graveyard to your hand."):
+        return None
+    body = text.removesuffix(" from your graveyard to your hand.")
+    phrases = re.findall(r"up to one target ([a-z ]+?) card", body)
+    target_map = {
+        "artifact": "artifact",
+        "enchantment": "enchantment",
+        "instant": "instant",
+        "sorcery": "sorcery",
+        "planeswalker": "planeswalker",
+        "creature": "creature",
+        "noncreature permanent": "noncreature_permanent",
+    }
+    targets = [target_map.get(phrase.strip()) for phrase in phrases]
+    if any(target is None for target in targets):
+        return None
+    if targets == ["artifact", "enchantment", "instant", "sorcery", "planeswalker"]:
+        return [recursion_component_up_to_one(str(target)) for target in targets]
+    if targets == ["creature", "noncreature_permanent"]:
+        return [recursion_component_up_to_one(str(target)) for target in targets]
+    return None
+
+
+def recursion_to_hand_exile_self_components_from_oracle(
+    metadata: dict[str, Any],
+) -> list[dict[str, Any]] | None:
+    text = oracle_text_without_trailing_self_exile(metadata)
+    if text is None:
+        return None
+    return recursion_exile_self_components_from_text(text)
+
+
+def source_supports_exile_self_recursion_target(source_text: str, target: str) -> bool:
+    text = str(source_text or "")
+    if target == "any_card":
+        return (
+            "TargetCardInYourGraveyard" in text
+            and (
+                "FILTER_CARD_FROM_YOUR_GRAVEYARD" in text
+                or "new TargetCardInYourGraveyard()" in text
+                or re.search(r"TargetCardInYourGraveyard\s*\(\s*\d+\s*,", text, re.S)
+            )
+        )
+    if target == "multicolored_card":
+        return "MulticoloredPredicate" in text
+    if target == "noncreature_permanent":
+        return "FilterPermanentCard" in text and "Predicates.not(CardType.CREATURE.getPredicate())" in text
+    checks = {
+        "artifact": ("FilterArtifactCard", "FILTER_CARD_ARTIFACT"),
+        "enchantment": ("FilterEnchantmentCard", "FilterEnchantmentCard"),
+        "instant": ("CardType.INSTANT", "instant card"),
+        "sorcery": ("CardType.SORCERY", "sorcery card"),
+        "planeswalker": ("FilterPlaneswalkerCard", "planeswalker card"),
+        "creature": ("FILTER_CARD_CREATURE", "FilterCreatureCard"),
+    }
+    return any(needle in text for needle in checks.get(target, ()))
+
+
+def source_supports_exile_self_recursion_components(
+    source_text: str,
+    components: list[dict[str, Any]],
+) -> bool:
+    text = str(source_text or "")
+    if "ExileSpellEffect" not in text or "ReturnFromGraveyardToHandTargetEffect" not in text:
+        return False
+    if "EachTargetPointer" not in text:
+        return False
+    targets = [str(component.get("target") or "") for component in components]
+    return all(source_supports_exile_self_recursion_target(text, target) for target in targets)
+
+
 def recursion_choose_one_from_text(text: str) -> list[dict[str, Any]] | None:
     text = re.sub(r"\s+", " ", str(text or "").strip().lower())
     if not text.startswith("choose one") or text.startswith("choose one or both"):
@@ -968,6 +1052,10 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
         (
             r"^return target multicolored card from your graveyard to your hand\.?$",
             ("multicolored_card", 1, False),
+        ),
+        (
+            r"^return up to three target multicolor(?:ed)? cards from your graveyard to your hand\.?$",
+            ("multicolored_card", 3, True),
         ),
         (
             r"^return target goblin card from your graveyard to your hand\.?$",
@@ -6758,10 +6846,34 @@ def split_row(
                 return None, "recursion_exile_self_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "recursion_exile_self_oracle_not_simple"
+            components = recursion_to_hand_exile_self_components_from_oracle(metadata)
+            if components is not None:
+                if not source_supports_exile_self_recursion_components(source_text, components):
+                    return None, "recursion_exile_self_source_components_not_supported"
+                effect_json = {
+                    "effect": "recursion",
+                    "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_exile_self_spell_v1",
+                    "mode_selection": "all_components",
+                    "recursion_components": components,
+                    "destination": "hand",
+                    "target_controller": "self",
+                    "exiles_self": True,
+                    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                    "xmage_additional_effect_class": "ExileSpellEffect",
+                    **flags,
+                }
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_graveyard_to_hand_multi_component_exile_self_spell",
+                ), "selected_exact_scope"
             target = recursion_to_hand_exile_self_from_oracle(metadata)
             if target is None:
                 return None, "recursion_exile_self_target_not_supported"
             target_type, count, up_to = target
+            if not source_supports_exile_self_recursion_target(source_text, target_type):
+                return None, "recursion_exile_self_source_target_not_supported"
             effect_json = {
                 "effect": "recursion",
                 "battle_model_scope": RECURSION_SCOPE,
