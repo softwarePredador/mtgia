@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG360
+thread goal remains active, but execution must use the current post-PG361
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -84,25 +84,27 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg359_aphetto_shared_type_recursion_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg360_static_graveyard_extended_filters_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg360_static_graveyard_extended_filters_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG360 counts:
+Post-PG361 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2503`
-- all-card readiness `battle_family_mapper_required`: `30044`
-- all-card readiness `snapshot_has_verified_rule`: `3651`
-- target battle-gap identities in authoritative queue: `27121`
-- XMage authoritative source resolved: `26807`
+- all-card readiness `battle_and_oracle_ready`: `2509`
+- all-card readiness `battle_family_mapper_required`: `30038`
+- all-card readiness `snapshot_has_verified_rule`: `3657`
+- target battle-gap identities in authoritative queue: `27115`
+- XMage authoritative source resolved: `26801`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26807`
+- XMage authoritative adapter required: `26801`
 - adapter work-unit keys: `11429`
 
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG360 queue above.
+historical only. The active execution baseline is the post-PG361 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -110,13 +112,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG360 control numbers:
+Current post-PG361 control numbers:
 
-- target battle-gap identities: `27121`
-- XMage-resolved authoritative source identities: `26807`
+- target battle-gap identities: `27115`
+- XMage-resolved authoritative source identities: `26801`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26807`
+- XMage authoritative adapter required: `26801`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -209,11 +211,19 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg360_static_graveyard_extended_filters_wave.md`
   passed with `48` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_docs_final.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_docs_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_docs_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg361_recursion_battlefield_selection_constraints_wave.md`
+  passed with `48` pass and `1` inherited warning.
 
 The next executable work starts from
-`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg360_static_graveyard_extended_filters_wave_commander_legal.json`.
+`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg361_recursion_battlefield_selection_constraints_wave_commander_legal.json`.
 The first priority is still
-`recursion::xmage_graveyard_return_variant_review_v1` with `1851` remaining
+`recursion::xmage_graveyard_return_variant_review_v1` with `1845` remaining
 identities, but that broad work unit must be split by exact XMage
 effect/ability/source signatures before any PostgreSQL promotion.
 
@@ -311,9 +321,9 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG360 authoritative queue unless a newer queue exists:
+Use the post-PG361 authoritative queue unless a newer queue exists:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1851`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1845`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`
@@ -324,7 +334,7 @@ Use the post-PG360 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG359:
+Immediate checkpoint after PG361:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
@@ -424,6 +434,12 @@ Immediate checkpoint after PG359:
     extension for `Runaway Trash-Bot` and `Xande, Dark Mage`, preserving
     artifact-or-enchantment and noncreature/nonland graveyard filters inside
     `xmage_static_source_boost_equal_graveyard_count_v1`.
+26. PG361 promoted the exact graveyard-to-battlefield spell selection
+    constraint extension for `Behold the Sinister Six!`, `Brought Back`,
+    `Continue?`, `Grim Return`, `March from the Tomb`, and `Patch Up`,
+    preserving total mana value ceilings, different-name requirements,
+    Ally-creature targeting, battlefield-to-graveyard-this-turn filters, and
+    tapped entry where Oracle/XMage require it.
 18. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
@@ -549,6 +565,11 @@ Immediate checkpoint after PG359:
     `docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_apply_evidence.md`,
     and
     `docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_e2e_validation.md`.
+43. PG361 is applied, synced, and E2E validated. The package evidence is in
+    `docs/hermes-analysis/master_optimizer_reports/pg361_xmage_recursion_battlefield_selection_constraints_wave_package.md`,
+    `docs/hermes-analysis/master_optimizer_reports/pg361_xmage_recursion_battlefield_selection_constraints_wave_apply_evidence.md`,
+    and
+    `docs/hermes-analysis/master_optimizer_reports/pg361_xmage_recursion_battlefield_selection_constraints_wave_e2e_validation.md`.
 36. The post-PG344 supported splitter recheck returned `proposal_count=0` over
     `7952` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg344_supported_recheck.md`.
@@ -600,8 +621,11 @@ Immediate checkpoint after PG359:
 52. The post-PG360 supported splitter recheck returned `proposal_count=0` over
     `7878` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg360_supported_recheck.md`.
-53. Continue from the fresh post-PG360 queue. The top reusable work unit remains
-    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1851`, so
+53. The post-PG361 supported splitter recheck returned `proposal_count=0` over
+    `7872` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg361_supported_recheck.md`.
+54. Continue from the fresh post-PG361 queue. The top reusable work unit remains
+    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1845`, so
     the next cycle should split another exact recursion subpattern unless a
     fresher queue changes the ranking.
 

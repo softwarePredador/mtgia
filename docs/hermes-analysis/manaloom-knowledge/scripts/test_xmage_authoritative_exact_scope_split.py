@@ -43,6 +43,150 @@ def metadata(name: str = "Fixture Spell", *, type_line: str = "Instant", oracle_
 
 
 class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
+    def test_recursion_battlefield_total_mana_value_limit_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Patch Up",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to three target creature cards with total mana value "
+                    "3 or less from your graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());"
+                "private static final FilterCard filterStatic = new FilterCreatureCard("
+                "\"creature cards with total mana value 3 or less from your graveyard\");"
+                "this.getSpellAbility().addTarget(new PatchUpTarget());"
+                "class PatchUpTarget extends TargetCardInYourGraveyard {"
+                "PatchUpTarget() { super(0, 3, filterStatic, false); }"
+                "return CardUtil.checkCanTargetTotalValueLimit(this.getTargets(), id, "
+                "MageObject::getManaValue, 3, game);"
+                "return CardUtil.checkPossibleTargetsTotalValueLimit(this.getTargets(), "
+                "super.possibleTargets(sourceControllerId, source, game), "
+                "MageObject::getManaValue, 3, game);"
+                "}"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 3)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["recursion_total_mana_value_max"], 3)
+        self.assertEqual(effect["target_constraints"]["total_mana_value_max"], 3)
+
+    def test_recursion_battlefield_ally_total_mana_value_limit_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="March from the Tomb",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return any number of target Ally creature cards with total mana value "
+                    "8 or less from your graveyard to the battlefield."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());"
+                "private static final FilterCreatureCard filterStatic = new FilterCreatureCard("
+                "\"Ally creature cards with total mana value 8 or less from your graveyard\");"
+                "filterStatic.add(SubType.ALLY.getPredicate());"
+                "this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filterStatic));"
+                "MarchFromTheTombTarget() { super(0, Integer.MAX_VALUE, filterStatic); }"
+                "return CardUtil.checkCanTargetTotalValueLimit(this.getTargets(), id, "
+                "MageObject::getManaValue, 8, game);"
+                "return CardUtil.checkPossibleTargetsTotalValueLimit(this.getTargets(), "
+                "super.possibleTargets(sourceControllerId, source, game), "
+                "MageObject::getManaValue, 8, game);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "ally_creature")
+        self.assertEqual(effect["count"], 99)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["recursion_total_mana_value_max"], 8)
+        self.assertEqual(effect["target_constraints"]["subtypes"], ["ally"])
+
+    def test_recursion_battlefield_this_turn_graveyard_filter_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Continue?",
+                type_line="Instant",
+                oracle_text=(
+                    "Choose up to four target creature cards in your graveyard that were put "
+                    "there from the battlefield this turn. Return them to the battlefield."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter = new FilterCreatureCard("
+                "\"creature cards in your graveyard that were put there from the battlefield this turn\");"
+                "filter.add(PutIntoGraveFromBattlefieldThisTurnPredicate.instance);"
+                "this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 4, filter));"
+                "this.getSpellAbility().addWatcher(new CardsPutIntoGraveyardWatcher());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 4)
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["graveyard_from_battlefield_this_turn"])
+        self.assertTrue(effect["target_constraints"]["graveyard_from_battlefield_this_turn"])
+
+    def test_recursion_battlefield_this_turn_permanents_enter_tapped_is_preserved(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Brought Back",
+                type_line="Instant",
+                oracle_text=(
+                    "Choose up to two target permanent cards in your graveyard that were put "
+                    "there from the battlefield this turn. Return them to the battlefield tapped."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter = new FilterPermanentCard("
+                "\"permanent cards in your graveyard that were put there from the battlefield this turn\");"
+                "filter.add(PutIntoGraveFromBattlefieldThisTurnPredicate.instance);"
+                "this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect(true));"
+                "this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 2, filter));"
+                "this.getSpellAbility().addWatcher(new CardsPutIntoGraveyardWatcher());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "permanent")
+        self.assertEqual(effect["count"], 2)
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["enters_tapped"])
+        self.assertTrue(effect["graveyard_from_battlefield_this_turn"])
+
     def test_static_controlled_power_toughness_boost_all_creatures_is_package_safe(self) -> None:
         row = queue_row(
             split.STATIC_CONTROLLED_PT_UNIT,

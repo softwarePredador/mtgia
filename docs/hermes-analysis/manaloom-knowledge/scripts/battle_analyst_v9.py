@@ -17527,6 +17527,8 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         replacement_event_cls=ReplacementEvent,
     )
     if isinstance(creature, dict) and destination != "none":
+        if destination == "graveyard":
+            creature["_put_into_graveyard_from_battlefield_turn"] = CURRENT_REPLAY_TURN
         emit_replay_event(
             "permanent_moved_from_battlefield",
             player=getattr(owner, "name", "?"),
@@ -17588,6 +17590,8 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         replacement_event_cls=ReplacementEvent,
     )
     if isinstance(permanent, dict) and destination != "none":
+        if destination == "graveyard":
+            permanent["_put_into_graveyard_from_battlefield_turn"] = CURRENT_REPLAY_TURN
         emit_replay_event(
             "permanent_moved_from_battlefield",
             player=getattr(owner, "name", "?"),
@@ -35521,6 +35525,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "mercenary" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("elf_card", "elf"):
         return "elf" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("ally_creature", "ally_creature_card", "ally"):
+        return is_creature_card(card) and "ally" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("human_creature", "human"):
         return is_creature_card(card) and "human" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
@@ -49224,7 +49230,7 @@ def apply_effect_immediate(
             component_mana_value_max = recursion_mana_value_max(component_data)
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
-            return [
+            candidates = [
                 grave_card
                 for grave_card in participant.graveyard
                 if graveyard_card_matches_recursion_target(
@@ -49233,6 +49239,47 @@ def apply_effect_immediate(
                     mana_value_max=component_mana_value_max,
                 )
             ]
+            if component_data.get("graveyard_from_battlefield_this_turn") or effect_data.get(
+                "graveyard_from_battlefield_this_turn"
+            ):
+                candidates = [
+                    grave_card
+                    for grave_card in candidates
+                    if grave_card.get("_put_into_graveyard_from_battlefield_turn") == turn
+                ]
+            if component_data.get("requires_different_names") or effect_data.get("requires_different_names"):
+                seen_names = set()
+                unique_candidates = []
+                for grave_card in candidates:
+                    normalized = normalize_card_name(grave_card.get("name") or grave_card.get("card_name") or "")
+                    if normalized in seen_names:
+                        continue
+                    seen_names.add(normalized)
+                    unique_candidates.append(grave_card)
+                candidates = unique_candidates
+            total_mana_value_max = (
+                component_data.get("recursion_total_mana_value_max")
+                or component_data.get("total_mana_value_max")
+                or effect_data.get("recursion_total_mana_value_max")
+                or effect_data.get("total_mana_value_max")
+            )
+            if total_mana_value_max is not None:
+                try:
+                    total_limit = int(float(total_mana_value_max))
+                except (TypeError, ValueError):
+                    total_limit = 0
+                selected = []
+                selected_total = 0
+                for grave_card in candidates:
+                    mana_value = card_mana_value(grave_card)
+                    if selected_total + mana_value > total_limit:
+                        continue
+                    selected.append(grave_card)
+                    selected_total += mana_value
+                    if len(selected) >= count:
+                        break
+                candidates = selected
+            return candidates
 
         def component_score(component_data):
             component_target_controller = str(
@@ -49428,6 +49475,10 @@ def apply_effect_immediate(
             enters_tapped=bool(effect_data.get("enters_tapped")),
             counter_type=effect_data.get("counter_type"),
             counter_amount=effect_data.get("counter_amount"),
+            total_mana_value_max=effect_data.get("recursion_total_mana_value_max")
+            or effect_data.get("total_mana_value_max"),
+            requires_different_names=bool(effect_data.get("requires_different_names")),
+            graveyard_from_battlefield_this_turn=bool(effect_data.get("graveyard_from_battlefield_this_turn")),
             return_all_matching=return_all_matching,
             mode_selection=effect_data.get("mode_selection"),
             grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),

@@ -1,0 +1,9 @@
+        card_name         |     normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------------+--------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Behold the Sinister Six! | behold the sinister six! | battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62 |                  1 |                           1 |                         1 |           0
+ Brought Back             | brought back             | battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c |                  1 |                           1 |                         1 |           0
+ Continue?                | continue?                | battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef |                  1 |                           1 |                         1 |           0
+ Grim Return              | grim return              | battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84 |                  1 |                           1 |                         1 |           0
+ March from the Tomb      | march from the tomb      | battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448 |                  1 |                           1 |                         1 |           0
+ Patch Up                 | patch up                 | battle_rule_v1:77e5f68e27a575e492b33361b92091fa |                  1 |                           1 |                         1 |           0
+(6 rows)

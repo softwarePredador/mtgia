@@ -1,0 +1,266 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T07:27:57.317777+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg361_xmage_recursion_battlefield_selection_constraints_wave_manifest.json",
+  "package_id": "pg361_xmage_recursion_battlefield_selection_constraints_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Behold the Sinister Six!",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62",
+          "oracle_hash": "22d23fc917885e5b22cb7b60c483756c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Brought Back",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c",
+          "oracle_hash": "af75ed7190647cd5a685e3dd34dfd3c9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Continue?",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef",
+          "oracle_hash": "6b2ab191a364b742c0e4c8d4d2957106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Grim Return",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84",
+          "oracle_hash": "cd84ad9ab549a29a67cbe1b5dae6cf75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "March from the Tomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448",
+          "oracle_hash": "23140e7a4f665d8e3e6015e1103ec5b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Patch Up",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:77e5f68e27a575e492b33361b92091fa",
+          "oracle_hash": "c999a9d7c9e85a1656c3fe8f2dc5fc8f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 6
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Behold the Sinister Six!",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62",
+          "oracle_hash": "22d23fc917885e5b22cb7b60c483756c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Brought Back",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c",
+          "oracle_hash": "af75ed7190647cd5a685e3dd34dfd3c9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Continue?",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef",
+          "oracle_hash": "6b2ab191a364b742c0e4c8d4d2957106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Grim Return",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84",
+          "oracle_hash": "cd84ad9ab549a29a67cbe1b5dae6cf75",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "March from the Tomb",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448",
+          "oracle_hash": "23140e7a4f665d8e3e6015e1103ec5b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Patch Up",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:77e5f68e27a575e492b33361b92091fa",
+          "oracle_hash": "c999a9d7c9e85a1656c3fe8f2dc5fc8f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Behold the Sinister Six!",
+          "logical_rule_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brought Back",
+          "logical_rule_key": "battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Continue?",
+          "logical_rule_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grim Return",
+          "logical_rule_key": "battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "March from the Tomb",
+          "logical_rule_key": "battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Patch Up",
+          "logical_rule_key": "battle_rule_v1:77e5f68e27a575e492b33361b92091fa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 6
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Behold the Sinister Six!",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brought Back",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Continue?",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grim Return",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "March from the Tomb",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Patch Up",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:77e5f68e27a575e492b33361b92091fa"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

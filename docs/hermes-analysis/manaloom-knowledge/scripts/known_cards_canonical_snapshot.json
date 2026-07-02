@@ -6464,6 +6464,36 @@
     "battle_rule_logical_key": "battle_rule_v1:0b543efc21cb5ee532062e24929c6ae1",
     "battle_rule_oracle_hash": "54b87eea8f1593e9f30794429bf7047f"
   },
+  "Behold the Sinister Six!": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 6,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "requires_different_names": true,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "requires_different_names": true,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62",
+    "battle_rule_oracle_hash": "22d23fc917885e5b22cb7b60c483756c"
+  },
   "Beledros Witherbloom": {
     "cmc": 7.0,
     "effect": "token_maker",
@@ -9732,6 +9762,42 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:9d95c51a6c089d9710c604b46ab3ff67"
+  },
+  "Brought Back": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 2,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "enters_tapped": true,
+    "graveyard_from_battlefield_this_turn": true,
+    "instant": true,
+    "sorcery": false,
+    "target": "permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "graveyard_from_battlefield_this_turn": true,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e054b75a3b97cc92a917e8bdecbee82c",
+    "battle_rule_oracle_hash": "af75ed7190647cd5a685e3dd34dfd3c9"
   },
   "Browbeat": {
     "cmc": 3.0,
@@ -14362,6 +14428,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "5759f5e1c31ee4159b031e0432f54459"
+  },
+  "Continue?": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 4,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "graveyard_from_battlefield_this_turn": true,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "graveyard_from_battlefield_this_turn": true,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:96c134fe95bf5a8397b9f1bcd8bbc1ef",
+    "battle_rule_oracle_hash": "6b2ab191a364b742c0e4c8d4d2957106"
   },
   "Cool but Rude": {
     "ability_kind": "triggered",
@@ -33321,6 +33417,35 @@
     "battle_rule_logical_key": "battle_rule_v1:ac773d3e88bf38de11004c2943b4d871",
     "battle_rule_oracle_hash": "2fcac973250226ee566f69491bff9de4"
   },
+  "Grim Return": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "graveyard_from_battlefield_this_turn": true,
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "any_player",
+      "graveyard_from_battlefield_this_turn": true,
+      "zone": "graveyard"
+    },
+    "target_controller": "any_player",
+    "target_graveyard_controller": "any_player",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:fb8c63570b73aab5f5069a1232f18e84",
+    "battle_rule_oracle_hash": "cd84ad9ab549a29a67cbe1b5dae6cf75"
+  },
   "Grim Tutor": {
     "effect": "tutor",
     "target": "any",
@@ -45029,6 +45154,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cd0eae61bb9dc1929706e91a784723dc"
   },
+  "March from the Tomb": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 99,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "recursion_total_mana_value_max": 8,
+    "sorcery": true,
+    "target": "ally_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "subtypes": [
+        "ally"
+      ],
+      "total_mana_value_max": 8,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:feb5bdcf4ab012abd1490b3a8611f448",
+    "battle_rule_oracle_hash": "23140e7a4f665d8e3e6015e1103ec5b0"
+  },
   "March of Otherworldly Light": {
     "cmc": 1.0,
     "effect": "remove_permanent",
@@ -51959,6 +52117,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ccdb2d362690ed2c1ef32711b42e51be",
     "battle_rule_oracle_hash": "12f293d8d746fbc4e5ba80828919dec5"
+  },
+  "Patch Up": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 3,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "recursion_total_mana_value_max": 3,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "total_mana_value_max": 3,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:77e5f68e27a575e492b33361b92091fa",
+    "battle_rule_oracle_hash": "c999a9d7c9e85a1656c3fe8f2dc5fc8f"
   },
   "Patchwork Banner": {
     "cmc": 3.0,

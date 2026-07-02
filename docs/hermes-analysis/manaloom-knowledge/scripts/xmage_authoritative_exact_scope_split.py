@@ -792,6 +792,9 @@ def recursion_target_constraints_for(
     *,
     controller: str = "self",
     mana_value_max: int | None = None,
+    total_mana_value_max: int | None = None,
+    requires_different_names: bool = False,
+    graveyard_from_battlefield_this_turn: bool = False,
 ) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "graveyard", "controller": controller}
     if target == "any_card":
@@ -812,6 +815,9 @@ def recursion_target_constraints_for(
         constraints["subtypes"] = ["mercenary"]
     elif target == "elf_card":
         constraints["subtypes"] = ["elf"]
+    elif target == "ally_creature":
+        constraints["card_types"] = ["creature"]
+        constraints["subtypes"] = ["ally"]
     elif target == "shared_creature_type":
         constraints["card_types"] = ["creature"]
         constraints["shared_subtype_group"] = "creature_type"
@@ -863,6 +869,12 @@ def recursion_target_constraints_for(
         constraints["target"] = target
     if mana_value_max is not None:
         constraints["mana_value_max"] = mana_value_max
+    if total_mana_value_max is not None:
+        constraints["total_mana_value_max"] = total_mana_value_max
+    if requires_different_names:
+        constraints["requires_different_names"] = True
+    if graveyard_from_battlefield_this_turn:
+        constraints["graveyard_from_battlefield_this_turn"] = True
     return constraints
 
 
@@ -1254,6 +1266,70 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
     text = oracle_text(metadata)
     patterns: list[tuple[str, dict[str, Any]]] = [
         (
+            r"^return up to six target creature cards with different names from your graveyard to the battlefield\.?$",
+            {
+                "target": "creature",
+                "count": 6,
+                "up_to_count": True,
+                "requires_different_names": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
+            r"^return up to three target creature cards with total mana value (?P<total_mana_value_max>\d+) or less from your graveyard to the battlefield\.?$",
+            {
+                "target": "creature",
+                "count": 3,
+                "up_to_count": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
+            r"^return any number of target ally creature cards with total mana value (?P<total_mana_value_max>\d+) or less from your graveyard to the battlefield\.?$",
+            {
+                "target": "ally_creature",
+                "count": 99,
+                "up_to_count": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
+            r"^choose up to two target permanent cards in your graveyard that were put there from the battlefield this turn\. return them to the battlefield tapped\.?$",
+            {
+                "target": "permanent",
+                "count": 2,
+                "up_to_count": True,
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+                "enters_tapped": True,
+                "graveyard_from_battlefield_this_turn": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
+            r"^choose up to four target creature cards in your graveyard that were put there from the battlefield this turn\. return them to the battlefield\.?$",
+            {
+                "target": "creature",
+                "count": 4,
+                "up_to_count": True,
+                "target_graveyard_controller": "self",
+                "battlefield_controller": "self",
+                "graveyard_from_battlefield_this_turn": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
+            r"^choose target creature card in a graveyard that was put there from the battlefield this turn\. put that card onto the battlefield under your control\.?$",
+            {
+                "target": "creature",
+                "count": 1,
+                "target_graveyard_controller": "any_player",
+                "battlefield_controller": "self",
+                "graveyard_from_battlefield_this_turn": True,
+                "oracle_complexity_supported": True,
+            },
+        ),
+        (
             r"^return target permanent card from your graveyard to the battlefield\.?$",
             {"target": "permanent", "count": 1},
         ),
@@ -1302,10 +1378,20 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
             "count": spec["count"],
             "target_graveyard_controller": spec.get("target_graveyard_controller", "self"),
             "battlefield_controller": spec.get("battlefield_controller", "self"),
-            "enters_tapped": bool(match.groupdict().get("tapped")),
+            "enters_tapped": bool(spec.get("enters_tapped") or match.groupdict().get("tapped")),
         }
         if match.groupdict().get("mana_value_max"):
             result["mana_value_max"] = int(match.group("mana_value_max"))
+        if match.groupdict().get("total_mana_value_max"):
+            result["recursion_total_mana_value_max"] = int(match.group("total_mana_value_max"))
+        for flag in (
+            "up_to_count",
+            "requires_different_names",
+            "graveyard_from_battlefield_this_turn",
+            "oracle_complexity_supported",
+        ):
+            if spec.get(flag):
+                result[flag] = True
         return result
     return None
 
@@ -1435,6 +1521,8 @@ def source_supports_battlefield_recursion_target_type(source_text: str, target_t
         )
     if target == "artifact":
         return "FILTER_CARD_ARTIFACT" in text or "FilterArtifactCard" in text or "artifact card" in lowered
+    if target == "ally_creature":
+        return "FilterCreatureCard" in text and "SubType.ALLY.getPredicate" in text
     if target == "enchantment":
         return (
             "FILTER_CARD_ENCHANTMENT" in text
@@ -1455,6 +1543,43 @@ def source_supports_battlefield_recursion_mana_value(source_text: str, mana_valu
         rf"{expected_exclusive}\s*\)"
     )
     return bool(re.search(pattern, source_text or ""))
+
+
+def source_supports_battlefield_recursion_total_mana_value(
+    source_text: str,
+    total_mana_value_max: int | None,
+) -> bool:
+    if total_mana_value_max is None:
+        return True
+    text = str(source_text or "")
+    return (
+        "checkCanTargetTotalValueLimit" in text
+        and "checkPossibleTargetsTotalValueLimit" in text
+        and "MageObject::getManaValue" in text
+        and re.search(rf"\b{int(total_mana_value_max)}\s*,\s*game", text) is not None
+    )
+
+
+def source_supports_battlefield_recursion_different_names(source_text: str, required: bool) -> bool:
+    if not required:
+        return True
+    text = str(source_text or "")
+    lowered = text.lower()
+    return (
+        "different names" in lowered
+        and "getTargets().contains" in text
+        and "Collectors.toSet" in text
+    )
+
+
+def source_supports_battlefield_recursion_this_turn(source_text: str, required: bool) -> bool:
+    if not required:
+        return True
+    text = str(source_text or "")
+    return (
+        "PutIntoGraveFromBattlefieldThisTurnPredicate" in text
+        and "CardsPutIntoGraveyardWatcher" in text
+    )
 
 
 def recursion_effect_text_from_oracle(metadata: dict[str, Any]) -> str | None:
@@ -8240,17 +8365,41 @@ def split_row(
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
             if ability_classes(row):
                 return None, "recursion_battlefield_ability_class_not_simple"
-            if has_oracle_complexity(metadata):
-                return None, "recursion_battlefield_oracle_not_simple"
             target = recursion_to_battlefield_from_oracle(metadata)
             if target is None:
+                if has_oracle_complexity(metadata):
+                    return None, "recursion_battlefield_oracle_not_simple"
                 return None, "recursion_battlefield_target_not_supported"
+            if has_oracle_complexity(metadata) and not target.get("oracle_complexity_supported"):
+                return None, "recursion_battlefield_oracle_not_simple"
             target_type = str(target["target"])
             count = int(target["count"])
             target_graveyard_controller = str(target.get("target_graveyard_controller") or "self")
             if not source_supports_battlefield_recursion_target(source_text, target_graveyard_controller):
                 return None, "recursion_battlefield_source_target_not_supported"
             mana_value_max = target.get("mana_value_max")
+            total_mana_value_max = target.get("recursion_total_mana_value_max")
+            requires_different_names = bool(target.get("requires_different_names"))
+            graveyard_from_battlefield_this_turn = bool(target.get("graveyard_from_battlefield_this_turn"))
+            requires_source_target_type_confirmation = bool(
+                total_mana_value_max is not None
+                or requires_different_names
+                or graveyard_from_battlefield_this_turn
+                or target_type == "ally_creature"
+            )
+            if requires_source_target_type_confirmation and not source_supports_battlefield_recursion_target_type(
+                source_text,
+                target_type,
+            ):
+                return None, "recursion_battlefield_source_target_not_supported"
+            if not source_supports_battlefield_recursion_mana_value(source_text, mana_value_max):
+                return None, "recursion_battlefield_source_mana_value_not_supported"
+            if not source_supports_battlefield_recursion_total_mana_value(source_text, total_mana_value_max):
+                return None, "recursion_battlefield_source_total_mana_value_not_supported"
+            if not source_supports_battlefield_recursion_different_names(source_text, requires_different_names):
+                return None, "recursion_battlefield_source_different_names_not_supported"
+            if not source_supports_battlefield_recursion_this_turn(source_text, graveyard_from_battlefield_this_turn):
+                return None, "recursion_battlefield_source_this_turn_not_supported"
             effect_json = {
                 "effect": "recursion",
                 "battle_model_scope": RECURSION_BATTLEFIELD_SCOPE,
@@ -8259,6 +8408,9 @@ def split_row(
                     target_type,
                     controller=target_graveyard_controller,
                     mana_value_max=mana_value_max,
+                    total_mana_value_max=total_mana_value_max,
+                    requires_different_names=requires_different_names,
+                    graveyard_from_battlefield_this_turn=graveyard_from_battlefield_this_turn,
                 ),
                 "count": count,
                 "destination": "battlefield",
@@ -8270,6 +8422,14 @@ def split_row(
             }
             if mana_value_max is not None:
                 effect_json["recursion_mana_value_max"] = mana_value_max
+            if total_mana_value_max is not None:
+                effect_json["recursion_total_mana_value_max"] = int(total_mana_value_max)
+            if target.get("up_to_count"):
+                effect_json["up_to_count"] = True
+            if requires_different_names:
+                effect_json["requires_different_names"] = True
+            if graveyard_from_battlefield_this_turn:
+                effect_json["graveyard_from_battlefield_this_turn"] = True
             if target.get("enters_tapped"):
                 effect_json["enters_tapped"] = True
             return build_proposal(
