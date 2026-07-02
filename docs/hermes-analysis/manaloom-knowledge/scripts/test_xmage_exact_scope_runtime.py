@@ -5595,6 +5595,113 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.graveyard, [source])
         self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
 
+    def test_graveyard_self_return_to_battlefield_pays_exile_creature_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        exile_creature = {"name": "Spent Servo", "type_line": "Artifact Creature - Servo", "cmc": 1}
+        stay_spell = {"name": "Past Spell", "type_line": "Sorcery", "cmc": 3}
+        source = {
+            "name": "Scrapheap Scrounger",
+            "type_line": "Artifact Creature - Construct",
+            "cmc": 2,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{1}{B}",
+            "graveyard_self_return_activation_cost_generic": 1,
+            "graveyard_self_return_activation_cost_colors": ["B"],
+            "graveyard_self_return_activation_exile_from_graveyard_count": 1,
+            "graveyard_self_return_activation_exile_from_graveyard_target": "creature_card",
+            "graveyard_self_return_activation_exile_from_graveyard_other": True,
+            "activation_exile_from_graveyard_count": 1,
+            "activation_exile_from_graveyard_target": "creature_card",
+            "activation_exile_from_graveyard_other": True,
+            "enters_tapped": False,
+            "cant_block": True,
+            "static_cant_block": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_scrapheap_scrounger",
+        }
+        active.graveyard.extend([stay_spell, exile_creature, source])
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=19,
+            rng=random.Random(19),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Past Spell"])
+        self.assertEqual([card["name"] for card in active.exile], ["Spent Servo"])
+        self.assertEqual(active.exile[0].get("_exile_reason"), "graveyard_self_return_exile_cost")
+        self.assertEqual([card["name"] for card in active.battlefield], ["Scrapheap Scrounger"])
+        self.assertFalse(active.battlefield[0].get("tapped"))
+        self.assertTrue(active.battlefield[0].get("cant_block"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Scrapheap Scrounger"
+                and data.get("activation_kind") == "graveyard_self_return_to_battlefield"
+                and data.get("activation_cost") == "{1}{B}"
+                and data.get("destination") == "battlefield"
+                and data.get("enters_tapped") is False
+                and data.get("exiled_cost") == ["Spent Servo"]
+                and data.get("exiled_cost_count") == 1
+                and data.get("exile_cost_target") == "creature_card"
+                and data.get("mana_paid") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_self_return_to_battlefield_does_not_pay_when_exile_cost_unavailable(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("black", 2)
+        only_creature = {"name": "Only Creature", "type_line": "Creature - Skeleton", "cmc": 2}
+        noncreature = {"name": "Spent Spell", "type_line": "Instant", "cmc": 1}
+        source = {
+            "name": "Despoiler of Souls",
+            "type_line": "Creature - Horror",
+            "cmc": 2,
+            "effect": "creature",
+            "battle_model_scope": "xmage_graveyard_simple_activated_self_return_to_battlefield_v1",
+            "graveyard_self_return_to_battlefield": True,
+            "graveyard_self_return_destination": "battlefield",
+            "graveyard_self_return_activation_cost_mana": "{B}{B}",
+            "graveyard_self_return_activation_cost_generic": 0,
+            "graveyard_self_return_activation_cost_colors": ["B", "B"],
+            "graveyard_self_return_activation_exile_from_graveyard_count": 2,
+            "graveyard_self_return_activation_exile_from_graveyard_target": "creature_card",
+            "graveyard_self_return_activation_exile_from_graveyard_other": True,
+            "activation_exile_from_graveyard_count": 2,
+            "activation_exile_from_graveyard_target": "creature_card",
+            "activation_exile_from_graveyard_other": True,
+            "enters_tapped": False,
+        }
+        active.graveyard.extend([noncreature, only_creature, source])
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=20,
+            rng=random.Random(20),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 0)
+        self.assertEqual(active.available_mana(), 2)
+        self.assertEqual(active.exile, [])
+        self.assertEqual(active.battlefield, [])
+        self.assertEqual(active.graveyard, [noncreature, only_creature, source])
+        self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
+
     def test_simple_activated_graveyard_exile_single_graveyard_exiles_multiple_and_sacrifices_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

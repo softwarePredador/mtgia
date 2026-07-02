@@ -3221,8 +3221,20 @@ def graveyard_self_return_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[
 
 def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    static_cant_block = False
+    card_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    cant_block_prefixes = [
+        f"{card_name} can't block. " if card_name else "",
+        "this creature can't block. ",
+        "this card can't block. ",
+    ]
+    for prefix in cant_block_prefixes:
+        if prefix and text.startswith(prefix):
+            static_cant_block = True
+            text = text.removeprefix(prefix).strip()
+            break
     match = re.fullmatch(
-        r"(?P<cost>(?:\{[0-9wubrg]\})+)(?:,\s*discard (?P<discard_count>two) cards?)?: return this card from your graveyard to the battlefield(?P<tapped> tapped)?\.?",
+        r"(?P<cost>(?:\{[0-9wubrg]\})+)(?:,\s*(?P<additional>(?:discard (?P<discard_count>two) cards?)|(?:exile (?:(?P<exile_count_word>seven|two) (?P<exile_other>other )?(?P<exile_target>creature cards|cards)|(?P<exile_another>another) (?P<exile_another_target>creature card)) from your graveyard)))?: return this card from your graveyard to the battlefield(?P<tapped> tapped)?\.?",
         text,
     )
     if not match:
@@ -3237,6 +3249,7 @@ def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
         "enters_tapped": bool(match.group("tapped")),
+        "static_cant_block": static_cant_block,
     }
     if match.group("discard_count"):
         result["activation_discard_count"] = 2
@@ -3244,6 +3257,23 @@ def graveyard_self_return_to_battlefield_from_oracle(metadata: dict[str, Any]) -
     else:
         result["activation_discard_count"] = 0
         result["activation_discard_target"] = None
+    result["activation_exile_from_graveyard_count"] = 0
+    result["activation_exile_from_graveyard_target"] = None
+    result["activation_exile_from_graveyard_other"] = False
+    if match.group("exile_count_word") or match.group("exile_another"):
+        if match.group("exile_another"):
+            exile_count = 1
+            exile_target_text = match.group("exile_another_target")
+            exile_other = True
+        else:
+            exile_count = {"two": 2, "seven": 7}[match.group("exile_count_word")]
+            exile_target_text = match.group("exile_target")
+            exile_other = bool(match.group("exile_other"))
+        result["activation_exile_from_graveyard_count"] = exile_count
+        result["activation_exile_from_graveyard_target"] = (
+            "creature_card" if "creature" in str(exile_target_text or "") else "any_card"
+        )
+        result["activation_exile_from_graveyard_other"] = exile_other
     return result
 
 
@@ -3278,7 +3308,15 @@ def graveyard_self_return_to_hand_from_source(source: str) -> dict[str, Any] | s
         "TapTargetCost",
         "UntapSourceCost",
     }
-    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    present_risky = []
+    for cost in risky_cost_classes:
+        if cost == "ExileFrom":
+            if re.search(r"\bExileFrom\s*\(", window):
+                present_risky.append(cost)
+            continue
+        if cost in window:
+            present_risky.append(cost)
+    present_risky = sorted(present_risky)
     if present_risky:
         return "graveyard_self_return_source_cost_not_supported"
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
@@ -3311,13 +3349,16 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
     window = text[ability_index : effect_index + 1400]
     if "Zone.GRAVEYARD" not in window:
         return "graveyard_self_return_battlefield_source_not_graveyard_zone"
-    if not re.search(r"ReturnSourceFromGraveyardToBattlefieldEffect\s*\(\s*true\b", window):
+    tapped_match = re.search(
+        r"ReturnSourceFromGraveyardToBattlefieldEffect\s*\(\s*(true|false)\b",
+        window,
+    )
+    if not tapped_match:
         return "graveyard_self_return_battlefield_source_tapped_mismatch"
     risky_cost_classes = {
         "CompositeCost",
         "DiscardCardCost",
         "ExileFrom",
-        "ExileFromGraveCost",
         "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
@@ -3331,11 +3372,22 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
         "TapTargetCost",
         "UntapSourceCost",
     }
-    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    present_risky = []
+    for cost in risky_cost_classes:
+        if cost == "ExileFrom":
+            if re.search(r"\bExileFrom\s*\(", window):
+                present_risky.append(cost)
+            continue
+        if cost in window:
+            present_risky.append(cost)
+    present_risky = sorted(present_risky)
     if present_risky:
         return "graveyard_self_return_battlefield_source_cost_not_supported"
     discard_count = 0
     discard_target = None
+    exile_count = 0
+    exile_target = None
+    exile_other = False
     if "DiscardTargetCost" in window:
         discard_matches = re.findall(
             r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*(\d+)\s*,\s*StaticFilters\.FILTER_CARD_CARDS\s*\)\s*\)",
@@ -3347,6 +3399,24 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
         if discard_count != 2:
             return "graveyard_self_return_battlefield_source_cost_not_supported"
         discard_target = "any_card"
+    if "ExileFromGraveCost" in window:
+        if discard_count:
+            return "graveyard_self_return_battlefield_source_cost_not_supported"
+        if "AnotherPredicate.instance" not in text:
+            return "graveyard_self_return_battlefield_source_cost_not_supported"
+        explicit_count_matches = re.findall(
+            r"new\s+ExileFromGraveCost\s*\(\s*new\s+TargetCardInYourGraveyard\s*\(\s*(\d+)\s*,\s*filter\s*\)\s*\)",
+            window,
+        )
+        implicit_count_matches = re.findall(
+            r"new\s+ExileFromGraveCost\s*\(\s*new\s+TargetCardInYourGraveyard\s*\(\s*filter\s*\)\s*\)",
+            window,
+        )
+        if len(explicit_count_matches) + len(implicit_count_matches) != 1:
+            return "graveyard_self_return_battlefield_source_cost_not_supported"
+        exile_count = int(explicit_count_matches[0]) if explicit_count_matches else 1
+        exile_target = "creature_card" if "FilterCreatureCard" in text else "any_card"
+        exile_other = True
     mana_matches = re.findall(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_matches = re.findall(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
     if len(mana_matches) + len(generic_matches) != 1:
@@ -3362,9 +3432,12 @@ def graveyard_self_return_to_battlefield_from_source(source: str) -> dict[str, A
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
-        "enters_tapped": True,
+        "enters_tapped": tapped_match.group(1) == "true",
         "activation_discard_count": discard_count,
         "activation_discard_target": discard_target,
+        "activation_exile_from_graveyard_count": exile_count,
+        "activation_exile_from_graveyard_target": exile_target,
+        "activation_exile_from_graveyard_other": exile_other,
     }
 
 
@@ -6425,7 +6498,9 @@ def split_row(
 
     if unit == RECURSION_UNIT and classes == {"ReturnSourceFromGraveyardToBattlefieldEffect"}:
         abilities = ability_classes(row)
-        allowed_abilities = {"SimpleActivatedAbility"} | set(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        allowed_abilities = {"SimpleActivatedAbility", "CantBlockAbility"} | set(
+            STATIC_SELF_KEYWORD_ABILITY_CLASSES
+        )
         if "SimpleActivatedAbility" not in abilities or abilities - allowed_abilities:
             return None, "graveyard_self_return_battlefield_ability_class_not_simple"
         if not is_permanent_metadata(metadata) or is_spell(metadata):
@@ -6443,9 +6518,14 @@ def split_row(
             "enters_tapped",
             "activation_discard_count",
             "activation_discard_target",
+            "activation_exile_from_graveyard_count",
+            "activation_exile_from_graveyard_target",
+            "activation_exile_from_graveyard_other",
         ):
             if source_activation[key] != oracle_activation[key]:
                 return None, "graveyard_self_return_battlefield_source_oracle_mismatch"
+        if ("CantBlockAbility" in abilities) != bool(oracle_activation["static_cant_block"]):
+            return None, "graveyard_self_return_battlefield_source_oracle_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -6475,7 +6555,7 @@ def split_row(
             "activation_cost_mana": oracle_activation["activation_cost_mana"],
             "activation_cost_generic": oracle_activation["activation_cost_generic"],
             "activation_cost_colors": oracle_activation["activation_cost_colors"],
-            "enters_tapped": True,
+            "enters_tapped": oracle_activation["enters_tapped"],
             "xmage_effect_class": "ReturnSourceFromGraveyardToBattlefieldEffect",
             "xmage_ability_class": "SimpleActivatedAbility",
         }
@@ -6486,6 +6566,29 @@ def split_row(
             effect_json["activation_discard_count"] = oracle_activation["activation_discard_count"]
             effect_json["activation_discard_target"] = oracle_activation["activation_discard_target"]
             effect_json["activation_additional_cost"] = "discard_cards"
+        if oracle_activation["activation_exile_from_graveyard_count"]:
+            effect_json["graveyard_self_return_activation_exile_from_graveyard_count"] = oracle_activation[
+                "activation_exile_from_graveyard_count"
+            ]
+            effect_json["graveyard_self_return_activation_exile_from_graveyard_target"] = oracle_activation[
+                "activation_exile_from_graveyard_target"
+            ]
+            effect_json["graveyard_self_return_activation_exile_from_graveyard_other"] = oracle_activation[
+                "activation_exile_from_graveyard_other"
+            ]
+            effect_json["activation_exile_from_graveyard_count"] = oracle_activation[
+                "activation_exile_from_graveyard_count"
+            ]
+            effect_json["activation_exile_from_graveyard_target"] = oracle_activation[
+                "activation_exile_from_graveyard_target"
+            ]
+            effect_json["activation_exile_from_graveyard_other"] = oracle_activation[
+                "activation_exile_from_graveyard_other"
+            ]
+            effect_json["activation_additional_cost"] = "exile_from_graveyard"
+        if oracle_activation["static_cant_block"]:
+            effect_json["cant_block"] = True
+            effect_json["static_cant_block"] = True
         if keywords:
             effect_json["keywords"] = ordered_keywords(keywords)
             effect_json["_keywords_are_self"] = True

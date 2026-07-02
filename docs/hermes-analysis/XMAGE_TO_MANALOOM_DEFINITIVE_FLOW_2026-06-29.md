@@ -135,21 +135,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg348_activated_graveyard_to_battlefield_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg349_graveyard_self_return_discard_battlefield_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg349_graveyard_self_return_discard_battlefield_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27175`
-- XMage authoritative source resolved: `26861`
+- target all-card battle-gap identities: `27172`
+- XMage authoritative source resolved: `26858`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26861`
+- XMage authoritative adapter required: `26858`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26861` identities, card semantics are accepted from XMage; work is now
+- For `26858` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -168,9 +170,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG349 Exact Adapter Waves
+## PG283-PG350 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG349 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG350 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -4142,9 +4144,8 @@ PG349 measured result:
   self-return creatures only when Oracle and XMage agree on the mana cost,
   battlefield tapped destination, and
   `DiscardTargetCost(new TargetCardInHand(2, StaticFilters.FILTER_CARD_CARDS))`.
-- Unsafe neighbors remain blocked explicitly, including `Bone Dragon` for its
-  exile-seven-other-cards graveyard cost and `Despoiler of Souls` /
-  `Scrapheap Scrounger` for unsupported ability/cost signatures.
+- Exile-from-graveyard cost neighbors remained blocked in PG349 and were split
+  into the next exact subpattern in PG350.
 - Runtime now checks for enough hand cards, pays mana, discards exactly two
   cards through the existing discard replacement/trigger pipeline, removes the
   source from graveyard, and puts it onto the battlefield tapped.
@@ -4172,9 +4173,83 @@ PG349 measured result:
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=26861`.
 - Running the exact splitter after PG349 on supported units returns
-  `proposal_count=0` over `7932` considered supported rows. The next cycle
-  should continue from the fresh post-PG349 queue; the top reusable work unit
-  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1871`.
+  `proposal_count=0` over `7932` considered supported rows. At that checkpoint,
+  the top reusable work unit remained
+  `recursion::xmage_graveyard_return_variant_review_v1` at `1871`; the current
+  continuation point is the newer post-PG350 queue below.
+
+PG350 evidence:
+
+- PG350 graveyard self-return exile-cost battlefield package:
+  `docs/hermes-analysis/master_optimizer_reports/pg350_xmage_graveyard_self_return_exile_cost_battlefield_wave_package.md`
+- PG350 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg350_xmage_graveyard_self_return_exile_cost_battlefield_wave_apply_evidence.md`
+- PG350 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg350_xmage_graveyard_self_return_exile_cost_battlefield_wave_pg_to_sqlite_sync.json`
+- PG350 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg350_xmage_graveyard_self_return_exile_cost_battlefield_wave_e2e_validation.md`
+- post-PG350 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_docs_final.md`
+- post-PG350 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_docs_final.md`
+- post-PG350 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_docs_final.md`
+- post-PG350 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_docs_final.md`
+- PG350 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg350_graveyard_self_return_exile_cost_battlefield_wave.md`
+- post-PG350 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_commander_legal.md`
+- post-PG350 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg350_supported_recheck.md`
+- post-PG350 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_recheck.md`
+
+PG350 measured result:
+
+- PG350 promoted `3` exact self-graveyard battlefield activated rules with a
+  real graveyard-exile cost: `Bone Dragon`, `Despoiler of Souls`, and
+  `Scrapheap Scrounger`.
+- The splitter now accepts exact
+  `ReturnSourceFromGraveyardToBattlefieldEffect + SimpleActivatedAbility`
+  self-return permanents when Oracle and XMage agree on mana cost, tapped
+  destination, optional static `CantBlockAbility`, and exact
+  `ExileFromGraveCost(new TargetCardInYourGraveyard(..., filter))` using
+  `AnotherPredicate.instance`.
+- The supported exile-cost variants are count/target constrained: seven other
+  cards, two other creature cards, or another creature card from your
+  graveyard. Generic graveyard exiling remains blocked.
+- Runtime now checks for enough valid other graveyard cards, pays mana, exiles
+  those cost cards through the graveyard leave/exile path, then removes the
+  source from graveyard and returns it to battlefield tapped or untapped as the
+  Oracle/XMage source says.
+- Focused splitter/runtime suites report `223` and `135` tests passing,
+  respectively; the package-builder focused command also exits `0`.
+- PostgreSQL precheck found `3/3` target card rows, `0` existing expected
+  rows, and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `3` upserted rows, `3/3` promoted rows,
+  `3/3` verified/auto rows, and `3/3` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7319` PostgreSQL rows, inserted/updated
+  `7113` SQLite rows, and exported `4896` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG350 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG350:
+  `battle_and_oracle_ready=2452`, `battle_family_mapper_required=30095`, and
+  `snapshot_has_verified_rule=3600`.
+- Global all-card authoritative queue after PG350:
+  `target_identity_count=27172`, `xmage_authoritative_source_count=26858`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26858`.
+- Running the exact splitter after PG350 on supported units returns
+  `proposal_count=0` over `7929` considered supported rows. The next cycle
+  should continue from the fresh post-PG350 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1868`.
 
 ## Why This Is The Best Current Flow
 
@@ -4815,10 +4890,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG349 queue, the next exact runtime-backed work should be selected from
+post-PG350 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1871`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1868`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

@@ -3765,7 +3765,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["enters_tapped"])
 
-    def test_graveyard_self_return_to_battlefield_blocks_source_tapped_mismatch(self) -> None:
+    def test_graveyard_self_return_to_battlefield_blocks_source_oracle_tapped_mismatch(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
@@ -3790,9 +3790,9 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "graveyard_self_return_battlefield_source_tapped_mismatch")
+        self.assertEqual(reason, "graveyard_self_return_battlefield_source_oracle_mismatch")
 
-    def test_graveyard_self_return_to_battlefield_blocks_exile_graveyard_cost(self) -> None:
+    def test_graveyard_self_return_to_battlefield_accepts_exile_other_graveyard_cost(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
@@ -3812,6 +3812,106 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 ),
             ),
             source_text="""
+                private static final FilterCard filter = new FilterCard("other cards");
+                static {
+                    filter.add(AnotherPredicate.instance);
+                }
+                this.addAbility(FlyingAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToBattlefieldEffect(true, false),
+                    new ManaCostsImpl<>("{3}{B}{B}")
+                );
+                ability.addCost(new ExileFromGraveCost(new TargetCardInYourGraveyard(7, filter)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE)
+        self.assertTrue(effect["graveyard_self_return_to_battlefield"])
+        self.assertEqual(effect["activation_cost_mana"], "{3}{B}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 3)
+        self.assertEqual(effect["activation_cost_colors"], ["B", "B"])
+        self.assertEqual(effect["graveyard_self_return_activation_exile_from_graveyard_count"], 7)
+        self.assertEqual(effect["graveyard_self_return_activation_exile_from_graveyard_target"], "any_card")
+        self.assertTrue(effect["graveyard_self_return_activation_exile_from_graveyard_other"])
+        self.assertEqual(effect["activation_additional_cost"], "exile_from_graveyard")
+        self.assertTrue(effect["enters_tapped"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
+    def test_graveyard_self_return_to_battlefield_accepts_exile_another_creature_and_cant_block(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["CantBlockAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Scrapheap Scrounger",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "Scrapheap Scrounger can't block.\n"
+                    "{1}{B}, Exile another creature card from your graveyard: "
+                    "Return this card from your graveyard to the battlefield."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard("another creature card");
+                static {
+                    filter.add(AnotherPredicate.instance);
+                }
+                this.addAbility(new CantBlockAbility());
+                Ability ability = new SimpleActivatedAbility(
+                    Zone.GRAVEYARD,
+                    new ReturnSourceFromGraveyardToBattlefieldEffect(false, false),
+                    new ManaCostsImpl<>("{1}{B}")
+                );
+                ability.addCost(new ExileFromGraveCost(new TargetCardInYourGraveyard(filter)));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["activation_cost_mana"], "{1}{B}")
+        self.assertEqual(effect["activation_cost_generic"], 1)
+        self.assertEqual(effect["activation_cost_colors"], ["B"])
+        self.assertEqual(effect["graveyard_self_return_activation_exile_from_graveyard_count"], 1)
+        self.assertEqual(effect["graveyard_self_return_activation_exile_from_graveyard_target"], "creature_card")
+        self.assertTrue(effect["graveyard_self_return_activation_exile_from_graveyard_other"])
+        self.assertEqual(effect["activation_exile_from_graveyard_count"], 1)
+        self.assertEqual(effect["activation_exile_from_graveyard_target"], "creature_card")
+        self.assertEqual(effect["activation_additional_cost"], "exile_from_graveyard")
+        self.assertFalse(effect["enters_tapped"])
+        self.assertTrue(effect["cant_block"])
+        self.assertTrue(effect["static_cant_block"])
+
+    def test_graveyard_self_return_to_battlefield_blocks_exile_cost_without_other_predicate(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnSourceFromGraveyardToBattlefieldEffect"],
+            ability_kind="graveyard_activated",
+            ability_classes=["FlyingAbility", "SimpleActivatedAbility"],
+            xmage_signals=["activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Bone Dragon",
+                type_line="Creature - Dragon Skeleton",
+                oracle_text=(
+                    "Flying\n"
+                    "{3}{B}{B}, Exile seven other cards from your graveyard: "
+                    "Return this card from your graveyard to the battlefield tapped."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("cards");
                 this.addAbility(FlyingAbility.getInstance());
                 Ability ability = new SimpleActivatedAbility(
                     Zone.GRAVEYARD,
@@ -3824,7 +3924,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "graveyard_self_return_battlefield_oracle_not_simple")
+        self.assertEqual(reason, "graveyard_self_return_battlefield_source_cost_not_supported")
 
     def test_graveyard_self_return_blocks_additional_cost(self) -> None:
         row = queue_row(
