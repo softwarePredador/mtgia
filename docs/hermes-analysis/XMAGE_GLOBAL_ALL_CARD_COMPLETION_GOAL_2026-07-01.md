@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG368
+thread goal remains active, but execution must use the current post-PG370
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -100,25 +100,29 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg367_return_all_graveyard_battlefield_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg368_graveyard_exile_spell_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg368_graveyard_exile_spell_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg369_activated_recursion_costs_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg369_activated_recursion_costs_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg370_static_token_keywords_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg370_static_token_keywords_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG368 counts:
+Post-PG370 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2540`
-- all-card readiness `battle_family_mapper_required`: `30007`
-- all-card readiness `snapshot_has_verified_rule`: `3688`
-- target battle-gap identities in authoritative queue: `27084`
-- XMage authoritative source resolved: `26770`
+- all-card readiness `battle_and_oracle_ready`: `2552`
+- all-card readiness `battle_family_mapper_required`: `29995`
+- all-card readiness `snapshot_has_verified_rule`: `3700`
+- target battle-gap identities in authoritative queue: `27072`
+- XMage authoritative source resolved: `26758`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26770`
+- XMage authoritative adapter required: `26758`
 - adapter work-unit keys: `11429`
 
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG368 queue above.
+historical only. The active execution baseline is the post-PG370 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -126,13 +130,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG368 control numbers:
+Current post-PG370 control numbers:
 
-- target battle-gap identities: `27084`
-- XMage-resolved authoritative source identities: `26770`
+- target battle-gap identities: `27072`
+- XMage-resolved authoritative source identities: `26758`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26770`
+- XMage authoritative adapter required: `26758`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -152,9 +156,9 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg368_graveyard_exile_spell_wave_commander_legal.json`.
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg370_static_token_keywords_wave_commander_legal.json`.
 2. Re-split the top broad unit
-   `recursion::xmage_graveyard_return_variant_review_v1` (`1826` identities)
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1822` identities)
    by exact XMage effect, ability, target, cost, zone movement, and Oracle text.
 3. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
@@ -754,8 +758,18 @@ Immediate checkpoint after PG361:
 66. The post-PG369 supported splitter recheck returned `proposal_count=0` over
     `7837` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg369_supported_recheck.md`.
-67. Continue from the fresh post-PG369 queue. The top reusable work unit remains
-    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1822`, so
+67. PG370 promoted `8` static token keyword rules for `Advent of the Wurm`,
+    `Call the Cavalry`, `Call to the Feast`, `Jungleborn Pioneer`,
+    `Knight Watch`, `Paladin of the Bloodstained`, `Queen's Commission`, and
+    `Sworn Companions`, extending simple token creation to runtime-supported
+    static token keywords such as trample, vigilance, lifelink, and hexproof.
+    Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg370_static_token_keywords_wave_apply_evidence.md`.
+68. The post-PG370 supported splitter recheck returned `proposal_count=0` over
+    `7829` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg370_supported_recheck.md`.
+69. Continue from the fresh post-PG370 queue. The top reusable work unit remains
+    `recursion::xmage_graveyard_return_variant_review_v1`, still at `1822`, so
     the next cycle should split another exact recursion subpattern unless a
     fresher queue changes the ranking.
 

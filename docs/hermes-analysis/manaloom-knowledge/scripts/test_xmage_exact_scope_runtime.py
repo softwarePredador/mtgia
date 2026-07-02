@@ -1812,6 +1812,43 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_create_creature_tokens_spell_preserves_static_token_keywords(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "token_maker",
+            "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+            "ability_kind": "one_shot",
+            "token_count": 1,
+            "token_name": "Wurm Token",
+            "token_subtype": "Wurm",
+            "token_power": 5,
+            "token_toughness": 5,
+            "token_colors": ["G"],
+            "token_keywords": ["trample"],
+            "_rule_logical_key": "battle_rule_v1:fixture_token_trample",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Wurm",
+                "type_line": "Instant",
+                "oracle_text": "Create a 5/5 green Wurm creature token with trample.",
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        tokens = [card for card in active.battlefield if card.get("name") == "Wurm Token"]
+        self.assertEqual(len(tokens), 1)
+        token = tokens[0]
+        self.assertTrue(token.get("trample"))
+        self.assertIn("trample", token.get("keywords", []))
+        self.assertTrue(self.battle.card_has_keyword(token, "trample"))
+
     def test_creature_etb_create_tokens_preserves_token_model(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

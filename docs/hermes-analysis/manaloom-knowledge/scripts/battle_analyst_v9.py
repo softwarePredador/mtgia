@@ -33887,6 +33887,10 @@ def create_creature_token(
         token_keywords.append("flying")
     if token_keywords:
         token["keywords"] = list(dict.fromkeys(token_keywords))
+        for keyword in token["keywords"]:
+            normalized_keyword = str(keyword or "").lower().replace(" ", "_")
+            if normalized_keyword in SELF_KEYWORD_ABILITIES:
+                token[normalized_keyword] = True
     if "prowess" in token_keywords:
         token["prowess"] = True
     token = prepare_entering_permanent(

@@ -222,8 +222,33 @@ SAFE_MANA_ABILITY_CLASSES = {
 }
 
 ALLOWED_TOKEN_ABILITY_KEYWORDS = {
+    "DeathtouchAbility": "deathtouch",
+    "DoubleStrikeAbility": "double_strike",
+    "FirstStrikeAbility": "first_strike",
     "FlyingAbility": "flying",
     "HasteAbility": "haste",
+    "HexproofAbility": "hexproof",
+    "IndestructibleAbility": "indestructible",
+    "LifelinkAbility": "lifelink",
+    "MenaceAbility": "menace",
+    "ReachAbility": "reach",
+    "TrampleAbility": "trample",
+    "VigilanceAbility": "vigilance",
+}
+
+TOKEN_DESCRIPTION_KEYWORDS = {
+    "deathtouch": "deathtouch",
+    "double strike": "double_strike",
+    "first strike": "first_strike",
+    "flying": "flying",
+    "haste": "haste",
+    "hexproof": "hexproof",
+    "indestructible": "indestructible",
+    "lifelink": "lifelink",
+    "menace": "menace",
+    "reach": "reach",
+    "trample": "trample",
+    "vigilance": "vigilance",
 }
 
 TOKEN_COLOR_SETTERS = {
@@ -246,12 +271,7 @@ UNSUPPORTED_TOKEN_DESCRIPTION_MARKERS = {
     "when ",
     "whenever ",
     "infect",
-    "lifelink",
-    "vigilance",
-    "trample",
-    "menace",
     "prowess",
-    "reach",
     "toxic",
     "sacrifice",
     "mountainwalk",
@@ -502,11 +522,20 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     ]
     if unsupported_markers:
         return {}, "token_description_keyword_not_supported"
-    if " with " in lower_description and not (
-        lower_description.endswith(" with flying")
-        or lower_description.endswith(" with haste")
-    ):
-        return {}, "token_description_keyword_not_supported"
+    description_keywords: list[str] = []
+    with_match = re.search(r"\bwith (?P<keywords>.+)$", lower_description)
+    if with_match:
+        raw_keywords = with_match.group("keywords")
+        keyword_parts = [
+            part.strip().rstrip(".")
+            for part in re.split(r",| and ", raw_keywords)
+            if part.strip()
+        ]
+        for keyword_part in keyword_parts:
+            normalized_keyword = TOKEN_DESCRIPTION_KEYWORDS.get(keyword_part)
+            if normalized_keyword is None:
+                return {}, "token_description_keyword_not_supported"
+            description_keywords.append(normalized_keyword)
     power_match = re.search(r"power\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
     toughness_match = re.search(r"toughness\s*=\s*new\s+MageInt\s*\(\s*(\d+)\s*\)", constructor_source)
     if not power_match or not toughness_match:
@@ -540,6 +569,9 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
         for ability_class, keyword in ALLOWED_TOKEN_ABILITY_KEYWORDS.items()
         if ability_class in ability_classes
     ]
+    for keyword in description_keywords:
+        if keyword not in token_keywords:
+            token_keywords.append(keyword)
     artifact = bool(
         "artifact creature token" in lower_description
         or re.search(r"cardType\.add\s*\(\s*CardType\.ARTIFACT\s*\)", constructor_source)

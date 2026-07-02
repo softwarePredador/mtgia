@@ -1,0 +1,334 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T10:30:48.718850+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg370_static_token_keywords_wave_manifest.json",
+  "package_id": "pg370_static_token_keywords_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Advent of the Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15ad6cde4eeec225c78c40aa1bae3eef",
+          "oracle_hash": "ff8e375ff6d722cb33ba0a79a4670dfc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call the Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+          "oracle_hash": "32d68e2d062d46dece64180695886a79",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call to the Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4c11b865d09547623884f1b1100610c",
+          "oracle_hash": "202f9814c0be3f31b4ecbd95ebdbe93f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Jungleborn Pioneer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef3e05a99c1ea3e0ae4d8f83d61174c",
+          "oracle_hash": "437a069274542fcc917c0ebd3f090a6a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Knight Watch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+          "oracle_hash": "32d68e2d062d46dece64180695886a79",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Paladin of the Bloodstained",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:594b1605e5f877db26cc8325c3338ed6",
+          "oracle_hash": "89c3a916361a14ceb4973cf23a14180d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Queen's Commission",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94",
+          "oracle_hash": "83272aece045b20eeef2cd70f2d7b80a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Sworn Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b095a7a51e9f9e5f82be474acc85c2e7",
+          "oracle_hash": "11963923899b828dbcd5021a17b50537",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 8
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Advent of the Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:15ad6cde4eeec225c78c40aa1bae3eef",
+          "oracle_hash": "ff8e375ff6d722cb33ba0a79a4670dfc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call the Cavalry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+          "oracle_hash": "32d68e2d062d46dece64180695886a79",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Call to the Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f4c11b865d09547623884f1b1100610c",
+          "oracle_hash": "202f9814c0be3f31b4ecbd95ebdbe93f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Jungleborn Pioneer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef3e05a99c1ea3e0ae4d8f83d61174c",
+          "oracle_hash": "437a069274542fcc917c0ebd3f090a6a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Knight Watch",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+          "oracle_hash": "32d68e2d062d46dece64180695886a79",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "card_name": "Paladin of the Bloodstained",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:594b1605e5f877db26cc8325c3338ed6",
+          "oracle_hash": "89c3a916361a14ceb4973cf23a14180d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Queen's Commission",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94",
+          "oracle_hash": "83272aece045b20eeef2cd70f2d7b80a",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "card_name": "Sworn Companions",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b095a7a51e9f9e5f82be474acc85c2e7",
+          "oracle_hash": "11963923899b828dbcd5021a17b50537",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Advent of the Wurm",
+          "logical_rule_key": "battle_rule_v1:15ad6cde4eeec225c78c40aa1bae3eef"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Call the Cavalry",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Call to the Feast",
+          "logical_rule_key": "battle_rule_v1:f4c11b865d09547623884f1b1100610c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jungleborn Pioneer",
+          "logical_rule_key": "battle_rule_v1:cef3e05a99c1ea3e0ae4d8f83d61174c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Knight Watch",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Paladin of the Bloodstained",
+          "logical_rule_key": "battle_rule_v1:594b1605e5f877db26cc8325c3338ed6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Queen's Commission",
+          "logical_rule_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sworn Companions",
+          "logical_rule_key": "battle_rule_v1:b095a7a51e9f9e5f82be474acc85c2e7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 8
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Advent of the Wurm",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:15ad6cde4eeec225c78c40aa1bae3eef"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Call the Cavalry",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Call to the Feast",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:f4c11b865d09547623884f1b1100610c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jungleborn Pioneer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:cef3e05a99c1ea3e0ae4d8f83d61174c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Knight Watch",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Paladin of the Bloodstained",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:594b1605e5f877db26cc8325c3338ed6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Queen's Commission",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sworn Companions",
+          "component_keys": [],
+          "effect": "token_maker",
+          "logical_rule_key": "battle_rule_v1:b095a7a51e9f9e5f82be474acc85c2e7"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

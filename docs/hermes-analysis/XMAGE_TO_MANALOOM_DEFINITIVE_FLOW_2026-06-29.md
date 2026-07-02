@@ -208,9 +208,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG369 Exact Adapter Waves
+## PG283-PG370 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG369 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG370 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -550,12 +550,16 @@ patterns:
 - `token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token` with
   one fixed `CreateTokenEffect`, a literal token class constructor, no
   additional token fanout, no custom effect text, and token keywords limited to
-  `flying` or `haste` ->
+  static runtime-supported keywords (`deathtouch`, `double_strike`,
+  `first_strike`, `flying`, `haste`, `hexproof`, `indestructible`, `lifelink`,
+  `menace`, `reach`, `trample`, `vigilance`) ->
   `xmage_fixed_create_creature_tokens_spell_v1`
 - `token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::no_target_class::no_condition_class::token,triggered_ability` with
   one fixed ETB `CreateTokenEffect`, a literal token class constructor, no
   additional token fanout, no custom effect text, and token keywords limited to
-  `flying` or `haste` ->
+  static runtime-supported keywords (`deathtouch`, `double_strike`,
+  `first_strike`, `flying`, `haste`, `hexproof`, `indestructible`, `lifelink`,
+  `menace`, `reach`, `trample`, `vigilance`) ->
   `xmage_creature_etb_create_tokens_v1`
 
 PG283 evidence:
@@ -5551,6 +5555,68 @@ PG368 measured result:
   should continue from the fresh post-PG368 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1826`.
 
+PG369 measured result:
+
+- PG369 promoted `4` activated recursion cost rules for `Ghen, Arcanum Weaver`,
+  `Malevolent Awakening`, `Phyrexian Reclamation`, and `Strands of Night`.
+- The splitter/runtime now supports pay-life and single target-sacrifice
+  activation costs for the existing simple graveyard-to-hand and
+  graveyard-to-battlefield recursion scopes.
+- PostgreSQL precheck found `4/4` target card rows and `0` expected rows
+  before apply, with `2` nonmatching shadow rows only on `Phyrexian Reclamation`.
+- PostgreSQL apply upserted `4` rows and deprecated `2` shadow rows.
+- PostgreSQL postcheck verified `4/4` promoted rows, `4/4` verified/auto rows,
+  and `4/4` matching Oracle hashes.
+- PG -> Hermes/SQLite sync loaded `7411` PG rows, updated `7206` SQLite rows,
+  and exported `4983` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `4/4` cards.
+- Global all-card readiness after PG369:
+  `battle_and_oracle_ready=2544`, `battle_family_mapper_required=30003`, and
+  `snapshot_has_verified_rule=3692`.
+- Global all-card authoritative queue after PG369:
+  `target_identity_count=27080`, `xmage_authoritative_source_count=26766`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26766`.
+- Running the exact splitter after PG369 on supported units returns
+  `proposal_count=0` over `7837` considered supported rows. The next cycle
+  should continue from the fresh post-PG369 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1822`.
+
+PG370 measured result:
+
+- PG370 promoted `8` exact static token keyword rules for `Advent of the Wurm`,
+  `Call the Cavalry`, `Call to the Feast`, `Jungleborn Pioneer`, `Knight Watch`,
+  `Paladin of the Bloodstained`, `Queen's Commission`, and `Sworn Companions`.
+- The splitter now accepts only safe static token keywords in simple fixed token
+  creation and creature ETB token creation; unsupported token text such as
+  infect, prowess, toxic, triggered token text, sacrifice text, banding, and
+  landwalk remains blocked.
+- Runtime token creation now copies safe `token_keywords` into the token's
+  boolean keyword fields, so `card_has_keyword` can read generated tokens even
+  when they have no Oracle text.
+- Focused splitter/runtime tests passed with `441` tests, `OK`.
+- PostgreSQL precheck found `8/8` target card rows, `0` expected rows before
+  apply, and `0` nonmatching shadow rows.
+- PostgreSQL apply upserted `8` rows and deprecated `0` shadow rows.
+- PostgreSQL postcheck verified `8/8` promoted rows, `8/8` verified/auto rows,
+  and `8/8` matching Oracle hashes.
+- PG -> Hermes/SQLite sync loaded `7419` PG rows, updated `7214` SQLite rows,
+  and exported `4991` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `8/8` cards.
+- Global all-card readiness after PG370:
+  `battle_and_oracle_ready=2552`, `battle_family_mapper_required=29995`, and
+  `snapshot_has_verified_rule=3700`.
+- Global all-card authoritative queue after PG370:
+  `target_identity_count=27072`, `xmage_authoritative_source_count=26758`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26758`.
+- Running the exact splitter after PG370 on supported units returns
+  `proposal_count=0` over `7829` considered supported rows. The next cycle
+  should continue from the fresh post-PG370 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1822`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6190,7 +6256,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG369 queue, the next exact runtime-backed work should be selected from
+post-PG370 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`

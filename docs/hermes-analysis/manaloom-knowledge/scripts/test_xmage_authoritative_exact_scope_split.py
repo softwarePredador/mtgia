@@ -974,7 +974,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_source_additional_tokens_not_supported")
 
-    def test_fixed_create_creature_tokens_spell_blocks_unsupported_token_keyword(self) -> None:
+    def test_fixed_create_creature_tokens_spell_maps_static_token_keyword(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(
             row,
@@ -994,6 +994,40 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                         power = new MageInt(5);
                         toughness = new MageInt(5);
                         addAbility(TrampleAbility.getInstance());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TOKEN_SPELL_SCOPE)
+        self.assertEqual(effect["token_name"], "Wurm Token")
+        self.assertEqual(effect["token_power"], 5)
+        self.assertEqual(effect["token_toughness"], 5)
+        self.assertEqual(effect["token_keywords"], ["trample"])
+
+    def test_fixed_create_creature_tokens_spell_still_blocks_unsupported_token_keyword(self) -> None:
+        row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Carrion Call",
+                type_line="Instant",
+                oracle_text="Create two 1/1 green Phyrexian Insect creature tokens with infect.",
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new CreateTokenEffect(new InsectInfectToken(), 2));
+                class InsectInfectToken extends TokenImpl {
+                    public InsectInfectToken() {
+                        super("Insect Token", "1/1 green Phyrexian Insect creature token with infect");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.PHYREXIAN);
+                        subtype.add(SubType.INSECT);
+                        color.setGreen(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new InfectAbility());
                     }
                 }
             """,
@@ -1075,6 +1109,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "token_description_not_creature_token")
+
+    def test_creature_etb_create_tokens_maps_static_token_keyword(self) -> None:
+        row = queue_row(
+            split.ETB_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jungleborn Pioneer",
+                type_line="Creature - Merfolk Scout",
+                oracle_text="When Jungleborn Pioneer enters the battlefield, create a 1/1 blue Merfolk creature token with hexproof.",
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new CreateTokenEffect(new MerfolkHexproofToken())));
+                class MerfolkHexproofToken extends TokenImpl {
+                    public MerfolkHexproofToken() {
+                        super("Merfolk Token", "1/1 blue Merfolk creature token with hexproof");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.MERFOLK);
+                        color.setBlue(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                        addAbility(new HexproofAbility());
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_token_name"], "Merfolk Token")
+        self.assertEqual(effect["etb_token_keywords"], ["hexproof"])
 
     def test_fixed_source_controller_draw_spell_is_package_safe(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])

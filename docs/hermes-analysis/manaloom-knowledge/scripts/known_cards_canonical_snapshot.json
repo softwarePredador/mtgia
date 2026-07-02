@@ -870,6 +870,32 @@
     "battle_rule_logical_key": "battle_rule_v1:7919ab5e9550d99f6530737dcd12bc48",
     "battle_rule_oracle_hash": "c9276c16fe79a207f14b0d2cfce820d2"
   },
+  "Advent of the Wurm": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "G"
+    ],
+    "token_count": 1,
+    "token_description": "5/5 green Wurm creature token with trample",
+    "token_keywords": [
+      "trample"
+    ],
+    "token_name": "Wurm Token",
+    "token_power": 5,
+    "token_subtype": "Wurm",
+    "token_toughness": 5,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "WurmWithTrampleToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:15ad6cde4eeec225c78c40aa1bae3eef",
+    "battle_rule_oracle_hash": "ff8e375ff6d722cb33ba0a79a4670dfc"
+  },
   "Adventurer's Inn": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -10559,6 +10585,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
   },
+  "Call the Cavalry": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "2/2 white Knight creature token with vigilance",
+    "token_keywords": [
+      "vigilance"
+    ],
+    "token_name": "Knight Token",
+    "token_power": 2,
+    "token_subtype": "Knight",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "KnightToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+    "battle_rule_oracle_hash": "32d68e2d062d46dece64180695886a79"
+  },
   "Call the Coppercoats": {
     "cmc": 3.0,
     "effect": "token_maker",
@@ -10597,6 +10649,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:09f4174ea055020453e3a6674fd8851c",
     "battle_rule_oracle_hash": "7dc2505fff00a2cdcbe34336f545505b"
+  },
+  "Call to the Feast": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 3,
+    "token_description": "1/1 white Vampire creature token with lifelink",
+    "token_keywords": [
+      "lifelink"
+    ],
+    "token_name": "Vampire Token",
+    "token_power": 1,
+    "token_subtype": "Vampire",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "IxalanVampireToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f4c11b865d09547623884f1b1100610c",
+    "battle_rule_oracle_hash": "202f9814c0be3f31b4ecbd95ebdbe93f"
   },
   "Caller of Gales": {
     "_activated_rule_effects": [
@@ -40145,6 +40223,34 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "dce3d21ffa6e8ba4ab6bca93a3050611"
   },
+  "Jungleborn Pioneer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "U"
+    ],
+    "etb_token_count": 1,
+    "etb_token_keywords": [
+      "hexproof"
+    ],
+    "etb_token_name": "Merfolk Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Merfolk",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 blue Merfolk creature token with hexproof",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "MerfolkHexproofToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cef3e05a99c1ea3e0ae4d8f83d61174c",
+    "battle_rule_oracle_hash": "437a069274542fcc917c0ebd3f090a6a"
+  },
   "Junk Diver": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -41435,6 +41541,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1320e9a85cb9d77de8e4cdf93a894beb",
     "battle_rule_oracle_hash": "834f9afe428ace236f1988e953b5736d"
+  },
+  "Knight Watch": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "2/2 white Knight creature token with vigilance",
+    "token_keywords": [
+      "vigilance"
+    ],
+    "token_name": "Knight Token",
+    "token_power": 2,
+    "token_subtype": "Knight",
+    "token_toughness": 2,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "KnightToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2bc1e95fd40f9c279ad684f5fddb9d2a",
+    "battle_rule_oracle_hash": "32d68e2d062d46dece64180695886a79"
   },
   "Knollspine Dragon": {
     "cmc": 7.0,
@@ -52561,6 +52693,34 @@
     "battle_rule_logical_key": "battle_rule_v1:78e122775d9a4b686877fa187b753bcf",
     "battle_rule_oracle_hash": "d94cef7f36b0d7157e06c077abb1e2be"
   },
+  "Paladin of the Bloodstained": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_create_tokens_v1",
+    "effect": "creature",
+    "etb_token_colors": [
+      "W"
+    ],
+    "etb_token_count": 1,
+    "etb_token_keywords": [
+      "lifelink"
+    ],
+    "etb_token_name": "Vampire Token",
+    "etb_token_power": 1,
+    "etb_token_subtype": "Vampire",
+    "etb_token_toughness": 1,
+    "token_description": "1/1 white Vampire creature token with lifelink",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "IxalanVampireToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:594b1605e5f877db26cc8325c3338ed6",
+    "battle_rule_oracle_hash": "89c3a916361a14ceb4973cf23a14180d"
+  },
   "Palant\u00edr of Orthanc": {
     "ability_kind": "triggered",
     "battle_model_scope": "controller_end_step_add_influence_scry_two_target_opponent_may_draw_else_mill_and_life_loss_v1",
@@ -56548,6 +56708,32 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f1a99e76647a37f9bc0f202822a2c126"
+  },
+  "Queen's Commission": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 white Vampire creature token with lifelink",
+    "token_keywords": [
+      "lifelink"
+    ],
+    "token_name": "Vampire Token",
+    "token_power": 1,
+    "token_subtype": "Vampire",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "IxalanVampireToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df5942a4afe369ac6448ff6cba57f94",
+    "battle_rule_oracle_hash": "83272aece045b20eeef2cd70f2d7b80a"
   },
   "Quick Study": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -74377,6 +74563,32 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:379008f3f03f94258292123453e3041c",
     "battle_rule_oracle_hash": "702f566e95dd477f5cf5a551e41e9df8"
+  },
+  "Sworn Companions": {
+    "ability_kind": "one_shot",
+    "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
+    "effect": "token_maker",
+    "token_colors": [
+      "W"
+    ],
+    "token_count": 2,
+    "token_description": "1/1 white Soldier creature token with lifelink",
+    "token_keywords": [
+      "lifelink"
+    ],
+    "token_name": "Soldier Token",
+    "token_power": 1,
+    "token_subtype": "Soldier",
+    "token_toughness": 1,
+    "xmage_effect_class": "CreateTokenEffect",
+    "xmage_token_class": "SoldierLifelinkToken",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b095a7a51e9f9e5f82be474acc85c2e7",
+    "battle_rule_oracle_hash": "11963923899b828dbcd5021a17b50537"
   },
   "Sylvan Brushstrider": {
     "ability_kind": "triggered",
