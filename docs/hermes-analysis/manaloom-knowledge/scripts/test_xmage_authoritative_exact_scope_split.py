@@ -6081,18 +6081,19 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Meldweb Curator",
-                type_line="Creature - Phyrexian Wizard",
+                name="Biblioplex Assistant",
+                type_line="Artifact Creature - Gargoyle",
                 oracle_text=(
-                    "When Meldweb Curator enters the battlefield, put up to one target instant "
+                    "Flying\n"
+                    "When Biblioplex Assistant enters the battlefield, put up to one target instant "
                     "or sorcery card from your graveyard on top of your library."
                 ),
             ),
             source_text="""
+                private static final FilterCard filter =
+                    new FilterInstantOrSorceryCard("instant or sorcery card from your graveyard");
                 Ability ability = new EntersBattlefieldTriggeredAbility(new PutOnLibraryTargetEffect(true));
-                ability.addTarget(new TargetCardInYourGraveyard(
-                    0, 1, StaticFilters.FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD
-                ));
+                ability.addTarget(new TargetCardInYourGraveyard(0, 1, filter));
                 this.addAbility(ability);
             """,
         )
@@ -6109,7 +6110,50 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
         )
 
-    def test_creature_etb_graveyard_to_library_blocks_any_graveyard_owner_library(self) -> None:
+    def test_creature_etb_graveyard_to_library_maps_noncreature_nonland_top(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Monastery Messenger",
+                type_line="Creature - Bird Scout",
+                oracle_text=(
+                    "Flying, vigilance\n"
+                    "When this creature enters, put up to one target noncreature, "
+                    "nonland card from your graveyard on top of your library."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter =
+                    new FilterNonlandCard("noncreature, nonland card from your graveyard");
+                static {
+                    filter.add(Predicates.not(CardType.CREATURE.getPredicate()));
+                }
+                Ability ability = new EntersBattlefieldTriggeredAbility(new PutOnLibraryTargetEffect(true));
+                ability.addTarget(new TargetCardInYourGraveyard(0, 1, filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "noncreature_nonland")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(effect["etb_recursion_destination"], "library_top")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "exclude_card_types": ["creature", "land"]},
+        )
+
+    def test_creature_etb_graveyard_to_library_maps_any_graveyard_owner_library(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["PutOnLibraryTargetEffect"],
@@ -6134,8 +6178,54 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "etb_graveyard_to_library_oracle_not_simple")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_target"], "any_card")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertEqual(effect["etb_recursion_destination"], "library_bottom")
+        self.assertEqual(effect["target_graveyard_controller"], "any")
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["library_controller"], "owner")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "any", "scope": "any_card"},
+        )
+
+    def test_creature_etb_graveyard_to_library_maps_up_to_one_any_graveyard_owner_library(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["PutOnLibraryTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Swiftgear Drake",
+                type_line="Artifact Creature - Drake",
+                oracle_text=(
+                    "Flying, haste\n"
+                    "When Swiftgear Drake enters the battlefield, put up to one target card "
+                    "from a graveyard on the bottom of its owner's library."
+                ),
+            ),
+            source_text="""
+                Ability ability = new EntersBattlefieldTriggeredAbility(new PutOnLibraryTargetEffect(false));
+                ability.addTarget(new TargetCardInGraveyard(0, 1));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "any_card")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(effect["etb_recursion_destination"], "library_bottom")
+        self.assertEqual(effect["target_graveyard_controller"], "any")
+        self.assertEqual(effect["library_controller"], "owner")
 
     def test_creature_dies_recursion_maps_artifact_target(self) -> None:
         row = queue_row(

@@ -4868,6 +4868,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.graveyard, [])
         self.assertEqual(active.hand, [])
 
+    def test_creature_etb_graveyard_to_library_owner_library_can_target_opponent_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Nantuko Tracer", "type_line": "Creature - Insect Druid"}
+        active.battlefield.append(permanent)
+        opponent.library = [{"name": "Opponent Existing Top", "type_line": "Land"}]
+        opponent.graveyard.append({"name": "Opponent Bomb", "type_line": "Creature - Dragon", "cmc": 7})
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "any_card",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "library_bottom",
+            "target_graveyard_controller": "any",
+            "target_controller": "any",
+            "library_controller": "owner",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "any",
+                "scope": "any_card",
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=16,
+            rng=random.Random(16),
+        )
+
+        self.assertEqual(opponent.graveyard, [])
+        self.assertEqual([card["name"] for card in opponent.library], ["Opponent Existing Top", "Opponent Bomb"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual(active.library, [])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Nantuko Tracer"
+                and data.get("recovered") == ["Opponent Bomb"]
+                and data.get("target_graveyard_controller") == "any"
+                and data.get("library_controller") == "owner"
+                and data.get("target_owners") == ["Opponent"]
+                and data.get("library_owners") == ["Opponent"]
+                for event, data in self.events
+            )
+        )
+
     def test_add_plus_one_counter_spell_buffs_own_best_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -6655,6 +6655,41 @@
     "battle_rule_logical_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed",
     "battle_rule_oracle_hash": "467a19f71881fd720f7d13f538a4f98c"
   },
+  "Biblioplex Assistant": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "library_top",
+    "etb_recursion_target": "instant_or_sorcery",
+    "etb_recursion_up_to_count": true,
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "library_controller": "self",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:351e3672438267675e3d8dfe22660aa2",
+    "battle_rule_oracle_hash": "fd587c3c46f46820ea55e4163de1f779"
+  },
   "Bident of Thassa": {
     "cmc": 4.0,
     "effect": "draw_cards",
@@ -47289,6 +47324,43 @@
     "battle_rule_logical_key": "battle_rule_v1:cf3b56796d6a3dd8d523f48dd33ea589",
     "battle_rule_oracle_hash": "b10893ae9ffbf66a5255617c56492e08"
   },
+  "Monastery Messenger": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "library_top",
+    "etb_recursion_target": "noncreature_nonland",
+    "etb_recursion_up_to_count": true,
+    "flying": true,
+    "keywords": [
+      "flying",
+      "vigilance"
+    ],
+    "library_controller": "self",
+    "target_constraints": {
+      "controller": "self",
+      "exclude_card_types": [
+        "creature",
+        "land"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "trigger": "enters_battlefield",
+    "vigilance": true,
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:94aaaaf239eae59b262d36160e9c73b4",
+    "battle_rule_oracle_hash": "aa82cdb03b699e96db46127f4867a8d0"
+  },
   "Mondrak, Glory Dominus": {
     "cmc": 4.0,
     "effect": "token_maker",
@@ -48916,6 +48988,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4d520d0d96b321586aba28441a5a3dd9",
     "battle_rule_oracle_hash": "feedb2f81c210c6386b5e88f3772f421"
+  },
+  "Nantuko Tracer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "library_bottom",
+    "etb_recursion_target": "any_card",
+    "library_controller": "owner",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "target_graveyard_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:484429dec81b99b1ed9ecb46d0b2aceb",
+    "battle_rule_oracle_hash": "1aec8047a1e4aa805b3237c36e07a9fc"
   },
   "Narset's Reversal": {
     "cmc": 2.0,
@@ -72349,6 +72447,40 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:86b568648669ceb1eef6d7f6b95d4f1c",
     "battle_rule_oracle_hash": "5f4fa8fe20c8a6c55a2aee48c34c6b25"
+  },
+  "Swiftgear Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "library_bottom",
+    "etb_recursion_target": "any_card",
+    "etb_recursion_up_to_count": true,
+    "flying": true,
+    "haste": true,
+    "keywords": [
+      "flying",
+      "haste"
+    ],
+    "library_controller": "owner",
+    "target_constraints": {
+      "controller": "any",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "any",
+    "target_graveyard_controller": "any",
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "PutOnLibraryTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f2df6636ba9501997f1d5e6577ff947a",
+    "battle_rule_oracle_hash": "10a62aaa977503f63b1c8843d8068464"
   },
   "Swiftwater Cliffs": {
     "effect": "land",

@@ -1580,6 +1580,17 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
             },
         ),
         (
+            r"^put up to one target card from a graveyard on the bottom of its owner's library\.?$",
+            {
+                "target": "any_card",
+                "count": 1,
+                "destination": "library_bottom",
+                "up_to_count": True,
+                "target_graveyard_controller": "any",
+                "library_controller": "owner",
+            },
+        ),
+        (
             r"^put target creature card from your graveyard on top of your library\.?$",
             {"target": "creature", "count": 1, "destination": "library_top", "up_to_count": False},
         ),
@@ -1680,15 +1691,21 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
     target_graveyard_controller = "self"
     library_controller = "self"
     if "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text:
-        if not re.search(r"TargetCardInGraveyard\s*\(\s*\)", text):
+        if not re.search(r"TargetCardInGraveyard\s*\(\s*(?:\)|0\s*,\s*\d+\s*\))", text):
             return "graveyard_to_library_source_target_not_supported"
         target = "any_card"
         target_graveyard_controller = "any"
         library_controller = "owner"
     elif "FILTER_CARD_ARTIFACT_OR_CREATURE" in text:
         target = "artifact_or_creature"
-    elif "FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD" in text:
+    elif "FILTER_CARD_INSTANT_OR_SORCERY_FROM_YOUR_GRAVEYARD" in text or "FilterInstantOrSorceryCard" in text:
         target = "instant_or_sorcery"
+    elif (
+        "FilterNonlandCard" in text
+        and "Predicates.not" in text
+        and "CardType.CREATURE.getPredicate()" in text
+    ):
+        target = "noncreature_nonland"
     elif "FILTER_CARD_CREATURES_YOUR_GRAVEYARD" in text or "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text:
         target = "creature"
     elif re.search(r"TargetCardInYourGraveyard\s*\(\s*\)", text):
@@ -1697,7 +1714,7 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         return "graveyard_to_library_source_target_not_supported"
     count = 1
     up_to = False
-    count_match = re.search(r"TargetCardInYourGraveyard\s*\(\s*0\s*,\s*(\d+)\s*,", text, re.S)
+    count_match = re.search(r"TargetCardIn(?:Your)?Graveyard\s*\(\s*0\s*,\s*(\d+)", text, re.S)
     if count_match:
         count = int(count_match.group(1))
         up_to = True
@@ -1807,7 +1824,11 @@ def activated_graveyard_to_library_from_source(source: str) -> dict[str, Any] | 
 def etb_graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     text = oracle_text_after_leading_static_keywords(metadata)
     trigger_prefix = r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?, (?:you may )?"
-    match = re.match(trigger_prefix + r"(?P<effect>put .+? from your graveyard .+? your library\.?)$", text)
+    match = re.match(
+        trigger_prefix
+        + r"(?P<effect>put .+? from (?:your|a) graveyard .+? (?:your|its owner's) library\.?)$",
+        text,
+    )
     if not match:
         return "etb_graveyard_to_library_oracle_not_simple"
     parsed = graveyard_to_library_from_oracle({"oracle_text": match.group("effect")})
@@ -7511,12 +7532,23 @@ def split_row(
         source_target = etb_graveyard_to_library_from_source(source_text)
         if isinstance(source_target, str):
             return None, source_target
-        for key in ("target", "count", "destination", "up_to_count"):
+        for key in (
+            "target",
+            "count",
+            "destination",
+            "up_to_count",
+            "target_graveyard_controller",
+            "library_controller",
+        ):
             if source_target.get(key) != oracle_target.get(key):
                 return None, f"etb_graveyard_to_library_source_oracle_{key}_mismatch"
         target_type = str(oracle_target["target"])
         count = int(oracle_target["count"])
         destination = str(oracle_target["destination"])
+        target_graveyard_controller = str(oracle_target.get("target_graveyard_controller") or "self")
+        library_controller = str(oracle_target.get("library_controller") or "self")
+        target_constraints = recursion_target_constraints_for(target_type)
+        target_constraints["controller"] = target_graveyard_controller
         effect_json = {
             "effect": "creature",
             "battle_model_scope": ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
@@ -7525,10 +7557,10 @@ def split_row(
             "etb_recursion_target": target_type,
             "etb_recursion_count": count,
             "etb_recursion_destination": destination,
-            "target_constraints": recursion_target_constraints_for(target_type),
-            "target_controller": "self",
-            "target_graveyard_controller": "self",
-            "library_controller": "self",
+            "target_constraints": target_constraints,
+            "target_controller": target_graveyard_controller,
+            "target_graveyard_controller": target_graveyard_controller,
+            "library_controller": library_controller,
             "xmage_effect_class": "PutOnLibraryTargetEffect",
             "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
         }

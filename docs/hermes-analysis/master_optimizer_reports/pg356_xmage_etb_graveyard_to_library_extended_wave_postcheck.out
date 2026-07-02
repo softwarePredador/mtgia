@@ -1,0 +1,7 @@
+      card_name       |   normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+----------------------+----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Biblioplex Assistant | biblioplex assistant | battle_rule_v1:351e3672438267675e3d8dfe22660aa2 |                  1 |                           1 |                         1 |           0
+ Monastery Messenger  | monastery messenger  | battle_rule_v1:94aaaaf239eae59b262d36160e9c73b4 |                  1 |                           1 |                         1 |           0
+ Nantuko Tracer       | nantuko tracer       | battle_rule_v1:484429dec81b99b1ed9ecb46d0b2aceb |                  1 |                           1 |                         1 |           0
+ Swiftgear Drake      | swiftgear drake      | battle_rule_v1:f2df6636ba9501997f1d5e6577ff947a |                  1 |                           1 |                         1 |           0
+(4 rows)

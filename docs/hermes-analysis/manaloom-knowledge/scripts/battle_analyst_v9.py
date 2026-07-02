@@ -16853,7 +16853,7 @@ def resolve_generic_permanent_etb(
             source_event="enters_battlefield",
         )
     if effect_data.get("etb_recursion_count"):
-        resolve_etb_graveyard_recursion(player, permanent, effect_data, turn)
+        resolve_etb_graveyard_recursion(player, permanent, effect_data, turn, [player] + list(opponents or []))
     if effect_data.get("etb_copy_target_types"):
         resolve_etb_copy_tokens(player, opponents, permanent, effect_data, turn)
 
@@ -36577,10 +36577,16 @@ def resolve_etb_library_tutor_to_hand(player, opponents, card, effect_data, turn
     return moved
 
 
-def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
+def resolve_etb_graveyard_recursion(player, card, effect_data, turn, all_players=None):
     count = max(1, int(effect_data.get("etb_recursion_count") or 1))
     target_type = effect_data.get("etb_recursion_target") or "nonland"
     destination = effect_data.get("etb_recursion_destination", "hand")
+    target_graveyard_controller = str(
+        effect_data.get("target_graveyard_controller")
+        or effect_data.get("target_controller")
+        or "self"
+    )
+    library_controller = str(effect_data.get("library_controller") or "self")
     mana_value_max = recursion_mana_value_max(effect_data, "etb_recursion_mana_value_max")
     milled = mill_self_to_graveyard(
         player,
@@ -36589,54 +36595,102 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
         source_card=card,
         source_event="etb_recursion_mill",
     )
-    candidates = [
-        grave_card
-        for grave_card in list(player.graveyard)
-        if graveyard_card_matches_recursion_target(
-            grave_card,
-            target_type,
-            mana_value_max=mana_value_max,
-        )
-    ]
     recovered = []
-    library_top_insert_index = 0
-    for recovered_card in remove_cards_from_graveyard(
-        player,
-        candidates[:count],
-        turn=turn,
-        source_event="etb_recursion",
+    target_owner_names = []
+    library_owner_names = []
+    participants = list(all_players or [player])
+    if destination in {"library_top", "library_bottom"} and (
+        target_graveyard_controller != "self" or library_controller != "self"
     ):
-        recovered.append(recovered_card)
-        if destination == "battlefield":
-            permanent_effect = get_card_effect(recovered_card)
-            permanent = prepare_entering_permanent(
-                enrich_card({**recovered_card, **permanent_effect}),
-                controller=player,
-                all_players=[player],
+        target_effect = {
+            **effect_data,
+            "graveyard_to_library_target": target_type,
+            "graveyard_to_library_target_count": count,
+            "graveyard_to_library_destination": destination,
+        }
+        target_pairs, _all_options = graveyard_to_library_target_pairs(
+            player,
+            card,
+            target_effect,
+            participants,
+            turn,
+        )
+        by_owner = defaultdict(list)
+        for owner, target in target_pairs:
+            by_owner[owner].append(target)
+        library_top_insert_indices = defaultdict(int)
+        for owner, targets in by_owner.items():
+            for recovered_card in remove_cards_from_graveyard(
+                owner,
+                targets,
                 turn=turn,
+                source_event="etb_recursion",
+            ):
+                library_owner = owner if library_controller == "owner" else player
+                recovered.append(recovered_card)
+                target_owner_names.append(owner.name)
+                library_owner_names.append(library_owner.name)
+                if destination == "library_bottom":
+                    library_owner.library.append(recovered_card)
+                else:
+                    insert_index = library_top_insert_indices[library_owner]
+                    library_owner.library.insert(insert_index, recovered_card)
+                    library_top_insert_indices[library_owner] = insert_index + 1
+    else:
+        candidates = [
+            grave_card
+            for grave_card in list(player.graveyard)
+            if graveyard_card_matches_recursion_target(
+                grave_card,
+                target_type,
+                mana_value_max=mana_value_max,
             )
-            if is_creature_card(recovered_card):
-                permanent["effect"] = "creature"
-            player.battlefield.append(permanent)
-        elif destination == "library_top":
-            player.library.insert(library_top_insert_index, recovered_card)
-            library_top_insert_index += 1
-        elif destination == "library_bottom":
-            player.library.append(recovered_card)
-        else:
-            player.hand.append(recovered_card)
+        ]
+        library_top_insert_index = 0
+        for recovered_card in remove_cards_from_graveyard(
+            player,
+            candidates[:count],
+            turn=turn,
+            source_event="etb_recursion",
+        ):
+            recovered.append(recovered_card)
+            target_owner_names.append(player.name)
+            if destination == "battlefield":
+                permanent_effect = get_card_effect(recovered_card)
+                permanent = prepare_entering_permanent(
+                    enrich_card({**recovered_card, **permanent_effect}),
+                    controller=player,
+                    all_players=[player],
+                    turn=turn,
+                )
+                if is_creature_card(recovered_card):
+                    permanent["effect"] = "creature"
+                player.battlefield.append(permanent)
+            elif destination == "library_top":
+                player.library.insert(library_top_insert_index, recovered_card)
+                library_top_insert_index += 1
+                library_owner_names.append(player.name)
+            elif destination == "library_bottom":
+                player.library.append(recovered_card)
+                library_owner_names.append(player.name)
+            else:
+                player.hand.append(recovered_card)
     emit_replay_event(
         "etb_recursion_resolved",
         player=player.name,
         card=card.get("name", "?"),
         trigger="enters_battlefield",
         target_type=target_type,
+        target_graveyard_controller=target_graveyard_controller,
+        library_controller=library_controller,
         destination=destination,
         mana_value_max=mana_value_max,
         milled=[milled_card.get("name", "?") for milled_card in milled if isinstance(milled_card, dict)],
         cards_milled=len(milled),
         recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
         recovered_count=len(recovered),
+        target_owners=target_owner_names,
+        library_owners=library_owner_names,
         turn=turn,
         **replay_rule_fields(effect_data),
     )
@@ -46570,7 +46624,7 @@ def cast_spells_v8(player, opponents, all_players, turn, phase, stack, rng, max_
                             artifact=bool(eff.get("etb_artifact_tokens")),
                         )
                 if eff.get("etb_recursion_count"):
-                    resolve_etb_graveyard_recursion(player, c_copy, eff, turn)
+                    resolve_etb_graveyard_recursion(player, c_copy, eff, turn, [player] + list(opponents or []))
                 if eff.get("etb_copy_target_types"):
                     resolve_etb_copy_tokens(player, opponents, c_copy, eff, turn)
                 played += 1

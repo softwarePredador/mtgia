@@ -1,0 +1,333 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg356_xmage_etb_graveyard_to_library_extended_wave_xmage",
+  "deploy_id": "pg356_xmage_etb_graveyard_to_library_extended_wave",
+  "expected_rules": [
+    {
+      "card_name": "Biblioplex Assistant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:351e3672438267675e3d8dfe22660aa2",
+      "min_rule_version": 2,
+      "normalized_name": "biblioplex assistant",
+      "oracle_hash": "fd587c3c46f46820ea55e4163de1f779",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_top",
+        "etb_recursion_target": "instant_or_sorcery",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying"
+        ],
+        "library_controller": "self",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "trigger": "enters_battlefield"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Monastery Messenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94aaaaf239eae59b262d36160e9c73b4",
+      "min_rule_version": 2,
+      "normalized_name": "monastery messenger",
+      "oracle_hash": "aa82cdb03b699e96db46127f4867a8d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_top",
+        "etb_recursion_target": "noncreature_nonland",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "library_controller": "self",
+        "target_constraints": {
+          "controller": "self",
+          "exclude_card_types": [
+            "creature",
+            "land"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "trigger": "enters_battlefield"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nantuko Tracer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:484429dec81b99b1ed9ecb46d0b2aceb",
+      "min_rule_version": 2,
+      "normalized_name": "nantuko tracer",
+      "oracle_hash": "1aec8047a1e4aa805b3237c36e07a9fc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_bottom",
+        "etb_recursion_target": "any_card",
+        "library_controller": "owner",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any",
+        "trigger": "enters_battlefield"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Swiftgear Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2df6636ba9501997f1d5e6577ff947a",
+      "min_rule_version": 2,
+      "normalized_name": "swiftgear drake",
+      "oracle_hash": "10a62aaa977503f63b1c8843d8068464",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_bottom",
+        "etb_recursion_target": "any_card",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "library_controller": "owner",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any",
+        "trigger": "enters_battlefield"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_graveyard_to_library": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T06:05:11+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Biblioplex Assistant"
+      },
+      "card_name": "Biblioplex Assistant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:351e3672438267675e3d8dfe22660aa2",
+      "normalized_name": "biblioplex assistant",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_top",
+        "etb_recursion_target": "instant_or_sorcery",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying"
+        ],
+        "library_controller": "self",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "trigger": "enters_battlefield"
+      }
+    },
+    {
+      "card": {
+        "name": "Monastery Messenger"
+      },
+      "card_name": "Monastery Messenger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94aaaaf239eae59b262d36160e9c73b4",
+      "normalized_name": "monastery messenger",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_top",
+        "etb_recursion_target": "noncreature_nonland",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying",
+          "vigilance"
+        ],
+        "library_controller": "self",
+        "target_constraints": {
+          "controller": "self",
+          "exclude_card_types": [
+            "creature",
+            "land"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "trigger": "enters_battlefield"
+      }
+    },
+    {
+      "card": {
+        "name": "Nantuko Tracer"
+      },
+      "card_name": "Nantuko Tracer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:484429dec81b99b1ed9ecb46d0b2aceb",
+      "normalized_name": "nantuko tracer",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_bottom",
+        "etb_recursion_target": "any_card",
+        "library_controller": "owner",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any",
+        "trigger": "enters_battlefield"
+      }
+    },
+    {
+      "card": {
+        "name": "Swiftgear Drake"
+      },
+      "card_name": "Swiftgear Drake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2df6636ba9501997f1d5e6577ff947a",
+      "normalized_name": "swiftgear drake",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "library_bottom",
+        "etb_recursion_target": "any_card",
+        "etb_recursion_up_to_count": true,
+        "keywords": [
+          "flying",
+          "haste"
+        ],
+        "library_controller": "owner",
+        "target_constraints": {
+          "controller": "any",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "any",
+        "target_graveyard_controller": "any",
+        "trigger": "enters_battlefield"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Biblioplex Assistant",
+    "Monastery Messenger",
+    "Nantuko Tracer",
+    "Swiftgear Drake"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_etb_graveyard_to_library_extended_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Biblioplex Assistant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:351e3672438267675e3d8dfe22660aa2",
+      "min_rule_version": 2,
+      "normalized_name": "biblioplex assistant",
+      "oracle_hash": "fd587c3c46f46820ea55e4163de1f779",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Monastery Messenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:94aaaaf239eae59b262d36160e9c73b4",
+      "min_rule_version": 2,
+      "normalized_name": "monastery messenger",
+      "oracle_hash": "aa82cdb03b699e96db46127f4867a8d0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nantuko Tracer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:484429dec81b99b1ed9ecb46d0b2aceb",
+      "min_rule_version": 2,
+      "normalized_name": "nantuko tracer",
+      "oracle_hash": "1aec8047a1e4aa805b3237c36e07a9fc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Swiftgear Drake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f2df6636ba9501997f1d5e6577ff947a",
+      "min_rule_version": 2,
+      "normalized_name": "swiftgear drake",
+      "oracle_hash": "10a62aaa977503f63b1c8843d8068464",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_put_graveyard_card_on_library_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

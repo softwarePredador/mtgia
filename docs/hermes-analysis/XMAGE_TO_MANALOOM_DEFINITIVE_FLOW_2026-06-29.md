@@ -180,9 +180,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG355 Exact Adapter Waves
+## PG283-PG356 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG355 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG356 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -4613,9 +4613,75 @@ PG355 measured result:
   `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
   `xmage_authoritative_adapter_required_count=26816`.
 - Running the exact splitter after PG355 on supported units returns
-  `proposal_count=0` over `7887` considered supported rows. The next cycle
-  should continue from the fresh post-PG355 queue; the top reusable work unit
-  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1860`.
+  `proposal_count=0` over `7887` considered supported rows. At that
+  checkpoint, the next cycle was the fresh post-PG355 queue and the top
+  reusable work unit remained
+  `recursion::xmage_graveyard_return_variant_review_v1` at `1860`.
+
+PG356 evidence:
+
+- PG356 ETB graveyard-to-library extended package:
+  `docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_package.md`
+- PG356 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_apply_evidence.md`
+- PG356 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_pg_to_sqlite_sync.json`
+- PG356 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg356_xmage_etb_graveyard_to_library_extended_wave_e2e_validation.md`
+- post-PG356 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg356_etb_graveyard_to_library_extended_wave_docs_final.md`
+- post-PG356 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg356_etb_graveyard_to_library_extended_wave.md`
+- post-PG356 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg356_etb_graveyard_to_library_extended_wave_docs_final.md`
+- post-PG356 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg356_etb_graveyard_to_library_extended_wave_docs_final.md`
+- PG356 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg356_etb_graveyard_to_library_extended_wave.md`
+- post-PG356 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg356_etb_graveyard_to_library_extended_wave_commander_legal.md`
+- post-PG356 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg356_supported_recheck.md`
+- post-PG356 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg356_etb_graveyard_to_library_extended_wave_recheck.md`
+
+PG356 measured result:
+
+- PG356 promoted `4` exact ETB graveyard-to-library rules for
+  `Biblioplex Assistant`, `Monastery Messenger`, `Nantuko Tracer`, and
+  `Swiftgear Drake`.
+- The splitter/runtime now support exact XMage `PutOnLibraryTargetEffect`
+  ETB creatures with real source filters for `FilterInstantOrSorceryCard`,
+  `FilterNonlandCard` plus noncreature predicate, and `TargetCardInGraveyard`
+  any-graveyard targets that move cards to the bottom of their owner's library.
+- Focused splitter/runtime suites report `237` and `145` tests passing before
+  package generation; combined focused unittest suites report `382` passing
+  tests after apply. Package/E2E pytest checks report `6` passing tests.
+- PostgreSQL precheck found `4/4` target card rows, `0` expected rule rows
+  before apply, and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `4/4` promoted rows, `4/4` verified/auto
+  rows, and `4/4` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7365` PostgreSQL rows, inserted/updated
+  `7160` SQLite rows, and exported `4940` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG356 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG356:
+  `battle_and_oracle_ready=2498`, `battle_family_mapper_required=30049`, and
+  `snapshot_has_verified_rule=3646`.
+- Global all-card authoritative queue after PG356:
+  `target_identity_count=27126`, `xmage_authoritative_source_count=26812`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26812`.
+- Running the exact splitter after PG356 on supported units returns
+  `proposal_count=0` over `7883` considered supported rows. The next cycle
+  should continue from the fresh post-PG356 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1856`.
 
 ## Why This Is The Best Current Flow
 
@@ -5256,10 +5322,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG355 queue, the next exact runtime-backed work should be selected from
+post-PG356 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1860`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1856`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`
