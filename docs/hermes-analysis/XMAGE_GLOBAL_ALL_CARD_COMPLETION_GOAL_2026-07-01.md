@@ -42,18 +42,20 @@ Source artifacts:
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg338_reveal_library_pick_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg339_etb_library_pick_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg339_etb_library_pick_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg340_spell_cast_draw_engine_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg340_spell_cast_draw_engine_wave_commander_legal.md`
 - `docs/hermes-analysis/XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
 
-Post-PG339 counts:
+Post-PG340 counts:
 
 - all known cards: `34331`
-- all-card readiness `battle_and_oracle_ready`: `2394`
-- all-card readiness `battle_family_mapper_required`: `30153`
-- target battle-gap identities in authoritative queue: `27230`
-- XMage authoritative source resolved: `26916`
+- all-card readiness `battle_and_oracle_ready`: `2408`
+- all-card readiness `battle_family_mapper_required`: `30139`
+- target battle-gap identities in authoritative queue: `27216`
+- XMage authoritative source resolved: `26902`
 - XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26916`
+- XMage authoritative adapter required: `26902`
 - adapter work-unit keys: `11429`
 
 ## Completion Criteria
@@ -150,10 +152,10 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG339 authoritative queue unless a newer queue exists:
+Use the post-PG340 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1912`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
 5. `add_counters::source_add_counters_variant_v1` - `795`
@@ -163,7 +165,7 @@ Use the post-PG339 authoritative queue unless a newer queue exists:
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
-Immediate checkpoint after PG339:
+Immediate checkpoint after PG340:
 
 1. PG336 promoted the exact
    `xmage_permanent_simple_activated_graveyard_to_library_v1` subpattern for
@@ -179,30 +181,42 @@ Immediate checkpoint after PG339:
    `xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1`
    subpattern for `Organ Hoarder`, `Sibsig Appraiser`, `Sultai Soothsayer`,
    and `Tower Geist`.
-5. PG336 is applied, synced, and E2E validated. The package evidence is in
+5. PG340 promoted the exact `xmage_spell_cast_draw_engine_v1` subpattern for
+   `Beast Whisperer`, `Enchantress's Presence`,
+   `Jhoira, Weatherlight Captain`, `Mesa Enchantress`, `Primordial Sage`,
+   `Reki, the History of Kamigawa`, `Satyr Enchanter`, `Secrets of the Dead`,
+   `Sram, Senior Edificer`, `Tanufel Rimespeaker`, `Thunderous Snapper`,
+   `Vedalken Archmage`, `Verduran Enchantress`, and
+   `Whirlwind of Thought`.
+6. PG336 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg336_xmage_activated_graveyard_to_library_wave_e2e_validation.md`.
-6. PG337 is applied, synced, and E2E validated. The package evidence is in
+7. PG337 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg337_xmage_etb_graveyard_to_library_wave_e2e_validation.md`.
-7. PG338 is applied, synced, and E2E validated. The package evidence is in
+8. PG338 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg338_xmage_reveal_library_pick_wave_e2e_validation.md`.
-8. PG339 is applied, synced, and E2E validated. The package evidence is in
+9. PG339 is applied, synced, and E2E validated. The package evidence is in
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_package.md`,
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_pg_apply_evidence.md`,
    and
    `docs/hermes-analysis/master_optimizer_reports/pg339_xmage_etb_library_pick_wave_e2e_validation.md`.
-9. The post-PG339 supported splitter recheck returned `proposal_count=0` over
-   `7937` considered supported rows. Current evidence:
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg339_supported_recheck.md`.
-10. Continue from the fresh post-PG339 queue. The top reusable work unit remains
+10. PG340 is applied, synced, and E2E validated. The package evidence is in
+    `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_package.md`,
+    `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_pg_apply_evidence.md`,
+    and
+    `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_e2e_validation.md`.
+11. The post-PG340 supported splitter recheck returned `proposal_count=0` over
+    `7941` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg340_supported_recheck.md`.
+12. Continue from the fresh post-PG340 queue. The top reusable work unit remains
    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1912`, so
    the next cycle should split another exact recursion subpattern unless a
    fresher queue changes the ranking.

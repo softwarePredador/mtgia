@@ -83,6 +83,16 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "additional_counter",
     "counter_grants_keywords",
     "keywords",
+    "trigger",
+    "trigger_effect",
+    "spell_cast_draw_count",
+    "spell_cast_draw_card_types",
+    "spell_cast_draw_required_subtypes",
+    "spell_cast_draw_required_supertypes",
+    "spell_cast_draw_requires_historic",
+    "spell_cast_draw_source_zone",
+    "spell_cast_draw_mana_value_min",
+    "spell_cast_draw_optional",
 )
 
 

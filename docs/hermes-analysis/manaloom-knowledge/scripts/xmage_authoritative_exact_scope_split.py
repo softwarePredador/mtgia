@@ -130,6 +130,7 @@ TARGET_KEYWORD_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_target_keywor
 STATIC_KEYWORD_CREATURE_SCOPE = "xmage_static_self_combat_keyword_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 PERMANENT_ACTIVATED_DRAW_SCOPE = "xmage_permanent_simple_activated_draw_v1"
+SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
@@ -2014,6 +2015,16 @@ def is_creature_dies_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_spell_cast_draw_engine_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect"}
+        and ability_classes(row) == {"SpellCastControllerTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"draw", "triggered_ability"}
+    )
+
+
 def is_creature_dies_recursion_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
@@ -3307,6 +3318,157 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     }
 
 
+def spell_cast_draw_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = re.sub(r"\s*\([^)]*historic[^)]*\)\s*", " ", text).strip()
+    match = re.search(
+        r"whenever you cast (?P<filter>.+?), (?:you )?(?P<may>may )?draw (?P<count>a|one|two|three|\d+) cards?\.?",
+        text,
+    )
+    if not match:
+        return "spell_cast_draw_oracle_not_simple"
+    value = match.group("count")
+    words = {"a": 1, "one": 1, "two": 2, "three": 3}
+    count = words.get(value, int(value) if value.isdigit() else 0)
+    if count <= 0:
+        return "spell_cast_draw_oracle_count_not_supported"
+    filter_text = re.sub(r"\s+", " ", match.group("filter").strip())
+    if filter_text.endswith(" spell"):
+        filter_text = filter_text[: -len(" spell")].strip()
+    result: dict[str, Any] = {
+        "spell_cast_draw_count": count,
+        "spell_cast_draw_optional": bool(match.group("may")),
+        "trigger": "spell_cast",
+    }
+    filter_specs: list[tuple[str, dict[str, Any]]] = [
+        ("a creature", {"spell_cast_draw_card_types": ["creature"]}),
+        ("an enchantment", {"spell_cast_draw_card_types": ["enchantment"]}),
+        ("an artifact", {"spell_cast_draw_card_types": ["artifact"]}),
+        ("a noncreature", {"trigger": "noncreature_spell_cast"}),
+        ("a legendary", {"spell_cast_draw_required_supertypes": ["legendary"]}),
+        ("a historic", {"spell_cast_draw_requires_historic": True}),
+        (
+            "an aura, equipment, or vehicle",
+            {"spell_cast_draw_required_subtypes": ["aura", "equipment", "vehicle"]},
+        ),
+        ("a spell from your graveyard", {"spell_cast_draw_source_zone": "graveyard"}),
+    ]
+    for prefix, spec in filter_specs:
+        if filter_text == prefix:
+            result.update(spec)
+            return result
+    match_mv = re.fullmatch(r"a spell with mana value (?P<mv>\d+) or greater", filter_text)
+    if match_mv:
+        result["spell_cast_draw_mana_value_min"] = int(match_mv.group("mv"))
+        return result
+    match_eldrazi = re.fullmatch(
+        r"an eldrazi creature spell with mana value (?P<mv>\d+) or greater",
+        filter_text,
+    )
+    if match_eldrazi:
+        result["spell_cast_draw_card_types"] = ["creature"]
+        result["spell_cast_draw_required_subtypes"] = ["eldrazi"]
+        result["spell_cast_draw_mana_value_min"] = int(match_eldrazi.group("mv"))
+        return result
+    return "spell_cast_draw_oracle_filter_not_supported"
+
+
+def spell_cast_draw_filter_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if len(re.findall(r"new\s+SpellCastControllerTriggeredAbility\s*\(", text)) != 1:
+        return "spell_cast_draw_source_not_single_trigger"
+    if "DoIfCostPaid" in text or "SacrificeSourceCost" in text or "PayLifeCost" in text:
+        return "spell_cast_draw_source_optional_cost_not_supported"
+    if "AdventurePredicate" in text:
+        return "spell_cast_draw_source_filter_not_supported"
+    draw_count = java_constructor_int(text, "DrawCardSourceControllerEffect")
+    if draw_count is None or draw_count <= 0:
+        return "spell_cast_draw_source_count_not_fixed"
+    result: dict[str, Any] = {
+        "spell_cast_draw_count": draw_count,
+        "trigger": "spell_cast",
+    }
+    if "FILTER_SPELL_A_NON_CREATURE" in text:
+        result["trigger"] = "noncreature_spell_cast"
+        return result
+    if "FILTER_SPELL_A_CREATURE" in text:
+        result["spell_cast_draw_card_types"] = ["creature"]
+        return result
+    if "FILTER_SPELL_AN_ENCHANTMENT" in text:
+        result["spell_cast_draw_card_types"] = ["enchantment"]
+        return result
+    if "FILTER_SPELL_AN_ARTIFACT" in text:
+        result["spell_cast_draw_card_types"] = ["artifact"]
+        return result
+    if "FILTER_SPELL_HISTORIC" in text:
+        result["spell_cast_draw_requires_historic"] = True
+        return result
+    if "FILTER_SPELL_MV_4_OR_GREATER" in text:
+        result["spell_cast_draw_mana_value_min"] = 4
+        return result
+    if "SpellZonePredicate(Zone.GRAVEYARD)" in text:
+        result["spell_cast_draw_source_zone"] = "graveyard"
+        return result
+    subtype_matches = [
+        value.lower()
+        for value in re.findall(r"SubType\.([A-Z_]+)\.getPredicate\s*\(\s*\)", text)
+    ]
+    if subtype_matches:
+        result["spell_cast_draw_required_subtypes"] = subtype_matches
+    if "SuperType.LEGENDARY.getPredicate()" in text:
+        result["spell_cast_draw_required_supertypes"] = ["legendary"]
+    mv_match = re.search(
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.MORE_THAN\s*,\s*(\d+)\s*\)",
+        text,
+    )
+    if mv_match:
+        result["spell_cast_draw_mana_value_min"] = int(mv_match.group(1)) + 1
+    if "Predicates.or" in text:
+        subtype_matches = [
+            value.lower()
+            for value in re.findall(r"SubType\.([A-Z_]+)\.getPredicate\s*\(\s*\)", text)
+        ]
+        if subtype_matches:
+            result["spell_cast_draw_required_subtypes"] = subtype_matches
+    supported_filter = any(
+        key in result
+        for key in (
+            "spell_cast_draw_card_types",
+            "spell_cast_draw_required_subtypes",
+            "spell_cast_draw_required_supertypes",
+            "spell_cast_draw_requires_historic",
+            "spell_cast_draw_source_zone",
+            "spell_cast_draw_mana_value_min",
+        )
+    )
+    if not supported_filter:
+        return "spell_cast_draw_source_filter_not_supported"
+    return result
+
+
+def spell_cast_draw_specs_match(oracle_spec: dict[str, Any], source_spec: dict[str, Any]) -> bool:
+    comparable_keys = {
+        "trigger",
+        "spell_cast_draw_count",
+        "spell_cast_draw_card_types",
+        "spell_cast_draw_required_subtypes",
+        "spell_cast_draw_required_supertypes",
+        "spell_cast_draw_requires_historic",
+        "spell_cast_draw_source_zone",
+        "spell_cast_draw_mana_value_min",
+    }
+    for key in comparable_keys:
+        oracle_value = oracle_spec.get(key)
+        source_value = source_spec.get(key)
+        if isinstance(oracle_value, list):
+            oracle_value = sorted(str(value) for value in oracle_value)
+        if isinstance(source_value, list):
+            source_value = sorted(str(value) for value in source_value)
+        if oracle_value != source_value:
+            return False
+    return True
+
+
 def activated_recursion_to_hand_target_from_source(text: str) -> tuple[str, int, bool] | str:
     lowered = str(text or "").lower()
     if "arcan" in lowered:
@@ -4257,6 +4419,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "permanent with a simple activated destroy-target ability"
     elif scope == PERMANENT_ACTIVATED_DRAW_SCOPE:
         scope_kind = "permanent with a simple activated draw ability"
+    elif scope == SPELL_CAST_DRAW_ENGINE_SCOPE:
+        scope_kind = "permanent with a triggered draw ability on casting matching spells"
     elif scope == PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE:
         scope_kind = "permanent with a simple activated fixed life-gain ability"
     elif scope == PERMANENT_ACTIVATED_GRAVEYARD_EXILE_SCOPE:
@@ -4327,6 +4491,7 @@ def split_row(
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
+    spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
@@ -4368,6 +4533,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not spell_cast_draw_engine_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
@@ -4402,6 +4568,7 @@ def split_row(
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not dies_draw_creature_unit
+        and not spell_cast_draw_engine_unit
         and not dies_recursion_creature_unit
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
@@ -4476,6 +4643,45 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_draw",
+        ), "selected_exact_scope"
+
+    if spell_cast_draw_engine_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "spell_cast_draw_not_permanent"
+        oracle_spec = spell_cast_draw_filter_from_oracle(metadata)
+        if isinstance(oracle_spec, str):
+            return None, oracle_spec
+        source_spec = spell_cast_draw_filter_from_source(source_text)
+        if isinstance(source_spec, str):
+            return None, source_spec
+        if not spell_cast_draw_specs_match(oracle_spec, source_spec):
+            return None, "spell_cast_draw_source_oracle_mismatch"
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "enchantment"
+            if "enchantment" in type_line
+            else "permanent"
+        )
+        effect_json = {
+            "effect": permanent_effect if permanent_effect == "creature" else "draw_engine",
+            "battle_model_scope": SPELL_CAST_DRAW_ENGINE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger_effect": "draw_cards",
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+            "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+            **oracle_spec,
+        }
+        if permanent_effect == "creature":
+            effect_json["is_creature_permanent"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_spell_cast_draw_engine",
         ), "selected_exact_scope"
 
     if permanent_activated_destroy_unit:
@@ -6730,6 +6936,7 @@ def build_exact_split_report(
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
             and not is_creature_dies_draw_unit(row)
+            and not is_spell_cast_draw_engine_unit(row)
             and not is_creature_etb_damage_unit(row)
             and not is_creature_etb_graveyard_to_library_unit(row)
             and not is_creature_etb_library_pick_unit(row)
@@ -6788,6 +6995,7 @@ def build_exact_split_report(
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",

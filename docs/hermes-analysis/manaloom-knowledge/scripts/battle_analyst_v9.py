@@ -41486,6 +41486,65 @@ def trigger_spell_cast_engines(
                 all_players=all_players,
             )
             continue
+        draw_count = int(permanent.get("spell_cast_draw_count") or 0)
+        if draw_count > 0 and spell_cast_draw_filter_matches(
+            permanent,
+            player,
+            spell,
+            source_zone=source_zone,
+        ):
+
+            def resolve_spell_cast_filtered_draw_trigger(
+                permanent=permanent,
+                draw_count=draw_count,
+                trigger_kind=trigger_kind,
+                spell=spell,
+            ):
+                drawn = player.draw(draw_count)
+                process_player_draw_triggers(
+                    player,
+                    len(drawn),
+                    turn,
+                    phase,
+                    all_players or [player, *opponents],
+                    stack=stack,
+                    turn_player=active_player or player,
+                )
+                emit_replay_event(
+                    "trigger_resolved",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    trigger=trigger_kind,
+                    trigger_spell=spell.get("name", "?"),
+                    effect="draw_cards",
+                    draw_count=draw_count,
+                    cards_drawn=len(drawn),
+                    trigger_spell_type_line=spell.get("type_line"),
+                    trigger_spell_source_zone=source_zone,
+                    spell_cast_draw_card_types=permanent.get("spell_cast_draw_card_types") or [],
+                    spell_cast_draw_required_subtypes=permanent.get("spell_cast_draw_required_subtypes") or [],
+                    spell_cast_draw_required_supertypes=permanent.get("spell_cast_draw_required_supertypes") or [],
+                    spell_cast_draw_requires_historic=bool(
+                        permanent.get("spell_cast_draw_requires_historic")
+                    ),
+                    spell_cast_draw_mana_value_min=int(
+                        permanent.get("spell_cast_draw_mana_value_min") or 0
+                    ),
+                    phase=phase,
+                    turn=turn,
+                    **replay_rule_fields(permanent),
+                )
+
+            resolve_or_enqueue_trigger(
+                player,
+                permanent,
+                trigger_kind,
+                resolve_spell_cast_filtered_draw_trigger,
+                stack=stack,
+                active_player=active_player,
+                all_players=all_players,
+            )
+            continue
         if permanent.get("trigger_effect") == "damage_each_opponent":
             amount = int(permanent.get("trigger_damage_each_opponent") or permanent.get("damage") or 1)
             if amount <= 0:
@@ -42950,6 +43009,49 @@ def is_artifact_spell_for_controller(player, spell):
     ):
         return True
     return False
+
+
+def spell_cast_draw_filter_matches(permanent, controller, spell, *, source_zone="hand"):
+    if not isinstance(permanent, dict) or not isinstance(spell, dict):
+        return False
+    required_zone = str(permanent.get("spell_cast_draw_source_zone") or "").strip().lower()
+    if required_zone and str(source_zone or "hand").strip().lower() != required_zone:
+        return False
+    required_types = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_draw_card_types"))
+        if str(value).strip()
+    ]
+    if required_types and not _card_type_matches(spell, required_types):
+        return False
+    type_line = str(spell.get("type_line") or "").lower()
+    required_subtypes = [
+        str(value).replace("_", " ").strip().lower()
+        for value in _as_list(permanent.get("spell_cast_draw_required_subtypes"))
+        if str(value).strip()
+    ]
+    if required_subtypes and not any(re.search(rf"\b{re.escape(subtype)}\b", type_line) for subtype in required_subtypes):
+        return False
+    required_supertypes = [
+        str(value).strip().lower()
+        for value in _as_list(permanent.get("spell_cast_draw_required_supertypes"))
+        if str(value).strip()
+    ]
+    if "legendary" in required_supertypes and "legendary" not in type_line and not spell.get("legendary"):
+        return False
+    if permanent.get("spell_cast_draw_requires_historic"):
+        is_historic = (
+            is_artifact_spell_for_controller(controller, spell)
+            or "legendary" in type_line
+            or bool(spell.get("legendary"))
+            or re.search(r"\bsaga\b", type_line) is not None
+        )
+        if not is_historic:
+            return False
+    mana_value_min = int(permanent.get("spell_cast_draw_mana_value_min") or 0)
+    if mana_value_min > 0 and card_mana_value(spell) < mana_value_min:
+        return False
+    return True
 
 
 def executable_activated_rule_effects(permanent, *, effect=None):

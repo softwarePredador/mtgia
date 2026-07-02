@@ -216,6 +216,13 @@ patterns:
   exact fixed Oracle activated draw text, mana/tap/self-sacrifice costs only,
   and no discard, target-tap, life, graveyard, or dynamic "for each" costs ->
   `xmage_permanent_simple_activated_draw_v1`
+- `draw_engine::xmage_draw_card_variant_review_v1` with
+  `DrawCardSourceControllerEffect + SpellCastControllerTriggeredAbility` on
+  permanents, exact fixed draw count, and supported spell filters for
+  creature/enchantment/artifact/noncreature spells, legendary or historic
+  spells, aura/equipment/vehicle subtype OR filters, graveyard source-zone
+  triggers, and mana-value thresholds ->
+  `xmage_spell_cast_draw_engine_v1`
 - `direct_damage::targeted_damage_variant_v1` with `DamageTargetEffect +
   EntersBattlefieldTriggeredAbility` on creatures and exact fixed ETB damage
   Oracle text ->
@@ -3429,6 +3436,76 @@ PG339 measured result:
 - Running the exact splitter after PG339 on supported units returns
   `proposal_count=0` over `7937` considered supported rows.
 
+PG340 evidence:
+
+- PG340 spell-cast draw-engine package:
+  `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_package.md`
+- PG340 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_pg_apply_evidence.md`
+- PG340 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_pg_to_sqlite_sync.json`
+- PG340 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg340_xmage_spell_cast_draw_engine_wave_e2e_validation.md`
+- post-PG340 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260701_post_pg340_spell_cast_draw_engine_wave.md`
+- post-PG340 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260701_post_pg340_spell_cast_draw_engine_wave.md`
+- post-PG340 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260701_post_pg340_spell_cast_draw_engine_wave.md`
+- post-PG340 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260701_post_pg340_spell_cast_draw_engine_wave.md`
+- PG340 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_pg340_spell_cast_draw_engine_wave.md`
+- post-PG340 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg340_spell_cast_draw_engine_wave_commander_legal.md`
+- post-PG340 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260701_post_pg340_supported_recheck.md`
+- post-PG340 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg340_spell_cast_draw_engine_wave_recheck.md`
+
+PG340 measured result:
+
+- PG340 promoted `14` exact spell-cast draw-engine rules:
+  `Beast Whisperer`, `Enchantress's Presence`,
+  `Jhoira, Weatherlight Captain`, `Mesa Enchantress`, `Primordial Sage`,
+  `Reki, the History of Kamigawa`, `Satyr Enchanter`, `Secrets of the Dead`,
+  `Sram, Senior Edificer`, `Tanufel Rimespeaker`, `Thunderous Snapper`,
+  `Vedalken Archmage`, `Verduran Enchantress`, and
+  `Whirlwind of Thought`.
+- The splitter now supports exact
+  `DrawCardSourceControllerEffect + SpellCastControllerTriggeredAbility`
+  permanent rows when Oracle and XMage agree on fixed draw count and one of the
+  supported spell filters.
+- Runtime now checks the cast spell against card type, subtype, supertype,
+  historic, source-zone, and mana-value constraints before drawing cards and
+  resolving downstream draw triggers.
+- Unsupported or ambiguous rows such as `Dreamcatcher`, `Edgewall Innkeeper`,
+  `Lunar Mystic`, and `Emrakul's Influence` remain blocked under exact blocker
+  reasons instead of being promoted.
+- Focused tests pass for the exact splitter (`191` tests) and runtime (`114`
+  tests).
+- PostgreSQL postcheck reports `14/14` promoted rows, `14/14` verified/auto
+  rows, and `14/14` matching Oracle hash rows, with `16` stale shadow rows
+  backed up and deprecated.
+- PG -> Hermes/SQLite sync loaded `7275` PostgreSQL rows, inserted/updated
+  `7069` SQLite rows, and exported `4855` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, and runtime `get_card_effect`.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` warning for the
+  pre-existing residual `trusted_executable_rules_missing_oracle_hash=1418`;
+  PG340 rows all carry matching Oracle hashes.
+- Global all-card readiness after PG340:
+  `battle_and_oracle_ready=2408`, `battle_family_mapper_required=30139`, and
+  `snapshot_has_verified_rule=3556`.
+- Global all-card authoritative queue after PG340:
+  `target_identity_count=27216`, `xmage_authoritative_source_count=26902`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26902`.
+- Running the exact splitter after PG340 on supported units returns
+  `proposal_count=0` over `7941` considered supported rows.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -4068,11 +4145,11 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG339 queue, the next exact runtime-backed work should be selected from
+post-PG340 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1912`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1660`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`
 5. `add_counters::source_add_counters_variant_v1` - `795`

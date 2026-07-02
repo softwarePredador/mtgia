@@ -646,6 +646,130 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_draw_oracle_not_simple")
 
+    def test_spell_cast_draw_engine_maps_creature_spell_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Beast Whisperer",
+                type_line="Creature - Elf Druid",
+                oracle_text="Whenever you cast a creature spell, draw a card.",
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1),
+                    StaticFilters.FILTER_SPELL_A_CREATURE, false
+                ));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.SPELL_CAST_DRAW_ENGINE_SCOPE)
+        self.assertEqual(effect["trigger"], "spell_cast")
+        self.assertEqual(effect["trigger_effect"], "draw_cards")
+        self.assertEqual(effect["spell_cast_draw_count"], 1)
+        self.assertEqual(effect["spell_cast_draw_card_types"], ["creature"])
+
+    def test_spell_cast_draw_engine_maps_subtype_or_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Sram, Senior Edificer",
+                type_line="Legendary Creature - Dwarf Advisor",
+                oracle_text="Whenever you cast an Aura, Equipment, or Vehicle spell, draw a card.",
+            ),
+            source_text="""
+                private static final FilterSpell filter = new FilterSpell(
+                    "an Aura, Equipment, or Vehicle spell");
+                static {
+                    filter.add(Predicates.or(SubType.AURA.getPredicate(),
+                        SubType.EQUIPMENT.getPredicate(),
+                        SubType.VEHICLE.getPredicate()));
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), filter, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["spell_cast_draw_count"], 1)
+        self.assertEqual(effect["spell_cast_draw_required_subtypes"], ["aura", "equipment", "vehicle"])
+
+    def test_spell_cast_draw_engine_maps_graveyard_source_filter(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Secrets of the Dead",
+                type_line="Enchantment",
+                oracle_text="Whenever you cast a spell from your graveyard, draw a card.",
+            ),
+            source_text="""
+                private static final FilterSpell filter = new FilterSpell("a spell from your graveyard");
+                static {
+                    filter.add(new SpellZonePredicate(Zone.GRAVEYARD));
+                }
+                this.addAbility(new SpellCastControllerTriggeredAbility(
+                    new DrawCardSourceControllerEffect(1), filter, false));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["trigger"], "spell_cast")
+        self.assertEqual(effect["spell_cast_draw_source_zone"], "graveyard")
+
+    def test_spell_cast_draw_engine_blocks_optional_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["SpellCastControllerTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dreamcatcher",
+                type_line="Creature - Spirit",
+                oracle_text=(
+                    "Whenever you cast a Spirit or Arcane spell, you may sacrifice "
+                    "Dreamcatcher. If you do, draw a card."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new SpellCastControllerTriggeredAbility(new DoIfCostPaid(
+                    new DrawCardSourceControllerEffect(1), new SacrificeSourceCost()
+                ), StaticFilters.FILTER_SPELL_SPIRIT_OR_ARCANE, false));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "spell_cast_draw_oracle_filter_not_supported")
+
     def test_permanent_activated_life_gain_maps_simple_mana_and_tap_cost(self) -> None:
         row = queue_row(
             split.LIFE_UNIT,

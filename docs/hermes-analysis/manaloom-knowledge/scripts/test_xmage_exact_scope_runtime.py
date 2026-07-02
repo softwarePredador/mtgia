@@ -877,6 +877,130 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_spell_cast_draw_engine_draws_for_matching_creature_spell(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        engine = {
+            "name": "Beast Whisperer",
+            "type_line": "Creature - Elf Druid",
+            "effect": "creature",
+            "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+            "trigger": "spell_cast",
+            "trigger_effect": "draw_cards",
+            "spell_cast_draw_count": 1,
+            "spell_cast_draw_card_types": ["creature"],
+            "_rule_logical_key": "battle_rule_v1:beast-whisperer-test",
+            "_rule_oracle_hash": "beast-whisperer-test-hash",
+        }
+        active.battlefield.append(engine)
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Llanowar Elves", "type_line": "Creature - Elf", "cmc": 1},
+            turn=2,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Sol Ring", "type_line": "Artifact", "cmc": 1},
+            turn=2,
+            phase="precombat_main",
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        draw_events = [
+            data
+            for event, data in self.events
+            if event == "trigger_resolved" and data.get("card") == "Beast Whisperer"
+        ]
+        self.assertEqual(len(draw_events), 1)
+        self.assertEqual(draw_events[0]["trigger_spell"], "Llanowar Elves")
+        self.assertEqual(draw_events[0]["cards_drawn"], 1)
+        self.assertEqual(draw_events[0]["rule_logical_key"], "battle_rule_v1:beast-whisperer-test")
+
+    def test_spell_cast_draw_engine_respects_subtype_mana_value_and_graveyard_source(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}, {"name": "Card C"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.extend(
+            [
+                {
+                    "name": "Emrakul's Influence",
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "draw_cards",
+                    "spell_cast_draw_count": 2,
+                    "spell_cast_draw_card_types": ["creature"],
+                    "spell_cast_draw_required_subtypes": ["eldrazi"],
+                    "spell_cast_draw_mana_value_min": 7,
+                },
+                {
+                    "name": "Secrets of the Dead",
+                    "type_line": "Enchantment",
+                    "effect": "draw_engine",
+                    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+                    "trigger": "spell_cast",
+                    "trigger_effect": "draw_cards",
+                    "spell_cast_draw_count": 1,
+                    "spell_cast_draw_source_zone": "graveyard",
+                },
+            ]
+        )
+
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Small Eldrazi", "type_line": "Creature - Eldrazi", "cmc": 6},
+            turn=3,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {"name": "Large Eldrazi", "type_line": "Creature - Eldrazi", "cmc": 7},
+            turn=3,
+            phase="precombat_main",
+        )
+        self.battle.trigger_spell_cast_engines(
+            active,
+            [active, opponent],
+            {
+                "name": "Flashback Spell",
+                "type_line": "Sorcery",
+                "cmc": 2,
+                "_cast_context": {"source_zone": "graveyard"},
+            },
+            turn=3,
+            phase="precombat_main",
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Card A", "Card B", "Card C"])
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Emrakul's Influence"
+                and data.get("trigger_spell") == "Large Eldrazi"
+                and data.get("cards_drawn") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Secrets of the Dead"
+                and data.get("trigger_spell") == "Flashback Spell"
+                and data.get("trigger_spell_source_zone") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_life_gain_permanent_pays_mana_taps_and_gains_life(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

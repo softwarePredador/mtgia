@@ -6067,14 +6067,26 @@
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
   },
   "Beast Whisperer": {
-    "cmc": 4.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "creature"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b9c07681c8beb7442495463ab61fae8a",
+    "battle_rule_oracle_hash": "8ae7642655af89139030ceda78968296"
   },
   "Beast Within": {
     "cmc": 3.0,
@@ -21322,14 +21334,25 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
   "Enchantress's Presence": {
-    "cmc": 3.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "draw_engine",
+    "spell_cast_draw_card_types": [
+      "enchantment"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5135086e42d1436acde69e2963049fc2",
+    "battle_rule_oracle_hash": "8ec549b56e8dd63eaa55e354692aeeb0"
   },
   "Encroaching Wastes": {
     "effect": "land",
@@ -36947,14 +36970,24 @@
     "battle_rule_logical_key": "battle_rule_v1:e90b582e4b128b4c890db8959fb6005c"
   },
   "Jhoira, Weatherlight Captain": {
-    "cmc": 4.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "spell_cast_draw_requires_historic": true,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:350f340c89e6be0b8c30b6f51543a1a9",
+    "battle_rule_oracle_hash": "37ce267db9dc6df937d567ec1d86b1ae"
   },
   "Jhovall Queen": {
     "_keywords_are_self": true,
@@ -43097,14 +43130,26 @@
     "battle_rule_oracle_hash": "5056c99d38870fb6c25d19751fd4fc6c"
   },
   "Mesa Enchantress": {
-    "cmc": 3.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "enchantment"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": true,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:246d77743bfb29c4b70446acbdf7911c",
+    "battle_rule_oracle_hash": "567f73040c2c6c12ef9cbe370ef25d9e"
   },
   "Mesa Unicorn": {
     "_keywords_are_self": true,
@@ -51293,6 +51338,28 @@
     "battle_rule_logical_key": "battle_rule_v1:9a6a4ae5c12e41985cc8d1e9998cef65",
     "battle_rule_oracle_hash": "0f6491e5b9cea210c7c33662a6aec0ac"
   },
+  "Primordial Sage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "creature"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": true,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6e687784043e72633218f1ac81c83d19",
+    "battle_rule_oracle_hash": "1bf4c8bc8bf3bf77dea910fa710d6c3e"
+  },
   "Princess Lucrezia": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -54597,6 +54664,28 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Reki, the History of Kamigawa": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "spell_cast_draw_required_supertypes": [
+      "legendary"
+    ],
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b2a991caf5017bfc3925fb3254d40ec9",
+    "battle_rule_oracle_hash": "8a5d7cafe47bdacd003d08287ec4c329"
   },
   "Relearn": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -58508,14 +58597,26 @@
     "battle_rule_logical_key": "battle_rule_v1:cddd177eac9b084e9366e1448a48974c"
   },
   "Satyr Enchanter": {
-    "cmc": 3.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "enchantment"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8d6ab43180600fed28961266f683b05e",
+    "battle_rule_oracle_hash": "8ec549b56e8dd63eaa55e354692aeeb0"
   },
   "Satyr Grovedancer": {
     "ability_kind": "triggered",
@@ -60292,6 +60393,25 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+  },
+  "Secrets of the Dead": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "draw_engine",
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "spell_cast_draw_source_zone": "graveyard",
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2bfb54abfdfe4eb1447e33a4d6090b9f",
+    "battle_rule_oracle_hash": "254b303ea0ace2fce8e81171431a4247"
   },
   "Secure the Wastes": {
     "cmc": 1.0,
@@ -65544,14 +65664,28 @@
     "battle_rule_oracle_hash": "13cecae816b64406aa3f621ad48976b3"
   },
   "Sram, Senior Edificer": {
-    "cmc": 2.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5a9fa603f2c12a7f6fef4be84bcd3692"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "spell_cast_draw_required_subtypes": [
+      "aura",
+      "equipment",
+      "vehicle"
+    ],
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c4ec947e48486c8f8e9e5d627bcc946a",
+    "battle_rule_oracle_hash": "c84a07dd8f06a09598531be5727c800f"
   },
   "Stab": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
@@ -69075,6 +69209,26 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:5d19ac0ece1a2310ec1df0f807f84b8d"
   },
+  "Tanufel Rimespeaker": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_mana_value_min": 4,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2c57ce8c41e8dafab0f386dfd35da302",
+    "battle_rule_oracle_hash": "b327d79a760e98113ecf3784b6b72f77"
+  },
   "Taoist Hermit": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -71943,6 +72097,26 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "8afcd78935ed974ae73286920eef92da"
+  },
+  "Thunderous Snapper": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_mana_value_min": 5,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b160ce1c45e80d9376bcaa588035f4dd",
+    "battle_rule_oracle_hash": "b727e0656a7ba1875095d876d73f2bc0"
   },
   "Thunderous Wrath": {
     "amount": 5,
@@ -76208,6 +76382,28 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Vedalken Archmage": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "artifact"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:23ec59e519653b081be50cdd798bcf75",
+    "battle_rule_oracle_hash": "0325adb114c77e90f81676f947fc9b1a"
+  },
   "Vedalken Orrery": {
     "ability_kind": "static",
     "artifact": true,
@@ -76485,14 +76681,26 @@
     "battle_rule_oracle_hash": "401469c416682300489c020bef626efd"
   },
   "Verduran Enchantress": {
-    "cmc": 3.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "creature",
+    "is_creature_permanent": true,
+    "spell_cast_draw_card_types": [
+      "enchantment"
+    ],
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": true,
+    "trigger": "spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:246d77743bfb29c4b70446acbdf7911c",
+    "battle_rule_oracle_hash": "567f73040c2c6c12ef9cbe370ef25d9e"
   },
   "Verge Rangers": {
     "ability_kind": "static",
@@ -79254,14 +79462,22 @@
     "battle_rule_logical_key": "battle_rule_v1:3fe6312c2e019be9666120bc0a803d0d"
   },
   "Whirlwind of Thought": {
-    "cmc": 4.0,
-    "effect": "draw_cards",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:5cda5aaf7f28ae40f9e36e84ef6bc954"
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
+    "effect": "draw_engine",
+    "spell_cast_draw_count": 1,
+    "spell_cast_draw_optional": false,
+    "trigger": "noncreature_spell_cast",
+    "trigger_effect": "draw_cards",
+    "xmage_ability_class": "SpellCastControllerTriggeredAbility",
+    "xmage_effect_class": "DrawCardSourceControllerEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0a5df57593d441fead5b647bead37c3b",
+    "battle_rule_oracle_hash": "8d1b3def6e90f817443397013093da3a"
   },
   "Whispers of the Muse": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
