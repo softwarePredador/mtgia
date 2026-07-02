@@ -13609,7 +13609,7 @@
     "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
     "count": 1,
     "destination": "exile",
-    "effect": "graveyard_exile",
+    "effect": "remove_permanent",
     "flashback_cost": "{B}",
     "flashback_status": "runtime_executor_v1",
     "graveyard_exile_destination": "exile",
@@ -24833,7 +24833,7 @@
     "cycling_cost": "{B}",
     "cycling_status": "runtime_executor_v1",
     "destination": "exile",
-    "effect": "graveyard_exile",
+    "effect": "remove_permanent",
     "graveyard_exile_destination": "exile",
     "graveyard_exile_single_graveyard": false,
     "graveyard_exile_target": "any_card",
@@ -30418,6 +30418,99 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ec9c870dd58d78bc15537f68438a0f47"
+  },
+  "Ghen, Arcanum Weaver": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [
+          "R",
+          "W",
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}{W}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_target": "enchantment",
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "battlefield",
+        "graveyard_to_hand_target": "enchantment",
+        "graveyard_to_hand_target_count": 1,
+        "target": "enchantment",
+        "target_constraints": {
+          "card_types": [
+            "enchantment"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activated_self_sacrifice_recursion": false,
+    "activation_cost_colors": [
+      "R",
+      "W",
+      "B"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{R}{W}{B}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_target": "enchantment",
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "graveyard_to_hand_activation_cost_colors": [
+      "R",
+      "W",
+      "B"
+    ],
+    "graveyard_to_hand_activation_cost_generic": 0,
+    "graveyard_to_hand_activation_cost_mana": "{R}{W}{B}",
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_sacrifice_target": true,
+    "graveyard_to_hand_activation_requires_tap": true,
+    "graveyard_to_hand_activation_sacrifice_target": "enchantment",
+    "graveyard_to_hand_destination": "battlefield",
+    "graveyard_to_hand_target": "enchantment",
+    "graveyard_to_hand_target_count": 1,
+    "target": "enchantment",
+    "target_constraints": {
+      "card_types": [
+        "enchantment"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0c2976a093d1395d8c033fd6c6290a0e",
+    "battle_rule_oracle_hash": "f1e1610c8fcbec61d1022c46dcd41672"
   },
   "Ghirapur Gearcrafter": {
     "ability_kind": "triggered",
@@ -45081,6 +45174,94 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e35051e9c60b94a84ac9b71c11c7fc4b"
   },
+  "Malevolent Awakening": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [
+          "B",
+          "B"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{B}{B}",
+        "activation_discard_count": 0,
+        "activation_discard_target": null,
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "creature",
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "hand",
+        "graveyard_to_hand_target": "creature",
+        "graveyard_to_hand_target_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "activated_effect": "recursion",
+    "activation_cost_colors": [
+      "B",
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}{B}",
+    "activation_discard_count": 0,
+    "activation_discard_target": null,
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_target": "creature",
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "effect": "enchantment",
+    "graveyard_to_hand_activation_cost_colors": [
+      "B",
+      "B"
+    ],
+    "graveyard_to_hand_activation_cost_generic": 1,
+    "graveyard_to_hand_activation_cost_mana": "{1}{B}{B}",
+    "graveyard_to_hand_activation_discard_count": 0,
+    "graveyard_to_hand_activation_discard_target": null,
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_sacrifice_target": true,
+    "graveyard_to_hand_activation_requires_tap": false,
+    "graveyard_to_hand_activation_sacrifice_target": "creature",
+    "graveyard_to_hand_destination": "hand",
+    "graveyard_to_hand_target": "creature",
+    "graveyard_to_hand_target_count": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6849f77a641ea157073493fe0dd18e3d",
+    "battle_rule_oracle_hash": "25d8c36379a831c873c935095e994fb8"
+  },
   "Mammoth Spider": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -53632,14 +53813,86 @@
     "battle_rule_oracle_hash": "f33412ad2deef26bceca34c6b467f890"
   },
   "Phyrexian Reclamation": {
-    "cmc": 1.0,
-    "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e055849cd43b61d89274f222f0a1efcd"
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{B}",
+        "activation_discard_count": 0,
+        "activation_discard_target": null,
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+        "count": 1,
+        "destination": "hand",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "hand",
+        "graveyard_to_hand_target": "creature",
+        "graveyard_to_hand_target_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "activated_effect": "recursion",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}",
+    "activation_discard_count": 0,
+    "activation_discard_target": null,
+    "activation_life_cost": 2,
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+    "effect": "enchantment",
+    "graveyard_to_hand_activation_cost_colors": [
+      "B"
+    ],
+    "graveyard_to_hand_activation_cost_generic": 1,
+    "graveyard_to_hand_activation_cost_mana": "{1}{B}",
+    "graveyard_to_hand_activation_discard_count": 0,
+    "graveyard_to_hand_activation_discard_target": null,
+    "graveyard_to_hand_activation_life_cost": 2,
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_tap": false,
+    "graveyard_to_hand_destination": "hand",
+    "graveyard_to_hand_target": "creature",
+    "graveyard_to_hand_target_count": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b85cdce409c4ce5572c65fb9ced02f39",
+    "battle_rule_oracle_hash": "24565a63a82b496e39729b71c35af295"
   },
   "Phyrexian Scrapyard": {
     "effect": "land",
@@ -55908,7 +56161,7 @@
     "battle_model_scope": "xmage_exile_target_graveyard_card_spell_v1",
     "count": 1,
     "destination": "exile",
-    "effect": "graveyard_exile",
+    "effect": "remove_permanent",
     "flashback_cost": "{W}",
     "flashback_status": "runtime_executor_v1",
     "graveyard_exile_destination": "exile",
@@ -72312,6 +72565,99 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "ec9843e6ec6cb36ed1d45f1d8448fb85"
+  },
+  "Strands of Night": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [
+          "B",
+          "B"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{B}{B}",
+        "activation_life_cost": 2,
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_target": "swamp",
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "battlefield",
+        "graveyard_to_hand_target": "creature",
+        "graveyard_to_hand_target_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activated_self_sacrifice_recursion": false,
+    "activation_cost_colors": [
+      "B",
+      "B"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{B}{B}",
+    "activation_life_cost": 2,
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_target": "swamp",
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "enchantment",
+    "graveyard_to_hand_activation_cost_colors": [
+      "B",
+      "B"
+    ],
+    "graveyard_to_hand_activation_cost_generic": 0,
+    "graveyard_to_hand_activation_cost_mana": "{B}{B}",
+    "graveyard_to_hand_activation_life_cost": 2,
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_sacrifice_target": true,
+    "graveyard_to_hand_activation_requires_tap": false,
+    "graveyard_to_hand_activation_sacrifice_target": "swamp",
+    "graveyard_to_hand_destination": "battlefield",
+    "graveyard_to_hand_target": "creature",
+    "graveyard_to_hand_target_count": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5b8a3aa594247255f7713dc4329790b9",
+    "battle_rule_oracle_hash": "6b4f86d95ed1ac8c933f3b07ff113f3b"
   },
   "Strangle": {
     "amount": 3,

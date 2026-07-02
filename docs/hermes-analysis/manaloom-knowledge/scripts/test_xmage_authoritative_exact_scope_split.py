@@ -4303,6 +4303,75 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIn("permanent with a simple activated graveyard-to-hand ability", proposal["notes"])
         self.assertNotIn("narrow instant/sorcery spell", proposal["notes"])
 
+    def test_permanent_activated_recursion_accepts_pay_life_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Phyrexian Reclamation",
+                type_line="Enchantment",
+                oracle_text="{1}{B}, Pay 2 life: Return target creature card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToHandTargetEffect(),
+                    new ManaCostsImpl<>("{1}{B}")
+                );
+                ability.addCost(new PayLifeCost(2));
+                ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE)
+        self.assertEqual(effect["graveyard_to_hand_target"], "creature")
+        self.assertEqual(effect["activation_cost_mana"], "{1}{B}")
+        self.assertEqual(effect["activation_life_cost"], 2)
+        self.assertEqual(effect["graveyard_to_hand_activation_life_cost"], 2)
+        self.assertFalse(effect["activation_requires_tap"])
+        self.assertFalse(effect["activation_requires_sacrifice"])
+
+    def test_permanent_activated_recursion_accepts_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Malevolent Awakening",
+                type_line="Enchantment",
+                oracle_text="{1}{B}{B}, Sacrifice a creature: Return target creature card from your graveyard to your hand.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToHandTargetEffect(),
+                    new ManaCostsImpl<>("{1}{B}{B}")
+                );
+                ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                ability.addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["graveyard_to_hand_target"], "creature")
+        self.assertEqual(effect["activation_sacrifice_target"], "creature")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertEqual(effect["graveyard_to_hand_activation_sacrifice_target"], "creature")
+
     def test_permanent_activated_recursion_blocks_or_cost(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
@@ -4442,7 +4511,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_tap"])
         self.assertTrue(effect["activation_requires_sacrifice"])
 
-    def test_permanent_activated_recursion_to_battlefield_blocks_sacrifice_target_cost(self) -> None:
+    def test_permanent_activated_recursion_to_battlefield_maps_sacrifice_target_cost(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
@@ -4458,6 +4527,8 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 oracle_text="{R}{W}{B}, {T}, Sacrifice an enchantment: Return target enchantment card from your graveyard to the battlefield.",
             ),
             source_text="""
+                private static final FilterControlledPermanent filter
+                        = new FilterControlledEnchantmentPermanent("an enchantment");
                 Ability ability = new SimpleActivatedAbility(
                     new ReturnFromGraveyardToBattlefieldTargetEffect(),
                     new ManaCostsImpl<>("{R}{W}{B}")
@@ -4465,6 +4536,41 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 ability.addCost(new TapSourceCost());
                 ability.addCost(new SacrificeTargetCost(filter));
                 ability.addTarget(new TargetCardInYourGraveyard(new FilterEnchantmentCard()));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["graveyard_to_hand_target"], "enchantment")
+        self.assertEqual(effect["graveyard_to_hand_destination"], "battlefield")
+        self.assertEqual(effect["activation_sacrifice_target"], "enchantment")
+        self.assertTrue(effect["activation_requires_sacrifice_target"])
+        self.assertEqual(effect["graveyard_to_hand_activation_sacrifice_target"], "enchantment")
+
+    def test_permanent_activated_recursion_to_battlefield_blocks_multi_sacrifice_target_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Whisper, Blood Liturgist",
+                type_line="Legendary Creature - Human Cleric",
+                oracle_text="{T}, Sacrifice two creatures: Return target creature card from your graveyard to the battlefield.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToBattlefieldTargetEffect(),
+                    new TapSourceCost()
+                );
+                ability.addCost(new SacrificeTargetCost(2, StaticFilters.FILTER_PERMANENT_CREATURES));
+                ability.addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
                 this.addAbility(ability);
             """,
         )

@@ -745,8 +745,17 @@ Immediate checkpoint after PG361:
 64. The post-PG368 supported splitter recheck returned `proposal_count=0` over
     `7841` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg368_supported_recheck.md`.
-65. Continue from the fresh post-PG368 queue. The top reusable work unit remains
-    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1826`, so
+65. PG369 promoted `4` activated recursion cost rules for `Ghen, Arcanum
+    Weaver`, `Malevolent Awakening`, `Phyrexian Reclamation`, and `Strands of
+    Night`, adding pay-life and single target-sacrifice activation costs to the
+    existing simple graveyard-to-hand and graveyard-to-battlefield recursion
+    scopes. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg369_activated_recursion_costs_wave_apply_evidence.md`.
+66. The post-PG369 supported splitter recheck returned `proposal_count=0` over
+    `7837` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg369_supported_recheck.md`.
+67. Continue from the fresh post-PG369 queue. The top reusable work unit remains
+    `recursion::xmage_graveyard_return_variant_review_v1`, now at `1822`, so
     the next cycle should split another exact recursion subpattern unless a
     fresher queue changes the ranking.
 

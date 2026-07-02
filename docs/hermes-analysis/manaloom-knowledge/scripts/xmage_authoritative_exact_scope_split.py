@@ -1583,6 +1583,10 @@ def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, 
             {"target": "artifact", "count": 1},
         ),
         (
+            r"^return target enchantment card from your graveyard to the battlefield\.?$",
+            {"target": "enchantment", "count": 1},
+        ),
+        (
             r"^return target creature card from your graveyard to the battlefield\.?$",
             {"target": "creature", "count": 1},
         ),
@@ -2421,11 +2425,9 @@ def activated_graveyard_to_library_from_source(source: str) -> dict[str, Any] | 
         "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
     }
     present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
@@ -3957,6 +3959,7 @@ def activation_sacrifice_target_from_phrase(phrase: str) -> str | None:
         "artifact": "artifact",
         "enchantment": "enchantment",
         "land": "land",
+        "swamp": "swamp",
         "permanent": "permanent",
     }
     return mapping.get(normalized)
@@ -4032,6 +4035,31 @@ def activated_recursion_to_hand_activation_from_oracle(metadata: dict[str, Any])
     if target is None:
         return "activated_recursion_oracle_not_simple"
     normalized_cost = cost_text
+    life_cost = 0
+    life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
+    life_matches = list(re.finditer(life_pattern, normalized_cost))
+    if len(life_matches) > 1:
+        return "activated_recursion_oracle_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0].group("life"))
+        normalized_cost = re.sub(life_pattern, ",", normalized_cost).strip(" ,")
+
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:artifact or creature|artifact or land|creature or land|"
+        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|swamp|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_recursion_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+        if sacrifice_target is None:
+            return "activated_recursion_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+
     discard_count = 0
     discard_target = None
     discard_patterns = [
@@ -4052,8 +4080,10 @@ def activated_recursion_to_hand_activation_from_oracle(metadata: dict[str, Any])
     activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_recursion")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_recursion_oracle_cost_not_supported"
     target_type, count, up_to = target
-    return {
+    result = {
         "target": target_type,
         "count": count,
         "up_to": up_to,
@@ -4061,6 +4091,12 @@ def activated_recursion_to_hand_activation_from_oracle(metadata: dict[str, Any])
         "activation_discard_count": discard_count,
         "activation_discard_target": discard_target,
     }
+    if life_cost:
+        result["activation_life_cost"] = life_cost
+    if sacrifice_target:
+        result["activation_sacrifice_target"] = sacrifice_target
+        result["activation_requires_sacrifice_target"] = True
+    return result
 
 
 def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
@@ -4433,11 +4469,9 @@ def activated_life_gain_from_source(source: str) -> dict[str, Any] | str:
         "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
@@ -5103,6 +5137,10 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
     relevant = (window or "") + "\n" + text
     if "FILTER_PERMANENT_ARTIFACT_OR_CREATURE" in relevant:
         return "artifact_or_creature"
+    if "FilterControlledEnchantmentPermanent" in relevant:
+        return "enchantment"
+    if "SubType.SWAMP.getPredicate" in relevant:
+        return "swamp"
     if "FILTER_PERMANENT_CREATURE" in relevant or "TargetControlledCreaturePermanent" in relevant:
         return "creature"
     if "FILTER_PERMANENT_ARTIFACT" in relevant:
@@ -5322,11 +5360,9 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
         "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
@@ -5376,6 +5412,26 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
     if parsed_cost is None:
         return "activated_recursion_source_mana_cost_not_supported"
     activation_cost_generic, activation_cost_colors = parsed_cost
+    requires_tap = "TapSourceCost" in window
+    requires_sacrifice = "SacrificeSourceCost" in window
+    life_cost = None
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if len(life_matches) > 1:
+        return "activated_recursion_source_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0])
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        if re.search(r"new\s+SacrificeTargetCost\s*\(\s*\d+\s*,", window):
+            return "activated_recursion_source_cost_not_supported"
+        sacrifice_cost_constructors = re.findall(r"new\s+SacrificeTargetCost\s*\(", window)
+        if len(sacrifice_cost_constructors) > 1:
+            return "activated_recursion_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_source(text, window)
+        if sacrifice_target is None:
+            return "activated_recursion_source_cost_not_supported"
+    if requires_sacrifice and sacrifice_target:
+        return "activated_recursion_source_cost_not_supported"
     return {
         "target": target,
         "count": count,
@@ -5383,10 +5439,19 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
-        "activation_requires_tap": "TapSourceCost" in window,
-        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        "activation_requires_tap": requires_tap,
+        "activation_requires_sacrifice": requires_sacrifice,
         "activation_discard_count": discard_count,
         "activation_discard_target": discard_target,
+        **({"activation_life_cost": life_cost} if life_cost else {}),
+        **(
+            {
+                "activation_sacrifice_target": sacrifice_target,
+                "activation_requires_sacrifice_target": True,
+            }
+            if sacrifice_target
+            else {}
+        ),
     }
 
 
@@ -5396,13 +5461,47 @@ def activated_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> 
         return "activated_recursion_battlefield_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
     effect_text = re.split(r"\s+partner[—-]", effect_text, maxsplit=1)[0].strip()
-    activation = activation_cost_from_oracle_prefix(cost_text, allow_source_sacrifice=True)
+    normalized_cost = cost_text
+    life_cost = 0
+    life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
+    life_matches = list(re.finditer(life_pattern, normalized_cost))
+    if len(life_matches) > 1:
+        return "activated_recursion_battlefield_oracle_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0].group("life"))
+        normalized_cost = re.sub(life_pattern, ",", normalized_cost).strip(" ,")
+
+    sacrifice_target = None
+    sacrifice_pattern = (
+        r"(?:^|,\s*)sacrifice (?P<phrase>"
+        r"(?:an?|another) (?:artifact or creature|artifact or land|creature or land|"
+        r"nontoken permanent|non-token permanent|token|creature|artifact|enchantment|land|swamp|permanent)"
+        r")(?:\s*,?|$)"
+    )
+    sacrifice_matches = list(re.finditer(sacrifice_pattern, normalized_cost))
+    if len(sacrifice_matches) > 1:
+        return "activated_recursion_battlefield_oracle_cost_not_supported"
+    if sacrifice_matches:
+        sacrifice_target = activation_sacrifice_target_from_phrase(sacrifice_matches[0].group("phrase"))
+        if sacrifice_target is None:
+            return "activated_recursion_battlefield_oracle_cost_not_supported"
+        normalized_cost = re.sub(sacrifice_pattern, ",", normalized_cost).strip(" ,")
+
+    activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
     if isinstance(activation, str):
         return str(activation).replace("activated_self_boost", "activated_recursion_battlefield")
+    if activation.get("activation_requires_sacrifice") and sacrifice_target:
+        return "activated_recursion_battlefield_oracle_cost_not_supported"
     target = recursion_to_battlefield_from_oracle({**metadata, "oracle_text": effect_text})
     if target is None:
         return "activated_recursion_battlefield_target_not_supported"
-    return {**target, **activation}
+    result = {**target, **activation}
+    if life_cost:
+        result["activation_life_cost"] = life_cost
+    if sacrifice_target:
+        result["activation_sacrifice_target"] = sacrifice_target
+        result["activation_requires_sacrifice_target"] = True
+    return result
 
 
 def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any] | str:
@@ -5416,11 +5515,9 @@ def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any
         "ExileSourceFromGraveCost",
         "MillCardsCost",
         "OrCost",
-        "PayLifeCost",
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
         "UntapSourceCost",
     }
@@ -5474,6 +5571,26 @@ def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any
     if parsed_cost is None:
         return "activated_recursion_battlefield_source_mana_cost_not_supported"
     activation_cost_generic, activation_cost_colors = parsed_cost
+    requires_tap = "TapSourceCost" in window
+    requires_sacrifice = "SacrificeSourceCost" in window
+    life_cost = None
+    life_matches = re.findall(r"PayLifeCost\s*\(\s*(\d+)\s*\)", window)
+    if len(life_matches) > 1:
+        return "activated_recursion_battlefield_source_cost_not_supported"
+    if life_matches:
+        life_cost = int(life_matches[0])
+    sacrifice_target = None
+    if "SacrificeTargetCost" in window:
+        if re.search(r"new\s+SacrificeTargetCost\s*\(\s*\d+\s*,", window):
+            return "activated_recursion_battlefield_source_cost_not_supported"
+        sacrifice_cost_constructors = re.findall(r"new\s+SacrificeTargetCost\s*\(", window)
+        if len(sacrifice_cost_constructors) > 1:
+            return "activated_recursion_battlefield_source_cost_not_supported"
+        sacrifice_target = activation_sacrifice_target_from_source(text, window)
+        if sacrifice_target is None:
+            return "activated_recursion_battlefield_source_cost_not_supported"
+    if requires_sacrifice and sacrifice_target:
+        return "activated_recursion_battlefield_source_cost_not_supported"
     result = {
         "target": target,
         "count": 1,
@@ -5485,9 +5602,14 @@ def activated_recursion_to_battlefield_from_source(source: str) -> dict[str, Any
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
-        "activation_requires_tap": "TapSourceCost" in window,
-        "activation_requires_sacrifice": "SacrificeSourceCost" in window,
+        "activation_requires_tap": requires_tap,
+        "activation_requires_sacrifice": requires_sacrifice,
     }
+    if life_cost:
+        result["activation_life_cost"] = life_cost
+    if sacrifice_target:
+        result["activation_sacrifice_target"] = sacrifice_target
+        result["activation_requires_sacrifice_target"] = True
     if "PutIntoGraveFromBattlefieldThisTurnPredicate" in text:
         result["graveyard_from_battlefield_this_turn"] = True
     mana_value_match = re.search(
@@ -7130,6 +7252,9 @@ def split_row(
             "activation_requires_sacrifice",
             "activation_discard_count",
             "activation_discard_target",
+            "activation_life_cost",
+            "activation_sacrifice_target",
+            "activation_requires_sacrifice_target",
         ):
             if parsed_activation.get(key) != oracle_target.get(key):
                 return None, f"activated_recursion_source_oracle_{key}_mismatch"
@@ -7168,7 +7293,11 @@ def split_row(
                     "activation_requires_sacrifice",
                     "activation_discard_count",
                     "activation_discard_target",
+                    "activation_life_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
                 )
+                if key in parsed_activation
             },
         }
         effect_json = {
@@ -7196,7 +7325,11 @@ def split_row(
                     "activation_requires_sacrifice",
                     "activation_discard_count",
                     "activation_discard_target",
+                    "activation_life_cost",
+                    "activation_sacrifice_target",
+                    "activation_requires_sacrifice_target",
                 )
+                if key in parsed_activation
             },
             "graveyard_to_hand_activation_cost_mana": parsed_activation["activation_cost_mana"],
             "graveyard_to_hand_activation_cost_generic": parsed_activation["activation_cost_generic"],
@@ -7206,6 +7339,17 @@ def split_row(
             "graveyard_to_hand_activation_discard_count": parsed_activation["activation_discard_count"],
             "graveyard_to_hand_activation_discard_target": parsed_activation["activation_discard_target"],
         }
+        if parsed_activation.get("activation_life_cost"):
+            activated_effect["activation_life_cost"] = parsed_activation["activation_life_cost"]
+            effect_json["activation_life_cost"] = parsed_activation["activation_life_cost"]
+            effect_json["graveyard_to_hand_activation_life_cost"] = parsed_activation["activation_life_cost"]
+        if parsed_activation.get("activation_sacrifice_target"):
+            activated_effect["activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            activated_effect["activation_requires_sacrifice_target"] = True
+            effect_json["activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            effect_json["activation_requires_sacrifice_target"] = True
+            effect_json["graveyard_to_hand_activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            effect_json["graveyard_to_hand_activation_requires_sacrifice_target"] = True
         if oracle_up_to:
             activated_effect["up_to_count"] = True
             activated_effect["graveyard_to_hand_up_to_count"] = True
@@ -7245,6 +7389,9 @@ def split_row(
             "activation_cost_colors",
             "activation_requires_tap",
             "activation_requires_sacrifice",
+            "activation_life_cost",
+            "activation_sacrifice_target",
+            "activation_requires_sacrifice_target",
         ):
             if parsed_activation.get(key) != oracle_target.get(key):
                 return None, f"activated_recursion_battlefield_source_oracle_{key}_mismatch"
@@ -7313,6 +7460,11 @@ def split_row(
             "activation_requires_tap": parsed_activation["activation_requires_tap"],
             "activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
         }
+        if parsed_activation.get("activation_life_cost"):
+            activated_effect["activation_life_cost"] = parsed_activation["activation_life_cost"]
+        if parsed_activation.get("activation_sacrifice_target"):
+            activated_effect["activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            activated_effect["activation_requires_sacrifice_target"] = True
         effect_json = {
             "effect": permanent_effect,
             "battle_model_scope": PERMANENT_ACTIVATED_RECURSION_TO_BATTLEFIELD_SCOPE,
@@ -7344,6 +7496,14 @@ def split_row(
             "graveyard_to_hand_activation_requires_sacrifice": parsed_activation["activation_requires_sacrifice"],
             "activated_self_sacrifice_recursion": bool(parsed_activation["activation_requires_sacrifice"]),
         }
+        if parsed_activation.get("activation_life_cost"):
+            effect_json["activation_life_cost"] = parsed_activation["activation_life_cost"]
+            effect_json["graveyard_to_hand_activation_life_cost"] = parsed_activation["activation_life_cost"]
+        if parsed_activation.get("activation_sacrifice_target"):
+            effect_json["activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            effect_json["activation_requires_sacrifice_target"] = True
+            effect_json["graveyard_to_hand_activation_sacrifice_target"] = parsed_activation["activation_sacrifice_target"]
+            effect_json["graveyard_to_hand_activation_requires_sacrifice_target"] = True
         if bool(oracle_target.get("enters_tapped")):
             effect_json["enters_tapped"] = True
             activated_effect["enters_tapped"] = True

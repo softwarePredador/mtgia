@@ -17771,6 +17771,8 @@ def activation_sacrifice_target_matches(permanent, target_type):
         return is_enchantment_permanent(permanent)
     if target == "land":
         return is_effective_land(permanent)
+    if target == "swamp":
+        return is_effective_land(permanent) and _permanent_has_subtype(permanent, "swamp")
     if target == "artifact_or_creature":
         return is_artifact_permanent(permanent) or is_battlefield_creature(permanent)
     if target == "artifact_or_land":
@@ -27148,6 +27150,18 @@ def activate_graveyard_recycling_artifacts(
                 or permanent.get("activation_discard_target")
                 or "any_card"
             )
+            activation_life_cost = int(
+                permanent.get("graveyard_to_hand_activation_life_cost")
+                or permanent.get("activation_life_cost")
+                or 0
+            )
+            sacrifice_target_type = str(
+                permanent.get("graveyard_to_hand_activation_sacrifice_target")
+                or permanent.get("activation_sacrifice_target")
+                or ""
+            ).strip()
+            sacrifice_target = None
+            sacrifice_options = []
             simple_activated_scope = (
                 permanent.get("battle_model_scope") == "xmage_permanent_simple_activated_graveyard_to_hand_v1"
                 or permanent.get("activated_battle_model_scope")
@@ -27186,6 +27200,22 @@ def activate_graveyard_recycling_artifacts(
                         phase=phase,
                     )
                     continue
+                if sacrifice_target_type:
+                    sacrifice_target, sacrifice_options = choose_activation_sacrifice_target(
+                        player,
+                        permanent,
+                        sacrifice_target_type,
+                    )
+                    if sacrifice_target is None:
+                        _utility_artifact_skip_event(
+                            player,
+                            permanent,
+                            turn,
+                            "no_valid_sacrifice_target_for_graveyard_to_hand_activation",
+                            phase=phase,
+                            risk_flags=["missing_sacrifice_target"],
+                        )
+                        continue
                 if requires_tap and permanent.get("tapped"):
                     _utility_artifact_skip_event(
                         player,
@@ -27209,6 +27239,19 @@ def activate_graveyard_recycling_artifacts(
                         phase=phase,
                     )
                     continue
+                if activation_life_cost and (
+                    getattr(player, "life_cant_change", False)
+                    or player.life <= activation_life_cost + 1
+                ):
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "life_too_low_for_graveyard_to_hand_activation_cost",
+                        phase=phase,
+                        risk_flags=["low_life", "life_payment"],
+                    )
+                    continue
                 if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
                     _utility_artifact_skip_event(
                         player,
@@ -27221,11 +27264,18 @@ def activate_graveyard_recycling_artifacts(
                 if requires_tap:
                     permanent["tapped"] = True
                 permanent["utility_artifact_used_this_turn"] = True
+                life_before = player.life
+                if activation_life_cost:
+                    change_life(player, -activation_life_cost)
                 if requires_sacrifice:
                     if permanent in player.battlefield:
                         player.battlefield.remove(permanent)
                     player.graveyard.append(permanent)
                     player.record_permanent_sacrificed(permanent, turn)
+                sacrificed_target_name = None
+                if sacrifice_target is not None:
+                    sacrificed_target_name = sacrifice_target.get("name", "?")
+                    sacrifice_permanent_for_activation(player, sacrifice_target, turn)
                 discard_result = {
                     "to_top": [],
                     "to_graveyard": [],
@@ -27323,6 +27373,15 @@ def activate_graveyard_recycling_artifacts(
                         "sacrificed_source": requires_sacrifice,
                         "discard_count": activation_discard_count,
                         "discard_target": activation_discard_target,
+                        "life_cost": activation_life_cost,
+                        "life_before": life_before,
+                        "life_after": player.life,
+                        "sacrifice_target": sacrifice_target_type or None,
+                        "sacrificed_target": sacrificed_target_name,
+                        "sacrifice_options": [
+                            option.get("name", "?")
+                            for option in sacrifice_options[:6]
+                        ],
                     },
                     rule_source=(
                         "simple_activated_graveyard_to_battlefield_permanent_v1"
@@ -27348,13 +27407,23 @@ def activate_graveyard_recycling_artifacts(
                         "mana": -mana_paid,
                         "cards_to_hand": len(recovered) if destination != "battlefield" else 0,
                         "permanents_to_battlefield": len(returned_to_battlefield),
-                        "permanents": -1 if requires_sacrifice else 0,
                         "graveyard": (
                             -len(recovered)
                             + (1 if requires_sacrifice else 0)
+                            + (
+                                1
+                                if sacrifice_target is not None
+                                and not is_token_permanent(sacrifice_target)
+                                else 0
+                            )
                             + len(discard_result.get("to_graveyard") or [])
                         ),
                         "cards_discarded": activation_discard_count,
+                        "life": -activation_life_cost,
+                        "permanents": (
+                            (-1 if requires_sacrifice else 0)
+                            + (-1 if sacrificed_target_name else 0)
+                        ),
                         "returned": [card.get("name", "?") for card in recovered],
                     },
                     risk_flags=[
@@ -27364,6 +27433,9 @@ def activate_graveyard_recycling_artifacts(
                             "sacrifice_artifact": requires_sacrifice and not simple_activated_scope,
                             "tap_ability": requires_tap and simple_activated_scope,
                             "sacrifice_source": requires_sacrifice and simple_activated_scope,
+                            "life_payment": activation_life_cost > 0,
+                            "sacrifice_permanent": sacrificed_target_name is not None,
+                            "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
                             "graveyard_to_battlefield": destination == "battlefield",
                             "graveyard_to_hand": destination != "battlefield",
                             "discard_cost": activation_discard_count > 0,
@@ -27389,6 +27461,11 @@ def activate_graveyard_recycling_artifacts(
                     "discarded": [card.get("name", "?") for card in discard_cards],
                     "discarded_count": activation_discard_count,
                     "discard_target": activation_discard_target,
+                    "life_paid": activation_life_cost,
+                    "life_before": life_before,
+                    "life_after": player.life,
+                    "sacrifice_target": sacrifice_target_type or None,
+                    "sacrificed_target": sacrificed_target_name,
                     "discard_to_graveyard": [
                         card.get("name", "?") for card in discard_result.get("to_graveyard") or []
                     ],
@@ -27423,6 +27500,11 @@ def activate_graveyard_recycling_artifacts(
                     destination=destination,
                     tapped=bool(permanent.get("tapped")),
                     sacrificed_self=requires_sacrifice,
+                    life_paid=activation_life_cost,
+                    life_before=life_before,
+                    life_after=player.life,
+                    sacrifice_target=sacrifice_target_type or None,
+                    sacrificed_target=sacrificed_target_name,
                     phase=phase,
                     turn=turn,
                     **replay_rule_fields(permanent),

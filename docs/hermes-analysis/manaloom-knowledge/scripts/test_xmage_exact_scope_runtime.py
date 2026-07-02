@@ -6715,6 +6715,129 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.graveyard, [target])
         self.assertFalse(any(event == "recursion_resolved" for event, _ in self.events))
 
+    def test_simple_activated_recursion_permanent_pays_life_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(1)
+        active.mana_pool.add("black", 1)
+        active.life = 20
+        target = {"name": "Returned Bear", "type_line": "Creature - Bear", "cmc": 2}
+        active.graveyard.append(target)
+        permanent = {
+            "name": "Phyrexian Reclamation",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "hand",
+            "graveyard_to_hand_activation_cost_mana": "{1}{B}",
+            "graveyard_to_hand_activation_cost_generic": 1,
+            "graveyard_to_hand_activation_cost_colors": ["B"],
+            "graveyard_to_hand_activation_requires_tap": False,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "graveyard_to_hand_activation_life_cost": 2,
+            "activation_life_cost": 2,
+            "_rule_logical_key": "battle_rule_v1:fixture_phyrexian_reclamation",
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=14,
+            rng=random.Random(14),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(active.life, 18)
+        self.assertIn(permanent, active.battlefield)
+        self.assertEqual([card["name"] for card in active.hand], ["Returned Bear"])
+        self.assertEqual(active.graveyard, [])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Phyrexian Reclamation"
+                and data.get("life_paid") == 2
+                and data.get("life_before") == 20
+                and data.get("life_after") == 18
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_recursion_to_battlefield_sacrifices_target_permanent(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("red", 1)
+        active.mana_pool.add("white", 1)
+        active.mana_pool.add("black", 1)
+        target = {
+            "name": "Seal of Cleansing",
+            "type_line": "Enchantment",
+            "effect": "enchantment",
+            "cmc": 2,
+        }
+        active.graveyard.append(target)
+        sacrificed = {"name": "Omen of the Sun", "type_line": "Enchantment", "cmc": 3}
+        permanent = {
+            "name": "Ghen, Arcanum Weaver",
+            "type_line": "Legendary Creature - Human Wizard",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "graveyard_to_hand_target": "enchantment",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "battlefield",
+            "graveyard_to_hand_activation_cost_mana": "{R}{W}{B}",
+            "graveyard_to_hand_activation_cost_generic": 0,
+            "graveyard_to_hand_activation_cost_colors": ["R", "W", "B"],
+            "graveyard_to_hand_activation_requires_tap": True,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "graveyard_to_hand_activation_sacrifice_target": "enchantment",
+            "graveyard_to_hand_activation_requires_sacrifice_target": True,
+            "activation_sacrifice_target": "enchantment",
+            "activation_requires_sacrifice_target": True,
+            "summoning_sick": False,
+            "_rule_logical_key": "battle_rule_v1:fixture_ghen_arcanum_weaver",
+        }
+        active.battlefield.extend([permanent, sacrificed])
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=17,
+            rng=random.Random(17),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertIn(permanent, active.battlefield)
+        self.assertNotIn(sacrificed, active.battlefield)
+        self.assertIn(sacrificed, active.graveyard)
+        self.assertEqual([card["name"] for card in active.battlefield], ["Ghen, Arcanum Weaver", "Seal of Cleansing"])
+        self.assertTrue(permanent.get("tapped"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Ghen, Arcanum Weaver"
+                and data.get("destination") == "battlefield"
+                and data.get("sacrifice_target") == "enchantment"
+                and data.get("sacrificed_target") == "Omen of the Sun"
+                and data.get("returned_to_battlefield") == ["Seal of Cleansing"]
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_recursion_self_sacrifice_selects_target_before_sacrificing_source(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
