@@ -7028,6 +7028,139 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
+    def test_recursion_for_each_color_maps_color_creature_components(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rogues' Gallery",
+                type_line="Sorcery",
+                oracle_text=(
+                    "For each color, return up to one target creature card of that color "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                new ReturnFromGraveyardToHandTargetEffect();
+                class RoguesGalleryTarget extends TargetCardInYourGraveyard {
+                    RoguesGalleryTarget() {
+                        super(0, 5, new FilterCreatureCard("creature cards"), false);
+                    }
+                    ColorAssignment colorAssignment = new ColorAssignment();
+                    ColorlessPredicate.instance.apply(card, game);
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1")
+        self.assertEqual(effect["mode_selection"], "all_components")
+        self.assertEqual(
+            [component["target"] for component in effect["recursion_components"]],
+            ["white_creature", "blue_creature", "black_creature", "red_creature", "green_creature"],
+        )
+        self.assertTrue(all(component.get("up_to_count") for component in effect["recursion_components"]))
+        self.assertEqual(effect["recursion_components"][0]["target_constraints"]["colors"], ["W"])
+        self.assertEqual(effect["recursion_components"][1]["target_constraints"]["colors"], ["U"])
+
+    def test_recursion_for_each_color_requires_xmage_color_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rogues' Gallery",
+                type_line="Sorcery",
+                oracle_text=(
+                    "For each color, return up to one target creature card of that color "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                new ReturnFromGraveyardToHandTargetEffect();
+                new TargetCardInYourGraveyard(0, 5, new FilterCreatureCard("creature cards"), false);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_for_each_color_source_not_supported")
+
+    def test_recursion_multi_target_maps_mount_vehicle_and_no_abilities_components(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rise from the Wreck",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to one target creature card, up to one target Mount card, "
+                    "up to one target Vehicle card, and up to one target creature card with no "
+                    "abilities from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect()
+                    .setTargetPointer(new EachTargetPointer()));
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_CREATURE));
+                FilterCard filter = new FilterCard("Mount card");
+                filter.add(SubType.MOUNT.getPredicate());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, filter));
+                FilterCard filter2 = new FilterCard("Vehicle card");
+                filter2.add(SubType.VEHICLE.getPredicate());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, filter2));
+                FilterCard filter3 = new FilterCard("creature card with no abilities");
+                filter3.add(NoAbilityPredicate.instance);
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, filter3));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], "xmage_return_multiple_graveyard_cards_to_hand_spell_v1")
+        self.assertEqual(
+            [component["target"] for component in effect["recursion_components"]],
+            ["creature", "mount_card", "vehicle_card", "creature_no_abilities"],
+        )
+        self.assertTrue(all(component.get("up_to_count") for component in effect["recursion_components"]))
+        self.assertEqual(effect["recursion_components"][3]["target_constraints"]["requires_no_abilities"], True)
+
+    def test_recursion_multi_target_requires_xmage_subtype_and_no_ability_filters(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rise from the Wreck",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return up to one target creature card, up to one target Mount card, "
+                    "up to one target Vehicle card, and up to one target creature card with no "
+                    "abilities from your graveyard to your hand."
+                ),
+            ),
+            source_text="""
+                new ReturnFromGraveyardToHandTargetEffect().setTargetPointer(new EachTargetPointer());
+                new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_CREATURE);
+                new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_CREATURE);
+                new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_ARTIFACT);
+                new TargetCardInYourGraveyard(0, 1, StaticFilters.FILTER_CARD_CREATURE);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_multi_target_source_not_supported")
+
     def test_recursion_exile_self_variable_x_requires_source_adjuster(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

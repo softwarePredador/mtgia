@@ -1,0 +1,5 @@
+      card_name      |   normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------+---------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Rise from the Wreck | rise from the wreck | battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129 |                  1 |                           1 |                         1 |           0
+ Rogues' Gallery     | rogues' gallery     | battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d |                  1 |                           1 |                         1 |           0
+(2 rows)

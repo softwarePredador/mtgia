@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T08:25:44.292025+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg364_multi_target_recursion_wave_manifest.json",
+  "package_id": "pg364_multi_target_recursion_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+          "card_name": "Rise from the Wreck",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129",
+          "oracle_hash": "f165245a634ee3badf5399cc4920b6e4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+          "card_name": "Rogues' Gallery",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d",
+          "oracle_hash": "3add5a0e5d562d4387f08f67caab250f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+          "card_name": "Rise from the Wreck",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129",
+          "oracle_hash": "f165245a634ee3badf5399cc4920b6e4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+          "card_name": "Rogues' Gallery",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d",
+          "oracle_hash": "3add5a0e5d562d4387f08f67caab250f",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rise from the Wreck",
+          "logical_rule_key": "battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rogues' Gallery",
+          "logical_rule_key": "battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Rise from the Wreck",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rogues' Gallery",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

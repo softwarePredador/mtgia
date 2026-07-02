@@ -798,8 +798,18 @@ def recursion_target_constraints_for(
     graveyard_from_battlefield_this_turn: bool = False,
 ) -> dict[str, Any]:
     constraints: dict[str, Any] = {"zone": "graveyard", "controller": controller}
+    color_creature_targets = {
+        "white_creature": "W",
+        "blue_creature": "U",
+        "black_creature": "B",
+        "red_creature": "R",
+        "green_creature": "G",
+    }
     if target == "any_card":
         constraints["scope"] = "any_card"
+    elif target in color_creature_targets:
+        constraints["card_types"] = ["creature"]
+        constraints["colors"] = [color_creature_targets[target]]
     elif target == "green_card":
         constraints["colors"] = ["G"]
     elif target == "multicolored_card":
@@ -816,6 +826,13 @@ def recursion_target_constraints_for(
         constraints["subtypes"] = ["mercenary"]
     elif target == "elf_card":
         constraints["subtypes"] = ["elf"]
+    elif target == "mount_card":
+        constraints["subtypes"] = ["mount"]
+    elif target == "vehicle_card":
+        constraints["subtypes"] = ["vehicle"]
+    elif target == "creature_no_abilities":
+        constraints["card_types"] = ["creature"]
+        constraints["requires_no_abilities"] = True
     elif target == "ally_creature":
         constraints["card_types"] = ["creature"]
         constraints["subtypes"] = ["ally"]
@@ -947,6 +964,84 @@ def recursion_component_up_to_one(target: str) -> dict[str, Any]:
     component = recursion_component(target, 1)
     component["up_to_count"] = True
     return component
+
+
+def recursion_for_each_color_creature_components_from_text(text: str) -> list[dict[str, Any]] | None:
+    normalized = re.sub(r"\s+", " ", str(text or "").strip().lower())
+    if normalized != (
+        "for each color, return up to one target creature card of that color "
+        "from your graveyard to your hand."
+    ):
+        return None
+    return [
+        recursion_component_up_to_one("white_creature"),
+        recursion_component_up_to_one("blue_creature"),
+        recursion_component_up_to_one("black_creature"),
+        recursion_component_up_to_one("red_creature"),
+        recursion_component_up_to_one("green_creature"),
+    ]
+
+
+def recursion_for_each_color_creature_components_from_oracle(
+    metadata: dict[str, Any],
+) -> list[dict[str, Any]] | None:
+    return recursion_for_each_color_creature_components_from_text(oracle_text(metadata))
+
+
+def source_supports_for_each_color_creature_recursion(source_text: str) -> bool:
+    text = str(source_text or "")
+    return (
+        "ReturnFromGraveyardToHandTargetEffect" in text
+        and "ColorAssignment" in text
+        and "TargetCardInYourGraveyard" in text
+        and "FilterCreatureCard" in text
+        and "ColorlessPredicate" in text
+    )
+
+
+def recursion_up_to_one_multi_target_components_from_text(text: str) -> list[dict[str, Any]] | None:
+    normalized = re.sub(r"\s+", " ", str(text or "").strip().lower())
+    if normalized == (
+        "return up to one target creature card, up to one target mount card, "
+        "up to one target vehicle card, and up to one target creature card with "
+        "no abilities from your graveyard to your hand."
+    ):
+        return [
+            recursion_component_up_to_one("creature"),
+            recursion_component_up_to_one("mount_card"),
+            recursion_component_up_to_one("vehicle_card"),
+            recursion_component_up_to_one("creature_no_abilities"),
+        ]
+    return None
+
+
+def recursion_up_to_one_multi_target_components_from_oracle(
+    metadata: dict[str, Any],
+) -> list[dict[str, Any]] | None:
+    return recursion_up_to_one_multi_target_components_from_text(oracle_text(metadata))
+
+
+def source_supports_up_to_one_multi_target_recursion(
+    source_text: str,
+    components: list[dict[str, Any]],
+) -> bool:
+    text = str(source_text or "")
+    if (
+        "ReturnFromGraveyardToHandTargetEffect" not in text
+        or "EachTargetPointer" not in text
+        or text.count("TargetCardInYourGraveyard") < len(components)
+    ):
+        return False
+    required_by_target = {
+        "creature": ("StaticFilters.FILTER_CARD_CREATURE",),
+        "mount_card": ("SubType.MOUNT",),
+        "vehicle_card": ("SubType.VEHICLE",),
+        "creature_no_abilities": ("NoAbilityPredicate",),
+    }
+    return all(
+        any(needle in text for needle in required_by_target.get(str(component.get("target")), ()))
+        for component in components
+    )
 
 
 def recursion_exile_self_components_from_text(text: str) -> list[dict[str, Any]] | None:
@@ -8712,6 +8807,46 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_hand_choose_one_spell",
+            ), "selected_exact_scope"
+        for_each_color_components = recursion_for_each_color_creature_components_from_oracle(metadata)
+        if for_each_color_components is not None:
+            if not source_supports_for_each_color_creature_recursion(source_text):
+                return None, "recursion_for_each_color_source_not_supported"
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+                "mode_selection": "all_components",
+                "recursion_components": for_each_color_components,
+                "destination": "hand",
+                "target_controller": "self",
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_hand_for_each_color_spell",
+            ), "selected_exact_scope"
+        multi_target_components = recursion_up_to_one_multi_target_components_from_oracle(metadata)
+        if multi_target_components is not None:
+            if not source_supports_up_to_one_multi_target_recursion(source_text, multi_target_components):
+                return None, "recursion_multi_target_source_not_supported"
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+                "mode_selection": "all_components",
+                "recursion_components": multi_target_components,
+                "destination": "hand",
+                "target_controller": "self",
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_hand_multi_target_spell",
             ), "selected_exact_scope"
         if has_oracle_complexity(metadata):
             return None, "recursion_oracle_not_simple"

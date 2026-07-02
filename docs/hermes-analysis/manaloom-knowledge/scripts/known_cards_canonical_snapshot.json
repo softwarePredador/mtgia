@@ -60177,6 +60177,82 @@
     "battle_rule_logical_key": "battle_rule_v1:b0046c8fa58ed98eb9754ac4148782be",
     "battle_rule_oracle_hash": "68b4cdebdb2d674f9aa24d95a2b74c9f"
   },
+  "Rise from the Wreck": {
+    "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "mount_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "mount"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "vehicle_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "vehicle"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "creature_no_abilities",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "requires_no_abilities": true,
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f5936a82bbc6efa77c6d178d3a659129",
+    "battle_rule_oracle_hash": "f165245a634ee3badf5399cc4920b6e4"
+  },
   "Rise of the Eldrazi": {
     "_composite_rule_components": [
       {
@@ -60732,6 +60808,110 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "35f40f0c9ded4410f7db6763916e9b76"
+  },
+  "Rogues' Gallery": {
+    "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "all_components",
+    "recursion_components": [
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "white_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "W"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "blue_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "U"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "black_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "B"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "red_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "R"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      {
+        "count": 1,
+        "destination": "hand",
+        "target": "green_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "colors": [
+            "G"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e99befa07d8ef3776682f24beddf5b4d",
+    "battle_rule_oracle_hash": "3add5a0e5d562d4387f08f67caab250f"
   },
   "Roiling Dragonstorm": {
     "count": 2,

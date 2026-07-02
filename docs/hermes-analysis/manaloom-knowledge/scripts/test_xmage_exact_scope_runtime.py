@@ -4790,6 +4790,180 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_for_each_color_returns_one_creature_per_color(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "White Soldier", "type_line": "Creature - Human Soldier", "colors": ["W"]},
+                {"name": "Blue Drake", "type_line": "Creature - Drake", "colors": ["U"]},
+                {"name": "Black Rogue", "type_line": "Creature - Rogue", "colors": ["B"]},
+                {"name": "Red Warrior", "type_line": "Creature - Warrior", "colors": ["R"]},
+                {"name": "Green Beast", "type_line": "Creature - Beast", "colors": ["G"]},
+                {"name": "Wrong Bolt", "type_line": "Instant", "colors": ["R"]},
+                {"name": "Colorless Golem", "type_line": "Artifact Creature - Golem", "colors": []},
+            ]
+        )
+        components = []
+        for target, color in [
+            ("white_creature", "W"),
+            ("blue_creature", "U"),
+            ("black_creature", "B"),
+            ("red_creature", "R"),
+            ("green_creature", "G"),
+        ]:
+            components.append(
+                {
+                    "target": target,
+                    "target_constraints": {
+                        "zone": "graveyard",
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "colors": [color],
+                    },
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                }
+            )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_one_graveyard_creature_per_color_to_hand_spell_v1",
+            "mode_selection": "all_components",
+            "recursion_components": components,
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Rogues' Gallery",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "For each color, return up to one target creature card of that color "
+                    "from your graveyard to your hand."
+                ),
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            [card["name"] for card in active.hand],
+            ["White Soldier", "Blue Drake", "Black Rogue", "Red Warrior", "Green Beast"],
+        )
+        self.assertEqual(
+            [card["name"] for card in active.graveyard],
+            ["Wrong Bolt", "Colorless Golem", "Fixture Rogues' Gallery"],
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("mode_selection") == "all_components"
+                and data.get("recovered_count") == 5
+                and [item["target_type"] for item in data.get("recovered_by_component", [])]
+                == ["white_creature", "blue_creature", "black_creature", "red_creature", "green_creature"]
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_hand_multi_target_respects_mount_vehicle_and_no_abilities(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Bear", "type_line": "Creature - Bear", "oracle_text": "Trample"},
+                {"name": "Saddle Mount", "type_line": "Creature - Horse Mount", "oracle_text": "Saddle 1"},
+                {"name": "Crew Vehicle", "type_line": "Artifact - Vehicle", "oracle_text": "Crew 2"},
+                {"name": "Vanilla Wolf", "type_line": "Creature - Wolf", "oracle_text": ""},
+                {"name": "Ability Elf", "type_line": "Creature - Elf", "oracle_text": "Tap: Add G."},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_multiple_graveyard_cards_to_hand_spell_v1",
+            "mode_selection": "all_components",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "mount_card",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "subtypes": ["mount"]},
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "vehicle_card",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "subtypes": ["vehicle"]},
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+                {
+                    "target": "creature_no_abilities",
+                    "target_constraints": {
+                        "zone": "graveyard",
+                        "controller": "self",
+                        "card_types": ["creature"],
+                        "requires_no_abilities": True,
+                    },
+                    "count": 1,
+                    "up_to_count": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                },
+            ],
+            "destination": "hand",
+            "target_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Rise from the Wreck",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Return up to one target creature card, up to one target Mount card, "
+                    "up to one target Vehicle card, and up to one target creature card with no abilities "
+                    "from your graveyard to your hand."
+                ),
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(
+            [card["name"] for card in active.hand],
+            ["Target Bear", "Saddle Mount", "Crew Vehicle", "Vanilla Wolf"],
+        )
+        self.assertEqual([card["name"] for card in active.graveyard], ["Ability Elf", "Fixture Rise from the Wreck"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("recovered_count") == 4
+                and [item["target_type"] for item in data.get("recovered_by_component", [])]
+                == ["creature", "mount_card", "vehicle_card", "creature_no_abilities"]
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_battlefield_recursion_returns_matching_permanent_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

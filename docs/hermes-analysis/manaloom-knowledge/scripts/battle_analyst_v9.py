@@ -35504,6 +35504,30 @@ def return_graveyard_lands_to_battlefield(player, card, turn, *, opponents=None,
     return returned
 
 
+def _type_line_tokens(card):
+    type_line = str((card or {}).get("type_line") or "")
+    return [
+        token.lower()
+        for token in re.split(r"[^A-Za-z0-9']+", type_line.replace("—", " "))
+        if token
+    ]
+
+
+def _card_has_printed_or_modeled_abilities(card):
+    if not isinstance(card, dict):
+        return True
+    for key in ("has_abilities", "has_printed_abilities"):
+        if key in card:
+            return bool(card.get(key))
+    for key in ("oracle_text", "rules_text", "text"):
+        if key in card:
+            return bool(str(card.get(key) or "").strip())
+    modeled_effect = str(get_card_effect(card).get("effect") or "").lower()
+    if modeled_effect and modeled_effect not in {"unknown", "creature", "vanilla_creature"}:
+        return True
+    return False
+
+
 def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max=None):
     """Return whether a graveyard card matches a narrow recursion target."""
     if not isinstance(card, dict):
@@ -35516,8 +35540,18 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
             return False
     target = str(target_type or "nonland").lower()
     type_line = str(card.get("type_line") or "").lower()
+    type_tokens = _type_line_tokens(card)
     if target in ("any_card", "card", "target_card"):
         return True
+    color_creature_targets = {
+        "white_creature": "W",
+        "blue_creature": "U",
+        "black_creature": "B",
+        "red_creature": "R",
+        "green_creature": "G",
+    }
+    if target in color_creature_targets:
+        return is_creature_card(card) and _spell_has_color(card, color_creature_targets[target])
     if target in ("green_card", "green"):
         return _spell_has_color(card, "G")
     if target in ("multicolored_card", "multicolored"):
@@ -35534,6 +35568,12 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "mercenary" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("elf_card", "elf"):
         return "elf" in type_line.replace("-", " ").replace("—", " ").split()
+    if target in ("mount_card", "mount"):
+        return "mount" in type_tokens
+    if target in ("vehicle_card", "vehicle"):
+        return "vehicle" in type_tokens
+    if target in ("creature_no_abilities", "creature_with_no_abilities", "vanilla_creature"):
+        return is_creature_card(card) and not _card_has_printed_or_modeled_abilities(card)
     if target in ("ally_creature", "ally_creature_card", "ally"):
         return is_creature_card(card) and "ally" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("outlaw_creature", "outlaw_creature_card", "outlaw"):
