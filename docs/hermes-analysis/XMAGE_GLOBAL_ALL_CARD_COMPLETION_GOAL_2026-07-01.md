@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG370
+thread goal remains active, but execution must use the current post-PG372
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -119,10 +119,26 @@ Post-PG370 counts:
 - XMage authoritative adapter required: `26758`
 - adapter work-unit keys: `11429`
 
+Post-PG372 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg372_boost_draw_spell_wave_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg372_boost_draw_spell_wave_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg372_supported_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg371_pg372_composite_resolution_waves_apply_evidence.md`
+- target battle-gap identities in authoritative queue: `27057`
+- XMage authoritative source resolved: `26743`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26743`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `49/49` pass
+- delta since post-PG370: `15` identities promoted
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG370 queue above.
+historical only. The active execution baseline is the post-PG372 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -130,13 +146,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG370 control numbers:
+Current post-PG372 control numbers:
 
-- target battle-gap identities: `27072`
-- XMage-resolved authoritative source identities: `26758`
+- target battle-gap identities: `27057`
+- XMage-resolved authoritative source identities: `26743`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26758`
+- XMage authoritative adapter required: `26743`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -156,16 +172,20 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg370_static_token_keywords_wave_commander_legal.json`.
-2. Re-split the top broad unit
-   `recursion::xmage_graveyard_return_variant_review_v1` (`1822` identities)
-   by exact XMage effect, ability, target, cost, zone movement, and Oracle text.
-3. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg372_boost_draw_spell_wave_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG372, so
+   the next cycle must add a new mapper/runtime subpattern before package
+   generation.
+3. Preferred next analysis lanes, in order:
+   `draw_effect_class_not_pure` composite draw spells (`544` blockers),
+   `mana_source_effect_class_not_simple` artifact/creature mana permanents
+   (`303` blockers), and then non-spell/triggered permanent families currently
+   blocked by `not_instant_or_sorcery_spell`.
+4. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
-4. If recursion produces no safe batch, record blocker counts and move to the
-   next largest work units in order: draw engine, protection, direct damage,
-   counters, life gain, draw cards, destroy removal, tutor, then targeted
-   counters.
+5. If a proposed lane cannot prove Oracle/source/runtime agreement, record the
+   blocker counts and move to the next lane without creating manual per-card
+   rules.
 
 Fresh alignment evidence:
 
@@ -768,10 +788,22 @@ Immediate checkpoint after PG361:
 68. The post-PG370 supported splitter recheck returned `proposal_count=0` over
     `7829` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg370_supported_recheck.md`.
-69. Continue from the fresh post-PG370 queue. The top reusable work unit remains
-    `recursion::xmage_graveyard_return_variant_review_v1`, still at `1822`, so
-    the next cycle should split another exact recursion subpattern unless a
-    fresher queue changes the ranking.
+69. PG371 promoted `5` fixed controller life-gain plus draw-card spells:
+    `Dosan's Oldest Chant`, `Resupply`, `Revitalize`, `Reviving Dose`, and
+    `Ritual of Rejuvenation`, adding
+    `xmage_fixed_controller_gain_life_draw_card_spell_v1` through
+    `composite_resolution`.
+70. PG372 promoted `10` fixed target-creature boost plus draw-card spells:
+    `Afflict`, `Aggressive Urge`, `Befuddle`, `Bewilder`, `Defiant Strike`,
+    `Fleeting Distraction`, `Rebellious Strike`, `Shocking Grasp`,
+    `Sudden Strength`, and `Sugar Rush`, adding
+    `xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1`.
+71. The final post-PG372 supported splitter recheck returned
+    `proposal_count=0` over `7814` considered supported rows. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg372_supported_recheck.md`.
+72. Continue from the fresh post-PG372 queue. Since the exact splitter is now
+    empty, the next cycle must implement a new mapper/runtime subpattern before
+    any PostgreSQL package can be generated.
 
 ## Non-Goals
 

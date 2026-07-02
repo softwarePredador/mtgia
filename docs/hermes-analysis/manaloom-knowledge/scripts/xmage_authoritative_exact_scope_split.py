@@ -103,6 +103,8 @@ GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
 )
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
+LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
+BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
@@ -2650,6 +2652,36 @@ def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
     if "TargetPointer" in (source or "") or ".setTargetPointer" in (source or ""):
         return None
     return int(matches[0][0]), int(matches[0][1])
+
+
+def fixed_boost_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    match = re.match(
+        r"^target creature gets ([+-]?\d+)/([+-]?\d+) until end of turn\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power = signed_int_from_oracle(match.group(1))
+    toughness = signed_int_from_oracle(match.group(2))
+    if power is None or toughness is None:
+        return None
+    return power, toughness, 1
+
+
+def fixed_boost_draw_from_source(source: str) -> tuple[int, int, int] | None:
+    text = source or ""
+    boost = fixed_boost_target_from_source(text)
+    if boost is None:
+        return None
+    draw_matches = re.findall(r"new\s+DrawCardSourceControllerEffect\s*\(\s*(\d+)\s*\)", text)
+    if len(draw_matches) != 1:
+        return None
+    boost_match = re.search(r"new\s+BoostTargetEffect\s*\(", text)
+    draw_match = re.search(r"new\s+DrawCardSourceControllerEffect\s*\(", text)
+    if not boost_match or not draw_match or boost_match.start() > draw_match.start():
+        return None
+    return boost[0], boost[1], int(draw_matches[0])
 
 
 def fixed_boost_keyword_target_from_source(
@@ -5808,6 +5840,34 @@ def life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(match.group(1))
 
 
+def fixed_life_gain_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int] | None:
+    match = re.match(r"^you gain (\d+) life\. draw a card\.?$", oracle_text(metadata))
+    if not match:
+        return None
+    return int(match.group(1)), 1
+
+
+def fixed_life_gain_draw_from_source(source_text: str) -> tuple[int, int] | None:
+    text = str(source_text or "")
+    gain_matches = list(re.finditer(r"new\s+GainLifeEffect\s*\(", text))
+    if len(gain_matches) != 1:
+        return None
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(draw_matches) != 1:
+        return None
+    life_gain = java_constructor_int(text, "GainLifeEffect")
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if life_gain is None or life_gain <= 0 or draw_count != 1:
+        return None
+    if gain_matches[0].start() > draw_matches[0].start():
+        return None
+    return life_gain, draw_count
+
+
 def etb_life_gain_amount_from_oracle(metadata: dict[str, Any]) -> int | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
     match = re.search(
@@ -6494,6 +6554,10 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed damage plus controller life-gain spell"
     elif scope == DESTROY_GAIN_LIFE_SCOPE:
         scope_kind = "fixed destroy-target plus controller life-gain spell"
+    elif scope == LIFE_GAIN_DRAW_SCOPE:
+        scope_kind = "fixed controller life-gain plus draw-card spell"
+    elif scope == BOOST_DRAW_SCOPE:
+        scope_kind = "fixed target-creature boost plus draw-card spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
@@ -8761,6 +8825,59 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
+        if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect"}:
+            if ability_classes(row):
+                return None, "boost_draw_ability_class_not_simple"
+            oracle_boost = fixed_boost_draw_from_oracle(metadata)
+            if oracle_boost is None:
+                return None, "boost_draw_oracle_not_exact_fixed"
+            source_boost = fixed_boost_draw_from_source(source_text)
+            if source_boost is None:
+                return None, "boost_draw_source_not_fixed"
+            if source_boost != oracle_boost:
+                return None, "boost_draw_source_oracle_mismatch"
+            power_delta, toughness_delta, draw_count = oracle_boost
+            boost_component = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": BOOST_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": "any",
+                "power_delta": power_delta,
+                "toughness_delta": toughness_delta,
+                "power_boost": power_delta,
+                "toughness_boost": toughness_delta,
+                "duration": "until_end_of_turn",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "BoostTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": BOOST_DRAW_SCOPE,
+                "power_delta": power_delta,
+                "toughness_delta": toughness_delta,
+                "power_boost": power_delta,
+                "toughness_boost": toughness_delta,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [boost_component, draw_component],
+                "xmage_effect_classes": ["BoostTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_boost_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes != {"DrawCardSourceControllerEffect"}:
             return None, "draw_effect_class_not_pure"
         count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
@@ -8881,6 +8998,52 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_destroy_target_gain_life_spell",
+        ), "selected_exact_scope"
+
+    if unit == LIFE_UNIT and classes == {"DrawCardSourceControllerEffect", "GainLifeEffect"}:
+        if ability_classes(row):
+            return None, "life_gain_draw_ability_class_not_simple"
+        if has_oracle_complexity(metadata):
+            return None, "life_gain_draw_oracle_not_simple"
+        oracle_pair = fixed_life_gain_draw_from_oracle(metadata)
+        if oracle_pair is None:
+            return None, "life_gain_draw_oracle_not_exact_fixed"
+        source_pair = fixed_life_gain_draw_from_source(source_text)
+        if source_pair is None:
+            return None, "life_gain_draw_source_not_fixed"
+        if source_pair != oracle_pair:
+            return None, "life_gain_draw_source_oracle_mismatch"
+        life_gain, draw_count = oracle_pair
+        life_component = {
+            "effect": "life_total_change",
+            "battle_model_scope": LIFE_SCOPE,
+            "life_gain_amount": life_gain,
+            "target": "self",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "GainLifeEffect",
+        }
+        draw_component = {
+            "effect": "draw_cards",
+            "battle_model_scope": DRAW_SCOPE,
+            "count": draw_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DrawCardSourceControllerEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": LIFE_GAIN_DRAW_SCOPE,
+            "life_gain_amount": life_gain,
+            "draw_count": draw_count,
+            "count": draw_count,
+            "_composite_rule_components": [life_component, draw_component],
+            "xmage_effect_classes": ["GainLifeEffect", "DrawCardSourceControllerEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_life_gain_draw_card_spell",
         ), "selected_exact_scope"
 
     if unit == LIFE_UNIT:

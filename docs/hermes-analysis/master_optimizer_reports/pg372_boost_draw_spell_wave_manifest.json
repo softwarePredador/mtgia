@@ -1,0 +1,469 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg372_boost_draw_spell_wave_20260702_105410",
+  "deploy_id": "PG372",
+  "expected_rules": [
+    {
+      "card_name": "Afflict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d127e90ecf3de2f9467b1d609a04e56",
+      "min_rule_version": 2,
+      "normalized_name": "afflict",
+      "oracle_hash": "cbbd4f66bac4dff77b8c264fbc917727",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aggressive Urge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50d76fa80bfffae06d7570b3894cec0e",
+      "min_rule_version": 2,
+      "normalized_name": "aggressive urge",
+      "oracle_hash": "689ddcf5b96963dafc6c6eebca23248e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Befuddle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae7cb661641c2688dc26049f2952d09c",
+      "min_rule_version": 2,
+      "normalized_name": "befuddle",
+      "oracle_hash": "51762dddef01d1e2c3d89133073cbcc2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bewilder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b313835edf8058c09f667e60863f9ba",
+      "min_rule_version": 2,
+      "normalized_name": "bewilder",
+      "oracle_hash": "5ccbe79bcfb37ca4c7fd69b65aaa806e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defiant Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:84d2425bf0c293e7ac4bb17139b06db0",
+      "min_rule_version": 2,
+      "normalized_name": "defiant strike",
+      "oracle_hash": "e2b69f7acef22951f3c01660041a309b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fleeting Distraction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65893665beae156031fae8a33825a054",
+      "min_rule_version": 2,
+      "normalized_name": "fleeting distraction",
+      "oracle_hash": "239c5ee6b2d37c972b3e57dd273cc43c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rebellious Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "min_rule_version": 2,
+      "normalized_name": "rebellious strike",
+      "oracle_hash": "b34983578b1e2174c1f78bcc9c340d80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shocking Grasp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:102d6f47bb28c3662d5e5a4a0463f660",
+      "min_rule_version": 2,
+      "normalized_name": "shocking grasp",
+      "oracle_hash": "cb7fe1a17713ee1953faf64d25ed0c98",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sudden Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c9625f24619f505cce987d8dd110123",
+      "min_rule_version": 2,
+      "normalized_name": "sudden strength",
+      "oracle_hash": "c45bd01776db602f966b795217b0b9f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sugar Rush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "min_rule_version": 2,
+      "normalized_name": "sugar rush",
+      "oracle_hash": "b34983578b1e2174c1f78bcc9c340d80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_fixed_boost_draw_card_spell": 10
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg372_boost_draw_spell_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T10:54:10+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Afflict"
+      },
+      "card_name": "Afflict",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d127e90ecf3de2f9467b1d609a04e56",
+      "normalized_name": "afflict",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Aggressive Urge"
+      },
+      "card_name": "Aggressive Urge",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50d76fa80bfffae06d7570b3894cec0e",
+      "normalized_name": "aggressive urge",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Befuddle"
+      },
+      "card_name": "Befuddle",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae7cb661641c2688dc26049f2952d09c",
+      "normalized_name": "befuddle",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Bewilder"
+      },
+      "card_name": "Bewilder",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b313835edf8058c09f667e60863f9ba",
+      "normalized_name": "bewilder",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Defiant Strike"
+      },
+      "card_name": "Defiant Strike",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:84d2425bf0c293e7ac4bb17139b06db0",
+      "normalized_name": "defiant strike",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Fleeting Distraction"
+      },
+      "card_name": "Fleeting Distraction",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65893665beae156031fae8a33825a054",
+      "normalized_name": "fleeting distraction",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Rebellious Strike"
+      },
+      "card_name": "Rebellious Strike",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "normalized_name": "rebellious strike",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Shocking Grasp"
+      },
+      "card_name": "Shocking Grasp",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:102d6f47bb28c3662d5e5a4a0463f660",
+      "normalized_name": "shocking grasp",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Sudden Strength"
+      },
+      "card_name": "Sudden Strength",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c9625f24619f505cce987d8dd110123",
+      "normalized_name": "sudden strength",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    },
+    {
+      "card": {
+        "name": "Sugar Rush"
+      },
+      "card_name": "Sugar Rush",
+      "effect": "composite_resolution",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "normalized_name": "sugar rush",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+        "count": 1,
+        "effect": "composite_resolution"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Afflict",
+    "Aggressive Urge",
+    "Befuddle",
+    "Bewilder",
+    "Defiant Strike",
+    "Fleeting Distraction",
+    "Rebellious Strike",
+    "Shocking Grasp",
+    "Sudden Strength",
+    "Sugar Rush"
+  ],
+  "selected_count": 10,
+  "slug": "boost_draw_spell_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Afflict",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1d127e90ecf3de2f9467b1d609a04e56",
+      "min_rule_version": 2,
+      "normalized_name": "afflict",
+      "oracle_hash": "cbbd4f66bac4dff77b8c264fbc917727",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Aggressive Urge",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50d76fa80bfffae06d7570b3894cec0e",
+      "min_rule_version": 2,
+      "normalized_name": "aggressive urge",
+      "oracle_hash": "689ddcf5b96963dafc6c6eebca23248e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Befuddle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae7cb661641c2688dc26049f2952d09c",
+      "min_rule_version": 2,
+      "normalized_name": "befuddle",
+      "oracle_hash": "51762dddef01d1e2c3d89133073cbcc2",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bewilder",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:0b313835edf8058c09f667e60863f9ba",
+      "min_rule_version": 2,
+      "normalized_name": "bewilder",
+      "oracle_hash": "5ccbe79bcfb37ca4c7fd69b65aaa806e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defiant Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:84d2425bf0c293e7ac4bb17139b06db0",
+      "min_rule_version": 2,
+      "normalized_name": "defiant strike",
+      "oracle_hash": "e2b69f7acef22951f3c01660041a309b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Fleeting Distraction",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:65893665beae156031fae8a33825a054",
+      "min_rule_version": 2,
+      "normalized_name": "fleeting distraction",
+      "oracle_hash": "239c5ee6b2d37c972b3e57dd273cc43c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rebellious Strike",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "min_rule_version": 2,
+      "normalized_name": "rebellious strike",
+      "oracle_hash": "b34983578b1e2174c1f78bcc9c340d80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shocking Grasp",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:102d6f47bb28c3662d5e5a4a0463f660",
+      "min_rule_version": 2,
+      "normalized_name": "shocking grasp",
+      "oracle_hash": "cb7fe1a17713ee1953faf64d25ed0c98",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sudden Strength",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9c9625f24619f505cce987d8dd110123",
+      "min_rule_version": 2,
+      "normalized_name": "sudden strength",
+      "oracle_hash": "c45bd01776db602f966b795217b0b9f7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sugar Rush",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+      "min_rule_version": 2,
+      "normalized_name": "sugar rush",
+      "oracle_hash": "b34983578b1e2174c1f78bcc9c340d80",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

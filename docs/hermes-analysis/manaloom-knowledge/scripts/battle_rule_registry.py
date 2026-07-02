@@ -70,6 +70,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "attack_limit": "protection",
     "attack_tax": "protection",
     "draw_cards": "draw",
+    "composite_resolution": "draw",
     "dig_to_hand": "draw",
     "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",

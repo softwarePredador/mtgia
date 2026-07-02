@@ -178,18 +178,18 @@ to build this queue. Current evidence:
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27080`
-- XMage authoritative source resolved: `26766`
+- target all-card battle-gap identities: `27057`
+- XMage authoritative source resolved: `26743`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26766`
+- XMage authoritative adapter required: `26743`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26770` identities, card semantics are accepted from XMage; work is now
+- For `26743` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -208,9 +208,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG370 Exact Adapter Waves
+## PG283-PG372 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG370 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG372 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -237,6 +237,15 @@ patterns:
   `DestroyTargetEffect + GainLifeEffect`, one supported simple target, fixed
   controller life-gain amount, and exact destroy/gain-life Oracle text ->
   `xmage_destroy_target_and_controller_gain_life_spell_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` with
+  `GainLifeEffect + DrawCardSourceControllerEffect`, exact fixed "You gain N
+  life. Draw a card." Oracle/source text, and composite runtime resolution ->
+  `xmage_fixed_controller_gain_life_draw_card_spell_v1`
+- `draw_cards::xmage_draw_card_variant_review_v1` with
+  `BoostTargetEffect + DrawCardSourceControllerEffect`, exact fixed "Target
+  creature gets X/Y until end of turn. Draw a card." Oracle/source text, and
+  composite runtime resolution without double-finishing the spell ->
+  `xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
@@ -5617,6 +5626,31 @@ PG370 measured result:
   should continue from the fresh post-PG370 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1822`.
 
+PG371-PG372 measured result:
+
+- PG371 promoted `5` fixed life-gain plus draw-card spells into
+  `xmage_fixed_controller_gain_life_draw_card_spell_v1`.
+- PG372 promoted `10` fixed target-creature boost plus draw-card spells into
+  `xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1`.
+- The runtime now supports `stat_modifier_until_eot` inside
+  `composite_resolution` without double-finishing the source spell.
+- Focused splitter/runtime tests passed with `447` tests, `OK`.
+- PostgreSQL postchecks verified `5/5` PG371 rows and `10/10` PG372 rows as
+  promoted, `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite final sync exported `5005` canonical snapshot rows and
+  updated `7229` SQLite rows.
+- Trusted executable curated/manual PostgreSQL rules missing `oracle_hash` were
+  backfilled from `md5(cards.oracle_text)`: `1419` general rows plus `3`
+  basic-land aliases; postcheck left `0` trusted executable rules without hash.
+- Final PG-Hermes-SQLite contract audit passed with `49/49` checks.
+- Global all-card authoritative queue after PG372:
+  `target_identity_count=27057`, `xmage_authoritative_source_count=26743`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26743`.
+- Running the exact splitter after PG372 on supported units returns
+  `proposal_count=0` over `7814` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6256,7 +6290,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG370 queue, the next exact runtime-backed work should be selected from
+post-PG372 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
@@ -6264,8 +6298,8 @@ these largest reusable work units, not from deck intuition:
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
-6. `life_gain::xmage_life_gain_variant_review_v1` - `740`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `676`
+6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `666`
 8. `removal_destroy::targeted_destroy_variant_v1` - `624`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`

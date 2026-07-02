@@ -1,0 +1,38 @@
+WITH proposed(normalized_name, card_name, oracle_hash, logical_rule_key, effect_json, deck_role_json, source, confidence, review_status, execution_status, notes, shadow_handling) AS (
+  VALUES
+    ('dosan''s oldest chant', 'Dosan''s Oldest Chant', '5b0d387e45be18bc74411b6efac41e9e', 'battle_rule_v1:845cf002f1ea5f405217669601cd4aff', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_controller_gain_life_spell_v1","compose_on_resolution":true,"effect":"life_total_change","life_gain_amount":6,"target":"self","xmage_effect_class":"GainLifeEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_controller_gain_life_draw_card_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":false,"life_gain_amount":6,"sorcery":true,"xmage_effect_classes":["GainLifeEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class DosansOldestChant translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_draw_card_spell_v1. This row is package-ready only because the source signature is a narrow fixed controller life-gain plus draw-card spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('resupply', 'Resupply', '5b0d387e45be18bc74411b6efac41e9e', 'battle_rule_v1:48e6975a5607f029b81b95b3e5c06041', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_controller_gain_life_spell_v1","compose_on_resolution":true,"effect":"life_total_change","life_gain_amount":6,"target":"self","xmage_effect_class":"GainLifeEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_controller_gain_life_draw_card_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"life_gain_amount":6,"sorcery":false,"xmage_effect_classes":["GainLifeEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Resupply translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_draw_card_spell_v1. This row is package-ready only because the source signature is a narrow fixed controller life-gain plus draw-card spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('revitalize', 'Revitalize', '93b450ed3d279fd803dee8b045efb577', 'battle_rule_v1:87d5572300d4d26224ab50839985e9f7', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_controller_gain_life_spell_v1","compose_on_resolution":true,"effect":"life_total_change","life_gain_amount":3,"target":"self","xmage_effect_class":"GainLifeEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_controller_gain_life_draw_card_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"life_gain_amount":3,"sorcery":false,"xmage_effect_classes":["GainLifeEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class Revitalize translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_draw_card_spell_v1. This row is package-ready only because the source signature is a narrow fixed controller life-gain plus draw-card spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('reviving dose', 'Reviving Dose', '93b450ed3d279fd803dee8b045efb577', 'battle_rule_v1:87d5572300d4d26224ab50839985e9f7', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_controller_gain_life_spell_v1","compose_on_resolution":true,"effect":"life_total_change","life_gain_amount":3,"target":"self","xmage_effect_class":"GainLifeEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_controller_gain_life_draw_card_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"life_gain_amount":3,"sorcery":false,"xmage_effect_classes":["GainLifeEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RevivingDose translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_draw_card_spell_v1. This row is package-ready only because the source signature is a narrow fixed controller life-gain plus draw-card spell with focused runtime coverage.', 'deprecate_nonmatching_rows'),
+    ('ritual of rejuvenation', 'Ritual of Rejuvenation', '550480e66f0402692883f60b05c7f038', 'battle_rule_v1:c5be6b33be518357ce817f1ab3f2dedd', '{"_composite_rule_components":[{"battle_model_scope":"xmage_fixed_controller_gain_life_spell_v1","compose_on_resolution":true,"effect":"life_total_change","life_gain_amount":4,"target":"self","xmage_effect_class":"GainLifeEffect"},{"battle_model_scope":"xmage_fixed_source_controller_draw_spell_v1","compose_on_resolution":true,"count":1,"effect":"draw_cards","xmage_effect_class":"DrawCardSourceControllerEffect"}],"battle_model_scope":"xmage_fixed_controller_gain_life_draw_card_spell_v1","count":1,"draw_count":1,"effect":"composite_resolution","instant":true,"life_gain_amount":4,"sorcery":false,"xmage_effect_classes":["GainLifeEffect","DrawCardSourceControllerEffect"]}'::jsonb, '{"category":"draw","effect":"composite_resolution","timing":"instant"}'::jsonb, 'curated', 0.96, 'verified', 'auto', 'XMage authoritative exact-scope split: local class RitualOfRejuvenation translated into ManaLoom runtime scope xmage_fixed_controller_gain_life_draw_card_spell_v1. This row is package-ready only because the source signature is a narrow fixed controller life-gain plus draw-card spell with focused runtime coverage.', 'deprecate_nonmatching_rows')
+),
+rule_rows AS (
+  SELECT
+    r.normalized_name,
+    r.logical_rule_key,
+    r.oracle_hash,
+    r.review_status,
+    r.execution_status
+  FROM proposed p
+  LEFT JOIN public.card_battle_rules r
+    ON (
+         r.normalized_name = p.normalized_name
+         OR r.normalized_name LIKE p.normalized_name || ' // %'
+       )
+   AND r.logical_rule_key = p.logical_rule_key
+)
+SELECT
+  p.card_name,
+  p.normalized_name,
+  p.logical_rule_key,
+  count(r.*) FILTER (WHERE r.logical_rule_key = p.logical_rule_key) AS promoted_rule_rows,
+  count(r.*) FILTER (WHERE r.review_status = 'verified' AND r.execution_status = 'auto') AS promoted_verified_auto_rows,
+  count(r.*) FILTER (WHERE r.oracle_hash = p.oracle_hash) AS promoted_oracle_hash_rows,
+  (SELECT count(*) FROM manaloom_deploy_audit.pg371_life_gain_draw_spell_wave_20260702_104450) AS backup_rows
+FROM proposed p
+LEFT JOIN rule_rows r
+  ON r.normalized_name = p.normalized_name
+ AND r.logical_rule_key = p.logical_rule_key
+ AND r.oracle_hash = p.oracle_hash
+GROUP BY p.card_name, p.normalized_name, p.logical_rule_key, p.oracle_hash
+ORDER BY p.card_name;

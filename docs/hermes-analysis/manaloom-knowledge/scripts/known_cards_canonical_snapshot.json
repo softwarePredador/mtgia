@@ -1120,6 +1120,56 @@
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
   },
+  "Afflict": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": -1,
+        "toughness_delta": -1,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": -1,
+    "power_delta": -1,
+    "sorcery": false,
+    "toughness_boost": -1,
+    "toughness_delta": -1,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1d127e90ecf3de2f9467b1d609a04e56",
+    "battle_rule_oracle_hash": "cbbd4f66bac4dff77b8c264fbc917727"
+  },
   "Aftermath Analyst": {
     "cmc": 2.0,
     "effect": "recursion",
@@ -1217,6 +1267,56 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "e7f42788ab1a0fd1e31952c6c057adc2"
+  },
+  "Aggressive Urge": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 1,
+        "toughness_delta": 1,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": 1,
+    "power_delta": 1,
+    "sorcery": false,
+    "toughness_boost": 1,
+    "toughness_delta": 1,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50d76fa80bfffae06d7570b3894cec0e",
+    "battle_rule_oracle_hash": "689ddcf5b96963dafc6c6eebca23248e"
   },
   "Agna Qel'a": {
     "effect": "land",
@@ -1541,7 +1641,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:0e870121f472307183c1364d02e3dca9"
+    "battle_rule_logical_key": "battle_rule_v1:0e870121f472307183c1364d02e3dca9",
+    "battle_rule_oracle_hash": "006e2b72eae264e2aaba82d99d07f593"
   },
   "Alabaster Host Sanctifier": {
     "_keywords_are_self": true,
@@ -6554,6 +6655,56 @@
     "battle_rule_logical_key": "battle_rule_v1:0b543efc21cb5ee532062e24929c6ae1",
     "battle_rule_oracle_hash": "54b87eea8f1593e9f30794429bf7047f"
   },
+  "Befuddle": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -4,
+        "power_delta": -4,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": -4,
+    "power_delta": -4,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae7cb661641c2688dc26049f2952d09c",
+    "battle_rule_oracle_hash": "51762dddef01d1e2c3d89133073cbcc2"
+  },
   "Behold the Sinister Six!": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
     "battlefield_controller": "self",
@@ -6801,6 +6952,56 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ad857c6ebacb98fda958faaf2b8715ed",
     "battle_rule_oracle_hash": "467a19f71881fd720f7d13f538a4f98c"
+  },
+  "Bewilder": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -3,
+        "power_delta": -3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": -3,
+    "power_delta": -3,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0b313835edf8058c09f667e60863f9ba",
+    "battle_rule_oracle_hash": "5ccbe79bcfb37ca4c7fd69b65aaa806e"
   },
   "Biblioplex Assistant": {
     "_keywords_are_self": true,
@@ -14223,7 +14424,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "df826611f7a0a91ba8781558b346e7af"
   },
   "Commandeer": {
     "effect": "counter",
@@ -17861,6 +18063,56 @@
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "0eb8f6509f829b9bc6c98e8dd5cf17e0"
   },
+  "Defiant Strike": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 1,
+        "power_delta": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": 1,
+    "power_delta": 1,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:84d2425bf0c293e7ac4bb17139b06db0",
+    "battle_rule_oracle_hash": "e2b69f7acef22951f3c01660041a309b"
+  },
   "Defibrillating Current": {
     "amount": 4,
     "battle_model_scope": "xmage_fixed_damage_target_and_controller_gain_life_spell_v1",
@@ -19795,6 +20047,43 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "f9075c77b6a261e9b864afa8da7ee602"
+  },
+  "Dosan's Oldest Chant": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 6,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": false,
+    "life_gain_amount": 6,
+    "sorcery": true,
+    "xmage_effect_classes": [
+      "GainLifeEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:845cf002f1ea5f405217669601cd4aff",
+    "battle_rule_oracle_hash": "5b0d387e45be18bc74411b6efac41e9e"
   },
   "Double Vision": {
     "ability_kind": "triggered",
@@ -23466,7 +23755,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:d61021fe4fa1357803be53fa0d1d915a"
+    "battle_rule_logical_key": "battle_rule_v1:d61021fe4fa1357803be53fa0d1d915a",
+    "battle_rule_oracle_hash": "ff9463f33167f2489bb78394a914d43c"
   },
   "Envelop": {
     "battle_model_scope": "xmage_counter_target_spell_v1",
@@ -27734,6 +28024,56 @@
     "battle_rule_logical_key": "battle_rule_v1:5d0109627191c5c727228204e7772560",
     "battle_rule_oracle_hash": "c0b03669563b52f9f50a47990690c73a"
   },
+  "Fleeting Distraction": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -1,
+        "power_delta": -1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": -1,
+    "power_delta": -1,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:65893665beae156031fae8a33825a054",
+    "battle_rule_oracle_hash": "239c5ee6b2d37c972b3e57dd273cc43c"
+  },
   "Flesh Duplicate": {
     "ability_kind": "replacement",
     "battle_model_scope": "etb_copy_target_creature_with_copy_applier_modifiers_v1",
@@ -28896,7 +29236,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "d195eb80707cbce1707db2d8d17b3bef"
   },
   "Forge Anew": {
     "cmc": 3.0,
@@ -39342,7 +39683,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "af3d6761c54d395360a09244a05ed050"
   },
   "Island of Wak-Wak": {
     "effect": "land",
@@ -44765,7 +45107,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7121868497e89831b067a8f08e3eada9"
+    "battle_rule_logical_key": "battle_rule_v1:7121868497e89831b067a8f08e3eada9",
+    "battle_rule_oracle_hash": "6d55531f06ba4e627600f3962ad9f95f"
   },
   "Lunar Insight": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -57869,7 +58212,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5"
+    "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
+    "battle_rule_oracle_hash": "4ce07a0d5e5a33a68517b988b63dbe42"
   },
   "Ramunap Ruins": {
     "effect": "land",
@@ -58469,7 +58813,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:4d539456ce3026ca5a85fbadc3e7b339"
+    "battle_rule_logical_key": "battle_rule_v1:4d539456ce3026ca5a85fbadc3e7b339",
+    "battle_rule_oracle_hash": "5936b4653734cd7087eb67229b4efbc3"
   },
   "Rearing Embermare": {
     "_keywords_are_self": true,
@@ -58546,6 +58891,56 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8844850db13384812775c4a7d8e1dceb",
     "battle_rule_oracle_hash": "867bf2beccb79b310789f7cbdc7b2f4c"
+  },
+  "Rebellious Strike": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+    "battle_rule_oracle_hash": "b34983578b1e2174c1f78bcc9c340d80"
   },
   "Reborn Hope": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -60110,16 +60505,41 @@
     "battle_rule_oracle_hash": "23ccef3f0d08d7be5c4285e10c682356"
   },
   "Resupply": {
-    "cmc": 6.0,
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 6,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
     "count": 1,
-    "effect": "draw_cards",
+    "draw_count": 1,
+    "effect": "composite_resolution",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:dbfba32fbd58b0d3483c87f324b21cc9"
+    "life_gain_amount": 6,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "GainLifeEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:48e6975a5607f029b81b95b3e5c06041",
+    "battle_rule_oracle_hash": "5b0d387e45be18bc74411b6efac41e9e"
   },
   "Resurrection": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
@@ -60633,6 +61053,43 @@
     "battle_rule_logical_key": "battle_rule_v1:70d3cbd28ace705feb076fb737205e90",
     "battle_rule_oracle_hash": "cf45f8dd47bcf4f77694df304a5a432a"
   },
+  "Revitalize": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 3,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "life_gain_amount": 3,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "GainLifeEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87d5572300d4d26224ab50839985e9f7",
+    "battle_rule_oracle_hash": "93b450ed3d279fd803dee8b045efb577"
+  },
   "Revitalizing Repast // Old-Growth Grove": {
     "cmc": 1.0,
     "effect": "indestructible",
@@ -60668,6 +61125,43 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:bd174969a9568e932ead996951ee8ec8",
     "battle_rule_oracle_hash": "19baafcc9f4b0da0129b72d41728a354"
+  },
+  "Reviving Dose": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 3,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "life_gain_amount": 3,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "GainLifeEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:87d5572300d4d26224ab50839985e9f7",
+    "battle_rule_oracle_hash": "93b450ed3d279fd803dee8b045efb577"
   },
   "Reviving Melody": {
     "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_hand_spell_v1",
@@ -61607,6 +62101,43 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0976f8b0a16fa4aae2b7ac3a56bd00b0"
+  },
+  "Ritual of Rejuvenation": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+        "compose_on_resolution": true,
+        "effect": "life_total_change",
+        "life_gain_amount": 4,
+        "target": "self",
+        "xmage_effect_class": "GainLifeEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "life_gain_amount": 4,
+    "sorcery": false,
+    "xmage_effect_classes": [
+      "GainLifeEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c5be6b33be518357ce817f1ab3f2dedd",
+    "battle_rule_oracle_hash": "550480e66f0402692883f60b05c7f038"
   },
   "Ritual of Restoration": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -62704,7 +63235,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:ad73fefa5aa5c9367eb4a895d71a59ed"
+    "battle_rule_logical_key": "battle_rule_v1:ad73fefa5aa5c9367eb4a895d71a59ed",
+    "battle_rule_oracle_hash": "abe8e79d26d363a82e68a55e6c19c0b3"
   },
   "Runaway Trash-Bot": {
     "_keywords_are_self": true,
@@ -63528,7 +64060,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:b411c1b26599c890aeef40da1a43d162"
+    "battle_rule_logical_key": "battle_rule_v1:b411c1b26599c890aeef40da1a43d162",
+    "battle_rule_oracle_hash": "d88d3c9d7319f3ce78f286614392ffbf"
   },
   "Sanctify": {
     "battle_model_scope": "xmage_destroy_target_and_controller_gain_life_spell_v1",
@@ -67441,6 +67974,56 @@
     "battle_rule_logical_key": "battle_rule_v1:4f135cb080fd36afcc57a5b7f866c45a",
     "battle_rule_oracle_hash": "a644e7df36ff6c2ce701c9e113559862"
   },
+  "Shocking Grasp": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": -2,
+        "power_delta": -2,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": -2,
+    "power_delta": -2,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:102d6f47bb28c3662d5e5a4a0463f660",
+    "battle_rule_oracle_hash": "cb7fe1a17713ee1953faf64d25ed0c98"
+  },
   "Shore Keeper": {
     "ability_kind": "activated",
     "activated_draw": true,
@@ -68566,7 +69149,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93"
+    "battle_rule_logical_key": "battle_rule_v1:44f3e6ff98ac438be56aa74272b47f93",
+    "battle_rule_oracle_hash": "01408ac2502c74e39791c1779ab33833"
   },
   "Sky Diamond": {
     "cmc": 2.0,
@@ -70998,7 +71582,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:70e713cd31334c7d5d77c042af8ba27b"
+    "battle_rule_logical_key": "battle_rule_v1:70e713cd31334c7d5d77c042af8ba27b",
+    "battle_rule_oracle_hash": "81249444bdb32006d5e687858df04b9a"
   },
   "Splinter's Technique": {
     "effect": "tutor",
@@ -71489,7 +72074,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d"
+    "battle_rule_logical_key": "battle_rule_v1:a5270b2fac934dee9b6efc9d0e2ea81d",
+    "battle_rule_oracle_hash": "6b66f4e89a1a484d4fd15b2acc365603"
   },
   "Staff of Domination": {
     "count": 1,
@@ -73288,6 +73874,56 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:47c452cdbc781b53fb8f27623cc44748"
   },
+  "Sudden Strength": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 3,
+        "toughness_delta": 3,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "toughness_boost": 3,
+    "toughness_delta": 3,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9c9625f24619f505cce987d8dd110123",
+    "battle_rule_oracle_hash": "c45bd01776db602f966b795217b0b9f7"
+  },
   "Sudden Strike": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -73309,6 +73945,56 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b13effdee2fe1313d4f6d0d3cc6f47fe",
     "battle_rule_oracle_hash": "558c8b8ff92c618ea30b16737033c237"
+  },
+  "Sugar Rush": {
+    "_composite_rule_components": [
+      {
+        "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+        "compose_on_resolution": true,
+        "duration": "until_end_of_turn",
+        "effect": "stat_modifier_until_eot",
+        "power_boost": 3,
+        "power_delta": 3,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "target_controller": "any",
+        "toughness_boost": 0,
+        "toughness_delta": 0,
+        "xmage_effect_class": "BoostTargetEffect"
+      },
+      {
+        "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+        "compose_on_resolution": true,
+        "count": 1,
+        "effect": "draw_cards",
+        "xmage_effect_class": "DrawCardSourceControllerEffect"
+      }
+    ],
+    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+    "count": 1,
+    "draw_count": 1,
+    "effect": "composite_resolution",
+    "instant": true,
+    "power_boost": 3,
+    "power_delta": 3,
+    "sorcery": false,
+    "toughness_boost": 0,
+    "toughness_delta": 0,
+    "xmage_effect_classes": [
+      "BoostTargetEffect",
+      "DrawCardSourceControllerEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:09d6c6f8cd65219d9b3ed2432dc8fd3a",
+    "battle_rule_oracle_hash": "b34983578b1e2174c1f78bcc9c340d80"
   },
   "Sulfur Falls": {
     "effect": "land",
@@ -74238,7 +74924,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
+    "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
+    "battle_rule_oracle_hash": "3c69341a79c87f39fc3383ff61006e98"
   },
   "Swan Song": {
     "ability_kind": "one_shot",
@@ -87852,7 +88539,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f56f3819b7773777b293a363b5cf432a"
+    "battle_rule_logical_key": "battle_rule_v1:f56f3819b7773777b293a363b5cf432a",
+    "battle_rule_oracle_hash": "dfb75aa49416e7e281ad8e5cdcf721fa"
   },
   "Worldly Tutor": {
     "ability_kind": "one_shot",
@@ -89038,7 +89726,8 @@
     "battle_rule_execution_status": "auto",
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:2c294b705a02af9c6d9b71749a512057"
+    "battle_rule_logical_key": "battle_rule_v1:2c294b705a02af9c6d9b71749a512057",
+    "battle_rule_oracle_hash": "5fef1974ee8b02952ac5612ea66c5c33"
   },
   "Zuran Spellcaster": {
     "_activated_rule_effects": [

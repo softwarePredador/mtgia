@@ -2471,6 +2471,133 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_life_gain_draw_spell_resolves_both_components_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 12
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_controller_gain_life_draw_card_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "life_total_change",
+                    "battle_model_scope": "xmage_fixed_controller_gain_life_spell_v1",
+                    "life_gain_amount": 3,
+                    "target": "self",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Revitalize",
+            "type_line": "Instant",
+            "oracle_text": "You gain 3 life. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=4,
+            rng=random.Random(47),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.life, 15)
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Revitalize"])
+        self.assertTrue(
+            any(
+                event == "life_total_changed"
+                and data.get("card") == "Fixture Revitalize"
+                and data.get("component_index") == 0
+                and data.get("requested_delta") == 3
+                and data.get("life_after") == 15
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Revitalize"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
+    def test_composite_boost_draw_spell_resolves_both_components_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Drawn Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield = [
+            {"name": "Active Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        ]
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "stat_modifier_until_eot",
+                    "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
+                    "target": "creature",
+                    "target_constraints": {"card_types": ["creature"]},
+                    "target_controller": "any",
+                    "power_delta": 1,
+                    "toughness_delta": 0,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Defiant Strike",
+            "type_line": "Instant",
+            "oracle_text": "Target creature gets +1/+0 until end of turn. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(48),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.battlefield[0]["power"], 3)
+        self.assertEqual(active.battlefield[0]["toughness"], 2)
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Defiant Strike"])
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Defiant Strike"
+                and data.get("target") == "Active Bear"
+                and data.get("target_power_after") == 3
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Defiant Strike"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

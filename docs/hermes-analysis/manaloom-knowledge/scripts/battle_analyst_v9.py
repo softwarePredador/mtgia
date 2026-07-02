@@ -4234,7 +4234,7 @@ def choose_stat_modifier_target(player, opponents, card, effect_data):
     return owner, target, [target for _owner, target in candidates]
 
 
-def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn):
+def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, turn, *, finish=True):
     power_delta = int(effect_data.get("power_delta") or effect_data.get("power_boost") or 0)
     toughness_delta = int(effect_data.get("toughness_delta") or effect_data.get("toughness_boost") or 0)
     target_owner, target, target_options = choose_stat_modifier_target(
@@ -4256,7 +4256,8 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
             turn=turn,
             **replay_rule_fields(effect_data),
         )
-        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+        if finish:
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
         return None
 
     power_before = int(float(target.get("power") or 0))
@@ -4316,7 +4317,8 @@ def resolve_stat_modifier_until_eot_spell(player, opponents, card, effect_data, 
         **decision,
         **replay_rule_fields(effect_data),
     )
-    finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+    if finish:
+        finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     return target
 
 
@@ -7208,6 +7210,8 @@ CANONICAL_RUNTIME_ENRICHMENT_KEYS = {
 
 COMPOSABLE_RESOLUTION_EFFECTS = {
     "draw_cards",
+    "life_total_change",
+    "stat_modifier_until_eot",
     "remove_creature",
     "remove_permanent",
     "remove_artifact_or_3dmg",
@@ -47395,6 +47399,61 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
             player.draw(max(0, count), rng)
             outcome = "cards_drawn"
             applied.append({"effect": component_effect, "count": count})
+        elif component_effect == "life_total_change":
+            target = _life_total_change_target(player, opponents, component)
+            life_before = int(getattr(target, "life", 0) or 0)
+            requested_delta = int(component.get("life_gain_amount") or 0)
+            changed = gain_life(target, requested_delta, cap=999) if requested_delta else False
+            life_after = int(getattr(target, "life", life_before) or 0)
+            outcome = "life_total_changed"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "life_gain_amount": requested_delta,
+                    "life_gained": max(0, life_after - life_before),
+                }
+            )
+            emit_replay_event(
+                "life_total_changed",
+                player=player.name,
+                card=card.get("name", "?"),
+                target_player=getattr(target, "name", None),
+                mode="gain_life",
+                requested_delta=requested_delta,
+                life_before=life_before,
+                expected_life_after=life_before + requested_delta,
+                life_after=life_after,
+                changed=changed,
+                component_index=index,
+                turn=turn,
+                **component_fields,
+            )
+        elif component_effect == "stat_modifier_until_eot":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            target = resolve_stat_modifier_until_eot_spell(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                finish=False,
+            )
+            power_delta = int(component.get("power_delta") or component.get("power_boost") or 0)
+            toughness_delta = int(component.get("toughness_delta") or component.get("toughness_boost") or 0)
+            if target is None:
+                outcome = "no_legal_target"
+                skipped.append({"effect": component_effect, "reason": outcome})
+            else:
+                outcome = "stat_modifier_until_eot_applied"
+                applied.append(
+                    {
+                        "effect": component_effect,
+                        "target": target.get("name", "?"),
+                        "power_delta": power_delta,
+                        "toughness_delta": toughness_delta,
+                    }
+                )
         elif component_effect == "ramp_ritual":
             produced = ritual_mana_produced(player, component, opponents)
             player.mana_pool.add_generic(produced)

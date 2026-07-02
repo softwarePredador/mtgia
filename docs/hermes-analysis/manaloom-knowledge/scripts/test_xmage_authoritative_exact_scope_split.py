@@ -1905,6 +1905,87 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "destroy_life_gain_source_not_fixed")
 
+    def test_fixed_life_gain_draw_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect", "DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 3 life.\nDraw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.LIFE_GAIN_DRAW_SCOPE)
+        self.assertEqual(effect["life_gain_amount"], 3)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["life_total_change", "draw_cards"],
+        )
+
+    def test_fixed_life_gain_draw_spell_blocks_dynamic_draw(self) -> None:
+        row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect", "DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="You gain 3 life.\nDraw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new GainLifeEffect(3));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "life_gain_draw_source_not_fixed")
+
+    def test_fixed_boost_draw_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gets +1/+0 until end of turn. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.BOOST_DRAW_SCOPE)
+        self.assertEqual(effect["power_delta"], 1)
+        self.assertEqual(effect["toughness_delta"], 0)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["stat_modifier_until_eot", "draw_cards"],
+        )
+
+    def test_fixed_boost_draw_spell_blocks_dynamic_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["BoostTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target creature gets +1/+0 until end of turn. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(1, 0, Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
+
     def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
