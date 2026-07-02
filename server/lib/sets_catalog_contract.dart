@@ -2,6 +2,9 @@ const int setCatalogDefaultLimit = 50;
 const int setCatalogMaxLimit = 200;
 const int setCatalogNewReleaseWindowDays = 30;
 const int setCatalogCurrentReleaseWindowDays = 180;
+const String setCatalogCacheHeader = 'X-ManaLoom-Sets-Cache';
+const String setCatalogTotalMsHeader = 'X-ManaLoom-Sets-Total-Ms';
+const String setCatalogQueryMsHeader = 'X-ManaLoom-Sets-Query-Ms';
 
 String? normalizeSetSearchQuery(String? value) {
   final query = value?.trim();
@@ -53,6 +56,28 @@ Map<String, dynamic> mapSetCatalogRow(
     'is_foreign_only': row['is_foreign_only'],
     'card_count': (row['card_count'] as num?)?.toInt() ?? 0,
     'status': resolveSetStatus(releaseDate, now: now),
+  };
+}
+
+Map<String, String> buildSetCatalogTimingHeaders({
+  required bool cacheHit,
+  required int totalElapsedMs,
+  int? queryElapsedMs,
+}) {
+  final safeTotal = totalElapsedMs < 0 ? 0 : totalElapsedMs;
+  final safeQuery =
+      queryElapsedMs == null ? null : (queryElapsedMs < 0 ? 0 : queryElapsedMs);
+  final timing = <String>[
+    'total;dur=$safeTotal',
+    if (safeQuery != null) 'db;dur=$safeQuery',
+    'cache;desc="${cacheHit ? 'hit' : 'miss'}"',
+  ].join(', ');
+
+  return {
+    'Server-Timing': timing,
+    setCatalogCacheHeader: cacheHit ? 'hit' : 'miss',
+    setCatalogTotalMsHeader: safeTotal.toString(),
+    if (safeQuery != null) setCatalogQueryMsHeader: safeQuery.toString(),
   };
 }
 

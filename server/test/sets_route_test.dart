@@ -77,5 +77,30 @@ void main() {
       expect(payload['status'], 'old');
       expect(payload['card_count'], 0);
     });
+
+    test('monta headers de telemetria sem alterar contrato do body', () {
+      final missHeaders = buildSetCatalogTimingHeaders(
+        cacheHit: false,
+        totalElapsedMs: 123,
+        queryElapsedMs: 109,
+      );
+      final hitHeaders = buildSetCatalogTimingHeaders(
+        cacheHit: true,
+        totalElapsedMs: -1,
+      );
+
+      expect(missHeaders[setCatalogCacheHeader], 'miss');
+      expect(missHeaders[setCatalogTotalMsHeader], '123');
+      expect(missHeaders[setCatalogQueryMsHeader], '109');
+      expect(
+        missHeaders['Server-Timing'],
+        'total;dur=123, db;dur=109, cache;desc="miss"',
+      );
+
+      expect(hitHeaders[setCatalogCacheHeader], 'hit');
+      expect(hitHeaders[setCatalogTotalMsHeader], '0');
+      expect(hitHeaders.containsKey(setCatalogQueryMsHeader), isFalse);
+      expect(hitHeaders['Server-Timing'], 'total;dur=0, cache;desc="hit"');
+    });
   });
 }
