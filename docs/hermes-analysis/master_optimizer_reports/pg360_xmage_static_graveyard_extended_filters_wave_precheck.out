@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+-------------------+-------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Runaway Trash-Bot | runaway trash-bot | 3e2e7609e4267fc6e89824d487e207a1 | battle_rule_v1:913735c6f27a40d02848b0feb763d625 | deprecate_nonmatching_rows |                1 | 6a9ac17b-5212-4d96-94dc-d20be84f357b |                  0 |                         0 |                           0
+ Xande, Dark Mage  | xande, dark mage  | 7492ac3535b38c79b1b59cece65be02a | battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192 | deprecate_nonmatching_rows |                1 | 5123d2ec-bad2-4d04-80a6-561dde70a843 |                  0 |                         0 |                           0
+(2 rows)

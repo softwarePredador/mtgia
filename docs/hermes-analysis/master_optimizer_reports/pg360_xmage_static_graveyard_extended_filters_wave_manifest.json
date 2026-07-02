@@ -1,0 +1,163 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg360_xmage_static_graveyard_extended_filters_wave_20260",
+  "deploy_id": "PG360",
+  "expected_rules": [
+    {
+      "card_name": "Runaway Trash-Bot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913735c6f27a40d02848b0feb763d625",
+      "min_rule_version": 2,
+      "normalized_name": "runaway trash-bot",
+      "oracle_hash": "3e2e7609e4267fc6e89824d487e207a1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "artifact",
+          "enchantment"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+        "static_power_bonus_per_graveyard_count": 1,
+        "static_toughness_bonus_per_graveyard_count": 0,
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Xande, Dark Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192",
+      "min_rule_version": 2,
+      "normalized_name": "xande, dark mage",
+      "oracle_hash": "7492ac3535b38c79b1b59cece65be02a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "noncreature_nonland"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "menace"
+        ],
+        "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+        "static_power_bonus_per_graveyard_count": 1,
+        "static_toughness_bonus_per_graveyard_count": 1,
+        "target": "self",
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_source_boost_equal_graveyard_count": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg360_xmage_static_graveyard_extended_filters_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T07:03:51+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Runaway Trash-Bot"
+      },
+      "card_name": "Runaway Trash-Bot",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913735c6f27a40d02848b0feb763d625",
+      "normalized_name": "runaway trash-bot",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "artifact",
+          "enchantment"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "trample"
+        ],
+        "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+        "static_power_bonus_per_graveyard_count": 1,
+        "static_toughness_bonus_per_graveyard_count": 0,
+        "target": "self",
+        "target_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Xande, Dark Mage"
+      },
+      "card_name": "Xande, Dark Mage",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192",
+      "normalized_name": "xande, dark mage",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+        "effect": "creature",
+        "graveyard_count_card_types": [
+          "noncreature_nonland"
+        ],
+        "graveyard_count_scope": "controller_graveyard",
+        "keywords": [
+          "menace"
+        ],
+        "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+        "static_power_bonus_per_graveyard_count": 1,
+        "static_toughness_bonus_per_graveyard_count": 1,
+        "target": "self",
+        "target_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Runaway Trash-Bot",
+    "Xande, Dark Mage"
+  ],
+  "selected_count": 2,
+  "slug": "xmage_static_graveyard_extended_filters_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Runaway Trash-Bot",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913735c6f27a40d02848b0feb763d625",
+      "min_rule_version": 2,
+      "normalized_name": "runaway trash-bot",
+      "oracle_hash": "3e2e7609e4267fc6e89824d487e207a1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Xande, Dark Mage",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192",
+      "min_rule_version": 2,
+      "normalized_name": "xande, dark mage",
+      "oracle_hash": "7492ac3535b38c79b1b59cece65be02a",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

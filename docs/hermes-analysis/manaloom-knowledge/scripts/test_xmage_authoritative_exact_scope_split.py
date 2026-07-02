@@ -435,6 +435,81 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
         self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 0)
 
+    def test_static_graveyard_count_boost_artifact_or_enchantment_power_only_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility", "TrampleAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Runaway Trash-Bot",
+                type_line="Artifact Creature - Construct",
+                oracle_text=(
+                    "Trample\n"
+                    "This creature gets +1/+0 for each artifact and/or enchantment card in your graveyard."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter "
+                "= new FilterArtifactOrEnchantmentCard(\"artifact and/or enchantment card\");"
+                "private static final DynamicValue xValue = new CardsInControllerGraveyardCount(filter);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "xValue, StaticValue.get(0), Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["artifact", "enchantment"])
+        self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
+        self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 0)
+        self.assertIn("trample", effect["keywords"])
+
+    def test_static_graveyard_count_boost_noncreature_nonland_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect"],
+            ability_kind="static",
+            ability_classes=["MenaceAbility", "SimpleStaticAbility"],
+            xmage_signals=["static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Xande, Dark Mage",
+                type_line="Legendary Creature - Human Wizard",
+                oracle_text=(
+                    "Menace\n"
+                    "Xande gets +1/+1 for each noncreature, nonland card in your graveyard."
+                ),
+            ),
+            source_text=(
+                "private static final FilterCard filter = new FilterCard(\"noncreature, nonland card\");"
+                "static {"
+                "filter.add(Predicates.not(CardType.CREATURE.getPredicate()));"
+                "filter.add(Predicates.not(CardType.LAND.getPredicate()));"
+                "}"
+                "private static final DynamicValue xValue = new CardsInControllerGraveyardCount(filter);"
+                "this.addAbility(new SimpleStaticAbility(new BoostSourceEffect("
+                "xValue, xValue, Duration.WhileOnBattlefield)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_COUNT_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["noncreature_nonland"])
+        self.assertEqual(effect["static_power_bonus_per_graveyard_count"], 1)
+        self.assertEqual(effect["static_toughness_bonus_per_graveyard_count"], 1)
+        self.assertIn("menace", effect["keywords"])
+
     def test_static_graveyard_count_boost_opponents_graveyards_is_package_safe(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

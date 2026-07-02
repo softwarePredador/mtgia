@@ -1,0 +1,5 @@
+     card_name     |  normalized_name  |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-------------------+-------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Runaway Trash-Bot | runaway trash-bot | battle_rule_v1:913735c6f27a40d02848b0feb763d625 |                  1 |                           1 |                         1 |           0
+ Xande, Dark Mage  | xande, dark mage  | battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192 |                  1 |                           1 |                         1 |           0
+(2 rows)

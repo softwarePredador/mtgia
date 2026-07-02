@@ -415,6 +415,62 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(slasher["power"], 3)
         self.assertEqual(slasher["toughness"], 1)
 
+    def test_static_graveyard_count_source_boost_counts_artifact_or_enchantment(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Artifact A", "type_line": "Artifact"},
+            {"name": "Enchantment A", "type_line": "Enchantment"},
+            {"name": "Artifact Creature A", "type_line": "Artifact Creature - Construct"},
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+        ]
+        trash_bot = {
+            "name": "Runaway Trash-Bot",
+            "type_line": "Artifact Creature - Construct",
+            "effect": "creature",
+            "power": 0,
+            "toughness": 4,
+            "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["artifact", "enchantment"],
+            "static_power_bonus_per_graveyard_count": 1,
+            "static_toughness_bonus_per_graveyard_count": 0,
+        }
+        active.battlefield = [trash_bot]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertEqual(trash_bot["static_graveyard_count_boost_current"], 3)
+        self.assertEqual(trash_bot["power"], 3)
+        self.assertEqual(trash_bot["toughness"], 4)
+
+    def test_static_graveyard_count_source_boost_counts_noncreature_nonland(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Instant A", "type_line": "Instant"},
+            {"name": "Artifact A", "type_line": "Artifact"},
+            {"name": "Enchantment Creature A", "type_line": "Enchantment Creature - Spirit"},
+            {"name": "Land A", "type_line": "Land"},
+        ]
+        xande = {
+            "name": "Xande, Dark Mage",
+            "type_line": "Legendary Creature - Human Wizard",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+            "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+            "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["noncreature_nonland"],
+            "static_power_bonus_per_graveyard_count": 1,
+            "static_toughness_bonus_per_graveyard_count": 1,
+        }
+        active.battlefield = [xande]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertEqual(xande["static_graveyard_count_boost_current"], 2)
+        self.assertEqual(xande["power"], 5)
+        self.assertEqual(xande["toughness"], 5)
+
     def test_static_graveyard_count_source_boost_counts_opponents_graveyards(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

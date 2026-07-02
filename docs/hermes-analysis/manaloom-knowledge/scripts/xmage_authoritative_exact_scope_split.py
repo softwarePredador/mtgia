@@ -2384,8 +2384,9 @@ def static_graveyard_threshold_boost_from_source(source: str) -> dict[str, Any] 
 def static_graveyard_count_boost_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = oracle_text_after_leading_static_keywords(metadata)
     match = re.match(
-        r"^this creature gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) for each "
-        r"(?P<card_type>artifact|creature) card in (?P<scope>your graveyard|your opponents' graveyards)\.?$",
+        r"^(?:this creature|[a-z0-9' ,./-]+) gets (?P<power>[+-]\d+)/(?P<toughness>[+-]\d+) for each "
+        r"(?P<card_type>artifact|creature|artifact and/or enchantment|noncreature, nonland) card in "
+        r"(?P<scope>your graveyard|your opponents' graveyards)\.?$",
         text,
     )
     if not match:
@@ -2400,7 +2401,10 @@ def static_graveyard_count_boost_from_oracle(metadata: dict[str, Any]) -> dict[s
             if match.group("scope") == "your graveyard"
             else "opponents_graveyards"
         ),
-        "graveyard_count_card_types": [match.group("card_type")],
+        "graveyard_count_card_types": {
+            "artifact and/or enchantment": ["artifact", "enchantment"],
+            "noncreature, nonland": ["noncreature_nonland"],
+        }.get(match.group("card_type"), [match.group("card_type")]),
         "static_power_bonus_per_graveyard_count": power_bonus,
         "static_toughness_bonus_per_graveyard_count": toughness_bonus,
     }
@@ -2411,8 +2415,22 @@ def static_graveyard_count_boost_source_filter_types(source: str, expr: str) -> 
     value = str(expr or "").strip()
     if "FilterArtifactCard" in value:
         return ["artifact"]
+    if "FilterArtifactOrEnchantmentCard" in value:
+        return ["artifact", "enchantment"]
     if "FILTER_CARD_CREATURE" in value or "FilterCreatureCard" in value:
         return ["creature"]
+    if (
+        "noncreature, nonland card" in value
+        and re.search(
+            r"\.add\s*\(\s*Predicates\.not\s*\(\s*CardType\.CREATURE\.getPredicate\s*\(\s*\)\s*\)\s*\)",
+            text,
+        )
+        and re.search(
+            r"\.add\s*\(\s*Predicates\.not\s*\(\s*CardType\.LAND\.getPredicate\s*\(\s*\)\s*\)\s*\)",
+            text,
+        )
+    ):
+        return ["noncreature_nonland"]
     if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", value):
         assignment = re.search(
             rf"(?:FilterCard|FilterCreatureCard|FilterArtifactCard)\s+{re.escape(value)}\s*=([^;]+);",
@@ -2429,9 +2447,9 @@ def static_graveyard_count_boost_source_dynamic_spec(source: str, expr: str) -> 
     value = str(expr or "").strip()
     if value == "StaticValue.get(0)":
         return {"static_value": 0}
-    if value in {"amount", "boost"}:
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", value):
         assignment = re.search(
-            rf"(?:DynamicValue\s+)?{re.escape(value)}\s*=\s*new\s+"
+            rf"(?:private\s+static\s+final\s+)?(?:DynamicValue\s+)?{re.escape(value)}\s*=\s*new\s+"
             r"(CardsInControllerGraveyardCount|CardsInOpponentGraveyardsCount)\s*\((.*?)\)\s*;",
             text,
             re.S,

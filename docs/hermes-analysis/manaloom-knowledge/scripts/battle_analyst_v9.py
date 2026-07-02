@@ -34334,7 +34334,10 @@ def _static_graveyard_count_card_matches(card, allowed_types):
         return True
     if "permanent" in normalized and is_permanent_card(card):
         return True
-    return bool(normalized.intersection(_static_pt_card_type_tokens(card)))
+    card_types = _static_pt_card_type_tokens(card)
+    if "noncreature_nonland" in normalized:
+        return "creature" not in card_types and "land" not in card_types
+    return bool(normalized.intersection(card_types))
 
 
 def static_graveyard_count_power_toughness_value(permanent, controller, all_players=None):

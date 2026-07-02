@@ -61133,6 +61133,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ad73fefa5aa5c9367eb4a895d71a59ed"
   },
+  "Runaway Trash-Bot": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "artifact",
+      "enchantment"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "keywords": [
+      "trample"
+    ],
+    "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+    "static_power_bonus_per_graveyard_count": 1,
+    "static_toughness_bonus_per_graveyard_count": 0,
+    "target": "self",
+    "target_controller": "self",
+    "trample": true,
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:913735c6f27a40d02848b0feb763d625",
+    "battle_rule_oracle_hash": "3e2e7609e4267fc6e89824d487e207a1"
+  },
   "Rune-Scarred Demon": {
     "cmc": 7.0,
     "effect": "tutor",
@@ -86175,6 +86204,34 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:94b99b04dabce55dfba67f9ebd63ea85",
     "battle_rule_oracle_hash": "d6a4c4f6c4d3a18a2f70413f97be5886"
+  },
+  "Xande, Dark Mage": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_equal_graveyard_count_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "noncreature_nonland"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "keywords": [
+      "menace"
+    ],
+    "menace": true,
+    "static_effect": "source_power_toughness_boost_equal_graveyard_count",
+    "static_power_bonus_per_graveyard_count": 1,
+    "static_toughness_bonus_per_graveyard_count": 1,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4e025c36a4e055acfdf8f7f974c35192",
+    "battle_rule_oracle_hash": "7492ac3535b38c79b1b59cece65be02a"
   },
   "Xander's Lounge": {
     "effect": "land",
