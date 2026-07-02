@@ -104,6 +104,9 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "static_power_toughness_source",
     "graveyard_count_scope",
     "graveyard_count_card_types",
+    "graveyard_count_threshold",
+    "static_power_bonus",
+    "static_toughness_bonus",
     "dynamic_power_equals_graveyard_count",
     "dynamic_toughness_equals_graveyard_count",
 )

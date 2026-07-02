@@ -244,6 +244,100 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_graveyard_threshold_source_boost_toggles_without_cumulative_bonus(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": f"Card {idx}", "type_line": "Instant"}
+            for idx in range(6)
+        ]
+        barkripper = {
+            "name": "Anurid Barkripper",
+            "type_line": "Creature - Frog Beast",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "graveyard_count_threshold": 7,
+            "static_power_bonus": 2,
+            "static_toughness_bonus": 2,
+        }
+        active.battlefield = [barkripper]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(barkripper["_static_graveyard_threshold_active"])
+        self.assertEqual(barkripper["power"], 2)
+        self.assertEqual(barkripper["toughness"], 2)
+
+        active.graveyard.append({"name": "Card 7", "type_line": "Sorcery"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(
+            active,
+            turn=3,
+            phase="test",
+            emit_events=True,
+        )
+        self.assertTrue(barkripper["_static_graveyard_threshold_active"])
+        self.assertEqual(barkripper["power"], 4)
+        self.assertEqual(barkripper["toughness"], 4)
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=4, phase="test")
+        self.assertEqual(barkripper["power"], 4)
+        self.assertEqual(barkripper["toughness"], 4)
+
+        active.graveyard.pop()
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=5, phase="test")
+        self.assertFalse(barkripper["_static_graveyard_threshold_active"])
+        self.assertEqual(barkripper["power"], 2)
+        self.assertEqual(barkripper["toughness"], 2)
+        self.assertTrue(
+            any(
+                event == "static_graveyard_threshold_source_boost_changed"
+                and data.get("card") == "Anurid Barkripper"
+                and data.get("graveyard_count") == 7
+                and data.get("active") is True
+                for event, data in self.events
+            )
+        )
+
+    def test_static_graveyard_threshold_source_boost_counts_permanent_cards_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.graveyard = [
+            {"name": "Creature A", "type_line": "Creature - Bear"},
+            {"name": "Artifact A", "type_line": "Artifact"},
+            {"name": "Land A", "type_line": "Land"},
+            {"name": "Instant A", "type_line": "Instant"},
+        ]
+        capybara = {
+            "name": "Basking Capybara",
+            "type_line": "Creature - Capybara",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 2,
+            "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+            "static_effect": "source_power_toughness_boost_if_graveyard_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["permanent"],
+            "graveyard_count_threshold": 4,
+            "static_power_bonus": 3,
+            "static_toughness_bonus": 0,
+        }
+        active.battlefield = [capybara]
+
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=2, phase="test")
+        self.assertFalse(capybara["_static_graveyard_threshold_active"])
+        self.assertEqual(capybara["static_graveyard_threshold_count_current"], 3)
+        self.assertEqual(capybara["power"], 3)
+        self.assertEqual(capybara["toughness"], 2)
+
+        active.graveyard.append({"name": "Enchantment A", "type_line": "Enchantment"})
+        self.battle.refresh_graveyard_count_creature_statics_for_player(active, turn=3, phase="test")
+        self.assertTrue(capybara["_static_graveyard_threshold_active"])
+        self.assertEqual(capybara["static_graveyard_threshold_count_current"], 4)
+        self.assertEqual(capybara["power"], 6)
+        self.assertEqual(capybara["toughness"], 2)
+
     def test_fixed_source_controller_draw_spell_draws_requested_cards(self) -> None:
         active = self.battle.Player(
             "Active",

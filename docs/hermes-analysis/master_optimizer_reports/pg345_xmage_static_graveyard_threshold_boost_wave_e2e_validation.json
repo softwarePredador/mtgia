@@ -1,0 +1,300 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T02:16:45.130577+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg345_xmage_static_graveyard_threshold_boost_wave_manifest.json",
+  "package_id": "pg345_xmage_static_graveyard_threshold_boost_wave_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Anurid Barkripper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+          "oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Basking Capybara",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42f3b1ced83c10c73c08b3295358b471",
+          "oracle_hash": "7a21fa965254fe0e0b59e9a615c6be82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Frilled Cave-Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:200cc2f6eac25de9aa5302e0ec8307e7",
+          "oracle_hash": "a82b4370d8d5601bdc35d993f8456cdf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Krosan Beast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e725b896a17c56815f9d1ec58d9bad5a",
+          "oracle_hash": "6858ee81dec4d380b436ecff0e4091c0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Metamorphic Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bb1f455c435995ff681b25fc60818155",
+          "oracle_hash": "c414e7610eae4070e4ef6b5bc5a6f4b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Seton's Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7182ce0e8acd2c75f07ea0e53f39f5a5",
+          "oracle_hash": "fa375ed2d3fe90010d7d1b4dc7354752",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Springing Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+          "oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 7
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Anurid Barkripper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+          "oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Basking Capybara",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:42f3b1ced83c10c73c08b3295358b471",
+          "oracle_hash": "7a21fa965254fe0e0b59e9a615c6be82",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Frilled Cave-Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:200cc2f6eac25de9aa5302e0ec8307e7",
+          "oracle_hash": "a82b4370d8d5601bdc35d993f8456cdf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Krosan Beast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e725b896a17c56815f9d1ec58d9bad5a",
+          "oracle_hash": "6858ee81dec4d380b436ecff0e4091c0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Metamorphic Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:bb1f455c435995ff681b25fc60818155",
+          "oracle_hash": "c414e7610eae4070e4ef6b5bc5a6f4b0",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Seton's Scout",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7182ce0e8acd2c75f07ea0e53f39f5a5",
+          "oracle_hash": "fa375ed2d3fe90010d7d1b4dc7354752",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "card_name": "Springing Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+          "oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anurid Barkripper",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Basking Capybara",
+          "logical_rule_key": "battle_rule_v1:42f3b1ced83c10c73c08b3295358b471"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Frilled Cave-Wurm",
+          "logical_rule_key": "battle_rule_v1:200cc2f6eac25de9aa5302e0ec8307e7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Krosan Beast",
+          "logical_rule_key": "battle_rule_v1:e725b896a17c56815f9d1ec58d9bad5a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Metamorphic Wurm",
+          "logical_rule_key": "battle_rule_v1:bb1f455c435995ff681b25fc60818155"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Seton's Scout",
+          "logical_rule_key": "battle_rule_v1:7182ce0e8acd2c75f07ea0e53f39f5a5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+          "battle_rule_version": 2,
+          "card_name": "Springing Tiger",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 7
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Anurid Barkripper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Basking Capybara",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:42f3b1ced83c10c73c08b3295358b471"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Frilled Cave-Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:200cc2f6eac25de9aa5302e0ec8307e7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Krosan Beast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:e725b896a17c56815f9d1ec58d9bad5a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Metamorphic Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:bb1f455c435995ff681b25fc60818155"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Seton's Scout",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7182ce0e8acd2c75f07ea0e53f39f5a5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Springing Tiger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

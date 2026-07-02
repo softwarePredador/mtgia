@@ -276,6 +276,103 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_graveyard_count_pt_oracle_not_exact")
 
+    def test_static_graveyard_threshold_boost_threshold_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Anurid Barkripper",
+                type_line="Creature - Frog Beast",
+                oracle_text=(
+                    "Threshold — This creature gets +2/+2 as long as "
+                    "there are seven or more cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(2, 2, Duration.WhileOnBattlefield), "
+                "ThresholdCondition.instance, \"threshold\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["static_effect"], "source_power_toughness_boost_if_graveyard_count")
+        self.assertEqual(effect["graveyard_count_scope"], "controller_graveyard")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card"])
+        self.assertEqual(effect["graveyard_count_threshold"], 7)
+        self.assertEqual(effect["static_power_bonus"], 2)
+        self.assertEqual(effect["static_toughness_bonus"], 2)
+
+    def test_static_graveyard_threshold_boost_descend_permanents_is_package_safe(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Basking Capybara",
+                type_line="Creature - Capybara",
+                oracle_text=(
+                    "Descend 4 — This creature gets +3/+0 as long as "
+                    "there are four or more permanent cards in your graveyard."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(3, 0, Duration.WhileOnBattlefield), "
+                "DescendCondition.FOUR, \"descend 4\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE)
+        self.assertEqual(effect["graveyard_count_card_types"], ["permanent"])
+        self.assertEqual(effect["graveyard_count_threshold"], 4)
+        self.assertEqual(effect["static_power_bonus"], 3)
+        self.assertEqual(effect["static_toughness_bonus"], 0)
+
+    def test_static_graveyard_threshold_boost_blocks_opponent_graveyard_count(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["BoostSourceEffect", "ConditionalContinuousEffect"],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "SimpleStaticAbility"],
+            xmage_signals=["condition", "static_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Jace's Phantasm",
+                type_line="Creature - Illusion",
+                oracle_text=(
+                    "Flying\n"
+                    "This creature gets +4/+4 as long as an opponent has "
+                    "ten or more cards in their graveyard."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new SimpleStaticAbility(new ConditionalContinuousEffect("
+                "new BoostSourceEffect(4, 4, Duration.WhileOnBattlefield), "
+                "CardsInOpponentGraveyardCondition.TEN, \"opponent graveyard\")));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_graveyard_threshold_boost_oracle_not_exact")
+
     def test_fixed_create_creature_tokens_spell_is_package_safe(self) -> None:
         row = queue_row(split.TOKEN_SPELL_UNIT, effect_classes=["CreateTokenEffect"], xmage_signals=["token"])
         proposal, reason = split.split_row(

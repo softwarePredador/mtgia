@@ -2732,6 +2732,30 @@
     "battle_rule_logical_key": "battle_rule_v1:775e48cfdbd6a0216549054631aadf2b",
     "battle_rule_oracle_hash": "4a570028eace3ac497b96fb187e5ab86"
   },
+  "Anurid Barkripper": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 7,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 2,
+    "static_toughness_bonus": 2,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+    "battle_rule_oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e"
+  },
   "Anvil of Bogardan": {
     "cmc": 2.0,
     "effect": "draw_engine",
@@ -5731,6 +5755,30 @@
     "battle_rule_confidence": 0.88,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4a8564b60f39507bb2bb7fe5ca0b3a72"
+  },
+  "Basking Capybara": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "permanent"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 4,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 3,
+    "static_toughness_bonus": 0,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:42f3b1ced83c10c73c08b3295358b471",
+    "battle_rule_oracle_hash": "7a21fa965254fe0e0b59e9a615c6be82"
   },
   "Bassara Tower Archer": {
     "_keywords_are_self": true,
@@ -27375,6 +27423,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:bd05ea5e0a5343c1bf8f2284d001471a"
   },
+  "Frilled Cave-Wurm": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "permanent"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 4,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 2,
+    "static_toughness_bonus": 0,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:200cc2f6eac25de9aa5302e0ec8307e7",
+    "battle_rule_oracle_hash": "a82b4370d8d5601bdc35d993f8456cdf"
+  },
   "Frog-Squirrels": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -39192,6 +39264,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
   },
+  "Krosan Beast": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 7,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 7,
+    "static_toughness_bonus": 7,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e725b896a17c56815f9d1ec58d9bad5a",
+    "battle_rule_oracle_hash": "6858ee81dec4d380b436ecff0e4091c0"
+  },
   "Krosan Grip": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -43487,6 +43583,30 @@
     "battle_rule_confidence": 1.0,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:4a521299bf46debb87210a2e3c7c167d"
+  },
+  "Metamorphic Wurm": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 7,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 4,
+    "static_toughness_bonus": 4,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bb1f455c435995ff681b25fc60818155",
+    "battle_rule_oracle_hash": "c414e7610eae4070e4ef6b5bc5a6f4b0"
   },
   "Metamorphosis": {
     "effect": "ramp_ritual",
@@ -61517,6 +61637,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:f4b075106d11d598652efb4c63cc9283"
   },
+  "Seton's Scout": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 7,
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 2,
+    "static_toughness_bonus": 2,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7182ce0e8acd2c75f07ea0e53f39f5a5",
+    "battle_rule_oracle_hash": "fa375ed2d3fe90010d7d1b4dc7354752"
+  },
   "Sevinne's Reclamation": {
     "ability_kind": "one_shot",
     "battle_model_scope": "graveyard_to_battlefield_variant_v1",
@@ -66010,6 +66159,30 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:bdb24c77e6b6dff83b1cdd01dbe09ba6",
     "battle_rule_oracle_hash": "e0fb2f2b4e774063b3f8f8ee12f180da"
+  },
+  "Springing Tiger": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_source_boost_if_graveyard_threshold_v1",
+    "effect": "creature",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_threshold": 7,
+    "static_effect": "source_power_toughness_boost_if_graveyard_count",
+    "static_power_bonus": 2,
+    "static_toughness_bonus": 2,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SimpleStaticAbility",
+    "xmage_effect_class": "BoostSourceEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
+    "battle_rule_oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e"
   },
   "Springjack Pasture": {
     "effect": "land",
