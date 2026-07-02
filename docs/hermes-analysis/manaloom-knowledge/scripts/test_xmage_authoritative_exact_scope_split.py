@@ -1961,6 +1961,96 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
         )
 
+    def test_mill_then_return_creature_spell_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Corpse Churn",
+                type_line="Instant",
+                oracle_text=(
+                    "Put the top three cards of your library into your graveyard, "
+                    "then you may return a creature card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new MillCardsControllerEffect(3));"
+                "this.getSpellAbility().addEffect(new ReturnCardChosenFromGraveyardEffect(true, "
+                "StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD, PutCards.HAND).concatBy(\", then\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_MILL_RETURN_SCOPE)
+        self.assertEqual(effect["pre_recursion_mill_count"], 3)
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+        )
+
+    def test_mill_then_return_creature_or_land_spell_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Grapple with the Past",
+                type_line="Instant",
+                oracle_text=(
+                    "Mill three cards, then you may return a creature or land card "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "filter.add(Predicates.or(CardType.CREATURE.getPredicate(), CardType.LAND.getPredicate()));"
+                "this.getSpellAbility().addEffect(new MillCardsControllerEffect(3));"
+                "this.getSpellAbility().addEffect(new ReturnCardChosenFromGraveyardEffect(true, "
+                "filter, PutCards.HAND).concatBy(\", then\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature_or_land")
+        self.assertEqual(effect["pre_recursion_mill_count"], 3)
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature", "land"]},
+        )
+
+    def test_mill_then_return_spell_blocks_source_oracle_mill_mismatch(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Churn",
+                type_line="Instant",
+                oracle_text=(
+                    "Mill three cards, then you may return a creature card "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new MillCardsControllerEffect(2));"
+                "this.getSpellAbility().addEffect(new ReturnCardChosenFromGraveyardEffect(true, "
+                "StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD, PutCards.HAND).concatBy(\", then\"));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mill_return_source_oracle_mill_count_mismatch")
+
     def test_graveyard_to_hand_up_to_two_creatures_preserves_count(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToHandTargetEffect"])
         proposal, reason = split.split_row(
@@ -4441,6 +4531,84 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_recursion_target"], "land")
         self.assertEqual(effect["etb_recursion_count"], 2)
         self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        )
+
+    def test_creature_etb_mill_then_return_permanent_maps_to_triggered_scope(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Acolyte of Affliction",
+                type_line="Creature - Human Cleric",
+                oracle_text=(
+                    "When Acolyte of Affliction enters the battlefield, put the top two cards "
+                    "of your library into your graveyard, then you may return a permanent card "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new MillCardsControllerEffect(2));"
+                "ability.addEffect(new ReturnCardChosenFromGraveyardEffect(true, "
+                "filter, PutCards.HAND).concatBy(\", then\"));"
+                "private static final FilterPermanentCard filter = new FilterPermanentCard(\"permanent card from your graveyard\");"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_MILL_RECURSION_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_recursion_mill_count"], 2)
+        self.assertEqual(effect["etb_recursion_target"], "permanent")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertTrue(effect["etb_recursion_up_to_count"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"],
+            },
+        )
+
+    def test_creature_etb_mill_then_return_land_maps_to_triggered_scope(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Eccentric Farmer",
+                type_line="Creature - Human Peasant",
+                oracle_text=(
+                    "When Eccentric Farmer enters the battlefield, mill three cards, "
+                    "then you may return a land card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new MillCardsControllerEffect(3));"
+                "ability.addEffect(new ReturnCardChosenFromGraveyardEffect(true, "
+                "StaticFilters.FILTER_CARD_LAND_FROM_YOUR_GRAVEYARD, PutCards.HAND).concatBy(\", then\"));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_mill_count"], 3)
+        self.assertEqual(effect["etb_recursion_target"], "land")
         self.assertEqual(
             effect["target_constraints"],
             {"zone": "graveyard", "controller": "self", "card_types": ["land"]},

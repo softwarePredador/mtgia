@@ -107,6 +107,7 @@ MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
+RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
 RECURSION_BATTLEFIELD_SCOPE = "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
 RECURSION_BATTLEFIELD_COUNTER_SCOPE = (
     "xmage_return_target_graveyard_creature_to_battlefield_with_counter_spell_v1"
@@ -136,6 +137,7 @@ ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1"
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
@@ -831,6 +833,8 @@ def recursion_target_constraints_for(
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature":
         constraints["card_types"] = ["artifact", "creature"]
+    elif target == "creature_or_land":
+        constraints["card_types"] = ["creature", "land"]
     elif target == "creature_or_enchantment":
         constraints["card_types"] = ["creature", "enchantment"]
     elif target == "creature_or_food":
@@ -1130,6 +1134,88 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
 
 def recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     return recursion_to_hand_from_text(oracle_text(metadata))
+
+
+def mill_then_return_target_from_phrase(phrase: str) -> str | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    mapping = {
+        "creature or land": "creature_or_land",
+        "permanent": "permanent",
+        "creature": "creature",
+        "land": "land",
+    }
+    return mapping.get(normalized)
+
+
+def mill_then_return_from_text(text: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(text or "").strip().lower())
+    normalized = re.sub(r"\s*\([^)]*\)", "", normalized).strip()
+    normalized = re.sub(
+        r"^when (?:this creature|[^,]+?) enters(?: the battlefield)?,\s*",
+        "",
+        normalized,
+    )
+    match = re.match(
+        r"^(?:put the top (?P<put_count>\w+|\d+) cards? of your library into your graveyard|"
+        r"mill (?P<mill_count>\w+|\d+) cards?), then you may return "
+        r"(?:a|an|one) (?P<phrase>.+?) card from your graveyard to your hand\.?$",
+        normalized,
+    )
+    if not match:
+        return None
+    count_raw = match.group("put_count") or match.group("mill_count")
+    mill_count = word_count_value(count_raw)
+    target = mill_then_return_target_from_phrase(match.group("phrase"))
+    if mill_count is None or target is None:
+        return None
+    return {
+        "mill_count": mill_count,
+        "target": target,
+        "count": 1,
+        "up_to_count": True,
+    }
+
+
+def mill_then_return_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    return mill_then_return_from_text(oracle_text(metadata))
+
+
+def source_mill_then_return_target(source_text: str) -> str | None:
+    text = str(source_text or "")
+    if "FilterPermanentCard" in text:
+        return "permanent"
+    if "FILTER_CARD_LAND_FROM_YOUR_GRAVEYARD" in text:
+        return "land"
+    if "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text or "FILTER_CARD_CREATURES_YOUR_GRAVEYARD" in text:
+        return "creature"
+    if "CardType.CREATURE.getPredicate()" in text and "CardType.LAND.getPredicate()" in text:
+        return "creature_or_land"
+    return None
+
+
+def mill_then_return_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    mill_matches = re.findall(r"MillCardsControllerEffect\s*\(\s*(\d+)\s*\)", text)
+    if len(mill_matches) != 1:
+        return "mill_return_source_mill_count_not_supported"
+    return_effect_matches = re.findall(r"ReturnCardChosenFromGraveyardEffect\s*\(", text)
+    if len(return_effect_matches) != 1:
+        return "mill_return_source_return_effect_count_not_supported"
+    mill_index = text.find("MillCardsControllerEffect")
+    return_index = text.find("ReturnCardChosenFromGraveyardEffect")
+    if mill_index < 0 or return_index < 0 or mill_index > return_index:
+        return "mill_return_source_effect_order_not_supported"
+    if "PutCards.HAND" not in text:
+        return "mill_return_source_destination_not_supported"
+    target = source_mill_then_return_target(text)
+    if target is None:
+        return "mill_return_source_target_not_supported"
+    return {
+        "mill_count": int(mill_matches[0]),
+        "target": target,
+        "count": 1,
+        "up_to_count": "ReturnCardChosenFromGraveyardEffect(true" in text,
+    }
 
 
 def oracle_text_without_trailing_self_exile(metadata: dict[str, Any]) -> str | None:
@@ -2292,6 +2378,19 @@ def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
         and "EntersBattlefieldTriggeredAbility" in abilities
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_etb_mill_then_return_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"triggered_ability"}
     )
 
 
@@ -4627,6 +4726,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
+        ETB_MILL_RECURSION_CREATURE_SCOPE,
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_LIBRARY_PICK_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
@@ -4720,6 +4820,7 @@ def split_row(
     etb_damage_creature_unit = is_creature_etb_damage_unit(row)
     etb_destroy_creature_unit = is_creature_etb_destroy_unit(row)
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
+    etb_mill_recursion_creature_unit = is_creature_etb_mill_then_return_unit(row)
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
@@ -4762,6 +4863,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_token_creature_unit
@@ -4797,6 +4899,7 @@ def split_row(
         and not etb_damage_creature_unit
         and not etb_destroy_creature_unit
         and not etb_recursion_creature_unit
+        and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_token_creature_unit
@@ -6205,6 +6308,47 @@ def split_row(
             family_id="xmage_creature_etb_graveyard_to_hand",
         ), "selected_exact_scope"
 
+    if etb_mill_recursion_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_mill_recursion_not_creature"
+        oracle_target = mill_then_return_from_oracle(metadata)
+        if oracle_target is None:
+            return None, "etb_mill_recursion_oracle_not_supported"
+        source_target = mill_then_return_from_source(source_text)
+        if isinstance(source_target, str):
+            return None, source_target
+        for key in ("mill_count", "target", "count", "up_to_count"):
+            if source_target.get(key) != oracle_target.get(key):
+                return None, f"etb_mill_recursion_source_oracle_{key}_mismatch"
+        target_type = str(oracle_target["target"])
+        mill_count = int(oracle_target["mill_count"])
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_MILL_RECURSION_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_mill_count": mill_count,
+            "etb_recursion_target": target_type,
+            "etb_recursion_count": int(oracle_target["count"]),
+            "etb_recursion_destination": "hand",
+            "etb_recursion_up_to_count": True,
+            "target_constraints": recursion_target_constraints_for(target_type),
+            "xmage_effect_classes": ["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_mill_then_return_graveyard_to_hand",
+        ), "selected_exact_scope"
+
     if etb_graveyard_to_library_creature_unit:
         if not is_creature_metadata(metadata):
             return None, "etb_graveyard_to_library_not_creature"
@@ -6739,6 +6883,40 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_battlefield_with_counter_spell",
+            ), "selected_exact_scope"
+        if classes == {"MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"}:
+            if ability_classes(row):
+                return None, "mill_return_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "mill_return_oracle_not_simple"
+            oracle_target = mill_then_return_from_oracle(metadata)
+            if oracle_target is None:
+                return None, "mill_return_oracle_not_supported"
+            source_target = mill_then_return_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in ("mill_count", "target", "count", "up_to_count"):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"mill_return_source_oracle_{key}_mismatch"
+            target_type = str(oracle_target["target"])
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_MILL_RETURN_SCOPE,
+                "pre_recursion_mill_count": int(oracle_target["mill_count"]),
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": int(oracle_target["count"]),
+                "destination": "hand",
+                "target_controller": "self",
+                "up_to_count": True,
+                "xmage_effect_classes": ["MillCardsControllerEffect", "ReturnCardChosenFromGraveyardEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_mill_then_return_graveyard_to_hand_spell",
             ), "selected_exact_scope"
         auxiliary_recursion_abilities = ability_classes(row)
         auxiliary_recursion_spell = bool(auxiliary_recursion_abilities) and (
@@ -7362,6 +7540,8 @@ def build_exact_split_report(
                 "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice source costs only",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, exact mill-then-return Oracle/source agreement, and no additional ability class",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, EntersBattlefieldTriggeredAbility, exact ETB mill-then-return Oracle/source agreement, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ExileTargetEffect, SimpleActivatedAbility, exact activated graveyard-exile Oracle text, and mana/tap/self-sacrifice source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",

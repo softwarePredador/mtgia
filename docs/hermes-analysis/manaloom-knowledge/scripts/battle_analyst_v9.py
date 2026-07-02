@@ -34655,6 +34655,8 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return is_land(card)
     if target in ("basic_land", "basic_land_card"):
         return is_land(card) and _is_basic_land_card(card)
+    if target in ("creature_or_land", "creature_or_land_card"):
+        return is_creature_card(card) or is_land(card)
     if is_land(card):
         return False
     if target in ("any", "nonland", "nonland_card"):
@@ -34753,6 +34755,40 @@ def recursion_mana_value_max(effect_data, *keys):
         if effect_data.get(key) is not None:
             return effect_data.get(key)
     return None
+
+
+def mill_self_to_graveyard(player, count, turn, *, source_card=None, source_event="mill"):
+    milled = []
+    try:
+        mill_count = max(0, int(count or 0))
+    except (TypeError, ValueError):
+        mill_count = 0
+    for _ in range(min(mill_count, len(getattr(player, "library", []) or []))):
+        milled_card = player.library.pop(0)
+        player.graveyard.append(milled_card)
+        milled.append(milled_card)
+        resolve_land_cards_enter_graveyard_triggers(
+            player,
+            [milled_card],
+            turn=turn,
+            source_event=source_event,
+        )
+    if mill_count > 0:
+        emit_replay_event(
+            "mill_resolved",
+            player=player.name,
+            card=(source_card or {}).get("name", "?") if isinstance(source_card, dict) else "?",
+            source_event=source_event,
+            requested_mill=mill_count,
+            cards_milled=len(milled),
+            milled=[
+                milled_card.get("name", "?")
+                for milled_card in milled
+                if isinstance(milled_card, dict)
+            ],
+            turn=turn,
+        )
+    return milled
 
 
 def trigger_opponent_land_play_engines(
@@ -35665,6 +35701,13 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
     target_type = effect_data.get("etb_recursion_target") or "nonland"
     destination = effect_data.get("etb_recursion_destination", "hand")
     mana_value_max = recursion_mana_value_max(effect_data, "etb_recursion_mana_value_max")
+    milled = mill_self_to_graveyard(
+        player,
+        effect_data.get("etb_recursion_mill_count") or 0,
+        turn,
+        source_card=card,
+        source_event="etb_recursion_mill",
+    )
     candidates = [
         grave_card
         for grave_card in list(player.graveyard)
@@ -35709,6 +35752,8 @@ def resolve_etb_graveyard_recursion(player, card, effect_data, turn):
         target_type=target_type,
         destination=destination,
         mana_value_max=mana_value_max,
+        milled=[milled_card.get("name", "?") for milled_card in milled if isinstance(milled_card, dict)],
+        cards_milled=len(milled),
         recovered=[recovered_card.get("name", "?") for recovered_card in recovered],
         recovered_count=len(recovered),
         turn=turn,
@@ -48172,6 +48217,13 @@ def apply_effect_immediate(
         recovered_by_player = {}
         recovered_by_component = []
         all_players = [player] + list(opponents or [])
+        pre_recursion_milled = mill_self_to_graveyard(
+            player,
+            effect_data.get("pre_recursion_mill_count") or effect_data.get("mill_count") or 0,
+            turn,
+            source_card=card,
+            source_event="pre_recursion_mill",
+        )
 
         def recursion_participants(controller_value):
             controller = str(controller_value or "self").lower()
@@ -48389,6 +48441,12 @@ def apply_effect_immediate(
             return_all_matching=return_all_matching,
             mode_selection=effect_data.get("mode_selection"),
             grants_haste_until_eot=bool(effect_data.get("grants_haste_until_eot")),
+            pre_recursion_milled=[
+                milled_card.get("name", "?")
+                for milled_card in pre_recursion_milled
+                if isinstance(milled_card, dict)
+            ],
+            pre_recursion_cards_milled=len(pre_recursion_milled),
             turn=turn,
             **replay_rule_fields(effect_data),
         )

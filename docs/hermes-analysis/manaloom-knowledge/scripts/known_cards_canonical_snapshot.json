@@ -473,6 +473,41 @@
     "battle_rule_logical_key": "battle_rule_v1:a29015235c68332879e75484e8b92857",
     "battle_rule_oracle_hash": "b1357b55b4ee3216faca778b2259e04a"
   },
+  "Acolyte of Affliction": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_mill_count": 2,
+    "etb_recursion_target": "permanent",
+    "etb_recursion_up_to_count": true,
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "MillCardsControllerEffect",
+      "ReturnCardChosenFromGraveyardEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:313c45d8db9d3044d3f2d6151dc0a49d",
+    "battle_rule_oracle_hash": "1065260768af491ce6b27a5e9f634035"
+  },
   "Ad Nauseam": {
     "ad_nauseam_choice_model": "compact_reveal_until_life_floor_or_library_empty_v1",
     "ad_nauseam_life_floor": 1,
@@ -13754,6 +13789,36 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be"
   },
+  "Corpse Churn": {
+    "battle_model_scope": "xmage_mill_then_return_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": true,
+    "pre_recursion_mill_count": 3,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_classes": [
+      "MillCardsControllerEffect",
+      "ReturnCardChosenFromGraveyardEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2a926d8f6e5d6d3947f2167ddbbbf450",
+    "battle_rule_oracle_hash": "e89e2255330f3db9a8acfef47365aa36"
+  },
   "Corpse Hauler": {
     "_activated_rule_effects": [
       {
@@ -19790,6 +19855,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:564fa22af443f7be1bc8f274087af858",
     "battle_rule_oracle_hash": "26207fc53f2c897892591c4962362b3d"
+  },
+  "Eccentric Farmer": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_mill_count": 3,
+    "etb_recursion_target": "land",
+    "etb_recursion_up_to_count": true,
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "MillCardsControllerEffect",
+      "ReturnCardChosenFromGraveyardEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8f1112c7845590f7af48ef2fe27e4042",
+    "battle_rule_oracle_hash": "93c7e9b37205b9ff286a1f6c48cc55fe"
   },
   "Echoes of Eternity": {
     "colorless_only": true,
@@ -30635,15 +30730,35 @@
     "battle_rule_oracle_hash": "2b0b7a6ae97fc371def1be151b9f5a9f"
   },
   "Grapple with the Past": {
-    "cmc": 2.0,
+    "battle_model_scope": "xmage_mill_then_return_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
     "effect": "recursion",
     "instant": true,
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:f82f300b6a2f6b1792ea8debcdece54a"
+    "pre_recursion_mill_count": 3,
+    "sorcery": false,
+    "target": "creature_or_land",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_effect_classes": [
+      "MillCardsControllerEffect",
+      "ReturnCardChosenFromGraveyardEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a6c4cee416262412bedfb007466f57cf",
+    "battle_rule_oracle_hash": "05436728f69b35f7b1e8b0c3c0c468b1"
   },
   "Grappler Spider": {
     "_keywords_are_self": true,
@@ -50918,6 +51033,36 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:160bebb577f9d874ec53bee6f8f3d3b8",
     "battle_rule_oracle_hash": "5da5211c6ce969ce3b5750e349c2b073"
+  },
+  "Pothole Mole": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_mill_count": 3,
+    "etb_recursion_target": "land",
+    "etb_recursion_up_to_count": true,
+    "target_constraints": {
+      "card_types": [
+        "land"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_classes": [
+      "MillCardsControllerEffect",
+      "ReturnCardChosenFromGraveyardEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8f1112c7845590f7af48ef2fe27e4042",
+    "battle_rule_oracle_hash": "93c7e9b37205b9ff286a1f6c48cc55fe"
   },
   "Power Depot": {
     "effect": "land",

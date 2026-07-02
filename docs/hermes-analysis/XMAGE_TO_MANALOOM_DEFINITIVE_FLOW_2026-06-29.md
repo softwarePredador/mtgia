@@ -158,9 +158,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG342 Exact Adapter Waves
+## PG283-PG343 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG342 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG343 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -3660,6 +3660,75 @@ PG342 measured result:
   must split another exact recursion subpattern or move to the next largest
   reusable work unit if recursion no longer yields a safe package.
 
+PG343 evidence:
+
+- PG343 recursion mill-return package:
+  `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_package.md`
+- PG343 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_apply_evidence.md`
+- PG343 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_pg_to_sqlite_sync.json`
+- PG343 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg343_xmage_recursion_mill_return_wave_e2e_validation.md`
+- post-PG343 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg343_recursion_mill_return_wave.md`
+- post-PG343 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg343_recursion_mill_return_wave.md`
+- post-PG343 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg343_recursion_mill_return_wave.md`
+- post-PG343 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg343_recursion_mill_return_wave.md`
+- PG343 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg343_recursion_mill_return_wave.md`
+- post-PG343 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg343_recursion_mill_return_wave_commander_legal.md`
+- post-PG343 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg343_supported_recheck.md`
+- post-PG343 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg343_recursion_mill_return_wave_recheck.md`
+
+PG343 measured result:
+
+- PG343 promoted `5` exact mill-then-return recursion rules:
+  `Acolyte of Affliction`, `Corpse Churn`, `Eccentric Farmer`,
+  `Grapple with the Past`, and `Pothole Mole`.
+- The splitter now accepts exact
+  `MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect` rows when
+  Oracle and XMage agree on mill count, graveyard target filter, effect order,
+  and hand destination. Supported targets in this wave are `creature`,
+  `creature_or_land`, `land`, and `permanent`.
+- Runtime now mills the controller before resolving graveyard recursion for
+  both instant/sorcery spells and ETB creatures, so a freshly milled matching
+  card can be returned in the same effect.
+- Focused splitter/runtime suites report `325` tests passing, and the package
+  builder/E2E validator pytest suite reports `6` tests passing.
+- PostgreSQL precheck found `5/5` target rows, `0/5` expected rules already
+  present, and `2` nonmatching shadow rows to deprecate.
+- PostgreSQL apply inserted/updated `5` rules and deprecated `2` shadow rows.
+- PostgreSQL postcheck reports `5/5` promoted rows, `5/5` verified/auto rows,
+  and `5/5` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7288` PostgreSQL rows, inserted/updated
+  `7082` SQLite rows, and exported `4865` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` warning for the
+  pre-existing residual `trusted_executable_rules_missing_oracle_hash=1418`;
+  PG343 rows all carry matching Oracle hashes.
+- Global all-card readiness after PG343:
+  `battle_and_oracle_ready=2421`, `battle_family_mapper_required=30126`, and
+  `snapshot_has_verified_rule=3569`.
+- Global all-card authoritative queue after PG343:
+  `target_identity_count=27203`, `xmage_authoritative_source_count=26889`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26889`.
+- Running the exact splitter after PG343 on supported units returns
+  `proposal_count=0` over `7928` considered supported rows. The next cycle
+  should continue from the fresh post-PG343 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1899`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -4299,10 +4368,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG342 queue, the next exact runtime-backed work should be selected from
+post-PG343 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1904`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1899`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

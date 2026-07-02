@@ -3309,6 +3309,104 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_mill_then_return_recursion_can_return_freshly_milled_creature(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Fresh Mountain", "type_line": "Basic Land - Mountain", "cmc": 0},
+                {"name": "Fresh Bolt", "type_line": "Instant", "cmc": 1},
+                {"name": "Library Tail", "type_line": "Sorcery", "cmc": 4},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_mill_then_return_graveyard_card_to_hand_spell_v1",
+            "pre_recursion_mill_count": 3,
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 1,
+            "destination": "hand",
+            "target_controller": "self",
+            "up_to_count": True,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Corpse Churn",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Put the top three cards of your library into your graveyard, "
+                    "then you may return a creature card from your graveyard to your hand."
+                ),
+            },
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Bear"])
+        self.assertEqual([card["name"] for card in active.library], ["Library Tail"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fresh Mountain", "Fresh Bolt", "Corpse Churn"])
+        self.assertTrue(
+            any(
+                event == "mill_resolved"
+                and data.get("card") == "Corpse Churn"
+                and data.get("cards_milled") == 3
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Corpse Churn"
+                and data.get("recovered") == ["Fresh Bear"]
+                and data.get("pre_recursion_cards_milled") == 3
+                for event, data in self.events
+            )
+        )
+
+    def test_mill_then_return_recursion_matches_creature_or_land(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Land", "type_line": "Land", "cmc": 0},
+                {"name": "Fresh Spell", "type_line": "Instant", "cmc": 1},
+                {"name": "Fresh Bear", "type_line": "Creature - Bear", "cmc": 2},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_mill_then_return_graveyard_card_to_hand_spell_v1",
+            "pre_recursion_mill_count": 3,
+            "target": "creature_or_land",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature", "land"]},
+            "count": 1,
+            "destination": "hand",
+            "target_controller": "self",
+            "up_to_count": True,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Grapple with the Past", "type_line": "Instant"},
+            turn=8,
+            rng=random.Random(8),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Land"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fresh Spell", "Fresh Bear", "Grapple with the Past"])
+
     def test_graveyard_to_hand_recursion_exiles_self_after_recovery(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -3824,6 +3922,96 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 for event, data in self.events
             )
         )
+
+    def test_creature_etb_mill_then_return_can_return_freshly_milled_land(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Plains", "type_line": "Basic Land - Plains", "cmc": 0},
+                {"name": "Fresh Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Fresh Spell", "type_line": "Sorcery", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Eccentric Farmer", "type_line": "Creature - Human Peasant"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_mill_count": 3,
+            "etb_recursion_target": "land",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "etb_recursion_up_to_count": True,
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=10,
+            rng=random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Plains"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fresh Bear", "Fresh Spell"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Eccentric Farmer"])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Eccentric Farmer"
+                and data.get("cards_milled") == 3
+                and data.get("recovered") == ["Fresh Plains"]
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_etb_mill_then_return_can_return_freshly_milled_permanent(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Relic", "type_line": "Artifact", "cmc": 2},
+                {"name": "Fresh Bolt", "type_line": "Instant", "cmc": 1},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Acolyte of Affliction", "type_line": "Creature - Human Cleric"}
+        active.battlefield.append(permanent)
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_mill_count": 2,
+            "etb_recursion_target": "permanent",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "etb_recursion_up_to_count": True,
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact", "creature", "enchantment", "planeswalker", "battle", "land"],
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=10,
+            rng=random.Random(10),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Relic"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fresh Bolt"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Acolyte of Affliction"])
 
     def test_creature_etb_graveyard_recursion_returns_subtype_card(self) -> None:
         active = self.battle.Player("Active", None, [])
