@@ -1,0 +1,165 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg363_recursion_x_exile_self_wave_20260702_080905",
+  "deploy_id": "PG363",
+  "expected_rules": [
+    {
+      "card_name": "Divergent Equation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20664fe4af66178c3811ccca3e6fab9a",
+      "min_rule_version": 2,
+      "normalized_name": "divergent equation",
+      "oracle_hash": "376cef76eb8f9f6c1aeaf4400fc01ee8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 0,
+        "count_from_x": true,
+        "destination": "hand",
+        "effect": "recursion",
+        "exiles_self": true,
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wildest Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97d28139449a9f98b967b80b18f28b8c",
+      "min_rule_version": 2,
+      "normalized_name": "wildest dreams",
+      "oracle_hash": "4a9777cb1c1ee5c15d96130ef777e5d7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 0,
+        "count_from_x": true,
+        "destination": "hand",
+        "effect": "recursion",
+        "exiles_self": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_graveyard_to_hand_x_count_exile_self_spell": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg363_recursion_x_exile_self_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T08:09:05+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Divergent Equation"
+      },
+      "card_name": "Divergent Equation",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20664fe4af66178c3811ccca3e6fab9a",
+      "normalized_name": "divergent equation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 0,
+        "count_from_x": true,
+        "destination": "hand",
+        "effect": "recursion",
+        "exiles_self": true,
+        "target": "instant_or_sorcery",
+        "target_constraints": {
+          "card_types": [
+            "instant",
+            "sorcery"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "up_to_count": true
+      }
+    },
+    {
+      "card": {
+        "name": "Wildest Dreams"
+      },
+      "card_name": "Wildest Dreams",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97d28139449a9f98b967b80b18f28b8c",
+      "normalized_name": "wildest dreams",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+        "count": 0,
+        "count_from_x": true,
+        "destination": "hand",
+        "effect": "recursion",
+        "exiles_self": true,
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "self",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Divergent Equation",
+    "Wildest Dreams"
+  ],
+  "selected_count": 2,
+  "slug": "recursion_x_exile_self_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Divergent Equation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:20664fe4af66178c3811ccca3e6fab9a",
+      "min_rule_version": 2,
+      "normalized_name": "divergent equation",
+      "oracle_hash": "376cef76eb8f9f6c1aeaf4400fc01ee8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wildest Dreams",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:97d28139449a9f98b967b80b18f28b8c",
+      "min_rule_version": 2,
+      "normalized_name": "wildest dreams",
+      "oracle_hash": "4a9777cb1c1ee5c15d96130ef777e5d7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

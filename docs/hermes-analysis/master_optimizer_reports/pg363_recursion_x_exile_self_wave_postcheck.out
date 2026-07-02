@@ -1,0 +1,5 @@
+     card_name      |  normalized_name   |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------+--------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Divergent Equation | divergent equation | battle_rule_v1:20664fe4af66178c3811ccca3e6fab9a |                  1 |                           1 |                         1 |           0
+ Wildest Dreams     | wildest dreams     | battle_rule_v1:97d28139449a9f98b967b80b18f28b8c |                  1 |                           1 |                         1 |           0
+(2 rows)

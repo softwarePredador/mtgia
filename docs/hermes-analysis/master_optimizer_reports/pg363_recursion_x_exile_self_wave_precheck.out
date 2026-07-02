@@ -1,0 +1,5 @@
+     card_name      |  normalized_name   |           oracle_hash            |                logical_rule_key                 |      shadow_handling       | target_card_rows |          canonical_card_id           | existing_rule_rows | expected_rule_rows_before | would_deprecate_shadow_rows
+--------------------+--------------------+----------------------------------+-------------------------------------------------+----------------------------+------------------+--------------------------------------+--------------------+---------------------------+-----------------------------
+ Divergent Equation | divergent equation | 376cef76eb8f9f6c1aeaf4400fc01ee8 | battle_rule_v1:20664fe4af66178c3811ccca3e6fab9a | deprecate_nonmatching_rows |                1 | 88b2b6b0-4f9e-475a-afcb-91318ad631b0 |                  0 |                         0 |                           0
+ Wildest Dreams     | wildest dreams     | 4a9777cb1c1ee5c15d96130ef777e5d7 | battle_rule_v1:97d28139449a9f98b967b80b18f28b8c | deprecate_nonmatching_rows |                1 | b87919f4-5c9e-4212-ac8a-517e5f522dd6 |                  0 |                         0 |                           0
+(2 rows)

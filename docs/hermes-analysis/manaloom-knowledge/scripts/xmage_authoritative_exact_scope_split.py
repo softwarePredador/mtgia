@@ -1005,6 +1005,7 @@ def source_supports_exile_self_recursion_target(source_text: str, target: str) -
         "enchantment": ("FilterEnchantmentCard", "FilterEnchantmentCard"),
         "instant": ("CardType.INSTANT", "instant card"),
         "sorcery": ("CardType.SORCERY", "sorcery card"),
+        "instant_or_sorcery": ("FilterInstantOrSorceryCard", "instant and/or sorcery", "instant or sorcery"),
         "planeswalker": ("FilterPlaneswalkerCard", "planeswalker card"),
         "creature": ("FILTER_CARD_CREATURE", "FilterCreatureCard"),
     }
@@ -1280,6 +1281,31 @@ def recursion_to_hand_exile_self_from_oracle(metadata: dict[str, Any]) -> tuple[
     if text is None:
         return None
     return recursion_to_hand_from_text(text)
+
+
+def recursion_to_hand_exile_self_x_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
+    text = oracle_text_without_trailing_self_exile(metadata)
+    if text is None:
+        return None
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (
+            r"^return x target cards from your graveyard to your hand\.?$",
+            {"target": "any_card", "up_to_count": False},
+        ),
+        (
+            r"^return up to x target instant and/or sorcery cards from your graveyard to your hand\.?$",
+            {"target": "instant_or_sorcery", "up_to_count": True},
+        ),
+    ]
+    for pattern, spec in patterns:
+        if re.match(pattern, text):
+            return {
+                "target": spec["target"],
+                "count": 0,
+                "count_from_x": True,
+                "up_to_count": bool(spec["up_to_count"]),
+            }
+    return None
 
 
 def recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -8518,6 +8544,35 @@ def split_row(
                 return None, "recursion_exile_self_ability_class_not_simple"
             if has_oracle_complexity(metadata):
                 return None, "recursion_exile_self_oracle_not_simple"
+            x_target = recursion_to_hand_exile_self_x_from_oracle(metadata)
+            if x_target is not None:
+                target_type = str(x_target["target"])
+                if not source_supports_recursion_x_target_count(source_text):
+                    return None, "recursion_exile_self_source_x_count_not_supported"
+                if not source_supports_exile_self_recursion_target(source_text, target_type):
+                    return None, "recursion_exile_self_source_target_not_supported"
+                effect_json = {
+                    "effect": "recursion",
+                    "battle_model_scope": RECURSION_SCOPE,
+                    "target": target_type,
+                    "target_constraints": recursion_target_constraints_for(target_type),
+                    "count": int(x_target["count"]),
+                    "count_from_x": True,
+                    "destination": "hand",
+                    "target_controller": "self",
+                    "exiles_self": True,
+                    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                    "xmage_additional_effect_class": "ExileSpellEffect",
+                    **flags,
+                }
+                if x_target.get("up_to_count"):
+                    effect_json["up_to_count"] = True
+                return build_proposal(
+                    row,
+                    metadata,
+                    effect_json,
+                    family_id="xmage_graveyard_to_hand_x_count_exile_self_spell",
+                ), "selected_exact_scope"
             components = recursion_to_hand_exile_self_components_from_oracle(metadata)
             if components is not None:
                 if not source_supports_exile_self_recursion_components(source_text, components):

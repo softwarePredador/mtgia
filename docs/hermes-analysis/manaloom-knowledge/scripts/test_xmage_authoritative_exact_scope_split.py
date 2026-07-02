@@ -3090,7 +3090,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["exiles_self"])
         self.assertEqual(effect["xmage_additional_effect_class"], "ExileSpellEffect")
 
-    def test_graveyard_to_hand_exile_self_variable_x_stays_blocked(self) -> None:
+    def test_graveyard_to_hand_exile_self_variable_x_maps_to_recursion_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ReturnFromGraveyardToHandTargetEffect", "ExileSpellEffect"],
@@ -3105,12 +3105,55 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             source_text="""
                 this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
                 this.getSpellAbility().addTarget(new TargetCardInYourGraveyard());
+                this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());
                 this.getSpellAbility().addEffect(new ExileSpellEffect());
             """,
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "recursion_exile_self_target_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "any_card")
+        self.assertEqual(effect["target_constraints"], {"zone": "graveyard", "controller": "self", "scope": "any_card"})
+        self.assertEqual(effect["count"], 0)
+        self.assertTrue(effect["count_from_x"])
+        self.assertTrue(effect["exiles_self"])
+        self.assertNotIn("up_to_count", effect)
+
+    def test_graveyard_to_hand_exile_self_up_to_x_instant_or_sorcery_maps_to_recursion_runtime(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect", "ExileSpellEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Divergent Equation",
+                type_line="Instant",
+                oracle_text=(
+                    "Return up to X target instant and/or sorcery cards from your graveyard to your hand. "
+                    "Exile Divergent Equation."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(0, 1, new FilterInstantOrSorceryCard("instant and/or sorcery cards")));
+                this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());
+                this.getSpellAbility().addEffect(new ExileSpellEffect());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "instant_or_sorcery")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+        )
+        self.assertEqual(effect["count"], 0)
+        self.assertTrue(effect["count_from_x"])
+        self.assertTrue(effect["up_to_count"])
+        self.assertTrue(effect["exiles_self"])
 
     def test_graveyard_to_battlefield_spell_maps_to_recursion_runtime(self) -> None:
         row = queue_row(split.RECURSION_UNIT, effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"])
@@ -6985,7 +7028,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             },
         )
 
-    def test_recursion_exile_self_variable_x_stays_blocked(self) -> None:
+    def test_recursion_exile_self_variable_x_requires_source_adjuster(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
             effect_classes=["ExileSpellEffect", "ReturnFromGraveyardToHandTargetEffect"],
@@ -6999,13 +7042,12 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
             source_text="""
                 this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
-                this.getSpellAbility().setTargetAdjuster(new XTargetsCountAdjuster());
                 this.getSpellAbility().addEffect(new ExileSpellEffect());
             """,
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "recursion_exile_self_target_not_supported")
+        self.assertEqual(reason, "recursion_exile_self_source_x_count_not_supported")
 
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(

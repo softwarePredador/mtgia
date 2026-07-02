@@ -4376,6 +4376,71 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_hand_x_recursion_exiles_self_and_filters_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Bolt", "type_line": "Instant", "cmc": 1},
+                {"name": "Wrong Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Target Ritual", "type_line": "Sorcery", "cmc": 2},
+                {"name": "Target Charm", "type_line": "Instant", "cmc": 3},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "instant_or_sorcery",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["instant", "sorcery"]},
+            "count": 0,
+            "count_from_x": True,
+            "up_to_count": True,
+            "destination": "hand",
+            "target_controller": "self",
+            "exiles_self": True,
+            "_cast_context": {"x_value": 2},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Divergent Equation",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Return up to X target instant and/or sorcery cards from your graveyard to your hand. "
+                    "Exile Divergent Equation."
+                ),
+            },
+            turn=8,
+            rng=random.Random(208),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Bolt", "Target Ritual"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Bear", "Target Charm"])
+        self.assertEqual([card["name"] for card in active.exile], ["Divergent Equation"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Divergent Equation"
+                and data.get("recovered") == ["Target Bolt", "Target Ritual"]
+                and data.get("recovered_count") == 2
+                and data.get("x_value") == 2
+                and data.get("target_type") == "instant_or_sorcery"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "spell_resolved"
+                and data.get("card") == "Divergent Equation"
+                and data.get("destination") == "exile"
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_hand_recursion_matches_color_and_subtype_targets(self) -> None:
         cases = [
             (
