@@ -765,6 +765,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(active.hand, [])
         self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Bottom"])
 
+    def test_graveyard_to_library_shuffle_targets_single_players_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [{"name": "Library Card", "type_line": "Land"}])
+        active.graveyard.append({"name": "Low Value", "type_line": "Land", "cmc": 0})
+        opponent.graveyard.extend(
+            [
+                {"name": "Opponent Bomb", "type_line": "Creature", "cmc": 7},
+                {"name": "Opponent Answer", "type_line": "Instant", "cmc": 2},
+                {"name": "Opponent Filler", "type_line": "Land", "cmc": 0},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+            "target": "any_card",
+            "target_constraints": {"zone": "graveyard", "controller": "target_player", "scope": "any_card"},
+            "count": 2,
+            "destination": "library_shuffle",
+            "up_to_count": True,
+            "target_controller": "target_player",
+            "target_graveyard_controller": "target_player",
+            "library_controller": "target_player",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {"name": "Fixture Reclamation", "type_line": "Instant"},
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.graveyard], ["Low Value", "Fixture Reclamation"])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Opponent Filler"])
+        self.assertEqual(
+            sorted(card["name"] for card in opponent.library),
+            ["Library Card", "Opponent Answer", "Opponent Bomb"],
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Reclamation"
+                and data.get("destination") == "library_shuffle"
+                and data.get("target_graveyard_controller") == "target_player"
+                and set(data.get("recovered") or []) == {"Opponent Bomb", "Opponent Answer"}
+                for event, data in self.events
+            )
+        )
+
     def test_recursion_battlefield_from_opponent_graveyard_enters_under_controller(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -2906,6 +2906,88 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "graveyard_to_library_source_oracle_destination_mismatch")
 
+    def test_target_player_shuffle_graveyard_cards_to_library_spell_maps(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["TargetPlayerShufflesTargetCardsEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dwell on the Past",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Target player shuffles up to four target cards from their graveyard into their library."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TargetPlayerShufflesTargetCardsEffect());
+                this.getSpellAbility().addTarget(new TargetPlayer());
+                this.getSpellAbility().addTarget(new TargetCardInTargetPlayersGraveyard(4));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_TO_LIBRARY_SPELL_SCOPE)
+        self.assertEqual(effect["xmage_effect_class"], "TargetPlayerShufflesTargetCardsEffect")
+        self.assertEqual(effect["target"], "any_card")
+        self.assertEqual(effect["count"], 4)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["destination"], "library_shuffle")
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target_graveyard_controller"], "target_player")
+        self.assertEqual(effect["library_controller"], "target_player")
+
+    def test_target_player_shuffle_graveyard_cards_to_library_allows_flashback(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["TargetPlayerShufflesTargetCardsEffect"],
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Memory's Journey",
+                type_line="Instant",
+                oracle_text=(
+                    "Target player shuffles up to three target cards from their graveyard into their library. "
+                    "Flashback {G}"
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TargetPlayerShufflesTargetCardsEffect());
+                this.getSpellAbility().addTarget(new TargetPlayer());
+                this.getSpellAbility().addTarget(new TargetCardInTargetPlayersGraveyard(3));
+                this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>("{G}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["count"], 3)
+        self.assertEqual(effect["flashback_cost"], "{G}")
+        self.assertEqual(effect["flashback_status"], "runtime_executor_v1")
+
+    def test_target_player_shuffle_graveyard_cards_count_mismatch_blocks(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["TargetPlayerShufflesTargetCardsEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Reclamation",
+                type_line="Instant",
+                oracle_text=(
+                    "Target player shuffles up to three target cards from their graveyard into their library."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new TargetPlayerShufflesTargetCardsEffect());
+                this.getSpellAbility().addTarget(new TargetPlayer());
+                this.getSpellAbility().addTarget(new TargetCardInTargetPlayersGraveyard(2));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_shuffle_to_library_source_oracle_count_mismatch")
+
     def test_permanent_activated_graveyard_to_library_maps_bottom_self_graveyard(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

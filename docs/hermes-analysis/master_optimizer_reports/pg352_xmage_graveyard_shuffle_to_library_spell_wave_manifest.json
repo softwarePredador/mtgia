@@ -1,0 +1,313 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg352_xmage_graveyard_shuffle_to_library_spell_wave_2026",
+  "deploy_id": "PG352",
+  "expected_rules": [
+    {
+      "card_name": "Dwell on the Past",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8d07ae1642f1792017f5037a500f23d",
+      "min_rule_version": 2,
+      "normalized_name": "dwell on the past",
+      "oracle_hash": "56186be506e23ca8577f2631a950f7ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 4,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krosan Reclamation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96e29173e026d208c085eba9c46eeb90",
+      "min_rule_version": 2,
+      "normalized_name": "krosan reclamation",
+      "oracle_hash": "bce73a05bed813794d698fe9623dc47c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 2,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "flashback_cost": "{1}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Memory's Journey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50505be06d0d57f05f3dadbfbe32fd43",
+      "min_rule_version": 2,
+      "normalized_name": "memory's journey",
+      "oracle_hash": "6c9de0cfefccac64e5774ae0c6510a59",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 3,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "flashback_cost": "{G}",
+        "flashback_status": "runtime_executor_v1",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stream of Consciousness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ead478fb37e561206c410fdf144df3a",
+      "min_rule_version": 2,
+      "normalized_name": "stream of consciousness",
+      "oracle_hash": "56186be506e23ca8577f2631a950f7ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 4,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_target_player_shuffle_graveyard_cards_to_library_spell": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T04:36:58+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Dwell on the Past"
+      },
+      "card_name": "Dwell on the Past",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8d07ae1642f1792017f5037a500f23d",
+      "normalized_name": "dwell on the past",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 4,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true
+      }
+    },
+    {
+      "card": {
+        "name": "Krosan Reclamation"
+      },
+      "card_name": "Krosan Reclamation",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96e29173e026d208c085eba9c46eeb90",
+      "normalized_name": "krosan reclamation",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 2,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "flashback_cost": "{1}{G}",
+        "flashback_status": "runtime_executor_v1",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Memory's Journey"
+      },
+      "card_name": "Memory's Journey",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50505be06d0d57f05f3dadbfbe32fd43",
+      "normalized_name": "memory's journey",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 3,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "flashback_cost": "{G}",
+        "flashback_status": "runtime_executor_v1",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true,
+        "xmage_auxiliary_ability_classes": [
+          "FlashbackAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Stream of Consciousness"
+      },
+      "card_name": "Stream of Consciousness",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ead478fb37e561206c410fdf144df3a",
+      "normalized_name": "stream of consciousness",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+        "count": 4,
+        "destination": "library_shuffle",
+        "effect": "recursion",
+        "library_controller": "target_player",
+        "target": "any_card",
+        "target_constraints": {
+          "controller": "target_player",
+          "scope": "any_card",
+          "zone": "graveyard"
+        },
+        "target_controller": "target_player",
+        "target_graveyard_controller": "target_player",
+        "up_to_count": true
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Dwell on the Past",
+    "Krosan Reclamation",
+    "Memory's Journey",
+    "Stream of Consciousness"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_graveyard_shuffle_to_library_spell_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Dwell on the Past",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c8d07ae1642f1792017f5037a500f23d",
+      "min_rule_version": 2,
+      "normalized_name": "dwell on the past",
+      "oracle_hash": "56186be506e23ca8577f2631a950f7ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Krosan Reclamation",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:96e29173e026d208c085eba9c46eeb90",
+      "min_rule_version": 2,
+      "normalized_name": "krosan reclamation",
+      "oracle_hash": "bce73a05bed813794d698fe9623dc47c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Memory's Journey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:50505be06d0d57f05f3dadbfbe32fd43",
+      "min_rule_version": 2,
+      "normalized_name": "memory's journey",
+      "oracle_hash": "6c9de0cfefccac64e5774ae0c6510a59",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Stream of Consciousness",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8ead478fb37e561206c410fdf144df3a",
+      "min_rule_version": 2,
+      "normalized_name": "stream of consciousness",
+      "oracle_hash": "56186be506e23ca8577f2631a950f7ca",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

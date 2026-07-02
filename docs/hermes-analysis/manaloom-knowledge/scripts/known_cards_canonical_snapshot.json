@@ -20324,6 +20324,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7bfd06bf8b9be951f1c73179d8a10b32"
   },
+  "Dwell on the Past": {
+    "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+    "count": 4,
+    "destination": "library_shuffle",
+    "effect": "recursion",
+    "instant": false,
+    "library_controller": "target_player",
+    "sorcery": true,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "target_player",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "target_player",
+    "target_graveyard_controller": "target_player",
+    "up_to_count": true,
+    "xmage_effect_class": "TargetPlayerShufflesTargetCardsEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c8d07ae1642f1792017f5037a500f23d",
+    "battle_rule_oracle_hash": "56186be506e23ca8577f2631a950f7ca"
+  },
   "D\u00e9j\u00e0 Vu": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -40430,6 +40456,37 @@
     "battle_rule_logical_key": "battle_rule_v1:ef2466b649b2dfd10755b79cf1c4df15",
     "battle_rule_oracle_hash": "f3df77a3d15abc7447b700732c1e7267"
   },
+  "Krosan Reclamation": {
+    "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+    "count": 2,
+    "destination": "library_shuffle",
+    "effect": "recursion",
+    "flashback_cost": "{1}{G}",
+    "flashback_status": "runtime_executor_v1",
+    "instant": true,
+    "library_controller": "target_player",
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "target_player",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "target_player",
+    "target_graveyard_controller": "target_player",
+    "up_to_count": true,
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "TargetPlayerShufflesTargetCardsEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:96e29173e026d208c085eba9c46eeb90",
+    "battle_rule_oracle_hash": "bce73a05bed813794d698fe9623dc47c"
+  },
   "Krosan Verge": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -44569,6 +44626,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "3a43b89172ff1ae7e48bd0ac5d35692a"
+  },
+  "Memory's Journey": {
+    "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+    "count": 3,
+    "destination": "library_shuffle",
+    "effect": "recursion",
+    "flashback_cost": "{G}",
+    "flashback_status": "runtime_executor_v1",
+    "instant": true,
+    "library_controller": "target_player",
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "target_player",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "target_player",
+    "target_graveyard_controller": "target_player",
+    "up_to_count": true,
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "TargetPlayerShufflesTargetCardsEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:50505be06d0d57f05f3dadbfbe32fd43",
+    "battle_rule_oracle_hash": "6c9de0cfefccac64e5774ae0c6510a59"
   },
   "Mental Journey": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -69659,6 +69747,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0b543efc21cb5ee532062e24929c6ae1",
     "battle_rule_oracle_hash": "d1de0f60cb1770bcbe4abfe87b024749"
+  },
+  "Stream of Consciousness": {
+    "battle_model_scope": "xmage_put_target_graveyard_card_on_library_spell_v1",
+    "count": 4,
+    "destination": "library_shuffle",
+    "effect": "recursion",
+    "instant": true,
+    "library_controller": "target_player",
+    "sorcery": false,
+    "target": "any_card",
+    "target_constraints": {
+      "controller": "target_player",
+      "scope": "any_card",
+      "zone": "graveyard"
+    },
+    "target_controller": "target_player",
+    "target_graveyard_controller": "target_player",
+    "up_to_count": true,
+    "xmage_effect_class": "TargetPlayerShufflesTargetCardsEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8ead478fb37e561206c410fdf144df3a",
+    "battle_rule_oracle_hash": "56186be506e23ca8577f2631a950f7ca"
   },
   "Strength of the Harvest // Haven of the Harvest": {
     "cmc": 3.0,

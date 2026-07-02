@@ -49099,6 +49099,33 @@ def apply_effect_immediate(
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
             component_participants = recursion_participants(component_target_controller)
+            if component_target_controller == "target_player":
+                scored_participants = []
+                for participant in all_players:
+                    candidates = matching_component_candidates(participant, component_data)
+                    participant_score = sum(
+                        graveyard_to_library_candidate_score(
+                            candidate,
+                            participant,
+                            player,
+                            all_players,
+                            turn,
+                        )
+                        for candidate in candidates[: component_count(component_data)]
+                    )
+                    scored_participants.append((len(candidates), participant_score, participant))
+                scored_participants.sort(
+                    key=lambda item: (
+                        item[0],
+                        item[1],
+                        1 if item[2] is player else 0,
+                        getattr(item[2], "name", ""),
+                    ),
+                    reverse=True,
+                )
+                component_participants = [
+                    scored_participants[0][2]
+                ] if scored_participants and scored_participants[0][0] > 0 else []
             component_recovered = []
             for participant in component_participants:
                 count = component_count(component_data)
@@ -49178,8 +49205,12 @@ def apply_effect_immediate(
                         participant.library.insert(0, recovered_card)
                     elif component_destination == "library_bottom":
                         participant.library.append(recovered_card)
+                    elif component_destination == "library_shuffle":
+                        participant.library.append(recovered_card)
                     else:
                         participant.hand.append(recovered_card)
+                if component_destination == "library_shuffle" and participant_recovered:
+                    participant.shuffle(rng)
             recovered_by_component.append(
                 {
                     "index": component_index,

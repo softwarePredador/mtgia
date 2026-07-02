@@ -139,21 +139,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg350_graveyard_self_return_exile_cost_battlefield_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg351_graveyard_self_return_hand_discard_creature_sorcery_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg351_graveyard_self_return_hand_discard_creature_sorcery_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27170`
-- XMage authoritative source resolved: `26856`
+- target all-card battle-gap identities: `27166`
+- XMage authoritative source resolved: `26852`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26856`
+- XMage authoritative adapter required: `26852`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26856` identities, card semantics are accepted from XMage; work is now
+- For `26852` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -172,9 +174,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG351 Exact Adapter Waves
+## PG283-PG352 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG351 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG352 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -327,6 +329,14 @@ patterns:
   supported targets `artifact or creature` and `instant or sorcery` with
   top/bottom destination agreement between Oracle and XMage source ->
   `xmage_creature_etb_put_graveyard_card_on_library_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `TargetPlayerShufflesTargetCardsEffect` on instant/sorcery spells, exact
+  Oracle/source agreement, `TargetPlayer`, and
+  `TargetCardInTargetPlayersGraveyard(N)` for up to N target cards from that
+  player's graveyard shuffled into that player's library. `FlashbackAbility`
+  is allowed only when Oracle and XMage flashback costs match ->
+  `xmage_put_target_graveyard_card_on_library_spell_v1` with
+  `destination=library_shuffle`
 - `recursion::xmage_graveyard_return_variant_review_v1` with
   `ReturnSourceFromGraveyardToHandEffect + SimpleActivatedAbility` in
   `Zone.GRAVEYARD`, mana-only activation cost, exact self-return Oracle/source
@@ -4323,6 +4333,73 @@ PG351 measured result:
   should continue from the fresh post-PG351 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1866`.
 
+PG352 evidence:
+
+- PG352 graveyard shuffle-to-library spell package:
+  `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_package.md`
+- PG352 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_apply_evidence.md`
+- PG352 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_pg_to_sqlite_sync.json`
+- PG352 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg352_xmage_graveyard_shuffle_to_library_spell_wave_e2e_validation.md`
+- post-PG352 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_docs_final.md`
+- post-PG352 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_docs_final.md`
+- post-PG352 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_docs_final.md`
+- post-PG352 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_docs_final.md`
+- PG352 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_pg352_graveyard_shuffle_to_library_spell_wave.md`
+- post-PG352 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.md`
+- post-PG352 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg352_supported_recheck.md`
+- post-PG352 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_recheck.md`
+
+PG352 measured result:
+
+- PG352 promoted `4` exact target-player graveyard shuffle-to-library spells:
+  `Dwell on the Past`, `Krosan Reclamation`, `Memory's Journey`, and
+  `Stream of Consciousness`.
+- The splitter/runtime now support exact
+  `TargetPlayerShufflesTargetCardsEffect` spells with
+  `TargetCardInTargetPlayersGraveyard(N)`, `destination=library_shuffle`, and
+  optional Flashback only when source/Oracle costs match.
+- Runtime now chooses a single target player with valid graveyard targets, moves
+  up to the modeled count into that player's library, and shuffles that
+  library once after the move.
+- Focused splitter/runtime suites report `229` and `138` tests passing,
+  respectively.
+- PostgreSQL precheck found `4/4` target card rows, `0` existing expected rows,
+  and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `4` upserted rows, `4/4` promoted rows,
+  `4/4` verified/auto rows, and `4/4` matching Oracle hash rows.
+- PG -> Hermes/SQLite sync loaded `7325` PostgreSQL rows, inserted/updated
+  `7119` SQLite rows, and exported `4902` canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG352 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG352:
+  `battle_and_oracle_ready=2458`, `battle_family_mapper_required=30089`, and
+  `snapshot_has_verified_rule=3606`.
+- Global all-card authoritative queue after PG352:
+  `target_identity_count=27166`, `xmage_authoritative_source_count=26852`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26852`.
+- Running the exact splitter after PG352 on supported units returns
+  `proposal_count=0` over `7923` considered supported rows. The next cycle
+  should continue from the fresh post-PG352 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1862`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -4962,10 +5039,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG351 queue, the next exact runtime-backed work should be selected from
+post-PG352 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1866`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1862`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `928`

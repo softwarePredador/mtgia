@@ -1644,6 +1644,31 @@ def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any]
     return None
 
 
+def graveyard_shuffle_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^target player shuffles up to (?P<count>one|two|three|four|\d+) "
+        r"target cards? from their graveyard into their library\.(?: .*)?$",
+        text,
+    )
+    if not match:
+        return "graveyard_shuffle_to_library_oracle_not_simple"
+    count_words = {"one": 1, "two": 2, "three": 3, "four": 4}
+    raw_count = match.group("count")
+    count = count_words.get(raw_count, int(raw_count) if raw_count.isdigit() else 0)
+    if count <= 0:
+        return "graveyard_shuffle_to_library_oracle_count_not_supported"
+    return {
+        "target": "any_card",
+        "count": count,
+        "destination": "library_shuffle",
+        "up_to_count": True,
+        "target_graveyard_controller": "target_player",
+        "target_controller": "target_player",
+        "library_controller": "target_player",
+    }
+
+
 def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
     text = str(source_text or "")
     effect_matches = re.findall(r"new\s+PutOnLibraryTargetEffect\s*\(\s*(true|false)\s*\)", text)
@@ -1683,6 +1708,29 @@ def graveyard_to_library_from_source(source_text: str) -> dict[str, Any] | str:
         "up_to_count": up_to,
         "target_graveyard_controller": target_graveyard_controller,
         "library_controller": library_controller,
+    }
+
+
+def graveyard_shuffle_to_library_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if len(re.findall(r"TargetPlayerShufflesTargetCardsEffect\s*\(", text)) != 1:
+        return "graveyard_shuffle_to_library_source_not_single_effect"
+    if len(re.findall(r"new\s+TargetPlayer\s*\(", text)) != 1:
+        return "graveyard_shuffle_to_library_source_target_player_not_supported"
+    target_match = re.search(r"TargetCardInTargetPlayersGraveyard\s*\(\s*(\d+)\s*\)", text)
+    if not target_match:
+        return "graveyard_shuffle_to_library_source_target_cards_not_supported"
+    count = int(target_match.group(1))
+    if count <= 0 or count > 20:
+        return "graveyard_shuffle_to_library_source_count_not_supported"
+    return {
+        "target": "any_card",
+        "count": count,
+        "destination": "library_shuffle",
+        "up_to_count": True,
+        "target_graveyard_controller": "target_player",
+        "target_controller": "target_player",
+        "library_controller": "target_player",
     }
 
 
@@ -7780,6 +7828,55 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_graveyard_to_library_spell",
+            ), "selected_exact_scope"
+        if classes == {"TargetPlayerShufflesTargetCardsEffect"}:
+            abilities = ability_classes(row)
+            if abilities - {"FlashbackAbility"}:
+                return None, "graveyard_shuffle_to_library_ability_class_not_supported"
+            oracle_target = graveyard_shuffle_to_library_from_oracle(metadata)
+            if isinstance(oracle_target, str):
+                return None, oracle_target
+            source_target = graveyard_shuffle_to_library_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, source_target
+            for key in (
+                "target",
+                "count",
+                "destination",
+                "up_to_count",
+                "target_graveyard_controller",
+                "target_controller",
+                "library_controller",
+            ):
+                if source_target.get(key) != oracle_target.get(key):
+                    return None, f"graveyard_shuffle_to_library_source_oracle_{key}_mismatch"
+            aux_fields = auxiliary_recursion_spell_fields_from_source(metadata, source_text, abilities)
+            if isinstance(aux_fields, str):
+                return None, aux_fields
+            count = int(oracle_target["count"])
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": GRAVEYARD_TO_LIBRARY_SPELL_SCOPE,
+                "target": "any_card",
+                "target_constraints": recursion_target_constraints_for(
+                    "any_card",
+                    controller="target_player",
+                ),
+                "count": count,
+                "destination": "library_shuffle",
+                "up_to_count": True,
+                "target_controller": "target_player",
+                "target_graveyard_controller": "target_player",
+                "library_controller": "target_player",
+                "xmage_effect_class": "TargetPlayerShufflesTargetCardsEffect",
+                **aux_fields,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_target_player_shuffle_graveyard_cards_to_library_spell",
             ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldWithCounterTargetEffect"}:
             if ability_classes(row):
