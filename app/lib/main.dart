@@ -235,23 +235,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
           return null;
         }
 
-        // Enquanto auth inicializa/carrega, mantém o app em splash/auth.
-        // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
-        if (status == AuthStatus.loading || status == AuthStatus.initial) {
-          final isBootSafeRoute =
-              location == '/' ||
-              location == '/login' ||
-              location == '/register' ||
-              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
-          if (!isBootSafeRoute) {
-            debugPrint('[🧭 Router] → / (status=$status, aguardando auth)');
-            return '/';
-          }
-
-          debugPrint('[🧭 Router] → null (status=$status, aguardando)');
-          return null;
-        }
-
         final isAuthRoute = location == '/login' || location == '/register';
         final isProtectedRoute =
             location.startsWith('/home') ||
@@ -269,6 +252,32 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/legal') ||
             location.startsWith('/onboarding') ||
             location.startsWith(lifeCounterRoutePath);
+
+        // Enquanto auth inicializa/carrega, mantém o app em splash/auth.
+        // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
+        if (status == AuthStatus.loading || status == AuthStatus.initial) {
+          final isBootSafeRoute =
+              location == '/' ||
+              location == '/login' ||
+              location == '/register' ||
+              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
+          if (!isBootSafeRoute) {
+            final redirectTarget = state.uri.toString();
+            final splashUri =
+                Uri(
+                  path: '/',
+                  queryParameters:
+                      isProtectedRoute ? {'redirect': redirectTarget} : null,
+                ).toString();
+            debugPrint(
+              '[🧭 Router] → $splashUri (status=$status, aguardando auth)',
+            );
+            return splashUri;
+          }
+
+          debugPrint('[🧭 Router] → null (status=$status, aguardando)');
+          return null;
+        }
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -296,7 +305,13 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         return null;
       },
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(
+          path: '/',
+          builder:
+              (context, state) => SplashScreen(
+                redirectPath: state.uri.queryParameters['redirect'],
+              ),
+        ),
 
         GoRoute(
           path: '/login',

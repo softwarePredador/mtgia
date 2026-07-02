@@ -5,10 +5,35 @@ import '../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({super.key, this.redirectPath});
+
+  final String? redirectPath;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
+}
+
+@visibleForTesting
+String? normalizePostSplashRedirect(String? redirectPath) {
+  final trimmed = redirectPath?.trim();
+  if (trimmed == null || trimmed.isEmpty) {
+    return null;
+  }
+
+  final uri = Uri.tryParse(trimmed);
+  if (uri == null || uri.hasScheme || uri.hasAuthority) {
+    return null;
+  }
+
+  final path = uri.path;
+  if (!path.startsWith('/') ||
+      path == '/' ||
+      path == '/login' ||
+      path == '/register') {
+    return null;
+  }
+
+  return uri.toString();
 }
 
 class _SplashScreenState extends State<SplashScreen>
@@ -52,9 +77,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
 
-    // Navega para /login; o redirect do GoRouter redireciona
-    // automaticamente para /home se o usuário já estiver autenticado.
-    context.go('/login');
+    final postAuthRedirect = normalizePostSplashRedirect(widget.redirectPath);
+    context.go(
+      authProvider.isAuthenticated ? postAuthRedirect ?? '/home' : '/login',
+    );
   }
 
   @override
