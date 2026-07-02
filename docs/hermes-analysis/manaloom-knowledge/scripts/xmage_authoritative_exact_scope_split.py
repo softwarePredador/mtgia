@@ -5212,7 +5212,7 @@ def etb_library_pick_from_source(source: str) -> dict[str, Any] | str:
 
 
 def dies_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
-    text = oracle_text(metadata)
+    text = oracle_text_after_leading_static_keywords(metadata)
     match = re.match(
         r"^when [^,]+ dies, return (?P<another>another )?target (?P<phrase>.+?) "
         r"cards? from your graveyard to your hand\.?$",

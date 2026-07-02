@@ -180,9 +180,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG356 Exact Adapter Waves
+## PG283-PG357 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG356 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG357 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -258,6 +258,13 @@ patterns:
   optional static self keywords, and exact fixed "When/Whenever this creature
   dies, draw N cards" Oracle text ->
   `xmage_creature_dies_draw_cards_v1`
+- `recursion::xmage_graveyard_return_variant_review_v1` with
+  `ReturnFromGraveyardToHandTargetEffect + DiesSourceTriggeredAbility` on
+  creatures, optional static self combat keywords before the trigger, exact
+  "When this creature dies, return another target artifact card from your
+  graveyard to your hand" Oracle/source agreement, and focused runtime coverage
+  that excludes the source card itself ->
+  `xmage_creature_dies_return_graveyard_card_to_hand_v1`
 - `draw_engine::xmage_draw_card_variant_review_v1` with
   `DrawCardSourceControllerEffect + SimpleActivatedAbility` on permanents,
   exact fixed Oracle activated draw text, mana/tap/self-sacrifice costs only,
@@ -4682,6 +4689,69 @@ PG356 measured result:
   `proposal_count=0` over `7883` considered supported rows. The next cycle
   should continue from the fresh post-PG356 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1856`.
+
+PG357 evidence:
+
+- PG357 dies-recursion keyword-fix package:
+  `docs/hermes-analysis/master_optimizer_reports/pg357_xmage_dies_recursion_keyword_fix_wave_package.md`
+- PG357 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg357_xmage_dies_recursion_keyword_fix_wave_apply_evidence.md`
+- PG357 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg357_xmage_dies_recursion_keyword_fix_wave_pg_to_sqlite_sync.json`
+- PG357 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg357_xmage_dies_recursion_keyword_fix_wave_e2e_validation.md`
+- post-PG357 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg357_dies_recursion_keyword_fix_wave_docs_updated.md`
+- post-PG357 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg357_dies_recursion_keyword_fix_wave.md`
+- post-PG357 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg357_dies_recursion_keyword_fix_wave_docs_updated.md`
+- post-PG357 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg357_dies_recursion_keyword_fix_wave_docs_updated.md`
+- PG357 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg356_dies_recursion_keyword_fix.md`
+- post-PG357 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg357_dies_recursion_keyword_fix_wave_commander_legal.md`
+- post-PG357 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg357_supported_recheck.md`
+- post-PG357 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg357_dies_recursion_keyword_fix_wave_recheck.md`
+
+PG357 measured result:
+
+- PG357 promoted `1` exact creature dies graveyard-to-hand recursion rule for
+  `Junk Diver`.
+- The splitter now parses dies-recursion Oracle text after leading static combat
+  keywords such as `Flying`, matching the PostgreSQL Oracle template
+  `Flying\nWhen this creature dies...`.
+- Focused splitter/runtime/package suites report `382` passing unittest tests.
+- PostgreSQL precheck found `1/1` target card row, `0` expected rule rows before
+  apply, and `2` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `1/1` promoted row, `1/1` verified/auto row,
+  `1/1` matching Oracle hash row, and `2` backup shadow rows.
+- PG -> Hermes/SQLite metadata sync matched `5948` PostgreSQL card rows and
+  refreshed `5875` SQLite cache alias rows. Battle-rules sync loaded `7366`
+  PostgreSQL rows, inserted/updated `7161` SQLite rows, and exported `4940`
+  canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG357 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG357:
+  `battle_and_oracle_ready=2499`, `battle_family_mapper_required=30048`, and
+  `snapshot_has_verified_rule=3647`.
+- Global all-card authoritative queue after PG357:
+  `target_identity_count=27125`, `xmage_authoritative_source_count=26811`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26811`.
+- Running the exact splitter after PG357 on supported units returns
+  `proposal_count=0` over `7882` considered supported rows. The next cycle
+  should continue from the fresh post-PG357 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1855`.
 
 ## Why This Is The Best Current Flow
 

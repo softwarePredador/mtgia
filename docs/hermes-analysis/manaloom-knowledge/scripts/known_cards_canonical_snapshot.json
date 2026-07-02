@@ -16282,7 +16282,7 @@
   "Dark Banishing": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -16306,7 +16306,7 @@
   "Dark Betrayal": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -17138,7 +17138,7 @@
   "Deathmark": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": false,
     "sorcery": true,
     "target": "creature",
@@ -35285,7 +35285,7 @@
   "Hero's Demise": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -39514,14 +39514,35 @@
     "battle_rule_oracle_hash": "dce3d21ffa6e8ba4ab6bca93a3050611"
   },
   "Junk Diver": {
-    "cmc": 3.0,
-    "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:7028e0aba8409e45d6156211b87d6f8e"
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_return_graveyard_card_to_hand_v1",
+    "dies_recursion_count": 1,
+    "dies_recursion_destination": "hand",
+    "dies_recursion_exclude_self": true,
+    "dies_recursion_target": "artifact",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target_constraints": {
+      "card_types": [
+        "artifact"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2ee0fdb35d6fb7c6f4f48249325a9a09",
+    "battle_rule_oracle_hash": "11e0a94543cbb383b4164a978a60b0cf"
   },
   "Junktown": {
     "effect": "land",
@@ -74526,7 +74547,7 @@
   "Terror // Terror": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",
@@ -79178,7 +79199,7 @@
   "Ultimate Price": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
-    "effect": "remove_creature",
+    "effect": "remove_permanent",
     "instant": true,
     "sorcery": false,
     "target": "creature",

@@ -1,0 +1,1 @@
+{'database': '143.198.230.247:5433/halder', 'rows': [{'card_name': 'Junk Diver', 'normalized_name': 'junk diver', 'logical_rule_key': 'battle_rule_v1:2ee0fdb35d6fb7c6f4f48249325a9a09', 'promoted_rule_rows': 1, 'promoted_verified_auto_rows': 1, 'promoted_oracle_hash_rows': 1, 'backup_rows': 2}]}

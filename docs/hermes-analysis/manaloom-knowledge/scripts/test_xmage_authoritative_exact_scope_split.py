@@ -6232,16 +6232,17 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             split.RECURSION_UNIT,
             effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
             ability_kind="triggered",
-            ability_classes=["DiesSourceTriggeredAbility"],
+            ability_classes=["DiesSourceTriggeredAbility", "FlyingAbility"],
             xmage_signals=["targeting", "triggered_ability"],
         )
         proposal, reason = split.split_row(
             row,
             metadata(
-                name="Myr Retriever",
+                name="Junk Diver",
                 type_line="Artifact Creature - Myr",
                 oracle_text=(
-                    "When Myr Retriever dies, return another target artifact card "
+                    "Flying\n"
+                    "When this creature dies, return another target artifact card "
                     "from your graveyard to your hand."
                 ),
             ),
@@ -6259,6 +6260,8 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["dies_recursion_count"], 1)
         self.assertEqual(effect["dies_recursion_destination"], "hand")
         self.assertTrue(effect["dies_recursion_exclude_self"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
         self.assertEqual(
             effect["target_constraints"],
             {"zone": "graveyard", "controller": "self", "card_types": ["artifact"]},
