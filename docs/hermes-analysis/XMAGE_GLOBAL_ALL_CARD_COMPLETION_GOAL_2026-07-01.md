@@ -83,6 +83,25 @@ Post-PG352 counts:
 - XMage authoritative adapter required: `26852`
 - adapter work-unit keys: `11429`
 
+## Latest Goal Recheck - 2026-07-02
+
+Current thread goal text still mentions the older post-PG284 baseline. That is
+historical only. The active execution baseline is the post-PG352 queue above.
+
+Fresh alignment evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_goal_general_recheck.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_goal_general_recheck.md`
+  passed with `35/35` checks.
+
+The next executable work starts from
+`docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg352_graveyard_shuffle_to_library_spell_wave_commander_legal.json`.
+The first priority is still
+`recursion::xmage_graveyard_return_variant_review_v1` with `1862` remaining
+identities, but that broad work unit must be split by exact XMage
+effect/ability/source signatures before any PostgreSQL promotion.
+
 ## Completion Criteria
 
 Stop only when a freshly regenerated global queue and readiness report prove all
