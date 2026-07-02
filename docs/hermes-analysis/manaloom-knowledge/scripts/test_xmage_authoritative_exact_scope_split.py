@@ -4907,6 +4907,144 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "dies_recursion_optional_cost_not_supported")
 
+    def test_recursion_spell_with_flashback_maps_to_hand_and_preserves_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="one_shot",
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Morgue Theft",
+                type_line="Sorcery",
+                oracle_text="Return target creature card from your graveyard to your hand. Flashback {4}{B}",
+            ),
+            source_text="""
+                // Return target creature card from your graveyard to your hand.
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE));
+                // Flashback {4}{B}
+                this.addAbility(new FlashbackAbility(this, new ManaCostsImpl<>("{4}{B}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["flashback_cost"], "{4}{B}")
+        self.assertEqual(effect["flashback_status"], "runtime_executor_v1")
+        self.assertEqual(effect["xmage_auxiliary_ability_classes"], ["FlashbackAbility"])
+
+    def test_recursion_spell_with_cycling_maps_to_hand_and_preserves_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="one_shot",
+            ability_classes=["CyclingAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Wander in Death",
+                type_line="Sorcery",
+                oracle_text="Return up to two target creature cards from your graveyard to your hand. Cycling {2}",
+            ),
+            source_text="""
+                // Return up to two target creature cards from your graveyard to your hand.
+                getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    0, 2, StaticFilters.FILTER_CARD_CREATURES_YOUR_GRAVEYARD));
+                getSpellAbility().addEffect(new ReturnFromGraveyardToHandTargetEffect());
+                // Cycling {2}
+                this.addAbility(new CyclingAbility(new GenericManaCost(2)));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["count"], 2)
+        self.assertTrue(effect["up_to_count"])
+        self.assertEqual(effect["cycling_cost"], "{2}")
+        self.assertEqual(effect["cycling_status"], "runtime_executor_v1")
+
+    def test_recursion_spell_with_cycling_maps_to_battlefield_and_preserves_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="one_shot",
+            ability_classes=["CyclingAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Unearth",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card with mana value 3 or less from your graveyard "
+                    "to the battlefield. Cycling {2}"
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard(
+                    "creature card with mana value 3 or less from your graveyard");
+                static {
+                    filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 4));
+                }
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter));
+                this.addAbility(new CyclingAbility(new ManaCostsImpl<>("{2}")));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.RECURSION_BATTLEFIELD_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertEqual(effect["recursion_mana_value_max"], 3)
+        self.assertEqual(effect["cycling_cost"], "{2}")
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "graveyard", "controller": "self", "card_types": ["creature"], "mana_value_max": 3},
+        )
+
+    def test_recursion_spell_blocks_flashback_non_mana_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="one_shot",
+            ability_classes=["FlashbackAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dread Return",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Return target creature card from your graveyard to the battlefield. "
+                    "Flashback-Sacrifice three creatures."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(
+                    StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                this.addAbility(new FlashbackAbility(this, new SacrificeTargetCost(3, filter)));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "recursion_auxiliary_flashback_cost_not_supported")
+
     def test_static_keyword_creature_blocks_protection_until_color_scope_exists(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",

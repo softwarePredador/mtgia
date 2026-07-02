@@ -93,6 +93,11 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "spell_cast_draw_source_zone",
     "spell_cast_draw_mana_value_min",
     "spell_cast_draw_optional",
+    "flashback_cost",
+    "flashback_status",
+    "cycling_cost",
+    "cycling_status",
+    "xmage_auxiliary_ability_classes",
 )
 
 

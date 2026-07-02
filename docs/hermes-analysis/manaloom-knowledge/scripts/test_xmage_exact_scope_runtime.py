@@ -5228,6 +5228,133 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_flashback_recursion_spell_resolves_from_graveyard_and_exiles(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(4)
+        active.mana_pool.add("black", 1)
+        target = {"name": "Graveyard Bear", "type_line": "Creature - Bear", "cmc": 2}
+        source = {
+            "name": "Morgue Theft",
+            "type_line": "Sorcery",
+            "cmc": 2,
+            "flashback_cost": "{4}{B}",
+        }
+        self.battle.HANDCRAFTED_KNOWN_CARD_RULES["Morgue Theft"] = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 1,
+            "destination": "hand",
+            "target_controller": "self",
+            "flashback_cost": "{4}{B}",
+            "flashback_status": "runtime_executor_v1",
+            "_rule_logical_key": "battle_rule_v1:fixture_morgue_theft",
+        }
+        self.battle.HANDCRAFTED_KNOWN_CARDS.add("Morgue Theft")
+        active.graveyard.extend([target, source])
+        stack = self.battle.Stack()
+
+        cast = self.battle.cast_flashback_spell_from_graveyard(
+            active,
+            source,
+            [opponent],
+            [active, opponent],
+            turn=24,
+            phase="precombat_main",
+            stack=stack,
+            rng=random.Random(24),
+        )
+
+        self.assertTrue(cast)
+        self.assertNotIn(source, active.graveyard)
+        self.assertEqual(len(stack.items), 1)
+
+        self.battle.priority_round(
+            active,
+            [active, opponent],
+            stack,
+            turn=24,
+            rng=random.Random(25),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(stack.empty())
+        self.assertEqual([card["name"] for card in active.hand], ["Graveyard Bear"])
+        self.assertEqual(active.graveyard, [])
+        self.assertEqual([card["name"] for card in active.exile], ["Morgue Theft"])
+        self.assertTrue(
+            any(
+                event == "flashback_cast"
+                and data.get("card") == "Morgue Theft"
+                and data.get("flashback_cost") == "{4}{B}"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Morgue Theft"
+                and data.get("destination") == "hand"
+                and data.get("recovered") == ["Graveyard Bear"]
+                for event, data in self.events
+            )
+        )
+
+    def test_cycling_recursion_spell_pays_cost_draws_and_moves_to_graveyard(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Fresh Card", "type_line": "Instant", "cmc": 1}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add_generic(2)
+        source = {
+            "name": "Wander in Death",
+            "type_line": "Sorcery",
+            "cmc": 3,
+        }
+        self.battle.HANDCRAFTED_KNOWN_CARD_RULES["Wander in Death"] = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+            "target": "creature",
+            "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+            "count": 2,
+            "up_to_count": True,
+            "destination": "hand",
+            "target_controller": "self",
+            "cycling_cost": "{2}",
+            "cycling_status": "runtime_executor_v1",
+            "_rule_logical_key": "battle_rule_v1:fixture_wander_in_death",
+        }
+        self.battle.HANDCRAFTED_KNOWN_CARDS.add("Wander in Death")
+        active.hand.append(source)
+
+        activated = self.battle.activate_hand_cycling(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=25,
+            rng=random.Random(26),
+            phase="precombat_main",
+            stack=self.battle.Stack(),
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wander in Death"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "cycling_activated"
+                and data.get("card") == "Wander in Death"
+                and data.get("cycling_cost") == "{2}"
+                and data.get("drawn") == ["Fresh Card"]
+                for event, data in self.events
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

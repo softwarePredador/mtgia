@@ -45035,6 +45035,36 @@
     "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
     "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
   },
+  "Morgue Theft": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "flashback_cost": "{4}{B}",
+    "flashback_status": "runtime_executor_v1",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:7ef10090331d934746bc0b9c4c3a2deb",
+    "battle_rule_oracle_hash": "3482d9adceeb393bac3d82c542d2c3ea"
+  },
   "Moriok Scavenger": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
@@ -45914,6 +45944,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:91908863a3c983e6d30a2ff99cf41fdb",
     "battle_rule_oracle_hash": "05eb27f7618511c39512cf5a6d93231d"
+  },
+  "Mystic Retrieval": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 1,
+    "destination": "hand",
+    "effect": "recursion",
+    "flashback_cost": "{2}{R}",
+    "flashback_status": "runtime_executor_v1",
+    "instant": false,
+    "sorcery": true,
+    "target": "instant_or_sorcery",
+    "target_constraints": {
+      "card_types": [
+        "instant",
+        "sorcery"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f10e702e2b0f82cc8f5b443aef4060bb",
+    "battle_rule_oracle_hash": "cdfb79bdce61ab9ea33e9f56c12b830e"
   },
   "Mystic Sanctuary": {
     "effect": "land",
@@ -74730,6 +74791,38 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:e2f2aad6cdf9033c0bd320ff7ca47787"
   },
+  "Unburial Rites": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "flashback_cost": "{3}{W}",
+    "flashback_status": "runtime_executor_v1",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_auxiliary_ability_classes": [
+      "FlashbackAbility"
+    ],
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3fcbbe9325bf4d5f05deabc46c9e6e5a",
+    "battle_rule_oracle_hash": "5c5464700efd3b715041490ae1e569a9"
+  },
   "Unbury": {
     "battle_model_scope": "xmage_return_choose_one_graveyard_cards_to_hand_spell_v1",
     "destination": "hand",
@@ -75017,14 +75110,38 @@
     "battle_rule_logical_key": "battle_rule_v1:fb9b2b633a4842d42599c293e0de4d68"
   },
   "Unearth": {
-    "cmc": 1.0,
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "cycling_cost": "{2}",
+    "cycling_status": "runtime_executor_v1",
+    "destination": "battlefield",
     "effect": "recursion",
-    "battle_rule_source": "generated",
-    "battle_rule_review_status": "needs_review",
-    "battle_rule_execution_status": "review_only",
-    "battle_rule_confidence": 0.55,
-    "battle_rule_version": 1,
-    "battle_rule_logical_key": "battle_rule_v1:e055849cd43b61d89274f222f0a1efcd"
+    "instant": false,
+    "recursion_mana_value_max": 3,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "mana_value_max": 3,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_auxiliary_ability_classes": [
+      "CyclingAbility"
+    ],
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:efd07ef68567702f9ddf63eaceaea872",
+    "battle_rule_oracle_hash": "c2d298f74835191e93848bb784b2985c"
   },
   "Unending Whisper": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -78384,6 +78501,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ab583f78c19a22031bb99e0ac2d0d131",
     "battle_rule_oracle_hash": "71de2615587654002b225714c5130a68"
+  },
+  "Wander in Death": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
+    "count": 2,
+    "cycling_cost": "{2}",
+    "cycling_status": "runtime_executor_v1",
+    "destination": "hand",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "up_to_count": true,
+    "xmage_auxiliary_ability_classes": [
+      "CyclingAbility"
+    ],
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:76aa1102386b493fec63d732eba4e344",
+    "battle_rule_oracle_hash": "c2b6b8df32f9cb2987c9b81a14629e97"
   },
   "Wander Off": {
     "battle_model_scope": "xmage_exile_target_spell_v1",

@@ -184,6 +184,11 @@ SPELL_COMPLEXITY_TOKENS = {
     "whenever ",
 }
 
+AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES = {
+    "FlashbackAbility",
+    "CyclingAbility",
+}
+
 SAFE_MANA_ABILITY_CLASSES = {
     "SimpleManaAbility",
     "AnyColorManaAbility",
@@ -1228,6 +1233,137 @@ def source_supports_battlefield_recursion_target(source_text: str, target_gravey
     if controller in {"any", "any_player"}:
         return "TargetCardInGraveyard" in text and "TargetCardInYourGraveyard" not in text
     return False
+
+
+def source_supports_battlefield_recursion_target_type(source_text: str, target_type: str) -> bool:
+    text = str(source_text or "")
+    lowered = text.lower()
+    target = str(target_type or "")
+    if target == "creature":
+        return (
+            "FILTER_CARD_CREATURE" in text
+            or "FilterCreatureCard" in text
+            or "creature card" in lowered
+        )
+    if target == "artifact":
+        return "FILTER_CARD_ARTIFACT" in text or "FilterArtifactCard" in text or "artifact card" in lowered
+    if target == "permanent":
+        return "FilterPermanentCard" in text or "permanent card" in lowered
+    return False
+
+
+def source_supports_battlefield_recursion_mana_value(source_text: str, mana_value_max: int | None) -> bool:
+    if mana_value_max is None:
+        return True
+    expected_exclusive = int(mana_value_max) + 1
+    pattern = (
+        r"ManaValuePredicate\s*\(\s*ComparisonType\.FEWER_THAN\s*,\s*"
+        rf"{expected_exclusive}\s*\)"
+    )
+    return bool(re.search(pattern, source_text or ""))
+
+
+def recursion_effect_text_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    if not text:
+        return None
+    for sentence in re.split(r"(?<=\.)\s+", text):
+        candidate = sentence.strip()
+        if not candidate:
+            continue
+        if not candidate.endswith("."):
+            candidate = candidate + "."
+        if (
+            candidate.startswith(("return ", "put "))
+            and "from your graveyard" in candidate
+            and "flashback" not in candidate
+            and "cycling" not in candidate
+        ):
+            return candidate
+    return None
+
+
+def auxiliary_cost_from_oracle(metadata: dict[str, Any], keyword: str) -> str | None:
+    match = re.search(
+        rf"\b{re.escape(keyword.lower())}\s+(?P<cost>(?:\{{[0-9wubrg]+\}})+)",
+        oracle_text(metadata),
+    )
+    if not match:
+        return None
+    cost = canonical_mana_cost_text(match.group("cost"))
+    return cost if parse_mana_cost_text(cost) is not None else None
+
+
+def parse_flashback_cost_from_source(source_text: str) -> str | None:
+    text = str(source_text or "")
+    match = re.search(
+        r"new\s+FlashbackAbility\s*\(\s*this\s*,\s*new\s+ManaCostsImpl<[^>]*>\s*\(\s*"
+        r'"(?P<cost>[^"]+)"\s*\)\s*\)',
+        text,
+        re.S,
+    )
+    if not match:
+        return None
+    cost = canonical_mana_cost_text(match.group("cost"))
+    return cost if parse_mana_cost_text(cost) is not None else None
+
+
+def parse_cycling_cost_from_source(source_text: str) -> str | None:
+    text = str(source_text or "")
+    mana_match = re.search(
+        r"new\s+CyclingAbility\s*\(\s*new\s+ManaCostsImpl<[^>]*>\s*\(\s*"
+        r'"(?P<cost>[^"]+)"\s*\)\s*\)',
+        text,
+        re.S,
+    )
+    if mana_match:
+        cost = canonical_mana_cost_text(mana_match.group("cost"))
+        return cost if parse_mana_cost_text(cost) is not None else None
+    generic_match = re.search(
+        r"new\s+CyclingAbility\s*\(\s*new\s+GenericManaCost\s*\(\s*(?P<generic>\d+)\s*\)\s*\)",
+        text,
+        re.S,
+    )
+    if generic_match:
+        return "{" + generic_match.group("generic") + "}"
+    return None
+
+
+def auxiliary_recursion_spell_fields_from_source(
+    metadata: dict[str, Any],
+    source_text: str,
+    abilities: set[str],
+) -> dict[str, Any] | str:
+    if not is_spell(metadata):
+        return "recursion_auxiliary_not_spell"
+    if not abilities:
+        return {}
+    unsupported = abilities - AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES
+    if unsupported:
+        return "recursion_auxiliary_ability_class_not_supported"
+
+    fields: dict[str, Any] = {
+        "xmage_auxiliary_ability_classes": sorted(abilities),
+    }
+    if "FlashbackAbility" in abilities:
+        source_cost = parse_flashback_cost_from_source(source_text)
+        oracle_cost = auxiliary_cost_from_oracle(metadata, "flashback")
+        if not source_cost or not oracle_cost:
+            return "recursion_auxiliary_flashback_cost_not_supported"
+        if source_cost != oracle_cost:
+            return "recursion_auxiliary_flashback_cost_mismatch"
+        fields["flashback_cost"] = source_cost
+        fields["flashback_status"] = "runtime_executor_v1"
+    if "CyclingAbility" in abilities:
+        source_cost = parse_cycling_cost_from_source(source_text)
+        oracle_cost = auxiliary_cost_from_oracle(metadata, "cycling")
+        if not source_cost or not oracle_cost:
+            return "recursion_auxiliary_cycling_cost_not_supported"
+        if source_cost != oracle_cost:
+            return "recursion_auxiliary_cycling_cost_mismatch"
+        fields["cycling_cost"] = source_cost
+        fields["cycling_status"] = "runtime_executor_v1"
+    return fields
 
 
 def graveyard_to_library_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -6516,6 +6652,62 @@ def split_row(
                 effect_json,
                 family_id="xmage_graveyard_to_battlefield_with_counter_spell",
             ), "selected_exact_scope"
+        auxiliary_recursion_abilities = ability_classes(row)
+        auxiliary_recursion_spell = bool(auxiliary_recursion_abilities) and (
+            auxiliary_recursion_abilities <= AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES
+        )
+        if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"} and auxiliary_recursion_spell:
+            effect_text = recursion_effect_text_from_oracle(metadata)
+            if effect_text is None:
+                return None, "recursion_auxiliary_primary_oracle_not_simple"
+            target = recursion_to_battlefield_from_oracle({**metadata, "oracle_text": effect_text})
+            if target is None:
+                return None, "recursion_auxiliary_battlefield_target_not_supported"
+            aux_fields = auxiliary_recursion_spell_fields_from_source(
+                metadata,
+                source_text,
+                auxiliary_recursion_abilities,
+            )
+            if isinstance(aux_fields, str):
+                return None, aux_fields
+            target_type = str(target["target"])
+            count = int(target["count"])
+            target_graveyard_controller = str(target.get("target_graveyard_controller") or "self")
+            if not source_supports_battlefield_recursion_target(source_text, target_graveyard_controller):
+                return None, "recursion_auxiliary_battlefield_source_target_not_supported"
+            if not source_supports_battlefield_recursion_target_type(source_text, target_type):
+                return None, "recursion_auxiliary_battlefield_source_target_not_supported"
+            mana_value_max = target.get("mana_value_max")
+            if not source_supports_battlefield_recursion_mana_value(source_text, mana_value_max):
+                return None, "recursion_auxiliary_battlefield_source_mana_value_not_supported"
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_BATTLEFIELD_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    controller=target_graveyard_controller,
+                    mana_value_max=mana_value_max,
+                ),
+                "count": count,
+                "destination": "battlefield",
+                "target_controller": target_graveyard_controller,
+                "target_graveyard_controller": target_graveyard_controller,
+                "battlefield_controller": str(target.get("battlefield_controller") or "self"),
+                "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+                **aux_fields,
+                **flags,
+            }
+            if mana_value_max is not None:
+                effect_json["recursion_mana_value_max"] = mana_value_max
+            if target.get("enters_tapped"):
+                effect_json["enters_tapped"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_battlefield_auxiliary_spell",
+            ), "selected_exact_scope"
         if classes == {"ReturnFromGraveyardToBattlefieldTargetEffect"}:
             if ability_classes(row):
                 return None, "recursion_battlefield_ability_class_not_simple"
@@ -6593,6 +6785,53 @@ def split_row(
             ), "selected_exact_scope"
         if classes != {"ReturnFromGraveyardToHandTargetEffect"}:
             return None, "recursion_effect_class_not_pure"
+        if auxiliary_recursion_spell:
+            effect_text = recursion_effect_text_from_oracle(metadata)
+            if effect_text is None:
+                return None, "recursion_auxiliary_primary_oracle_not_simple"
+            target = recursion_to_hand_from_text(effect_text)
+            if target is None:
+                return None, "recursion_auxiliary_target_not_supported"
+            source_target = activated_recursion_to_hand_target_from_source(source_text)
+            if isinstance(source_target, str):
+                return None, "recursion_auxiliary_source_target_not_supported"
+            target_type, count, up_to = target
+            source_target_type, source_count, source_up_to = source_target
+            if source_target_type != target_type:
+                return None, "recursion_auxiliary_source_oracle_target_mismatch"
+            if int(source_count) != int(count):
+                return None, "recursion_auxiliary_source_oracle_count_mismatch"
+            if bool(source_up_to) != bool(up_to):
+                return None, "recursion_auxiliary_source_oracle_count_mismatch"
+            if len(re.findall(r"ReturnFromGraveyardToHandTargetEffect\s*\(", source_text or "")) != 1:
+                return None, "recursion_auxiliary_source_effect_count_not_supported"
+            aux_fields = auxiliary_recursion_spell_fields_from_source(
+                metadata,
+                source_text,
+                auxiliary_recursion_abilities,
+            )
+            if isinstance(aux_fields, str):
+                return None, aux_fields
+            effect_json = {
+                "effect": "recursion",
+                "battle_model_scope": RECURSION_SCOPE,
+                "target": target_type,
+                "target_constraints": recursion_target_constraints_for(target_type),
+                "count": count,
+                "destination": "hand",
+                "target_controller": "self",
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                **aux_fields,
+                **flags,
+            }
+            if up_to:
+                effect_json["up_to_count"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_graveyard_to_hand_auxiliary_spell",
+            ), "selected_exact_scope"
         if ability_classes(row):
             return None, "recursion_ability_class_not_simple"
         choose_components = recursion_choose_one_or_both_from_text(oracle_text(metadata))
