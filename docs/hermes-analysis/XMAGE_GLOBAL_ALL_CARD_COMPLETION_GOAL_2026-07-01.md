@@ -187,8 +187,36 @@ Next executable cycle:
    blocker counts and move to the next lane without creating manual per-card
    rules.
 
+PG373 starting hypothesis:
+
+1. Treat `draw_cards::xmage_draw_card_variant_review_v1` composites as the next
+   runtime-adapter proving ground, because the post-PG372 splitter blocks
+   `draw_effect_class_not_pure` for `544` rows and the queue has no remaining
+   exact proposals.
+2. Split the lane by XMage effect signature before any PostgreSQL package.
+   Current measured subpatterns in the post-PG372 queue include:
+   `DiscardControllerEffect + DrawCardSourceControllerEffect` (`13` rows),
+   `DestroyTargetEffect + DrawCardSourceControllerEffect` (`12` rows),
+   `CounterTargetEffect + DrawCardSourceControllerEffect` (`11` rows),
+   `DamageTargetEffect + DrawCardSourceControllerEffect` (`10` rows),
+   `DrawCardSourceControllerEffect + ScryEffect` (`8` rows), and
+   `DrawCardSourceControllerEffect + ReturnToHandTargetEffect` (`7` rows).
+3. Promote only exact fixed subsets from those signatures. Variable `X`, modal
+   spells, dynamic card counts, optional discard clauses, unsupported target
+   restrictions, and conditionally-derived amounts remain blocked until their
+   own mapper/runtime subpattern exists.
+4. The first PG373 candidate should be the highest-confidence subpattern whose
+   component effects are already supported by `composite_resolution` or can be
+   added with a focused runtime test in the same cycle. If that fails, preserve
+   blocker evidence and try the next measured subpattern; do not hand-write
+   individual card rules.
+
 Fresh alignment evidence:
 
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_goal_next_step_recheck.md`
+  passed with `26/26` checks after the PG373 starting hypothesis update.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_goal_next_step_recheck.md`
+  passed after the PG373 starting hypothesis update.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_goal_general_recheck.md`
   passed with `26/26` checks.
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_goal_general_recheck.md`
