@@ -178,18 +178,18 @@ to build this queue. Current evidence:
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27057`
-- XMage authoritative source resolved: `26743`
+- target all-card battle-gap identities: `27050`
+- XMage authoritative source resolved: `26736`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26743`
+- XMage authoritative adapter required: `26736`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26743` identities, card semantics are accepted from XMage; work is now
+- For `26736` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -208,9 +208,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG372 Exact Adapter Waves
+## PG283-PG373 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG372 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG373 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -246,6 +246,12 @@ patterns:
   creature gets X/Y until end of turn. Draw a card." Oracle/source text, and
   composite runtime resolution without double-finishing the spell ->
   `xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1`
+- `draw_cards::xmage_draw_card_variant_review_v1` with
+  `DestroyTargetEffect + DrawCardSourceControllerEffect`, exact fixed
+  "Destroy target ... Draw a card." Oracle/source text, a supported single
+  battlefield target constraint, and composite runtime resolution without
+  double-finishing the spell ->
+  `xmage_destroy_target_and_draw_card_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->

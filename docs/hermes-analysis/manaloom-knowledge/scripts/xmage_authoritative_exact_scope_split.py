@@ -105,6 +105,7 @@ DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
+DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
@@ -733,6 +734,47 @@ def simple_destroy_gain_life_from_oracle(metadata: dict[str, Any]) -> tuple[str,
         if match:
             return target, int(match.group(1))
     return None
+
+
+def fixed_destroy_draw_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^(destroy target .+?)(\. it can't be regenerated)?\. (?:then )?draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}{match.group(2) or ''}."
+    parsed = destroy_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, 1
+
+
+def fixed_destroy_draw_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S))
+    if len(destroy_matches) != 1:
+        return None
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return None
+    if destroy_matches[0].start() > draw_matches[0].start():
+        return None
+    return draw_count
 
 
 def exile_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
@@ -6558,6 +6600,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "fixed controller life-gain plus draw-card spell"
     elif scope == BOOST_DRAW_SCOPE:
         scope_kind = "fixed target-creature boost plus draw-card spell"
+    elif scope == DESTROY_DRAW_SCOPE:
+        scope_kind = "fixed destroy-target plus draw-card spell"
     elif scope == BOOST_KEYWORD_SCOPE:
         scope_kind = "fixed target-creature boost plus until-end-of-turn keyword spell"
     elif scope == BOOST_CONTROLLED_SPELL_SCOPE:
@@ -8876,6 +8920,58 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_boost_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DestroyTargetEffect", "DrawCardSourceControllerEffect"}:
+            if ability_classes(row):
+                return None, "destroy_draw_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "destroy_draw_oracle_not_simple"
+            oracle_destroy = fixed_destroy_draw_from_oracle(metadata)
+            if oracle_destroy is None:
+                return None, "destroy_draw_oracle_not_exact_fixed"
+            source_draw_count = fixed_destroy_draw_from_source(source_text)
+            if source_draw_count is None:
+                return None, "destroy_draw_source_not_fixed"
+            effect, target_type, draw_count = oracle_destroy
+            if source_draw_count != draw_count:
+                return None, "destroy_draw_source_oracle_mismatch"
+            if not source_matches_target_constraint(source_text, target_type):
+                return None, "destroy_draw_target_source_mismatch"
+            target_base = restricted_target_base(target_type)
+            destroy_component = {
+                "effect": effect,
+                "battle_model_scope": DESTROY_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DestroyTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DESTROY_DRAW_SCOPE,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target_type),
+                "destination": "graveyard",
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [destroy_component, draw_component],
+                "xmage_effect_classes": ["DestroyTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_destroy_target_draw_card_spell",
             ), "selected_exact_scope"
 
         if classes != {"DrawCardSourceControllerEffect"}:

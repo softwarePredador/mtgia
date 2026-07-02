@@ -1986,6 +1986,70 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
 
+    def test_fixed_destroy_draw_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DestroyTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target nonblack creature. It can't be regenerated. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(StaticFilters.FILTER_CREATURE_NON_BLACK));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "exclude_colors": ["B"]})
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["remove_creature", "draw_cards"],
+        )
+        self.assertEqual(effect["_composite_rule_components"][0]["destination"], "graveyard")
+
+    def test_fixed_destroy_draw_spell_blocks_dynamic_source_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DestroyTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_draw_source_not_fixed")
+
+    def test_fixed_destroy_draw_spell_blocks_dynamic_oracle_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DestroyTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature. Draw a card for each creature that died this turn."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "destroy_draw_oracle_not_exact_fixed")
+
     def test_damage_spell_with_variable_x_stays_blocked(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
         proposal, reason = split.split_row(
