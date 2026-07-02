@@ -4,8 +4,12 @@ set -euo pipefail
 SERVER_BIN_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 REPO_ROOT="${MANALOOM_REPO:-$(CDPATH= cd -- "$SERVER_BIN_DIR/../.." && pwd)}"
 SCRIPT_DIR="${MANALOOM_HERMES_SCRIPT_DIR:-$REPO_ROOT/docs/hermes-analysis/manaloom-knowledge/scripts}"
-REPORT_DIR="${MANALOOM_MASTER_OPTIMIZER_REPORT_DIR:-$REPO_ROOT/docs/hermes-analysis/master_optimizer_reports}"
 ARTIFACT_DIR="${MANALOOM_MASTER_OPTIMIZER_ARTIFACT_DIR:-$REPO_ROOT/server/test/artifacts/master_optimizer_preflight}"
+DEFAULT_REPORT_DIR="$REPO_ROOT/docs/hermes-analysis/master_optimizer_reports"
+if [[ -d /data/manaloom-ops ]]; then
+  DEFAULT_REPORT_DIR="$ARTIFACT_DIR/master_optimizer_reports"
+fi
+REPORT_DIR="${MANALOOM_MASTER_OPTIMIZER_REPORT_DIR:-$DEFAULT_REPORT_DIR}"
 SECRET_ENV="${MANALOOM_POSTGRES_ENV:-${MTGIA_ENV_FILE:-$REPO_ROOT/server/.env}}"
 SQLITE_DB="${HERMES_KNOWLEDGE_DB:-$SCRIPT_DIR/knowledge.db}"
 DECK_ID="${MANALOOM_OPTIMIZER_DECK_ID:-6}"

@@ -1,0 +1,22 @@
+.git/
+.github/
+.credentials.env
+.env
+server/.env
+*.log
+*.out
+
+app/.dart_tool/
+app/build/
+server/.dart_tool/
+server/build/
+web-public/.next/
+web-public/node_modules/
+
+# Root-context ops builds need the Hermes scripts, but not generated history.
+docs/hermes-analysis/master_optimizer_reports/
+docs/hermes-analysis/master_optimizer_replays/
+docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db
+docs/hermes-analysis/manaloom-knowledge/scripts/knowledge-backups/
+
+archive_docs/
