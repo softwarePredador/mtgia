@@ -96,6 +96,49 @@ Post-PG356 counts:
 Current thread goal text still mentions the older post-PG284 baseline. That is
 historical only. The active execution baseline is the post-PG356 queue above.
 
+## General Goal Contract - 2026-07-02
+
+Treat this file as the active stop contract for the all-card work. The Codex
+thread goal may contain older counts, but execution stops only when a freshly
+generated queue proves the terminal stop definition below.
+
+Current post-PG356 control numbers:
+
+- target battle-gap identities: `27126`
+- XMage-resolved authoritative source identities: `26812`
+- local XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26812`
+- adapter work-unit keys: `11429`
+
+Operational goal:
+
+1. Continue applying exact XMage-derived subpatterns until
+   `xmage_authoritative_adapter_required_count = 0`.
+2. Keep `xmage_authoritative_parser_gap_count = 0`; any new parser gap blocks
+   completion until fixed or classified with evidence.
+3. Close the `314` missing-source exceptions in a separate official/Forge/manual
+   lane; do not mix them into the XMage-resolved adapter queue.
+4. Do not switch scope back to Lorehold, deck `607`, saved decks, or the current
+   registered decks. Those are QA seeds only.
+5. Every promoted rule must have runtime support, focused tests, PostgreSQL
+   precheck/apply/postcheck evidence, Hermes/SQLite sync, canonical snapshot
+   visibility, audit pass, and commit/push evidence.
+
+Next executable cycle:
+
+1. Start from
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg356_etb_graveyard_to_library_extended_wave_commander_legal.json`.
+2. Re-split the top broad unit
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1856` identities)
+   by exact XMage effect, ability, target, cost, zone movement, and Oracle text.
+3. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
+   implemented or implemented in the same cycle.
+4. If recursion produces no safe batch, record blocker counts and move to the
+   next largest work units in order: draw engine, protection, direct damage,
+   counters, life gain, draw cards, destroy removal, tutor, then targeted
+   counters.
+
 Fresh alignment evidence:
 
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_goal_general_recheck.md`
