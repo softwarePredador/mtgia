@@ -96,7 +96,9 @@ Future<void> showDeckCardEditDialog({
                         if (snapshot.hasError) {
                           return Text(
                             'Não foi possível carregar as edições agora. Tente novamente.',
-                            style: TextStyle(color: theme.colorScheme.error),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.error,
+                            ),
                           );
                         }
 
@@ -196,7 +198,9 @@ Future<void> showDeckCardEditDialog({
                       const SizedBox(height: 12),
                       Text(
                         error!,
-                        style: TextStyle(color: theme.colorScheme.error),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppTheme.error,
+                        ),
                       ),
                     ],
                   ],

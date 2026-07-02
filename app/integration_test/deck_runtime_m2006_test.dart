@@ -278,6 +278,24 @@ Future<void> _openCreatedDeckDetails(
   await tester.pump();
 }
 
+Future<void> _openImportListDialogFromDetailsMenu(WidgetTester tester) async {
+  await tester.tap(find.byKey(const Key('deck-details-menu')));
+  await tester.pump(const Duration(milliseconds: 500));
+
+  final importMenuEntry = find.byKey(
+    const Key('deck-details-menu-import-list'),
+  );
+  await pumpUntilFound(tester, importMenuEntry, attempts: 30);
+
+  final importMenuText = find.descendant(
+    of: importMenuEntry,
+    matching: find.text('Colar lista de cartas'),
+  );
+  await pumpUntilFound(tester, importMenuText, attempts: 30);
+  await tester.tap(importMenuText.last);
+  await tester.pump();
+}
+
 Future<String> _findDeckIdByName(String deckName) async {
   final response = await ApiClient().get('/decks');
   expect(response.statusCode, 200);
@@ -446,16 +464,7 @@ void main() {
       );
       await _capture(binding, tester, '05_empty_deck_details');
 
-      await tester.tap(find.byKey(const Key('deck-details-menu')));
-      await tester.pump();
-
-      final importMenuEntry = find.byKey(
-        const Key('deck-details-menu-import-list'),
-      );
-      await pumpUntilFound(tester, importMenuEntry, attempts: 30);
-      await tester.tap(importMenuEntry);
-      await tester.pump();
-
+      await _openImportListDialogFromDetailsMenu(tester);
       final importDialogTitle = find.text('Importar Lista');
       await pumpUntilFound(tester, importDialogTitle, attempts: 30);
 
@@ -483,15 +492,7 @@ void main() {
       );
       await _capture(binding, tester, '07_commander_imported');
 
-      await tester.tap(find.byKey(const Key('deck-details-menu')));
-      await tester.pump();
-      final noCommanderImportMenuEntry = find.byKey(
-        const Key('deck-details-menu-import-list'),
-      );
-      await pumpUntilFound(tester, noCommanderImportMenuEntry, attempts: 30);
-      await tester.tap(noCommanderImportMenuEntry);
-      await tester.pump();
-
+      await _openImportListDialogFromDetailsMenu(tester);
       await pumpUntilFound(tester, importDialogTitle, attempts: 30);
       await tester.tap(
         find.byKey(const Key('deck-import-list-dialog-replace-switch')),
@@ -547,8 +548,12 @@ void main() {
       await pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
       final applyCurrentStrategy = find.byKey(
         const Key('optimize-apply-current-strategy-button'),
+        skipOffstage: false,
       );
-      final strategyCards = find.byType(StrategyOptionCard);
+      final strategyCards = find.byType(
+        StrategyOptionCard,
+        skipOffstage: false,
+      );
       await pumpUntilAnyFound(tester, [
         strategyCards,
         applyCurrentStrategy,
@@ -579,13 +584,14 @@ void main() {
         applyCurrentStrategy,
       ], attempts: 240);
 
-      if (applyCurrentStrategy.evaluate().isNotEmpty) {
+      if (finderExists(applyCurrentStrategy)) {
         await tester.ensureVisible(applyCurrentStrategy.first);
+        await tester.pump();
         await tester.tap(applyCurrentStrategy.first);
-      } else if (strategyCards.evaluate().isNotEmpty) {
+      } else if (finderExists(strategyCards)) {
         final strategyTapTarget = find.descendant(
           of: strategyCards.first,
-          matching: find.byType(Text),
+          matching: find.byType(Text, skipOffstage: false),
         );
         await tester.scrollUntilVisible(
           strategyTapTarget.first,
@@ -637,12 +643,19 @@ void main() {
       }
 
       if (optimizeRebuild.evaluate().isNotEmpty) {
-        await _capture(binding, tester, '09_rebuild_guided_blocker');
+        await _capture(binding, tester, '09_rebuild_guided_safe_outcome');
         if (_runtimeOptimizeRequireApply) {
           fail(
             'Runtime optimize returned rebuild_guided, but apply proof was required.',
           );
         }
+        // ignore: avoid_print
+        print('RUNTIME_OPTIMIZE_SAFE_OUTCOME rebuild_guided_available');
+        await tester.tap(
+          find.byKey(const Key('optimize-rebuild-guided-cancel-button')),
+        );
+        await tester.pumpAndSettle();
+        expect(optimizeRebuild, findsNothing);
         return;
       }
 
@@ -687,12 +700,14 @@ void main() {
           findsNothing,
         );
         expect(find.textContaining('quality_gate_rejected'), findsNothing);
-        await _capture(binding, tester, '09_quality_rejected_blocker');
+        await _capture(binding, tester, '09_safe_noop_quality_gate');
         if (_runtimeOptimizeRequireApply) {
           fail(
             'Runtime optimize returned safe no-op, but apply proof was required.',
           );
         }
+        // ignore: avoid_print
+        print('RUNTIME_OPTIMIZE_SAFE_OUTCOME no_safe_swap');
         return;
       }
 

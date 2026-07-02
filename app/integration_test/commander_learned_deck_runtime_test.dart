@@ -171,13 +171,9 @@ void main() {
       );
 
       expect(find.text('Deck aprendido Hermes'), findsOneWidget);
-      expect(
-        find.textContaining('Origem: HERMES learned_deck:82'),
-        findsOneWidget,
-      );
-      expect(find.textContaining('Score:'), findsOneWidget);
-      expect(find.text('Legalidade: commander_legal'), findsOneWidget);
-      expect(find.text('Confiança: high'), findsOneWidget);
+      expect(find.textContaining('learned_deck:82'), findsNothing);
+      expect(find.textContaining('PG_COMMANDER'), findsNothing);
+      expect(find.textContaining('pg_commander'), findsNothing);
       expect(find.text('1x $commanderName'), findsOneWidget);
       expect(find.text('Total: 100 cartas'), findsOneWidget);
       expect(find.textContaining('Deck principal (99 cartas'), findsOneWidget);

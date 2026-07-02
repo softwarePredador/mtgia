@@ -19,7 +19,7 @@ Future<LifeCounterSession?> showLifeCounterNativePlayerStateSheet(
   return showModalBottomSheet<LifeCounterSession>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppTheme.transparent,
     builder: (context) {
       return _LifeCounterNativePlayerStateSheet(
         initialSession: initialSession,
@@ -257,7 +257,7 @@ class _LifeCounterNativePlayerStateSheetState
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: AppTheme.fontMd,
-                                height: 1.35,
+                                height: AppTheme.lineHeightCompact,
                               ),
                             ),
                           ],
@@ -583,7 +583,7 @@ class _SectionCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: AppTheme.fontSm,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
             const SizedBox(height: 14),

@@ -261,7 +261,7 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
                 'Use "Gerar análise" para produzir uma leitura executiva do plano do deck antes de otimizar.',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: AppTheme.textSecondary,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
             ),
@@ -571,7 +571,10 @@ class _SummaryMetricRing extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(color: accent.withValues(alpha: 0.42)),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.42),
+          width: AppTheme.strokeRegular,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -694,7 +697,7 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.45),
-          width: 0.7,
+          width: AppTheme.strokeThin,
         ),
       ),
       child: Column(
@@ -901,7 +904,7 @@ class _FunctionalTagsOverview extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
               color: AppTheme.outlineMuted.withValues(alpha: 0.35),
-              width: 0.7,
+              width: AppTheme.strokeThin,
             ),
           ),
           child: Column(
@@ -1002,7 +1005,7 @@ class _FunctionalAnalysisStatus extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: AppTheme.outlineMuted.withValues(alpha: 0.35),
-          width: 0.7,
+          width: AppTheme.strokeThin,
         ),
       ),
       child: Column(
@@ -1018,7 +1021,7 @@ class _FunctionalAnalysisStatus extends StatelessWidget {
                   message,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppTheme.textPrimary.withValues(alpha: 0.88),
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ),
@@ -1098,7 +1101,7 @@ class _FunctionalBucketTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: bucket.color.withValues(alpha: 0.2),
-          width: 0.7,
+          width: AppTheme.strokeThin,
         ),
       ),
       child: ExpansionTile(
@@ -1161,7 +1164,7 @@ class _FunctionalBucketTile extends StatelessWidget {
               bucket.description,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: AppTheme.textSecondary,
-                height: 1.35,
+                height: AppTheme.lineHeightCompact,
               ),
             ),
           ),
@@ -1229,7 +1232,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
             'Este backend retornou a contagem, mas não enviou amostras de cartas para este indicador.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
-              height: 1.35,
+              height: AppTheme.lineHeightCompact,
             ),
           )
         else ...[
@@ -1241,7 +1244,7 @@ class _FunctionalBucketSamples extends StatelessWidget {
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textPrimary.withValues(alpha: 0.84),
               fontWeight: FontWeight.w700,
-              height: 1.35,
+              height: AppTheme.lineHeightCompact,
             ),
           ),
           const SizedBox(height: 8),
@@ -1506,7 +1509,10 @@ class _InsightBlock extends StatelessWidget {
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: accent.withValues(alpha: 0.18), width: 0.7),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.18),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1529,7 +1535,7 @@ class _InsightBlock extends StatelessWidget {
             text,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textPrimary.withValues(alpha: 0.88),
-              height: 1.35,
+              height: AppTheme.lineHeightCompact,
             ),
           ),
         ],
@@ -1591,7 +1597,10 @@ class _AnalysisCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: color.withValues(alpha: 0.18), width: 0.7),
+        border: Border.all(
+          color: color.withValues(alpha: 0.18),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Row(
         children: [

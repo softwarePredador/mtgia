@@ -40,9 +40,7 @@ class ApiClient {
     'DISABLE_FIREBASE_PERFORMANCE_INIT',
     defaultValue: false,
   );
-  static const String _debugAndroidEmulatorUrl = 'http://10.0.2.2:8080';
-  static const String _debugLocalhostUrl = 'http://127.0.0.1:8080';
-  static const String _releaseFallbackUrl =
+  static const String _serverFallbackUrl =
       'https://evolution-cartinhas.8ktevp.easypanel.host';
 
   // ──────────────────────────────────────────
@@ -60,6 +58,7 @@ class ApiClient {
   static http.Client _httpClient = http.Client();
   static bool _performanceUnavailable = false;
   static final Random _requestIdRandom = Random.secure();
+  static const int _requestIdEntropyChunkMax = 0x10000;
 
   @visibleForTesting
   static void resetForTesting({
@@ -78,14 +77,7 @@ class ApiClient {
       return _envBaseUrl.trim().replaceAll(RegExp(r'/$'), '');
     }
 
-    if (kDebugMode) {
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-        return _debugAndroidEmulatorUrl;
-      }
-      return _debugLocalhostUrl;
-    }
-
-    return _releaseFallbackUrl;
+    return _serverFallbackUrl;
   }
 
   /// Log da URL base resolvida (chamado uma vez no boot)
@@ -97,7 +89,7 @@ class ApiClient {
     if (_envBaseUrl.trim().isEmpty) {
       if (kDebugMode) {
         debugPrint(
-          '[🌐 ApiClient] fallback de debug ativo; em device físico ou backend remoto use --dart-define=API_BASE_URL=https://seu-host',
+          '[🌐 ApiClient] API_BASE_URL ausente; usando servidor público. Para backend local, passe --dart-define=API_BASE_URL=http://127.0.0.1:8080',
         );
       } else if (baseUrl.isEmpty) {
         debugPrint(
@@ -111,7 +103,15 @@ class ApiClient {
     final resolvedNow = now ?? DateTime.now();
     final resolvedRandom = random ?? _requestIdRandom;
     final timestamp = resolvedNow.microsecondsSinceEpoch.toRadixString(16);
-    final entropy = resolvedRandom.nextInt(1 << 32).toRadixString(16);
+    final entropyHigh = resolvedRandom
+        .nextInt(_requestIdEntropyChunkMax)
+        .toRadixString(16)
+        .padLeft(4, '0');
+    final entropyLow = resolvedRandom
+        .nextInt(_requestIdEntropyChunkMax)
+        .toRadixString(16)
+        .padLeft(4, '0');
+    final entropy = '$entropyHigh$entropyLow';
     return 'mob-$timestamp-$entropy';
   }
 
@@ -127,6 +127,14 @@ class ApiClient {
   }
 
   static bool isReportableHttpStatus(int statusCode) => statusCode >= 400;
+
+  @visibleForTesting
+  static Duration timeoutForEndpoint(String endpoint, {Duration? override}) {
+    if (override != null) return override;
+    return endpoint.startsWith('/ai/')
+        ? const Duration(minutes: 2)
+        : const Duration(seconds: 15);
+  }
 
   Map<String, String> _getHeaders({String? requestId}) {
     final baseHeaders = {
@@ -169,15 +177,16 @@ class ApiClient {
     final headers = _getHeaders(requestId: requestId);
     final metric = _createMetric(url, HttpMethod.Get);
     final stopwatch = Stopwatch()..start();
+    final effectiveTimeout = timeoutForEndpoint(endpoint);
 
-    debugPrint('[🌐 ApiClient] GET $url');
+    debugPrint('[🌐 ApiClient] GET $endpoint');
 
     try {
       await metric?.start();
 
       final response = await _httpClient
           .get(Uri.parse(url), headers: headers)
-          .timeout(const Duration(seconds: 15));
+          .timeout(effectiveTimeout);
 
       stopwatch.stop();
 
@@ -241,14 +250,9 @@ class ApiClient {
     final bodyBytes = utf8.encode(jsonEncode(body));
 
     // Endpoints de IA têm timeout maior (2 minutos)
-    final isAiEndpoint = endpoint.startsWith('/ai/');
-    final effectiveTimeout =
-        timeout ??
-        (isAiEndpoint
-            ? const Duration(minutes: 2)
-            : const Duration(seconds: 15));
+    final effectiveTimeout = timeoutForEndpoint(endpoint, override: timeout);
 
-    debugPrint('[🌐 ApiClient] POST $url');
+    debugPrint('[🌐 ApiClient] POST $endpoint');
 
     try {
       await metric?.start();
@@ -312,7 +316,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Put);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] PUT $url');
+    debugPrint('[🌐 ApiClient] PUT $endpoint');
 
     try {
       await metric?.start();
@@ -370,7 +374,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Patch);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] PATCH $url');
+    debugPrint('[🌐 ApiClient] PATCH $endpoint');
 
     try {
       await metric?.start();
@@ -424,7 +428,7 @@ class ApiClient {
     final metric = _createMetric(url, HttpMethod.Delete);
     final stopwatch = Stopwatch()..start();
 
-    debugPrint('[🌐 ApiClient] DELETE $url');
+    debugPrint('[🌐 ApiClient] DELETE $endpoint');
 
     try {
       await metric?.start();
@@ -556,8 +560,9 @@ class ApiClient {
   void _ensureBaseUrlConfigured() {
     if (baseUrl.isNotEmpty) return;
     throw StateError(
-      'API_BASE_URL não configurado. Em debug use --dart-define=API_BASE_URL=http://seu-host:8080 '
-      'para backend remoto/device físico; em release/profile configure a URL pública da API no build.',
+      'API_BASE_URL não configurado e fallback público indisponível. '
+      'Configure --dart-define=API_BASE_URL=https://seu-host para backend remoto, '
+      'ou passe uma URL local explicitamente durante desenvolvimento.',
     );
   }
 }

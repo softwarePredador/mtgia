@@ -102,6 +102,21 @@ Map<String, dynamic> _binderItemJson({
 };
 
 void main() {
+  test('parses reserved-list metadata for binder and marketplace cards', () {
+    final binderItem = BinderItem.fromJson({
+      'id': 'binder-1',
+      'card': {'id': 'card-1', 'name': 'Gaea\'s Cradle', 'is_reserved': true},
+    });
+    final marketplaceItem = MarketplaceItem.fromJson({
+      'id': 'market-1',
+      'card': {'id': 'card-2', 'name': 'Mox Diamond', 'is_reserved': true},
+      'owner': {'id': 'user-1', 'username': 'seller'},
+    });
+
+    expect(binderItem.cardIsReserved, isTrue);
+    expect(marketplaceItem.cardIsReserved, isTrue);
+  });
+
   test(
     'removeItem treats backend 204 No Content as successful delete',
     () async {

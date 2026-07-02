@@ -48,6 +48,7 @@ void main() {
         'set_name': 'Commander Legends',
         'set_release_date': '2020-11-20',
         'rarity': 'uncommon',
+        'is_reserved': true,
         'quantity': 1,
         'is_commander': false,
         'collector_number': '331',
@@ -69,6 +70,7 @@ void main() {
       expect(card.setName, 'Commander Legends');
       expect(card.setReleaseDate, '2020-11-20');
       expect(card.rarity, 'uncommon');
+      expect(card.isReserved, isTrue);
       expect(card.quantity, 1);
       expect(card.isCommander, false);
       expect(card.collectorNumber, '331');
@@ -77,10 +79,7 @@ void main() {
     });
 
     test('fromJson deve usar defaults para campos ausentes', () {
-      final json = {
-        'id': 'card-2',
-        'name': 'Island',
-      };
+      final json = {'id': 'card-2', 'name': 'Island'};
 
       final card = DeckCardItem.fromJson(json);
 
@@ -94,6 +93,7 @@ void main() {
       expect(card.imageUrl, isNull);
       expect(card.setCode, '');
       expect(card.rarity, '');
+      expect(card.isReserved, isFalse);
       expect(card.quantity, 1);
       expect(card.isCommander, false);
       expect(card.foil, isNull);

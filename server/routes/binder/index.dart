@@ -117,6 +117,7 @@ Future<Response> _listBinder(RequestContext context) async {
               c.name AS card_name, c.image_url AS card_image_url,
               c.set_code AS card_set_code, c.mana_cost AS card_mana_cost,
               c.type_line AS card_type_line, c.rarity AS card_rarity,
+              c.is_reserved AS card_is_reserved,
               c.price_usd AS card_market_price,
               COALESCE(du.deck_count, 0)::int AS deck_count,
               COALESCE(du.deck_quantity, 0)::int AS deck_quantity
@@ -145,6 +146,7 @@ Future<Response> _listBinder(RequestContext context) async {
           'mana_cost': cols['card_mana_cost'],
           'type_line': cols['card_type_line'],
           'rarity': cols['card_rarity'],
+          'is_reserved': cols['card_is_reserved'] == true,
           'market_price': cols['card_market_price'] != null
               ? double.tryParse(cols['card_market_price'].toString())
               : null,

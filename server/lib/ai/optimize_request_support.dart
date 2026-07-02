@@ -59,6 +59,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   required String intensity,
   required int? bracket,
   required bool keepTheme,
+  String recommendationContextSignature = '',
   OptimizeStageTelemetry? telemetry,
 }) async {
   final deckResult = await (telemetry?.trackAsync(
@@ -97,7 +98,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
   final hasCardIntelligenceSnapshot =
       await _hasTable(pool, 'card_intelligence_snapshot');
   final cardSourceJoin = hasCardIntelligenceSnapshot
-      ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+      ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
       : 'JOIN cards c ON c.id = dc.card_id';
   final semanticV2Select = hasCardIntelligenceSnapshot
       ? 'c.semantic_tags_v2 AS semantic_tags_v2'
@@ -181,6 +182,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     keepTheme: keepTheme,
     deckSignature: deckSignature,
     intensity: intensity,
+    recommendationContextSignature: recommendationContextSignature,
   );
 
   final commanders = <String>[];

@@ -5,6 +5,13 @@ import 'package:test/test.dart';
 
 import '../lib/meta/external_commander_meta_candidate_support.dart';
 
+const _stage1ArtifactPath =
+    'test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json';
+const _stage2ExpansionArtifactPath =
+    'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json';
+const _stage2ValidationArtifactPath =
+    'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json';
+
 void main() {
   group('ExternalCommanderMetaCandidate.fromJson', () {
     test('normaliza payload com card entries e status validated', () {
@@ -295,9 +302,7 @@ void main() {
     });
 
     test('fixture stage 1 mantem contrato 2 accepted e 2 rejected', () {
-      final raw = File(
-        'test/artifacts/external_commander_meta_candidates_topdeck_edhtop16_stage1_2026-04-24.json',
-      ).readAsStringSync();
+      final raw = File(_stage1ArtifactPath).readAsStringSync();
       final candidates = parseExternalCommanderMetaCandidates(raw);
 
       final results = validateExternalCommanderMetaCandidates(
@@ -317,12 +322,10 @@ void main() {
         results.expand((result) => result.issues).map((issue) => issue.code),
         containsAll(<String>{'invalid_subformat', 'invalid_source_path'}),
       );
-    });
+    }, skip: _missingArtifactsSkip(const <String>[_stage1ArtifactPath]));
 
     test('stage 2 aceita fixture expandida com decklists completas', () {
-      final raw = File(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.json',
-      ).readAsStringSync();
+      final raw = File(_stage2ExpansionArtifactPath).readAsStringSync();
       final artifact = jsonDecode(raw) as Map<String, dynamic>;
       final candidates = parseExternalCommanderMetaCandidates(raw);
 
@@ -341,7 +344,10 @@ void main() {
         results.expand((result) => result.issues).map((issue) => issue.code),
         isNot(contains('card_count_below_stage2_minimum')),
       );
-    });
+    },
+        skip: _missingArtifactsSkip(
+          const <String>[_stage2ExpansionArtifactPath],
+        ));
 
     test('stage 2 reaplica stage 1 e rejeita source fora do path controlado',
         () {
@@ -682,9 +688,7 @@ void main() {
     test(
         'artifact de validacao stage 2 expoe commander_color_identity e status',
         () {
-      final raw = File(
-        'test/artifacts/topdeck_edhtop16_expansion_dry_run_latest.validation.json',
-      ).readAsStringSync();
+      final raw = File(_stage2ValidationArtifactPath).readAsStringSync();
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       final results =
           (decoded['results'] as List<dynamic>).cast<Map<String, dynamic>>();
@@ -696,8 +700,17 @@ void main() {
         expect(result, contains('illegal_cards'));
         expect(result, contains('legal_status'));
       }
-    });
+    },
+        skip: _missingArtifactsSkip(
+          const <String>[_stage2ValidationArtifactPath],
+        ));
   });
+}
+
+String? _missingArtifactsSkip(List<String> paths) {
+  final missing = paths.where((path) => !File(path).existsSync()).toList();
+  if (missing.isEmpty) return null;
+  return 'Fixture artifact absent: ${missing.join(', ')}';
 }
 
 class _FakeLegalityRepository

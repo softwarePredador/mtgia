@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/launch_features.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_state_panel.dart';
 import '../../../core/widgets/cached_card_image.dart';
@@ -344,7 +345,7 @@ class _BinderListViewState extends State<_BinderListView>
               _StatsBar(
                 stats: stats,
                 onAdd: _openAddCard,
-                onScan: _openScanCard,
+                onScan: LaunchFeatures.scannerEnabled ? _openScanCard : null,
               ),
 
             // Search + filters
@@ -449,7 +450,10 @@ class _BinderListViewState extends State<_BinderListView>
             decoration: BoxDecoration(
               color: AppTheme.surfaceElevated,
               borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-              border: Border.all(color: accent.withValues(alpha: 0.22)),
+              border: Border.all(
+                color: accent.withValues(alpha: 0.22),
+                width: AppTheme.strokeThin,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -506,15 +510,16 @@ class _BinderListViewState extends State<_BinderListView>
                         foregroundColor: AppTheme.backgroundAbyss,
                       ),
                     ),
-                    OutlinedButton.icon(
-                      onPressed: _openScanCard,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Escanear'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.brass400,
-                        side: const BorderSide(color: AppTheme.outlineMuted),
+                    if (LaunchFeatures.scannerEnabled)
+                      OutlinedButton.icon(
+                        onPressed: _openScanCard,
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Escanear'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.brass400,
+                          side: const BorderSide(color: AppTheme.outlineMuted),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -751,7 +756,10 @@ class _DashboardSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -966,7 +974,10 @@ class _DistributionChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
-        border: Border.all(color: AppTheme.outlineMuted, width: 0.5),
+        border: Border.all(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Text(
         '$label • $value',
@@ -1007,7 +1018,10 @@ class _StatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppTheme.surfaceSlate,
           borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: color.withValues(alpha: 0.22)),
+          border: Border.all(
+            color: color.withValues(alpha: 0.22),
+            width: AppTheme.strokeThin,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1488,7 +1502,10 @@ class _BinderItemCard extends StatelessWidget {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        side: const BorderSide(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
@@ -1500,7 +1517,7 @@ class _BinderItemCard extends StatelessWidget {
             children: [
               CachedCardImage(
                 imageUrl: item.cardImageUrl,
-                width: 46,
+                width: AppTheme.touchTargetMin,
                 height: 64,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
               ),
@@ -1533,6 +1550,10 @@ class _BinderItemCard extends StatelessWidget {
                             size: 14,
                             color: AppTheme.brass400.withValues(alpha: 0.8),
                           ),
+                        ],
+                        if (item.cardIsReserved) ...[
+                          const SizedBox(width: 6),
+                          _badge('Reserved', AppTheme.brass400),
                         ],
                         if (item.cardSetCode != null) ...[
                           const SizedBox(width: 6),

@@ -37,28 +37,28 @@ class AppStatePanel extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 420),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                    color: AppTheme.surfaceSlate.withValues(alpha: 0.94),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                     border: Border.all(
-                      color: accent.withValues(alpha: 0.22),
-                      width: 0.9,
+                      color: AppTheme.outlineMuted.withValues(alpha: 0.62),
+                      width: AppTheme.strokeHairline,
                     ),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        width: 56,
-                        height: 56,
+                        width: 52,
+                        height: 52,
                         decoration: BoxDecoration(
-                          color: accent.withValues(alpha: 0.12),
+                          color: accent.withValues(alpha: 0.10),
                           borderRadius: BorderRadius.circular(
-                            AppTheme.radiusLg,
+                            AppTheme.radiusMd,
                           ),
                         ),
-                        child: Icon(icon, color: accent, size: 28),
+                        child: Icon(icon, color: accent, size: 26),
                       ),
                       const SizedBox(height: 14),
                       Text(
@@ -76,7 +76,7 @@ class AppStatePanel extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: AppTheme.textSecondary,
-                            height: 1.4,
+                            height: 1.36,
                           ),
                         ),
                       ],

@@ -33,11 +33,18 @@ Future<void> pumpUntil(
   int attempts = 60,
   Duration step = const Duration(milliseconds: 500),
 }) async {
+  if (await condition()) return;
   for (var i = 0; i < attempts; i += 1) {
     await tester.pump(step);
     if (await condition()) return;
   }
+  if (await condition()) return;
   fail('Timeout waiting for $description');
+}
+
+bool finderExists(Finder finder) {
+  finder.reset();
+  return finder.evaluate().isNotEmpty;
 }
 
 Future<void> pumpUntilFound(
@@ -48,7 +55,7 @@ Future<void> pumpUntilFound(
 }) {
   return pumpUntil(
     tester,
-    () => finder.evaluate().isNotEmpty,
+    () => finderExists(finder),
     description: finder.toString(),
     attempts: attempts,
     step: step,
@@ -63,7 +70,7 @@ Future<void> pumpUntilAbsent(
 }) {
   return pumpUntil(
     tester,
-    () => finder.evaluate().isEmpty,
+    () => !finderExists(finder),
     description: '${finder.toString()} to disappear',
     attempts: attempts,
     step: step,
@@ -78,7 +85,7 @@ Future<void> pumpUntilAnyFound(
 }) {
   return pumpUntil(
     tester,
-    () => finders.any((finder) => finder.evaluate().isNotEmpty),
+    () => finders.any(finderExists),
     description: finders.map((finder) => finder.toString()).join(' OR '),
     attempts: attempts,
     step: step,

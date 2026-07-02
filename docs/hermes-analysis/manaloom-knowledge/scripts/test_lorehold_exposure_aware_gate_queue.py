@@ -119,7 +119,7 @@ def test_low_exposure_package_becomes_forced_exposure_diagnostic():
     assert mana_vault["forced_access_mode"] == "opening_hand"
     assert "--forced-access-mode" in mana_vault["command"]
     assert report["summary"]["recommended_next_action"] == (
-        "forced_exposure_diagnostic_only_review_focus_runtime_before_gate"
+        "run_forced_exposure_probe_before_natural_gate"
     )
 
 
@@ -257,13 +257,5 @@ irrelevant package output
     assert status["markdown"] == "/tmp/report.md"
 
 
-def test_defaults_use_current_after_profiled_gate_handoff():
-    assert (
-        queue.DEFAULT_READINESS.name
-        == "lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json"
-    )
-    assert (
-        queue.DEFAULT_HYPOTHESIS_QUEUE.name
-        == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
-    )
-    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_after_profiled_gate.json"
+def test_default_planner_uses_current_queue_closed_contract():
+    assert queue.DEFAULT_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"

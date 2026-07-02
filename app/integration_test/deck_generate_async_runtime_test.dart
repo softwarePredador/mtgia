@@ -263,16 +263,21 @@ void main() {
       await pumpUntilFound(tester, find.text('Otimizar Deck'), attempts: 60);
       final applyCurrentStrategy = find.byKey(
         const Key('optimize-apply-current-strategy-button'),
+        skipOffstage: false,
       );
-      final strategyCards = find.byType(StrategyOptionCard);
+      final strategyCards = find.byType(
+        StrategyOptionCard,
+        skipOffstage: false,
+      );
       await pumpUntilAnyFound(tester, [
         strategyCards,
         applyCurrentStrategy,
       ], attempts: 240);
       await _capture(binding, tester, '09_optimize_sheet');
 
-      if (applyCurrentStrategy.evaluate().isNotEmpty) {
+      if (finderExists(applyCurrentStrategy)) {
         await tester.ensureVisible(applyCurrentStrategy.first);
+        await tester.pump();
         await tester.tap(applyCurrentStrategy.first);
       } else {
         final strategyCard = tester.widget<StrategyOptionCard>(
@@ -310,12 +315,21 @@ void main() {
       }
 
       if (optimizeRebuild.evaluate().isNotEmpty) {
-        await _capture(binding, tester, '10_rebuild_guided_blocker');
+        await _capture(binding, tester, '10_rebuild_guided_safe_outcome');
+        // ignore: avoid_print
+        print('OPTIMIZE_NEEDS_REPAIR_SAFE_OUTCOME rebuild_guided_available');
+        await tester.tap(
+          find.byKey(const Key('optimize-rebuild-guided-cancel-button')),
+        );
+        await tester.pumpAndSettle();
+        expect(optimizeRebuild, findsNothing);
         return;
       }
 
       if (optimizeOutcome.evaluate().isNotEmpty) {
         await _capture(binding, tester, '10_safe_noop');
+        // ignore: avoid_print
+        print('OPTIMIZE_SAFE_OUTCOME no_changes_or_near_peak');
         return;
       }
 

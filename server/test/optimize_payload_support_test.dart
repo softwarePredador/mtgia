@@ -74,6 +74,25 @@ void main() {
       expect(detail['function'], 'ramp');
       expect(detail['roles'], ['draw', 'ramp']);
       expect(detail['functions'], ['draw', 'ramp']);
+      expect(
+        detail['reason'],
+        contains('abre espaço na função ramp para uma troca revisável'),
+      );
+      final explanation = detail['explanation'] as Map;
+      expect(
+        explanation['schema_version'],
+        'optimize_recommendation_explanation_v1_2026-07-01',
+      );
+      expect(explanation['summary'], detail['reason']);
+      expect(explanation['decision'], 'remove');
+      expect(explanation['target_archetype'], 'Spellslinger');
+      expect(explanation['why'], contains('Função principal: ramp.'));
+      expect(
+        explanation['why'],
+        contains('Funções consideradas: draw, ramp.'),
+      );
+      expect((explanation['safety'] as Map)['preview_required'], isTrue);
+      expect((explanation['safety'] as Map)['theme_preserved'], isTrue);
       expect(detail['impact_estimate']['curve'], 'ΔCMC -0.30');
       expect(detail['impact_estimate']['consistency'], 'alta');
     });

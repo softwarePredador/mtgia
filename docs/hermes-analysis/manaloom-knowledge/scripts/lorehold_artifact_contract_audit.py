@@ -239,6 +239,34 @@ def summarize_profiled_cut_package_manifest(payload: Mapping[str, Any]) -> dict[
     }
 
 
+def summarize_prior_package_decision(payload: Mapping[str, Any]) -> dict[str, Any]:
+    packages = payload.get("packages") or []
+    packages = packages if isinstance(packages, list) else []
+    valid_rows = [
+        row
+        for row in packages
+        if isinstance(row, Mapping)
+        and row.get("package_key")
+        and isinstance(row.get("adds"), list)
+        and isinstance(row.get("cuts"), list)
+        and row.get("decision")
+    ]
+    decision_counts: dict[str, int] = {}
+    for row in valid_rows:
+        decision = str(row.get("decision"))
+        decision_counts[decision] = decision_counts.get(decision, 0) + 1
+    return {
+        "source": payload.get("source"),
+        "baseline_deck_id": payload.get("baseline_deck_id"),
+        "package_count": len(packages),
+        "valid_package_row_count": len(valid_rows),
+        "decision_counts": decision_counts,
+        "source_db_mutated": payload.get("source_db_mutated", False),
+        "postgres_writes": payload.get("postgres_writes", False),
+        "package_keys": [str(row.get("package_key")) for row in valid_rows],
+    }
+
+
 def summarize_exposure_aware_gate_queue(payload: Mapping[str, Any]) -> dict[str, Any]:
     packages = payload.get("packages") or []
     ready_queue = payload.get("ready_queue") or []
@@ -295,6 +323,19 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             canonical_summary=summary,
         )
 
+    if payload.get("status") == "compact_gate_summary" and "results" in keys:
+        summary = normalize_equal_battle_gate(payload)
+        summary["schema_version"] = "compact_gate_summary_v1"
+        status = "pass" if summary["result_count"] > 0 else "warn"
+        return ArtifactClassification(
+            **base,
+            artifact_kind="compact_gate_summary",
+            schema_version="compact_gate_summary_v1",
+            status=status,
+            detail="compact battle gate summary for planner consumption",
+            canonical_summary=summary,
+        )
+
     if "package_rollups" in keys and "packages" in keys:
         summary = {
             "schema_version": "exposure_outcome_audit_v2",
@@ -319,6 +360,23 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
             schema_version="package_gate_v1",
             status="pass",
             detail="package gate; not an equal deck battle gate",
+            canonical_summary=summary,
+        )
+
+    if (
+        "packages" in keys
+        and "baseline_deck_id" in keys
+        and "source" in keys
+        and "postgres_writes" in keys
+        and "source_db_mutated" in keys
+    ):
+        summary = summarize_prior_package_decision(payload)
+        return ArtifactClassification(
+            **base,
+            artifact_kind="prior_package_decision",
+            schema_version="prior_package_decision_compact_v1",
+            status="pass" if summary["package_count"] == summary["valid_package_row_count"] else "warn",
+            detail="compact prior package decision rows for package-reject memory",
             canonical_summary=summary,
         )
 
@@ -355,6 +413,16 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ("card_exposure_profile", {"card_profiles", "scan_summary"}, "card exposure profile"),
         ("battle_forensic", {"replay_files", "rule_findings", "turn_findings"}, "battle forensic report"),
         ("canonical_snapshot", {"canonical_decisions", "cards", "local_summary"}, "canonical snapshot"),
+        (
+            "from_scratch_challenger_summary",
+            {"candidates", "corpus_deck_ids", "fixed_opponent_deck_id_for_gate", "protected_baseline_deck_id"},
+            "from-scratch challenger summary",
+        ),
+        (
+            "from_scratch_challenger_candidate",
+            {"battle_gate_command", "candidate_key", "final_deck", "mode", "protected_baseline_deck_id"},
+            "from-scratch challenger candidate",
+        ),
         ("generated_candidate", {"final_deck", "validation", "candidate_hash"}, "generated candidate"),
         ("generator_source_mix", {"runtime_source_mix_counts", "total_card_entries"}, "generator source mix"),
         ("cut_model", {"pair_evaluations", "top_pair_evaluations", "guardrails"}, "cut model"),
@@ -421,9 +489,49 @@ def classify_payload(path: Path, payload: Mapping[str, Any]) -> ArtifactClassifi
         ),
         ("safe_cut_replanner", {"manifest_ready_packages", "cut_safety"}, "safe cut replanner"),
         (
+            "seed_safe_cut_hypothesis",
+            {"cut_slots", "seed_safe_cut_candidates", "same_lane_only_cut_slots"},
+            "seed-safe cut hypothesis synthesis",
+        ),
+        (
+            "from_scratch_shell_failure_synthesis",
+            {"learning_constraints", "next_hypothesis_requirements", "shell_gate_rows"},
+            "from-scratch shell failure synthesis",
+        ),
+        (
+            "closing_window_trace_miner",
+            {"closing_window_comparisons", "hypothesis_queue", "protected_baseline"},
+            "closing-window trace miner",
+        ),
+        (
+            "trace_targeted_micro_package_model",
+            {"blocked_hypotheses", "protected_anchor_evidence", "ready_packages"},
+            "trace-targeted micro-package model",
+        ),
+        (
+            "lorehold_current_champion_snapshot",
+            {"cards", "champion_decision", "protected_anchors"},
+            "Lorehold current champion snapshot",
+        ),
+        (
+            "trace_cut_evidence_expansion_queue",
+            {"all_cut_slots", "hard_blocked_queue", "reviewable_evidence_gap_queue"},
+            "trace cut evidence expansion queue",
+        ),
+        (
+            "lorehold_deckbuilding_final_closure",
+            {"final_decision", "source_reports", "validation"},
+            "Lorehold deckbuilding final closure",
+        ),
+        (
             "safe_cut_package_manifest",
             {"generated_at", "packages", "purpose", "source_ledger"},
             "safe cut package manifest",
+        ),
+        (
+            "seed_safe_cut_manifest",
+            {"generated_at", "cut_slots", "purpose", "deck_id"},
+            "seed-safe cut manifest",
         ),
         ("action_critic", {"actions", "findings"}, "single replay action critic"),
         ("decision_audit", {"decision_findings", "baseline_findings"}, "single replay decision audit"),

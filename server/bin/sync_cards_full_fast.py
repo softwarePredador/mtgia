@@ -139,6 +139,7 @@ def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[An
             scryfall_image_url(name, identifiers, set_code),
             set_code,
             chosen.get("rarity"),
+            chosen.get("isReserved") if isinstance(chosen.get("isReserved"), bool) else None,
         )
 
         legalities = chosen.get("legalities")
@@ -159,6 +160,7 @@ def ensure_schema(conn) -> None:
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT")
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT")
         cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]")
+        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN")
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)"
         )
@@ -179,7 +181,7 @@ def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
                 INSERT INTO cards (
                   scryfall_id, name, mana_cost, type_line, oracle_text,
                   colors, color_identity, power, toughness, keywords,
-                  image_url, set_code, rarity
+                  image_url, set_code, rarity, is_reserved
                 ) VALUES %s
                 ON CONFLICT (scryfall_id) DO UPDATE SET
                   name = EXCLUDED.name,
@@ -193,13 +195,14 @@ def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
                   keywords = EXCLUDED.keywords,
                   image_url = EXCLUDED.image_url,
                   set_code = EXCLUDED.set_code,
-                  rarity = EXCLUDED.rarity
+                  rarity = EXCLUDED.rarity,
+                  is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved)
                 """,
                 batch,
                 template=(
                     "(%s::uuid, %s::text, %s::text, %s::text, %s::text, "
                     "%s::text[], %s::text[], %s::text, %s::text, %s::text[], "
-                    "%s::text, %s::text, %s::text)"
+                    "%s::text, %s::text, %s::text, %s::boolean)"
                 ),
                 page_size=len(batch),
             )

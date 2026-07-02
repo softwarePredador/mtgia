@@ -405,6 +405,7 @@ Future<Response> onRequest(RequestContext context) async {
     final parsedKeepTheme = routeRequest.parsedKeepTheme;
     final requestMode = routeRequest.requestMode;
     final intensity = routeRequest.intensity;
+    final recommendationContext = routeRequest.recommendationContext;
     if (!intensity.valid) {
       return badRequest(
         'intensity must be light, focused, aggressive or rebuild.',
@@ -487,16 +488,22 @@ Future<Response> onRequest(RequestContext context) async {
       );
 
       telemetry.logSummary();
+      final responseBody =
+          optimize_route_async.buildOptimizeModeAsyncAcceptedBody(
+        deckId: deckId,
+        requestMode: requestMode,
+        jobId: jobId,
+        elapsedMs: requestStopwatch.elapsedMilliseconds,
+        telemetrySnapshot: telemetry.snapshot(),
+        intensity: intensity,
+      );
+      optimize_route_request.attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
+      );
       return Response.json(
         statusCode: HttpStatus.accepted,
-        body: optimize_route_async.buildOptimizeModeAsyncAcceptedBody(
-          deckId: deckId,
-          requestMode: requestMode,
-          jobId: jobId,
-          elapsedMs: requestStopwatch.elapsedMilliseconds,
-          telemetrySnapshot: telemetry.snapshot(),
-          intensity: intensity,
-        ),
+        body: responseBody,
       );
     }
 
@@ -529,6 +536,7 @@ Future<Response> onRequest(RequestContext context) async {
           intensity: intensity.selected,
           bracket: bracket,
           keepTheme: keepTheme,
+          recommendationContextSignature: recommendationContext.cacheSignature,
           telemetry: telemetry,
         ),
       );
@@ -568,6 +576,10 @@ Future<Response> onRequest(RequestContext context) async {
         hasKeepThemeOverride: hasKeepThemeOverride,
         keepTheme: keepTheme,
         userPreferences: userPreferences,
+      );
+      optimize_route_request.attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
       );
       telemetry.logSummary();
       return Response.json(body: responseBody);
@@ -658,6 +670,10 @@ Future<Response> onRequest(RequestContext context) async {
       List<Map<String, dynamic>> blockedByBracketOverride = const [],
     }) async {
       final responseBody = Map<String, dynamic>.from(body);
+      optimize_route_request.attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
+      );
       responseBody['deck_state'] ??= deckState.toJson();
       responseBody['intensity'] ??= intensity.selected;
       responseBody['optimize_intensity'] ??= intensity.toJson(
@@ -1032,15 +1048,22 @@ Future<Response> onRequest(RequestContext context) async {
         userPreferences: userPreferences,
         hasBracketOverride: hasBracketOverride,
         hasKeepThemeOverride: hasKeepThemeOverride,
+        recommendationContext: recommendationContext,
       );
 
+      final responseBody =
+          optimize_route_async.buildCompleteModeAsyncAcceptedBody(
+        jobId: jobId,
+        telemetrySnapshot: telemetry.snapshot(),
+        intensity: intensity,
+      );
+      optimize_route_request.attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
+      );
       return Response.json(
         statusCode: HttpStatus.accepted,
-        body: optimize_route_async.buildCompleteModeAsyncAcceptedBody(
-          jobId: jobId,
-          telemetrySnapshot: telemetry.snapshot(),
-          intensity: intensity,
-        ),
+        body: responseBody,
       );
     }
 
@@ -2290,6 +2313,10 @@ Future<Response> onRequest(RequestContext context) async {
               (responseBody['additions'] as List).map((entry) => '$entry'),
         );
       }
+      optimize_route_request.attachRecommendationContextToOptimizeResponse(
+        responseBody,
+        recommendationContext,
+      );
 
       try {
         if (semanticV2OptimizeEnforcementMode ==

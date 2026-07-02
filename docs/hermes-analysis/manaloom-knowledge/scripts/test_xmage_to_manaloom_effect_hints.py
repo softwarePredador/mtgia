@@ -7782,6 +7782,7 @@ class XMageToManaLoomEffectHintsTests(unittest.TestCase):
                     "DeathbellowWarCry",
                     "GhoulcallersBell",
                     "KaylasMusicBox",
+                    "DeathbellowWarCry",
                     "LanternOfInsight",
                     "LeylineDowser",
                     "OrcishSpy",

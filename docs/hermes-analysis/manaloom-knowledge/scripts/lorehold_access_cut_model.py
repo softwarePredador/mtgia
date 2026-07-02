@@ -28,7 +28,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_STRATEGY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_SEED_MATRIX = REPORT_DIR / "lorehold_seed_matrix_all_20260628_v1_run.json"
-DEFAULT_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+FALLBACK_SQUEE_PROBE = REPORT_DIR / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
 DEFAULT_HIDDEN_RETREAT_PACKAGE_MANIFEST = (
     REPORT_DIR / "pg271_hidden_retreat_damage_prevention_20260630_manifest.json"
 )
@@ -77,6 +77,22 @@ KNOWN_ENGINE_CUTS = {
     "The Mind Stone",
     "Urza's Saga",
 }
+
+
+def newest_report(pattern: str, fallback: Path, *, report_dir: Path = REPORT_DIR) -> Path:
+    matches = sorted(
+        report_dir.glob(pattern),
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_squee_probe() -> Path:
+    return newest_report(
+        "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+        FALLBACK_SQUEE_PROBE,
+    )
 
 
 def utc_now() -> str:
@@ -638,9 +654,10 @@ def build_model(
     db_path: Path = DEFAULT_DB,
     strategy_path: Path = DEFAULT_STRATEGY_REPORT,
     seed_matrix_path: Path = DEFAULT_SEED_MATRIX,
-    squee_probe_path: Path = DEFAULT_SQUEE_PROBE,
+    squee_probe_path: Path | None = None,
     runtime_package_proposal_reports: Iterable[Path] | None = None,
 ) -> dict[str, Any]:
+    squee_probe_path = squee_probe_path or default_squee_probe()
     deck_cards = load_deck_cards(conn, deck_id)
     deck_cards_by_name = {normalize_key(row["card_name"]): row for row in deck_cards}
     all_names = sorted({*candidates, *(row["card_name"] for row in deck_cards)})
@@ -812,7 +829,7 @@ def build_model(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Access Cut Model - 2026-06-28",
+        "# Lorehold Access Cut Model - 2026-06-30",
         "",
         f"- generated_at: `{payload['generated_at']}`",
         f"- source_db: `{payload['source_db']}`",
@@ -917,7 +934,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--strategy-report", type=Path, default=DEFAULT_STRATEGY_REPORT)
     parser.add_argument("--seed-matrix-report", type=Path, default=DEFAULT_SEED_MATRIX)
-    parser.add_argument("--squee-probe", type=Path, default=DEFAULT_SQUEE_PROBE)
+    parser.add_argument("--squee-probe", type=Path, default=default_squee_probe())
     parser.add_argument(
         "--runtime-package-proposals",
         type=Path,
@@ -926,7 +943,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
-    parser.add_argument("--stem", default="lorehold_access_cut_model_20260628_v2")
+    parser.add_argument("--stem", default="lorehold_access_cut_model_20260630_current")
     return parser.parse_args()
 
 

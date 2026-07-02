@@ -77,6 +77,9 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = (
     REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
     REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
     REPORT_DIR / "lorehold_cloud_key_waterskin_gate_20260630_all_lanes_20260630_082705.json",
+    REPORT_DIR / "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
 )
 
 
@@ -927,6 +930,7 @@ STRATEGIC_METRICS = (
     "squee_upkeep_return",
     "squee_return_after_known_graveyard_entry",
 )
+CRITICAL_MATCHUP_PATTERNS = ("Winota",)
 
 MIRACLE_CORE_NAMES = {
     "Artist's Talent",
@@ -945,6 +949,7 @@ CUT_SAFETY_RISKY_STATUSES = {"risky_cut_only_same_lane"}
 CUT_SAFETY_PROTECTED_STATUSES = CUT_SAFETY_BLOCKED_STATUSES | CUT_SAFETY_RISKY_STATUSES
 PRIOR_PACKAGE_BLOCKED_DECISIONS = {
     "reject_or_rework",
+    "reject_regresses_critical_matchup",
     "invalid_or_incomplete",
     "forced_access_no_lift_reject_or_rework",
     "tie_watch_strategy_regression",
@@ -1002,9 +1007,10 @@ def load_package_definition_file(path: Path) -> dict[str, dict[str, Any]]:
     return definitions
 
 
-def merge_package_definitions(package_files: list[Path]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+def merge_package_definitions(package_files: list[Path]) -> tuple[dict[str, dict[str, Any]], list[str], list[str]]:
     definitions = dict(PACKAGE_DEFINITIONS)
     loaded_paths: list[str] = []
+    loaded_package_keys: list[str] = []
     for path in package_files:
         loaded = load_package_definition_file(path)
         collisions = sorted(set(definitions) & set(loaded))
@@ -1012,7 +1018,20 @@ def merge_package_definitions(package_files: list[Path]) -> tuple[dict[str, dict
             raise ValueError(f"{path} redefines existing package(s): {', '.join(collisions)}")
         definitions.update(loaded)
         loaded_paths.append(str(path))
-    return definitions, loaded_paths
+        loaded_package_keys.extend(loaded)
+    return definitions, loaded_paths, loaded_package_keys
+
+
+def selected_package_keys(
+    *,
+    packages_arg: str | None,
+    loaded_package_keys: list[str],
+) -> list[str]:
+    if packages_arg:
+        return [key.strip() for key in packages_arg.split(",") if key.strip()]
+    if loaded_package_keys:
+        return list(loaded_package_keys)
+    return list(PACKAGE_DEFINITIONS)
 
 
 def utc_stamp() -> str:
@@ -2875,6 +2894,49 @@ def result_exposure_summary(result: dict[str, Any]) -> dict[str, Any]:
     return package_exposure_summary(gate, adds=adds, cuts=cuts)
 
 
+def critical_matchup_record(side: dict[str, Any], pattern: str) -> dict[str, int]:
+    record = {"wins": 0, "losses": 0, "stalls": 0, "games": 0}
+    for row in side.get("game_results") or []:
+        opponent = str(row.get("opponent") or "")
+        if pattern not in opponent:
+            continue
+        result = str(row.get("result") or "")
+        record["games"] += 1
+        if result == "win":
+            record["wins"] += 1
+        elif result == "loss":
+            record["losses"] += 1
+        elif result == "stall":
+            record["stalls"] += 1
+    return record
+
+
+def critical_matchup_regressions(gate: dict[str, Any]) -> list[str]:
+    baseline = gate.get("baseline") or {}
+    candidate = gate.get("candidate") or {}
+    regressions: list[str] = []
+    for pattern in CRITICAL_MATCHUP_PATTERNS:
+        baseline_record = critical_matchup_record(baseline, pattern)
+        candidate_record = critical_matchup_record(candidate, pattern)
+        if not baseline_record["games"] or not candidate_record["games"]:
+            continue
+        if candidate_record["wins"] < baseline_record["wins"]:
+            regressions.append(pattern)
+    return regressions
+
+
+def critical_matchup_records(gate: dict[str, Any]) -> dict[str, dict[str, dict[str, int]]]:
+    baseline = gate.get("baseline") or {}
+    candidate = gate.get("candidate") or {}
+    return {
+        pattern: {
+            "baseline": critical_matchup_record(baseline, pattern),
+            "candidate": critical_matchup_record(candidate, pattern),
+        }
+        for pattern in CRITICAL_MATCHUP_PATTERNS
+    }
+
+
 def gate_decision(
     gate: dict[str, Any],
     exposure: dict[str, Any] | None = None,
@@ -2894,6 +2956,7 @@ def gate_decision(
     candidate_losses = int(candidate.get("losses") or 0)
     delta = float(gate.get("delta_pp") or 0.0)
     strategic = strategic_delta(gate)
+    critical_regressions = critical_matchup_regressions(gate)
 
     if forced_access_mode and forced_access_mode != "none":
         if delta > 0 or candidate_wins > baseline_wins or (
@@ -2904,6 +2967,8 @@ def gate_decision(
             return "forced_access_tie_requires_natural_confirmation"
         return "forced_access_no_lift_reject_or_rework"
 
+    if critical_regressions:
+        return "reject_regresses_critical_matchup"
     if delta > 0:
         return "promote_to_deeper_gate"
     if candidate_wins > baseline_wins or (
@@ -3104,6 +3169,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
                 f"- allow_miracle_core_cuts: `{result.get('candidate_meta', {}).get('allow_miracle_core_cuts')}`",
                 f"- miracle_core_cuts: `{', '.join(result.get('candidate_meta', {}).get('miracle_core_cuts') or []) or '-'}`",
                 f"- added_rule_counts: `{json.dumps(result.get('candidate_meta', {}).get('added_rule_counts') or {}, sort_keys=True)}`",
+                f"- critical_matchup_records: `{json.dumps(result.get('critical_matchup_records') or {}, sort_keys=True)}`",
+                f"- critical_matchup_regressions: `{', '.join(result.get('critical_matchup_regressions') or []) or '-'}`",
                 f"- exposure_summary: `{json.dumps(result.get('exposure_summary') or {}, sort_keys=True)}`",
                 f"- candidate_db: `{result.get('candidate_db') or '-'}`",
                 f"- gate_markdown: `{result.get('gate_markdown') or '-'}`",
@@ -3118,7 +3185,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-db", type=Path, default=DEFAULT_SOURCE_DB)
-    parser.add_argument("--packages", default=",".join(PACKAGE_DEFINITIONS))
+    parser.add_argument("--packages", default=None)
     parser.add_argument("--games", type=int, default=1)
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--baseline-deck-id", type=int, default=607)
@@ -3170,7 +3237,7 @@ def main() -> int:
     source_db = args.source_db.resolve()
     stamp = args.stamp or utc_stamp()
     package_files = [path.resolve() for path in args.package_file]
-    package_definitions, loaded_package_files = merge_package_definitions(package_files)
+    package_definitions, loaded_package_files, loaded_package_keys = merge_package_definitions(package_files)
     cut_safety_report = None if args.no_cut_safety else args.cut_safety_report.resolve()
     cut_safety = load_cut_safety_manifest(cut_safety_report)
     registry_path = None if args.no_cut_safety else args.registry.resolve()
@@ -3190,7 +3257,10 @@ def main() -> int:
     prior_results = load_prior_package_results(prior_package_reports)
     registry_prior_results = load_registry_prior_results(registry_path)
     prior_results = merge_registry_prior_results(prior_results, registry_prior_results)
-    package_keys = [key.strip() for key in args.packages.split(",") if key.strip()]
+    package_keys = selected_package_keys(
+        packages_arg=args.packages,
+        loaded_package_keys=loaded_package_keys,
+    )
     unknown = [key for key in package_keys if key not in package_definitions]
     if unknown:
         raise SystemExit(f"unknown package(s): {', '.join(unknown)}")
@@ -3401,6 +3471,8 @@ def main() -> int:
             "gate_stdout_tail": completed.stdout[-2000:],
             "gate_stderr_tail": completed.stderr[-2000:],
             "gate_summary": gate_summary,
+            "critical_matchup_records": critical_matchup_records(gate_summary),
+            "critical_matchup_regressions": critical_matchup_regressions(gate_summary),
             "exposure_summary": exposure_summary,
         }
         results.append(result)
@@ -3429,6 +3501,7 @@ def main() -> int:
         "forced_access_mode": args.forced_access_mode,
         "runtime_package_proposal_reports": [str(path) for path in runtime_package_proposal_reports],
         "package_definition_files": loaded_package_files,
+        "package_definition_keys": loaded_package_keys,
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "protected_cut_registry": str(registry_path) if registry_path else None,
         "protected_cut_registry_summary": registry_guard.get("summary") or {},

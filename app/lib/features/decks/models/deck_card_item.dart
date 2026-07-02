@@ -35,6 +35,7 @@ class DeckCardItem {
   final String? setName;
   final String? setReleaseDate; // yyyy-mm-dd
   final String rarity;
+  final bool isReserved;
   final int quantity;
   final bool isCommander;
 
@@ -60,6 +61,7 @@ class DeckCardItem {
     this.setName,
     this.setReleaseDate,
     required this.rarity,
+    this.isReserved = false,
     required this.quantity,
     required this.isCommander,
     this.collectorNumber,
@@ -81,6 +83,7 @@ class DeckCardItem {
     String? setName,
     String? setReleaseDate,
     String? rarity,
+    bool? isReserved,
     int? quantity,
     bool? isCommander,
     String? collectorNumber,
@@ -100,6 +103,7 @@ class DeckCardItem {
       setName: setName ?? this.setName,
       setReleaseDate: setReleaseDate ?? this.setReleaseDate,
       rarity: rarity ?? this.rarity,
+      isReserved: isReserved ?? this.isReserved,
       quantity: quantity ?? this.quantity,
       isCommander: isCommander ?? this.isCommander,
       collectorNumber: collectorNumber ?? this.collectorNumber,
@@ -116,12 +120,15 @@ class DeckCardItem {
       typeLine: json['type_line'] as String? ?? '',
       oracleText: json['oracle_text'] as String?,
       colors: (json['colors'] as List?)?.map((e) => e as String).toList() ?? [],
-      colorIdentity: (json['color_identity'] as List?)?.map((e) => e as String).toList() ?? [],
+      colorIdentity:
+          (json['color_identity'] as List?)?.map((e) => e as String).toList() ??
+          [],
       imageUrl: json['image_url'] as String?,
       setCode: json['set_code'] as String? ?? '',
       setName: json['set_name'] as String?,
       setReleaseDate: json['set_release_date'] as String?,
       rarity: json['rarity'] as String? ?? '',
+      isReserved: json['is_reserved'] as bool? ?? false,
       quantity: json['quantity'] as int? ?? 1,
       isCommander: json['is_commander'] as bool? ?? false,
       collectorNumber: json['collector_number'] as String?,

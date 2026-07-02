@@ -6,6 +6,7 @@ This is intentionally narrow:
 - fetches legalities by `oracle_id`;
 - upserts only `card_legalities`;
 - defaults to dry-run.
+- defaults to every card missing Commander legality; `--sets` narrows the batch.
 
 It does not create cards, alter decks, or promote Hermes findings.
 """
@@ -196,7 +197,7 @@ def load_candidates(
     limit: int | None,
     missing_commander_only: bool,
 ) -> list[Candidate]:
-    where = ["COALESCE(c.oracle_id, c.scryfall_id) IS NOT NULL"]
+    where = ["c.oracle_id IS NOT NULL"]
     params: list[Any] = []
     if sets:
         where.append("LOWER(c.set_code) = ANY(%s)")
@@ -210,7 +211,7 @@ def load_candidates(
     query = f"""
         SELECT
           c.id::text AS card_id,
-          COALESCE(c.oracle_id, c.scryfall_id)::text AS oracle_id,
+          c.oracle_id::text AS oracle_id,
           c.name,
           COALESCE(c.set_code, '') AS set_code
         FROM cards c
@@ -288,7 +289,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Sync missing legalities for existing cards using Scryfall oracle_id collection lookup."
     )
-    parser.add_argument("--sets", default=os.environ.get("MANALOOM_SYNC_LEGALITIES_SETS", "msh,msc,mar"))
+    parser.add_argument("--sets", default=os.environ.get("MANALOOM_SYNC_LEGALITIES_SETS", ""))
     parser.add_argument("--limit", type=int)
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--include-existing", action="store_true")

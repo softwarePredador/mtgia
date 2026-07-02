@@ -20,21 +20,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from master_optimizer_common import resolve_default_knowledge_db
+import lorehold_next_action_planner as next_action_planner
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
-DEFAULT_DB = resolve_default_knowledge_db()
+DEFAULT_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
+    REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
     REPORT_DIR / "lorehold_tutor_cut_candidate_exposure_profile_20260627_v1.json",
 ]
+DEFAULT_PRIOR_PACKAGE_REPORTS = list(next_action_planner.DEFAULT_PRIOR_PACKAGE_REPORTS)
 DEFAULT_CANDIDATES = ["Enlightened Tutor", "Gamble"]
 DEFAULT_BASELINE_DECK_ID = 607
 ACTIVE_EXECUTION_STATUSES = {"active", "verified", "auto", "reviewed"}
@@ -185,7 +187,83 @@ def cut_inventory_lookup(miner_report: dict[str, Any]) -> dict[str, dict[str, An
     }
 
 
-def prior_tutor_evidence(strategy_audit: dict[str, Any]) -> list[dict[str, Any]]:
+def win_rate_delta_pp(records: dict[str, Any]) -> float | None:
+    deltas: list[float] = []
+    for record in records.values():
+        if not isinstance(record, dict):
+            continue
+        baseline = record.get("baseline") or {}
+        candidate = record.get("candidate") or {}
+        if not isinstance(baseline, dict) or not isinstance(candidate, dict):
+            continue
+        baseline_games = int(baseline.get("games") or 0)
+        candidate_games = int(candidate.get("games") or 0)
+        if baseline_games <= 0:
+            baseline_games = int(baseline.get("wins") or 0) + int(baseline.get("losses") or 0) + int(
+                baseline.get("stalls") or 0
+            )
+        if candidate_games <= 0:
+            candidate_games = int(candidate.get("wins") or 0) + int(candidate.get("losses") or 0) + int(
+                candidate.get("stalls") or 0
+            )
+        if baseline_games <= 0 or candidate_games <= 0:
+            continue
+        baseline_wr = int(baseline.get("wins") or 0) / baseline_games * 100
+        candidate_wr = int(candidate.get("wins") or 0) / candidate_games * 100
+        deltas.append(round(candidate_wr - baseline_wr, 2))
+    return min(deltas) if deltas else None
+
+
+def compact_prior_package_row(path: Path, result: dict[str, Any]) -> dict[str, Any]:
+    row = dict(result)
+    if "gate_summary" not in row:
+        flat_gate = next_action_planner.gate_summary_from_flat_result(row)
+        if flat_gate:
+            row["gate_summary"] = flat_gate
+    decision = next_action_planner.infer_package_decision(row)
+    gate = row.get("gate_summary") or {}
+    aggregate = row.get("aggregate") or {}
+    delta = gate.get("delta_pp", aggregate.get("delta_pp_total", row.get("delta_pp")))
+    strong_seed_delta = row.get("strong_seed_delta_pp")
+    if strong_seed_delta is None:
+        strong_seed_delta = win_rate_delta_pp(row.get("critical_matchup_records") or {})
+    if strong_seed_delta is None:
+        strong_seed_delta = delta
+    return {
+        "package_key": row.get("package_key"),
+        "family": row.get("family"),
+        "adds": row.get("adds") or [],
+        "cuts": row.get("cuts") or [],
+        "decision": decision,
+        "delta_pp": delta,
+        "strong_seed_delta_pp": strong_seed_delta,
+        "source_report": str(path),
+        "source_section": row.get("source_section") or "prior_package_report",
+    }
+
+
+def prior_package_tutor_evidence(
+    prior_package_reports: list[tuple[Path, dict[str, Any]]],
+    candidates: Iterable[str],
+) -> list[dict[str, Any]]:
+    candidate_keys = {normalize_key(candidate) for candidate in candidates}
+    rows: list[dict[str, Any]] = []
+    for path, payload in prior_package_reports:
+        for result in next_action_planner.package_rows_from_prior_payload(payload):
+            if not isinstance(result, dict):
+                continue
+            add_keys = {normalize_key(card) for card in result.get("adds") or []}
+            if not candidate_keys.intersection(add_keys):
+                continue
+            rows.append(compact_prior_package_row(path, result))
+    return rows
+
+
+def prior_tutor_evidence(
+    strategy_audit: dict[str, Any],
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    candidates: Iterable[str] = DEFAULT_CANDIDATES,
+) -> list[dict[str, Any]]:
     post_squee = (
         (strategy_audit.get("strategy_dependency_map") or {})
         .get("package_learning", {})
@@ -196,6 +274,7 @@ def prior_tutor_evidence(strategy_audit: dict[str, Any]) -> list[dict[str, Any]]
         for row in post_squee.get(section) or []:
             if row.get("family") == "tutor_access":
                 rows.append({**row, "source_section": section})
+    rows.extend(prior_package_tutor_evidence(prior_package_reports or [], candidates))
     rows.sort(
         key=lambda row: (
             row.get("adds") or [],
@@ -336,6 +415,7 @@ def build_model(
     strategy_audit: dict[str, Any],
     miner_report: dict[str, Any],
     exposure_profiles: list[tuple[Path, dict[str, Any]]],
+    prior_package_reports: list[tuple[Path, dict[str, Any]]] | None = None,
     candidates: list[str] = DEFAULT_CANDIDATES,
     deck_id: int = DEFAULT_BASELINE_DECK_ID,
     db_path: Path = DEFAULT_DB,
@@ -348,7 +428,8 @@ def build_model(
     exposures = exposure_lookup(exposure_profiles)
     cut_inventory = cut_inventory_lookup(miner_report)
     guardrails = guardrail_lookup(strategy_audit)
-    prior_rows = prior_tutor_evidence(strategy_audit)
+    prior_package_reports = prior_package_reports or []
+    prior_rows = prior_tutor_evidence(strategy_audit, prior_package_reports, candidates)
     candidate_rows = [
         candidate_summary(candidate, rules, exposures, prior_rows)
         for candidate in candidates
@@ -410,6 +491,7 @@ def build_model(
         "strategy_audit": str(strategy_path),
         "miner_report": str(miner_path),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
+        "prior_package_reports": [str(path) for path, _payload in prior_package_reports],
         "deck_id": deck_id,
         "postgres_writes": False,
         "source_db_mutated": False,
@@ -449,7 +531,7 @@ def build_model(
 
 def render_markdown(payload: dict[str, Any]) -> str:
     lines = [
-        "# Lorehold Tutor Cut Model - 2026-06-28",
+        "# Lorehold Tutor Cut Model - 2026-06-30",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Source DB: `{payload['source_db']}`",
@@ -457,6 +539,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Strategy audit: `{payload['strategy_audit']}`",
         f"- Miner report: `{payload['miner_report']}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
+        f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -540,21 +623,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--miner-report", type=Path, default=DEFAULT_MINER_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
+    parser.add_argument("--prior-package-report", type=Path, action="append")
     parser.add_argument("--candidate", action="append")
     parser.add_argument("--deck-id", type=int, default=DEFAULT_BASELINE_DECK_ID)
-    parser.add_argument("--stem", default="lorehold_tutor_cut_model_20260628_v2_current_miner")
+    parser.add_argument("--stem", default="lorehold_tutor_cut_model_20260630_current")
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
+    prior_package_paths = args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     with connect(args.db) as conn:
         payload = build_model(
             conn=conn,
             strategy_audit=read_json(args.strategy_audit),
             miner_report=read_json(args.miner_report),
             exposure_profiles=read_existing_json(exposure_paths),
+            prior_package_reports=read_existing_json(prior_package_paths),
             candidates=args.candidate or DEFAULT_CANDIDATES,
             deck_id=args.deck_id,
             db_path=args.db,

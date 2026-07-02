@@ -133,7 +133,7 @@ def variant_gate_report_for_mana_vault() -> dict:
         "forced_access_mode": "none",
         "results": [
             {
-                "deck_key": "deck_6",
+                "deck_key": "deck_607",
                 "status": "pass",
                 "wins": 1,
                 "losses": 1,

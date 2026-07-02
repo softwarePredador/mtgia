@@ -4,7 +4,7 @@
 > Esta e a porta de entrada para decidir quais docs ler e quais ignorar em
 > tarefas Hermes.
 
-Updated: 2026-06-30
+Updated: 2026-07-01
 
 Esta pasta mistura contrato operacional, historico de auditoria, relatorios de
 rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
@@ -63,18 +63,98 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
 - `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`
   - Status: `current_operating_standard`.
   - Fluxo operacional atual para absorver XMage/Oracle/Fonte externa em
-    ManaLoom por familias e subpadroes, sem promover escopos genericos como
-    regra executavel.
+    ManaLoom por familias e subpadroes, tratando XMage local resolvido como
+    fonte autoritativa de comportamento e bloqueando apenas a promocao
+    executavel sem adaptador runtime.
   - Define a hierarquia de fontes: regras oficiais + Scryfall/MTGJSON para
-    identidade/oracle/rulings, XMage local como referencia primaria de engine,
+    identidade/oracle/rulings, XMage local como verdade de engine para cartas
+    com classe resolvida,
     Forge/Magarena/Cockatrice apenas como comparacao quando necessario,
     PostgreSQL como fonte duravel e Hermes/SQLite como cache/lab.
   - Evidencia atual:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.
+  - Manifesto de replay corrente para o checkpoint operacional:
     `master_optimizer_reports/xmage_current_replay_batch_pipeline_20260630_post_pg276_assemble_the_players_manifest.md`.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/xmage_strategy_consistency_audit.py`.
   - Auditoria geral de superficie operacional:
     `manaloom-knowledge/scripts/operational_surface_alignment_audit.py`.
+  - A partir de 2026-07-01, a fila de cartas e global sobre `cards`, nao
+    limitada a Lorehold/decks cadastrados. Rode
+    `manaloom-knowledge/scripts/global_card_oracle_battle_readiness.py` para
+    separar sync Oracle/legalities, blank Oracle text esperado, cobertura por
+    `card_id`/`normalized_name`, propagacao real por `oracle_id` e familias
+    XMage. Evidencia corrente:
+    `master_optimizer_reports/global_card_oracle_battle_readiness_20260701_post_pg323_creature_etb_add_counters_wave_recheck.md`.
+  - Para acelerar a adaptacao de todas as cartas, rode tambem
+    `manaloom-knowledge/scripts/global_card_adaptation_acceleration_model.py`.
+    Ele prova a fila no grao correto sem usar decks cadastrados como demanda:
+    `31772` rows com gap viram `28835` identidades Commander-legais,
+    `345` identidades com sinal externo de popularidade, e `28` unidades de
+    planejamento por template/familia. As `1511` identidades em decks
+    cadastrados e `232` em ready-product sao QA seeds apenas. Evidencia
+    corrente:
+    `master_optimizer_reports/global_card_adaptation_acceleration_model_20260701_demand_corrected.md`.
+  - Para aplicar a decisao "XMage como verdade final" em massa, rode
+    `manaloom-knowledge/scripts/xmage_authoritative_adaptation_queue.py`.
+    Depois rode
+    `manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py` para
+    transformar apenas assinaturas exatas/runtime-backed em candidato PG.
+    Evidencia corrente pos-PG323:
+    `master_optimizer_reports/xmage_authoritative_adaptation_queue_20260701_post_pg323_creature_etb_add_counters_wave_commander_legal.md`.
+    Resultado all-card: `27312` identidades ainda com gap, `26998` com fonte
+    XMage autoritativa resolvida, `314` excecoes sem fonte local, `0` parser
+    gaps e `11429` work units de adaptador ManaLoom por assinatura/effect
+    XMage. O PG283 promoveu/sincronizou `312` regras exatas de instant/sorcery
+    simples (`draw`, `direct_damage`, `destroy target`). O PG284 adicionou
+    `53` regras exatas utilitarias (`29` mana sources simples, `18` exile
+    target, `6` life gain). O PG285 fechou `8` residuos all-card ja suportados,
+    o PG286 adicionou `12` counters puros com restricao real de alvo na stack,
+    o PG287 adicionou `7` bounce spells com `destination=hand`, o PG288
+    adicionou `22` recursion spells graveyard-to-hand, e o PG289 adicionou
+    `13` mass-removal spells por destroy-all/fixed damage-all. O PG290
+    adicionou `3` add-counters spells de alvo criatura (`Battlegrowth`,
+    `Blight Rot`, `Scar`). O PG291 adicionou `42` boost/debuff spells de alvo
+    criatura com modificador de poder/resistencia ate o fim do turno. O PG292
+    adicionou `409` criaturas com keyword estatica de combate propria. O PG293
+    adicionou `85` criaturas com keyword estatica propria, incluindo multiline
+    Oracle e `hexproof`/`shroud`/`indestructible` seguros. O PG294 adicionou
+    `37` criaturas com ganho de vida fixo ao entrar no campo de batalha,
+    bloqueando casos proporcionais como "for each". O PG295 adicionou `28`
+    criaturas com draw fixo ao entrar no campo de batalha, bloqueando draw
+    proporcional/dinamico. O PG296 adicionou `6` criaturas com habilidade
+    ativada `{T}` de dano fixo a alvo, criando a base runtime para
+    `SimpleActivatedAbility` sem custo de mana/sacrificio. O PG297 adicionou
+    `19` criaturas com destroy de alvo ao entrar no campo de batalha, bloqueando
+    textos restritos como power/toughness, subtipo e condicoes. Do PG298 ao
+    PG317 foram adicionados ETB recursion, graveyard-to-battlefield recursion,
+    dies-draw, ETB damage, token spells/ETB tokens, boost+keyword, damage/destroy
+    com life gain, alvo restrito, permanentes ativados de draw/damage/recursion/
+    destroy/self-boost/target-keyword/target-boost e target-boost com sacrificio
+    da propria fonte, alem de target-keyword com keyword estatica propria. O
+    PG318 adicionou `13` tutors de biblioteca exatos para campo de batalha/topo
+    do grimorio, incluindo land tutors como `Farseek`/`Nature's Lore` e
+    `Personal Tutor`. O PG319 adicionou `6` permanentes com habilidade simples
+    de retorno da propria carta do cemiterio para a mao, incluindo
+    `Sanitarium Skeleton` e `Firewing Phoenix`. O PG320 adicionou `14`
+    permanentes com habilidade ativada simples de ganho de vida fixo, incluindo
+    `Bottle Gnomes`, `Fountain of Youth`, `Tower of Eons` e `Zarichi Tiger`.
+    O PG321 adicionou `32` estaticas exatas de poder/resistencia para criaturas
+    controladas via `BoostControlledEffect + SimpleStaticAbility`, incluindo
+    anthem/lord, subtipo, artefato criatura e criatura lendaria. O PG322
+    adicionou `19` spells one-shot de boost para criaturas controladas ate o
+    fim do turno via `BoostControlledEffect` fixo, com runtime
+    `controlled_stat_modifier_until_eot`. O PG323 adicionou `11` criaturas com
+    ETB que coloca counter fixo em uma criatura alvo via
+    `AddCountersTargetEffect + EntersBattlefieldTriggeredAbility`, mantendo a
+    fonte no campo e bloqueando multi-target/filtros. Todos os pacotes
+    PG285-PG323
+    passaram postcheck PostgreSQL e E2E em PG/SQLite/snapshot/runtime. O
+    splitter PG323 selecionou `11` propostas, o recheck pos-PG323 voltou
+    `proposal_count=0`, e a fila pos-PG323 caiu para `26998` adapters XMage
+    pendentes; a
+    proxima etapa deve continuar em novos subpadroes runtime-backed de maior
+    reducao reutilizavel, partindo da fila global e nao de decks cadastrados.
 
 - `XMAGE_ACCELERATION_STRATEGY_DECISION_2026-06-24.md` e
   `XMAGE_ABSORPTION_WORKFLOW_V2_2026-06-24.md`
@@ -83,7 +163,7 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
   - Nao devem ser usados como contrato operacional quando divergirem do fluxo
     definitivo de 2026-06-29.
 
-## Decisao atual Lorehold deckbuilding
+## Decisao atual Commander deckbuilding global
 
 - `COMMANDER_DECKBUILDING_CONTRACT_2026-06-29.md`
   - Status: `frozen_operating_contract`.
@@ -98,6 +178,25 @@ rodadas e memorias antigas. Para evitar confusao, use esta ordem de leitura.
     `server/lib/ai/commander_deckbuilding_contract_support.dart`, para ligar
     profile, stats, corpus, learned deck, usage hot cards, validacao e proximo
     gate em um unico diagnostico.
+  - A partir de 2026-07-01, o tratamento de decks deve ser globalizado pelo
+    metodo, nao pelo conteudo do Lorehold: rode
+    `manaloom-knowledge/scripts/global_commander_deck_contract_audit.py` para
+    separar `user_product`, `registered_pg_variant`, Hermes/lab e fixtures
+    antes de qualquer promocao, e depois rode
+    `manaloom-knowledge/scripts/global_commander_strategy_matrix.py` para
+    decidir quais comandantes entram em matriz estrategica especifica.
+  - Evidencia global atual:
+    `master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md`
+    e
+    `master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md`.
+    Resultado: 13 variantes PostgreSQL registradas `structure_ready`; Hermes
+    local 6/606-621 estruturalmente pronto; deck 607 do usuario
+    `rafaelhalder@gmail.com` com 100 cartas, 1 comandante e legalidades
+    Commander completas. A matriz global considera 10 comandantes, 36 decks
+    prontos, 19 decks de produto prontos e 8 decks de produto bloqueados;
+    `Lorehold`, `Kaalia`, `Kefka` e `Y'shtola` ja podem seguir para matriz
+    estrategica especifica, enquanto comandantes sem fonte/perfil ficam
+    bloqueados antes de battle/otimizacao.
   - Auditoria de alinhamento:
     `manaloom-knowledge/scripts/deckbuilding_contract_surface_audit.py`.
   - Auditoria obrigatoria de artefatos Lorehold antes de usar historico em

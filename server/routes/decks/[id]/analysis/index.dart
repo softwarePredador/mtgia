@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../lib/ai/commander_deckbuilding_contract_support.dart';
 import '../../../../lib/ai/functional_card_tags.dart';
 import '../../../../lib/meta/meta_deck_card_list_support.dart';
 import '../../../../lib/meta/meta_deck_format_support.dart';
@@ -35,10 +36,25 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         await _hasTable(pool, 'card_intelligence_snapshot');
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
     final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.id'
+        ? 'JOIN card_intelligence_snapshot c ON dc.card_id = c.card_id'
         : 'JOIN cards c ON dc.card_id = c.id';
     final priceSelect =
         hasCardIntelligenceSnapshot ? 'c.price_usd AS price' : 'c.price';
+    final battleRuleCountSelect = hasCardIntelligenceSnapshot
+        ? 'c.battle_rule_count AS battle_rule_count'
+        : '0::int AS battle_rule_count';
+    final verifiedBattleRuleCountSelect = hasCardIntelligenceSnapshot
+        ? 'c.verified_battle_rule_count AS verified_battle_rule_count'
+        : '0::int AS verified_battle_rule_count';
+    final sourceCoverageSelect = hasCardIntelligenceSnapshot
+        ? 'c.source_coverage AS source_coverage'
+        : '''jsonb_build_object(
+            'has_function_tags', false,
+            'has_semantic_v2', false,
+            'has_verified_battle_rules', false,
+            'has_any_battle_rules', false,
+            'has_legalities', false
+          ) AS source_coverage''';
     final functionalTagsSelect = hasCardIntelligenceSnapshot
         ? 'c.function_tag_details AS functional_tags'
         : '''
@@ -105,9 +121,13 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           c.oracle_text,
           $priceSelect,
           dc.quantity,
+          dc.is_commander,
           c.cmc,
           $functionalTagsSelect,
-          $semanticV2Select
+          $semanticV2Select,
+          $battleRuleCountSelect,
+          $verifiedBattleRuleCountSelect,
+          $sourceCoverageSelect
         FROM deck_cards dc
         $cardSourceJoin
         WHERE dc.deck_id = @deckId
@@ -442,6 +462,30 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         }
       },
       'functional_tags': functionalSummary.toJson(),
+      'readiness': _buildDeckReadinessSummary(
+        format: format,
+        totalCards: totalCards,
+        cards: cards,
+        issues: issues,
+      ),
+      'battle_readiness': _buildBattleReadinessSummary(cards),
+      'card_battle_readiness': _buildCardBattleReadiness(cards),
+      'understanding_summary': _buildUnderstandingSummary(
+        cards: cards,
+        functionalSummary: functionalSummary,
+        hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
+      ),
+      'commander_contract': _buildCommanderContractSummary(
+        format: format,
+        totalCards: totalCards,
+        cards: cards,
+        issues: issues,
+      ),
+      'launch_capabilities': _buildLaunchCapabilities(
+        format: format,
+        hasCardIntelligenceSnapshot: hasCardIntelligenceSnapshot,
+        hasSemanticV2: hasSemanticV2,
+      ),
       'meta_analysis': metaAnalysis,
       'mana_curve':
           manaCurve.map((key, value) => MapEntry(key.toString(), value)),
@@ -458,6 +502,447 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
       body: {'error': 'Failed to analyze deck'},
     );
   }
+}
+
+Map<String, dynamic> _buildLaunchCapabilities({
+  required String format,
+  required bool hasCardIntelligenceSnapshot,
+  required bool hasSemanticV2,
+}) {
+  final normalizedFormat = format.toLowerCase().trim();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+  final betaSurfacesEnabled = _envFlag('MANALOOM_BETA_SURFACES', true);
+
+  return {
+    'schema_version': 'launch_capabilities_v1_2026-07-01',
+    'release_channel': betaSurfacesEnabled ? 'beta' : 'stable_only',
+    'flags': {
+      'beta_surfaces_enabled': betaSurfacesEnabled,
+      'card_intelligence_snapshot': hasCardIntelligenceSnapshot,
+      'semantic_v2_available': hasSemanticV2 || hasCardIntelligenceSnapshot,
+    },
+    'surfaces': [
+      {
+        'key': 'deck_analysis',
+        'label': 'Análise de deck',
+        'enabled': true,
+        'stage': 'stable',
+        'requires_review': false,
+      },
+      {
+        'key': 'commander_contract',
+        'label': 'Plano Commander',
+        'enabled': betaSurfacesEnabled && isCommander,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'battle_readiness',
+        'label': 'Battle readiness',
+        'enabled': betaSurfacesEnabled && hasCardIntelligenceSnapshot,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'optimize_explanations',
+        'label': 'Explicações de optimize',
+        'enabled': betaSurfacesEnabled,
+        'stage': 'beta',
+        'requires_review': true,
+      },
+      {
+        'key': 'recommendations',
+        'label': 'Recomendações',
+        'enabled': true,
+        'stage': 'advisory',
+        'requires_review': true,
+      },
+    ],
+    'disclaimer':
+        'Superficies beta e advisory exigem preview/review; nao sao verdade final do deck.',
+  };
+}
+
+Map<String, dynamic> _buildCommanderContractSummary({
+  required String format,
+  required int totalCards,
+  required List<Map<String, dynamic>> cards,
+  required List<Map<String, dynamic>> issues,
+}) {
+  final normalizedFormat = format.toLowerCase().trim();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+
+  if (!isCommander) {
+    final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+      format: format,
+      generatedDeck: const {
+        'commander': '',
+        'cards': <Map<String, dynamic>>[],
+      },
+      validationSummary: const {
+        'is_valid': true,
+        'invalid_cards': <String>[],
+        'errors': <String>[],
+        'warnings': <String>[],
+      },
+      battleGateRequired: false,
+    );
+    return buildCommanderDeckbuildingAppSummary(
+      diagnostics,
+      totalCards: totalCards,
+      commanderCount: 0,
+    );
+  }
+
+  final commanderCards =
+      cards.where((card) => card['is_commander'] == true).toList();
+  final commanderCount = commanderCards.fold<int>(
+    0,
+    (sum, card) => sum + _quantity(card),
+  );
+  final commanderName = commanderCards.isEmpty
+      ? ''
+      : commanderCards.first['name']?.toString().trim() ?? '';
+  final errors = issues
+      .where((issue) => issue['type']?.toString() == 'error')
+      .map((issue) => issue['message']?.toString().trim() ?? '')
+      .where((message) => message.isNotEmpty)
+      .toList();
+  final warnings = issues
+      .where((issue) => issue['type']?.toString() == 'warning')
+      .map((issue) => issue['message']?.toString().trim() ?? '')
+      .where((message) => message.isNotEmpty)
+      .toList();
+
+  if (commanderCount <= 0) errors.add('Commander missing.');
+  if (totalCards != 100) {
+    errors.add('Commander decks must have exactly 100 cards.');
+  }
+
+  final generatedCards = cards
+      .where((card) => card['is_commander'] != true)
+      .map(
+        (card) => {
+          'name': card['name']?.toString() ?? '',
+          'quantity': _quantity(card),
+        },
+      )
+      .where((card) => card['name']?.toString().trim().isNotEmpty == true)
+      .toList(growable: false);
+
+  final diagnostics = buildCommanderDeckbuildingContractDiagnostics(
+    format: format,
+    generatedDeck: {
+      'commander': {'name': commanderName},
+      'cards': generatedCards,
+    },
+    validationSummary: {
+      'is_valid': errors.isEmpty,
+      'invalid_cards': const <String>[],
+      'errors': errors,
+      'warnings': warnings,
+    },
+    battleGateRequired: true,
+  );
+
+  return buildCommanderDeckbuildingAppSummary(
+    diagnostics,
+    totalCards: totalCards,
+    commanderCount: commanderCount,
+  );
+}
+
+Map<String, dynamic> _buildDeckReadinessSummary({
+  required String format,
+  required int totalCards,
+  required List<Map<String, dynamic>> cards,
+  required List<Map<String, dynamic>> issues,
+}) {
+  final normalizedFormat = format.toLowerCase().trim();
+  final isCommander =
+      normalizedFormat == 'commander' || normalizedFormat == 'edh';
+  final commanderCount = cards.fold<int>(
+    0,
+    (sum, card) => sum + (card['is_commander'] == true ? _quantity(card) : 0),
+  );
+  final errorCount =
+      issues.where((issue) => issue['type']?.toString() == 'error').length;
+  final warningCount =
+      issues.where((issue) => issue['type']?.toString() == 'warning').length;
+  final blockers = <String>[];
+  final nextActions = <String>[];
+
+  if (isCommander) {
+    if (commanderCount <= 0) {
+      blockers.add('needs_commander');
+      nextActions.add('Definir o comandante antes de avaliar o plano.');
+    }
+    if (totalCards < 100) {
+      blockers.add('incomplete_deck');
+      nextActions.add('Completar a lista ate 100 cartas.');
+    } else if (totalCards > 100) {
+      blockers.add('too_many_cards');
+      nextActions.add('Reduzir a lista para exatamente 100 cartas.');
+    }
+  } else if (totalCards < 60) {
+    blockers.add('incomplete_deck');
+    nextActions
+        .add('Completar a lista antes de aplicar diagnosticos avancados.');
+  }
+
+  if (errorCount > 0) {
+    blockers.add('legality_or_structure_errors');
+    nextActions.add('Corrigir erros de legalidade e estrutura.');
+  }
+
+  final status = blockers.isNotEmpty
+      ? blockers.first
+      : warningCount > 0
+          ? 'ready_with_warnings'
+          : isCommander
+              ? 'valid_commander_deck'
+              : 'valid_deck';
+
+  return {
+    'schema_version': 'deck_readiness_v1_2026-07-01',
+    'status': status,
+    'is_commander': isCommander,
+    'commander_count': commanderCount,
+    'total_cards': totalCards,
+    'error_count': errorCount,
+    'warning_count': warningCount,
+    'blockers': blockers.toSet().toList(growable: false),
+    'next_actions': nextActions.toSet().toList(growable: false),
+    'advanced_intelligence_enabled': blockers.isEmpty,
+  };
+}
+
+List<Map<String, dynamic>> _buildCardBattleReadiness(
+  List<Map<String, dynamic>> cards,
+) {
+  final readiness = cards.map((card) {
+    final name = card['name']?.toString() ?? '';
+    final quantity = _quantity(card);
+    final battleRuleCount = _intValue(card['battle_rule_count']);
+    final verifiedBattleRuleCount =
+        _intValue(card['verified_battle_rule_count']);
+    final status = _cardBattleReadinessStatus(card);
+    final sourceCoverage = card['source_coverage'] is Map
+        ? (card['source_coverage'] as Map).cast<String, dynamic>()
+        : const <String, dynamic>{};
+
+    return {
+      'schema_version': 'card_battle_readiness_v1_2026-07-01',
+      'card_id': card['id']?.toString() ?? '',
+      'name': name,
+      'quantity': quantity,
+      'is_commander': card['is_commander'] == true,
+      'status': status,
+      'status_label': _cardBattleReadinessLabel(status),
+      'battle_rule_count': battleRuleCount,
+      'verified_battle_rule_count': verifiedBattleRuleCount,
+      'source_coverage': sourceCoverage,
+      'detail': _cardBattleReadinessDetail(
+        status: status,
+        verifiedBattleRuleCount: verifiedBattleRuleCount,
+        battleRuleCount: battleRuleCount,
+      ),
+      'disclaimer':
+          'Badge conservador: indica cobertura de regra/battle no backend, nao garantia de simulacao perfeita.',
+    };
+  }).toList(growable: false);
+
+  final sorted = [...readiness];
+  sorted.sort((a, b) {
+    final commanderCompare = (b['is_commander'] == true ? 1 : 0) -
+        (a['is_commander'] == true ? 1 : 0);
+    if (commanderCompare != 0) return commanderCompare;
+    return (a['name']?.toString() ?? '').compareTo(b['name']?.toString() ?? '');
+  });
+  return sorted;
+}
+
+Map<String, dynamic> _buildBattleReadinessSummary(
+  List<Map<String, dynamic>> cards,
+) {
+  var totalCopies = 0;
+  var verifiedCopies = 0;
+  var partialCopies = 0;
+  var pendingAdapterCopies = 0;
+  var rulesTextOnlyCopies = 0;
+  final samples = <String, List<String>>{
+    'verified_simulation': <String>[],
+    'partial_simulation': <String>[],
+    'pending_adapter': <String>[],
+    'rules_text_only': <String>[],
+  };
+
+  void addSample(String key, String name) {
+    final bucket = samples[key];
+    if (bucket == null || bucket.length >= 5 || name.trim().isEmpty) return;
+    if (!bucket.contains(name)) bucket.add(name);
+  }
+
+  for (final card in cards) {
+    final quantity = _quantity(card);
+    final name = card['name']?.toString() ?? '';
+    final oracleText = card['oracle_text']?.toString().trim() ?? '';
+    final battleRuleCount = _intValue(card['battle_rule_count']);
+    final verifiedBattleRuleCount =
+        _intValue(card['verified_battle_rule_count']);
+    totalCopies += quantity;
+
+    if (verifiedBattleRuleCount > 0) {
+      verifiedCopies += quantity;
+      addSample('verified_simulation', name);
+    } else if (battleRuleCount > 0) {
+      partialCopies += quantity;
+      addSample('partial_simulation', name);
+    } else if (oracleText.isNotEmpty) {
+      pendingAdapterCopies += quantity;
+      addSample('pending_adapter', name);
+    } else {
+      rulesTextOnlyCopies += quantity;
+      addSample('rules_text_only', name);
+    }
+  }
+
+  final verifiedRatio = totalCopies == 0 ? 0.0 : verifiedCopies / totalCopies;
+  final status = totalCopies == 0
+      ? 'not_available'
+      : verifiedCopies == totalCopies
+          ? 'verified_simulation'
+          : verifiedCopies > 0 || partialCopies > 0
+              ? 'partial_simulation'
+              : pendingAdapterCopies > 0
+                  ? 'pending_adapter'
+                  : 'rules_text_only';
+
+  return {
+    'schema_version': 'deck_battle_readiness_v1_2026-07-01',
+    'status': status,
+    'total_copies': totalCopies,
+    'verified_simulation_copies': verifiedCopies,
+    'partial_simulation_copies': partialCopies,
+    'pending_adapter_copies': pendingAdapterCopies,
+    'rules_text_only_copies': rulesTextOnlyCopies,
+    'verified_ratio': double.parse(verifiedRatio.toStringAsFixed(4)),
+    'samples': samples,
+    'disclaimer':
+        'Battle readiness indica suporte verificado do runtime quando existe; nao significa simulacao perfeita de todas as cartas.',
+  };
+}
+
+String _cardBattleReadinessStatus(Map<String, dynamic> card) {
+  final oracleText = card['oracle_text']?.toString().trim() ?? '';
+  final battleRuleCount = _intValue(card['battle_rule_count']);
+  final verifiedBattleRuleCount = _intValue(card['verified_battle_rule_count']);
+
+  if (verifiedBattleRuleCount > 0) return 'verified_simulation';
+  if (battleRuleCount > 0) return 'partial_simulation';
+  if (oracleText.isNotEmpty) return 'pending_adapter';
+  return 'rules_text_only';
+}
+
+String _cardBattleReadinessLabel(String status) {
+  switch (status) {
+    case 'verified_simulation':
+      return 'Simulação verificada';
+    case 'partial_simulation':
+      return 'Simulação parcial';
+    case 'pending_adapter':
+      return 'Adaptador pendente';
+    case 'rules_text_only':
+      return 'Texto de regra';
+    default:
+      return 'Sem leitura';
+  }
+}
+
+String _cardBattleReadinessDetail({
+  required String status,
+  required int verifiedBattleRuleCount,
+  required int battleRuleCount,
+}) {
+  switch (status) {
+    case 'verified_simulation':
+      return '$verifiedBattleRuleCount regra(s) verificadas para battle.';
+    case 'partial_simulation':
+      return '$battleRuleCount regra(s) mapeadas, ainda sem verificação completa.';
+    case 'pending_adapter':
+      return 'Texto Oracle presente, mas sem adaptador battle verificado.';
+    case 'rules_text_only':
+      return 'Sem texto Oracle ou regra battle suficiente para simulação.';
+    default:
+      return 'Sem leitura de battle para esta carta.';
+  }
+}
+
+Map<String, dynamic> _buildUnderstandingSummary({
+  required List<Map<String, dynamic>> cards,
+  required FunctionalDeckSummary functionalSummary,
+  required bool hasCardIntelligenceSnapshot,
+}) {
+  final totalCopies = cards.fold<int>(
+    0,
+    (sum, card) => sum + _quantity(card),
+  );
+  final taggedCopies = functionalSummary.taggedCopies;
+  var semanticCopies = 0;
+  var verifiedRuleCopies = 0;
+
+  for (final card in cards) {
+    final quantity = _quantity(card);
+    final semanticTags = card['semantic_tags_v2'];
+    final hasSemantic = semanticTags is Iterable
+        ? semanticTags.isNotEmpty
+        : semanticTags?.toString().trim().isNotEmpty == true &&
+            semanticTags.toString() != '[]';
+    if (hasSemantic) semanticCopies += quantity;
+    if (_intValue(card['verified_battle_rule_count']) > 0) {
+      verifiedRuleCopies += quantity;
+    }
+  }
+
+  return {
+    'schema_version': 'deck_understanding_summary_v1_2026-07-01',
+    'source': hasCardIntelligenceSnapshot
+        ? 'card_intelligence_snapshot'
+        : 'legacy_aggregated_queries',
+    'total_copies': totalCopies,
+    'functional_tagged_copies': taggedCopies,
+    'semantic_tagged_copies': semanticCopies,
+    'verified_battle_rule_copies': verifiedRuleCopies,
+    'functional_coverage_ratio': totalCopies == 0
+        ? 0.0
+        : double.parse((taggedCopies / totalCopies).toStringAsFixed(4)),
+    'verified_battle_ratio': totalCopies == 0
+        ? 0.0
+        : double.parse((verifiedRuleCopies / totalCopies).toStringAsFixed(4)),
+  };
+}
+
+int _quantity(Map<String, dynamic> card) {
+  final raw = card['quantity'];
+  if (raw is int) return raw;
+  if (raw is num) return raw.round();
+  return int.tryParse(raw?.toString() ?? '') ?? 1;
+}
+
+int _intValue(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+bool _envFlag(String key, bool defaultValue) {
+  final value = Platform.environment[key]?.trim().toLowerCase();
+  if (value == null || value.isEmpty) return defaultValue;
+  if (value == '0' || value == 'false' || value == 'no') return false;
+  if (value == '1' || value == 'true' || value == 'yes') return true;
+  return defaultValue;
 }
 
 class ManaAnalysis {

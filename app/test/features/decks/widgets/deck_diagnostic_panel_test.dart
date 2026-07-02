@@ -369,6 +369,214 @@ void main() {
       expect(find.text('Análise completa'), findsOneWidget);
     });
 
+    testWidgets('renders backend launch readiness signals when available', (
+      tester,
+    ) async {
+      final deck = makeHealthyCommanderDeck();
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': deck.id,
+        'format': 'commander',
+        'stats': {
+          'composition': {
+            'ramp': 10,
+            'draw': 10,
+            'removal': 9,
+            'board_wipes': 2,
+          },
+        },
+        'readiness': {
+          'schema_version': 'deck_readiness_v1_2026-07-01',
+          'status': 'valid_commander_deck',
+          'is_commander': true,
+          'commander_count': 1,
+          'total_cards': 100,
+          'error_count': 0,
+          'warning_count': 0,
+          'blockers': [],
+          'next_actions': [],
+          'advanced_intelligence_enabled': true,
+        },
+        'battle_readiness': {
+          'schema_version': 'deck_battle_readiness_v1_2026-07-01',
+          'status': 'partial_simulation',
+          'total_copies': 100,
+          'verified_simulation_copies': 72,
+          'partial_simulation_copies': 8,
+          'pending_adapter_copies': 20,
+          'rules_text_only_copies': 0,
+          'verified_ratio': 0.72,
+          'samples': {
+            'verified_simulation': ['Counterspell'],
+            'pending_adapter': ['Pteramander'],
+          },
+        },
+        'card_battle_readiness': [
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'cmdr',
+            'name': 'Talrand, Sky Summoner',
+            'quantity': 1,
+            'is_commander': true,
+            'status': 'verified_simulation',
+            'status_label': 'Simulação verificada',
+            'battle_rule_count': 2,
+            'verified_battle_rule_count': 1,
+            'source_coverage': {'has_verified_battle_rules': true},
+            'detail': '1 regra verificada para battle.',
+          },
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'ptera',
+            'name': 'Pteramander',
+            'quantity': 34,
+            'is_commander': false,
+            'status': 'pending_adapter',
+            'status_label': 'Adaptador pendente',
+            'battle_rule_count': 0,
+            'verified_battle_rule_count': 0,
+            'source_coverage': {},
+            'detail': 'Texto Oracle presente.',
+          },
+        ],
+        'understanding_summary': {
+          'schema_version': 'deck_understanding_summary_v1_2026-07-01',
+          'source': 'card_intelligence_snapshot',
+          'total_copies': 100,
+          'functional_tagged_copies': 82,
+          'semantic_tagged_copies': 77,
+          'verified_battle_rule_copies': 72,
+          'functional_coverage_ratio': 0.82,
+          'verified_battle_ratio': 0.72,
+        },
+        'commander_contract': {
+          'schema_version': 'commander_contract_summary_v1_2026-07-01',
+          'source_version': 'commander_deckbuilding_contract_v2_2026-06-29',
+          'status': 'ready_for_battle_gate',
+          'status_label': 'Pronto para battle gate',
+          'is_commander_applicable': true,
+          'commander_name': 'Talrand, Sky Summoner',
+          'total_cards': 100,
+          'commander_count': 1,
+          'summary':
+              'Estrutura e fontes suficientes; falta validar em battle gate igualado.',
+          'battle_gate': {
+            'required': true,
+            'status': 'pending',
+            'label': 'Pendente',
+          },
+          'gates': {
+            'commander_present': true,
+            'validation_valid': true,
+            'unresolved_cards_zero': true,
+            'has_reference_lane': true,
+            'deterministic_reference_ready': true,
+          },
+          'source_lanes': [
+            {
+              'key': 'reference_card_stats',
+              'label': 'Estatísticas de cartas',
+              'available': true,
+              'count': 18,
+            },
+          ],
+          'planning_flow': [
+            {
+              'key': 'commander_intent_and_archetype',
+              'label': 'Plano do comandante',
+            },
+          ],
+          'overview_fields': [
+            {'key': 'commander_plan_sentence', 'label': 'Frase do plano'},
+          ],
+          'blockers': [],
+          'warnings': [],
+          'next_actions': ['Rodar battle gate igualado.'],
+        },
+        'launch_capabilities': {
+          'schema_version': 'launch_capabilities_v1_2026-07-01',
+          'release_channel': 'beta',
+          'flags': {
+            'beta_surfaces_enabled': true,
+            'card_intelligence_snapshot': true,
+          },
+          'surfaces': [
+            {
+              'key': 'commander_contract',
+              'label': 'Plano Commander',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'battle_readiness',
+              'label': 'Battle readiness',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'recommendations',
+              'label': 'Recomendações',
+              'enabled': true,
+              'stage': 'advisory',
+              'requires_review': true,
+            },
+          ],
+          'disclaimer': 'Superfícies beta exigem review.',
+        },
+      });
+
+      await tester.pumpWidget(createSubject(deck, analysis: analysis));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-launch-readiness-card')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('deck-launch-battle-card')), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-launch-understanding-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-launch-commander-contract-card')),
+        findsOneWidget,
+      );
+      expect(find.text('Prontidão'), findsOneWidget);
+      expect(find.text('Commander válido'), findsOneWidget);
+      expect(find.text('Inteligência avançada liberada.'), findsOneWidget);
+      expect(find.text('Simulação parcial'), findsOneWidget);
+      expect(find.text('72/100 cópias verificadas'), findsOneWidget);
+      expect(find.text('82% classificado'), findsOneWidget);
+      expect(find.text('Plano Commander'), findsOneWidget);
+      expect(find.text('Pronto para battle gate'), findsOneWidget);
+      expect(find.text('Battle gate: Pendente'), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-launch-capability-badges')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-launch-capability-battle_readiness')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle readiness beta'), findsOneWidget);
+      expect(find.text('Recomendações advisory'), findsOneWidget);
+      expect(
+        find.byKey(const Key('deck-card-battle-readiness-badges')),
+        findsOneWidget,
+      );
+      expect(find.text('Battle por carta'), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('deck-card-battle-readiness-Talrand, Sky Summoner'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Simulação verificada'), findsOneWidget);
+      expect(find.text('Adaptador pendente'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('avoids overflow and surfaces warnings for a greedy deck', (
       tester,
     ) async {

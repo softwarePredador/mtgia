@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'core/api/api_client.dart';
+import 'core/config/launch_features.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/platform_unavailable_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/decks/screens/deck_list_screen.dart';
 import 'features/decks/providers/deck_provider.dart';
@@ -53,6 +55,12 @@ import 'features/notifications/screens/notification_screen.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
+import 'features/commercial/providers/commercial_provider.dart';
+import 'features/commercial/screens/checkout_screen.dart';
+import 'features/commercial/screens/legal_screen.dart';
+import 'features/commercial/screens/plan_screen.dart';
+import 'features/commercial/screens/upgrade_screen.dart';
+import 'features/retention/screens/post_game_notes_screen.dart';
 
 final bool _debugBootIntoLifeCounter =
     kDebugMode &&
@@ -178,6 +186,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
   late final TradeProvider _tradeProvider;
   late final MessageProvider _messageProvider;
   late final NotificationProvider _notificationProvider;
+  late final CommercialProvider _commercialProvider;
   late final RealtimeNotificationCoordinator _realtimeCoordinator;
   late final GoRouter _router;
   bool _hadAuthenticatedSession = false;
@@ -195,9 +204,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
     _tradeProvider = TradeProvider();
     _messageProvider = MessageProvider();
     _notificationProvider = NotificationProvider();
+    _commercialProvider = CommercialProvider();
+    unawaited(_commercialProvider.load());
 
     // Iniciar/parar polling de notificações quando autenticado
     _authProvider.addListener(_onAuthChanged);
+    unawaited(_authProvider.initialize());
 
     // Log da URL da API no boot
     ApiClient.debugLogBaseUrl();
@@ -223,23 +235,6 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
           return null;
         }
 
-        // Enquanto auth inicializa/carrega, mantém o app em splash/auth.
-        // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
-        if (status == AuthStatus.loading || status == AuthStatus.initial) {
-          final isBootSafeRoute =
-              location == '/' ||
-              location == '/login' ||
-              location == '/register' ||
-              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
-          if (!isBootSafeRoute) {
-            debugPrint('[🧭 Router] → / (status=$status, aguardando auth)');
-            return '/';
-          }
-
-          debugPrint('[🧭 Router] → null (status=$status, aguardando)');
-          return null;
-        }
-
         final isAuthRoute = location == '/login' || location == '/register';
         final isProtectedRoute =
             location.startsWith('/home') ||
@@ -251,8 +246,38 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
             location.startsWith('/trades') ||
             location.startsWith('/messages') ||
             location.startsWith('/notifications') ||
+            location.startsWith('/plans') ||
+            location.startsWith('/upgrade') ||
+            location.startsWith('/checkout') ||
+            location.startsWith('/legal') ||
             location.startsWith('/onboarding') ||
             location.startsWith(lifeCounterRoutePath);
+
+        // Enquanto auth inicializa/carrega, mantém o app em splash/auth.
+        // Evita abrir telas protegidas e disparar rajadas de 401 no boot.
+        if (status == AuthStatus.loading || status == AuthStatus.initial) {
+          final isBootSafeRoute =
+              location == '/' ||
+              location == '/login' ||
+              location == '/register' ||
+              (_debugBootIntoLifeCounter && location == lifeCounterRoutePath);
+          if (!isBootSafeRoute) {
+            final redirectTarget = state.uri.toString();
+            final splashUri =
+                Uri(
+                  path: '/',
+                  queryParameters:
+                      isProtectedRoute ? {'redirect': redirectTarget} : null,
+                ).toString();
+            debugPrint(
+              '[🧭 Router] → $splashUri (status=$status, aguardando auth)',
+            );
+            return splashUri;
+          }
+
+          debugPrint('[🧭 Router] → null (status=$status, aguardando)');
+          return null;
+        }
 
         if (isProtectedRoute && !_authProvider.isAuthenticated) {
           debugPrint('[🧭 Router] → /login (rota protegida sem auth)');
@@ -264,11 +289,29 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
           return '/home';
         }
 
+        final uriPath = state.uri.path;
+        if (!LaunchFeatures.scannerEnabled && uriPath.endsWith('/scan')) {
+          final fallbackPath = uriPath.replaceFirst(
+            RegExp(r'/scan$'),
+            '/search',
+          );
+          debugPrint(
+            '[🧭 Router] → $fallbackPath (scanner deferred neste build)',
+          );
+          return fallbackPath;
+        }
+
         debugPrint('[🧭 Router] → null (sem redirect)');
         return null;
       },
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(
+          path: '/',
+          builder:
+              (context, state) => SplashScreen(
+                redirectPath: state.uri.queryParameters['redirect'],
+              ),
+        ),
 
         GoRoute(
           path: '/login',
@@ -281,7 +324,20 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
 
         GoRoute(
           path: lifeCounterRoutePath,
-          builder: (context, state) => const LotusLifeCounterScreen(),
+          builder:
+              (context, state) =>
+                  kIsWeb
+                      ? const PlatformUnavailableScreen(
+                        title: 'Contador disponivel no app mobile',
+                        message:
+                            'O contador Lotus usa WebView nativo e fica '
+                            'desabilitado no Flutter Web neste corte.',
+                        details:
+                            'No navegador, continue usando deck builder, IA, '
+                            'colecao, planos, comunidade e trade. A rota fica '
+                            'protegida para nao quebrar o app web.',
+                      )
+                      : const LotusLifeCounterScreen(),
         ),
 
         ShellRoute(
@@ -337,9 +393,32 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
                         return CardScannerScreen(deckId: id);
                       },
                     ),
+                    GoRoute(
+                      path: 'post-game',
+                      builder: (context, state) {
+                        final id = state.pathParameters['id']!;
+                        return PostGameNotesScreen(deckId: id);
+                      },
+                    ),
                   ],
                 ),
               ],
+            ),
+            GoRoute(
+              path: '/plans',
+              builder: (context, state) => const PlanScreen(),
+            ),
+            GoRoute(
+              path: '/upgrade',
+              builder: (context, state) => const UpgradeScreen(),
+            ),
+            GoRoute(
+              path: '/checkout',
+              builder: (context, state) => const CheckoutScreen(),
+            ),
+            GoRoute(
+              path: '/legal',
+              builder: (context, state) => const CommercialLegalScreen(),
             ),
             GoRoute(
               path: '/collection',
@@ -541,6 +620,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> {
         ChangeNotifierProvider.value(value: _tradeProvider),
         ChangeNotifierProvider.value(value: _messageProvider),
         ChangeNotifierProvider.value(value: _notificationProvider),
+        ChangeNotifierProvider.value(value: _commercialProvider),
       ],
       child: MaterialApp.router(
         title: 'ManaLoom - Deck Builder',

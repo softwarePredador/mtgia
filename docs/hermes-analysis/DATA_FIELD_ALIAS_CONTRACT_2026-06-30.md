@@ -32,6 +32,10 @@ now checks the cross-field drift that caused duplicate work risk:
 - Trusted executable `battle_card_rules` missing `oracle_hash` are surfaced as
   warnings. This remains a backlog for old rows, not a reason to block every
   current runtime package.
+- Global card readiness audits must treat `card_battle_rules` coverage as
+  effective when either `card_id` matches or the existing storage key
+  `normalized_name + logical_rule_key` matches. `oracle_id` is a propagation
+  candidate only after both of those coverage checks fail.
 
 ## Current Remediation
 
@@ -65,6 +69,11 @@ first:
 3. `logical_rule_key` over effect text or generated rule labels.
 4. `oracle_hash` over timestamp/source notes for rule drift detection.
 5. Aggregated snapshots over raw multi-row joins.
+
+For battle-rule coverage specifically, do not create a new row only because a
+different printing has a different `card_id`. First check whether the rule is
+already covered by `normalized_name + logical_rule_key`; only then consider an
+`oracle_id` propagation package.
 
 If the durable field is absent but a cache/source table can fill it, run the
 sync/backfill path before writing new logic around the missing value.

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../auth/models/user.dart';
 import '../auth/providers/auth_provider.dart';
+import '../commercial/widgets/ai_usage_meter.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -289,7 +290,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: AppTheme.backgroundAbyss,
-                                        width: 2,
+                                        width: AppTheme.strokeStrong,
                                       ),
                                     ),
                                     child: Semantics(
@@ -492,6 +493,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 18),
+                      const AiUsageMeter(compact: true),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              key: const Key('profile-open-plans-button'),
+                              onPressed: () => context.push('/plans'),
+                              icon: const Icon(Icons.tune_outlined),
+                              label: const Text('Planos'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              key: const Key('profile-open-legal-button'),
+                              onPressed: () => context.push('/legal'),
+                              icon: const Icon(Icons.policy_outlined),
+                              label: const Text('Legal'),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 18),
                       _ProfileSectionPanel(

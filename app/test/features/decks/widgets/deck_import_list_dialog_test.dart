@@ -83,6 +83,87 @@ void main() {
   });
 
   testWidgets(
+    'showDeckImportListDialog closes replace-all success when commander is preserved',
+    (tester) async {
+      final importCalls = <Map<String, dynamic>>[];
+      final refreshedDecks = <String>[];
+      String? snackMessage;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Builder(
+            builder: (context) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showDeckImportListDialog(
+                        context: context,
+                        deckId: 'deck-1',
+                        importListToDeck: ({
+                          required deckId,
+                          required list,
+                          required replaceAll,
+                        }) async {
+                          importCalls.add({
+                            'deckId': deckId,
+                            'list': list,
+                            'replaceAll': replaceAll,
+                          });
+                          return {
+                            'success': true,
+                            'cards_imported': 99,
+                            'not_found_lines': const [],
+                            'warnings': const [],
+                            'missing_commander': false,
+                            'commander_preserved': true,
+                          };
+                        },
+                        refreshDeckDetails: (deckId) async {
+                          refreshedDecks.add(deckId);
+                        },
+                        showSnackBar: ({
+                          required message,
+                          required backgroundColor,
+                        }) {
+                          snackMessage = message;
+                        },
+                      );
+                    },
+                    child: const Text('abrir'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-replace-switch')),
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        '1 Island',
+      );
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(importCalls, hasLength(1));
+      expect(importCalls.first['replaceAll'], isTrue);
+      expect(refreshedDecks, ['deck-1']);
+      expect(snackMessage, '99 cartas importadas; comandante preservado');
+      expect(find.byKey(const Key('deck-import-list-dialog')), findsNothing);
+    },
+  );
+
+  testWidgets(
     'showDeckImportListDialog keeps review visible for import status',
     (tester) async {
       final refreshedDecks = <String>[];

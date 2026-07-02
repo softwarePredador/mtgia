@@ -232,6 +232,8 @@ Future<void> _ensureCardsCombatMetadata(Pool pool) async {
   await pool.execute(
       Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]'));
   await pool.execute(Sql.named(
+      'ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN'));
+  await pool.execute(Sql.named(
       'CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)'));
 }
 
@@ -590,6 +592,7 @@ Future<void> _upsertCardRowsBatch(
     'image_url',
     'set_code',
     'rarity',
+    'is_reserved',
     if (includeCollectorFoil) 'collector_number',
     if (includeCollectorFoil) 'foil',
     if (includeIdentityColumns) 'layout',
@@ -615,10 +618,11 @@ Future<void> _upsertCardRowsBatch(
       row[11],
       row[12],
       row[13],
-      if (includeCollectorFoil) row[14],
+      row[14],
       if (includeCollectorFoil) row[15],
-      if (includeIdentityColumns) row[16],
+      if (includeCollectorFoil) row[16],
       if (includeIdentityColumns) row[17],
+      if (includeIdentityColumns) row[18],
     ];
     final placeholders = <String>[];
     for (var columnIndex = 0; columnIndex < rowValues.length; columnIndex++) {
@@ -659,6 +663,7 @@ Future<void> _upsertCardRowsBatch(
       image_url = EXCLUDED.image_url,
       set_code = EXCLUDED.set_code,
       rarity = EXCLUDED.rarity,
+      is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
       $identityUpdates
       $collectorUpdates
       created_at = cards.created_at

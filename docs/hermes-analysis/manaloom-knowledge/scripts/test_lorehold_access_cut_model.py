@@ -15,6 +15,38 @@ def test_default_hidden_retreat_manifest_uses_pg271_package():
     assert model.DEFAULT_RUNTIME_PACKAGE_PROPOSAL_REPORTS == ()
 
 
+def test_newest_report_prefers_latest_current_squee_probe(tmp_path):
+    old_path = tmp_path / "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v1.json"
+    new_path = tmp_path / "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v2.json"
+    fallback = tmp_path / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+    fallback.write_text("{}", encoding="utf-8")
+    old_path.write_text("{}", encoding="utf-8")
+    new_path.write_text("{}", encoding="utf-8")
+
+    assert (
+        model.newest_report(
+            "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+            fallback,
+            report_dir=tmp_path,
+        )
+        == new_path
+    )
+
+
+def test_newest_report_falls_back_when_current_squee_probe_is_absent(tmp_path):
+    fallback = tmp_path / "lorehold_squee_graveyard_entry_probe_20260628_v1.json"
+    fallback.write_text("{}", encoding="utf-8")
+
+    assert (
+        model.newest_report(
+            "lorehold_squee_graveyard_entry_probe_20260630_definitive_learning_v*.json",
+            fallback,
+            report_dir=tmp_path,
+        )
+        == fallback
+    )
+
+
 def memory_db():
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row

@@ -26,9 +26,10 @@ DEFAULT_MINER_REPORT = (
     REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 )
 DEFAULT_MANUAL_REVIEW = (
-    REPORT_DIR / "lorehold_manual_cut_review_20260628_v2_cut_exposure_profiled.json"
+    REPORT_DIR / "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json"
 )
 DEFAULT_EXPOSURE_PROFILES = [
+    REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
     REPORT_DIR / "lorehold_cut_exposure_profile_20260628_v1.json",
 ]
@@ -36,23 +37,67 @@ DEFAULT_STRATEGY_AUDIT = (
     REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 )
 DEFAULT_HYPOTHESIS_QUEUE = (
-    REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+    REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
 )
 DEFAULT_TRACE_AUDIT = (
-    REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+    REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
 )
-DEFAULT_TUTOR_CUT_MODEL_REPORTS = [REPORT_DIR / "lorehold_tutor_cut_model_20260628_v2_current_miner.json"]
+DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT = (
+    REPORT_DIR / "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
+)
+DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT = (
+    REPORT_DIR / "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json"
+)
+DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS = [
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json",
+    REPORT_DIR / "lorehold_from_scratch_challengers_20260630_access_density_control_v1.json",
+]
+DEFAULT_FROM_SCRATCH_GATE_REPORTS = [
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_fixed607_gate.json",
+    REPORT_DIR
+    / "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json",
+]
+DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT = (
+    REPORT_DIR / "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
+)
+DEFAULT_CLOSING_WINDOW_TRACE_REPORT = (
+    REPORT_DIR / "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
+)
+DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT = (
+    REPORT_DIR / "lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json"
+)
+DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT = (
+    REPORT_DIR / "lorehold_current_champion_snapshot_20260630_goal_learning.json"
+)
+DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT = (
+    REPORT_DIR / "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
+)
+DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT = (
+    REPORT_DIR / "lorehold_deckbuilding_final_closure_20260630_goal_learning.json"
+)
+DEFAULT_TUTOR_CUT_MODEL_REPORTS = [
+    REPORT_DIR / "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
+]
 DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS = [
-    REPORT_DIR / "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+    REPORT_DIR / "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
 ]
 DEFAULT_RECURSION_CUT_MODEL_REPORTS = [
-    REPORT_DIR / "lorehold_recursion_cut_model_20260627_v2_pinnacle_rejected.json"
+    REPORT_DIR / "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
 ]
 DEFAULT_MANA_BASE_VALIDATOR_REPORTS = [
     REPORT_DIR / "lorehold_mana_base_validator_20260627_v3_plateau_lane_rejected.json"
 ]
 DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS = [
-    REPORT_DIR / "lorehold_profiled_cut_family_benchmark_generator_20260628_v7_exhausted.json"
+    REPORT_DIR / "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json"
 ]
 DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_tutor_land_tax_benchmark_gate_20260627_v1_real.json",
@@ -76,7 +121,28 @@ DEFAULT_PRIOR_PACKAGE_REPORTS = [
     REPORT_DIR / "lorehold_forced_exposure_probe_decision_20260630.json",
     REPORT_DIR / "lorehold_forced_signal_natural_confirm_decision_20260630.json",
     REPORT_DIR / "lorehold_profiled_cut_benchmark_gate_decision_20260630.json",
+    REPORT_DIR / "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
+    REPORT_DIR / "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json",
 ]
+FROM_SCRATCH_TELEMETRY_KEYS = (
+    "lorehold_cost_paid",
+    "lorehold_spell_cast",
+    "lorehold_upkeep_rummage",
+    "miracle_cast",
+    "topdeck_manipulation_activated",
+    "discard_to_top_replacement",
+    "lorehold_rummage_discard_to_top",
+    "lorehold_rummage_discards_squee",
+    "squee_to_graveyard",
+    "squee_upkeep_return",
+    "squee_return_after_known_graveyard_entry",
+    "static_cost_reduction_total",
+    "scarlet_static_cost_reduction_total",
+    "birgi_spell_cast_mana",
+    "spell_cast_mana_trigger",
+)
 INCONCLUSIVE_EXPOSURE_DECISIONS = {
     "inconclusive_low_exposure",
     "forced_access_inconclusive_low_exposure",
@@ -89,6 +155,8 @@ INCONCLUSIVE_EXPOSURE_DECISIONS = {
 }
 REJECTED_PRIOR_DECISIONS = {
     "reject_or_rework",
+    "reject_regresses_critical_matchup",
+    "invalid_or_incomplete",
     "forced_access_no_lift_reject_or_rework",
     "tie_watch_strategy_regression",
 }
@@ -106,6 +174,18 @@ def utc_now() -> str:
 
 def normalize_key(value: object) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").lower()).strip()
+
+
+def unique_nonempty(values: Iterable[object]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = str(value or "").strip()
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        out.append(text)
+    return out
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -282,6 +362,8 @@ def infer_package_decision(result: dict[str, Any]) -> str:
             return decision
         if exposure_decision:
             return exposure_decision
+        if decision in REJECTED_PRIOR_DECISIONS:
+            return decision
         return "reject_or_rework" if decision.startswith("reject") else decision
     aggregate = result.get("aggregate") or {}
     aggregate_decision = str(aggregate.get("decision") or "")
@@ -1353,6 +1435,616 @@ def build_focus_access_trace_action(trace_audit: dict[str, Any] | None) -> dict[
     }
 
 
+def build_focus_access_package_result_action(
+    focus_access_report: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not focus_access_report:
+        return None
+    summary = focus_access_report.get("summary") or {}
+    if (
+        summary.get("recommended_next_action")
+        != "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis"
+    ):
+        return None
+    if int(summary.get("active_operational_work_count") or 0) != 0:
+        return None
+    exhausted_work = [
+        {
+            "work_key": row.get("work_key"),
+            "failure_mode": row.get("failure_mode"),
+            "blocked_package_count": row.get("blocked_package_count"),
+            "evidence_inputs": row.get("evidence_inputs") or [],
+        }
+        for row in focus_access_report.get("operational_work_queue") or []
+        if row.get("status") == "model_exhausted_do_not_repeat_without_new_evidence"
+    ]
+    return {
+        "priority": -3,
+        "action_key": "create_new_seed_safe_cut_hypothesis",
+        "status": "focus_access_cut_models_exhausted_new_seed_safe_cut_required",
+        "lane": "strategy_learning",
+        "candidate_cards": [],
+        "cut_cards": [],
+        "why_now": (
+            "The focus-access generator consumed the weak-seed trace, current access model, "
+            "tutor cut model, and hand-filter model and found zero gate-ready packages or "
+            "active modeling work. The next step is not another battle gate; it is a fresh "
+            "seed-safe cut hypothesis."
+        ),
+        "blockers": [
+            "current focus-access package queue has zero gate-ready packages",
+            "access, tutor, and hand-filter cut models are exhausted for the current evidence",
+            "new package must preserve protected engine pieces and seed-42 telemetry",
+        ],
+        "next_steps": [
+            "Expand cut-safety evidence or produce a lane-specific exposure model for non-protected cuts.",
+            "Prefer non-Squee recursion packages or tutor packages only after a seed-safe cut exists.",
+            "Do not run battle gates until the new package has explicit add/cut evidence and card-use criteria.",
+        ],
+        "evidence": {
+            "focus_access_summary": summary,
+            "exhausted_work": exhausted_work,
+        },
+    }
+
+
+def build_seed_safe_cut_hypothesis_action(
+    seed_safe_cut_report: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not seed_safe_cut_report:
+        return None
+    summary = seed_safe_cut_report.get("summary") or {}
+    ready_count = int(summary.get("seed_safe_cut_ready_count") or 0)
+    ready_rows = list(seed_safe_cut_report.get("seed_safe_cut_candidates") or [])
+    same_lane_rows = list(seed_safe_cut_report.get("same_lane_only_cut_slots") or [])
+    blocker_counts = summary.get("blocker_counts") or {}
+    if ready_count > 0:
+        return {
+            "priority": -5,
+            "action_key": "build_packages_from_seed_safe_cut_hypotheses",
+            "status": "seed_safe_cut_slots_ready_for_package_design",
+            "lane": "strategy_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in ready_rows[:8]],
+            "why_now": (
+                "The seed-safe cut synthesis found current 607 cut slots that are not protected "
+                "by mana floor, protection, miracle core, prior-reject, or high-exposure evidence."
+            ),
+            "blockers": [
+                "this is still cut-slot evidence, not a deck promotion",
+                "each add card still needs exact package preflight and natural card-use evidence",
+            ],
+            "next_steps": [
+                "Attach only failure-targeted add cards to these cut slots.",
+                "Run exact package preflight before battle.",
+                "Run a natural equal gate only if preflight has no prior-negative exact signature.",
+            ],
+            "evidence": {
+                "seed_safe_summary": summary,
+                "seed_safe_cut_candidates": ready_rows[:12],
+            },
+        }
+    if (
+        summary.get("recommended_next_action")
+        == "expand_cut_safety_model_or_multi_card_shell_before_gate"
+    ):
+        return {
+            "priority": -4,
+            "action_key": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+            "status": "seed_safe_cut_unavailable",
+            "lane": "cut_modeling",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in same_lane_rows[:8]],
+            "why_now": (
+                "The requested seed-safe cut synthesis has now run and found zero generic "
+                "seed-safe cut slots in protected deck 607. Running another one-card battle "
+                "gate from the old queue would repeat a blocked or prior-negative cut."
+            ),
+            "blockers": [
+                "seed_safe_cut_ready_count is zero",
+                "current same-lane slots require a concrete same-lane add before battle",
+                "current flex ramp slots are mana-floor support or prior-negative cut slots",
+            ],
+            "next_steps": [
+                "Create a new cut-safety model from failed-seed traces and current 607 utilization.",
+                "Use multi-card shell hypotheses only when they preserve mana floor, protection, and miracle density.",
+                "Use forced-access diagnostics only for card-understanding, not deck promotion.",
+            ],
+            "evidence": {
+                "seed_safe_summary": summary,
+                "same_lane_only_cut_slots": same_lane_rows[:12],
+                "top_blocker_counts": blocker_counts,
+            },
+        }
+    return None
+
+
+def side_record_from_results(results: list[dict[str, Any]], deck_key: str) -> dict[str, Any]:
+    for row in results:
+        if row.get("deck_key") == deck_key:
+            strategic_games = ((row.get("telemetry") or {}).get("strategic_games") or {})
+            return {
+                "deck_key": row.get("deck_key"),
+                "wins": int(row.get("wins") or 0),
+                "losses": int(row.get("losses") or 0),
+                "stalls": int(row.get("stalls") or 0),
+                "games": int(row.get("games") or 0),
+                "win_rate": float(row.get("win_rate") or 0.0),
+                "strategic_games": {
+                    key: strategic_games[key]
+                    for key in FROM_SCRATCH_TELEMETRY_KEYS
+                    if key in strategic_games
+                },
+            }
+    return {}
+
+
+def build_from_scratch_shell_action(
+    from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None,
+    from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None,
+) -> dict[str, Any] | None:
+    if not from_scratch_reports and not from_scratch_gate_reports:
+        return None
+    generated_candidates = []
+    for path, payload in from_scratch_reports or []:
+        for row in payload.get("candidates") or []:
+            generated_candidates.append(
+                {
+                    "source_report": str(path),
+                    "candidate_key": row.get("candidate_key"),
+                    "candidate_name": row.get("candidate_name"),
+                    "intent_score": ((row.get("commander_intent_alignment") or {}).get("score")),
+                    "missing_required_cards": row.get("missing_required_cards") or [],
+                    "battle_gate_json": row.get("battle_gate_json"),
+                }
+            )
+    gate_rows = []
+    for path, payload in from_scratch_gate_reports or []:
+        results = [row for row in payload.get("results") or [] if isinstance(row, dict)]
+        baseline = side_record_from_results(results, "deck_607")
+        for row in results:
+            deck_key = str(row.get("deck_key") or "")
+            if deck_key == "deck_607" or not deck_key:
+                continue
+            candidate = side_record_from_results(results, deck_key)
+            delta_wins = int(candidate.get("wins") or 0) - int(baseline.get("wins") or 0)
+            gate_rows.append(
+                {
+                    "source_report": str(path),
+                    "candidate_key": deck_key,
+                    "baseline": baseline,
+                    "candidate": candidate,
+                    "delta_wins": delta_wins,
+                    "candidate_squee_return_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get(
+                                "squee_upkeep_return"
+                            )
+                            or {}
+                        ).get("games")
+                    ),
+                    "candidate_miracle_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get("miracle_cast")
+                            or {}
+                        ).get("games")
+                    ),
+                    "candidate_topdeck_games": (
+                        (
+                            (candidate.get("strategic_games") or {}).get(
+                                "topdeck_manipulation_activated"
+                            )
+                            or {}
+                        ).get("games")
+                    ),
+                }
+            )
+    gate_rows.sort(
+        key=lambda row: (
+            -int(row.get("delta_wins") or 0),
+            row.get("candidate_key") or "",
+        )
+    )
+    if any(int(row.get("delta_wins") or 0) >= 0 for row in gate_rows):
+        best = gate_rows[0]
+        return {
+            "priority": -5,
+            "action_key": "confirm_or_rework_from_scratch_shell_signal",
+            "status": "from_scratch_shell_has_non_negative_gate_signal",
+            "lane": "multi_card_shell",
+            "candidate_cards": [str(best.get("candidate_key") or "")],
+            "cut_cards": [],
+            "why_now": (
+                "A from-scratch shell has tied or exceeded 607 in a current gate. Treat it as "
+                "a shell-level signal and require confirmation before any deck replacement."
+            ),
+            "blockers": [
+                "shell-level result is not card-level proof",
+                "must preserve fixed 607 opponent and direct strategic telemetry",
+            ],
+            "next_steps": [
+                "Run confirmation against the same protected 607 gate.",
+                "Inspect miracle/topdeck/Squee/pressure telemetry before promoting or cutting anything.",
+            ],
+            "evidence": {
+                "generated_candidates": generated_candidates,
+                "from_scratch_gate_rows": gate_rows,
+            },
+        }
+    if gate_rows:
+        return {
+            "priority": -5,
+            "action_key": "rework_from_scratch_shell_after_current_shells_rejected",
+            "status": "from_scratch_shells_not_promotable",
+            "lane": "multi_card_shell",
+            "candidate_cards": unique_nonempty(row.get("candidate_key") for row in gate_rows[:5]),
+            "cut_cards": [],
+            "why_now": (
+                "Current from-scratch shells already tested against fixed 607 do not beat the "
+                "protected baseline. The pressure-repair shell improves Squee telemetry, but still "
+                "loses the 8x3 gate, so the next shell must repair conversion/pressure without "
+                "discarding the 607 floor."
+            ),
+            "blockers": [
+                "best current from-scratch gate is below protected 607",
+                "positive Squee or conversion telemetry did not convert into wins",
+                "do not promote shell-level telemetry without equal-gate wins",
+            ],
+            "next_steps": [
+                "Use the rejected recursion and pressure-conversion shells as telemetry, not as deck replacements.",
+                "Build another shell only if it materially changes closing-window execution while preserving the 607 mana/protection/miracle floor.",
+                "Require a declared evidence target before the next gate: miracle frequency at least matches 607 and at least one conversion card is naturally accessed or used.",
+            ],
+            "evidence": {
+                "generated_candidates": generated_candidates,
+                "from_scratch_gate_rows": gate_rows,
+            },
+        }
+    return None
+
+
+def build_from_scratch_failure_synthesis_action(
+    failure_synthesis: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not failure_synthesis:
+        return None
+    summary = failure_synthesis.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    if recommended == "confirm_non_negative_from_scratch_shell_signal":
+        signal_rows = [
+            row
+            for row in failure_synthesis.get("shell_gate_rows") or []
+            if row.get("can_promote_from_gate")
+        ]
+        return {
+            "priority": -6,
+            "action_key": "confirm_non_negative_from_scratch_shell_signal",
+            "status": "from_scratch_shell_signal_requires_confirmation",
+            "lane": "multi_card_shell",
+            "candidate_cards": unique_nonempty(
+                row.get("candidate_key") for row in signal_rows[:5]
+            ),
+            "cut_cards": [],
+            "why_now": (
+                "The shell failure synthesis found at least one natural from-scratch "
+                "shell that tied or beat protected 607. This is still shell-level "
+                "evidence and needs confirmation before any promotion."
+            ),
+            "blockers": list(summary.get("blockers") or []),
+            "next_steps": list(
+                (failure_synthesis.get("next_hypothesis_requirements") or {}).get(
+                    "required_before_next_shell"
+                )
+                or []
+            )
+            or [
+                "Run an equal protected-607 confirmation gate.",
+                "Inspect card-use and miracle/topdeck telemetry before any deck replacement.",
+            ],
+            "evidence": {
+                "failure_synthesis_summary": summary,
+                "signal_rows": signal_rows[:6],
+                "learning_constraints": failure_synthesis.get("learning_constraints") or [],
+            },
+        }
+    if recommended == "mine_closing_window_trace_before_next_shell":
+        rows = list(failure_synthesis.get("shell_gate_rows") or [])
+        return {
+            "priority": -6,
+            "action_key": "mine_closing_window_trace_before_next_shell",
+            "status": "from_scratch_shell_learning_requires_trace_mining",
+            "lane": "strategy_learning",
+            "candidate_cards": unique_nonempty(row.get("candidate_key") for row in rows[:5]),
+            "cut_cards": [],
+            "why_now": (
+                "The current from-scratch shells, including access-density and "
+                "pressure-conversion attempts, are already rejected against protected 607. "
+                "The next candidate must come from closing-window trace evidence, not another "
+                "broad shell gate."
+            ),
+            "blockers": list(summary.get("blockers") or []),
+            "next_steps": list(
+                (failure_synthesis.get("next_hypothesis_requirements") or {}).get(
+                    "required_before_next_shell"
+                )
+                or []
+            ),
+            "evidence": {
+                "failure_synthesis_summary": summary,
+                "top_failed_shell_rows": rows[:8],
+                "learning_constraints": failure_synthesis.get("learning_constraints") or [],
+            },
+        }
+    return None
+
+
+def build_closing_window_trace_action(
+    closing_window_trace: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not closing_window_trace:
+        return None
+    summary = closing_window_trace.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    if recommended != "build_trace_targeted_micro_package_from_closing_window":
+        return None
+    hypotheses = list(closing_window_trace.get("hypothesis_queue") or [])
+    return {
+        "priority": -7,
+        "action_key": "build_trace_targeted_micro_package_from_closing_window",
+        "status": "closing_window_trace_targets_ready_for_micro_package_model",
+        "lane": "strategy_learning",
+        "candidate_cards": [],
+        "candidate_count": len(hypotheses),
+        "cut_cards": [],
+        "why_now": (
+            "Closing-window mining compared exact same-opponent slots where protected 607 "
+            "won and rejected shells lost. The dominant gaps are miracle/topdeck/spell-volume "
+            "deficits, so the next deck work must be a trace-targeted micro-package with "
+            "protected 607 anchors, not another broad shell."
+        ),
+        "blockers": [
+            "no package is ready until a micro-package names its add/cut lane",
+            "do not cut 607 anchors surfaced by the closing-window trace",
+            "do not battle-gate a package that has not predeclared miracle/topdeck/spell-volume targets",
+        ],
+        "next_steps": list(summary.get("next_steps") or []),
+        "evidence": {
+            "closing_window_summary": summary,
+            "hypothesis_queue": hypotheses,
+            "top_comparisons": list(closing_window_trace.get("closing_window_comparisons") or [])[:8],
+        },
+    }
+
+
+def build_trace_targeted_micro_package_model_action(
+    model: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not model:
+        return None
+    summary = model.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    ready_packages = list(model.get("ready_packages") or [])
+    blocked_hypotheses = list(model.get("blocked_hypotheses") or [])
+    same_lane_only = list(summary.get("same_lane_only_cut_cards") or [])
+    if recommended == "build_trace_targeted_micro_package_gate_manifest":
+        return {
+            "priority": -8,
+            "action_key": "build_trace_targeted_micro_package_gate_manifest",
+            "status": "trace_targeted_micro_packages_ready_for_gate_manifest",
+            "lane": "strategy_learning",
+            "candidate_cards": unique_nonempty(
+                card
+                for package in ready_packages[:5]
+                for card in (package.get("adds") or package.get("candidate_cards") or [])
+            ),
+            "cut_cards": unique_nonempty(
+                card
+                for package in ready_packages[:5]
+                for card in (package.get("cuts") or package.get("cut_cards") or [])
+            ),
+            "why_now": (
+                "The trace-targeted model found concrete packages with named adds and "
+                "seed-safe cuts. These are the only Lorehold swaps that can move to a gate."
+            ),
+            "blockers": [],
+            "next_steps": list(summary.get("next_steps") or []),
+            "evidence": {
+                "micro_package_model_summary": summary,
+                "ready_packages": ready_packages[:8],
+            },
+        }
+    if recommended == "freeze_607_current_champion_snapshot_until_new_cut_evidence":
+        return {
+            "priority": -8,
+            "action_key": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "status": "no_trace_targeted_micro_package_ready_current_607_champion_snapshot_required",
+            "lane": "strategy_learning",
+            "candidate_cards": [],
+            "candidate_count": len(blocked_hypotheses),
+            "cut_cards": same_lane_only,
+            "why_now": (
+                "Closing-window hypotheses are strategically useful, but the current "
+                "seed-safe model has zero cuts ready. Running another swap or shell gate "
+                "would repeat the old error: testing a good idea through an unsafe cut."
+            ),
+            "blockers": [
+                "seed_safe_cut_ready_count is zero",
+                "no trace-targeted package has both named add cards and seed-safe cuts",
+                "same-lane-only cuts remain protected until new evidence changes their status",
+            ],
+            "next_steps": list(summary.get("next_steps") or []),
+            "evidence": {
+                "micro_package_model_summary": summary,
+                "blocked_hypotheses": blocked_hypotheses[:8],
+                "protected_anchor_evidence": model.get("protected_anchor_evidence") or {},
+            },
+        }
+    return None
+
+
+def build_current_champion_snapshot_action(
+    champion_snapshot: dict[str, Any] | None,
+    micro_package_model: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not champion_snapshot:
+        return None
+    if str(champion_snapshot.get("status") or "") != "current_champion_snapshot":
+        return None
+    model_summary = (micro_package_model or {}).get("summary") or {}
+    if str(model_summary.get("recommended_next_action") or "") != (
+        "freeze_607_current_champion_snapshot_until_new_cut_evidence"
+    ):
+        return None
+    same_lane_only = list(model_summary.get("same_lane_only_cut_cards") or [])
+    return {
+        "priority": -9,
+        "action_key": "expand_trace_cut_evidence_after_607_champion_snapshot",
+        "status": "current_607_champion_snapshot_recorded_cut_evidence_required",
+        "lane": "cut_safety_learning",
+        "candidate_cards": list(champion_snapshot.get("protected_anchors") or [])[:8],
+        "cut_cards": same_lane_only,
+        "why_now": (
+            "Deck 607 has been snapshotted as the current champion and the "
+            "trace-targeted micro-package model has zero seed-safe cuts. The next "
+            "productive work is cut-evidence expansion, not another shell or gate."
+        ),
+        "blockers": [
+            "ready_micro_package_count is zero",
+            "seed_safe_cut_ready_count is zero",
+            "same-lane-only cut slots are not seed-safe under current evidence",
+        ],
+        "next_steps": [
+            "Mine card-use, loss-window, and role-replacement evidence for exact cut slots.",
+            "Promote a cut slot only if removing it preserves the 607 miracle/topdeck/spell-volume floor.",
+            "Generate a new trace-targeted package only after a named add and seed-safe cut both exist.",
+        ],
+        "evidence": {
+            "champion_snapshot_summary": champion_snapshot.get("summary") or {},
+            "champion_decision": champion_snapshot.get("champion_decision") or {},
+            "micro_package_model_summary": model_summary,
+        },
+    }
+
+
+def build_trace_cut_evidence_expander_action(
+    cut_evidence_expander: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not cut_evidence_expander:
+        return None
+    summary = cut_evidence_expander.get("summary") or {}
+    recommended = str(summary.get("recommended_next_action") or "")
+    reviewable = list(cut_evidence_expander.get("reviewable_evidence_gap_queue") or [])
+    ready = list(cut_evidence_expander.get("seed_safe_cut_queue") or [])
+    near_miss = list(cut_evidence_expander.get("all_cut_slots") or [])[:8]
+    if recommended == "build_package_from_seed_safe_cut":
+        return {
+            "priority": -10,
+            "action_key": "build_package_from_seed_safe_cut",
+            "status": "trace_cut_evidence_found_seed_safe_cut",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in ready[:8]],
+            "why_now": (
+                "The cut evidence expander found seed-safe cuts after the 607 champion "
+                "snapshot. A package can now be designed from exact add/cut pairs."
+            ),
+            "blockers": [],
+            "next_steps": [
+                "Pair each cut with a trace-targeted add in the same strategic lane.",
+                "Run preflight for prior negatives before any battle gate.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "seed_safe_cut_queue": ready[:8],
+            },
+        }
+    if recommended == "review_cut_safety_rows_for_evidence_gap_slots":
+        return {
+            "priority": -10,
+            "action_key": "review_cut_safety_rows_for_evidence_gap_slots",
+            "status": "trace_cut_evidence_has_reviewable_gaps",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in reviewable[:8]],
+            "why_now": (
+                "The current 607 champion snapshot is fixed, and the cut evidence "
+                "queue found slots blocked by missing or stale cut-safety rows rather "
+                "than absolute deck-function blockers."
+            ),
+            "blockers": [
+                "reviewable slots are not seed-safe until the cut-safety row is updated",
+            ],
+            "next_steps": [
+                "Audit the listed cut-safety rows against battle exposure and strategy role.",
+                "Regenerate the seed-safe cut synthesis after any reviewed cut-safety change.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "reviewable_evidence_gap_queue": reviewable[:12],
+            },
+        }
+    if recommended == "no_cut_slot_to_expand_under_current_607_contract":
+        return {
+            "priority": -10,
+            "action_key": "no_cut_slot_to_expand_under_current_607_contract",
+            "status": "trace_cut_evidence_exhausted_current_607_one_for_one_contract",
+            "lane": "cut_safety_learning",
+            "candidate_cards": [],
+            "cut_cards": [str(row.get("card_name") or "") for row in near_miss],
+            "why_now": (
+                "After the 607 champion snapshot, every deck slot is either seed-safe "
+                "blocked by an absolute role/protection/prior-negative reason or has no "
+                "reviewable evidence gap. Under the current one-for-one contract there is "
+                "no valid cut to test."
+            ),
+            "blockers": [
+                "seed_safe_ready_count is zero",
+                "reviewable_evidence_gap_count is zero",
+                "every current cut slot has an absolute blocker under the active contract",
+            ],
+            "next_steps": [
+                "Do not run more one-for-one package gates against 607.",
+                "Only resume deck changes if new external/card evidence changes a cut-safety row, the owner explicitly relaxes the cut contract, or a new full-shell archetype is evaluated under a separate contract.",
+                "Keep 607 as the current best Lorehold deck for battle validation while runtime/card-rule work continues.",
+            ],
+            "evidence": {
+                "cut_evidence_summary": summary,
+                "top_near_miss_cut_slots": near_miss,
+            },
+        }
+    return None
+
+
+def build_deckbuilding_final_closure_action(
+    final_closure: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if not final_closure:
+        return None
+    if str(final_closure.get("status") or "") != "closed_current_607_champion":
+        return None
+    summary = final_closure.get("summary") or {}
+    decision = final_closure.get("final_decision") or {}
+    return {
+        "priority": -11,
+        "action_key": "lorehold_deckbuilding_closed_current_607_champion",
+        "status": "closed_no_deck_change_under_active_contract",
+        "lane": "deckbuilding_closure",
+        "candidate_cards": [],
+        "cut_cards": [],
+        "why_now": (
+            "The final closure artifact proves protected 607 is the current Lorehold "
+            "champion and the active one-for-one improvement contract is exhausted."
+        ),
+        "blockers": list(decision.get("forbidden_next_steps") or []),
+        "next_steps": list((final_closure.get("handoff") or {}).get("safe_next_work") or []),
+        "evidence": {
+            "final_closure_summary": summary,
+            "final_decision": decision,
+            "source_reports": final_closure.get("source_reports") or {},
+        },
+    }
+
+
 def build_guardrails(
     miner_report: dict[str, Any],
     manual_review: dict[str, Any],
@@ -1459,11 +2151,31 @@ def build_plan(
     strategy_audit: dict[str, Any] | None = None,
     hypothesis_queue: dict[str, Any] | None = None,
     trace_audit: dict[str, Any] | None = None,
+    focus_access_package_report: dict[str, Any] | None = None,
+    seed_safe_cut_hypothesis_report: dict[str, Any] | None = None,
+    from_scratch_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    from_scratch_gate_reports: list[tuple[Path, dict[str, Any]]] | None = None,
+    from_scratch_failure_synthesis: dict[str, Any] | None = None,
+    closing_window_trace: dict[str, Any] | None = None,
+    trace_targeted_micro_package_model: dict[str, Any] | None = None,
+    current_champion_snapshot: dict[str, Any] | None = None,
+    trace_cut_evidence_expander: dict[str, Any] | None = None,
+    deckbuilding_final_closure: dict[str, Any] | None = None,
     miner_path: Path = DEFAULT_MINER_REPORT,
     manual_path: Path = DEFAULT_MANUAL_REVIEW,
     strategy_path: Path = DEFAULT_STRATEGY_AUDIT,
     hypothesis_queue_path: Path = DEFAULT_HYPOTHESIS_QUEUE,
     trace_audit_path: Path = DEFAULT_TRACE_AUDIT,
+    focus_access_package_path: Path = DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT,
+    seed_safe_cut_hypothesis_path: Path = DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT,
+    from_scratch_failure_synthesis_path: Path = DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
+    closing_window_trace_path: Path = DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
+    trace_targeted_micro_package_model_path: Path = (
+        DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT
+    ),
+    current_champion_snapshot_path: Path = DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT,
+    trace_cut_evidence_expander_path: Path = DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
+    deckbuilding_final_closure_path: Path = DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT,
 ) -> dict[str, Any]:
     exposures = exposure_lookup(exposure_profiles)
     gate_ready = pairing_rows(miner_report, status="gate_ready_safe_same_lane")
@@ -1479,9 +2191,53 @@ def build_plan(
     inconclusive_action = build_inconclusive_exposure_action(inconclusive_packages)
     if inconclusive_action:
         actions.append(inconclusive_action)
-    trace_action = build_focus_access_trace_action(trace_audit)
-    if trace_action:
-        actions.append(trace_action)
+    seed_safe_action = build_seed_safe_cut_hypothesis_action(seed_safe_cut_hypothesis_report)
+    if seed_safe_action:
+        actions.append(seed_safe_action)
+    from_scratch_action = build_from_scratch_shell_action(
+        from_scratch_reports,
+        from_scratch_gate_reports,
+    )
+    if from_scratch_action:
+        actions.append(from_scratch_action)
+    from_scratch_failure_action = build_from_scratch_failure_synthesis_action(
+        from_scratch_failure_synthesis
+    )
+    if from_scratch_failure_action:
+        actions.append(from_scratch_failure_action)
+    final_closure_action = build_deckbuilding_final_closure_action(
+        deckbuilding_final_closure
+    )
+    if final_closure_action:
+        actions.append(final_closure_action)
+    cut_evidence_expander_action = build_trace_cut_evidence_expander_action(
+        trace_cut_evidence_expander
+    )
+    if cut_evidence_expander_action:
+        actions.append(cut_evidence_expander_action)
+    champion_snapshot_action = build_current_champion_snapshot_action(
+        current_champion_snapshot,
+        trace_targeted_micro_package_model,
+    )
+    if champion_snapshot_action:
+        actions.append(champion_snapshot_action)
+    micro_package_action = build_trace_targeted_micro_package_model_action(
+        trace_targeted_micro_package_model
+    )
+    if micro_package_action:
+        actions.append(micro_package_action)
+    closing_window_action = build_closing_window_trace_action(closing_window_trace)
+    if closing_window_action:
+        actions.append(closing_window_action)
+    focus_access_result_action = build_focus_access_package_result_action(
+        focus_access_package_report
+    )
+    if focus_access_result_action:
+        actions.append(focus_access_result_action)
+    else:
+        trace_action = build_focus_access_trace_action(trace_audit)
+        if trace_action:
+            actions.append(trace_action)
     strategy_action = build_strategy_synthesis_action(strategy_audit, hypothesis_queue)
     if strategy_action:
         actions.append(strategy_action)
@@ -1544,6 +2300,12 @@ def build_plan(
         "strategy_audit": str(strategy_path) if strategy_audit else "",
         "hypothesis_queue": str(hypothesis_queue_path) if hypothesis_queue else "",
         "trace_audit": str(trace_audit_path) if trace_audit else "",
+        "focus_access_package_report": (
+            str(focus_access_package_path) if focus_access_package_report else ""
+        ),
+        "seed_safe_cut_hypothesis_report": (
+            str(seed_safe_cut_hypothesis_path) if seed_safe_cut_hypothesis_report else ""
+        ),
         "exposure_profiles": [str(path) for path, _payload in exposure_profiles],
         "tutor_cut_model_reports": [
             str(path) for path, _payload in (tutor_cut_model_reports or [])
@@ -1561,6 +2323,30 @@ def build_plan(
             str(path) for path, _payload in (profiled_cut_benchmark_reports or [])
         ],
         "prior_package_reports": [str(path) for path, _payload in (prior_package_reports or [])],
+        "from_scratch_reports": [str(path) for path, _payload in (from_scratch_reports or [])],
+        "from_scratch_gate_reports": [
+            str(path) for path, _payload in (from_scratch_gate_reports or [])
+        ],
+        "from_scratch_failure_synthesis_report": str(from_scratch_failure_synthesis_path)
+        if from_scratch_failure_synthesis
+        else None,
+        "closing_window_trace_report": str(closing_window_trace_path)
+        if closing_window_trace
+        else None,
+        "trace_targeted_micro_package_model_report": (
+            str(trace_targeted_micro_package_model_path)
+            if trace_targeted_micro_package_model
+            else None
+        ),
+        "current_champion_snapshot_report": (
+            str(current_champion_snapshot_path) if current_champion_snapshot else None
+        ),
+        "trace_cut_evidence_expander_report": (
+            str(trace_cut_evidence_expander_path) if trace_cut_evidence_expander else None
+        ),
+        "deckbuilding_final_closure_report": (
+            str(deckbuilding_final_closure_path) if deckbuilding_final_closure else None
+        ),
         "postgres_writes": False,
         "source_db_mutated": False,
         "summary": {
@@ -1586,6 +2372,28 @@ def build_plan(
             "trace_audit_status_counts": (
                 (trace_audit or {}).get("summary") or {}
             ).get("trace_status_counts", {}),
+            "seed_safe_cut_summary": (
+                (seed_safe_cut_hypothesis_report or {}).get("summary") or {}
+            ),
+            "from_scratch_gate_count": len(from_scratch_gate_reports or []),
+            "from_scratch_failure_synthesis": (
+                (from_scratch_failure_synthesis or {}).get("summary") or {}
+            ),
+            "closing_window_trace_summary": (
+                (closing_window_trace or {}).get("summary") or {}
+            ),
+            "trace_targeted_micro_package_model_summary": (
+                (trace_targeted_micro_package_model or {}).get("summary") or {}
+            ),
+            "current_champion_snapshot_summary": (
+                (current_champion_snapshot or {}).get("summary") or {}
+            ),
+            "trace_cut_evidence_expander_summary": (
+                (trace_cut_evidence_expander or {}).get("summary") or {}
+            ),
+            "deckbuilding_final_closure_summary": (
+                (deckbuilding_final_closure or {}).get("summary") or {}
+            ),
         },
         "action_queue": actions,
         "guardrails": build_guardrails(
@@ -1603,6 +2411,14 @@ def build_plan(
             "An exhausted hypothesis queue routes back to failure-targeted strategy synthesis before any new gate.",
             "A completed focus-access trace routes to package design; do not regenerate the same payload unless the deck list changes.",
             "An exhausted profiled cut benchmark queue routes to trace/runtime synthesis instead of repeated same-lane generators.",
+            "A completed seed-safe cut synthesis routes to cut-safety expansion or package design; do not keep asking for abstract seed-safe cuts.",
+            "From-scratch challenger gates are shell-level evidence; they can guide package design but cannot promote individual cards by themselves.",
+            "A rejected from-scratch shell synthesis blocks another broad shell gate until a closing-window trace target is declared.",
+            "A completed closing-window trace routes to micro-package modeling; do not run another broad shell before the micro-package exists.",
+            "A trace-targeted micro-package model with zero seed-safe cuts freezes 607 as the current champion until new cut evidence exists.",
+            "After the 607 current champion snapshot exists, the next action is cut-evidence expansion for exact slots, not another snapshot.",
+            "If cut-evidence expansion has zero reviewable slots, the current 607 one-for-one deck contract is exhausted.",
+            "If final closure exists, do not keep planning Lorehold deck swaps under the active contract.",
             "PostgreSQL and SQLite are not mutated by this script.",
         ],
     }
@@ -1619,6 +2435,8 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Strategy audit: `{payload.get('strategy_audit') or '-'}`",
         f"- Hypothesis queue: `{payload.get('hypothesis_queue') or '-'}`",
         f"- Trace audit: `{payload.get('trace_audit') or '-'}`",
+        f"- Focus-access package report: `{payload.get('focus_access_package_report') or '-'}`",
+        f"- Seed-safe cut hypothesis report: `{payload.get('seed_safe_cut_hypothesis_report') or '-'}`",
         f"- Exposure profiles: `{', '.join(payload['exposure_profiles'])}`",
         f"- Tutor cut model reports: `{', '.join(payload.get('tutor_cut_model_reports') or []) or '-'}`",
         f"- Hand-filter cut model reports: `{', '.join(payload.get('hand_filter_cut_model_reports') or []) or '-'}`",
@@ -1626,6 +2444,14 @@ def render_markdown(payload: dict[str, Any]) -> str:
         f"- Mana-base validator reports: `{', '.join(payload.get('mana_base_validator_reports') or []) or '-'}`",
         f"- Profiled cut benchmark reports: `{', '.join(payload.get('profiled_cut_benchmark_reports') or []) or '-'}`",
         f"- Prior package reports: `{', '.join(payload.get('prior_package_reports') or []) or '-'}`",
+        f"- From-scratch reports: `{', '.join(payload.get('from_scratch_reports') or []) or '-'}`",
+        f"- From-scratch gate reports: `{', '.join(payload.get('from_scratch_gate_reports') or []) or '-'}`",
+        f"- From-scratch failure synthesis: `{payload.get('from_scratch_failure_synthesis_report') or '-'}`",
+        f"- Closing-window trace report: `{payload.get('closing_window_trace_report') or '-'}`",
+        f"- Trace-targeted micro-package model: `{payload.get('trace_targeted_micro_package_model_report') or '-'}`",
+        f"- Current champion snapshot: `{payload.get('current_champion_snapshot_report') or '-'}`",
+        f"- Trace cut evidence expander: `{payload.get('trace_cut_evidence_expander_report') or '-'}`",
+        f"- Deckbuilding final closure: `{payload.get('deckbuilding_final_closure_report') or '-'}`",
         "- PostgreSQL writes: `false`",
         "- Source DB mutated: `false`",
         "",
@@ -1702,6 +2528,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strategy-audit", type=Path, default=DEFAULT_STRATEGY_AUDIT)
     parser.add_argument("--hypothesis-queue", type=Path, default=DEFAULT_HYPOTHESIS_QUEUE)
     parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
+    parser.add_argument("--focus-access-package-report", type=Path, default=DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT)
+    parser.add_argument("--seed-safe-cut-hypothesis-report", type=Path, default=DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT)
     parser.add_argument("--exposure-profile", type=Path, action="append")
     parser.add_argument("--tutor-cut-model-report", type=Path, action="append")
     parser.add_argument("--hand-filter-cut-model-report", type=Path, action="append")
@@ -1709,7 +2537,39 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mana-base-validator-report", type=Path, action="append")
     parser.add_argument("--profiled-cut-benchmark-report", type=Path, action="append")
     parser.add_argument("--prior-package-report", type=Path, action="append")
-    parser.add_argument("--stem", default="lorehold_next_action_planner_20260628_v1")
+    parser.add_argument("--from-scratch-report", type=Path, action="append")
+    parser.add_argument("--from-scratch-gate-report", type=Path, action="append")
+    parser.add_argument(
+        "--from-scratch-failure-synthesis-report",
+        type=Path,
+        default=DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT,
+    )
+    parser.add_argument(
+        "--closing-window-trace-report",
+        type=Path,
+        default=DEFAULT_CLOSING_WINDOW_TRACE_REPORT,
+    )
+    parser.add_argument(
+        "--trace-targeted-micro-package-model-report",
+        type=Path,
+        default=DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT,
+    )
+    parser.add_argument(
+        "--current-champion-snapshot-report",
+        type=Path,
+        default=DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT,
+    )
+    parser.add_argument(
+        "--trace-cut-evidence-expander-report",
+        type=Path,
+        default=DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT,
+    )
+    parser.add_argument(
+        "--deckbuilding-final-closure-report",
+        type=Path,
+        default=DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT,
+    )
+    parser.add_argument("--stem", default="lorehold_next_action_planner_20260630_current")
     return parser.parse_args()
 
 
@@ -1720,6 +2580,16 @@ def main() -> int:
     strategy_audit = read_json(args.strategy_audit) if args.strategy_audit.exists() else None
     hypothesis_queue = read_json(args.hypothesis_queue) if args.hypothesis_queue.exists() else None
     trace_audit = read_json(args.trace_audit) if args.trace_audit.exists() else None
+    focus_access_package_report = (
+        read_json(args.focus_access_package_report)
+        if args.focus_access_package_report.exists()
+        else None
+    )
+    seed_safe_cut_hypothesis_report = (
+        read_json(args.seed_safe_cut_hypothesis_report)
+        if args.seed_safe_cut_hypothesis_report.exists()
+        else None
+    )
     exposure_paths = args.exposure_profile or DEFAULT_EXPOSURE_PROFILES
     exposure_profiles = read_existing_json(exposure_paths)
     tutor_cut_model_reports = read_existing_json(
@@ -1740,6 +2610,42 @@ def main() -> int:
     prior_package_reports = read_existing_json(
         args.prior_package_report or DEFAULT_PRIOR_PACKAGE_REPORTS
     )
+    from_scratch_reports = read_existing_json(
+        args.from_scratch_report or DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS
+    )
+    from_scratch_gate_reports = read_existing_json(
+        args.from_scratch_gate_report or DEFAULT_FROM_SCRATCH_GATE_REPORTS
+    )
+    from_scratch_failure_synthesis = (
+        read_json(args.from_scratch_failure_synthesis_report)
+        if args.from_scratch_failure_synthesis_report.exists()
+        else None
+    )
+    closing_window_trace = (
+        read_json(args.closing_window_trace_report)
+        if args.closing_window_trace_report.exists()
+        else None
+    )
+    trace_targeted_micro_package_model = (
+        read_json(args.trace_targeted_micro_package_model_report)
+        if args.trace_targeted_micro_package_model_report.exists()
+        else None
+    )
+    current_champion_snapshot = (
+        read_json(args.current_champion_snapshot_report)
+        if args.current_champion_snapshot_report.exists()
+        else None
+    )
+    trace_cut_evidence_expander = (
+        read_json(args.trace_cut_evidence_expander_report)
+        if args.trace_cut_evidence_expander_report.exists()
+        else None
+    )
+    deckbuilding_final_closure = (
+        read_json(args.deckbuilding_final_closure_report)
+        if args.deckbuilding_final_closure_report.exists()
+        else None
+    )
     payload = build_plan(
         miner_report=miner_report,
         manual_review=manual_review,
@@ -1753,11 +2659,29 @@ def main() -> int:
         strategy_audit=strategy_audit,
         hypothesis_queue=hypothesis_queue,
         trace_audit=trace_audit,
+        focus_access_package_report=focus_access_package_report,
+        seed_safe_cut_hypothesis_report=seed_safe_cut_hypothesis_report,
+        from_scratch_reports=from_scratch_reports,
+        from_scratch_gate_reports=from_scratch_gate_reports,
+        from_scratch_failure_synthesis=from_scratch_failure_synthesis,
+        closing_window_trace=closing_window_trace,
+        trace_targeted_micro_package_model=trace_targeted_micro_package_model,
+        current_champion_snapshot=current_champion_snapshot,
+        trace_cut_evidence_expander=trace_cut_evidence_expander,
+        deckbuilding_final_closure=deckbuilding_final_closure,
         miner_path=args.miner_report,
         manual_path=args.manual_review,
         strategy_path=args.strategy_audit,
         hypothesis_queue_path=args.hypothesis_queue,
         trace_audit_path=args.trace_audit,
+        focus_access_package_path=args.focus_access_package_report,
+        seed_safe_cut_hypothesis_path=args.seed_safe_cut_hypothesis_report,
+        from_scratch_failure_synthesis_path=args.from_scratch_failure_synthesis_report,
+        closing_window_trace_path=args.closing_window_trace_report,
+        trace_targeted_micro_package_model_path=args.trace_targeted_micro_package_model_report,
+        current_champion_snapshot_path=args.current_champion_snapshot_report,
+        trace_cut_evidence_expander_path=args.trace_cut_evidence_expander_report,
+        deckbuilding_final_closure_path=args.deckbuilding_final_closure_report,
     )
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = REPORT_DIR / f"{args.stem}.json"

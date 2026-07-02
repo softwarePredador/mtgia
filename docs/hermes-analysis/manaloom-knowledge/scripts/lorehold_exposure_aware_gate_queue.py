@@ -26,9 +26,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260630_post_pg282_final_eight.json"
-DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
-DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_after_profiled_gate.json"
+DEFAULT_READINESS = REPORT_DIR / "lorehold_runtime_candidate_readiness_20260628_v1.json"
+DEFAULT_HYPOTHESIS_QUEUE = REPORT_DIR / "lorehold_next_hypothesis_queue_20260628_v10_runtime_pg245.json"
+DEFAULT_PLANNER = REPORT_DIR / "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 DEFAULT_CUT_SAFETY_REPORT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v3_runtime_readiness.json"
 
@@ -336,10 +336,10 @@ def classify_package(
 def recommended_next_action(rows: list[dict[str, Any]]) -> str:
     if any(row["status"] == "natural_gate_preflight_ready" for row in rows):
         return "run_next_natural_gate_package"
+    if any(row["status"] == "forced_exposure_probe_ready" for row in rows):
+        return "run_forced_exposure_probe_before_natural_gate"
     if any(actionable_added_card_readiness_blocker(row) for row in rows):
         return "resolve_runtime_or_pg_readiness_before_more_battles"
-    if any(row["status"] == "forced_exposure_probe_ready" for row in rows):
-        return "forced_exposure_diagnostic_only_review_focus_runtime_before_gate"
     return "no_package_ready; build_new_failure_targeted_package_or_cut_model"
 
 
@@ -543,7 +543,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--opponent-limit", type=int, default=3)
     parser.add_argument("--opponent-seed", type=int, default=20260626)
     parser.add_argument("--simulation-seed", type=int, default=42)
-    parser.add_argument("--stem", default="lorehold_exposure_aware_gate_queue_20260630_after_profiled_gate")
+    parser.add_argument("--stem", default="lorehold_exposure_aware_gate_queue_20260628_v1")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--max-execute", type=int, default=1)
     return parser.parse_args()
@@ -552,7 +552,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     package_files = [path.resolve() for path in args.package_file]
-    package_definitions, loaded_package_files = package_gate.merge_package_definitions(package_files)
+    package_definitions, loaded_package_files, _loaded_package_keys = package_gate.merge_package_definitions(package_files)
     cut_safety = package_gate.merge_registry_cut_guard(
         package_gate.load_cut_safety_manifest(args.cut_safety_report.resolve()),
         package_gate.load_registry_cut_guard(args.registry.resolve()),

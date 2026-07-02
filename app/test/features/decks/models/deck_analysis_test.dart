@@ -92,6 +92,201 @@ void main() {
       expect(analysis.sourceLabel, contains('999'));
     });
 
+    test('parses launch readiness and battle coverage contract', () {
+      final analysis = DeckAnalysisData.fromJson({
+        'deck_id': 'deck-launch',
+        'format': 'commander',
+        'stats': {
+          'composition': {'ramp': 10},
+        },
+        'readiness': {
+          'schema_version': 'deck_readiness_v1_2026-07-01',
+          'status': 'ready_with_warnings',
+          'is_commander': true,
+          'commander_count': '1',
+          'total_cards': 100,
+          'error_count': 0,
+          'warning_count': 2,
+          'blockers': [],
+          'next_actions': ['Revisar avisos antes da simulação.'],
+          'advanced_intelligence_enabled': 'true',
+        },
+        'battle_readiness': {
+          'schema_version': 'deck_battle_readiness_v1_2026-07-01',
+          'status': 'partial_simulation',
+          'total_copies': 100,
+          'verified_simulation_copies': 62,
+          'partial_simulation_copies': 8,
+          'pending_adapter_copies': 30,
+          'rules_text_only_copies': 0,
+          'verified_ratio': '0.62',
+          'samples': {
+            'verified_simulation': ['Sol Ring'],
+            'pending_adapter': ['Complex Card', null],
+          },
+          'disclaimer': 'Runtime verificado quando existe.',
+        },
+        'card_battle_readiness': [
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'cmdr',
+            'name': 'Talrand, Sky Summoner',
+            'quantity': 1,
+            'is_commander': true,
+            'status': 'verified_simulation',
+            'status_label': 'Simulação verificada',
+            'battle_rule_count': 2,
+            'verified_battle_rule_count': 1,
+            'source_coverage': {'has_verified_battle_rules': true},
+            'detail': '1 regra verificada para battle.',
+          },
+          {
+            'schema_version': 'card_battle_readiness_v1_2026-07-01',
+            'card_id': 'complex',
+            'name': 'Complex Card',
+            'quantity': 1,
+            'is_commander': false,
+            'status': 'pending_adapter',
+            'status_label': 'Adaptador pendente',
+            'battle_rule_count': 0,
+            'verified_battle_rule_count': 0,
+            'source_coverage': {},
+            'detail': 'Texto Oracle presente.',
+          },
+        ],
+        'understanding_summary': {
+          'schema_version': 'deck_understanding_summary_v1_2026-07-01',
+          'source': 'card_intelligence_snapshot',
+          'total_copies': 100,
+          'functional_tagged_copies': 74,
+          'semantic_tagged_copies': 68,
+          'verified_battle_rule_copies': 62,
+          'functional_coverage_ratio': 0.74,
+          'verified_battle_ratio': 0.62,
+        },
+        'commander_contract': {
+          'schema_version': 'commander_contract_summary_v1_2026-07-01',
+          'source_version': 'commander_deckbuilding_contract_v2_2026-06-29',
+          'status': 'ready_for_battle_gate',
+          'status_label': 'Pronto para battle gate',
+          'is_commander_applicable': true,
+          'commander_name': 'Talrand, Sky Summoner',
+          'total_cards': 100,
+          'commander_count': 1,
+          'summary':
+              'Estrutura e fontes suficientes; falta validar em battle gate igualado.',
+          'battle_gate': {
+            'required': true,
+            'status': 'pending',
+            'label': 'Pendente',
+          },
+          'gates': {
+            'commander_present': true,
+            'validation_valid': true,
+            'unresolved_cards_zero': true,
+            'has_reference_lane': true,
+            'deterministic_reference_ready': true,
+          },
+          'source_lanes': [
+            {
+              'key': 'reference_card_stats',
+              'label': 'Estatísticas de cartas',
+              'available': true,
+              'count': '12',
+            },
+          ],
+          'planning_flow': [
+            {
+              'key': 'commander_intent_and_archetype',
+              'label': 'Plano do comandante',
+            },
+          ],
+          'overview_fields': [
+            {'key': 'commander_plan_sentence', 'label': 'Frase do plano'},
+          ],
+          'blockers': [],
+          'warnings': ['reference_profile_missing'],
+          'next_actions': ['Rodar battle gate igualado.'],
+          'disclaimer': 'Plano conservador.',
+        },
+        'launch_capabilities': {
+          'schema_version': 'launch_capabilities_v1_2026-07-01',
+          'release_channel': 'beta',
+          'flags': {
+            'beta_surfaces_enabled': true,
+            'card_intelligence_snapshot': true,
+          },
+          'surfaces': [
+            {
+              'key': 'deck_analysis',
+              'label': 'Análise de deck',
+              'enabled': true,
+              'stage': 'stable',
+              'requires_review': false,
+            },
+            {
+              'key': 'battle_readiness',
+              'label': 'Battle readiness',
+              'enabled': true,
+              'stage': 'beta',
+              'requires_review': true,
+            },
+            {
+              'key': 'recommendations',
+              'label': 'Recomendações',
+              'enabled': true,
+              'stage': 'advisory',
+              'requires_review': true,
+            },
+          ],
+          'disclaimer': 'Superfícies beta exigem review.',
+        },
+      });
+
+      expect(analysis.hasLaunchSignals, isTrue);
+      expect(analysis.readiness?.statusLabel, 'Pronto com avisos');
+      expect(analysis.readiness?.primaryAction, contains('Revisar avisos'));
+      expect(analysis.readiness?.advancedIntelligenceEnabled, isTrue);
+      expect(analysis.battleReadiness?.statusLabel, 'Simulação parcial');
+      expect(analysis.battleReadiness?.verifiedPercentLabel, '62% verificado');
+      expect(analysis.battleReadiness?.samples['pending_adapter'], [
+        'Complex Card',
+      ]);
+      expect(analysis.cardBattleReadiness, hasLength(2));
+      expect(analysis.cardBattleReadiness.first.isCommander, isTrue);
+      expect(
+        analysis.cardBattleReadiness.first.safeStatusLabel,
+        'Simulação verificada',
+      );
+      expect(analysis.cardBattleReadiness.last.sourceCoverage, isEmpty);
+      expect(
+        analysis.understandingSummary?.functionalCoverageLabel,
+        '74% classificado',
+      );
+      expect(
+        analysis.understandingSummary?.verifiedBattleLabel,
+        '62% simulado',
+      );
+      expect(analysis.commanderContract?.shouldDisplay, isTrue);
+      expect(
+        analysis.commanderContract?.safeStatusLabel,
+        'Pronto para battle gate',
+      );
+      expect(analysis.commanderContract?.footerLabel, 'Battle gate: Pendente');
+      expect(analysis.commanderContract?.battleGate.required, isTrue);
+      expect(analysis.commanderContract?.gates.hasReferenceLane, isTrue);
+      expect(analysis.commanderContract?.sourceLanes.first.count, 12);
+      expect(
+        analysis.commanderContract?.planningFlow.first.label,
+        'Plano do comandante',
+      );
+      expect(analysis.launchCapabilities?.releaseChannel, 'beta');
+      expect(
+        analysis.launchCapabilities?.visibleBetaSurfaces.map((s) => s.key),
+        ['battle_readiness', 'recommendations'],
+      );
+    });
+
     test(
       'falls back to legacy stats.composition when functional_tags is absent',
       () {

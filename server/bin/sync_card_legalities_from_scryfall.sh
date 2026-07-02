@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="${MTGIA_HOME:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$ROOT"
 
-SETS="${MANALOOM_SYNC_LEGALITIES_SETS:-${MANALOOM_NEW_CARD_REVIEW_SETS:-msh,msc,mar}}"
+SETS="${MANALOOM_SYNC_LEGALITIES_SETS:-}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 args=(

@@ -18,25 +18,17 @@ class LoreholdVariantBattleGateTest(unittest.TestCase):
         self.assertIn("Aetherflux Reservoir", focus)
         self.assertIn("Molecule Man", focus)
 
-    def test_candidate_spec_defaults_to_protected_607_load_slot(self):
-        previous = gate.load_deck_metadata
-        gate.load_deck_metadata = lambda db, deck_ids: {}
-        try:
-            with TemporaryDirectory() as tmpdir:
-                candidate_db = Path(tmpdir) / "knowledge_candidate.db"
-                candidate_db.write_text("", encoding="utf-8")
+    def test_fixed_opponent_deck_id_parser_and_profile_use_real_deck(self):
+        self.assertEqual(gate.parse_fixed_opponent_deck_ids("607, 615"), [607, 615])
 
-                specs = gate.deck_specs(
-                    db=Path(tmpdir) / "knowledge.db",
-                    deck_ids=[],
-                    candidate_db=candidate_db,
-                    include_candidate=True,
-                )
-        finally:
-            gate.load_deck_metadata = previous
+        profile = gate.fixed_opponent_profile_from_deck(gate.DEFAULT_DB, 607)
 
-        self.assertEqual(specs[0]["deck_key"], "candidate_v7")
-        self.assertEqual(specs[0]["load_deck_id"], 607)
+        self.assertEqual(profile["fixed_opponent_deck_id"], 607)
+        self.assertTrue(profile["is_real"])
+        self.assertTrue(profile["is_fixed_opponent"])
+        self.assertEqual(profile["commander_name"], "Lorehold, the Historian")
+        self.assertEqual(len(profile["built_deck"]), 99)
+        self.assertEqual(profile["source"], "fixed_deck")
 
     def test_gate_telemetry_counts_lorehold_strategy_events(self):
         telemetry = gate.GateTelemetry()

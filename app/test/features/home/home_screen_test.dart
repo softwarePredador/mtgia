@@ -68,7 +68,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(_buildSubject());
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('ManaLoom'), findsOneWidget);
     expect(find.text('Olá,\nPlaneswalker'), findsOneWidget);
@@ -110,6 +110,13 @@ void main() {
 
     expect(find.text('Construir deck'), findsOneWidget);
     expect(find.text('Meus Decks'), findsOneWidget);
+
+    final quickActionsList = find.byKey(const Key('home-quick-actions-list'));
+    expect(quickActionsList, findsOneWidget);
+
+    await tester.drag(quickActionsList, const Offset(-260, 0));
+    await tester.pumpAndSettle();
+
     expect(find.text('Coleção'), findsOneWidget);
     expect(find.text('Trocas'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -126,7 +133,7 @@ void main() {
       const AssetImage('assets/branding/home_hero_banner.png'),
       tester.element(find.byType(HomeScreen)),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 900));
 
     await expectLater(
       find.byKey(const Key('home-hero-frame')),

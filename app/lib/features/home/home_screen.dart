@@ -164,7 +164,7 @@ class _HomeHeader extends StatelessWidget {
                         color: AppTheme.brass400,
                         fontWeight: FontWeight.w900,
                         fontSize: AppTheme.fontXl + 4,
-                        letterSpacing: 0.25,
+                        letterSpacing: 0,
                       ),
                     ),
                   ],
@@ -252,7 +252,7 @@ class _HomeHero extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontSize: AppTheme.fontDisplay - 8,
                       height: 1.03,
-                      letterSpacing: -0.45,
+                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 9),
@@ -319,11 +319,11 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 3,
-          height: 20,
+          width: 2,
+          height: AppTheme.iconSpinnerSm,
           decoration: BoxDecoration(
-            color: AppTheme.frost400,
-            borderRadius: BorderRadius.circular(999),
+            color: AppTheme.brass500,
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
           ),
         ),
         const SizedBox(width: 12),
@@ -335,8 +335,8 @@ class _SectionHeader extends StatelessWidget {
             style: theme.textTheme.titleLarge?.copyWith(
               color: AppTheme.textPrimary,
               fontWeight: FontWeight.w900,
-              fontSize: AppTheme.fontXl + 1,
-              letterSpacing: 0.1,
+              fontSize: AppTheme.fontXl,
+              letterSpacing: 0,
             ),
           ),
         ),
@@ -370,14 +370,14 @@ class _QuickActions extends StatelessWidget {
         icon: Icons.collections_bookmark_rounded,
         title: 'Meus Decks',
         subtitle: 'Ver e gerenciar seus decks',
-        accent: AppTheme.frost400,
+        accent: AppTheme.textSecondary,
         onTap: () => context.go('/decks'),
       ),
       _QuickActionData(
         icon: Icons.public_rounded,
         title: 'Coleção',
         subtitle: 'Suas cartas e coleções',
-        accent: AppTheme.frost400,
+        accent: AppTheme.textSecondary,
         onTap: () => context.go('/collection'),
       ),
       _QuickActionData(
@@ -390,14 +390,19 @@ class _QuickActions extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 108,
-      child: Row(
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) const SizedBox(width: 8),
-            Expanded(child: _QuickActionCard(data: actions[index])),
-          ],
-        ],
+      height: 112,
+      child: ListView.separated(
+        key: const Key('home-quick-actions-list'),
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: actions.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          return SizedBox(
+            width: 112,
+            child: _QuickActionCard(data: actions[index]),
+          );
+        },
       ),
     );
   }
@@ -435,18 +440,19 @@ class _QuickActionCard extends StatelessWidget {
         splashColor: data.accent.withValues(alpha: 0.08),
         highlightColor: data.accent.withValues(alpha: 0.04),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
             color: AppTheme.surfaceSlate.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             border: Border.all(
-              color: AppTheme.outlineMuted.withValues(alpha: 0.9),
+              color: AppTheme.outlineMuted.withValues(alpha: 0.55),
+              width: AppTheme.strokeHairline,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.backgroundAbyss.withValues(alpha: 0.14),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+                color: AppTheme.backgroundAbyss.withValues(alpha: 0.10),
+                blurRadius: 12,
+                offset: const Offset(0, 7),
               ),
             ],
           ),
@@ -457,10 +463,11 @@ class _QuickActionCard extends StatelessWidget {
                 width: 34,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: data.accent.withValues(alpha: 0.12),
+                  color: data.accent.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                   border: Border.all(
-                    color: data.accent.withValues(alpha: 0.18),
+                    color: data.accent.withValues(alpha: 0.12),
+                    width: AppTheme.strokeHairline,
                   ),
                 ),
                 child: Icon(data.icon, color: data.accent, size: 18),
@@ -490,8 +497,8 @@ class _QuickActionCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  fontSize: AppTheme.fontMicro - 0.5,
-                  height: 1.08,
+                  fontSize: AppTheme.fontTiny,
+                  height: 1.12,
                 ),
               ),
             ],
@@ -536,7 +543,7 @@ class _RecentDeckCard extends StatelessWidget {
     final age = _relativeTime(deck.createdAt);
 
     return SizedBox(
-      width: 86,
+      width: 108,
       child: Material(
         color: AppTheme.transparent,
         child: InkWell(
@@ -584,8 +591,8 @@ class _RecentDeckCard extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints.tightFor(
-                        width: 28,
-                        height: 28,
+                        width: AppTheme.touchTargetMin,
+                        height: AppTheme.touchTargetMin,
                       ),
                       onPressed: () => context.go('/decks/${deck.id}'),
                       icon: const Icon(Icons.more_vert_rounded),
@@ -625,21 +632,30 @@ class _RecentDeckCard extends StatelessWidget {
                         const SizedBox(height: 5),
                         Row(
                           children: [
-                            _ManaPips(identity: deck.colorIdentity),
-                            const Spacer(),
-                            Text(
-                              '${deck.cardCount}/$target',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: AppTheme.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: AppTheme.fontTiny,
+                            Flexible(
+                              child: _ManaPips(identity: deck.colorIdentity),
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                '${deck.cardCount}/$target',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: AppTheme.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: AppTheme.fontTiny,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusPill,
+                          ),
                           child: LinearProgressIndicator(
                             minHeight: 3,
                             value: ratio,
@@ -741,15 +757,15 @@ class _ManaPips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final symbols = identity.isEmpty ? const ['C'] : identity;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      spacing: 2,
+      runSpacing: 2,
       children:
           symbols.take(5).map((symbol) {
             final normalized = symbol.toUpperCase();
             return Container(
               width: 10,
               height: 10,
-              margin: const EdgeInsets.only(right: 2),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: AppTheme.manaPipBackground(normalized),
@@ -961,7 +977,10 @@ class _ActivityRow extends StatelessWidget {
             decoration: BoxDecoration(
               color: data.color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(color: data.color.withValues(alpha: 0.16)),
+              border: Border.all(
+                color: data.color.withValues(alpha: 0.16),
+                width: AppTheme.strokeThin,
+              ),
             ),
             child: Icon(data.icon, color: data.color, size: 20),
           ),

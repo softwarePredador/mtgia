@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
+import '../../commercial/models/manaloom_plan.dart';
+import '../../commercial/widgets/ai_usage_gate.dart';
+import '../../commercial/widgets/ai_usage_meter.dart';
 import '../providers/deck_provider.dart';
 import '../widgets/deck_feedback_dialogs.dart';
 
@@ -155,6 +158,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       );
       return;
     }
+
+    final hasAiQuota = await reserveAiActionOrShowPaywall(
+      context,
+      kind: AiUsageKind.deckGeneration,
+    );
+    if (!hasAiQuota || !mounted) return;
 
     _generateCancellation?.cancel();
     final cancellation = GenerateDeckCancellation();
@@ -569,8 +578,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               children: [
                 const Icon(
                   Icons.auto_awesome,
-                  color: AppTheme.frost400,
-                  size: 32,
+                  color: AppTheme.brass400,
+                  size: 28,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -592,6 +601,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
             const SizedBox(height: 16),
             const _AiTrustPanel(),
+            const SizedBox(height: 12),
+            const AiUsageMeter(compact: true),
             const SizedBox(height: 24),
 
             // Format Selector
@@ -670,20 +681,20 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               icon:
                   _isGenerating
                       ? const SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: AppTheme.iconSpinnerSm,
+                        height: AppTheme.iconSpinnerSm,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                       : const Icon(Icons.auto_awesome),
               label: Text(
                 _isGenerating ? 'Gerando proposta...' : 'Gerar proposta',
                 style: const TextStyle(
-                  fontSize: AppTheme.fontLg,
+                  fontSize: AppTheme.fontMd,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: AppTheme.brass500,
                 foregroundColor: AppTheme.backgroundAbyss,
               ),
@@ -745,7 +756,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                 'Confira comandante, quantidade e avisos. Nada entra na sua coleção até você salvar.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
-                  height: 1.35,
+                  height: AppTheme.lineHeightCompact,
                 ),
               ),
               const SizedBox(height: 18),
@@ -785,7 +796,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: AppTheme.brass500,
                   foregroundColor: AppTheme.backgroundAbyss,
                 ),
@@ -858,8 +869,8 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
         color: AppTheme.surfaceSlate,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.outlineMuted.withValues(alpha: 0.55),
-          width: 0.8,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.46),
+          width: AppTheme.strokeHairline,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
@@ -940,7 +951,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.errorContainer,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                border: Border.all(color: theme.colorScheme.outline),
+                border: Border.all(
+                  color: theme.colorScheme.outline,
+                  width: AppTheme.strokeThin,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1028,14 +1042,33 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
       return value == null || value.isEmpty ? null : value;
     }
 
+    String sourceDisplayLabel(String rawSource) {
+      final normalized = rawSource.toLowerCase();
+      if (normalized.contains('hermes') ||
+          normalized.contains('learned_deck') ||
+          normalized.contains('commander_learning') ||
+          normalized.contains('pg_commander')) {
+        return 'Deck aprendido Hermes';
+      }
+
+      final cleaned = rawSource.replaceAll(RegExp(r'[_-]+'), ' ').trim();
+      if (cleaned.isEmpty) return 'Deck aprendido';
+      return cleaned
+          .split(RegExp(r'\s+'))
+          .map((word) {
+            if (word.isEmpty) return word;
+            return word.length == 1
+                ? word.toUpperCase()
+                : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+          })
+          .join(' ');
+    }
+
     final sourceSystem =
         textValue(promotedDeck, 'source_system') ??
         textValue(recommendedDeck, 'source_system') ??
         'hermes';
-    final sourceLabel =
-        sourceSystem.toLowerCase() == 'hermes'
-            ? 'Deck aprendido Hermes'
-            : sourceSystem.toUpperCase();
+    final sourceLabel = sourceDisplayLabel(sourceSystem);
     final score = promotedDeck['score'] ?? recommendedDeck['score'];
     final legalStatus =
         textValue(promotedDeck, 'legal_status') ??
@@ -1087,7 +1120,7 @@ class _LearnedDeckCallout extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
               border: Border.all(
                 color: AppTheme.brass400.withValues(alpha: 0.34),
-                width: 0.8,
+                width: AppTheme.strokeMedium,
               ),
             ),
             child: Row(
@@ -1191,7 +1224,7 @@ class _ExamplePromptList extends StatelessWidget {
                   Icon(
                     Icons.north_east_rounded,
                     size: 14,
-                    color: AppTheme.frost400.withValues(alpha: 0.72),
+                    color: AppTheme.textHint,
                   ),
                   const SizedBox(width: 9),
                   Expanded(
@@ -1231,7 +1264,7 @@ class _LearnedDeckPreviewSummary extends StatelessWidget {
         border: Border(
           left: BorderSide(
             color: AppTheme.frost400.withValues(alpha: 0.78),
-            width: 2,
+            width: AppTheme.strokeMedium,
           ),
         ),
       ),
@@ -1315,8 +1348,8 @@ class _GenerateProgressPanel extends StatelessWidget {
         color: AppTheme.surfaceElevated,
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.brass500.withValues(alpha: 0.28),
-          width: 0.8,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.58),
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: Column(
@@ -1380,7 +1413,7 @@ class _GenerateProgressChip extends StatelessWidget {
           color:
               isActive
                   ? AppTheme.brass500.withValues(alpha: 0.44)
-                  : AppTheme.outlineMuted,
+                  : AppTheme.outlineMuted.withValues(alpha: 0.6),
         ),
       ),
       child: Padding(
@@ -1407,26 +1440,26 @@ class _AiTrustPanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
+        color: AppTheme.surfaceSlate.withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
-          color: AppTheme.frost400.withValues(alpha: 0.26),
-          width: 0.8,
+          color: AppTheme.outlineMuted.withValues(alpha: 0.56),
+          width: AppTheme.strokeHairline,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: AppTheme.touchTargetMin,
+            height: AppTheme.touchTargetMin,
             decoration: BoxDecoration(
-              color: AppTheme.frost400.withValues(alpha: 0.14),
+              color: AppTheme.brass400.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(AppTheme.radiusMd),
             ),
             child: const Icon(
               Icons.psychology_alt_outlined,
-              color: AppTheme.frost400,
+              color: AppTheme.brass400,
               size: 20,
             ),
           ),
@@ -1447,7 +1480,7 @@ class _AiTrustPanel extends StatelessWidget {
                   'Gerar cria uma proposta revisável; otimizar depois faz ajuste leve ou rebuild guiado. Meta pode orientar escolhas, mas nunca substitui validação e review.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ],

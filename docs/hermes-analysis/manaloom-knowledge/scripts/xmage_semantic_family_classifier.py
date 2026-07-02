@@ -4601,7 +4601,7 @@ def promotion_lane(card: dict[str, Any], family: dict[str, Any]) -> str:
     ):
         return "split_family_scope_review_required"
     if support_status in {"runtime_supported_family", "runtime_supported_by_local_artifact"}:
-        return "batch_metadata_candidate_requires_pg_precheck"
+        return "split_family_scope_review_required"
     if support_status == "runtime_family_required":
         return "runtime_family_implementation_required"
     if support_status == "runtime_family_partially_supported_review_required":

@@ -20,7 +20,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 
-DEFAULT_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
+FALLBACK_TRACE_AUDIT = REPORT_DIR / "lorehold_failure_targeted_trace_audit_20260628_v3_focus_access.json"
 DEFAULT_RUNTIME_GATES = [
     REPORT_DIR / "lorehold_runtime_squee_rummage_gate_20260628_seed7_v1.json",
     REPORT_DIR / "lorehold_runtime_squee_rummage_gate_20260628_seed20260625_v1.json",
@@ -34,6 +34,22 @@ SQUEE_EVENTS = [
     "squee_upkeep_return",
     "squee_return_after_known_graveyard_entry",
 ]
+
+
+def newest_report(pattern: str, fallback: Path) -> Path:
+    matches = sorted(
+        REPORT_DIR.glob(pattern),
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return matches[0] if matches else fallback
+
+
+def default_trace_audit() -> Path:
+    return newest_report(
+        "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v*.json",
+        FALLBACK_TRACE_AUDIT,
+    )
 
 
 def utc_now() -> str:
@@ -197,8 +213,9 @@ def build_report(
     *,
     trace_audit: dict[str, Any],
     runtime_gate_paths: list[Path],
-    trace_path: Path = DEFAULT_TRACE_AUDIT,
+    trace_path: Path | None = None,
 ) -> dict[str, Any]:
+    trace_path = trace_path or default_trace_audit()
     trace_rows = trace_seed_rows(trace_audit)
     runtime_rows = runtime_gate_rows(runtime_gate_paths)
     classification = classify_probe(trace_rows, runtime_rows)
@@ -239,7 +256,7 @@ def build_report(
 def render_markdown(payload: Mapping[str, Any]) -> str:
     summary = payload["summary"]
     lines = [
-        "# Lorehold Squee Graveyard Entry Probe - 2026-06-28",
+        "# Lorehold Squee Graveyard Entry Probe",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Trace audit: `{payload['trace_audit']}`",
@@ -310,9 +327,9 @@ def render_markdown(payload: Mapping[str, Any]) -> str:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--trace-audit", type=Path, default=DEFAULT_TRACE_AUDIT)
+    parser.add_argument("--trace-audit", type=Path, default=default_trace_audit())
     parser.add_argument("--runtime-gates", type=Path, nargs="*", default=DEFAULT_RUNTIME_GATES)
-    parser.add_argument("--stem", default="lorehold_squee_graveyard_entry_probe_20260628_v1")
+    parser.add_argument("--stem", default="lorehold_squee_graveyard_entry_probe_current")
     return parser.parse_args()
 
 

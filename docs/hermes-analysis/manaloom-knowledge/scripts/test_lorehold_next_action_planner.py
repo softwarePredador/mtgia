@@ -4,8 +4,44 @@ import lorehold_next_action_planner as planner
 
 
 def test_defaults_use_current_cut_models():
-    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260628_v2_current_miner.json"
-    assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260628_v4_current_miner.json"
+    assert planner.DEFAULT_MANUAL_REVIEW.name == "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json"
+    assert planner.DEFAULT_HYPOTHESIS_QUEUE.name == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
+    assert planner.DEFAULT_TRACE_AUDIT.name == "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json"
+    assert planner.DEFAULT_FOCUS_ACCESS_PACKAGE_REPORT.name == "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json"
+    assert planner.DEFAULT_SEED_SAFE_CUT_HYPOTHESIS_REPORT.name == "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json"
+    assert planner.DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS[0].name == (
+        "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json"
+    )
+    assert planner.DEFAULT_FROM_SCRATCH_CHALLENGER_REPORTS[-1].name == (
+        "lorehold_from_scratch_challengers_20260630_access_density_control_v1.json"
+    )
+    assert planner.DEFAULT_FROM_SCRATCH_GATE_REPORTS[-1].name == (
+        "lorehold_from_scratch_challengers_20260630_access_density_control_v1_access_density_control_forced_tutors_pipe_opening_gate.json"
+    )
+    assert planner.DEFAULT_FROM_SCRATCH_FAILURE_SYNTHESIS_REPORT.name == (
+        "lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_CLOSING_WINDOW_TRACE_REPORT.name == (
+        "lorehold_closing_window_trace_miner_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_TRACE_TARGETED_MICRO_PACKAGE_MODEL_REPORT.name == (
+        "lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_CURRENT_CHAMPION_SNAPSHOT_REPORT.name == (
+        "lorehold_current_champion_snapshot_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_TRACE_CUT_EVIDENCE_EXPANDER_REPORT.name == (
+        "lorehold_trace_cut_evidence_expander_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_DECKBUILDING_FINAL_CLOSURE_REPORT.name == (
+        "lorehold_deckbuilding_final_closure_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_PRIOR_PACKAGE_REPORTS[-1].name == (
+        "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json"
+    )
+    assert planner.DEFAULT_TUTOR_CUT_MODEL_REPORTS[0].name == "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json"
+    assert planner.DEFAULT_HAND_FILTER_CUT_MODEL_REPORTS[0].name == "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json"
+    assert planner.DEFAULT_RECURSION_CUT_MODEL_REPORTS[0].name == "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json"
 
 
 def miner_report():
@@ -959,12 +995,22 @@ def test_next_action_planner_default_prior_reports_include_strategy_audit():
 
 def test_next_action_planner_defaults_include_exposure_contract_report():
     default_names = {path.name for path in planner.DEFAULT_PRIOR_PACKAGE_REPORTS}
+    exposure_names = {path.name for path in planner.DEFAULT_EXPOSURE_PROFILES}
+    profiled_names = {path.name for path in planner.DEFAULT_PROFILED_CUT_BENCHMARK_REPORTS}
 
+    assert "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json" in exposure_names
+    assert (
+        "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json"
+        in profiled_names
+    )
     assert "lorehold_exposure_decision_contract_20260628_v1_20260628_190000.json" in default_names
     assert "lorehold_exposure_outcome_audit_20260628_actionability_v1.json" in default_names
     assert "lorehold_forced_exposure_probe_decision_20260630.json" in default_names
     assert "lorehold_forced_signal_natural_confirm_decision_20260630.json" in default_names
     assert "lorehold_profiled_cut_benchmark_gate_decision_20260630.json" in default_names
+    assert "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json" in default_names
+    assert "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json" in default_names
+    assert "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json" in default_names
 
 
 def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_rejections():
@@ -994,6 +1040,17 @@ def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_reje
                         "delta_pp": 0.0,
                     },
                 },
+                {
+                    "package_key": "chaos_warp_same_lane_benchmark_cut_generous_gift",
+                    "adds": ["Chaos Warp"],
+                    "cuts": ["Generous Gift"],
+                    "decision": "reject_regresses_critical_matchup",
+                    "gate_summary": {
+                        "baseline": {"wins": 27, "losses": 44, "stalls": 1},
+                        "candidate": {"wins": 30, "losses": 42, "stalls": 0},
+                        "delta_pp": 3.64,
+                    },
+                },
             ]
         },
     )
@@ -1001,9 +1058,13 @@ def test_next_action_planner_imports_forced_no_lift_and_strategy_regression_reje
     rejected = planner.rejected_package_evidence([prior])
 
     assert sorted(rejected) == [
+        "chaos_warp_same_lane_benchmark_cut_generous_gift",
         "enlightened_access_benchmark_cut_land_tax",
         "gamble_access_benchmark_cut_land_tax",
     ]
+    assert rejected["chaos_warp_same_lane_benchmark_cut_generous_gift"]["decision"] == (
+        "reject_regresses_critical_matchup"
+    )
     assert rejected["enlightened_access_benchmark_cut_land_tax"]["decision"] == (
         "tie_watch_strategy_regression"
     )
@@ -1216,6 +1277,435 @@ def test_next_action_planner_prioritizes_focus_access_trace_review():
     assert action["status"] == "focus_access_trace_ready_for_package_design"
     assert "Squee, Goblin Nabob" in action["candidate_cards"]
     assert "The Mind Stone" in action["candidate_cards"]
+
+
+def test_next_action_planner_uses_focus_package_result_after_cut_models_exhausted():
+    focus_report = {
+        "summary": {
+            "recommended_next_action": "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis",
+            "active_operational_work_count": 0,
+            "gate_ready_package_count": 0,
+        },
+        "operational_work_queue": [
+            {
+                "work_key": "contextual_tutor_cut_model",
+                "status": "model_exhausted_do_not_repeat_without_new_evidence",
+                "failure_mode": "seed7_missing_engine_access",
+                "blocked_package_count": 2,
+                "evidence_inputs": ["tutor.json"],
+            }
+        ],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        trace_audit=trace_audit_report(),
+        focus_access_package_report=focus_report,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == "create_new_seed_safe_cut_hypothesis"
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    assert "review_focus_access_trace_then_define_next_deck_or_runtime_package" not in actions
+    action = actions["create_new_seed_safe_cut_hypothesis"]
+    assert action["status"] == "focus_access_cut_models_exhausted_new_seed_safe_cut_required"
+    assert action["evidence"]["exhausted_work"][0]["work_key"] == "contextual_tutor_cut_model"
+
+
+def test_next_action_planner_moves_past_created_seed_safe_report_with_zero_ready_cuts():
+    focus_report = {
+        "summary": {
+            "recommended_next_action": "do_not_create_blind_swap; create_new_seed_safe_cut_hypothesis",
+            "active_operational_work_count": 0,
+            "gate_ready_package_count": 0,
+        },
+        "operational_work_queue": [],
+    }
+    seed_safe_report = {
+        "summary": {
+            "seed_safe_cut_ready_count": 0,
+            "same_lane_only_count": 2,
+            "recommended_next_action": "expand_cut_safety_model_or_multi_card_shell_before_gate",
+            "blocker_counts": {"early_mana_floor_support": 6},
+        },
+        "same_lane_only_cut_slots": [
+            {"card_name": "Creative Technique", "lane": "big_spell_value"},
+            {"card_name": "Bender's Waterskin", "lane": "early_mana"},
+        ],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        focus_access_package_report=focus_report,
+        seed_safe_cut_hypothesis_report=seed_safe_report,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "expand_cut_safety_model_or_multi_card_shell_before_gate"
+    )
+    actions = {row["action_key"]: row for row in payload["action_queue"]}
+    action = actions["expand_cut_safety_model_or_multi_card_shell_before_gate"]
+    assert action["status"] == "seed_safe_cut_unavailable"
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert payload["summary"]["seed_safe_cut_summary"]["seed_safe_cut_ready_count"] == 0
+
+
+def test_next_action_planner_can_route_ready_seed_safe_cut_slots_to_package_design():
+    seed_safe_report = {
+        "summary": {
+            "seed_safe_cut_ready_count": 1,
+            "recommended_next_action": "build_failure_targeted_packages_from_seed_safe_cuts",
+        },
+        "seed_safe_cut_candidates": [
+            {"card_name": "Quiet Study", "lane": "draw", "score": 107},
+        ],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        seed_safe_cut_hypothesis_report=seed_safe_report,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_packages_from_seed_safe_cut_hypotheses"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "seed_safe_cut_slots_ready_for_package_design"
+    assert action["cut_cards"] == ["Quiet Study"]
+
+
+def test_next_action_planner_uses_negative_from_scratch_shell_gates_as_rework_signal():
+    gate_report = (
+        Path("/tmp/from_scratch_gate.json"),
+        {
+            "results": [
+                {"deck_key": "deck_607", "wins": 6, "losses": 18, "games": 24, "win_rate": 25.0},
+                {
+                    "deck_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+                    "wins": 3,
+                    "losses": 21,
+                    "games": 24,
+                    "win_rate": 12.5,
+                    "telemetry": {
+                        "strategic_games": {
+                            "squee_upkeep_return": {"games": 3},
+                            "miracle_cast": {"games": 11},
+                        }
+                    },
+                },
+            ]
+        },
+    )
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_gate_reports=[gate_report],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "rework_from_scratch_shell_after_current_shells_rejected"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "from_scratch_shells_not_promotable"
+    assert action["evidence"]["from_scratch_gate_rows"][0]["delta_wins"] == -3
+    assert action["evidence"]["from_scratch_gate_rows"][0]["candidate_squee_return_games"] == 3
+
+
+def test_next_action_planner_routes_non_negative_from_scratch_shell_to_confirmation():
+    gate_report = (
+        Path("/tmp/from_scratch_gate.json"),
+        {
+            "results": [
+                {"deck_key": "deck_607", "wins": 4, "losses": 20, "games": 24, "win_rate": 16.67},
+                {
+                    "deck_key": "challenger_lorehold_new_shell_v1",
+                    "wins": 5,
+                    "losses": 19,
+                    "games": 24,
+                    "win_rate": 20.83,
+                },
+            ]
+        },
+    )
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_gate_reports=[gate_report],
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "confirm_or_rework_from_scratch_shell_signal"
+    )
+    assert payload["action_queue"][0]["status"] == "from_scratch_shell_has_non_negative_gate_signal"
+
+
+def test_next_action_planner_prioritizes_from_scratch_failure_synthesis():
+    failure_synthesis = {
+        "summary": {
+            "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+            "can_run_next_battle_gate": False,
+            "blockers": ["all current shells are below protected 607"],
+        },
+        "shell_gate_rows": [
+            {
+                "candidate_key": "challenger_lorehold_access_density_control_v1",
+                "status": "forced_access_rejected",
+                "delta_wins": -1,
+            }
+        ],
+        "learning_constraints": [
+            {
+                "constraint_key": "forced_access_is_diagnostic_only",
+                "requirement": "Forced access cannot promote a deck.",
+            }
+        ],
+        "next_hypothesis_requirements": {
+            "required_before_next_shell": [
+                "mine closing-window trace before another shell",
+            ]
+        },
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_failure_synthesis=failure_synthesis,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "mine_closing_window_trace_before_next_shell"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "from_scratch_shell_learning_requires_trace_mining"
+    assert action["candidate_cards"] == ["challenger_lorehold_access_density_control_v1"]
+
+
+def test_next_action_planner_prioritizes_closing_window_trace_over_failure_synthesis():
+    closing_window = {
+        "summary": {
+            "recommended_next_action": "build_trace_targeted_micro_package_from_closing_window",
+            "comparison_count": 3,
+            "next_steps": ["build a trace-targeted micro-package"],
+        },
+        "hypothesis_queue": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "ready_for_micro_package_model",
+            }
+        ],
+        "closing_window_comparisons": [{"candidate_key": "challenger_shell"}],
+    }
+    failure_synthesis = {
+        "summary": {
+            "recommended_next_action": "mine_closing_window_trace_before_next_shell",
+            "can_run_next_battle_gate": False,
+            "blockers": ["all current shells are below protected 607"],
+        },
+        "shell_gate_rows": [{"candidate_key": "challenger_shell"}],
+        "learning_constraints": [],
+        "next_hypothesis_requirements": {},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        from_scratch_failure_synthesis=failure_synthesis,
+        closing_window_trace=closing_window,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "build_trace_targeted_micro_package_from_closing_window"
+    )
+    action = payload["action_queue"][0]
+    assert action["status"] == "closing_window_trace_targets_ready_for_micro_package_model"
+    assert action["candidate_count"] == 1
+
+
+def test_next_action_planner_freezes_607_when_micro_package_model_has_no_safe_cuts():
+    closing_window = {
+        "summary": {
+            "recommended_next_action": "build_trace_targeted_micro_package_from_closing_window",
+            "comparison_count": 3,
+            "next_steps": ["build a trace-targeted micro-package"],
+        },
+        "hypothesis_queue": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "ready_for_micro_package_model",
+            }
+        ],
+        "closing_window_comparisons": [{"candidate_key": "challenger_shell"}],
+    }
+    micro_model = {
+        "summary": {
+            "recommended_next_action": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "ready_micro_package_count": 0,
+            "seed_safe_cut_ready_count": 0,
+            "same_lane_only_cut_cards": ["Creative Technique", "Bender's Waterskin"],
+            "next_steps": ["Snapshot protected deck_607 as the current champion candidate."],
+        },
+        "ready_packages": [],
+        "blocked_hypotheses": [
+            {
+                "hypothesis_key": "preserve_topdeck_miracle_floor_micro_package",
+                "status": "blocked_no_seed_safe_cut",
+            }
+        ],
+        "protected_anchor_evidence": {"top_strategic_deficits": []},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        closing_window_trace=closing_window,
+        trace_targeted_micro_package_model=micro_model,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "freeze_607_current_champion_snapshot_until_new_cut_evidence"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -8
+    assert action["status"] == (
+        "no_trace_targeted_micro_package_ready_current_607_champion_snapshot_required"
+    )
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert action["evidence"]["blocked_hypotheses"][0]["status"] == (
+        "blocked_no_seed_safe_cut"
+    )
+    assert payload["summary"]["trace_targeted_micro_package_model_summary"][
+        "seed_safe_cut_ready_count"
+    ] == 0
+
+
+def test_next_action_planner_moves_to_cut_evidence_after_champion_snapshot_exists():
+    micro_model = {
+        "summary": {
+            "recommended_next_action": "freeze_607_current_champion_snapshot_until_new_cut_evidence",
+            "ready_micro_package_count": 0,
+            "seed_safe_cut_ready_count": 0,
+            "same_lane_only_cut_cards": ["Creative Technique", "Bender's Waterskin"],
+        },
+        "ready_packages": [],
+        "blocked_hypotheses": [],
+        "protected_anchor_evidence": {},
+    }
+    champion_snapshot = {
+        "status": "current_champion_snapshot",
+        "summary": {"total_cards": 100, "validation_error_count": 0},
+        "protected_anchors": ["Sensei's Divining Top", "Scroll Rack"],
+        "champion_decision": {"decision": "keep_607_as_current_champion"},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        trace_targeted_micro_package_model=micro_model,
+        current_champion_snapshot=champion_snapshot,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "expand_trace_cut_evidence_after_607_champion_snapshot"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -9
+    assert action["status"] == "current_607_champion_snapshot_recorded_cut_evidence_required"
+    assert action["candidate_cards"] == ["Sensei's Divining Top", "Scroll Rack"]
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert payload["summary"]["current_champion_snapshot_summary"]["total_cards"] == 100
+
+
+def test_next_action_planner_records_exhausted_cut_evidence_contract():
+    champion_snapshot = {
+        "status": "current_champion_snapshot",
+        "summary": {"total_cards": 100, "validation_error_count": 0},
+        "protected_anchors": ["Sensei's Divining Top"],
+        "champion_decision": {"decision": "keep_607_as_current_champion"},
+    }
+    cut_expander = {
+        "summary": {
+            "recommended_next_action": "no_cut_slot_to_expand_under_current_607_contract",
+            "seed_safe_ready_count": 0,
+            "reviewable_evidence_gap_count": 0,
+            "hard_blocked_count": 94,
+        },
+        "all_cut_slots": [
+            {"card_name": "Creative Technique", "actionability": "same_lane_hard_blocked"},
+            {"card_name": "Bender's Waterskin", "actionability": "same_lane_hard_blocked"},
+        ],
+        "reviewable_evidence_gap_queue": [],
+        "seed_safe_cut_queue": [],
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        current_champion_snapshot=champion_snapshot,
+        trace_cut_evidence_expander=cut_expander,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "no_cut_slot_to_expand_under_current_607_contract"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -10
+    assert action["status"] == (
+        "trace_cut_evidence_exhausted_current_607_one_for_one_contract"
+    )
+    assert action["cut_cards"] == ["Creative Technique", "Bender's Waterskin"]
+    assert action["evidence"]["cut_evidence_summary"]["hard_blocked_count"] == 94
+
+
+def test_next_action_planner_stops_when_final_closure_exists():
+    final_closure = {
+        "status": "closed_current_607_champion",
+        "summary": {
+            "deck_id": 607,
+            "recommended_next_action": "keep_607_closed_until_reopen_condition",
+        },
+        "final_decision": {
+            "decision": "keep_607_as_current_lorehold_champion_under_active_contract",
+            "forbidden_next_steps": [
+                "do not run another one-for-one swap gate against 607"
+            ],
+        },
+        "handoff": {
+            "safe_next_work": [
+                "use deck 607 as the Lorehold baseline for battle validation"
+            ]
+        },
+        "source_reports": {"planner": "planner.json"},
+    }
+
+    payload = planner.build_plan(
+        miner_report=miner_report(),
+        manual_review=manual_review(),
+        exposure_profiles=[exposure_profile()],
+        deckbuilding_final_closure=final_closure,
+    )
+
+    assert payload["summary"]["recommended_next_action"] == (
+        "lorehold_deckbuilding_closed_current_607_champion"
+    )
+    action = payload["action_queue"][0]
+    assert action["priority"] == -11
+    assert action["status"] == "closed_no_deck_change_under_active_contract"
+    assert action["evidence"]["final_closure_summary"]["deck_id"] == 607
+    assert payload["summary"]["deckbuilding_final_closure_summary"]["deck_id"] == 607
 
 
 def test_next_action_planner_uses_hand_filter_model_after_prior_rejects():

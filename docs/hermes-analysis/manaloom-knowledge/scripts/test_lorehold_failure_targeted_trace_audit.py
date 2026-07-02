@@ -3,10 +3,10 @@ import json
 import lorehold_failure_targeted_trace_audit as audit
 
 
-def test_default_synthesis_uses_current_after_profiled_gate_handoff():
+def test_default_synthesis_uses_current_learning_report():
     assert (
         audit.DEFAULT_SYNTHESIS.name
-        == "lorehold_failure_targeted_synergy_hypotheses_20260630_after_profiled_gate.json"
+        == "lorehold_failure_targeted_synergy_hypotheses_20260630_definitive_learning_v1.json"
     )
 
 

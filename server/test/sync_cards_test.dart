@@ -19,6 +19,7 @@ void main() {
           'colorIdentity': ['R'],
           'printings': ['LEA', 'M10', 'A25'],
           'rarity': 'common',
+          'isReserved': true,
           'identifiers': {
             'scryfallOracleId': 'abc-123-def',
           },
@@ -39,6 +40,7 @@ void main() {
       expect(row[7], contains('set=LEA')); // primeiro set
       expect(row[8], 'LEA'); // setCode
       expect(row[9], 'common'); // rarity
+      expect(row[10], isTrue); // isReserved
     });
 
     test('retorna null quando não tem scryfallOracleId', () {
@@ -161,6 +163,7 @@ void main() {
       expect(row[5], <String>[]); // colors
       expect(row[6], <String>[]); // colorIdentity
       expect(row[9], isNull); // rarity
+      expect(row[10], isNull); // isReserved
     });
 
     test('url encoda nomes com caracteres especiais', () {
@@ -301,6 +304,7 @@ void main() {
         'power': '4',
         'toughness': '4',
         'keywords': ['Trample'],
+        'isReserved': true,
         'number': '42',
         'hasFoil': true,
         'hasNonFoil': false,
@@ -313,7 +317,7 @@ void main() {
       final row = extractSetCardSyncRow(card, 'tst');
 
       expect(row, isNotNull);
-      expect(row, hasLength(18));
+      expect(row, hasLength(19));
       expect(row![0], 'scryfall-printing-id');
       expect(row[1], 'operational-creature-id');
       expect(row[8], '4');
@@ -321,8 +325,9 @@ void main() {
       expect(row[10], equals(['Trample']));
       expect(row[11], contains('/scryfall-printing-id?format=image'));
       expect(row[12], 'TST');
-      expect(row[14], '42');
-      expect(row[15], isTrue);
+      expect(row[14], isTrue);
+      expect(row[15], '42');
+      expect(row[16], isTrue);
     });
 
     test('sync operacional cai para oracle id quando printing id esta ausente',

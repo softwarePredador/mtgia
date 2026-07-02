@@ -54,7 +54,7 @@ Future<Response> _generateRecommendations(
         final hasCardIntelligenceSnapshot =
             await _hasTable(pool, 'card_intelligence_snapshot');
         final cardSourceJoin = hasCardIntelligenceSnapshot
-            ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+            ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
             : 'JOIN cards c ON dc.card_id = c.id';
         final functionalTagsSelect = hasCardIntelligenceSnapshot
             ? 'c.function_tag_details AS functional_tags'

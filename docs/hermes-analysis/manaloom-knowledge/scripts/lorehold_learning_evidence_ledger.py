@@ -16,8 +16,6 @@ REPO_ROOT = SCRIPT_DIR.parents[3]
 REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_REGISTRY = REPORT_DIR / "lorehold_candidate_hypothesis_registry_20260626.json"
 CRITICAL_MATCHUP_TERMS = ("Winota", "Vivi", "Sisay")
-CURRENT_BASELINE_KEY = "deck_607"
-LEGACY_BASELINE_KEY = "deck_6"
 
 
 def utc_now() -> str:
@@ -30,6 +28,47 @@ def load_json(path: Path) -> dict[str, Any] | None:
     except Exception:
         return None
     return payload if isinstance(payload, dict) else None
+
+
+def corrected_invalid_package_keys(report_path: Path, payload: Mapping[str, Any]) -> dict[str, str]:
+    """Return package keys invalidated by corrected package manifests.
+
+    Some historical gate reports were generated from a manifest that was later
+    corrected in place. If the corrected manifest has a correction note and no
+    longer contains a package that still appears in the old gate output, the
+    old package must not remain in the confirmation queue.
+    """
+
+    report_keys = {
+        str(package.get("package_key") or "")
+        for package in payload.get("packages") or []
+        if isinstance(package, Mapping) and package.get("package_key")
+    }
+    if not report_keys:
+        return {}
+
+    invalid: dict[str, str] = {}
+    for raw_path in payload.get("package_definition_files") or []:
+        manifest_path = Path(str(raw_path))
+        if not manifest_path.is_absolute():
+            manifest_path = report_path.parent / manifest_path
+        manifest = load_json(manifest_path)
+        if not manifest:
+            continue
+        correction_note = str(manifest.get("correction_note") or "")
+        if not correction_note:
+            continue
+        lowered_note = correction_note.lower()
+        if "removed" not in lowered_note and "invalid" not in lowered_note:
+            continue
+        valid_keys = {
+            str(package.get("package_key") or "")
+            for package in manifest.get("packages") or []
+            if isinstance(package, Mapping) and package.get("package_key")
+        }
+        for package_key in sorted(report_keys - valid_keys):
+            invalid[package_key] = correction_note
+    return invalid
 
 
 def numeric(value: Any, default: float = 0.0) -> float:
@@ -64,9 +103,12 @@ def gate_decision(delta_pp: float, baseline: Mapping[str, Any], candidate: Mappi
 
 def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     observations: list[dict[str, Any]] = []
+    invalid_packages = corrected_invalid_package_keys(path, payload)
     for package in payload.get("packages") or []:
         if not isinstance(package, dict):
             continue
+        package_key = str(package.get("package_key") or "")
+        invalid_reason = invalid_packages.get(package_key)
         gate = package.get("gate_summary") or {}
         baseline = gate.get("baseline") or {}
         candidate = gate.get("candidate") or {}
@@ -87,7 +129,7 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
                     "source_mtime": path.stat().st_mtime,
                     "generated_at": payload.get("generated_at"),
                     "source_kind": "package_preflight",
-                    "package_key": str(package.get("package_key") or ""),
+                    "package_key": package_key,
                     "family": package.get("family"),
                     "adds": list(package.get("adds") or []),
                     "cuts": list(package.get("cuts") or []),
@@ -97,7 +139,10 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
                     "baseline": {},
                     "candidate": {},
                     "delta_pp": None,
-                    "decision": preflight_decision(package),
+                    "decision": "invalid_corrected_package_definition"
+                    if invalid_reason
+                    else preflight_decision(package),
+                    "invalid_reason": invalid_reason,
                     "games_per_opponent": payload.get("games_per_opponent"),
                     "opponent_limit": payload.get("opponent_limit"),
                     "opponent_seed": payload.get("opponent_seed"),
@@ -109,25 +154,28 @@ def observation_from_package_report(path: Path, payload: Mapping[str, Any]) -> l
             continue
         delta_pp = numeric(gate.get("delta_pp"), numeric(candidate.get("win_rate")) - numeric(baseline.get("win_rate")))
         observations.append(
-            {
-                "source_path": str(path),
-                "source_file": path.name,
-                "source_mtime": path.stat().st_mtime,
-                "generated_at": payload.get("generated_at"),
-                "source_kind": "package_gate",
-                "package_key": str(package.get("package_key") or ""),
-                "family": package.get("family"),
-                "adds": list(package.get("adds") or []),
-                "cuts": list(package.get("cuts") or []),
-                "status": package.get("status"),
-                "baseline": compact_result(baseline),
-                "candidate": compact_result(candidate),
-                "delta_pp": round(delta_pp, 2),
-                "decision": gate_decision(delta_pp, baseline, candidate),
-                "games_per_opponent": payload.get("games_per_opponent"),
-                "opponent_limit": payload.get("opponent_limit"),
-                "opponent_seed": payload.get("opponent_seed"),
-                "simulation_seed": payload.get("simulation_seed"),
+                {
+                    "source_path": str(path),
+                    "source_file": path.name,
+                    "source_mtime": path.stat().st_mtime,
+                    "generated_at": payload.get("generated_at"),
+                    "source_kind": "package_gate",
+                    "package_key": package_key,
+                    "family": package.get("family"),
+                    "adds": list(package.get("adds") or []),
+                    "cuts": list(package.get("cuts") or []),
+                    "status": package.get("status"),
+                    "baseline": compact_result(baseline),
+                    "candidate": compact_result(candidate),
+                    "delta_pp": round(delta_pp, 2),
+                    "decision": "invalid_corrected_package_definition"
+                    if invalid_reason
+                    else gate_decision(delta_pp, baseline, candidate),
+                    "invalid_reason": invalid_reason,
+                    "games_per_opponent": payload.get("games_per_opponent"),
+                    "opponent_limit": payload.get("opponent_limit"),
+                    "opponent_seed": payload.get("opponent_seed"),
+                    "simulation_seed": payload.get("simulation_seed"),
                 "source_db": payload.get("source_db"),
                 "runtime_package_proposal_reports": payload.get("runtime_package_proposal_reports") or [],
             }
@@ -193,28 +241,11 @@ def critical_terms_for_opponent(opponent: str) -> list[str]:
     return [term for term in CRITICAL_MATCHUP_TERMS if term.lower() in opponent.lower()]
 
 
-def resolve_baseline_result(results: Iterable[Any]) -> tuple[dict[str, Any] | None, str, bool]:
-    rows = [row for row in results if isinstance(row, dict)]
-    current = next((row for row in rows if row.get("deck_key") == CURRENT_BASELINE_KEY), None)
-    if isinstance(current, dict):
-        return current, CURRENT_BASELINE_KEY, False
-    legacy = next((row for row in rows if row.get("deck_key") == LEGACY_BASELINE_KEY), None)
-    if isinstance(legacy, dict):
-        return legacy, LEGACY_BASELINE_KEY, True
-    return None, "", False
-
-
-def result_gate_decision(delta_pp: float, baseline: Mapping[str, Any], candidate: Mapping[str, Any], *, legacy_baseline: bool) -> str:
-    if legacy_baseline:
-        return "legacy_baseline_observation_only"
-    return gate_decision(delta_pp, baseline, candidate)
-
-
 def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     results = payload.get("results") or []
     if not isinstance(results, list):
         return []
-    baseline, baseline_key, baseline_is_legacy = resolve_baseline_result(results)
+    baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
     if not isinstance(baseline, dict):
         return []
     observations: list[dict[str, Any]] = []
@@ -222,7 +253,7 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
         if not isinstance(row, dict):
             continue
         deck_key = str(row.get("deck_key") or "")
-        if deck_key == baseline_key or not deck_key.startswith("candidate_"):
+        if deck_key == "deck_6" or not deck_key.startswith("candidate_"):
             continue
         delta_pp = numeric(row.get("win_rate")) - numeric(baseline.get("win_rate"))
         observations.append(
@@ -237,17 +268,10 @@ def observation_from_result_report(path: Path, payload: Mapping[str, Any]) -> li
                 "adds": [],
                 "cuts": [],
                 "status": row.get("status"),
-                "baseline_key": baseline_key,
-                "baseline_is_legacy": baseline_is_legacy,
                 "baseline": compact_result(baseline),
                 "candidate": compact_result(row),
                 "delta_pp": round(delta_pp, 2),
-                "decision": result_gate_decision(
-                    delta_pp,
-                    baseline,
-                    row,
-                    legacy_baseline=baseline_is_legacy,
-                ),
+                "decision": gate_decision(delta_pp, baseline, row),
                 "games_per_opponent": payload.get("games_per_opponent"),
                 "opponent_limit": len(payload.get("opponents") or []),
                 "opponent_seed": payload.get("opponent_seed"),
@@ -291,10 +315,8 @@ def collect_synergy_critical_matchups(reports_dir: Path) -> dict[str, list[dict[
         results = payload.get("results") or []
         if not isinstance(results, list):
             continue
-        baseline, baseline_key, baseline_is_legacy = resolve_baseline_result(results)
+        baseline = next((row for row in results if isinstance(row, dict) and row.get("deck_key") == "deck_6"), None)
         if not isinstance(baseline, dict):
-            continue
-        if baseline_is_legacy:
             continue
         baseline_opponents = {
             str(row.get("opponent") or ""): row
@@ -394,7 +416,6 @@ def summarize_group(
     positive = [row for row in delta_rows if numeric(row.get("delta_pp")) > 0]
     negative = [row for row in delta_rows if numeric(row.get("delta_pp")) < 0]
     ties = [row for row in delta_rows if numeric(row.get("delta_pp")) == 0]
-    legacy_baseline_count = sum(1 for row in observations if row.get("baseline_is_legacy"))
     critical_improvements = [row for row in critical_matchups if row.get("result") == "improved"]
     critical_regressions = [row for row in critical_matchups if row.get("result") == "regressed"]
     critical_ties = [row for row in critical_matchups if row.get("result") == "tied"]
@@ -428,7 +449,6 @@ def summarize_group(
         "positive_count": len(positive),
         "negative_count": len(negative),
         "tie_count": len(ties),
-        "legacy_baseline_count": legacy_baseline_count,
         "critical_matchup_count": len(critical_matchups),
         "critical_improvement_count": len(critical_improvements),
         "critical_regression_count": len(critical_regressions),
@@ -447,6 +467,7 @@ def summarize_group(
         "latest_status": latest.get("status"),
         "latest_cut_safety": latest.get("cut_safety") or {},
         "latest_prior_evidence": latest.get("prior_evidence") or {},
+        "latest_invalid_reason": latest.get("invalid_reason"),
         "latest_adds": latest.get("adds") or [],
         "latest_cuts": latest.get("cuts") or [],
         "families": sorted({str(row.get("family")) for row in observations if row.get("family")}),
@@ -472,8 +493,8 @@ def classify_group(
         return "blocked_prior_evidence"
     if latest_decision == "candidate_apply_error":
         return "candidate_apply_error"
-    if latest_decision == "legacy_baseline_observation_only":
-        return "legacy_baseline_observation_only"
+    if latest_decision == "invalid_corrected_package_definition":
+        return "invalid_corrected_package_definition"
     if latest_decision in {"preflight_ready", "apply_ready"}:
         if positive_count:
             return "preflight_ready_needs_gate"

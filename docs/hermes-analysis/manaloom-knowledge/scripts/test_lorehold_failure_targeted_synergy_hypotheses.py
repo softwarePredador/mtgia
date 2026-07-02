@@ -4,15 +4,9 @@ import sqlite3
 import lorehold_failure_targeted_synergy_hypotheses as synth
 
 
-def test_defaults_use_current_after_profiled_gate_handoff():
-    assert (
-        synth.DEFAULT_HYPOTHESIS_QUEUE.name
-        == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
-    )
-    assert (
-        synth.DEFAULT_NEXT_ACTION_PLANNER.name
-        == "lorehold_next_action_planner_20260630_after_profiled_gate.json"
-    )
+def test_defaults_use_current_learning_queue_and_planner():
+    assert synth.DEFAULT_HYPOTHESIS_QUEUE.name == "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json"
+    assert synth.DEFAULT_NEXT_ACTION_PLANNER.name == "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"
 
 
 def memory_db():

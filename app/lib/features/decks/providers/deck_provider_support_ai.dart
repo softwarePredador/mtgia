@@ -13,6 +13,7 @@ Map<String, dynamic> buildOptimizeRequestPayload({
   int? bracket,
   required bool keepTheme,
   OptimizeIntensity intensity = OptimizeIntensity.focused,
+  Map<String, dynamic>? recommendationContext,
 }) {
   return <String, dynamic>{
     'deck_id': deckId,
@@ -20,6 +21,8 @@ Map<String, dynamic> buildOptimizeRequestPayload({
     if (bracket != null) 'bracket': bracket,
     'keep_theme': keepTheme,
     'intensity': intensity.apiValue,
+    if (recommendationContext != null && recommendationContext.isNotEmpty)
+      'recommendation_context': recommendationContext,
   };
 }
 
@@ -30,6 +33,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
   int? bracket,
   required bool keepTheme,
   OptimizeIntensity intensity = OptimizeIntensity.focused,
+  Map<String, dynamic>? recommendationContext,
 }) async {
   final payload = buildOptimizeRequestPayload(
     deckId: deckId,
@@ -37,6 +41,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     bracket: bracket,
     keepTheme: keepTheme,
     intensity: intensity,
+    recommendationContext: recommendationContext,
   );
 
   await saveOptimizeDebugSnapshot(request: payload);
@@ -50,6 +55,8 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
       if (bracket != null) 'bracket': bracket,
       'keep_theme': keepTheme,
       'intensity': intensity.apiValue,
+      if (recommendationContext != null && recommendationContext.isNotEmpty)
+        'recommendation_context': recommendationContext,
     },
   );
 

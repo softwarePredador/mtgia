@@ -90,8 +90,8 @@ class _CommunityDeckDetailScreenState extends State<CommunityDeckDetailScreen> {
               icon:
                   _isCopying
                       ? const SizedBox(
-                        width: 20,
-                        height: 20,
+                        width: AppTheme.iconSpinnerSm,
+                        height: AppTheme.iconSpinnerSm,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: AppTheme.brass400,

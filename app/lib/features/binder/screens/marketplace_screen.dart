@@ -374,7 +374,7 @@ class _MarketplaceTrustHeader extends StatelessWidget {
                   style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontSize: AppTheme.fontSm,
-                    height: 1.35,
+                    height: AppTheme.lineHeightCompact,
                   ),
                 ),
               ],
@@ -409,7 +409,10 @@ class _MarketplaceCard extends StatelessWidget {
       color: AppTheme.surfaceSlate,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        side: const BorderSide(color: AppTheme.outlineMuted, width: 0.5),
+        side: const BorderSide(
+          color: AppTheme.outlineMuted,
+          width: AppTheme.strokeHairline,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -465,6 +468,8 @@ class _MarketplaceCard extends StatelessWidget {
                           size: 14,
                           color: AppTheme.brass400.withValues(alpha: 0.8),
                         ),
+                      if (item.cardIsReserved)
+                        _badge('Reserved', AppTheme.brass400),
                     ],
                   ),
                   const SizedBox(height: 4),
@@ -711,7 +716,10 @@ class _MarketplaceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        border: Border.all(
+          color: color.withValues(alpha: 0.25),
+          width: AppTheme.strokeThin,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

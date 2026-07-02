@@ -42,14 +42,16 @@ LOREHOLD_RECURSION_CUT_MODEL = SCRIPT_DIR / "lorehold_recursion_cut_model.py"
 LOREHOLD_SAFE_CUT_REPLANNER = SCRIPT_DIR / "lorehold_safe_cut_replanner.py"
 LOREHOLD_MANUAL_CUT_REVIEW = SCRIPT_DIR / "lorehold_manual_cut_review.py"
 LOREHOLD_FOCUS_ACCESS_GENERATOR = SCRIPT_DIR / "lorehold_focus_access_package_generator.py"
-LOREHOLD_REGISTRY_CANDIDATE_RUNNER = SCRIPT_DIR / "lorehold_registry_candidate_runner.py"
-LOREHOLD_LOSS_FAILURE_CLASSIFIER = SCRIPT_DIR / "lorehold_loss_failure_classifier.py"
+LOREHOLD_NEXT_ACTION_PLANNER = SCRIPT_DIR / "lorehold_next_action_planner.py"
+LOREHOLD_SEED_SAFE_CUT_HYPOTHESIS = SCRIPT_DIR / "lorehold_seed_safe_cut_hypothesis_builder.py"
+LOREHOLD_EXPOSURE_AWARE_GATE_QUEUE = SCRIPT_DIR / "lorehold_exposure_aware_gate_queue.py"
+LOREHOLD_FAILURE_SYNERGY = SCRIPT_DIR / "lorehold_failure_targeted_synergy_hypotheses.py"
+LOREHOLD_FAILURE_TRACE = SCRIPT_DIR / "lorehold_failure_targeted_trace_audit.py"
 LEGACY_CONTAMINATION_AUDIT = SCRIPT_DIR / "legacy_contamination_audit.py"
 BUILD_OPTIMIZED_DECK = SCRIPT_DIR / "build_optimized_deck.py"
 UNIVERSAL_OPTIMIZER = SCRIPT_DIR / "universal_optimizer.py"
 ROUTE_GENERATE = REPO_ROOT / "server" / "routes" / "ai" / "generate" / "index.dart"
 DECKBUILDING_SUPPORT = REPO_ROOT / "server" / "lib" / "ai" / "commander_deckbuilding_contract_support.dart"
-REBUILD_GUIDED_SERVICE = REPO_ROOT / "server" / "lib" / "ai" / "rebuild_guided_service.dart"
 LEGACY_CONTAMINATION_BASELINE = DOCS_DIR / "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json"
 
 CURRENT_XMAGE_MANIFEST = (
@@ -144,6 +146,7 @@ def build_checks() -> list[Check]:
                 "MANALOOM_FAILURE_MODE_VALIDATION_MATRIX_2026-06-30.md",
                 "legacy_contamination_audit.py",
                 CURRENT_XMAGE_MANIFEST,
+                "global_commander_deck_contract_audit.py",
                 "build_optimized_deck.py` e `universal_optimizer.py` ficam como historicos",
             ],
             "docs.root_readme_routes_current_contracts",
@@ -226,13 +229,10 @@ def build_checks() -> list[Check]:
         check_contains(
             LEGACY_CONTAMINATION_AUDIT,
             [
-                "LEGACY_CONTAMINATION_BASELINE_2026-06-30.json",
-                "stale_sqlite_path",
-                "hardcoded_pg_fallback",
-                "legacy_deck6_current_default",
-                "legacy_ranked_decks_schema",
-                "raw_edhrec_inclusion_score",
-                "excess_group_count",
+                "workspace_contract_drift_audit.py",
+                "stale SQLite path contamination",
+                "hardcoded PostgreSQL fallback contamination",
+                "PG -> Hermes -> SQLite sync sequence drift",
             ],
             "scripts.legacy_contamination_audit_blocks_new_old_patterns",
         ),
@@ -268,6 +268,8 @@ def build_checks() -> list[Check]:
                 "historical_blocked_surfaces",
                 "lorehold_artifact_contract_audit.py",
                 "lorehold_promotion_gate_decision_audit.py",
+                "global_commander_deck_contract_audit.py",
+                "global_commander_strategy_matrix.py",
             ],
             "scripts.deckbuilding_surface_audit_blocks_legacy",
         ),
@@ -342,34 +344,67 @@ def build_checks() -> list[Check]:
             "scripts.lorehold_manual_cut_review_defaults_to_protected_607",
         ),
         check_contains(
+            LOREHOLD_SEED_SAFE_CUT_HYPOTHESIS,
+            ["DEFAULT_BASELINE_DECK_ID = 607"],
+            "scripts.lorehold_seed_safe_cut_hypothesis_defaults_to_protected_607",
+        ),
+        check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_access_cut_model_20260630_post_pg276_lane_core_blocked.json"],
+            ["lorehold_access_cut_model_20260630_goal_learning_squee_access_density.json"],
             "scripts.lorehold_focus_generator_uses_corrected_access_model",
         ),
         check_contains(
             LOREHOLD_FOCUS_ACCESS_GENERATOR,
-            ["lorehold_runtime_gap_family_queue_20260630_post_pg282_final_eight.json"],
+            ["lorehold_runtime_gap_family_queue_20260630_definitive_learning_v1.json"],
             "scripts.lorehold_focus_generator_uses_current_runtime_gap_queue",
         ),
         check_contains(
-            LOREHOLD_REGISTRY_CANDIDATE_RUNNER,
-            [
-                "blocked_legacy_registry_runner",
-                "--allow-legacy-registry-runner",
-                "lorehold_failure_targeted_synergy_hypotheses.py",
-                "lorehold_exposure_aware_gate_queue.py",
-            ],
-            "scripts.lorehold_registry_runner_blocked_by_default",
+            LOREHOLD_FOCUS_ACCESS_GENERATOR,
+            ["lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"],
+            "scripts.lorehold_focus_generator_uses_current_planner",
         ),
         check_contains(
-            LOREHOLD_LOSS_FAILURE_CLASSIFIER,
+            LOREHOLD_EXPOSURE_AWARE_GATE_QUEUE,
+            ["lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json"],
+            "scripts.lorehold_exposure_queue_uses_current_planner",
+        ),
+        check_contains(
+            LOREHOLD_NEXT_ACTION_PLANNER,
             [
-                'CURRENT_BASELINE_KEY = "deck_607"',
-                'LEGACY_BASELINE_KEY = "deck_6"',
-                'CURRENT_BASELINE_PACKAGE_KEY = "protected_baseline_607"',
-                'LEGACY_BASELINE_PACKAGE_KEY = "legacy_baseline_deck_6"',
+                "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
+                "lorehold_failure_targeted_trace_audit_20260630_definitive_learning_v1.json",
+                "lorehold_focus_access_package_generator_20260630_goal_learning_queue_closed.json",
+                "lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.json",
+                "lorehold_manual_cut_review_20260630_goal_learning_new_seed_safe_cut.json",
+                "lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_closed.json",
+                "lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.json",
+                "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.json",
+                "lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.json",
+                "lorehold_tutor_cut_model_20260630_goal_learning_contextual_tutor.json",
+                "lorehold_hand_filter_cut_model_20260630_post_pg270_expanded607_search.json",
+                "lorehold_recursion_cut_model_20260630_after_pg269_alhammarret.json",
+                "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1.json",
+                "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1.json",
+                "lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.json",
+                "lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.json",
+                "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1.json",
+                "lorehold_from_scratch_challengers_20260630_goal_pressure_conversion_v1_miracle_pressure_conversion_fixed607_gate_summary.json",
+                "lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.json",
             ],
-            "scripts.lorehold_loss_classifier_labels_current_and_legacy_baselines",
+            "scripts.lorehold_next_action_planner_uses_current_learning_inputs",
+        ),
+        check_contains(
+            LOREHOLD_FAILURE_SYNERGY,
+            [
+                "lorehold_next_hypothesis_queue_20260630_after_profiled_gate.json",
+                "lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.json",
+            ],
+            "scripts.lorehold_failure_synergy_uses_current_queue_and_planner",
+        ),
+        check_contains(
+            LOREHOLD_FAILURE_TRACE,
+            ["lorehold_failure_targeted_synergy_hypotheses_20260630_definitive_learning_v1.json"],
+            "scripts.lorehold_failure_trace_uses_current_synthesis",
         ),
         check_contains(
             IDEAL_MATRIX,
@@ -414,14 +449,6 @@ def build_checks() -> list[Check]:
                 "ready_for_battle_gate",
             ],
             "server.deckbuilding_contract_support_exists",
-        ),
-        check_contains(
-            REBUILD_GUIDED_SERVICE,
-            [
-                "rebuildGuidedEdhrecTopCardWeight",
-                "card.inclusionRate * 20",
-            ],
-            "server.rebuild_guided_scores_edhrec_by_inclusion_rate",
         ),
     ]
 

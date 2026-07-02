@@ -131,6 +131,7 @@ String buildOptimizeCacheKey({
   required bool keepTheme,
   required String deckSignature,
   String intensity = 'focused',
+  String recommendationContextSignature = '',
 }) {
   return optimize_cache.buildOptimizeCacheKey(
     deckId: deckId,
@@ -140,8 +141,13 @@ String buildOptimizeCacheKey({
     keepTheme: keepTheme,
     deckSignature: deckSignature,
     intensity: intensity,
+    recommendationContextSignature: recommendationContextSignature,
   );
 }
+
+String stableOptimizeHash(String value) => optimize_cache.stableOptimizeHash(
+      value,
+    );
 
 Future<Map<String, dynamic>?> loadOptimizeCache({
   required Pool pool,

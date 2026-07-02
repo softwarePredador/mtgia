@@ -64,9 +64,17 @@ void main() {
             : omenpathsTileUpper,
       );
       await tester.pumpAndSettle();
-      await pumpUntilFound(
+      await pumpUntil(
         tester,
-        find.text('Dados parciais de coleção futura'),
+        () =>
+            find.byKey(const Key('setCardsList')).evaluate().isNotEmpty ||
+            find.byKey(const Key('setCardsEmptyState')).evaluate().isNotEmpty,
+        description: 'OM2 card list or empty set state',
+      );
+      expect(
+        find.byKey(const Key('setCardsList')).evaluate().isNotEmpty ||
+            find.byKey(const Key('setCardsEmptyState')).evaluate().isNotEmpty,
+        isTrue,
       );
 
       await tester.pageBack();

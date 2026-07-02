@@ -17,6 +17,7 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus _status = AuthStatus.initial;
   String? _errorMessage;
   int _authGeneration = 0;
+  Future<void>? _initializeFuture;
 
   User? get user => _user;
   String? get token => _token;
@@ -28,6 +29,24 @@ class AuthProvider extends ChangeNotifier {
 
   /// Inicializa o provider verificando se há token salvo
   Future<void> initialize() async {
+    final existingInitialization = _initializeFuture;
+    if (existingInitialization != null) {
+      debugPrint('[🔑 Auth] initialize() reutilizando chamada em andamento');
+      return existingInitialization;
+    }
+
+    final initialization = _initializeFromDisk();
+    _initializeFuture = initialization;
+    try {
+      await initialization;
+    } finally {
+      if (identical(_initializeFuture, initialization)) {
+        _initializeFuture = null;
+      }
+    }
+  }
+
+  Future<void> _initializeFromDisk() async {
     final generation = ++_authGeneration;
     debugPrint('[🔑 Auth] initialize() → loading');
     _status = AuthStatus.loading;
@@ -167,22 +186,33 @@ class AuthProvider extends ChangeNotifier {
     required String password,
   }) async {
     final generation = ++_authGeneration;
+    debugPrint(
+      '[🔑 Auth] register() chamado email_domain=${_safeEmailDomain(email)}',
+    );
     _status = AuthStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      debugPrint('[🔑 Auth] enviando POST /auth/register...');
       final response = await _apiClient.post('/auth/register', {
         'username': username,
         'email': email,
         'password': password,
       });
+      debugPrint(
+        '[🔑 Auth] resposta recebida: statusCode=${response.statusCode}',
+      );
 
       if (response.statusCode == 201) {
         if (generation != _authGeneration) return false;
         final data = response.data as Map<String, dynamic>;
         final nextToken = data['token'] as String?;
         final nextUser = User.fromJson(data['user'] as Map<String, dynamic>);
+        debugPrint(
+          '[🔑 Auth] token recebido: ${nextToken != null ? "sim" : "NÃO"}',
+        );
+        debugPrint('[🔑 Auth] user parsed: ${nextUser.username}');
         if (!await _saveCredentials(
           generation,
           token: nextToken,
@@ -193,8 +223,10 @@ class AuthProvider extends ChangeNotifier {
         _token = nextToken;
         _user = nextUser;
         ApiClient.setToken(_token);
+        debugPrint('[🔑 Auth] credenciais salvas');
 
         _status = AuthStatus.authenticated;
+        debugPrint('[🔑 Auth] status → authenticated ✅');
         notifyListeners();
         return true;
       } else {
@@ -203,6 +235,7 @@ class AuthProvider extends ChangeNotifier {
           response,
           context: FriendlyErrorContext.authRegister,
         );
+        debugPrint('[🔑 Auth] register falhou: $_errorMessage');
         _status = AuthStatus.unauthenticated;
         notifyListeners();
         return false;
@@ -213,6 +246,7 @@ class AuthProvider extends ChangeNotifier {
         e,
         context: FriendlyErrorContext.authRegister,
       );
+      debugPrint('[❌ Auth] register() EXCEPTION: $e');
       unawaited(
         AppObservability.instance.captureProviderException(
           e,

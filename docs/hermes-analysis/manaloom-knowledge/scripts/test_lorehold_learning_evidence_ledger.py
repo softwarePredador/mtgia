@@ -223,6 +223,59 @@ class LoreholdLearningEvidenceLedgerTest(unittest.TestCase):
             self.assertEqual(group["latest_decision"], "preflight_blocked_protected_cut")
             self.assertNotIn(group, payload["actionable_confirmation_queue"])
 
+    def test_corrected_manifest_invalidates_removed_package_from_old_gate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            registry = tmp / "registry.json"
+            manifest = tmp / "corrected_manifest.json"
+            write_json(registry, {"current_leader": "deck_607"})
+            write_json(
+                manifest,
+                {
+                    "correction_note": (
+                        "Olórin's Searing Light was removed from the corrected "
+                        "hand-filter package queue because its active rule scope "
+                        "is removal/edict, not hand-filter."
+                    ),
+                    "packages": [
+                        {
+                            "package_key": "wheel_hand_filter_cut_improvisation_capstone_expanded607",
+                            "adds": ["Wheel of Fortune"],
+                            "cuts": ["Improvisation Capstone"],
+                            "hypothesis": "valid same-lane hand-filter benchmark",
+                        }
+                    ],
+                },
+            )
+            write_json(
+                tmp / "lorehold_hand_filter_gate.json",
+                {
+                    "package_definition_files": [str(manifest)],
+                    "packages": [
+                        {
+                            "package_key": "olorin_hand_filter_cut_improvisation_capstone_expanded607",
+                            "family": "hand_filter_benchmark",
+                            "adds": ["Olórin's Searing Light"],
+                            "cuts": ["Improvisation Capstone"],
+                            "status": "gated",
+                            "gate_summary": {
+                                "baseline": {"games": 24, "wins": 11, "losses": 12, "stalls": 1, "win_rate": 45.83},
+                                "candidate": {"games": 24, "wins": 12, "losses": 12, "stalls": 0, "win_rate": 50.0},
+                                "delta_pp": 4.17,
+                            },
+                        }
+                    ],
+                },
+            )
+
+            payload = ledger.build_ledger(tmp, registry)
+
+            group = next(row for row in payload["package_groups"] if row["package_key"] == "olorin_hand_filter_cut_improvisation_capstone_expanded607")
+            self.assertEqual(group["classification"], "invalid_corrected_package_definition")
+            self.assertEqual(group["latest_decision"], "invalid_corrected_package_definition")
+            self.assertIn("removed", group["latest_invalid_reason"])
+            self.assertNotIn(group, payload["actionable_confirmation_queue"])
+
     def test_critical_matchup_regression_blocks_positive_aggregate_signal(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)

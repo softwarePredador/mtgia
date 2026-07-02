@@ -141,6 +141,64 @@ baseline, not universal truth. A future Lorehold candidate can replace it only
 when it ties or beats the protected baseline under the same strategy and battle
 gate rules.
 
+## Global Commander Rollout - 2026-07-01
+
+The Lorehold work is now the pilot methodology, not a special-case deckbuilder
+path. Before applying the Commander contract to all decks, run:
+
+```bash
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities
+python3 docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_strategy_matrix.py \
+  --out-prefix docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current
+```
+
+Current global audit evidence:
+
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_deck_contract_audit_20260701_post_scope_legalities.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_commander_strategy_matrix_20260701_current.md`
+- PostgreSQL registered variants: `13/13` are `structure_ready`.
+- Hermes local lab decks: Lorehold baseline `6`, Lorehold variants `606-616`,
+  and non-Lorehold variants `617-621` are structurally ready.
+- Product/user Commander scope after fixture/probe refinement: `16` likely user
+  decks; `6` are `structure_ready`, `10` need repair or exclusion before
+  entering global promotion gates.
+- The remaining product repair queue is shape/legality, not unknown legality:
+  `9` decks are incomplete or missing commander data, and `goblins` is blocked
+  by `Auntie Flint` as `not_legal` in Commander.
+- Test/fixture decks are explicitly excluded from product promotion decisions.
+- Deck `607` materialized for `rafaelhalder@gmail.com` is structurally ready
+  after legalities sync: `100` cards, `1` commander, `0` missing legalities,
+  and `0` illegal rows.
+- Legalities syncs applied on 2026-07-01:
+  `msh` upserted `2921` `card_legalities` rows; `tdc,tle,blc,drc` upserted
+  `207` rows; `eoc,sld,soc,unk` upserted `12604` rows. These syncs updated
+  legalities only, not cards or deck contents.
+- Global Commander strategy matrix status: `10` commanders considered, `36`
+  ready deck candidates, `19` product-ready decks, `8` blocked product decks;
+  `Lorehold`, `Kaalia`, `Kefka`, and `Y'shtola` are ready for commander-specific
+  strategy matrix, while `Sauron`, `Valgavoth`, `Animar`, and `Jin-Gitaxias //
+  The Great Synthesis` need a reference/profile/learned source lane before
+  strategy-matrix promotion.
+
+Global promotion rules:
+
+- A deck cannot enter global deck-quality comparison until it is in an intended
+  scope (`user_product`, `registered_pg_variant`, or an explicitly selected
+  Hermes lab deck) and passes structure/legality gates.
+- Partner/background or multi-commander decks are blocked from automatic
+  promotion until the project has an explicit partner/background profile
+  contract.
+- Cards with printed deck-construction exceptions, such as `Nazgûl`, must be
+  handled by rule-aware duplicate validation rather than generic singleton
+  counting.
+- The global audit is a readiness and prioritization gate. It does not replace
+  commander intent profiles, source corpus, strategy matrix, or battle gate
+  evidence.
+- The global strategy matrix is a routing gate. It can say which commander
+  should receive a commander-specific strategy matrix next, but it cannot
+  promote a deck without equal battle gate evidence.
+
 ## Source Hierarchy
 
 | Source lane | Use for | Must not be used for |
@@ -424,6 +482,9 @@ A Lorehold candidate can replace `607` only when all are true:
 - it ties or beats `607` in the same opponent set and seed window;
 - it does not regress the fast pressure matchup, especially Winota-style
   combat pressure;
+- a positive aggregate result is still rejected when a critical matchup record
+  regresses versus `607`; seed-matrix reports must surface those matchup
+  records before a package can be promoted;
 - decision traces show Lorehold actually uses topdeck/miracle setup and
   discounted spell-chain conversion before the game is decided.
 
@@ -530,7 +591,23 @@ the corrected 607-baseline package gate exercised `Electro` but lost the smoke
 gate and collapsed Winota. Also do not promote
 `cloud_key_same_lane_benchmark_cut_bender_s_waterskin`; `Cloud Key` was
 exercised in the natural gate but lost to protected `607` and regressed Winota
-and miracle cadence. The protected baseline remains `607`.
+and miracle cadence. Also do not promote
+`cool_but_rude_same_lane_benchmark_cut_monument_to_endurance` or
+`currency_converter_same_lane_benchmark_cut_monument_to_endurance`; both were
+same-lane discard-ramp-value tests over `Monument to Endurance`, and neither
+passed the protected fast-pressure gate. Also do not promote
+`glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance`,
+`magmakin_artillerist_same_lane_benchmark_cut_monument_to_endurance`, or
+`surly_badgersaur_same_lane_benchmark_cut_monument_to_endurance`; the remaining
+same-lane discard-ramp-value candidates also lost the protected gate and
+regressed Winota. Also do not promote
+`possibility_storm_same_lane_benchmark_cut_creative_technique`; it was the
+remaining all-lanes package after prior filtering, but it lost the smoke gate
+and regressed Winota while collecting too little used-game outcome sample for a
+positive card-level claim. The current profiled same-lane one-for-one queue is
+closed: the latest all-lanes pass evaluated `1080` candidate/cut pairs, found
+`0` preflight-ready packages, and blocked `31` exact prior rejects. The
+protected baseline remains `607`.
 
 Package-gate correction generated on 2026-06-30:
 
@@ -635,6 +712,191 @@ Chaos Warp removal-probe decision generated on 2026-06-30:
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_stroke_decision_20260630.md`.
 
+Chaos Warp/Generous Gift profiled-removal decision generated on 2026-06-30:
+
+- Candidate:
+  `chaos_warp_same_lane_benchmark_cut_generous_gift`.
+- Why it was tested: the current exposure/manual-cut pass found no automatic
+  safe cut, but did find a same-lane spot-removal benchmark where `Chaos Warp`
+  has active battle-rule support and appears in Lorehold variants while
+  `Generous Gift` had measured low exposure in deck `607`.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `14/24` versus `607` `11/24`.
+- Direct card-use evidence in the smoke gate: candidate `Chaos Warp` recorded
+  `31` use events, was accessed in `10/24` games, used in `9/24` games, and
+  its used-game record was `8W/1L/0S`. Baseline `Generous Gift` recorded `9`
+  use events and was accessed in `4/24` games.
+- Confirmed result over seeds `20260630`, `123`, and `999`: candidate
+  `30/72` versus `607` `27/72`, but seed `999` regressed `10/24` versus
+  `607` `11/24`.
+- Critical matchup failure: Winota fell from `4/9` on baseline `607` to `3/9`
+  on the candidate.
+- Decision: reject this exact `+Chaos Warp; -Generous Gift` swap despite the
+  positive aggregate. The swap is real and exercised, but it violates the
+  protected fast-pressure gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_gate_20260630_goal_learning_smoke_20260630_205058.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_seed_matrix_20260630_goal_learning_confirm_20260630_205527.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_chaos_warp_generous_gift_decision_20260630_goal_learning.md`.
+
+Discard-ramp-value / Monument decision generated on 2026-06-30:
+
+- Candidates:
+  `cool_but_rude_same_lane_benchmark_cut_monument_to_endurance`,
+  `currency_converter_same_lane_benchmark_cut_monument_to_endurance`,
+  `glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance`,
+  `magmakin_artillerist_same_lane_benchmark_cut_monument_to_endurance`, and
+  `surly_badgersaur_same_lane_benchmark_cut_monument_to_endurance`.
+- Why they were tested: `Monument to Endurance` is not generic ramp in the
+  current shell; it is a discard-trigger value/ramp payoff tied to hand
+  filtering, treasure, and opponent life-loss pressure. The profiled-cut
+  generator was expanded with `discard_ramp_value` and `--cut-card` so this
+  lane can be benchmarked directly from the full manual-review expansion.
+- Smoke result for `Cool but Rude`: candidate `9W/15L/0S` versus `607`
+  `11W/12L/1S`; Winota regressed from `2W/1L/0S` to `0W/3L/0S`. The card was
+  used `20` times and accessed in `4` games, so the rejection is not a
+  no-exposure artifact.
+- Smoke result for `Currency Converter`: candidate tied total wins at
+  `11W/13L/0S` versus `607` `11W/12L/1S`, but Winota regressed from
+  `2W/1L/0S` to `1W/2L/0S`. The card was used `41` times and accessed in
+  `8` games.
+- Residual same-lane smoke results after prior-reject filtering:
+  `Glint-Horn Buccaneer` lost `10W/14L/0S` and Winota `0W/3L/0S`;
+  `Magmakin Artillerist` lost `7W/17L/0S` and Winota `1W/2L/0S`; and
+  `Surly Badgersaur` lost `10W/14L/0S` and Winota `0W/3L/0S`.
+- Direct card-use evidence exists for the residual candidates:
+  `Glint-Horn Buccaneer` use `13` / access `7`, `Magmakin Artillerist` use
+  `16` / access `11`, and `Surly Badgersaur` use `6` / access `7`.
+- Tooling decision: package gates now return
+  `reject_regresses_critical_matchup` when a critical matchup record drops,
+  even if aggregate win rate ties or improves.
+- Decision: keep `Monument to Endurance` protected in deck `607`. The current
+  discard-ramp-value one-for-one replacement pool over `Monument to Endurance`
+  is exhausted and rejected; revisit these cards only with a safer cut or a
+  package-level hypothesis that preserves the fast-pressure matchup.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_discard_ramp_value_monument.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_discard_ramp_value_monument_remaining.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_gate_20260630_goal_learning_smoke_20260630_210849.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_currency_converter_monument_gate_20260630_goal_learning_critical_guard_20260630_212135.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_remaining_gate_20260630_goal_learning_smoke_20260630_213021.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_discard_ramp_value_monument_decision_20260630_goal_learning.md`.
+
+Possibility Storm / Creative Technique decision generated on 2026-06-30:
+
+- Candidate:
+  `possibility_storm_same_lane_benchmark_cut_creative_technique`.
+- Why it was tested: after prior-exact blockers for `Chaos Warp / Generous
+  Gift` and the five current `Monument to Endurance` discard-ramp-value
+  replacements, the profiled all-lanes queue had one remaining
+  preflight-ready same-lane package. `Creative Technique` is protected, but the
+  registry allows a same-function `big_spell_value` benchmark.
+- Smoke result at `opponent_seed=20260629`, `simulation_seed=20260630`:
+  candidate `3W/21L/0S` versus `607` `11W/12L/1S`.
+- Critical matchup failure: Winota fell from `2W/1L/0S` on baseline `607` to
+  `0W/3L/0S` on the candidate.
+- Direct card-use evidence: `Possibility Storm` was accessed in `6` games and
+  recorded `3` use events, but produced only one used-game outcome sample; the
+  gate decision is therefore `insufficient_card_outcome_sample`, not a
+  promotion signal.
+- Decision: reject this exact natural package and keep `Creative Technique`
+  protected. Revisit `Possibility Storm` only through a forced-access
+  diagnostic or a materially different package hypothesis.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_benchmark_generator_20260630_goal_learning_all_lanes_after_monument_closure.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_big_spell_value_creative_technique_gate_20260630_goal_learning_smoke_20260630_213730.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_possibility_storm_creative_technique_decision_20260630_goal_learning.md`.
+
+Profiled cut queue closure generated on 2026-06-30:
+
+- Scope: current same-lane one-for-one package queue over protected deck `607`,
+  with variant decks `608` through `616` used as candidate context.
+- Latest all-lanes generator result:
+  `candidate_pool_count=270`, `pair_evaluation_count=1080`,
+  `preflight_ready_pair_count=0`, and `selected_package_count=0`.
+- The prior-reject registry now blocks the current rejected package signatures
+  for `Chaos Warp / Generous Gift`, all five current `Monument to Endurance`
+  discard-ramp-value replacements, and `Possibility Storm / Creative
+  Technique`.
+- Decision: stop this one-for-one queue. The next Lorehold learning cycle must
+  either introduce a new strategic safe-cut model, a multi-card package
+  hypothesis that preserves the Winota/fast-pressure guard, or a forced-access
+  diagnostic used only for card-understanding evidence.
+- Updated planner result:
+  `gate_ready_now_count=0`, `prior_rejected_package_count=59`, and
+  recommended next action
+  `review_focus_access_trace_then_define_next_deck_or_runtime_package`.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_profiled_cut_queue_closed_decision_20260630_goal_learning.md`.
+- Next-action report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_queue_closed.md`.
+
+Seed-safe cut synthesis generated on 2026-06-30:
+
+- Scope: protected baseline deck `607`, current manual cut review, current
+  deck-607 exposure profile, current cut-safety manifest, and current
+  safe-cut replanner blockers.
+- Result: `seed_safe_cut_ready_count=0` across `94` deck cards. The only
+  same-lane-only slots are `Creative Technique` and `Bender's Waterskin`; both
+  remain blocked for generic package work because they require concrete
+  same-lane replacement proof and have prior/protected evidence.
+- Decision: do not keep generating one-card swaps from the old queue. The next
+  deck-learning step is `expand_cut_safety_model_or_multi_card_shell_before_gate`:
+  build a new cut-safety model from failed-seed traces/current utilization, or
+  design a multi-card shell that preserves mana floor, protection, and miracle
+  density before any natural battle gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
+
+From-scratch shell handoff generated on 2026-06-30:
+
+- Scope: full 100-card challengers generated from the Lorehold `607-616`
+  corpus, with protected `607` fixed as the baseline opponent rather than
+  treated as a swap list.
+- Confirmed shell evidence now consumed by the current next-action planner:
+  `challenger_lorehold_recursion_discard_engine_v1` lost the 8x3 gate
+  `4/24` versus `607` at `6/24`, and
+  `challenger_lorehold_recursion_discard_pressure_repair_v1` lost `3/24`
+  versus `607` at `6/24`.
+- Interpretation: the recursion/Squee shell produced useful telemetry, but it
+  did not convert into wins. Shell-level telemetry is not card-level proof and
+  cannot promote an individual card or a full deck by itself.
+- Current planner top action:
+  `rework_from_scratch_shell_after_current_shells_rejected`. The next shell
+  must materially repair pressure conversion and closing windows while
+  preserving the `607` mana/protection/miracle floor before any new natural
+  battle gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_definitive_learning_v1_recursion_discard_engine_confirm8x3.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260630_goal_pressure_repair_v1_recursion_discard_pressure_repair_confirm8x3_sources_v3.md`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_seed_safe_synthesis.md`.
+
+Miracle pressure-conversion shell decision generated on 2026-06-30:
+
+- Candidate:
+  `challenger_lorehold_miracle_pressure_conversion_v1`.
+- Why it was tested: preserve the `607` land base and protected
+  miracle/protection floor while adding a compact conversion package
+  (`Aetherflux Reservoir`, `Birgi`, `Squee`, `Faithless Looting`,
+  `Underworld Breach`, `Wheel of Fortune`, `Boros Charm`, and `Silence`).
+- Smoke result against fixed `607`: baseline `607` = `1/4`; candidate =
+  `0/4`.
+- Direct strategic signal: candidate miracle games fell to `2/4` versus
+  baseline `4/4`; `Squee` reached the graveyard once but returned `0` times;
+  `Birgi` generated `0` mana-trigger games.
+- Decision: reject this exact shell and do not confirm it to 8x3. Preserving
+  the `607` floor was necessary but not sufficient; the next shell must improve
+  actual closing-window execution instead of merely adding compact conversion
+  cards.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_miracle_pressure_conversion_decision_20260630_goal_learning.md`.
+
 Return the Favor redirect/copy probe decision generated on 2026-06-30:
 
 - Candidate:
@@ -670,6 +932,158 @@ Past in Flames recursion-probe decision generated on 2026-06-30:
   but this replacement does not improve the current `607` shell.
 - Evidence report:
   `docs/hermes-analysis/master_optimizer_reports/lorehold_past_in_flames_pinnacle_decision_20260630.md`.
+
+Access-density from-scratch decision generated on 2026-06-30:
+
+- Candidate:
+  `challenger_lorehold_access_density_control_v1`.
+- Purpose: test whether the weak-seed access issue could be repaired by a full
+  shell that preserves the protected `607` miracle engine while adding both
+  `Enlightened Tutor` and `Gamble`.
+- Structural result: legal 100-card challenger with no missing required cards,
+  but the matrix flagged overfilled `topdeck_miracle_setup`, `hand_filter`,
+  `spell_chain_conversion`, and `graveyard_recursion`.
+- Natural smoke result against fixed `607`: candidate `0/4` versus `607`
+  `1/4`; the tutors did not naturally appear enough to prove card-level impact.
+- Forced tutor-access result with `Enlightened Tutor|Gamble` in opening hand:
+  candidate still `0/4` versus `607` `1/4`; `Enlightened Tutor` was accessed
+  `4/4`, cast `3`, resolved `4`, while `Gamble` was accessed `4/4`, cast `3`,
+  resolved `2`.
+- Decision: reject this exact from-scratch access-density shell. More access
+  alone is not sufficient evidence; future tutor work must use a smaller
+  same-lane package or a seed-safe cut model, not a broad overfilled shell.
+- Evidence report:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_access_density_control_decision_20260630_goal_current.md`.
+
+From-scratch shell failure synthesis generated on 2026-06-30:
+
+- Scope: all current from-scratch shell gates consumed by the planner,
+  including recursion/discard, pressure repair, miracle pressure conversion,
+  and access-density natural plus forced tutor-access gates.
+- Result: `4` unique shells and `5` shell gate rows were evaluated; all were
+  rejected against protected `607`. Best natural delta was `-1` win and best
+  forced-access delta was also `-1` win.
+- Failure-mode counts now include `wins_below_protected_607=5`,
+  `upkeep_rummage_floor_regressed=5`, `package_lanes_overfilled=4`,
+  `miracle_floor_regressed=3`, and
+  `positive_squee_telemetry_not_converting=3`.
+- Decision: do not run another broad from-scratch shell gate now. The current
+  planner top action is `mine_closing_window_trace_before_next_shell`.
+- Required before the next shell: mine `607` win traces versus candidate loss
+  traces for closing-window sequence differences, name the exact lane or
+  pressure failure being repaired, predeclare miracle/topdeck/conversion-card
+  targets, and keep forced-access diagnostics separate from natural promotion
+  evidence.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_shell_failure_synthesis_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_shell_failure_synthesis.md`.
+
+Closing-window trace mining generated on 2026-06-30:
+
+- Scope: exact same-opponent slots where protected `607` won and a rejected
+  from-scratch shell lost, across the current recursion/discard, pressure
+  repair, and access-density gates.
+- Result: `13` direct comparisons; every compared challenger loss died before
+  the 607 closing window. Average 607 turn advantage was `10.15` turns.
+- Dominant strategic deficits were `lorehold_cost_paid=153`,
+  `lorehold_spell_cast=134`, `miracle_cast=71`,
+  `lorehold_upkeep_rummage=63`, `topdeck_manipulation_activated=41`, and
+  `static_cost_reduction_total=37`.
+- Dominant anchor deficits were `Sensei's Divining Top`, `Scroll Rack`,
+  `Approach of the Second Sun`, `Victory Chimes`, `Mizzix's Mastery`,
+  `Bender's Waterskin`, and `Jeska's Will`.
+- Decision: the next deck-learning step is
+  `build_trace_targeted_micro_package_from_closing_window`. Build only a
+  micro-package that preserves those 607 anchors, predeclares miracle/topdeck
+  and spell-volume targets, and repairs pressure/closing-window execution.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_closing_window_trace_miner_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_closing_window_trace.md`.
+
+Trace-targeted micro-package model generated on 2026-06-30:
+
+- Scope: consume the closing-window hypotheses and the current seed-safe cut
+  synthesis before allowing any new Lorehold swap or shell gate.
+- Result: `3` trace hypotheses were evaluated, but `ready_micro_package_count`
+  is `0` because `seed_safe_cut_ready_count` is also `0`.
+- Current same-lane-only cut slots are `Creative Technique` and
+  `Bender's Waterskin`; both remain non-seed-safe/protected under the current
+  model and cannot be used as generic cuts.
+- Decision: freeze protected `607` as the current champion snapshot until new
+  cut evidence exists. Do not run another deck gate unless it has a named
+  add/cut package, seed-safe cut status, and predeclared miracle/topdeck,
+  spell-volume, and pressure-window targets.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_trace_targeted_micro_package_model_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_micro_package_model.md`.
+
+Current champion snapshot generated on 2026-06-30:
+
+- Scope: read-only snapshot of deck `607` after the micro-package model blocked
+  new swaps without seed-safe cuts.
+- Validation: `100` cards, `94` deck rows, `1` commander, `34` lands, `0`
+  validation errors, and all `9` protected anchors present.
+- Role profile: `15` ramp, `12` draw, `9` protection, `9` wincon, `7`
+  removal, `6` board wipe, `2` engine, `2` creature, `2` unknown, `1` tutor,
+  plus commander and lands.
+- Decision: keep `607` as the current champion snapshot. After this snapshot
+  exists, the planner moves to
+  `expand_trace_cut_evidence_after_607_champion_snapshot`; it must not keep
+  repeating the snapshot or start a new shell gate.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.md`,
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260630_goal_learning.decklist.txt`,
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_champion_snapshot.md`.
+
+Trace cut-evidence expansion generated on 2026-06-30:
+
+- Scope: classify every current `607` cut slot after the champion snapshot to
+  determine whether cut-safety evidence can still be expanded before a new
+  package gate.
+- Result: `94` cut slots evaluated, `0` seed-safe cuts, `0` reviewable
+  evidence gaps, `92` hard-blocked slots, and `2` same-lane hard-blocked slots.
+- Same-lane hard-blocked slots remain `Creative Technique` and
+  `Bender's Waterskin`; neither is a current generic cut.
+- Decision: the current `607` one-for-one deck-improvement contract is
+  exhausted. Do not run more one-for-one swap gates against `607` unless new
+  external/card evidence changes a cut-safety row, the owner explicitly relaxes
+  the cut contract, or a new full-shell archetype is evaluated under a separate
+  contract.
+- Current planner top action:
+  `no_cut_slot_to_expand_under_current_607_contract`.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_trace_cut_evidence_expander_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_cut_evidence_exhausted.md`.
+
+Lorehold deckbuilding final closure generated on 2026-06-30:
+
+- Scope: final read-only closure over the current champion snapshot,
+  trace-targeted micro-package model, cut-evidence expander, and final planner.
+- Result: status `closed_current_607_champion`; deck `607` remains the current
+  Lorehold champion under the active contract.
+- Closure evidence: `100` cards, `1` commander, `34` lands, `9` protected
+  anchors, `0` micro-packages ready, `0` seed-safe cuts, `0` reviewable
+  cut-evidence gaps, `92` hard-blocked slots, and `2` same-lane hard-blocked
+  slots.
+- Final planner top action:
+  `lorehold_deckbuilding_closed_current_607_champion`.
+- Reopen conditions: new external/card evidence changes a cut-safety row; the
+  owner explicitly relaxes protected-cut rules for a named slot; a new
+  full-shell archetype is evaluated under a separate declared contract; or
+  battle/runtime changes materially alter the current `607` evidence inputs.
+- Forbidden under this closure: do not run another one-for-one swap gate
+  against `607`, do not cut `Creative Technique` or `Bender's Waterskin` as
+  generic cuts, do not promote from forced-access signal alone, and do not
+  replace `607` from structure-only or aggregate-only evidence.
+- Evidence reports:
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_deckbuilding_final_closure_20260630_goal_learning.md`
+  and
+  `docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_final_closure.md`.
 
 Electro ramp-benchmark decision generated on 2026-06-30:
 

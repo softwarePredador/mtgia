@@ -27,12 +27,13 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 DEFAULT_STRATEGY_AUDIT = REPORT_DIR / "lorehold_strategy_learning_audit_20260628_v2_runtime_packages.json"
 DEFAULT_CUT_MODEL = REPORT_DIR / "lorehold_variant_gap_miner_20260628_v4_all_candidates_runtime_queue.json"
 DEFAULT_EXPOSURE_PROFILES = [
+    REPORT_DIR / "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json",
     REPORT_DIR / "lorehold_card_exposure_profile_20260627_v2_role_fix.json",
     REPORT_DIR / "lorehold_cut_exposure_profile_20260628_v1.json",
 ]
 DEFAULT_EXPOSURE_PROFILE = DEFAULT_EXPOSURE_PROFILES[0]
 DEFAULT_SAFE_CUT_REPLANNER = (
-    REPORT_DIR / "lorehold_safe_cut_replanner_20260630_post_pg276_squee_access_density_lane_corrected.json"
+    REPORT_DIR / "lorehold_safe_cut_replanner_20260630_goal_learning_new_seed_safe_cut.json"
 )
 DEFAULT_DB = resolve_default_knowledge_db()
 DEFAULT_LOREHOLD_VARIANT_DECK_IDS = tuple(range(607, 617))
@@ -902,7 +903,7 @@ def recommended_cut_search(candidate: str, evidence: list[dict[str, Any]]) -> st
 def render_markdown(payload: dict[str, Any]) -> str:
     cut_summary = payload.get("cut_evidence_expansion", {}).get("summary") or {}
     lines = [
-        "# Lorehold Manual Cut Review - 2026-06-28",
+        "# Lorehold Manual Cut Review - 2026-06-30",
         "",
         f"- Generated at: `{payload['generated_at']}`",
         f"- Strategy audit: `{payload['strategy_audit']}`",

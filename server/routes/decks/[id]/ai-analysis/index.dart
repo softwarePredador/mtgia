@@ -77,7 +77,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         await _hasTable(pool, 'card_intelligence_snapshot');
     final hasSemanticV2 = await _hasTable(pool, 'card_semantic_tags_v2');
     final cardSourceJoin = hasCardIntelligenceSnapshot
-        ? 'JOIN card_intelligence_snapshot c ON c.id = dc.card_id'
+        ? 'JOIN card_intelligence_snapshot c ON c.card_id = dc.card_id'
         : 'JOIN cards c ON c.id = dc.card_id';
     final functionalTagsSelect = hasCardIntelligenceSnapshot
         ? 'c.function_tag_details'

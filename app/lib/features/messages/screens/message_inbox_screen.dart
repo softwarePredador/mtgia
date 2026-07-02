@@ -136,7 +136,7 @@ class _ConversationTile extends StatelessWidget {
                   hasUnread
                       ? AppTheme.brass400.withValues(alpha: 0.3)
                       : AppTheme.outlineMuted,
-              width: 0.8,
+              width: AppTheme.strokeMedium,
             ),
           ),
           padding: const EdgeInsets.fromLTRB(0, 8, 10, 8),
@@ -147,7 +147,7 @@ class _ConversationTile extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: hasUnread ? AppTheme.brass400 : AppTheme.transparent,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                 ),
               ),
               Expanded(
@@ -221,7 +221,7 @@ class _ConversationTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppTheme.brass400,
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusLifeCounterSm),
                           ),
                           child: Text(
                             '${conversation.unreadCount}',

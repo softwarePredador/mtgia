@@ -6,6 +6,7 @@ import '../../lib/endpoint_cache.dart';
 import '../../lib/sets_catalog_contract.dart';
 
 Future<Response> onRequest(RequestContext context) async {
+  final totalStopwatch = Stopwatch()..start();
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
   }
@@ -23,7 +24,13 @@ Future<Response> onRequest(RequestContext context) async {
 
   final cached = EndpointCache.instance.get(cacheKey);
   if (cached != null) {
-    return Response.json(body: cached);
+    return Response.json(
+      body: cached,
+      headers: buildSetCatalogTimingHeaders(
+        cacheHit: true,
+        totalElapsedMs: totalStopwatch.elapsedMilliseconds,
+      ),
+    );
   }
 
   final where = <String>[];
@@ -45,6 +52,7 @@ Future<Response> onRequest(RequestContext context) async {
   final whereSql = where.isEmpty ? '' : 'WHERE ${where.join(' AND ')}';
 
   try {
+    final queryStopwatch = Stopwatch()..start();
     final result = await pool.execute(
       Sql.named('''
         WITH filtered_sets AS (
@@ -89,6 +97,7 @@ Future<Response> onRequest(RequestContext context) async {
       '''),
       parameters: sqlParams,
     );
+    queryStopwatch.stop();
 
     final sets = result.map((row) {
       final map = row.toColumnMap();
@@ -104,7 +113,14 @@ Future<Response> onRequest(RequestContext context) async {
 
     EndpointCache.instance
         .set(cacheKey, payload, ttl: const Duration(seconds: 60));
-    return Response.json(body: payload);
+    return Response.json(
+      body: payload,
+      headers: buildSetCatalogTimingHeaders(
+        cacheHit: false,
+        totalElapsedMs: totalStopwatch.elapsedMilliseconds,
+        queryElapsedMs: queryStopwatch.elapsedMilliseconds,
+      ),
+    );
   } catch (e) {
     print('[ERROR] Erro interno ao buscar sets: $e');
     return Response.json(

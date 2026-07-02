@@ -70,6 +70,8 @@ EFFECT_TO_DECK_CATEGORY = {
     "attack_limit": "protection",
     "attack_tax": "protection",
     "draw_cards": "draw",
+    "composite_resolution": "draw",
+    "dig_to_hand": "draw",
     "cantrip_mana_filter_artifact": "draw",
     "draw_engine": "draw",
     "equipment_static_attachment": "protection",
@@ -92,6 +94,7 @@ EFFECT_TO_DECK_CATEGORY = {
     "remove_creature": "removal",
     "fated_clash_protect_then_destroy": "wipe",
     "remove_permanent": "removal",
+    "graveyard_exile": "removal",
     "remove_artifact_or_3dmg": "removal",
     "damage_player_and_creatures": "removal",
     "deal_damage": "removal",
@@ -100,6 +103,8 @@ EFFECT_TO_DECK_CATEGORY = {
     "copy_spell": "engine",
     "exile_top_nonland_free_cast": "engine",
     "recursion": "engine",
+    "add_counters": "support",
+    "stat_modifier_until_eot": "support",
     "graveyard_flashback_grant": "engine",
     "redistribute_life_totals": "wincon",
     "land_recursion": "engine",
@@ -283,6 +288,12 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     if effect == "creature" and effect_json.get("is_mana_source"):
         category = "ramp"
         subtype = "mana_dork"
+    elif effect == "creature" and (
+        effect_json.get("graveyard_self_return_to_hand")
+        or effect_json.get("graveyard_self_return_to_battlefield")
+    ):
+        category = "engine"
+        subtype = "recursive_threat"
     elif (
         effect == "creature"
         and effect_json.get("battle_model_scope")
@@ -290,6 +301,9 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
     ):
         category = "protection"
         subtype = "activated_targeted_protection_response"
+    elif effect_json.get("activated_effect") == "graveyard_exile":
+        category = "removal"
+        subtype = "graveyard_hate"
     elif effect == "topdeck_play":
         if effect_json.get("play_lands_from_top_library"):
             category = "ramp"
@@ -297,6 +311,23 @@ def deck_role_from_effect(effect_json: dict[str, Any]) -> dict[str, Any]:
         elif effect_json.get("look_top_library_any_time"):
             category = "draw"
             subtype = "topdeck_visibility"
+    elif effect == "add_counters":
+        counter_type = str(effect_json.get("counter_type") or "")
+        if counter_type == "-1/-1":
+            category = "removal"
+            subtype = "negative_counters"
+        elif counter_type == "+1/+1":
+            subtype = "plus_one_counters"
+    elif effect == "stat_modifier_until_eot":
+        power_delta = int(effect_json.get("power_delta") or effect_json.get("power_boost") or 0)
+        toughness_delta = int(effect_json.get("toughness_delta") or effect_json.get("toughness_boost") or 0)
+        if toughness_delta < 0 or (power_delta < 0 and toughness_delta <= 0):
+            category = "removal"
+            subtype = "temporary_debuff"
+        else:
+            subtype = "temporary_pump"
+    elif effect == "graveyard_exile":
+        subtype = "graveyard_hate"
     role = {
         "category": category,
         "effect": effect,

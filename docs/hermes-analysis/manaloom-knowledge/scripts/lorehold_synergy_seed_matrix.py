@@ -23,6 +23,7 @@ import lorehold_synergy_package_gate as package_gate
 
 DEFAULT_SEEDS = (7, 20260625, 42)
 DEFAULT_STRONG_SEEDS = (42,)
+CRITICAL_MATCHUP_PATTERNS = ("Winota",)
 
 
 def utc_now() -> str:
@@ -136,6 +137,27 @@ def compact_prior_evidence(value: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def critical_matchup_records(value: dict[str, Any]) -> dict[str, dict[str, int]]:
+    records = {
+        pattern: {"wins": 0, "losses": 0, "stalls": 0, "games": 0}
+        for pattern in CRITICAL_MATCHUP_PATTERNS
+    }
+    for row in value.get("game_results") or []:
+        opponent = str(row.get("opponent") or "")
+        result = str(row.get("result") or "")
+        for pattern in CRITICAL_MATCHUP_PATTERNS:
+            if pattern not in opponent:
+                continue
+            records[pattern]["games"] += 1
+            if result == "win":
+                records[pattern]["wins"] += 1
+            elif result == "loss":
+                records[pattern]["losses"] += 1
+            elif result == "stall":
+                records[pattern]["stalls"] += 1
+    return records
+
+
 def compact_gate_side(value: dict[str, Any]) -> dict[str, Any]:
     telemetry = value.get("telemetry") or {}
     return {
@@ -147,6 +169,7 @@ def compact_gate_side(value: dict[str, Any]) -> dict[str, Any]:
         "stalls": value.get("stalls"),
         "win_rate": value.get("win_rate"),
         "avg_win_turn": value.get("avg_win_turn"),
+        "critical_matchups": critical_matchup_records(value),
         "telemetry": {
             "strategic_event_counts": telemetry.get("strategic_event_counts") or {},
             "top_cards": telemetry.get("top_cards") or [],
@@ -264,6 +287,7 @@ def aggregate_seed_rows(
     games = 0
     incomplete = []
     strong_regressions = []
+    critical_matchup_totals: dict[str, dict[str, dict[str, int]]] = {}
     deltas: list[float] = []
 
     for row in seed_rows:
@@ -283,11 +307,33 @@ def aggregate_seed_rows(
         if int(row.get("seed") or -1) in strong_seeds:
             if int(candidate.get("wins") or 0) < int(baseline.get("wins") or 0) or delta < 0:
                 strong_regressions.append(row.get("seed"))
+        for pattern in CRITICAL_MATCHUP_PATTERNS:
+            baseline_record = ((baseline.get("critical_matchups") or {}).get(pattern) or {})
+            candidate_record = ((candidate.get("critical_matchups") or {}).get(pattern) or {})
+            totals = critical_matchup_totals.setdefault(
+                pattern,
+                {
+                    "baseline": {"wins": 0, "losses": 0, "stalls": 0, "games": 0},
+                    "candidate": {"wins": 0, "losses": 0, "stalls": 0, "games": 0},
+                },
+            )
+            for side_name, record in (("baseline", baseline_record), ("candidate", candidate_record)):
+                for key in ("wins", "losses", "stalls", "games"):
+                    totals[side_name][key] += int(record.get(key) or 0)
+
+    critical_matchup_regressions = [
+        pattern
+        for pattern, totals in sorted(critical_matchup_totals.items())
+        if int((totals.get("candidate") or {}).get("wins") or 0)
+        < int((totals.get("baseline") or {}).get("wins") or 0)
+    ]
 
     if incomplete:
         decision = "invalid_or_incomplete"
     elif strong_regressions:
         decision = "reject_regresses_strong_seed"
+    elif critical_matchup_regressions:
+        decision = "reject_regresses_critical_matchup"
     elif candidate_wins > baseline_wins:
         decision = "promote_to_confirm_gate"
     elif candidate_wins == baseline_wins and all(delta >= 0 for delta in deltas):
@@ -314,6 +360,8 @@ def aggregate_seed_rows(
         "games": games,
         "incomplete_seeds": incomplete,
         "strong_seed_regressions": strong_regressions,
+        "critical_matchup_records": critical_matchup_totals,
+        "critical_matchup_regressions": critical_matchup_regressions,
     }
 
 
@@ -333,19 +381,25 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         "## Aggregate Decisions",
         "",
-        "| Package | Family | Adds | Cuts | Record Base | Record Candidate | Delta | Avg Seed Delta | Decision |",
-        "| --- | --- | --- | --- | --- | --- | ---: | ---: | --- |",
+        "| Package | Family | Adds | Cuts | Record Base | Record Candidate | Critical Matchups | Delta | Avg Seed Delta | Decision |",
+        "| --- | --- | --- | --- | --- | --- | --- | ---: | ---: | --- |",
     ]
     for row in payload["packages"]:
         aggregate = row.get("aggregate") or {}
+        critical_records = aggregate.get("critical_matchup_records") or {}
+        critical_text = "; ".join(
+            f"{name} {record.get('baseline', {}).get('wins', 0)}-{record.get('baseline', {}).get('losses', 0)} vs {record.get('candidate', {}).get('wins', 0)}-{record.get('candidate', {}).get('losses', 0)}"
+            for name, record in sorted(critical_records.items())
+        ) or "-"
         lines.append(
-            "| {package} | {family} | {adds} | {cuts} | {base} | {candidate} | {delta:+.2f} | {avg:+.2f} | `{decision}` |".format(
+            "| {package} | {family} | {adds} | {cuts} | {base} | {candidate} | {critical} | {delta:+.2f} | {avg:+.2f} | `{decision}` |".format(
                 package=row["package_key"],
                 family=row.get("family") or "-",
                 adds=", ".join(row.get("adds") or []),
                 cuts=", ".join(row.get("cuts") or []),
                 base=aggregate.get("baseline_record") or "-",
                 candidate=aggregate.get("candidate_record") or "-",
+                critical=critical_text,
                 delta=float(aggregate.get("delta_pp_total") or 0.0),
                 avg=float(aggregate.get("avg_seed_delta_pp") or 0.0),
                 decision=aggregate.get("decision") or row.get("status"),
@@ -397,7 +451,7 @@ def write_report(payload: dict[str, Any], stem: str, stamp: str) -> tuple[Path, 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-db", type=Path, default=package_gate.DEFAULT_SOURCE_DB)
-    parser.add_argument("--packages", default="all")
+    parser.add_argument("--packages", default=None)
     parser.add_argument("--max-packages", type=int, default=0)
     parser.add_argument("--seeds", default=",".join(str(seed) for seed in DEFAULT_SEEDS))
     parser.add_argument("--strong-seeds", default=",".join(str(seed) for seed in DEFAULT_STRONG_SEEDS))
@@ -428,8 +482,14 @@ def main() -> int:
     args = parser.parse_args()
 
     package_files = [path.resolve() for path in args.package_file]
-    package_definitions, loaded_package_files = package_gate.merge_package_definitions(package_files)
-    package_keys = parse_package_keys(args.packages, package_definitions=package_definitions)
+    package_definitions, loaded_package_files, loaded_package_keys = package_gate.merge_package_definitions(package_files)
+    if args.packages is None:
+        package_keys = package_gate.selected_package_keys(
+            packages_arg=None,
+            loaded_package_keys=loaded_package_keys,
+        )
+    else:
+        package_keys = parse_package_keys(args.packages, package_definitions=package_definitions)
     seeds = parse_int_csv(args.seeds)
     strong_seeds = set(parse_int_csv(args.strong_seeds))
     if args.max_packages > 0:
@@ -506,6 +566,7 @@ def main() -> int:
         "cut_safety_report": str(cut_safety_report) if cut_safety_report else None,
         "prior_package_reports": [str(path) for path in prior_package_reports],
         "loaded_package_files": loaded_package_files,
+        "loaded_package_keys": loaded_package_keys,
         "package_status_counts": dict(sorted(status_counts.items())),
         "packages": results,
     }

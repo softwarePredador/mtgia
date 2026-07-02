@@ -59,6 +59,7 @@ docs/hermes-analysis/master_optimizer_reports/**/*.out
 docs/hermes-analysis/master_optimizer_reports/**/*.err
 docs/hermes-analysis/master_optimizer_reports/**/*.tsv
 docs/hermes-analysis/master_optimizer_reports/**/*.json
+docs/hermes-analysis/master_optimizer_reports/**/*.md
 docs/hermes-analysis/master_optimizer_reports/xmage_current_replay_batch_pipeline_*
 docs/hermes-analysis/master_optimizer_reports/xmage_effective_queue_*
 docs/hermes-analysis/master_optimizer_reports/lorehold_*_gate_*

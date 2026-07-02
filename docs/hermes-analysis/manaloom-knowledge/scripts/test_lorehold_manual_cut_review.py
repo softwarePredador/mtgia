@@ -5,10 +5,14 @@ from pathlib import Path
 import lorehold_manual_cut_review as review
 
 
-def test_default_safe_cut_replanner_uses_post_pg276_lane_corrected_report():
+def test_defaults_use_goal_learning_cut_inputs():
+    assert (
+        review.DEFAULT_EXPOSURE_PROFILES[0].name
+        == "lorehold_card_exposure_profile_20260630_goal_learning_deck607_current.json"
+    )
     assert (
         review.DEFAULT_SAFE_CUT_REPLANNER.name
-        == "lorehold_safe_cut_replanner_20260630_post_pg276_squee_access_density_lane_corrected.json"
+        == "lorehold_safe_cut_replanner_20260630_goal_learning_new_seed_safe_cut.json"
     )
 
 

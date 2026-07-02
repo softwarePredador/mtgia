@@ -132,6 +132,90 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
         self.assertEqual(classification.status, "pass")
         self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
 
+    def test_prior_package_decision_compact_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-06-30T00:00:00Z",
+            "source": "lorehold_discard_ramp_value_monument_decision_20260630_goal_learning",
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "baseline_deck_id": 607,
+            "packages": [
+                {
+                    "package_key": "glint_horn_buccaneer_same_lane_benchmark_cut_monument_to_endurance",
+                    "family": "discard_ramp_value_benchmark",
+                    "adds": ["Glint-Horn Buccaneer"],
+                    "cuts": ["Monument to Endurance"],
+                    "decision": "reject_regresses_critical_matchup",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prior_package_decision.json"
+            classification = audit.classify_payload(path, payload)
+
+        self.assertEqual(classification.artifact_kind, "prior_package_decision")
+        self.assertEqual(classification.schema_version, "prior_package_decision_compact_v1")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["valid_package_row_count"], 1)
+        self.assertEqual(
+            classification.canonical_summary["decision_counts"],
+            {"reject_regresses_critical_matchup": 1},
+        )
+
+    def test_from_scratch_challenger_artifacts_are_recognized(self) -> None:
+        summary_payload = {
+            "candidates": [{"candidate_key": "challenger_lorehold_access_density_control_v1"}],
+            "corpus_deck_ids": [607, 608],
+            "fixed_opponent_deck_id_for_gate": 607,
+            "protected_baseline_deck_id": 607,
+            "postgres_writes": False,
+            "source_db_mutated": False,
+            "status": "ready",
+        }
+        candidate_payload = {
+            "battle_gate_command": ["python3", "gate.py"],
+            "candidate_key": "challenger_lorehold_access_density_control_v1",
+            "final_deck": [{"card_name": "Lorehold, the Historian"}],
+            "mode": "from_scratch",
+            "protected_baseline_deck_id": 607,
+            "postgres_writes": False,
+            "source_db_mutated": False,
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = audit.classify_payload(Path(tmp) / "summary.json", summary_payload)
+            candidate = audit.classify_payload(Path(tmp) / "candidate.json", candidate_payload)
+
+        self.assertEqual(summary.artifact_kind, "from_scratch_challenger_summary")
+        self.assertEqual(summary.status, "pass")
+        self.assertEqual(candidate.artifact_kind, "from_scratch_challenger_candidate")
+        self.assertEqual(candidate.status, "pass")
+
+    def test_compact_gate_summary_is_recognized(self) -> None:
+        payload = {
+            "generated_at": "2026-06-30T00:00:00Z",
+            "results": [
+                {"deck_key": "deck_607", "games": 4, "wins": 1, "losses": 3, "stalls": 0},
+                {
+                    "deck_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+                    "games": 4,
+                    "wins": 0,
+                    "losses": 4,
+                    "stalls": 0,
+                },
+            ],
+            "source_gate_markdown": "gate.md",
+            "status": "compact_gate_summary",
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            classification = audit.classify_payload(Path(tmp) / "gate_summary.json", payload)
+
+        self.assertEqual(classification.artifact_kind, "compact_gate_summary")
+        self.assertEqual(classification.status, "pass")
+        self.assertEqual(classification.canonical_summary["result_count"], 2)
+
     def test_focus_decision_wrapper_is_recognized(self) -> None:
         payload = {
             "generated_at": "2026-06-30T00:00:00Z",
@@ -245,6 +329,78 @@ class LoreholdArtifactContractAuditTests(unittest.TestCase):
                     "purpose": "safe cut packages",
                     "source_db_mutated": False,
                     "source_ledger": "ledger.json",
+                },
+            ),
+            (
+                "from_scratch_shell_failure_synthesis",
+                {
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "learning_constraints": [],
+                    "next_hypothesis_requirements": {},
+                    "postgres_writes": False,
+                    "shell_gate_rows": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "closing_window_trace_miner",
+                {
+                    "closing_window_comparisons": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "hypothesis_queue": [],
+                    "postgres_writes": False,
+                    "protected_baseline": "deck_607",
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "trace_targeted_micro_package_model",
+                {
+                    "blocked_hypotheses": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "protected_anchor_evidence": {},
+                    "ready_packages": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "lorehold_current_champion_snapshot",
+                {
+                    "cards": [],
+                    "champion_decision": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "protected_anchors": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "trace_cut_evidence_expansion_queue",
+                {
+                    "all_cut_slots": [],
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "hard_blocked_queue": [],
+                    "postgres_writes": False,
+                    "reviewable_evidence_gap_queue": [],
+                    "source_db_mutated": False,
+                    "summary": {},
+                },
+            ),
+            (
+                "lorehold_deckbuilding_final_closure",
+                {
+                    "final_decision": {},
+                    "generated_at": "2026-06-30T00:00:00Z",
+                    "postgres_writes": False,
+                    "source_db_mutated": False,
+                    "source_reports": {},
+                    "summary": {},
+                    "validation": {},
                 },
             ),
         ]

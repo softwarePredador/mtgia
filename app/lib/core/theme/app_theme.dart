@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 ///   10 brand/layout + 5 semantic + 6 WUBRG + 1 hint + 2 format extras = 24
 ///   Qualquer cor fora deste arquivo é violação.
 ///
-/// RADIUS SCALE: radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20)
+/// RADIUS SCALE: radiusXxs(2) / radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20) / radiusPill(999)
 /// FONT SCALE:   fontMicro(8) / fontTiny(9) / fontXs(10) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
 class AppTheme {
   static const String uiFontFamily = 'Inter';
@@ -27,9 +27,9 @@ class AppTheme {
 
   // ── Brand palette (layout) ──────────────────────────────────
   // Core surfaces
-  static const Color backgroundAbyss = Color(0xFF0F1115); // obsidian-950
-  static const Color surfaceSlate = Color(0xFF171A21); // obsidian-900
-  static const Color surfaceElevated = Color(0xFF232735); // slate-800
+  static const Color backgroundAbyss = Color(0xFF0B0D12); // obsidian-950
+  static const Color surfaceSlate = Color(0xFF151821); // obsidian-900
+  static const Color surfaceElevated = Color(0xFF1D222C); // slate-850
 
   // Product accents
   static const Color brass500 = Color(0xFFC58B2A);
@@ -51,7 +51,7 @@ class AppTheme {
   static const Color textHint = Color(
     0xFF8A93A3,
   ); // mist-500 (hints/placeholders)
-  static const Color outlineMuted = Color(0xFF2B3142); // slate-700
+  static const Color outlineMuted = Color(0xFF293041); // slate-750
 
   // ── Shared overlays ───────────────────────────────────────
   static const Color overlayBlack20 = Color(0x33000000);
@@ -78,6 +78,8 @@ class AppTheme {
   static const Color lifeCounterGreen = Color(0xFF44E063);
   static const Color lifeCounterVictoryGreen = Color(0xFF6BFF8D);
   static const Color lifeCounterIvory = Color(0xFFF7F4EC);
+  static const Color lifeCounterWhite = Color(0xFFFFFFFF);
+  static const Color lifeCounterBlack = Color(0xFF000000);
   static const Color lifeCounterHubIconDark = Color(0xFF0D1117);
   static const Color lifeCounterRestartYellow = Color(0xFFFFE277);
   static const Color lifeCounterSettingsPurple = Color(0xFFB9B4FF);
@@ -85,6 +87,7 @@ class AppTheme {
   static const Color lifeCounterSettingsRadio = Color(0xFF1C78FF);
   static const Color lifeCounterNeutralChip = Color(0xFF454257);
   static const Color lifeCounterSheetDark = Color(0xFF171717);
+  static const Color lifeCounterHubGlow = Color(0xFF9CE9FF);
 
   static const List<Color> lifeCounterHubShellGradient = [
     Color(0xFF04070E),
@@ -180,12 +183,33 @@ class AppTheme {
     colors: [brass400, brass700],
   );
 
-  // ── Border Radius Scale (5 tokens) ────────────────────────
+  // ── Border Radius Scale ───────────────────────────────────
+  static const double radiusXxs = 2; // hairline progress indicators
   static const double radiusXs = 4; // chips, badges, indicators
   static const double radiusSm = 8; // buttons, small containers
   static const double radiusMd = 12; // cards, panels, dialogs
   static const double radiusLg = 16; // large containers, scanner
   static const double radiusXl = 20; // pills, bottom sheets
+  static const double radiusPill = 999; // fully rounded pills/circular shells
+
+  // ── Stroke / layout metrics ───────────────────────────────
+  static const double strokeHairline = 0.5;
+  static const double strokeThin = 0.7;
+  static const double strokeMedium = 0.8;
+  static const double strokeRegular = 0.9;
+  static const double strokeStrong = 2;
+  static const double strokeAccent = 3;
+  static const double lineHeightCompact = 1.35;
+  static const double touchTargetMin = 48;
+  static const double iconSpinnerSm = 20;
+  static const double radiusLogoOuter = 30;
+  static const double radiusLogoInner = 26;
+  static const double radiusLifeCounterSm = 10;
+  static const double radiusLifeCounterMd = 16;
+  static const double radiusLifeCounterLg = 18;
+  static const double radiusLifeCounterAction = 28;
+  static const double radiusLifeCounterXl = 22;
+  static const double radiusLifeCounterXxl = 24;
 
   // ── Font Size Scale (9 tokens) ────────────────────────────
   static const double fontMicro = 8; // dense metadata, compact helper text
@@ -197,6 +221,19 @@ class AppTheme {
   static const double fontXl = 18; // section headers
   static const double fontXxl = 20; // screen titles
   static const double fontDisplay = 32; // hero / avatar placeholder
+  static const double fontLifeCounterLabel = 13.4;
+  static const double fontLifeCounterStepLarge = 28;
+  static const double fontLifeCounterHub = 22;
+  static const double fontLifeCounterAction = 24;
+  static const double fontLifeCounterInputValue = 62;
+  static const double fontLifeCounterLargeValue = 72;
+  static const double fontLifeCounterXLargeValue = 76;
+  static const double fontLifeCounterCoreDense = 104;
+  static const double fontLifeCounterCoreCompact = 126;
+  static const double fontLifeCounterCoreLarge = 184;
+  static const double fontLifeCounterTableDense = 128;
+  static const double fontLifeCounterTableCompact = 168;
+  static const double fontLifeCounterTableLarge = 246;
 
   // ── MTG WUBRG + Colorless ──────────────────────────────────
   static const Color manaW = Color(0xFFF0F2C0);
@@ -356,33 +393,33 @@ class AppTheme {
         base.displayLarge,
         fontWeight: FontWeight.w800,
         height: 1.04,
-        letterSpacing: -0.6,
+        letterSpacing: 0,
       ),
       displayMedium: display(
         base.displayMedium,
         fontWeight: FontWeight.w800,
         height: 1.04,
-        letterSpacing: -0.4,
+        letterSpacing: 0,
       ),
       displaySmall: display(
         base.displaySmall,
         fontWeight: FontWeight.w800,
         height: 1.05,
-        letterSpacing: -0.3,
+        letterSpacing: 0,
       ),
       headlineLarge: display(
         base.headlineLarge,
         fontSize: 30,
         fontWeight: FontWeight.w800,
         height: 1.08,
-        letterSpacing: -0.2,
+        letterSpacing: 0,
       ),
       headlineMedium: display(
         base.headlineMedium,
         fontSize: 26,
         fontWeight: FontWeight.w800,
         height: 1.08,
-        letterSpacing: -0.15,
+        letterSpacing: 0,
       ),
       headlineSmall: display(
         base.headlineSmall,
@@ -401,7 +438,7 @@ class AppTheme {
         fontSize: fontLg,
         fontWeight: FontWeight.w700,
         height: 1.22,
-        letterSpacing: -0.05,
+        letterSpacing: 0,
       ),
       titleSmall: ui(
         base.titleSmall,
@@ -432,21 +469,21 @@ class AppTheme {
         fontSize: fontMd,
         fontWeight: FontWeight.w700,
         height: 1.16,
-        letterSpacing: 0.05,
+        letterSpacing: 0,
       ),
       labelMedium: ui(
         base.labelMedium,
         fontSize: fontSm,
         fontWeight: FontWeight.w700,
         height: 1.14,
-        letterSpacing: 0.05,
+        letterSpacing: 0,
       ),
       labelSmall: ui(
         base.labelSmall,
         fontSize: fontXs,
         fontWeight: FontWeight.w700,
         height: 1.12,
-        letterSpacing: 0.08,
+        letterSpacing: 0,
       ),
     );
   }
@@ -491,14 +528,20 @@ class AppTheme {
       shadowColor: transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        side: const BorderSide(color: outlineMuted, width: 0.5),
+        side: const BorderSide(color: outlineMuted, width: 0.4),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -510,7 +553,13 @@ class AppTheme {
       style: FilledButton.styleFrom(
         backgroundColor: brass500,
         foregroundColor: backgroundAbyss,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -519,8 +568,14 @@ class AppTheme {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: brass400,
-        side: const BorderSide(color: outlineMuted, width: 1),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        side: const BorderSide(color: outlineMuted, width: 0.7),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        textStyle: const TextStyle(
+          fontFamily: uiFontFamily,
+          fontSize: fontMd,
+          fontWeight: FontWeight.w800,
+          height: 1.12,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -566,7 +621,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(radiusMd),
-        borderSide: const BorderSide(color: brass400, width: 1.5),
+        borderSide: const BorderSide(color: brass400, width: 1.1),
       ),
     ),
     dialogTheme: DialogThemeData(
@@ -575,7 +630,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(radiusLg),
         side: const BorderSide(color: outlineMuted, width: 0.5),
       ),
-      elevation: 8,
+      elevation: 0,
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: surfaceElevated,
@@ -626,8 +681,8 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: surfaceSlate,
-      indicatorColor: brass500.withValues(alpha: 0.15),
+      backgroundColor: backgroundAbyss,
+      indicatorColor: brass500.withValues(alpha: 0.10),
       indicatorShape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radiusSm),
       ),
@@ -648,9 +703,9 @@ class AppTheme {
       }),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const IconThemeData(color: brass500, size: 22);
+          return const IconThemeData(color: brass500, size: 21);
         }
-        return const IconThemeData(color: textSecondary, size: 22);
+        return const IconThemeData(color: textSecondary, size: 21);
       }),
     ),
     popupMenuTheme: PopupMenuThemeData(

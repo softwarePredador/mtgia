@@ -61,6 +61,7 @@ void main() {
                     'set_name': 'Bloomburrow',
                     'set_release_date': '2024-08-02',
                     'rarity': 'rare',
+                    'is_reserved': true,
                     'collector_number': '157',
                     'foil': true,
                   },
@@ -77,6 +78,7 @@ void main() {
       expect(printings, hasLength(1));
       expect(printings.single.collectorNumber, '157');
       expect(printings.single.foil, isTrue);
+      expect(printings.single.isReserved, isTrue);
       expect(apiClient.getCalls, [
         '/cards/printings?name=Lightning+Bolt&limit=50&dedupe=false',
       ]);
@@ -98,6 +100,7 @@ void main() {
                   'color_identity': [],
                   'set_code': 'fic',
                   'rarity': 'mythic',
+                  'is_reserved': false,
                   'collector_number': '397',
                   'foil': false,
                 },
@@ -111,6 +114,7 @@ void main() {
 
         expect(resolved, hasLength(1));
         expect(resolved.single.name, 'New Card');
+        expect(resolved.single.isReserved, isFalse);
         expect(resolved.single.collectorNumber, '397');
         expect(resolved.single.foil, isFalse);
         expect(apiClient.postCalls, ['/cards/resolve']);
