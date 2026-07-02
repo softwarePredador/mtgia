@@ -5118,6 +5118,201 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_graveyard_to_battlefield_uses_graveyard_permanent_count_mana_value_limit(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Too Large Relic", "type_line": "Artifact", "cmc": 4},
+                {"name": "Legal Relic", "type_line": "Artifact", "cmc": 2},
+                {"name": "Wrong Land", "type_line": "Land", "cmc": 0},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+            "target": "nonland_permanent",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "card_types": ["artifact", "creature", "enchantment", "planeswalker", "battle"],
+                "exclude_card_types": ["land"],
+                "mana_value_max_source": "graveyard_permanent_count",
+            },
+            "count": 1,
+            "destination": "battlefield",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "target_mana_value_max_from_graveyard_permanent_count": True,
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Squirming Emergence",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Fathomless descent — Return to the battlefield target nonland permanent card "
+                    "in your graveyard with mana value less than or equal to the number of permanent cards in your graveyard."
+                ),
+            },
+            turn=9,
+            rng=random.Random(111),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Legal Relic"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Too Large Relic", "Wrong Land", "Fixture Squirming Emergence"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Squirming Emergence"
+                and data.get("mana_value_max") == 3
+                and data.get("recovered") == ["Legal Relic"]
+                for event, data in self.events
+            )
+        )
+
+    def test_graveyard_to_battlefield_choose_one_or_both_components_resolve(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Target Bear", "type_line": "Creature - Bear", "cmc": 2, "power": 2, "toughness": 2},
+                {"name": "Target Aura", "type_line": "Enchantment - Aura", "cmc": 1},
+                {"name": "Wrong Relic", "type_line": "Artifact", "cmc": 1},
+            ]
+        )
+        effect = {
+            "effect": "recursion",
+            "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+            "mode_selection": "one_or_both",
+            "recursion_components": [
+                {
+                    "target": "creature",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "card_types": ["creature"]},
+                    "count": 1,
+                    "destination": "battlefield",
+                    "target_controller": "self",
+                    "target_graveyard_controller": "self",
+                    "battlefield_controller": "self",
+                },
+                {
+                    "target": "aura_card",
+                    "target_constraints": {"zone": "graveyard", "controller": "self", "subtypes": ["aura"]},
+                    "count": 1,
+                    "destination": "battlefield",
+                    "target_controller": "self",
+                    "target_graveyard_controller": "self",
+                    "battlefield_controller": "self",
+                },
+            ],
+            "destination": "battlefield",
+            "target_controller": "self",
+            "target_graveyard_controller": "self",
+            "battlefield_controller": "self",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Rise to Glory",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Choose one or both — Return target creature card from your graveyard to the battlefield. "
+                    "Return target Aura card from your graveyard to the battlefield."
+                ),
+            },
+            turn=9,
+            rng=random.Random(112),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Target Bear", "Target Aura"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Wrong Relic", "Fixture Rise to Glory"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("mode_selection") == "one_or_both"
+                and [item["target_type"] for item in data.get("recovered_by_component", [])]
+                == ["creature", "aura_card"]
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_recursion_to_battlefield_respects_this_turn_and_enters_tapped(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.mana_pool.add("colorless", 2)
+        wrong_old = {
+            "name": "Old Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "cmc": 2,
+        }
+        target = {
+            "name": "Fresh Bear",
+            "type_line": "Creature - Bear",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "cmc": 2,
+            "_put_into_graveyard_from_battlefield_turn": 16,
+        }
+        active.graveyard.extend([wrong_old, target])
+        permanent = {
+            "name": "Fixture Othelm",
+            "type_line": "Creature - Human",
+            "effect": "creature",
+            "power": 2,
+            "toughness": 2,
+            "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "activated_effect": "recursion",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+            "graveyard_to_hand_target": "creature",
+            "graveyard_to_hand_target_count": 1,
+            "graveyard_to_hand_destination": "battlefield",
+            "graveyard_to_hand_activation_cost_mana": "{2}",
+            "graveyard_to_hand_activation_cost_generic": 2,
+            "graveyard_to_hand_activation_cost_colors": [],
+            "graveyard_to_hand_activation_requires_tap": True,
+            "graveyard_to_hand_activation_requires_sacrifice": False,
+            "graveyard_from_battlefield_this_turn": True,
+            "enters_tapped": True,
+            "summoning_sick": False,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=16,
+            rng=random.Random(16),
+            phase="precombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Old Bear"])
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Othelm", "Fresh Bear"])
+        self.assertTrue(active.battlefield[1].get("tapped"))
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Fixture Othelm"
+                and data.get("recovered") == ["Fresh Bear"]
+                and data.get("activation_kind") == "simple_activated_graveyard_to_battlefield"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_dies_draw_trigger_draws_when_moved_to_graveyard(self) -> None:
         active = self.battle.Player(
             "Active",

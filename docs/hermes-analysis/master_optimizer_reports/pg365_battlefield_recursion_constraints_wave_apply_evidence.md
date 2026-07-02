@@ -1,0 +1,47 @@
+# PG365 Battlefield Recursion Constraints Wave Apply Evidence
+
+Status: `applied_verified_synced`.
+
+Applied package:
+
+- manifest: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_manifest.json`
+- precheck: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_precheck.sql`
+- apply: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_apply.sql`
+- postcheck: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_postcheck.sql`
+
+Cards promoted:
+
+- `Othelm, Sigardian Outcast`
+- `Ramosian Revivalist`
+- `Rise to Glory`
+- `Squirming Emergence`
+
+PostgreSQL evidence:
+
+- precheck matched `4` target card rows and `0` existing rule rows.
+- apply upserted `4` rows and deprecated `0` shadow rows.
+- postcheck verified `1` promoted verified/auto Oracle-hash row for each promoted card.
+
+Sync evidence:
+
+- PG -> SQLite sync report: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_pg_to_sqlite_sync.json`
+- metadata sync report: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_pg_metadata_sync.json`
+- PG rows loaded: `7387`
+- SQLite rows inserted/updated: `7182`
+- canonical snapshot rows exported: `4961`
+
+Validation evidence:
+
+- focused splitter/runtime tests: `420` tests passed.
+- E2E validation: `docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_e2e_validation.md`
+- post-PG365 queue: `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg365_battlefield_recursion_constraints_wave_commander_legal.md`
+- post-PG365 supported recheck: `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg365_supported_recheck.md`
+
+Current queue after apply:
+
+- target battle-gap identities: `27104`
+- XMage authoritative source resolved: `26790`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26790`
+- top remaining work unit: `recursion::xmage_graveyard_return_variant_review_v1` with `1834` identities.

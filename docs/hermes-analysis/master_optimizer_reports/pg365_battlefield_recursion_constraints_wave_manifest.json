@@ -1,0 +1,391 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg365_battlefield_recursion_constraints_wave_20260702_08",
+  "deploy_id": "PG365",
+  "expected_rules": [
+    {
+      "card_name": "Othelm, Sigardian Outcast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+      "min_rule_version": 2,
+      "normalized_name": "othelm, sigardian outcast",
+      "oracle_hash": "892dac96b806675afaa11bc15c65e08c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "enters_tapped": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "graveyard_from_battlefield_this_turn": true,
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ramosian Revivalist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+      "min_rule_version": 2,
+      "normalized_name": "ramosian revivalist",
+      "oracle_hash": "ee63e43e30e9c420b425349ed602e643",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "recursion_mana_value_max": 5,
+        "target": "rebel_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "mana_value_max": 5,
+          "subtypes": [
+            "rebel"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rise to Glory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+      "min_rule_version": 2,
+      "normalized_name": "rise to glory",
+      "oracle_hash": "16043bda3ddbf4b4db3790524911ec02",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+        "battlefield_controller": "self",
+        "destination": "battlefield",
+        "effect": "recursion",
+        "mode_selection": "one_or_both",
+        "recursion_components": [
+          {
+            "battlefield_controller": "self",
+            "count": 1,
+            "destination": "battlefield",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "self",
+              "zone": "graveyard"
+            },
+            "target_controller": "self",
+            "target_graveyard_controller": "self"
+          },
+          {
+            "battlefield_controller": "self",
+            "count": 1,
+            "destination": "battlefield",
+            "target": "aura_card",
+            "target_constraints": {
+              "controller": "self",
+              "subtypes": [
+                "aura"
+              ],
+              "zone": "graveyard"
+            },
+            "target_controller": "self",
+            "target_graveyard_controller": "self"
+          }
+        ],
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squirming Emergence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+      "min_rule_version": 2,
+      "normalized_name": "squirming emergence",
+      "oracle_hash": "f098fbc9d600c3db40c9aecc256bded1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle"
+          ],
+          "controller": "self",
+          "exclude_card_types": [
+            "land"
+          ],
+          "mana_value_max_source": "graveyard_permanent_count",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_graveyard_to_battlefield_choose_one_or_both_spell": 1,
+    "xmage_graveyard_to_battlefield_spell": 1,
+    "xmage_permanent_simple_activated_graveyard_to_battlefield": 2
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T08:42:52+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Othelm, Sigardian Outcast"
+      },
+      "card_name": "Othelm, Sigardian Outcast",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+      "normalized_name": "othelm, sigardian outcast",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "enters_tapped": true,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "graveyard_from_battlefield_this_turn": true,
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Ramosian Revivalist"
+      },
+      "card_name": "Ramosian Revivalist",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+      "normalized_name": "ramosian revivalist",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "creature",
+        "recursion_mana_value_max": 5,
+        "target": "rebel_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "mana_value_max": 5,
+          "subtypes": [
+            "rebel"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Rise to Glory"
+      },
+      "card_name": "Rise to Glory",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+      "normalized_name": "rise to glory",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+        "battlefield_controller": "self",
+        "destination": "battlefield",
+        "effect": "recursion",
+        "mode_selection": "one_or_both",
+        "recursion_components": [
+          {
+            "battlefield_controller": "self",
+            "count": 1,
+            "destination": "battlefield",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ],
+              "controller": "self",
+              "zone": "graveyard"
+            },
+            "target_controller": "self",
+            "target_graveyard_controller": "self"
+          },
+          {
+            "battlefield_controller": "self",
+            "count": 1,
+            "destination": "battlefield",
+            "target": "aura_card",
+            "target_constraints": {
+              "controller": "self",
+              "subtypes": [
+                "aura"
+              ],
+              "zone": "graveyard"
+            },
+            "target_controller": "self",
+            "target_graveyard_controller": "self"
+          }
+        ],
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      }
+    },
+    {
+      "card": {
+        "name": "Squirming Emergence"
+      },
+      "card_name": "Squirming Emergence",
+      "effect": "recursion",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+      "normalized_name": "squirming emergence",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "target": "nonland_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle"
+          ],
+          "controller": "self",
+          "exclude_card_types": [
+            "land"
+          ],
+          "mana_value_max_source": "graveyard_permanent_count",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Othelm, Sigardian Outcast",
+    "Ramosian Revivalist",
+    "Rise to Glory",
+    "Squirming Emergence"
+  ],
+  "selected_count": 4,
+  "slug": "battlefield_recursion_constraints_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Othelm, Sigardian Outcast",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+      "min_rule_version": 2,
+      "normalized_name": "othelm, sigardian outcast",
+      "oracle_hash": "892dac96b806675afaa11bc15c65e08c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ramosian Revivalist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+      "min_rule_version": 2,
+      "normalized_name": "ramosian revivalist",
+      "oracle_hash": "ee63e43e30e9c420b425349ed602e643",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rise to Glory",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+      "min_rule_version": 2,
+      "normalized_name": "rise to glory",
+      "oracle_hash": "16043bda3ddbf4b4db3790524911ec02",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Squirming Emergence",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+      "min_rule_version": 2,
+      "normalized_name": "squirming emergence",
+      "oracle_hash": "f098fbc9d600c3db40c9aecc256bded1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

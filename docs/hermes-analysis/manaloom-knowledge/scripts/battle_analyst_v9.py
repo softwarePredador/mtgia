@@ -25770,6 +25770,7 @@ def graveyard_to_hand_targets(player, permanent, all_players, turn):
         permanent,
         "graveyard_to_hand_mana_value_max",
         "graveyard_return_mana_value_max",
+        player=player,
     )
     candidates = [
         grave_card
@@ -25780,6 +25781,12 @@ def graveyard_to_hand_targets(player, permanent, all_players, turn):
             mana_value_max=mana_value_max,
         )
     ]
+    if permanent.get("graveyard_from_battlefield_this_turn"):
+        candidates = [
+            grave_card
+            for grave_card in candidates
+            if grave_card.get("_put_into_graveyard_from_battlefield_turn") == turn
+        ]
     candidates.sort(
         key=lambda grave_card: (
             -graveyard_recycle_candidate_score(grave_card, player, all_players, turn),
@@ -35528,6 +35535,24 @@ def _card_has_printed_or_modeled_abilities(card):
     return False
 
 
+def _is_permanent_card(card):
+    if not isinstance(card, dict):
+        return False
+    type_line = str(card.get("type_line") or "").lower()
+    return is_land(card) or any(
+        kind in type_line
+        for kind in ("artifact", "creature", "enchantment", "planeswalker", "battle")
+    )
+
+
+def _graveyard_permanent_count(player):
+    return sum(
+        1
+        for grave_card in getattr(player, "graveyard", []) or []
+        if _is_permanent_card(grave_card)
+    )
+
+
 def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max=None):
     """Return whether a graveyard card matches a narrow recursion target."""
     if not isinstance(card, dict):
@@ -35574,6 +35599,10 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "vehicle" in type_tokens
     if target in ("creature_no_abilities", "creature_with_no_abilities", "vanilla_creature"):
         return is_creature_card(card) and not _card_has_printed_or_modeled_abilities(card)
+    if target in ("aura_card", "aura"):
+        return "aura" in type_tokens
+    if target in ("rebel_permanent", "rebel_permanent_card"):
+        return _is_permanent_card(card) and "rebel" in type_tokens
     if target in ("ally_creature", "ally_creature_card", "ally"):
         return is_creature_card(card) and "ally" in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("outlaw_creature", "outlaw_creature_card", "outlaw"):
@@ -35586,7 +35615,9 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
     if target in ("non_human_creature", "nonhuman_creature", "non-human"):
         return is_creature_card(card) and "human" not in type_line.replace("-", " ").replace("—", " ").split()
     if target in ("permanent", "permanent_card"):
-        return is_land(card) or any(
+        return _is_permanent_card(card)
+    if target in ("nonland_permanent", "nonland_permanent_card"):
+        return not is_land(card) and any(
             kind in type_line
             for kind in ("artifact", "creature", "enchantment", "planeswalker", "battle")
         )
@@ -35693,13 +35724,17 @@ def choose_shared_creature_type_cards(cards, count, *, require_full_count=True):
     return best_group[:count]
 
 
-def recursion_mana_value_max(effect_data, *keys):
+def recursion_mana_value_max(effect_data, *keys, player=None):
     if effect_data.get("target_mana_value_max_from_x") or effect_data.get("recursion_mana_value_max_from_x"):
         cast_context = effect_data.get("_cast_context") or {}
         try:
             return int(float(cast_context.get("x_value") or effect_data.get("x_value") or 0))
         except (TypeError, ValueError):
             return 0
+    if effect_data.get("target_mana_value_max_from_graveyard_permanent_count"):
+        if player is None:
+            return 0
+        return _graveyard_permanent_count(player)
     for key in keys:
         if effect_data.get(key) is not None:
             return effect_data.get(key)
@@ -49229,7 +49264,7 @@ def apply_effect_immediate(
     elif effect == "recursion":
         return_all_matching = bool(effect_data.get("return_all_matching"))
         target_type = effect_data.get("target")
-        mana_value_max = recursion_mana_value_max(effect_data)
+        mana_value_max = recursion_mana_value_max(effect_data, player=player)
         destination = effect_data.get("destination", "hand")
         target_controller = str(effect_data.get("target_controller") or "self")
         recovered = []
@@ -49299,7 +49334,7 @@ def apply_effect_immediate(
                         component_data.get("up_to_count") or effect_data.get("up_to_count")
                     ),
                 )
-            component_mana_value_max = recursion_mana_value_max(component_data)
+            component_mana_value_max = recursion_mana_value_max(component_data, player=participant)
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
             candidates = [
@@ -49374,7 +49409,7 @@ def apply_effect_immediate(
                 or component_data.get("target_controller")
                 or target_controller
             )
-            component_mana_value_max = recursion_mana_value_max(component_data)
+            component_mana_value_max = recursion_mana_value_max(component_data, player=player)
             if component_mana_value_max is None:
                 component_mana_value_max = mana_value_max
             component_participants = recursion_participants(component_target_controller)

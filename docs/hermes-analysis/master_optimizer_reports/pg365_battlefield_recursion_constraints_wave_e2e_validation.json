@@ -1,0 +1,198 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-02T08:44:08.667197+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg365_battlefield_recursion_constraints_wave_manifest.json",
+  "package_id": "pg365_battlefield_recursion_constraints_wave_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "card_name": "Othelm, Sigardian Outcast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+          "oracle_hash": "892dac96b806675afaa11bc15c65e08c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "card_name": "Ramosian Revivalist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+          "oracle_hash": "ee63e43e30e9c420b425349ed602e643",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+          "card_name": "Rise to Glory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+          "oracle_hash": "16043bda3ddbf4b4db3790524911ec02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Squirming Emergence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+          "oracle_hash": "f098fbc9d600c3db40c9aecc256bded1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 4
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "card_name": "Othelm, Sigardian Outcast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+          "oracle_hash": "892dac96b806675afaa11bc15c65e08c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "card_name": "Ramosian Revivalist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+          "oracle_hash": "ee63e43e30e9c420b425349ed602e643",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+          "card_name": "Rise to Glory",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+          "oracle_hash": "16043bda3ddbf4b4db3790524911ec02",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "card_name": "Squirming Emergence",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+          "oracle_hash": "f098fbc9d600c3db40c9aecc256bded1",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Othelm, Sigardian Outcast",
+          "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ramosian Revivalist",
+          "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rise to Glory",
+          "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Squirming Emergence",
+          "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 4
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Othelm, Sigardian Outcast",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ramosian Revivalist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rise to Glory",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Squirming Emergence",
+          "component_keys": [],
+          "effect": "recursion",
+          "logical_rule_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

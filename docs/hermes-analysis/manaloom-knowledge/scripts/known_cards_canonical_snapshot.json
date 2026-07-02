@@ -51629,6 +51629,87 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "67425e369b5a0d9702d90f916a0eb39c"
   },
+  "Othelm, Sigardian Outcast": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "enters_tapped": true,
+        "graveyard_from_battlefield_this_turn": true,
+        "graveyard_to_hand_destination": "battlefield",
+        "graveyard_to_hand_target": "creature",
+        "graveyard_to_hand_target_count": 1,
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "graveyard_from_battlefield_this_turn": true,
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activated_self_sacrifice_recursion": false,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "enters_tapped": true,
+    "graveyard_from_battlefield_this_turn": true,
+    "graveyard_to_hand_activation_cost_colors": [],
+    "graveyard_to_hand_activation_cost_generic": 2,
+    "graveyard_to_hand_activation_cost_mana": "{2}",
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_tap": true,
+    "graveyard_to_hand_destination": "battlefield",
+    "graveyard_to_hand_target": "creature",
+    "graveyard_to_hand_target_count": 1,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "controller": "self",
+      "graveyard_from_battlefield_this_turn": true,
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e",
+    "battle_rule_oracle_hash": "892dac96b806675afaa11bc15c65e08c"
+  },
   "Outlaw Medic": {
     "_keywords_are_self": true,
     "ability_kind": "triggered",
@@ -56835,6 +56916,103 @@
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "3595fe627f1b6adb32bafe5c4a236316"
   },
+  "Ramosian Revivalist": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "activated_effect": "recursion",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 6,
+        "activation_cost_mana": "{6}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "recursion",
+        "graveyard_to_hand_destination": "battlefield",
+        "graveyard_to_hand_mana_value_max": 5,
+        "graveyard_to_hand_target": "rebel_permanent",
+        "graveyard_to_hand_target_count": 1,
+        "recursion_mana_value_max": 5,
+        "target": "rebel_permanent",
+        "target_constraints": {
+          "card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "battle",
+            "land"
+          ],
+          "controller": "self",
+          "mana_value_max": 5,
+          "subtypes": [
+            "rebel"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "activated_effect": "recursion",
+    "activated_self_sacrifice_recursion": false,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 6,
+    "activation_cost_mana": "{6}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_battlefield_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "graveyard_to_hand_activation_cost_colors": [],
+    "graveyard_to_hand_activation_cost_generic": 6,
+    "graveyard_to_hand_activation_cost_mana": "{6}",
+    "graveyard_to_hand_activation_requires_sacrifice": false,
+    "graveyard_to_hand_activation_requires_tap": true,
+    "graveyard_to_hand_destination": "battlefield",
+    "graveyard_to_hand_mana_value_max": 5,
+    "graveyard_to_hand_target": "rebel_permanent",
+    "graveyard_to_hand_target_count": 1,
+    "recursion_mana_value_max": 5,
+    "target": "rebel_permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle",
+        "land"
+      ],
+      "controller": "self",
+      "mana_value_max": 5,
+      "subtypes": [
+        "rebel"
+      ],
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
+    "battle_rule_oracle_hash": "ee63e43e30e9c420b425349ed602e643"
+  },
   "Rampaging Baloths": {
     "cmc": 6.0,
     "effect": "token_maker",
@@ -60294,6 +60472,57 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:cbc31597c59b4deef51aec39e807d64d"
+  },
+  "Rise to Glory": {
+    "battle_model_scope": "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "mode_selection": "one_or_both",
+    "recursion_components": [
+      {
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      },
+      {
+        "battlefield_controller": "self",
+        "count": 1,
+        "destination": "battlefield",
+        "target": "aura_card",
+        "target_constraints": {
+          "controller": "self",
+          "subtypes": [
+            "aura"
+          ],
+          "zone": "graveyard"
+        },
+        "target_controller": "self",
+        "target_graveyard_controller": "self"
+      }
+    ],
+    "sorcery": true,
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b59b25c2465e54f30f187c5095904a74",
+    "battle_rule_oracle_hash": "16043bda3ddbf4b4db3790524911ec02"
   },
   "Rise to the Challenge": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
@@ -70139,6 +70368,42 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:26190cd09ff09f21859165388f24587b",
     "battle_rule_oracle_hash": "848ea51a9bdb38f5e0fc50106c5b9e5b"
+  },
+  "Squirming Emergence": {
+    "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
+    "battlefield_controller": "self",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "recursion",
+    "instant": false,
+    "sorcery": true,
+    "target": "nonland_permanent",
+    "target_constraints": {
+      "card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "battle"
+      ],
+      "controller": "self",
+      "exclude_card_types": [
+        "land"
+      ],
+      "mana_value_max_source": "graveyard_permanent_count",
+      "zone": "graveyard"
+    },
+    "target_controller": "self",
+    "target_graveyard_controller": "self",
+    "target_mana_value_max_from_graveyard_permanent_count": true,
+    "xmage_effect_class": "ReturnFromGraveyardToBattlefieldTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027",
+    "battle_rule_oracle_hash": "f098fbc9d600c3db40c9aecc256bded1"
   },
   "Squirrel Sovereign": {
     "ability_kind": "static",

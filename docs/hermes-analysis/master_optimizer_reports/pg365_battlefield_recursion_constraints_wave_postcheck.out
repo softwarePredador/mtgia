@@ -1,0 +1,7 @@
+         card_name         |      normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+---------------------------+---------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Othelm, Sigardian Outcast | othelm, sigardian outcast | battle_rule_v1:aeea4d9d5b81f866734a71f3d2e0450e |                  1 |                           1 |                         1 |           0
+ Ramosian Revivalist       | ramosian revivalist       | battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278 |                  1 |                           1 |                         1 |           0
+ Rise to Glory             | rise to glory             | battle_rule_v1:b59b25c2465e54f30f187c5095904a74 |                  1 |                           1 |                         1 |           0
+ Squirming Emergence       | squirming emergence       | battle_rule_v1:4c3bbbeabd8eae3fbec132c57726c027 |                  1 |                           1 |                         1 |           0
+(4 rows)

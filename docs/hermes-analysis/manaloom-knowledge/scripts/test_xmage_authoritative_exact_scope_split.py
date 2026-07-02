@@ -4219,7 +4219,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "activated_recursion_battlefield_target_not_supported")
+        self.assertEqual(reason, "activated_recursion_battlefield_source_this_turn_not_supported")
 
     def test_permanent_activated_graveyard_exile_maps_up_to_three_single_graveyard(self) -> None:
         row = queue_row(
@@ -7160,6 +7160,163 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "recursion_multi_target_source_not_supported")
+
+    def test_recursion_battlefield_dynamic_graveyard_permanent_count_maps(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Squirming Emergence",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Fathomless descent — Return to the battlefield target nonland permanent card "
+                    "in your graveyard with mana value less than or equal to the number of permanent "
+                    "cards in your graveyard."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterNonlandCard(
+                    "nonland permanent card in your graveyard with mana value less than or equal to the number of permanent cards in your graveyard"
+                );
+                static {
+                    filter.add(PermanentPredicate.instance);
+                    filter.add(SquirmingEmergencePredicate.instance);
+                }
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(filter));
+                return player.getGraveyard().count(StaticFilters.FILTER_CARD_PERMANENT, game) >= input.getObject().getManaValue();
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "nonland_permanent")
+        self.assertTrue(effect["target_mana_value_max_from_graveyard_permanent_count"])
+        self.assertEqual(effect["target_constraints"]["mana_value_max_source"], "graveyard_permanent_count")
+
+    def test_recursion_battlefield_choose_one_or_both_maps_components(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Rise to Glory",
+                type_line="Sorcery",
+                oracle_text=(
+                    "Choose one or both —\n"
+                    "• Return target creature card from your graveyard to the battlefield.\n"
+                    "• Return target Aura card from your graveyard to the battlefield."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().getModes().setMinModes(1);
+                this.getSpellAbility().getModes().setMaxModes(2);
+                this.getSpellAbility().addEffect(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                this.getSpellAbility().addTarget(new TargetCardInYourGraveyard(StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));
+                FilterCard filter = new FilterCard("Aura card from your graveyard");
+                filter.add(SubType.AURA.getPredicate());
+                Mode mode = new Mode(new ReturnFromGraveyardToBattlefieldTargetEffect());
+                mode.addTarget(new TargetCardInYourGraveyard(filter));
+                this.getSpellAbility().addMode(mode);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["mode_selection"], "one_or_both")
+        self.assertEqual(effect["battle_model_scope"], "xmage_return_one_or_both_graveyard_cards_to_battlefield_spell_v1")
+        self.assertEqual(
+            [component["target"] for component in effect["recursion_components"]],
+            ["creature", "aura_card"],
+        )
+        self.assertTrue(all(component["destination"] == "battlefield" for component in effect["recursion_components"]))
+
+    def test_activated_recursion_battlefield_maps_this_turn_tapped_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Othelm, Sigardian Outcast",
+                type_line="Legendary Creature - Human",
+                oracle_text=(
+                    "{2}, {T}: Choose target creature card in your graveyard that was put there "
+                    "from the battlefield this turn. Return it to the battlefield tapped.\n"
+                    "Partner—Friends forever (You can have two commanders if both have this ability.)"
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCreatureCard(
+                    "creature card in your graveyard that was put there from the battlefield this turn"
+                );
+                static { filter.add(PutIntoGraveFromBattlefieldThisTurnPredicate.instance); }
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToBattlefieldTargetEffect(true),
+                    new GenericManaCost(2)
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetCardInYourGraveyard(filter));
+                this.addAbility(ability, new CardsPutIntoGraveyardWatcher());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertTrue(effect["enters_tapped"])
+        self.assertTrue(effect["graveyard_from_battlefield_this_turn"])
+        self.assertTrue(effect["target_constraints"]["graveyard_from_battlefield_this_turn"])
+
+    def test_activated_recursion_battlefield_maps_rebel_permanent_mana_value(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToBattlefieldTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ramosian Revivalist",
+                type_line="Creature - Human Rebel Cleric",
+                oracle_text=(
+                    "{6}, {T}: Return target Rebel permanent card with mana value 5 or less "
+                    "from your graveyard to the battlefield."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanentCard filter = new FilterPermanentCard(
+                    "Rebel permanent card with mana value 5 or less from your graveyard"
+                );
+                static {
+                    filter.add(SubType.REBEL.getPredicate());
+                    filter.add(new ManaValuePredicate(ComparisonType.FEWER_THAN, 6));
+                }
+                Ability ability = new SimpleActivatedAbility(
+                    new ReturnFromGraveyardToBattlefieldTargetEffect(), new GenericManaCost(6)
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addTarget(new TargetCardInYourGraveyard(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "rebel_permanent")
+        self.assertEqual(effect["recursion_mana_value_max"], 5)
+        self.assertEqual(effect["target_constraints"]["subtypes"], ["rebel"])
+        self.assertEqual(effect["target_constraints"]["mana_value_max"], 5)
 
     def test_recursion_exile_self_variable_x_requires_source_adjuster(self) -> None:
         row = queue_row(
