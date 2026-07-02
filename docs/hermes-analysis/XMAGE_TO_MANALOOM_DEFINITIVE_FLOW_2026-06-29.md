@@ -147,14 +147,20 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg354_permanent_activated_damage_restricted_target_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg355_destroy_restricted_target_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg355_destroy_restricted_target_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg356_etb_graveyard_to_library_extended_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg356_etb_graveyard_to_library_extended_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg357_dies_recursion_keyword_fix_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg357_dies_recursion_keyword_fix_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg358_returned_pastcaller_recursion_wave_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg358_returned_pastcaller_recursion_wave_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27130`
-- XMage authoritative source resolved: `26816`
+- target all-card battle-gap identities: `27124`
+- XMage authoritative source resolved: `26810`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26816`
+- XMage authoritative adapter required: `26810`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
@@ -180,9 +186,9 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG357 Exact Adapter Waves
+## PG283-PG358 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG357 all-card exact adapter waves are applied and
+As of 2026-07-02, the PG283-PG358 all-card exact adapter waves are applied and
 synced.
 
 Use
@@ -4753,6 +4759,71 @@ PG357 measured result:
   should continue from the fresh post-PG357 queue; the top reusable work unit
   remains `recursion::xmage_graveyard_return_variant_review_v1` at `1855`.
 
+PG358 evidence:
+
+- PG358 Returned Pastcaller recursion package:
+  `docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_package.md`
+- PG358 PostgreSQL apply evidence:
+  `docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_apply_evidence.md`
+- PG358 PG battle-rules -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_pg_to_sqlite_sync.json`
+- PG358 PG card metadata -> Hermes/SQLite sync:
+  `docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_pg_metadata_sync.json`
+- PG358 E2E validation:
+  `docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_e2e_validation.md`
+- post-PG358 XMage strategy audit:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg358_returned_pastcaller_recursion_wave_docs_updated.md`
+- post-PG358 PG/Hermes/SQLite contract audit:
+  `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg358_returned_pastcaller_recursion_wave.md`
+- post-PG358 operational surface audit:
+  `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260702_post_pg358_returned_pastcaller_recursion_wave_docs_updated.md`
+- post-PG358 legacy contamination audit:
+  `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260702_post_pg358_returned_pastcaller_recursion_wave_docs_updated.md`
+- PG358 authoritative split:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg357_returned_pastcaller_wave.md`
+- post-PG358 authoritative queue:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg358_returned_pastcaller_recursion_wave_commander_legal.md`
+- post-PG358 supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg358_supported_recheck.md`
+- post-PG358 all-card readiness:
+  `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg358_returned_pastcaller_recursion_wave_recheck.md`
+
+PG358 measured result:
+
+- PG358 promoted `1` exact creature ETB graveyard-to-hand recursion rule for
+  `Returned Pastcaller`.
+- The exact scope extends
+  `xmage_creature_etb_return_graveyard_card_to_hand_v1` with the
+  `spirit_instant_or_sorcery` target constraint, preserving `Flying` metadata.
+- Focused splitter/runtime/package suites report `384` passing unittest tests.
+- PostgreSQL precheck found `1/1` target card row, `0` expected rule rows before
+  apply, and `0` shadow rows to deprecate.
+- PostgreSQL apply/postcheck reports `1/1` promoted row, `1/1` verified/auto row,
+  `1/1` matching Oracle hash row, and `0` backup shadow rows.
+- PG -> Hermes/SQLite metadata sync matched `5949` PostgreSQL card rows and
+  refreshed `5876` SQLite cache alias rows. Battle-rules sync loaded `7367`
+  PostgreSQL rows, inserted/updated `7162` SQLite rows, and exported `4941`
+  canonical snapshot rows.
+- E2E package validation reports pass for PostgreSQL source of truth, SQLite
+  Hermes cache, canonical snapshot fallback, runtime `get_card_effect`, and
+  battle execution no-override.
+- XMage strategy consistency audit reports `26/26` pass.
+- Operational surface alignment and legacy contamination audits report `pass`.
+- PG/Hermes/SQLite contract audit reports `48` pass and `1` inherited warning
+  for trusted executable SQLite rows without Oracle hash; PG358 rows all carry
+  matching Oracle hashes.
+- Global all-card readiness after PG358:
+  `battle_and_oracle_ready=2500`, `battle_family_mapper_required=30047`, and
+  `snapshot_has_verified_rule=3648`.
+- Global all-card authoritative queue after PG358:
+  `target_identity_count=27124`, `xmage_authoritative_source_count=26810`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26810`.
+- Running the exact splitter after PG358 on supported units returns
+  `proposal_count=0` over `7881` considered supported rows. The next cycle
+  should continue from the fresh post-PG358 queue; the top reusable work unit
+  remains `recursion::xmage_graveyard_return_variant_review_v1` at `1854`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -5392,10 +5463,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG356 queue, the next exact runtime-backed work should be selected from
+post-PG358 queue, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1856`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1854`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1646`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
 4. `direct_damage::targeted_damage_variant_v1` - `906`

@@ -1,0 +1,1 @@
+{'database': '143.198.230.247:5433/halder', 'rows': [{'card_name': 'Returned Pastcaller', 'normalized_name': 'returned pastcaller', 'logical_rule_key': 'battle_rule_v1:6675020f7bc86c55e647c5139d39cb1f', 'promoted_rule_rows': 1, 'promoted_verified_auto_rows': 1, 'promoted_oracle_hash_rows': 1, 'backup_rows': 0}]}

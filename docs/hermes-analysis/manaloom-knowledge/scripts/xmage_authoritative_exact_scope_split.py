@@ -833,6 +833,12 @@ def recursion_target_constraints_for(
         constraints["supertypes"] = ["basic"]
     elif target == "instant_or_sorcery":
         constraints["card_types"] = ["instant", "sorcery"]
+    elif target == "spirit_instant_or_sorcery":
+        constraints["any_of"] = [
+            {"subtypes": ["spirit"]},
+            {"card_types": ["instant"]},
+            {"card_types": ["sorcery"]},
+        ]
     elif target == "artifact_or_enchantment":
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature":
@@ -4970,6 +4976,7 @@ def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] 
 def etb_recursion_target_from_phrase(phrase: str) -> str | None:
     normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
     target_patterns: list[tuple[str, str]] = [
+        ("spirit_instant_or_sorcery", r"spirit, instant, or sorcery"),
         ("instant_or_sorcery", r"instant (?:or|and/or) sorcery"),
         ("artifact_or_enchantment", r"artifact or enchantment"),
         ("artifact_or_creature", r"artifact or creature"),

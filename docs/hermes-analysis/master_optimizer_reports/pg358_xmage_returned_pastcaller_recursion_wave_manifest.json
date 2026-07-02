@@ -1,0 +1,127 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg358_xmage_returned_pastcaller_recursion_wave_20260702_",
+  "deploy_id": "PG358",
+  "expected_rules": [
+    {
+      "card_name": "Returned Pastcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6675020f7bc86c55e647c5139d39cb1f",
+      "min_rule_version": 2,
+      "normalized_name": "returned pastcaller",
+      "oracle_hash": "afafa879627b9008f2161e952b9c905c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "spirit_instant_or_sorcery",
+        "keywords": [
+          "flying"
+        ],
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "spirit"
+              ]
+            },
+            {
+              "card_types": [
+                "instant"
+              ]
+            },
+            {
+              "card_types": [
+                "sorcery"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_creature_etb_graveyard_to_hand": 1
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg358_xmage_returned_pastcaller_recursion_wave_rollback.sql"
+  },
+  "generated_at": "2026-07-02T06:32:26+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Returned Pastcaller"
+      },
+      "card_name": "Returned Pastcaller",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6675020f7bc86c55e647c5139d39cb1f",
+      "normalized_name": "returned pastcaller",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+        "effect": "creature",
+        "etb_recursion_count": 1,
+        "etb_recursion_destination": "hand",
+        "etb_recursion_target": "spirit_instant_or_sorcery",
+        "keywords": [
+          "flying"
+        ],
+        "target_constraints": {
+          "any_of": [
+            {
+              "subtypes": [
+                "spirit"
+              ]
+            },
+            {
+              "card_types": [
+                "instant"
+              ]
+            },
+            {
+              "card_types": [
+                "sorcery"
+              ]
+            }
+          ],
+          "controller": "self",
+          "zone": "graveyard"
+        },
+        "trigger": "enters_battlefield"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Returned Pastcaller"
+  ],
+  "selected_count": 1,
+  "slug": "xmage_returned_pastcaller_recursion_wave",
+  "snapshot_checks": [
+    {
+      "card_name": "Returned Pastcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6675020f7bc86c55e647c5139d39cb1f",
+      "min_rule_version": 2,
+      "normalized_name": "returned pastcaller",
+      "oracle_hash": "afafa879627b9008f2161e952b9c905c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

@@ -35538,6 +35538,12 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return is_land(card) and _is_basic_land_card(card)
     if target in ("creature_or_land", "creature_or_land_card"):
         return is_creature_card(card) or is_land(card)
+    if target in (
+        "spirit_instant_or_sorcery",
+        "spirit_instant_or_sorcery_card",
+    ):
+        subtype_tokens = type_line.replace("-", " ").replace("—", " ").split()
+        return "spirit" in subtype_tokens or is_instant(card) or is_sorcery(card)
     if is_land(card):
         return False
     if target in ("any", "nonland", "nonland_card"):

@@ -59083,6 +59083,50 @@
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "e4db138db6bd5d65e2f2e4c2ba93120d"
   },
+  "Returned Pastcaller": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+    "effect": "creature",
+    "etb_recursion_count": 1,
+    "etb_recursion_destination": "hand",
+    "etb_recursion_target": "spirit_instant_or_sorcery",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target_constraints": {
+      "any_of": [
+        {
+          "subtypes": [
+            "spirit"
+          ]
+        },
+        {
+          "card_types": [
+            "instant"
+          ]
+        },
+        {
+          "card_types": [
+            "sorcery"
+          ]
+        }
+      ],
+      "controller": "self",
+      "zone": "graveyard"
+    },
+    "trigger": "enters_battlefield",
+    "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+    "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6675020f7bc86c55e647c5139d39cb1f",
+    "battle_rule_oracle_hash": "afafa879627b9008f2161e952b9c905c"
+  },
   "Revel in Riches": {
     "cmc": 5.0,
     "effect": "finisher",

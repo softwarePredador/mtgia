@@ -4537,6 +4537,55 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_graveyard_recursion_returns_spirit_instant_or_sorcery(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {"name": "Returned Pastcaller", "type_line": "Creature - Spirit Cleric"}
+        active.battlefield.append(permanent)
+        non_target = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        target = {"name": "Target Spirit", "type_line": "Creature - Spirit", "cmc": 3}
+        active.graveyard.extend([non_target, target])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_recursion_target": "spirit_instant_or_sorcery",
+            "etb_recursion_count": 1,
+            "etb_recursion_destination": "hand",
+            "target_constraints": {
+                "zone": "graveyard",
+                "controller": "self",
+                "any_of": [
+                    {"subtypes": ["spirit"]},
+                    {"card_types": ["instant"]},
+                    {"card_types": ["sorcery"]},
+                ],
+            },
+        }
+
+        self.battle.resolve_generic_permanent_etb(
+            active,
+            [opponent],
+            permanent,
+            effect,
+            turn=9,
+            rng=random.Random(9),
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Target Spirit"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Relic"])
+        self.assertTrue(
+            any(
+                event == "etb_recursion_resolved"
+                and data.get("card") == "Returned Pastcaller"
+                and data.get("recovered") == ["Target Spirit"]
+                and data.get("target_type") == "spirit_instant_or_sorcery"
+                and data.get("destination") == "hand"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_graveyard_recursion_returns_lands(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

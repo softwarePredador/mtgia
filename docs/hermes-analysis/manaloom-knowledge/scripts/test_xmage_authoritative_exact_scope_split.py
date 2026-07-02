@@ -5910,6 +5910,51 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["flying"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_creature_etb_recursion_maps_spirit_instant_or_sorcery(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Returned Pastcaller",
+                type_line="Creature - Spirit Cleric",
+                oracle_text=(
+                    "Flying\n"
+                    "When this creature enters, return target Spirit, instant, or sorcery card "
+                    "from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "filter.add(Predicates.or(SubType.SPIRIT.getPredicate(), "
+                "CardType.INSTANT.getPredicate(), CardType.SORCERY.getPredicate()));"
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new ReturnFromGraveyardToHandTargetEffect());"
+                "ability.addTarget(new TargetCardInYourGraveyard(filter));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_recursion_target"], "spirit_instant_or_sorcery")
+        self.assertEqual(effect["etb_recursion_count"], 1)
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertEqual(
+            effect["target_constraints"],
+            {
+                "zone": "graveyard",
+                "controller": "self",
+                "any_of": [
+                    {"subtypes": ["spirit"]},
+                    {"card_types": ["instant"]},
+                    {"card_types": ["sorcery"]},
+                ],
+            },
+        )
+
     def test_creature_etb_recursion_blocks_conditional_text(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,
