@@ -9604,6 +9604,52 @@ new server:
   `12` cards each, and `xmage_static_self_cant_be_blocked_creature` with `11`
   cards.
 
+## 2026-07-04 PG447 Self-Sacrifice Mana Source Closure
+
+- Closed the exact XMage self-sacrifice mana source family as ManaLoom scope
+  `xmage_self_sacrifice_mana_source_permanent_v1`.
+- The selected package accepted local XMage permanents whose simple activated
+  mana ability sacrifices the source itself to produce fixed mana. Runtime
+  behavior remains contextual: these sources are not refreshed automatically
+  and are sacrificed only when the extra mana unlocks a material action.
+- The batch covers `13` cards: Basal Thrull, Blood Pet, Blood Vassal, Catalyst
+  Elemental, Coal Golem, Composite Golem, Crosis's Attendant, Darigaaz's
+  Attendant, Dromar's Attendant, Morgue Toad, Rith's Attendant, Satyr Hedonist,
+  and Treva's Attendant.
+- Focused mapper/runtime tests covered simple creature and artifact sacrifice
+  mana sources, tap/sacrifice costs, composite mana constructor parsing, source
+  constructor color order, multiple-mana-ability blocking, and contextual-only
+  activation; PG447 performed no code mutation. The focused test lane passed
+  `718` checks.
+- The PostgreSQL package promoted `13` cards. Precheck found `13` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `13/13` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4314` PostgreSQL runtime rows, wrote `4306` SQLite runtime
+  rows, and exported `4281` canonical fallback rows.
+- PG447 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `13` selected cards. Generic
+  battle scenario count remained `0`; self-sacrifice mana behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26572`, `xmage_authoritative_source_count=26258`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26258`. This is an exact
+  reduction of `13` from the post-PG446 queue.
+- The post-PG447 exact split recheck reports `proposal_count=233` and
+  `safe_for_batch_pg_package_count=233`. The largest remaining exact family is
+  `xmage_static_self_cant_block_creature` with `13` cards, followed by
+  `xmage_fixed_damage_exile_if_dies_spell` and `xmage_fixed_draw_spell` with
+  `12` cards each, and `xmage_static_self_cant_be_blocked_creature` and
+  `xmage_static_self_protection_from_card_types_creature` with `11` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

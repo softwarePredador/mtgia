@@ -1,0 +1,945 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg447_xmage_self_sacrifice_mana_source_new_server_202607",
+  "deploy_id": "pg447",
+  "expected_rules": [
+    {
+      "card_name": "Basal Thrull",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d69eb95d509e5b2fec24a34ae88604f5",
+      "min_rule_version": 2,
+      "normalized_name": "basal thrull",
+      "oracle_hash": "6cde21b2f4ce73144008f302c2dc65f5",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Pet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae1ea7dbc6e05e2d7b58a956a76436a4",
+      "min_rule_version": 2,
+      "normalized_name": "blood pet",
+      "oracle_hash": "ac212076f211191deac254a55b9e4efa",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Vassal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:986b9a375a4fa1053952e158a7960f77",
+      "min_rule_version": 2,
+      "normalized_name": "blood vassal",
+      "oracle_hash": "1f0d84d040066bc4b65f9180aeb988b6",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Catalyst Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf5beac6b4c97d8fa4b70d0abf648fa1",
+      "min_rule_version": 2,
+      "normalized_name": "catalyst elemental",
+      "oracle_hash": "2624a42fe38948a6225a247ba102d11d",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Coal Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1baab616b093b614441a897eb9c90aff",
+      "min_rule_version": 2,
+      "normalized_name": "coal golem",
+      "oracle_hash": "6264558f562814b786de6f70b27ab302",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Composite Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccbe6b5ec18a31f45f2f6dc22c798cce",
+      "min_rule_version": 2,
+      "normalized_name": "composite golem",
+      "oracle_hash": "47bfdc582372221ae2df2b205fc9915e",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 5,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "WUBRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crosis's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e43e3146992b940b3e12e14c74fabcc6",
+      "min_rule_version": 2,
+      "normalized_name": "crosis's attendant",
+      "oracle_hash": "4854a7b1f3411876f75702a095fa0e68",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "U",
+          "B",
+          "R"
+        ],
+        "produces": "UBR",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Darigaaz's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:165a08267c0d88bed3c2121070dd3ca6",
+      "min_rule_version": 2,
+      "normalized_name": "darigaaz's attendant",
+      "oracle_hash": "dbe0025036fa2c70556d0e7e4da0aa4b",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "BRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dromar's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913f2628280c75f83623b274394c78ab",
+      "min_rule_version": 2,
+      "normalized_name": "dromar's attendant",
+      "oracle_hash": "c9662cc22adc7299ec1263bb09852eb3",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B"
+        ],
+        "produces": "WUB",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Morgue Toad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d7bd10f259751a844ba56293ab501501",
+      "min_rule_version": 2,
+      "normalized_name": "morgue toad",
+      "oracle_hash": "026d2deece1ad85cf38951b86dca35eb",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "U",
+          "R"
+        ],
+        "produces": "UR",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rith's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6eb30b02a5e82a34a0af6a85631696c",
+      "min_rule_version": 2,
+      "normalized_name": "rith's attendant",
+      "oracle_hash": "c71c0b720143aa4459ace2161bf240a8",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "G",
+          "W"
+        ],
+        "produces": "RGW",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Satyr Hedonist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af510c5e5b789c3ad56b26271af0c3df",
+      "min_rule_version": 2,
+      "normalized_name": "satyr hedonist",
+      "oracle_hash": "f7172fdc53573436376e238e0fc92c2c",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treva's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d409157b20663ee285ca20a1fafd18c",
+      "min_rule_version": 2,
+      "normalized_name": "treva's attendant",
+      "oracle_hash": "3c623b378945ea9372f8515717483778",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G",
+          "W",
+          "U"
+        ],
+        "produces": "GWU",
+        "xmage_ability_class": "SimpleManaAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_self_sacrifice_mana_source_permanent": 13
+  },
+  "files": {
+    "apply": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_apply.sql",
+    "manifest": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_manifest.json",
+    "package": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_package.md",
+    "postcheck": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_postcheck.sql",
+    "precheck": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_precheck.sql",
+    "rollback": "../../master_optimizer_reports/pg447_xmage_self_sacrifice_mana_source_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T23:06:57+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Basal Thrull"
+      },
+      "card_name": "Basal Thrull",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d69eb95d509e5b2fec24a34ae88604f5",
+      "normalized_name": "basal thrull",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Blood Pet"
+      },
+      "card_name": "Blood Pet",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae1ea7dbc6e05e2d7b58a956a76436a4",
+      "normalized_name": "blood pet",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Blood Vassal"
+      },
+      "card_name": "Blood Vassal",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:986b9a375a4fa1053952e158a7960f77",
+      "normalized_name": "blood vassal",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "B"
+        ],
+        "produces": "B",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Catalyst Elemental"
+      },
+      "card_name": "Catalyst Elemental",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf5beac6b4c97d8fa4b70d0abf648fa1",
+      "normalized_name": "catalyst elemental",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Coal Golem"
+      },
+      "card_name": "Coal Golem",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1baab616b093b614441a897eb9c90aff",
+      "normalized_name": "coal golem",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Composite Golem"
+      },
+      "card_name": "Composite Golem",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccbe6b5ec18a31f45f2f6dc22c798cce",
+      "normalized_name": "composite golem",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 5,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "WUBRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Crosis's Attendant"
+      },
+      "card_name": "Crosis's Attendant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e43e3146992b940b3e12e14c74fabcc6",
+      "normalized_name": "crosis's attendant",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "U",
+          "B",
+          "R"
+        ],
+        "produces": "UBR",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Darigaaz's Attendant"
+      },
+      "card_name": "Darigaaz's Attendant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:165a08267c0d88bed3c2121070dd3ca6",
+      "normalized_name": "darigaaz's attendant",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B",
+          "R",
+          "G"
+        ],
+        "produces": "BRG",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Dromar's Attendant"
+      },
+      "card_name": "Dromar's Attendant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913f2628280c75f83623b274394c78ab",
+      "normalized_name": "dromar's attendant",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "W",
+          "U",
+          "B"
+        ],
+        "produces": "WUB",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Morgue Toad"
+      },
+      "card_name": "Morgue Toad",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d7bd10f259751a844ba56293ab501501",
+      "normalized_name": "morgue toad",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 2,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "U",
+          "R"
+        ],
+        "produces": "UR",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Rith's Attendant"
+      },
+      "card_name": "Rith's Attendant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6eb30b02a5e82a34a0af6a85631696c",
+      "normalized_name": "rith's attendant",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "G",
+          "W"
+        ],
+        "produces": "RGW",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Satyr Hedonist"
+      },
+      "card_name": "Satyr Hedonist",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af510c5e5b789c3ad56b26271af0c3df",
+      "normalized_name": "satyr hedonist",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "R",
+          "R",
+          "R"
+        ],
+        "produces": "R",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Treva's Attendant"
+      },
+      "card_name": "Treva's Attendant",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d409157b20663ee285ca20a1fafd18c",
+      "normalized_name": "treva's attendant",
+      "required_effect_fields": {
+        "ability_kind": "activated_mana",
+        "activation_mana_cost": "{1}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 3,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G",
+          "W",
+          "U"
+        ],
+        "produces": "GWU",
+        "xmage_ability_class": "SimpleManaAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Basal Thrull",
+    "Blood Pet",
+    "Blood Vassal",
+    "Catalyst Elemental",
+    "Coal Golem",
+    "Composite Golem",
+    "Crosis's Attendant",
+    "Darigaaz's Attendant",
+    "Dromar's Attendant",
+    "Morgue Toad",
+    "Rith's Attendant",
+    "Satyr Hedonist",
+    "Treva's Attendant"
+  ],
+  "selected_count": 13,
+  "slug": "xmage_self_sacrifice_mana_source_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Basal Thrull",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d69eb95d509e5b2fec24a34ae88604f5",
+      "min_rule_version": 2,
+      "normalized_name": "basal thrull",
+      "oracle_hash": "6cde21b2f4ce73144008f302c2dc65f5",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Pet",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ae1ea7dbc6e05e2d7b58a956a76436a4",
+      "min_rule_version": 2,
+      "normalized_name": "blood pet",
+      "oracle_hash": "ac212076f211191deac254a55b9e4efa",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Blood Vassal",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:986b9a375a4fa1053952e158a7960f77",
+      "min_rule_version": 2,
+      "normalized_name": "blood vassal",
+      "oracle_hash": "1f0d84d040066bc4b65f9180aeb988b6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Catalyst Elemental",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:bf5beac6b4c97d8fa4b70d0abf648fa1",
+      "min_rule_version": 2,
+      "normalized_name": "catalyst elemental",
+      "oracle_hash": "2624a42fe38948a6225a247ba102d11d",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Coal Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:1baab616b093b614441a897eb9c90aff",
+      "min_rule_version": 2,
+      "normalized_name": "coal golem",
+      "oracle_hash": "6264558f562814b786de6f70b27ab302",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Composite Golem",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ccbe6b5ec18a31f45f2f6dc22c798cce",
+      "min_rule_version": 2,
+      "normalized_name": "composite golem",
+      "oracle_hash": "47bfdc582372221ae2df2b205fc9915e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Crosis's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e43e3146992b940b3e12e14c74fabcc6",
+      "min_rule_version": 2,
+      "normalized_name": "crosis's attendant",
+      "oracle_hash": "4854a7b1f3411876f75702a095fa0e68",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Darigaaz's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:165a08267c0d88bed3c2121070dd3ca6",
+      "min_rule_version": 2,
+      "normalized_name": "darigaaz's attendant",
+      "oracle_hash": "dbe0025036fa2c70556d0e7e4da0aa4b",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dromar's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:913f2628280c75f83623b274394c78ab",
+      "min_rule_version": 2,
+      "normalized_name": "dromar's attendant",
+      "oracle_hash": "c9662cc22adc7299ec1263bb09852eb3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Morgue Toad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d7bd10f259751a844ba56293ab501501",
+      "min_rule_version": 2,
+      "normalized_name": "morgue toad",
+      "oracle_hash": "026d2deece1ad85cf38951b86dca35eb",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rith's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:e6eb30b02a5e82a34a0af6a85631696c",
+      "min_rule_version": 2,
+      "normalized_name": "rith's attendant",
+      "oracle_hash": "c71c0b720143aa4459ace2161bf240a8",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Satyr Hedonist",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:af510c5e5b789c3ad56b26271af0c3df",
+      "min_rule_version": 2,
+      "normalized_name": "satyr hedonist",
+      "oracle_hash": "f7172fdc53573436376e238e0fc92c2c",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Treva's Attendant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:9d409157b20663ee285ca20a1fafd18c",
+      "min_rule_version": 2,
+      "normalized_name": "treva's attendant",
+      "oracle_hash": "3c623b378945ea9372f8515717483778",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

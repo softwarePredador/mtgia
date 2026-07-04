@@ -6530,6 +6530,37 @@
     "battle_rule_logical_key": "battle_rule_v1:f05bd490c5e9f3917fda923e6aba233c",
     "battle_rule_oracle_hash": "5fb6e6a8fa62d2d0698978462ee5b295"
   },
+  "Basal Thrull": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": true,
+    "mana_produced": 2,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B",
+      "B"
+    ],
+    "produces": "B",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d69eb95d509e5b2fec24a34ae88604f5",
+    "battle_rule_oracle_hash": "6cde21b2f4ce73144008f302c2dc65f5"
+  },
   "Basalt Monolith": {
     "ability_kind": "activated",
     "activated_untap_cost_generic": 3,
@@ -8533,6 +8564,36 @@
     "battle_rule_logical_key": "battle_rule_v1:544a658a2c0bc182ebfeb88ace95dc64",
     "battle_rule_oracle_hash": "f9b52f264dbb36074c8c151ad47331cb"
   },
+  "Blood Pet": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 1,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B"
+    ],
+    "produces": "B",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ae1ea7dbc6e05e2d7b58a956a76436a4",
+    "battle_rule_oracle_hash": "ac212076f211191deac254a55b9e4efa"
+  },
   "Blood Sun": {
     "ability_kind": "triggered",
     "battle_model_scope": "etb_draw_all_lands_lose_nonmana_abilities_v1",
@@ -8546,6 +8607,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:caf72014bc4cda2cd2b0a2e7ce450a08",
     "battle_rule_oracle_hash": "b0b6f9cdfd28c3c98f2eee7055c136c5"
+  },
+  "Blood Vassal": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 2,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B",
+      "B"
+    ],
+    "produces": "B",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:986b9a375a4fa1053952e158a7960f77",
+    "battle_rule_oracle_hash": "1f0d84d040066bc4b65f9180aeb988b6"
   },
   "Bloodchief's Thirst": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
@@ -12768,6 +12860,37 @@
     "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
     "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
+  "Catalyst Elemental": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 2,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R",
+      "R"
+    ],
+    "produces": "R",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bf5beac6b4c97d8fa4b70d0abf648fa1",
+    "battle_rule_oracle_hash": "2624a42fe38948a6225a247ba102d11d"
+  },
   "Cateran Brute": {
     "_activated_rule_effects": [
       {
@@ -15189,6 +15312,39 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "a83000715f0b1b87a83e114a9ec812ab"
   },
+  "Coal Golem": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{3}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R",
+      "R",
+      "R"
+    ],
+    "produces": "R",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1baab616b093b614441a897eb9c90aff",
+    "battle_rule_oracle_hash": "6264558f562814b786de6f70b27ab302"
+  },
   "Coast Watcher": {
     "_keywords_are_self": true,
     "ability_kind": "static",
@@ -15835,6 +15991,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:dee33e0d21b42f1d5133090250212c7f",
     "battle_rule_oracle_hash": "6d7ce4016bfce500247badd42e1fbf9a"
+  },
+  "Composite Golem": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 5,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "W",
+      "U",
+      "B",
+      "R",
+      "G"
+    ],
+    "produces": "WUBRG",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ccbe6b5ec18a31f45f2f6dc22c798cce",
+    "battle_rule_oracle_hash": "47bfdc582372221ae2df2b205fc9915e"
   },
   "Concealed Courtyard": {
     "effect": "land",
@@ -17055,6 +17245,39 @@
     "battle_rule_logical_key": "battle_rule_v1:bdce68609ebf3349f35a5e81b6bb2e22",
     "battle_rule_oracle_hash": "67869230ccb8b4499893e14915ca8b14"
   },
+  "Crosis's Attendant": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "U",
+      "B",
+      "R"
+    ],
+    "produces": "UBR",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e43e3146992b940b3e12e14c74fabcc6",
+    "battle_rule_oracle_hash": "4854a7b1f3411876f75702a095fa0e68"
+  },
   "Crosis's Catacombs": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -17954,6 +18177,39 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:947eca66a843591ccbbaa6080e2ec17a",
     "battle_rule_oracle_hash": "8683fc84ed2dfe9f92c9c6c6c5546a53"
+  },
+  "Darigaaz's Attendant": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "B",
+      "R",
+      "G"
+    ],
+    "produces": "BRG",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:165a08267c0d88bed3c2121070dd3ca6",
+    "battle_rule_oracle_hash": "dbe0025036fa2c70556d0e7e4da0aa4b"
   },
   "Darigaaz's Caldera": {
     "effect": "land",
@@ -22475,6 +22731,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b2df7e83bf3aed811c3c42c6c2e7327e"
+  },
+  "Dromar's Attendant": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "W",
+      "U",
+      "B"
+    ],
+    "produces": "WUB",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:913f2628280c75f83623b274394c78ab",
+    "battle_rule_oracle_hash": "c9662cc22adc7299ec1263bb09852eb3"
   },
   "Dromar's Cavern": {
     "effect": "land",
@@ -51092,6 +51381,37 @@
     "battle_rule_logical_key": "battle_rule_v1:7ef10090331d934746bc0b9c4c3a2deb",
     "battle_rule_oracle_hash": "3482d9adceeb393bac3d82c542d2c3ea"
   },
+  "Morgue Toad": {
+    "ability_kind": "activated_mana",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 2,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "U",
+      "R"
+    ],
+    "produces": "UR",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d7bd10f259751a844ba56293ab501501",
+    "battle_rule_oracle_hash": "026d2deece1ad85cf38951b86dca35eb"
+  },
   "Moriok Scavenger": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_return_graveyard_card_to_hand_v1",
@@ -64936,6 +65256,39 @@
     "battle_rule_logical_key": "battle_rule_v1:b23bca3229a81d65750cf9c453c7943d",
     "battle_rule_oracle_hash": "9308f0eadf924f7ea0c8ea2463224c9a"
   },
+  "Rith's Attendant": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R",
+      "G",
+      "W"
+    ],
+    "produces": "RGW",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e6eb30b02a5e82a34a0af6a85631696c",
+    "battle_rule_oracle_hash": "c71c0b720143aa4459ace2161bf240a8"
+  },
   "Rith's Grove": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -67503,6 +67856,39 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:79cfdb710b6cb24de6e123f5c89d4e5a",
     "battle_rule_oracle_hash": "0ff0cf34f727891d39b4bf442a64daee"
+  },
+  "Satyr Hedonist": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{R}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "R",
+      "R",
+      "R"
+    ],
+    "produces": "R",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:af510c5e5b789c3ad56b26271af0c3df",
+    "battle_rule_oracle_hash": "f7172fdc53573436376e238e0fc92c2c"
   },
   "Satyr Rambler": {
     "_keywords_are_self": true,
@@ -84810,6 +85196,39 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7105ed5dc039a26a6581731e4a81a98b"
+  },
+  "Treva's Attendant": {
+    "ability_kind": "activated_mana",
+    "activation_mana_cost": "{1}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_self_sacrifice_mana_source_permanent_v1",
+    "effect": "ramp_permanent",
+    "is_mana_source": true,
+    "mana_activation_requires_sacrifice": true,
+    "mana_activation_requires_tap": false,
+    "mana_produced": 3,
+    "mana_source_contextual_only": true,
+    "permanent_type": "creature",
+    "produced_mana_symbols": [
+      "G",
+      "W",
+      "U"
+    ],
+    "produces": "GWU",
+    "xmage_ability_class": "SimpleManaAbility",
+    "xmage_cost_class": "SacrificeSourceCost",
+    "xmage_effect_classes": [],
+    "xmage_mana_ability_classes": [
+      "SimpleManaAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9d409157b20663ee285ca20a1fafd18c",
+    "battle_rule_oracle_hash": "3c623b378945ea9372f8515717483778"
   },
   "Treva's Ruins": {
     "effect": "land",
