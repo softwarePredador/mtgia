@@ -30458,6 +30458,8 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             )
             life_cost = max(0, int(permanent.get("activation_life_cost") or 0))
             sacrifice_target_type = str(permanent.get("activation_sacrifice_target") or "").strip()
+            activation_discard_count = max(0, int(permanent.get("activation_discard_count") or 0))
+            activation_discard_target = str(permanent.get("activation_discard_target") or "any_card")
             sacrifice_target = None
             sacrifice_options = []
             if sacrifice_target_type:
@@ -30506,7 +30508,10 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     phase=phase,
                 )
                 continue
-            max_hand_size = int(permanent.get("activated_draw_max_hand_size") or 2)
+            max_hand_size = int(
+                permanent.get("activated_draw_max_hand_size")
+                or (7 if activation_discard_count else 2)
+            )
             if hand_size > max_hand_size:
                 _utility_artifact_skip_event(
                     player,
@@ -30526,6 +30531,40 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                     risk_flags=["low_life", "life_payment"],
                 )
                 continue
+            discard_cards = []
+            if activation_discard_count:
+                if activation_discard_target != "any_card":
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "unsupported_activated_draw_discard_target",
+                        phase=phase,
+                    )
+                    continue
+                if len(getattr(player, "hand", []) or []) < activation_discard_count:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "not_enough_cards_for_activated_draw_discard_cost",
+                        phase=phase,
+                    )
+                    continue
+                for _ in range(activation_discard_count):
+                    discard_card = _choose_currency_converter_discard(player)
+                    if discard_card is None or discard_card in discard_cards:
+                        break
+                    discard_cards.append(discard_card)
+                if len(discard_cards) != activation_discard_count:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "failed_to_select_activated_draw_discard_cost",
+                        phase=phase,
+                    )
+                    continue
             if not player.can_pay(activation_cost_text) or not player.spend_mana(activation_cost_text):
                 _utility_artifact_skip_event(
                     player,
@@ -30544,6 +30583,31 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             if sacrifice_target is not None:
                 sacrificed_name = sacrifice_target.get("name", "?")
                 sacrifice_permanent_for_activation(player, sacrifice_target, turn)
+            discard_resolution = {"to_graveyard": []}
+            if discard_cards:
+                removed_cards = []
+                for discard_card in discard_cards:
+                    if discard_card in player.hand:
+                        player.hand.remove(discard_card)
+                        removed_cards.append(discard_card)
+                if len(removed_cards) != activation_discard_count:
+                    _utility_artifact_skip_event(
+                        player,
+                        permanent,
+                        turn,
+                        "failed_to_pay_activated_draw_discard_cost",
+                        phase=phase,
+                    )
+                    continue
+                discard_resolution = resolve_effect_discard_cards(
+                    player,
+                    removed_cards,
+                    top_limit=0,
+                    opponents=opponents,
+                    turn=turn,
+                    phase=phase,
+                    rng=rng,
+                )
             permanent["utility_artifact_used_this_turn"] = True
             draw_count = int(
                 permanent.get("activated_draw_count")
@@ -30590,6 +30654,9 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                         option.get("name", "?")
                         for option in sacrifice_options[:6]
                     ],
+                    "discarded": [card.get("name", "?") for card in discard_cards],
+                    "discarded_count": len(discard_cards),
+                    "discard_target": activation_discard_target if activation_discard_count else None,
                 },
                 rule_source="simple_activated_draw_permanent_v1",
                 rule_status=permanent.get("_rule_review_status", "active"),
@@ -30599,18 +30666,23 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 strategic_principle="use a safe activated draw permanent when hand size is low",
                 heuristic_version=DECISION_STRATEGY_VERSION,
                 resource_delta={
-                    "cards": len(drawn),
+                    "cards": len(drawn) - len(discard_cards),
                     "mana": -activation_cost,
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
                     "life": -life_cost,
                     "permanents": -1 if sacrificed_name else 0,
-                    "graveyard": 0 if sacrifice_target is None or is_token_permanent(sacrifice_target) else 1,
+                    "graveyard": (
+                        0 if sacrifice_target is None or is_token_permanent(sacrifice_target) else 1
+                    )
+                    + len(discard_resolution.get("to_graveyard") or []),
+                    "cards_discarded": len(discard_cards),
                 },
                 risk_flags=[
                     flag
                     for flag, active in {
                         "activated_draw": True,
                         "life_payment": life_cost > 0,
+                        "discard_cost": bool(discard_cards),
                         "sacrifice_permanent": sacrificed_name is not None,
                         "sacrifice_token": sacrifice_target is not None and is_token_permanent(sacrifice_target),
                     }.items()
@@ -30633,6 +30705,9 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 life_after=player.life,
                 sacrifice_target=sacrifice_target_type or None,
                 sacrificed=sacrificed_name,
+                discarded=[card.get("name", "?") for card in discard_cards],
+                discarded_count=len(discard_cards),
+                discard_target=activation_discard_target if activation_discard_count else None,
                 phase=phase,
                 turn=turn,
                 **replay_rule_fields(permanent),

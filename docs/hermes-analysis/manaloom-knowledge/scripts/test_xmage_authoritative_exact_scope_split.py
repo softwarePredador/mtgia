@@ -1773,7 +1773,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_draw_source_cost_not_supported")
 
-    def test_permanent_activated_draw_blocks_discard_cost(self) -> None:
+    def test_permanent_activated_draw_maps_discard_card_cost(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -1795,6 +1795,42 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
                 );
                 ability.addCost(new TapSourceCost());
                 ability.addCost(new DiscardCardCost());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+        self.assertTrue(effect["activated_draw"])
+        self.assertEqual(effect["activated_draw_count"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{R}")
+        self.assertEqual(effect["activation_discard_count"], 1)
+        self.assertEqual(effect["activation_discard_target"], "any_card")
+        self.assertTrue(effect["activation_requires_discard_card"])
+        self.assertTrue(effect["activation_requires_tap"])
+
+    def test_permanent_activated_draw_blocks_filtered_discard_cost(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["SimpleActivatedAbility"],
+            xmage_signals=["draw", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Entomber",
+                type_line="Creature - Zombie",
+                oracle_text="{T}, Discard a creature card: Draw a card.",
+            ),
+            source_text="""
+                Ability ability = new SimpleActivatedAbility(
+                    new DrawCardSourceControllerEffect(1),
+                    new TapSourceCost()
+                );
+                ability.addCost(new DiscardCardCost(StaticFilters.FILTER_CARD_CREATURE_A));
                 this.addAbility(ability);
             """,
         )

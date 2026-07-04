@@ -4583,6 +4583,15 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
         return "activated_draw_oracle_not_simple"
 
     normalized_cost = cost_text
+    discard_count = 0
+    discard_pattern = r"(?:^|,\s*)discard (?:a|one) card(?:\s*,?|$)"
+    discard_matches = list(re.finditer(discard_pattern, normalized_cost))
+    if len(discard_matches) > 1:
+        return "activated_draw_oracle_cost_not_supported"
+    if discard_matches:
+        discard_count = 1
+        normalized_cost = re.sub(discard_pattern, ",", normalized_cost).strip(" ,")
+
     life_cost = 0
     life_pattern = r"(?:^|,\s*)pay (?P<life>\d+) life(?:\s*,?|$)"
     life_matches = list(re.finditer(life_pattern, normalized_cost))
@@ -4614,6 +4623,10 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     if activation.get("activation_requires_sacrifice") and sacrifice_target:
         return "activated_draw_oracle_cost_not_supported"
     activation["count"] = count
+    if discard_count:
+        activation["activation_discard_count"] = discard_count
+        activation["activation_discard_target"] = "any_card"
+        activation["activation_requires_discard_card"] = True
     if life_cost:
         activation["activation_life_cost"] = life_cost
     if sacrifice_target:
@@ -5972,17 +5985,19 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     text = source or ""
     if "Zone.GRAVEYARD" in text:
         return "activated_draw_source_not_battlefield"
-    draw_matches = re.findall(r"DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)", text)
+    draw_matches = re.findall(
+        r"SimpleActivatedAbility\s*\(\s*new\s+DrawCardSourceControllerEffect\s*\(\s*(\d*)\s*\)",
+        text,
+        flags=re.DOTALL,
+    )
     if len(draw_matches) != 1:
         return "activated_draw_source_count_not_fixed"
     count = int(draw_matches[0] or "1")
     if count <= 0:
         return "activated_draw_source_count_not_fixed"
-    draw_index = text.find("DrawCardSourceControllerEffect")
+    draw_index = text.find("SimpleActivatedAbility")
     window = text[max(0, draw_index - 500) : draw_index + 1800]
     risky_cost_classes = {
-        "DiscardCardCost",
-        "DiscardTargetCost",
         "ExileFrom",
         "ExileSourceFromGraveCost",
         "MillCardsCost",
@@ -5993,6 +6008,17 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
     }
     present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
     if present_risky:
+        return "activated_draw_source_cost_not_supported"
+    discard_count = 0
+    if re.search(r"new\s+DiscardCardCost\s*\(\s*\)", window):
+        discard_count = 1
+    elif re.search(
+        r"new\s+DiscardTargetCost\s*\(\s*new\s+TargetCardInHand\s*\(\s*(?:1\s*,\s*StaticFilters\.FILTER_CARD_A)?\s*\)\s*\)",
+        window,
+        flags=re.DOTALL,
+    ):
+        discard_count = 1
+    elif "DiscardCardCost" in window or "DiscardTargetCost" in window:
         return "activated_draw_source_cost_not_supported"
     if "SimpleActivatedAbility" not in window:
         return "activated_draw_source_not_simple_activated"
@@ -6032,6 +6058,15 @@ def activated_draw_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
+        **(
+            {
+                "activation_discard_count": discard_count,
+                "activation_discard_target": "any_card",
+                "activation_requires_discard_card": True,
+            }
+            if discard_count
+            else {}
+        ),
         **({"activation_life_cost": life_cost} if life_cost else {}),
         **(
             {
@@ -8132,6 +8167,9 @@ def split_row(
             "activation_requires_sacrifice",
             "activation_life_cost",
             "activation_sacrifice_target",
+            "activation_discard_count",
+            "activation_discard_target",
+            "activation_requires_discard_card",
         ):
             if parsed_activation.get(key) != oracle_activation.get(key):
                 return None, "activated_draw_source_oracle_mismatch"

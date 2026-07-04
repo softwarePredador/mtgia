@@ -1798,6 +1798,55 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_draw_pays_discard_card_cost_before_draw(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Card", "cmc": 1}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand.append({"name": "Discard Me", "cmc": 6, "type_line": "Sorcery"})
+        active.mana_pool.add("red", 1)
+        permanent = {
+            "name": "Fixture Picker",
+            "type_line": "Creature - Goblin",
+            "effect": "draw_engine",
+            "battle_model_scope": "xmage_permanent_simple_activated_draw_v1",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activation_cost_mana": "{R}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["R"],
+            "activation_requires_tap": True,
+            "activation_discard_count": 1,
+            "activation_discard_target": "any_card",
+            "activation_requires_discard_card": True,
+        }
+        active.battlefield.append(permanent)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=7,
+            rng=random.Random(7),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Discard Me"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(permanent["tapped"])
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("activation_kind") == "simple_activated_draw"
+                and data.get("card") == "Fixture Picker"
+                and data.get("cards_drawn") == 1
+                and data.get("discarded") == ["Discard Me"]
+                and data.get("discarded_count") == 1
+                and data.get("discard_target") == "any_card"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_discard_permanent_draws_then_discards(self) -> None:
         active = self.battle.Player(
             "Active",
