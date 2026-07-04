@@ -50912,6 +50912,17 @@ def apply_effect_immediate(
             return
         permanent = prepare_resolved_permanent(enrich_card({**card, **effect_data}))
         player.battlefield.append(permanent)
+        resolve_generic_permanent_etb(
+            player,
+            opponents,
+            permanent,
+            effect_data,
+            turn,
+            rng,
+            stack=stack,
+            all_players=all_players_for_entry,
+            phase=phase or "resolution",
+        )
         enters_treasure = int(
             effect_data.get("enters_treasure")
             or (

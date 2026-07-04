@@ -5200,6 +5200,106 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_mana_ability_classes"], ["BlackManaAbility", "GreenManaAbility", "WhiteManaAbility"])
         self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
 
+    def test_simple_mana_source_with_etb_draw_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["AnyColorManaAbility", "EntersBattlefieldTriggeredAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Prophetic Prism",
+                type_line="Artifact",
+                oracle_text=(
+                    "When this artifact enters, draw a card.\n"
+                    "{1}, {T}: Add one mana of any color."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1)));"
+                "Ability ability = new AnyColorManaAbility(new GenericManaCost(1));"
+                "ability.addCost(new TapSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ETB_DRAW_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertEqual(effect["produces"], "WUBRG")
+        self.assertEqual(effect["activation_mana_cost"], "{1}")
+        self.assertTrue(effect["mana_activation_requires_tap"])
+        self.assertEqual(effect["etb_draw_count"], 1)
+        self.assertEqual(effect["ability_kind"], "mana_and_triggered")
+
+    def test_mana_source_with_no_tap_activation_cost_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_CREATURE_UNIT,
+            effect_classes=[],
+            ability_kind="activated",
+            ability_classes=["SimpleManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Agent of Stromgald",
+                type_line="Creature - Human Knight",
+                oracle_text="{R}: Add {B}.",
+            ),
+            source_text=(
+                "this.addAbility(new SimpleManaAbility(Zone.BATTLEFIELD, "
+                "Mana.BlackMana(1), new ManaCostsImpl<>(\"{R}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_SCOPE)
+        self.assertEqual(effect["produces"], "B")
+        self.assertEqual(effect["produced_mana_symbols"], ["B"])
+        self.assertEqual(effect["activation_mana_cost"], "{R}")
+        self.assertFalse(effect["mana_activation_requires_tap"])
+
+    def test_mana_source_with_etb_draw_and_food_ability_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=[
+                "AnyColorManaAbility",
+                "EntersBattlefieldTriggeredAbility",
+                "FoodAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Golden Egg",
+                type_line="Artifact - Food",
+                oracle_text=(
+                    "When this artifact enters, draw a card.\n"
+                    "{1}, {T}, Sacrifice this artifact: Add one mana of any color.\n"
+                    "{2}, {T}, Sacrifice this artifact: You gain 3 life."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1)));"
+                "Ability ability = new AnyColorManaAbility(new GenericManaCost(1));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+                "this.addAbility(new FoodAbility());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_auxiliary_ability_not_supported")
+
     def test_simple_mana_source_with_hybrid_activated_draw_cost_stays_blocked(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

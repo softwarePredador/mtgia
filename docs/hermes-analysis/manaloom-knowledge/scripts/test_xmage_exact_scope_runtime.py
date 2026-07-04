@@ -6332,6 +6332,74 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_mana_source_with_etb_draw_draws_then_pays_activation_cost_for_mana(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Card"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.battlefield.append(
+            {
+                "name": "Fixture Land",
+                "type_line": "Basic Land",
+                "effect": "land",
+                "mana_produced": 1,
+                "produces": "C",
+            }
+        )
+        effect = {
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WUBRG",
+            "activation_mana_cost": "{1}",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+            "ability_kind": "mana_and_triggered",
+            "trigger": "enters_battlefield",
+            "trigger_effect": "draw_cards",
+            "etb_draw_count": 1,
+            "_rule_logical_key": "battle_rule_v1:fixture_prism",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Prism",
+                "type_line": "Artifact",
+                "oracle_text": "When this artifact enters, draw a card.\n{1}, {T}: Add one mana of any color.",
+            },
+            turn=4,
+            rng=random.Random(162),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        prism = next(card for card in active.battlefield if card.get("name") == "Fixture Prism")
+
+        active.refresh_mana_sources(turn=4)
+
+        self.assertTrue(prism["tapped"])
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Prism"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "mana_source_activation_cost_paid"
+                and data.get("card") == "Fixture Prism"
+                and data.get("activation_mana_cost") == "{1}"
+                for event, data in self.events
+            )
+        )
+
     def test_simple_mana_source_permanent_refreshes_fixed_distinct_symbols(self) -> None:
         active = self.battle.Player("Active", None, [])
         engineer = {

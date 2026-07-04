@@ -1,0 +1,850 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg408_mana_etb_draw_new_server_mana_etb_draw_new_server_",
+  "deploy_id": "pg408_mana_etb_draw_new_server",
+  "expected_rules": [
+    {
+      "card_name": "Agent of Stromgald",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+      "min_rule_version": 2,
+      "normalized_name": "agent of stromgald",
+      "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+      "required_effect_fields": {
+        "activation_mana_cost": "{R}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arcum's Astrolabe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "arcum's astrolabe",
+      "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Initiate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+      "min_rule_version": 2,
+      "normalized_name": "bog initiate",
+      "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energy Refractor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "min_rule_version": 2,
+      "normalized_name": "energy refractor",
+      "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Helionaut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+      "min_rule_version": 2,
+      "normalized_name": "helionaut",
+      "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "keywords": [
+          "flying"
+        ],
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Envoy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar envoy",
+      "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar visionary",
+      "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "EntersBattlefieldTriggeredAbility",
+          "GreenManaAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nomadic Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "min_rule_version": 2,
+      "normalized_name": "nomadic elf",
+      "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orochi Leafcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+      "min_rule_version": 2,
+      "normalized_name": "orochi leafcaller",
+      "oracle_hash": "bbe66105c445b665906687869850951e",
+      "required_effect_fields": {
+        "activation_mana_cost": "{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prismite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+      "min_rule_version": 2,
+      "normalized_name": "prismite",
+      "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophetic Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "prophetic prism",
+      "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Signpost Scarecrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+      "min_rule_version": 2,
+      "normalized_name": "signpost scarecrow",
+      "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "keywords": [
+          "vigilance"
+        ],
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Acolyte",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+      "min_rule_version": 2,
+      "normalized_name": "viridian acolyte",
+      "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_simple_mana_source_permanent": 9,
+    "xmage_simple_mana_source_with_etb_draw": 4
+  },
+  "files": {
+    "apply": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_apply.sql",
+    "manifest": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_manifest.json",
+    "package": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_package.md",
+    "postcheck": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_postcheck.sql",
+    "precheck": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_precheck.sql",
+    "rollback": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_rollback.sql"
+  },
+  "generated_at": "2026-07-04T13:54:27+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Agent of Stromgald"
+      },
+      "card_name": "Agent of Stromgald",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+      "normalized_name": "agent of stromgald",
+      "required_effect_fields": {
+        "activation_mana_cost": "{R}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B"
+      }
+    },
+    {
+      "card": {
+        "name": "Arcum's Astrolabe"
+      },
+      "card_name": "Arcum's Astrolabe",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "normalized_name": "arcum's astrolabe",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Initiate"
+      },
+      "card_name": "Bog Initiate",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+      "normalized_name": "bog initiate",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "B"
+        ],
+        "produces": "B"
+      }
+    },
+    {
+      "card": {
+        "name": "Energy Refractor"
+      },
+      "card_name": "Energy Refractor",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "normalized_name": "energy refractor",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Helionaut"
+      },
+      "card_name": "Helionaut",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+      "normalized_name": "helionaut",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "keywords": [
+          "flying"
+        ],
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Llanowar Envoy"
+      },
+      "card_name": "Llanowar Envoy",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "normalized_name": "llanowar envoy",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Llanowar Visionary"
+      },
+      "card_name": "Llanowar Visionary",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "normalized_name": "llanowar visionary",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produced_mana_symbols": [
+          "G"
+        ],
+        "produces": "G",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "EntersBattlefieldTriggeredAbility",
+          "GreenManaAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Nomadic Elf"
+      },
+      "card_name": "Nomadic Elf",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "normalized_name": "nomadic elf",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Orochi Leafcaller"
+      },
+      "card_name": "Orochi Leafcaller",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+      "normalized_name": "orochi leafcaller",
+      "required_effect_fields": {
+        "activation_mana_cost": "{G}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Prismite"
+      },
+      "card_name": "Prismite",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+      "normalized_name": "prismite",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Prophetic Prism"
+      },
+      "card_name": "Prophetic Prism",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "normalized_name": "prophetic prism",
+      "required_effect_fields": {
+        "ability_kind": "mana_and_triggered",
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+        "effect": "ramp_permanent",
+        "etb_draw_count": 1,
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "artifact",
+        "produces": "WUBRG",
+        "trigger": "enters_battlefield",
+        "trigger_effect": "draw_cards",
+        "xmage_ability_classes": [
+          "AnyColorManaAbility",
+          "EntersBattlefieldTriggeredAbility"
+        ]
+      }
+    },
+    {
+      "card": {
+        "name": "Signpost Scarecrow"
+      },
+      "card_name": "Signpost Scarecrow",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+      "normalized_name": "signpost scarecrow",
+      "required_effect_fields": {
+        "activation_mana_cost": "{2}",
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "keywords": [
+          "vigilance"
+        ],
+        "mana_activation_requires_tap": false,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    },
+    {
+      "card": {
+        "name": "Viridian Acolyte"
+      },
+      "card_name": "Viridian Acolyte",
+      "effect": "ramp_permanent",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+      "normalized_name": "viridian acolyte",
+      "required_effect_fields": {
+        "activation_mana_cost": "{1}",
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+        "effect": "ramp_permanent",
+        "is_mana_source": true,
+        "mana_activation_requires_tap": true,
+        "mana_produced": 1,
+        "permanent_type": "creature",
+        "produces": "WUBRG"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Agent of Stromgald",
+    "Arcum's Astrolabe",
+    "Bog Initiate",
+    "Energy Refractor",
+    "Helionaut",
+    "Llanowar Envoy",
+    "Llanowar Visionary",
+    "Nomadic Elf",
+    "Orochi Leafcaller",
+    "Prismite",
+    "Prophetic Prism",
+    "Signpost Scarecrow",
+    "Viridian Acolyte"
+  ],
+  "selected_count": 13,
+  "slug": "mana_etb_draw_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Agent of Stromgald",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+      "min_rule_version": 2,
+      "normalized_name": "agent of stromgald",
+      "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Arcum's Astrolabe",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "arcum's astrolabe",
+      "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Initiate",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+      "min_rule_version": 2,
+      "normalized_name": "bog initiate",
+      "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Energy Refractor",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+      "min_rule_version": 2,
+      "normalized_name": "energy refractor",
+      "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Helionaut",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+      "min_rule_version": 2,
+      "normalized_name": "helionaut",
+      "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Envoy",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar envoy",
+      "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Llanowar Visionary",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+      "min_rule_version": 2,
+      "normalized_name": "llanowar visionary",
+      "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Nomadic Elf",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+      "min_rule_version": 2,
+      "normalized_name": "nomadic elf",
+      "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Orochi Leafcaller",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+      "min_rule_version": 2,
+      "normalized_name": "orochi leafcaller",
+      "oracle_hash": "bbe66105c445b665906687869850951e",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prismite",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+      "min_rule_version": 2,
+      "normalized_name": "prismite",
+      "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Prophetic Prism",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+      "min_rule_version": 2,
+      "normalized_name": "prophetic prism",
+      "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Signpost Scarecrow",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+      "min_rule_version": 2,
+      "normalized_name": "signpost scarecrow",
+      "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Viridian Acolyte",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+      "min_rule_version": 2,
+      "normalized_name": "viridian acolyte",
+      "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

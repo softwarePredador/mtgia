@@ -1,0 +1,73 @@
+{
+  "generated_at_utc": "2026-07-04T14:05:43Z",
+  "database_target": "127.0.0.1:15432/halder",
+  "package": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_package.md",
+  "precheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_precheck.sql",
+  "apply_sql": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_apply.sql",
+  "postcheck_sql": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_postcheck.sql",
+  "rollback_sql": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_rollback.sql",
+  "deprecated_shadow_rows": 0,
+  "upserted_rows": 13,
+  "postcheck": {
+    "promoted_rule_rows": 13,
+    "promoted_verified_auto_rows": 13,
+    "promoted_oracle_hash_rows": 13,
+    "backup_rows": 0
+  },
+  "selected_cards": [
+    "Agent of Stromgald",
+    "Arcum's Astrolabe",
+    "Bog Initiate",
+    "Energy Refractor",
+    "Helionaut",
+    "Llanowar Envoy",
+    "Llanowar Visionary",
+    "Nomadic Elf",
+    "Orochi Leafcaller",
+    "Prismite",
+    "Prophetic Prism",
+    "Signpost Scarecrow",
+    "Viridian Acolyte"
+  ],
+  "sync": {
+    "pg_rows_loaded": 13,
+    "sqlite_inserted_or_updated": 13,
+    "canonical_snapshot_rows_exported": 5358
+  },
+  "e2e": {
+    "status": "pass",
+    "postgres_source_of_truth_validated_rows": 13,
+    "sqlite_hermes_cache_validated_rows": 13,
+    "canonical_snapshot_validated_cards": 13,
+    "runtime_get_card_effect_validated_cards": 13,
+    "battle_execution_scenarios": 0
+  },
+  "focused_tests": {
+    "test_xmage_authoritative_exact_scope_split.py": {
+      "tests": 402,
+      "status": "OK"
+    },
+    "test_xmage_exact_scope_runtime.py": {
+      "tests": 232,
+      "status": "OK"
+    }
+  },
+  "final_audits_after_docs": {
+    "xmage_strategy": {
+      "status": "pass",
+      "checks": 26
+    },
+    "operational_surface": {
+      "status": "pass",
+      "checks": 39
+    },
+    "legacy_contamination": {
+      "status": "pass",
+      "checks": 32
+    },
+    "pg_hermes_sqlite_contract": {
+      "status": "pass",
+      "checks": 51
+    }
+  }
+}

@@ -1,0 +1,504 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T13:56:27.037694+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_manifest.json",
+  "package_id": "pg408_mana_etb_draw_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Agent of Stromgald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+          "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Arcum's Astrolabe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Initiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+          "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Energy Refractor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+          "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Helionaut",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+          "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Llanowar Envoy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Llanowar Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+          "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Nomadic Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Orochi Leafcaller",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+          "oracle_hash": "bbe66105c445b665906687869850951e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Prismite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+          "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Prophetic Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Signpost Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+          "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Viridian Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 13
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Agent of Stromgald",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4",
+          "oracle_hash": "65769fe8e16d48a7ec023932d2e52ced",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Arcum's Astrolabe",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "b8440b4581f1393b623f598bf31c8341",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Bog Initiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4",
+          "oracle_hash": "9c6c2892bea942797a43ca0b6a7414c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Energy Refractor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3",
+          "oracle_hash": "cec4e478a79bc9f7ee003844fb1e3cdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Helionaut",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708",
+          "oracle_hash": "69e2cdb07b75b18579ce768170f274e7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Llanowar Envoy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Llanowar Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19",
+          "oracle_hash": "bb7ee1e889365c1602ebac24e4dbedab",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Nomadic Elf",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f",
+          "oracle_hash": "786fcf3ffe8f1295d3823eddbe13aa9e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Orochi Leafcaller",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9",
+          "oracle_hash": "bbe66105c445b665906687869850951e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Prismite",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5",
+          "oracle_hash": "87fc16872f2a927fc1135934d7482210",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "card_name": "Prophetic Prism",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00",
+          "oracle_hash": "dbafd52cab67ffc85aa684f524be0c37",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Signpost Scarecrow",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a",
+          "oracle_hash": "ef749be7a1c4f2fdd418676c59548c40",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "card_name": "Viridian Acolyte",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857",
+          "oracle_hash": "e7da6ddd05e9302702b6f8a48bba9fd6",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Agent of Stromgald",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arcum's Astrolabe",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Initiate",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Energy Refractor",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Helionaut",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Llanowar Envoy",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Llanowar Visionary",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nomadic Elf",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orochi Leafcaller",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prismite",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_mana_source_with_etb_draw_v1",
+          "battle_rule_version": 2,
+          "card_name": "Prophetic Prism",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Signpost Scarecrow",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
+          "battle_rule_version": 2,
+          "card_name": "Viridian Acolyte",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 13
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Agent of Stromgald",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:2907955c06e4a4101075db2633ced5e4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Arcum's Astrolabe",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Initiate",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a9ac3ac0cd0dfd199915d9a6bb6f23d4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Energy Refractor",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:f44443c9021d46c52c2315ad02ff0cd3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Helionaut",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:a26ca15f1b2f94fda32550e99bbcb708"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Llanowar Envoy",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Llanowar Visionary",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cea74fd817022b48dd64801a774cab19"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nomadic Elf",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:ab447d2bfcbf21ad6d657f7402ec179f"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orochi Leafcaller",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:87166899f68892662c796031bcfed5e9"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prismite",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:52ba9c064622007634c52a0829a6a1a5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Prophetic Prism",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:30884a43b3dc66d721472b52a6493f00"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Signpost Scarecrow",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:cef34afaf485fec4f9482471b49e101a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Viridian Acolyte",
+          "component_keys": [],
+          "effect": "ramp_permanent",
+          "logical_rule_key": "battle_rule_v1:03bc4728554a351446b90d6274bee857"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

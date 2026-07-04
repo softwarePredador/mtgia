@@ -134,6 +134,7 @@ BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
+MANA_WITH_ETB_DRAW_SCOPE = "xmage_simple_mana_source_with_etb_draw_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
@@ -8790,11 +8791,16 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     if any(token in text for token in UNSUPPORTED_SIMPLE_MANA_ORACLE_TOKENS):
         return None
     if text == "{t}: add one mana of any color.":
-        return {"produces": "WUBRG", "mana_produced": 1}
+        return {"produces": "WUBRG", "mana_produced": 1, "mana_activation_requires_tap": True}
     match = re.match(r"^\{t\}: add \{([wubrgc])\}\.?$", text)
     if match:
         symbol = match.group(1).upper()
-        return {"produces": symbol, "mana_produced": 1, "produced_mana_symbols": [symbol]}
+        return {
+            "produces": symbol,
+            "mana_produced": 1,
+            "produced_mana_symbols": [symbol],
+            "mana_activation_requires_tap": True,
+        }
     match = re.match(r"^\{t\}: add ((?:\{[wubrgc]\}){2,})\.?$", text)
     if match:
         symbols = _brace_mana_symbols(match.group(1))
@@ -8803,6 +8809,7 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
                 "produces": _unique_mana_symbols(symbols),
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
+                "mana_activation_requires_tap": True,
             }
     match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add (?P<mana>(?:\{[wubrgc]\})+)\.?$", text)
     if match:
@@ -8813,6 +8820,34 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
                 "mana_produced": len(symbols),
                 "produced_mana_symbols": symbols,
                 "activation_mana_cost": match.group("cost").upper(),
+                "mana_activation_requires_tap": True,
+            }
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+), \{t\}: add one mana of any color\.?$", text)
+    if match:
+        return {
+            "produces": "WUBRG",
+            "mana_produced": 1,
+            "activation_mana_cost": match.group("cost").upper(),
+            "mana_activation_requires_tap": True,
+        }
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add one mana of any color\.?$", text)
+    if match:
+        return {
+            "produces": "WUBRG",
+            "mana_produced": 1,
+            "activation_mana_cost": match.group("cost").upper(),
+            "mana_activation_requires_tap": False,
+        }
+    match = re.match(r"^(?P<cost>(?:\{[0-9wubrgc]+\})+): add (?P<mana>(?:\{[wubrgc]\})+)\.?$", text)
+    if match:
+        symbols = _brace_mana_symbols(match.group("mana"))
+        if symbols:
+            return {
+                "produces": _unique_mana_symbols(symbols),
+                "mana_produced": len(symbols),
+                "produced_mana_symbols": symbols,
+                "activation_mana_cost": match.group("cost").upper(),
+                "mana_activation_requires_tap": False,
             }
     match = re.match(
         r"^\{t\}: add (?P<choices>\{[wubrgc]\}(?:, \{[wubrgc]\})*(?:,? or \{[wubrgc]\}))\.?$",
@@ -8820,7 +8855,7 @@ def simple_mana_source_detail_from_line(text: str) -> dict[str, Any] | None:
     )
     if match:
         produced = _unique_mana_symbols(_brace_mana_symbols(match.group("choices")))
-        return {"produces": produced, "mana_produced": 1}
+        return {"produces": produced, "mana_produced": 1, "mana_activation_requires_tap": True}
     return None
 
 
@@ -8850,7 +8885,11 @@ def simple_mana_source_from_oracle(metadata: dict[str, Any]) -> tuple[str, int] 
     return str(detail["produces"]), int(detail["mana_produced"])
 
 
-def simple_mana_source_source_blocker(source_text: str, ability_class_values: set[str]) -> str | None:
+def simple_mana_source_source_blocker(
+    source_text: str,
+    ability_class_values: set[str],
+    mana_source_detail: dict[str, Any] | None = None,
+) -> str | None:
     text = source_text or ""
     unsupported_markers = {
         "SacrificeSourceCost": "mana_source_source_sacrifice_cost_not_supported",
@@ -8864,8 +8903,12 @@ def simple_mana_source_source_blocker(source_text: str, ability_class_values: se
     for marker, reason in unsupported_markers.items():
         if marker in text:
             return reason
-    if "SimpleManaAbility" in ability_class_values and "TapSourceCost" not in text:
-        return "mana_source_simple_source_missing_tap_cost"
+    if mana_source_detail is not None:
+        requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+        if "TapSourceCost" in text and not requires_tap:
+            return "mana_source_source_oracle_tap_mismatch"
+        if "SimpleManaAbility" in ability_class_values and "TapSourceCost" not in text and requires_tap:
+            return "mana_source_simple_source_missing_tap_cost"
     return None
 
 
@@ -9423,7 +9466,11 @@ def target_constraints_for(target: str) -> dict[str, Any]:
 
 def proposal_notes(row: dict[str, Any], scope: str) -> str:
     scope_kind = "runtime-backed exact-scope adapter"
-    if str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
+    if scope == MANA_WITH_ACTIVATED_DRAW_SCOPE:
+        scope_kind = "activated mana-source permanent with separate activated draw ability"
+    elif scope == MANA_WITH_ETB_DRAW_SCOPE:
+        scope_kind = "mana-source permanent with fixed enter-the-battlefield draw trigger"
+    elif str(row.get("adapter_work_unit") or "") in RAMP_UNITS:
         scope_kind = "activated mana-source permanent"
     elif scope == TOKEN_SPELL_SCOPE:
         scope_kind = "fixed spell-resolution creature-token maker"
@@ -14334,6 +14381,16 @@ def split_row(
                 - {"SimpleActivatedAbility"}
             )
         )
+        mana_source_with_etb_draw = (
+            classes == {"DrawCardSourceControllerEffect"}
+            and "EntersBattlefieldTriggeredAbility" in mana_ability_classes
+            and not (
+                mana_ability_classes
+                - SAFE_MANA_ABILITY_CLASSES
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+                - {"EntersBattlefieldTriggeredAbility"}
+            )
+        )
         if mana_source_with_activated_draw:
             mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
             if mana_source_detail is None:
@@ -14423,27 +14480,101 @@ def split_row(
                 effect_json,
                 family_id="xmage_simple_mana_source_with_activated_draw",
             ), "selected_exact_scope"
+        if mana_source_with_etb_draw:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
+                if source_blocker:
+                    return None, source_blocker
+                return None, "mana_source_oracle_not_simple"
+            source_blocker = simple_mana_source_source_blocker(
+                source_text,
+                mana_ability_classes,
+                mana_source_detail,
+            )
+            if source_blocker:
+                return None, source_blocker
+            oracle_draw_count = etb_draw_count_from_oracle(metadata)
+            source_draw_count = java_constructor_int_or_noarg_default(
+                source_text,
+                "DrawCardSourceControllerEffect",
+                noarg_default=1,
+            )
+            if oracle_draw_count is None or oracle_draw_count <= 0:
+                return None, "mana_source_etb_draw_count_not_fixed"
+            if source_draw_count is None or source_draw_count <= 0:
+                return None, "mana_source_etb_draw_source_count_not_fixed"
+            if int(source_draw_count) != int(oracle_draw_count):
+                return None, "mana_source_etb_draw_source_oracle_mismatch"
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_ETB_DRAW_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": mana_requires_tap,
+                "mana_activation_requires_tap": mana_requires_tap,
+                "permanent_type": permanent_type,
+                "ability_kind": "mana_and_triggered",
+                "trigger": "enters_battlefield",
+                "trigger_effect": "draw_cards",
+                "etb_draw_count": int(oracle_draw_count),
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes - {"EntersBattlefieldTriggeredAbility"}
+                ),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+            }
+            if mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            if mana_source_detail.get("activation_mana_cost"):
+                effect_json["activation_mana_cost"] = mana_source_detail["activation_mana_cost"]
+            if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                effect_json["enters_tapped"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_etb_draw",
+            ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
         if auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES:
             return None, "mana_source_auxiliary_ability_not_supported"
         if classes - {"BasicManaEffect", "AddManaOfAnyColorEffect"}:
             return None, "mana_source_effect_class_not_simple"
-        source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
-        if source_blocker:
-            return None, source_blocker
         mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
         if mana_source_detail is None:
+            source_blocker = simple_mana_source_source_blocker(source_text, mana_ability_classes)
+            if source_blocker:
+                return None, source_blocker
             return None, "mana_source_oracle_not_simple"
+        source_blocker = simple_mana_source_source_blocker(
+            source_text,
+            mana_ability_classes,
+            mana_source_detail,
+        )
+        if source_blocker:
+            return None, source_blocker
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_type = "creature" if "creature" in type_line else "artifact" if "artifact" in type_line else "permanent"
+        mana_requires_tap = bool(mana_source_detail.get("mana_activation_requires_tap", True))
         effect_json = {
             "effect": "ramp_permanent",
             "battle_model_scope": MANA_SCOPE,
             "is_mana_source": True,
             "mana_produced": int(mana_source_detail["mana_produced"]),
             "produces": str(mana_source_detail["produces"]),
-            "activation_requires_tap": True,
-            "mana_activation_requires_tap": True,
+            "activation_requires_tap": mana_requires_tap,
+            "mana_activation_requires_tap": mana_requires_tap,
             "permanent_type": permanent_type,
             "xmage_mana_ability_classes": sorted(mana_ability_classes),
             "xmage_effect_classes": sorted(classes),

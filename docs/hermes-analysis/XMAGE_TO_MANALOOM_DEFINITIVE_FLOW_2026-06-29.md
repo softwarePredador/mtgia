@@ -311,21 +311,32 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_docs_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg405_dynamic_count_damage_new_server_after_hash_backfill_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg408_mana_etb_draw_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg408_mana_etb_draw_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg408_mana_etb_draw_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg408_mana_etb_draw_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg408_mana_etb_draw_new_server_after_docs_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26718`
-- XMage authoritative source resolved: `26404`
+- target all-card battle-gap identities: `26667`
+- XMage authoritative source resolved: `26353`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26404`
+- XMage authoritative adapter required: `26353`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9882`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26404` identities, card semantics are accepted from XMage; work is now
+- For `26353` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -7865,7 +7876,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG407 queue on the new server, the next exact runtime-backed work should
+post-PG408 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1809`
@@ -7893,37 +7904,47 @@ Selection rule:
 
 ## Latest Cycle Evidence
 
-PG407 closed the exact X-cost direct-damage subpattern on the new server:
+PG408 closed the exact simple mana-source / ETB-draw mana-source subpattern on
+the new server:
 
-- Runtime/split support added for `xmage_x_damage_target_spell_v1`, using the
-  cast context `x_value` as `damage_amount_source`.
+- Split support now accepts simple mana activations with explicit activation
+  mana cost and tap/no-tap state, including `{R}: Add {B}`, `{1}: Add {B}`,
+  `{1}{G}: Add one mana of any color`, and `{2}: Add one mana of any color`.
+- Runtime support now resolves generic ETB triggers for `ramp_permanent`, so
+  mana permanents that draw on entry can execute the draw before later mana
+  activation.
 - Focused tests passed:
-  `test_xmage_authoritative_exact_scope_split.py` (`399` tests) and
-  `test_xmage_exact_scope_runtime.py` (`231` tests).
+  `test_xmage_authoritative_exact_scope_split.py` (`402` tests) and
+  `test_xmage_exact_scope_runtime.py` (`232` tests). The runtime test exercises
+  ETB draw plus paying activation cost for mana.
 - Exact split:
-  `xmage_authoritative_exact_scope_split_20260704_pg407_x_damage_new_server`
-  produced `3` safe candidates: `Blaze`, `Heat Ray`, and `Volcanic Geyser`.
-- Safety blockers were recorded for near misses: `Fanning the Flames` remains
-  blocked by `x_damage_buyback_not_supported`; `Ghitu Fire` remains blocked by
-  `x_damage_alternative_timing_not_supported`.
-- PostgreSQL package `PG407` applied on the new server:
-  `3` upserted rows, `0` deprecated shadow rows, postcheck `3/3`
+  `xmage_authoritative_exact_scope_split_20260704_pg408_mana_etb_draw_new_server`
+  produced `13` safe candidates: `Agent of Stromgald`, `Arcum's Astrolabe`,
+  `Bog Initiate`, `Energy Refractor`, `Helionaut`, `Llanowar Envoy`,
+  `Llanowar Visionary`, `Nomadic Elf`, `Orochi Leafcaller`, `Prismite`,
+  `Prophetic Prism`, `Signpost Scarecrow`, and `Viridian Acolyte`.
+- Scope split was `9` `xmage_simple_tap_mana_source_permanent_v1` rows and
+  `4` `xmage_simple_mana_source_with_etb_draw_v1` rows. The legacy-named
+  simple mana-source scope is still controlled by the explicit
+  `mana_activation_requires_tap` field, so no-tap activations remain distinct
+  in `effect_json`.
+- PostgreSQL package `PG408` was applied on the new server:
+  `13` upserted rows, `0` deprecated shadow rows, and postcheck `13/13`
   `verified`/`auto` rows with Oracle hashes.
-- PG -> SQLite sync loaded `3` PostgreSQL rows, updated `3` SQLite rows, and
-  exported `5345` canonical snapshot rows.
+- PG -> SQLite sync loaded `13` PostgreSQL rows, updated `13` SQLite rows, and
+  exported `5358` canonical snapshot rows.
 - E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
-  and runtime `get_card_effect`.
-- The final PG/Hermes/SQLite audit found `44` old trusted executable rows
-  missing `oracle_hash`; the PG407 integrity backfill filled all `44` from
-  current PostgreSQL `cards.oracle_text`, synced those rows to SQLite, and
-  reduced `trusted_executable_rules_missing_oracle_hash` to `0`.
-- Final governance audits passed after the hash backfill:
-  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
-  (`51/51`), and legacy contamination.
+  and runtime `get_card_effect` for all `13` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime test above.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`),
+  PG/Hermes/SQLite contract (`51/51`), and legacy contamination (`32/32`).
 - Post-sync queue rebuild reduced the Commander-legal target identity queue
-  from `26683` to `26680`, authoritative adapter-required count from `26369`
-  to `26366`, and `direct_damage::targeted_damage_variant_v1` from `830` to
-  `827`. The post-PG407 exact split recheck produced `proposal_count=0`.
+  from `26680` to `26667`, authoritative adapter-required count from `26366`
+  to `26353`, creature mana-source work from `351` to `343`, and artifact
+  mana-source work from `279` to `274`. The post-PG408 exact split recheck
+  produced `proposal_count=0`.
 
 ## Required Artifacts Per Cycle
 
