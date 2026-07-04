@@ -1,0 +1,1015 @@
+{
+  "artifact_type": "lorehold_current_champion_snapshot",
+  "cards": [
+    {
+      "card_id": "e0996f42-3adb-4beb-b80b-ab6cb72ece89",
+      "cmc": 5.0,
+      "functional_tag": "engine",
+      "is_commander": true,
+      "name": "Lorehold, the Historian",
+      "quantity": 1,
+      "role": "commander",
+      "type_line": "Legendary Creature \u2014 Elder Dragon"
+    },
+    {
+      "card_id": "a56c1a39-a256-4067-8516-4bbd8e08980e",
+      "cmc": 0.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Furygale Flocking",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "66fd8a2d-c9b1-47d6-bf3d-8eb5d09c2164",
+      "cmc": 0.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Improvisation Capstone",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Sorcery \u2014 Lesson"
+    },
+    {
+      "card_id": "2ae3f49c-3b48-480a-ae7a-c69920e91014",
+      "cmc": 0.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Prismari Pianist",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Creature \u2014 Djinn Bard"
+    },
+    {
+      "card_id": "9bb64af2-ae46-49f2-9413-480765d1d709",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Esper Sentinel",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Artifact Creature \u2014 Human Soldier"
+    },
+    {
+      "card_id": "f8eb4bbe-ff04-4eb5-a98e-8484dcef05b5",
+      "cmc": 1.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Giver of Runes",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Creature \u2014 Kor Cleric"
+    },
+    {
+      "card_id": "c0bee05b-9be6-41d3-8acc-01ddf1fc8503",
+      "cmc": 1.0,
+      "functional_tag": "tutor",
+      "is_commander": false,
+      "name": "Land Tax",
+      "quantity": 1,
+      "role": "tutor",
+      "type_line": "Enchantment"
+    },
+    {
+      "card_id": "ec9cd418-f443-4e59-9a1a-7086be318209",
+      "cmc": 1.0,
+      "functional_tag": "engine",
+      "is_commander": false,
+      "name": "Library of Leng",
+      "quantity": 1,
+      "role": "engine",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "9025f693-8d9a-48bc-b208-cecad9dc1c91",
+      "cmc": 1.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Mother of Runes",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Creature \u2014 Human Cleric"
+    },
+    {
+      "card_id": "2fd0e384-8025-43cc-a7f5-5125c7b4d1bc",
+      "cmc": 1.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Path to Exile",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "558a8bda-ea1a-4c01-b3c2-186a2ad6478d",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Redirect Lightning",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Instant \u2014 Lesson"
+    },
+    {
+      "card_id": "7c56bc66-8eb0-4c2e-9652-56274fa061e2",
+      "cmc": 1.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Sensei's Divining Top",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "7d81dee8-ca89-4402-a03c-9366b62dabe8",
+      "cmc": 1.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Sol Ring",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "18b46232-481b-4868-884e-1c2d2d3f8f60",
+      "cmc": 1.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Swords to Plowshares",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "af4dbd03-8804-42d5-8672-546dcb1a77a2",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Arcane Signet",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "8a94a6e3-d4ae-461b-b4db-f5b42864342b",
+      "cmc": 2.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Artist's Talent",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Enchantment \u2014 Class"
+    },
+    {
+      "card_id": "472a0921-e401-4a72-8e25-68a0da983e51",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Boros Signet",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "e8db4764-31df-47b9-8ac7-2355a4717ad7",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Dawn's Truce",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "e052e629-239f-49d1-a68f-f678f18e93dc",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Fellwar Stone",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "b6c9d0b5-7919-49e7-9299-4aa59b3bdb6e",
+      "cmc": 2.0,
+      "functional_tag": "creature",
+      "is_commander": false,
+      "name": "Hexing Squelcher",
+      "quantity": 1,
+      "role": "creature",
+      "type_line": "Creature \u2014 Goblin Sorcerer"
+    },
+    {
+      "card_id": "788c4a89-aa69-457a-b673-047b95ef19e0",
+      "cmc": 2.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "High Noon",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Enchantment"
+    },
+    {
+      "card_id": "06f2fd25-4eb3-4f53-bc19-bd7b91c77dc0",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Lightning Greaves",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Artifact \u2014 Equipment"
+    },
+    {
+      "card_id": "fb5ddd4b-2e48-4ac9-bcc2-2bbcba154309",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Pearl Medallion",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "4463bb2f-eb7e-4021-b9a4-99f03a2ce969",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Ruby Medallion",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "166c82b2-f988-4073-9cf4-73a0bf4645a6",
+      "cmc": 2.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Scroll Rack",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "f6fa0d2d-65fa-4b42-976e-c4fdc8cf9e27",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Swiftfoot Boots",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Artifact \u2014 Equipment"
+    },
+    {
+      "card_id": "6a6b4572-5c96-4405-a480-45344904b697",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Talisman of Conviction",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "952222c4-374d-42ed-b654-db4cc8751339",
+      "cmc": 2.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "The Mind Stone",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Legendary Artifact \u2014 Infinity Stone"
+    },
+    {
+      "card_id": "60a6f6b9-9464-438b-b828-1b2e0a14e622",
+      "cmc": 2.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Tibalt's Trickery",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "bcfea72c-fd1f-4936-bb90-9e3bf6933a0b",
+      "cmc": 2.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Winds of Abandon",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "f6ae4d32-cbfa-479a-bb62-cf94321b5a93",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Bender's Waterskin",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "ae0d54e1-1471-4bb7-8b8d-09ef5b51b2ed",
+      "cmc": 3.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Deflecting Swat",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "1c3861d1-4ce4-4f06-9a99-f36af23de7b0",
+      "cmc": 3.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Flawless Maneuver",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "c889018b-975b-4bdb-a27d-52b62b09bd9d",
+      "cmc": 3.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Generous Gift",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "47b80e59-a15c-492b-8250-bcc701aa3d24",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Jeska's Will",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "def07ca3-388d-4acf-b4ff-7a8bd593ca81",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Monument to Endurance",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "0683f722-a930-41fb-9e56-a670659ef353",
+      "cmc": 3.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Stroke of Midnight",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "d5252134-bdff-49d1-8b2b-e409018d1d2f",
+      "cmc": 3.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Teferi's Protection",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "7a8b7999-d3ed-4cea-a33b-02d0e322fb91",
+      "cmc": 3.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Tempt with Bunnies",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "40994661-32d0-4450-b09f-e908e329a3c3",
+      "cmc": 3.0,
+      "functional_tag": "creature",
+      "is_commander": false,
+      "name": "The Scarlet Witch",
+      "quantity": 1,
+      "role": "creature",
+      "type_line": "Legendary Creature \u2014 Mutant Warlock Hero"
+    },
+    {
+      "card_id": "82e491ce-b461-4e87-95fb-51f3048b4c1b",
+      "cmc": 3.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Victory Chimes",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Artifact"
+    },
+    {
+      "card_id": "833dba89-4616-4ffa-9b8d-763696fc129c",
+      "cmc": 4.0,
+      "functional_tag": "protection",
+      "is_commander": false,
+      "name": "Avatar's Wrath",
+      "quantity": 1,
+      "role": "protection",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "c22ef5e7-2a5f-405a-9cc9-57ac4e0a0311",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Big Score",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "c2b84ef2-328b-4090-a251-a8d173daee23",
+      "cmc": 4.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Mizzix's Mastery",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "61748999-886f-46ac-b100-5e79a39a972a",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Smothering Tithe",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Enchantment"
+    },
+    {
+      "card_id": "08112727-89cc-4af8-aff1-1435ffc40098",
+      "cmc": 4.0,
+      "functional_tag": "ramp",
+      "is_commander": false,
+      "name": "Unexpected Windfall",
+      "quantity": 1,
+      "role": "ramp",
+      "type_line": "Instant"
+    },
+    {
+      "card_id": "a16f9ee6-8e65-4ea7-96d6-0662bd702e13",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Creative Technique",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "deb226fb-7e8e-4bf5-9a8d-fe9865639456",
+      "cmc": 5.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Fated Clash",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "02b5e14b-83c9-43df-bbe2-f3d541d2567e",
+      "cmc": 5.0,
+      "functional_tag": "engine",
+      "is_commander": false,
+      "name": "Pinnacle Monk // Mystic Peak",
+      "quantity": 1,
+      "role": "engine",
+      "type_line": "Creature \u2014 Djinn Monk"
+    },
+    {
+      "card_id": "6a219f1a-0b0a-4628-9d60-b81f7dbcab5c",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Promise of Loyalty",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "b192e670-a234-470f-90ef-58d8bf2ebb73",
+      "cmc": 5.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Reforge the Soul",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "370ded3d-a5ca-4f4e-a1c6-89926e89b4a6",
+      "cmc": 5.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Starfall Invocation",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "ceddc419-1225-4090-ba30-b14999c5d04c",
+      "cmc": 5.0,
+      "functional_tag": "removal",
+      "is_commander": false,
+      "name": "Thor, God of Thunder",
+      "quantity": 1,
+      "role": "removal",
+      "type_line": "Legendary Creature \u2014 God Warrior Hero"
+    },
+    {
+      "card_id": "abe21b14-7c49-4629-bbf2-8fce03d66d94",
+      "cmc": 5.0,
+      "functional_tag": "unknown",
+      "is_commander": false,
+      "name": "Tragic Arrogance",
+      "quantity": 1,
+      "role": "unknown",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "8b82bb80-8de5-431c-9a8e-0d880331f9b4",
+      "cmc": 6.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Farewell",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "ee64d0dd-e3d8-4abc-b9d6-b19c505fbfa1",
+      "cmc": 6.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Molecule Man",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Legendary Creature \u2014 Human Villain"
+    },
+    {
+      "card_id": "198b55f7-d5f4-457a-9fb6-52ff4088fe30",
+      "cmc": 6.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Surge to Victory",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "3730958e-18ee-4dde-bd62-46a18b24bf11",
+      "cmc": 7.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Approach of the Second Sun",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "356b93e3-62db-44ec-9322-4e999eefc674",
+      "cmc": 7.0,
+      "functional_tag": "unknown",
+      "is_commander": false,
+      "name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "quantity": 1,
+      "role": "unknown",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "7caa46d2-7f38-4982-a638-a4692a164059",
+      "cmc": 7.0,
+      "functional_tag": "draw",
+      "is_commander": false,
+      "name": "Hit the Mother Lode",
+      "quantity": 1,
+      "role": "draw",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "820290f5-3faf-4492-a794-5e8d6cfb772a",
+      "cmc": 8.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Call Forth the Tempest",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "c354303a-0554-49d4-91da-4b293400a0c9",
+      "cmc": 8.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Insurrection",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "5774e590-3524-463e-bb0d-88612707cc6f",
+      "cmc": 9.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Blasphemous Act",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "8743ed37-99f0-4ade-a408-bcec4f372373",
+      "cmc": 10.0,
+      "functional_tag": "board_wipe",
+      "is_commander": false,
+      "name": "Everything Comes to Dust",
+      "quantity": 1,
+      "role": "board_wipe",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "31d655f2-1ed3-4bd2-b3b4-b776756b9408",
+      "cmc": 10.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Storm Herd",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "c31583f4-ed96-466b-9716-51d1090a1263",
+      "cmc": 12.0,
+      "functional_tag": "wincon",
+      "is_commander": false,
+      "name": "Rise of the Eldrazi",
+      "quantity": 1,
+      "role": "wincon",
+      "type_line": "Sorcery"
+    },
+    {
+      "card_id": "623d4733-796e-4f99-a5dd-1ccc2e4e71cd",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Ancient Tomb",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "2d7a5fab-cd2b-436b-8944-b8e364dfbd16",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Arid Mesa",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "5eff86ec-75d9-492f-9438-ffd08480184c",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Battlefield Forge",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "15384bd2-e1b0-49f3-975a-9b0c87a7639c",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Bloodstained Mire",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "a5054e28-ada0-4ba5-bc0a-84818d2ace70",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Command Beacon",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "a247f253-15dc-43be-9085-9f88674e8cca",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Command Tower",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "428a8332-c861-4e65-9036-55863f05a2d1",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Eiganjo, Seat of the Empire",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Legendary Land"
+    },
+    {
+      "card_id": "e87384c6-104c-41bd-8077-afdfcf733172",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Elegant Parlor",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "card_id": "f9fecf31-2518-4620-97bd-1e0abcc4785e",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Exotic Orchard",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "7fe642fa-a4b1-4ec5-b137-c75805ee5ce9",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Flooded Strand",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "368ae44c-d32e-467f-a7de-d4f40a913c86",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Glittering Massif",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "card_id": "3662fe5d-ca1e-41be-8273-f4e9e3bb1baa",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Marsh Flats",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "73d87611-651a-4318-a0ae-5e83446dd762",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Mountain // Mountain",
+      "quantity": 4,
+      "role": "land",
+      "type_line": "Basic Land \u2014 Mountain"
+    },
+    {
+      "card_id": "a08016ec-4371-41b8-9e0f-5b3a086b9169",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Plains // Plains",
+      "quantity": 4,
+      "role": "land",
+      "type_line": "Basic Land \u2014 Plains"
+    },
+    {
+      "card_id": "251c43bc-e739-4f34-97c2-fb18baf47d4f",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Plaza of Heroes",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "b39d08e7-6400-4d08-8962-1f2a12dbaeab",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Prismatic Vista",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "bc7944ca-7334-40e3-a903-c4b349a1bd6d",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Radiant Summit",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "card_id": "a239b583-5f72-40a2-80af-e250e2858449",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Reliquary Tower",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "e6b3c4f5-e738-42fc-8914-f82df13a39b5",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Sacred Foundry",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "card_id": "820a2796-f976-41ee-90c1-37a01a8a2a14",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Scalding Tarn",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "a01557bf-b19b-4387-a1e3-d0718078dcf7",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Spectator Seating",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "4acbecf1-fa0e-4d2f-9d87-5d91b1fd8ef5",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Sunbaked Canyon",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "6d56c87e-197f-48e9-a882-280bbbc705e6",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Sunbillow Verge",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "58f4646c-d24e-401e-bb20-6463c4e3016d",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Turbulent Steppe",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land \u2014 Mountain Plains"
+    },
+    {
+      "card_id": "55761b91-117b-4861-ba85-5ac377ab09df",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Urza's Saga",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Enchantment Land \u2014 Urza's Saga"
+    },
+    {
+      "card_id": "9d65f34d-bc5e-4979-8f58-2b52f7496d6c",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "War Room",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "de94a98f-78cf-489c-8188-386257df185b",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Windswept Heath",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    },
+    {
+      "card_id": "e5e06009-5dc4-4224-b6bd-a9dd87b6d708",
+      "cmc": 0.0,
+      "functional_tag": "land",
+      "is_commander": false,
+      "name": "Wooded Foothills",
+      "quantity": 1,
+      "role": "land",
+      "type_line": "Land"
+    }
+  ],
+  "champion_decision": {
+    "decision": "keep_607_as_current_champion",
+    "reason": "Trace-targeted hypotheses exist, but no micro-package has both named adds and a seed-safe cut.",
+    "replacement_allowed_only_when": [
+      "package names exact add cards and cut cards",
+      "cut is seed-safe under the current cut model",
+      "natural gate ties or beats protected 607 on the same opponent and seed window",
+      "miracle/topdeck/spell-volume and pressure-window targets do not regress",
+      "added cards are drawn, cast, resolved, activated, or otherwise used enough to prove impact"
+    ]
+  },
+  "deck_id": 607,
+  "generated_at": "2026-07-04T19:50:19Z",
+  "hash_summary": {
+    "deck_hashes": [
+      "a9234fbf61d175e03a731bdb234a0187d7845a58242cd7eebd85003c7f88c306"
+    ],
+    "ruleset_hashes": [
+      "3439bc8d84dcb9c8973a39c4a1aba4e7d9d403f2c64ed197008eb2d11031f6e8"
+    ],
+    "semantics_hashes": [
+      "3ea141db816abab69c59e0c4f209aabc89fb23d719c99d497709fadc84bd5260"
+    ]
+  },
+  "micro_package_model_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_targeted_micro_package_model_20260630_goal_learning.json",
+  "missing_protected_anchors": [],
+  "planner_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_next_action_planner_20260630_goal_learning_micro_package_model.json",
+  "postgres_writes": false,
+  "protected_anchors": [
+    "Lorehold, the Historian",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Approach of the Second Sun",
+    "Victory Chimes",
+    "Mizzix's Mastery",
+    "Bender's Waterskin",
+    "Jeska's Will",
+    "Library of Leng"
+  ],
+  "source_db_mutated": false,
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "status": "current_champion_snapshot",
+  "summary": {
+    "commander_count": 1,
+    "deck_id": 607,
+    "deck_row_count": 94,
+    "land_count": 34,
+    "micro_package_ready_count": 0,
+    "missing_protected_anchor_count": 0,
+    "planner_recommended_next_action": "",
+    "protected_anchor_count": 9,
+    "role_counts": {
+      "board_wipe": 6,
+      "commander": 1,
+      "creature": 2,
+      "draw": 12,
+      "engine": 2,
+      "land": 34,
+      "protection": 9,
+      "ramp": 15,
+      "removal": 7,
+      "tutor": 1,
+      "unknown": 2,
+      "wincon": 9
+    },
+    "seed_safe_cut_ready_count": 0,
+    "total_cards": 100,
+    "validation_error_count": 0
+  },
+  "validation_errors": []
+}

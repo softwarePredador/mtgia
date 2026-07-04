@@ -1,0 +1,6147 @@
+{
+  "all_cut_slots": [
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "same_lane_hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_safety_decision": "manual_review",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "recommended_action": "do_not_use_until_concrete_same_lane_add_and_new_evidence",
+      "score": 42,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58,
+      "unknown_blockers": [
+        "same_lane_only_requires_concrete_same_lane_add"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "same_lane_hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Bender's Waterskin",
+      "cut_safety_decision": "flex_but_cut_risky",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "recommended_action": "do_not_use_until_concrete_same_lane_add_and_new_evidence",
+      "score": 0,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268,
+      "unknown_blockers": [
+        "same_lane_only_requires_concrete_same_lane_add"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Generous Gift",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 48,
+      "status": "blocked",
+      "unique_exposure_count": 52,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Improvisation Capstone",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Esper Sentinel",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 527,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Path to Exile",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 166,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Swords to Plowshares",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 271,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Stroke of Midnight",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 57,
+      "status": "blocked",
+      "unique_exposure_count": 43,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Winds of Abandon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Monument to Endurance",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3816,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Smothering Tithe",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 859,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Hexing Squelcher",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "contextual",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Elegant Parlor",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Spectator Seating",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Windswept Heath",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Arid Mesa",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "War Room",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Exotic Orchard",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Prismatic Vista",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Battlefield Forge",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 95,
+      "status": "blocked",
+      "unique_exposure_count": 15,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Flawless Maneuver",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 94,
+      "status": "blocked",
+      "unique_exposure_count": 16,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plaza of Heroes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Beacon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Flooded Strand",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Teferi's Protection",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 86,
+      "status": "blocked",
+      "unique_exposure_count": 24,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Marsh Flats",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 71,
+      "status": "blocked",
+      "unique_exposure_count": 29,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbaked Canyon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 70,
+      "status": "blocked",
+      "unique_exposure_count": 30,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Bloodstained Mire",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Tempt with Bunnies",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbillow Verge",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 68,
+      "status": "blocked",
+      "unique_exposure_count": 32,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 66,
+      "status": "blocked",
+      "unique_exposure_count": 34,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Scalding Tarn",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 62,
+      "status": "blocked",
+      "unique_exposure_count": 38,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Ancient Tomb",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 61,
+      "status": "blocked",
+      "unique_exposure_count": 39,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Wooded Foothills",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sacred Foundry",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 54,
+      "status": "blocked",
+      "unique_exposure_count": 46,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 40,
+      "status": "blocked",
+      "unique_exposure_count": 60,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "High Noon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 34,
+      "status": "blocked",
+      "unique_exposure_count": 66,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Giver of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 28,
+      "status": "blocked",
+      "unique_exposure_count": 72,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Swiftfoot Boots",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Glittering Massif",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 25,
+      "status": "blocked",
+      "unique_exposure_count": 75,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Lightning Greaves",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 15,
+      "status": "blocked",
+      "unique_exposure_count": 85,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Tower",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 4,
+      "status": "blocked",
+      "unique_exposure_count": 96,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 3,
+      "status": "blocked",
+      "unique_exposure_count": 97,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Artist's Talent",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 535,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Land Tax",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3449,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Library of Leng",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 855,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature"
+      ],
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Thor, God of Thunder",
+      "cut_safety_decision": "modeled_not_deck_proven",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "graveyard_recursion",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 152,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Jeska's Will",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Boros Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Talisman of Conviction",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 31,
+      "status": "blocked",
+      "unique_exposure_count": 69,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Fellwar Stone",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "card_name": "Sol Ring",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 226,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Radiant Summit",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 103,
+      "status": "blocked",
+      "unique_exposure_count": 7,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Turbulent Steppe",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Unexpected Windfall",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 67,
+      "status": "blocked",
+      "unique_exposure_count": 33,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Mother of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 11,
+      "status": "blocked",
+      "unique_exposure_count": 89,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Approach of the Second Sun",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 140,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Deflecting Swat",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 126,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Farewell",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 231,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Furygale Flocking",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 160,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "commander_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "commander_never_cut",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Lorehold, the Historian",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "commander",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 5768,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Molecule Man",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 102,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Mountain // Mountain",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 402,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plains // Plains",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 244,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Scroll Rack",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2957,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Starfall Invocation",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 396,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Surge to Victory",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 275,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "The Mind Stone",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2312,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Urza's Saga",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2656,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Dawn's Truce",
+      "cut_safety_decision": "core_engine_or_probation",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "hand_filter",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "cut_safety_decision": "finisher_benchmark_lane",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "big_spell_value",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 75,
+      "status": "blocked",
+      "unique_exposure_count": 25,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Arcane Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 195,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Redirect Lightning",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Tibalt's Trickery",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Reforge the Soul",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Reliquary Tower",
+      "cut_safety_decision": "mana_base_core",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Big Score",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 60,
+      "status": "blocked",
+      "unique_exposure_count": 40,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Prismari Pianist",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Blasphemous Act",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 368,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Pearl Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 184,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Ruby Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 219,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "The Scarlet Witch",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 362,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut"
+      ],
+      "card_name": "Tragic Arrogance",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 20,
+      "status": "blocked",
+      "unique_exposure_count": 80,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Victory Chimes",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 283,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Promise of Loyalty",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 47,
+      "status": "blocked",
+      "unique_exposure_count": 53,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protection_shell"
+      ],
+      "card_name": "Avatar's Wrath",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 118,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Fated Clash",
+      "cut_safety_decision": "core_support",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 267,
+      "unknown_blockers": []
+    }
+  ],
+  "artifact_type": "trace_cut_evidence_expansion_queue",
+  "current_champion_snapshot": "docs/hermes-analysis/master_optimizer_reports/lorehold_current_champion_snapshot_20260704_learning_refresh.json",
+  "generated_at": "2026-07-04T21:25:37Z",
+  "hard_blocked_queue": [
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Generous Gift",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 48,
+      "status": "blocked",
+      "unique_exposure_count": 52,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Improvisation Capstone",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Esper Sentinel",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 527,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Path to Exile",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 166,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Swords to Plowshares",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 271,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Stroke of Midnight",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 57,
+      "status": "blocked",
+      "unique_exposure_count": 43,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Winds of Abandon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 41,
+      "status": "blocked",
+      "unique_exposure_count": 59,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Monument to Endurance",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut"
+      ],
+      "card_name": "Sensei's Divining Top",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3816,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row"
+      ],
+      "card_name": "Smothering Tithe",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "measured_high_cut_exposure",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 859,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Hexing Squelcher",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "contextual",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Call Forth the Tempest",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Elegant Parlor",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Spectator Seating",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Windswept Heath",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Arid Mesa",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "War Room",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 97,
+      "status": "blocked",
+      "unique_exposure_count": 13,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Exotic Orchard",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Prismatic Vista",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 96,
+      "status": "blocked",
+      "unique_exposure_count": 14,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Battlefield Forge",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 95,
+      "status": "blocked",
+      "unique_exposure_count": 15,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Flawless Maneuver",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 94,
+      "status": "blocked",
+      "unique_exposure_count": 16,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plaza of Heroes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Beacon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Flooded Strand",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 92,
+      "status": "blocked",
+      "unique_exposure_count": 18,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Teferi's Protection",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 86,
+      "status": "blocked",
+      "unique_exposure_count": 24,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Marsh Flats",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 71,
+      "status": "blocked",
+      "unique_exposure_count": 29,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbaked Canyon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 70,
+      "status": "blocked",
+      "unique_exposure_count": 30,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Bloodstained Mire",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Tempt with Bunnies",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sunbillow Verge",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 68,
+      "status": "blocked",
+      "unique_exposure_count": 32,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Everything Comes to Dust",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 66,
+      "status": "blocked",
+      "unique_exposure_count": 34,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Scalding Tarn",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 62,
+      "status": "blocked",
+      "unique_exposure_count": 38,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Ancient Tomb",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 61,
+      "status": "blocked",
+      "unique_exposure_count": 39,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Wooded Foothills",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Sacred Foundry",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 54,
+      "status": "blocked",
+      "unique_exposure_count": 46,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Rise of the Eldrazi",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 40,
+      "status": "blocked",
+      "unique_exposure_count": 60,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "High Noon",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 34,
+      "status": "blocked",
+      "unique_exposure_count": 66,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Giver of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 28,
+      "status": "blocked",
+      "unique_exposure_count": 72,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Swiftfoot Boots",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 27,
+      "status": "blocked",
+      "unique_exposure_count": 73,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Glittering Massif",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 25,
+      "status": "blocked",
+      "unique_exposure_count": 75,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Lightning Greaves",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 15,
+      "status": "blocked",
+      "unique_exposure_count": 85,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Command Tower",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 7,
+      "status": "blocked",
+      "unique_exposure_count": 93,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Eiganjo, Seat of the Empire",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 4,
+      "status": "blocked",
+      "unique_exposure_count": 96,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Mizzix's Mastery",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 3,
+      "status": "blocked",
+      "unique_exposure_count": 97,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Artist's Talent",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 535,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Land Tax",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 3449,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Library of Leng",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 855,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature"
+      ],
+      "card_name": "Pinnacle Monk // Mystic Peak",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Thor, God of Thunder",
+      "cut_safety_decision": "modeled_not_deck_proven",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "graveyard_recursion",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 152,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Jeska's Will",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 56,
+      "status": "blocked",
+      "unique_exposure_count": 44,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Boros Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Talisman of Conviction",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 31,
+      "status": "blocked",
+      "unique_exposure_count": 69,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Fellwar Stone",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "card_name": "Sol Ring",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 226,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Insurrection",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Radiant Summit",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 103,
+      "status": "blocked",
+      "unique_exposure_count": 7,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut"
+      ],
+      "card_name": "Turbulent Steppe",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 102,
+      "status": "blocked",
+      "unique_exposure_count": 8,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Unexpected Windfall",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 67,
+      "status": "blocked",
+      "unique_exposure_count": 33,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Mother of Runes",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 11,
+      "status": "blocked",
+      "unique_exposure_count": 89,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Approach of the Second Sun",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 140,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protection_shell",
+        "structural_dependency"
+      ],
+      "card_name": "Deflecting Swat",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 126,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Farewell",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 231,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Furygale Flocking",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 160,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "commander_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "commander_never_cut",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Lorehold, the Historian",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "commander",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 5768,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Molecule Man",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 102,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Mountain // Mountain",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 402,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Plains // Plains",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 244,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "protected_cut",
+        "structural_dependency"
+      ],
+      "card_name": "Scroll Rack",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2957,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Starfall Invocation",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 396,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Surge to Victory",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 275,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "The Mind Stone",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2312,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "measured_high_cut_exposure",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "never_cut_lane",
+        "never_cut_or_mana_base"
+      ],
+      "card_name": "Urza's Saga",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 2656,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Dawn's Truce",
+      "cut_safety_decision": "core_engine_or_probation",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "hand_filter",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Storm Herd",
+      "cut_safety_decision": "finisher_benchmark_lane",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "big_spell_value",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 75,
+      "status": "blocked",
+      "unique_exposure_count": 25,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Arcane Signet",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "core_support",
+      "evidence_gap_blockers": [
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 195,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Redirect Lightning",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 101,
+      "status": "blocked",
+      "unique_exposure_count": 9,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Hit the Mother Lode",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 99,
+      "status": "blocked",
+      "unique_exposure_count": 11,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_protection_shell",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Tibalt's Trickery",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 93,
+      "status": "blocked",
+      "unique_exposure_count": 17,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Reforge the Soul",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "draw",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 87,
+      "status": "blocked",
+      "unique_exposure_count": 23,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "mana_base_never_cut",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "mana_base_never_cut",
+        "manual_status_not_seed_safe",
+        "never_cut_lane",
+        "never_cut_or_mana_base",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Reliquary Tower",
+      "cut_safety_decision": "mana_base_core",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "mana_base",
+      "manual_status": "never_cut",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 69,
+      "status": "blocked",
+      "unique_exposure_count": 31,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "early_mana_floor_support",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot"
+      ],
+      "card_name": "Big Score",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 60,
+      "status": "blocked",
+      "unique_exposure_count": 40,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "Prismari Pianist",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "wincon",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 35,
+      "status": "blocked",
+      "unique_exposure_count": 65,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "structural_dependency"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "structural_dependency"
+      ],
+      "card_name": "Blasphemous Act",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "spell_velocity",
+      "manual_status": "structural_dependency",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 368,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Pearl Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 184,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Ruby Medallion",
+      "cut_safety_decision": "support_flex",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 219,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "card_name": "The Scarlet Witch",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "misc",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 362,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut"
+      ],
+      "card_name": "Tragic Arrogance",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "removal",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 20,
+      "status": "blocked",
+      "unique_exposure_count": 80,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "card_name": "Victory Chimes",
+      "cut_safety_decision": "flex_cut_tested_negative",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 283,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "card_name": "Emeria's Call // Emeria, Shattered Skyclave",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 14,
+      "status": "blocked",
+      "unique_exposure_count": 86,
+      "unknown_blockers": []
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Promise of Loyalty",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 47,
+      "status": "blocked",
+      "unique_exposure_count": 53,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "missing_cut_safety_row",
+        "prior_rejected_cut",
+        "prior_rejected_cut_slot",
+        "prior_rejected_signature",
+        "protection_shell"
+      ],
+      "card_name": "Avatar's Wrath",
+      "cut_safety_decision": "",
+      "cut_safety_status": "",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "manual_status_not_seed_safe",
+        "missing_cut_safety_row"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_prior_rejection",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 118,
+      "unknown_blockers": [
+        "prior_rejected_signature"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "actionability": "hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_is_protection_shell",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "protection_shell"
+      ],
+      "card_name": "Fated Clash",
+      "cut_safety_decision": "core_support",
+      "cut_safety_status": "locked_do_not_cut",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_review_cut_safety_block",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "protection",
+      "manual_status": "blocked_by_cut_safety",
+      "recommended_action": "do_not_use_as_cut_under_current_contract",
+      "score": 0,
+      "status": "blocked",
+      "unique_exposure_count": 267,
+      "unknown_blockers": []
+    }
+  ],
+  "method_notes": [
+    "This report does not make blocked cuts safe.",
+    "A reviewable evidence gap must be reclassified by cut-safety evidence before any package gate.",
+    "If reviewable_evidence_gap_count is zero, the current 607 one-for-one cut contract is exhausted.",
+    "PostgreSQL and SQLite are not mutated by this script."
+  ],
+  "micro_package_model_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_trace_targeted_micro_package_model_20260704_role_tag_repair.json",
+  "postgres_writes": false,
+  "reviewable_evidence_gap_queue": [],
+  "same_lane_hard_blocked_queue": [
+    {
+      "absolute_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "same_lane_hard_blocked",
+      "all_blockers": [
+        "cut_is_miracle_core_big_spell",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe",
+        "miracle_or_finisher_core",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Creative Technique",
+      "cut_safety_decision": "manual_review",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "evidence_gap_blockers": [
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "big_spell_value",
+      "manual_status": "same_lane_only",
+      "recommended_action": "do_not_use_until_concrete_same_lane_add_and_new_evidence",
+      "score": 42,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 58,
+      "unknown_blockers": [
+        "same_lane_only_requires_concrete_same_lane_add"
+      ]
+    },
+    {
+      "absolute_blockers": [
+        "cut_is_early_mana_floor_support",
+        "early_mana_floor_support",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut"
+      ],
+      "actionability": "same_lane_hard_blocked",
+      "all_blockers": [
+        "cut_is_early_mana_floor_support",
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "early_mana_floor_support",
+        "manual_status_not_seed_safe",
+        "measured_high_cut_exposure",
+        "prior_rejected_cut",
+        "protected_cut",
+        "same_lane_only_requires_concrete_same_lane_add"
+      ],
+      "card_name": "Bender's Waterskin",
+      "cut_safety_decision": "flex_but_cut_risky",
+      "cut_safety_status": "risky_cut_only_same_lane",
+      "evidence_gap_blockers": [
+        "cut_not_flex_decision",
+        "cut_safety_not_seed_safe",
+        "manual_status_not_seed_safe"
+      ],
+      "lane": "early_mana",
+      "manual_status": "same_lane_only",
+      "recommended_action": "do_not_use_until_concrete_same_lane_add_and_new_evidence",
+      "score": 0,
+      "status": "same_lane_only_not_seed_safe",
+      "unique_exposure_count": 268,
+      "unknown_blockers": [
+        "same_lane_only_requires_concrete_same_lane_add"
+      ]
+    }
+  ],
+  "seed_safe_cut_queue": [],
+  "seed_safe_cut_report": "docs/hermes-analysis/master_optimizer_reports/lorehold_seed_safe_cut_hypothesis_20260704_role_tag_repair.json",
+  "source_db_mutated": false,
+  "summary": {
+    "actionability_counts": {
+      "hard_blocked": 92,
+      "same_lane_hard_blocked": 2
+    },
+    "blocker_counts": {
+      "commander_never_cut": 1,
+      "cut_is_early_mana_floor_support": 14,
+      "cut_is_miracle_core_big_spell": 25,
+      "cut_is_protection_shell": 14,
+      "cut_not_flex_decision": 84,
+      "cut_safety_not_seed_safe": 11,
+      "early_mana_floor_support": 18,
+      "mana_base_never_cut": 28,
+      "manual_review_cut_safety_block": 8,
+      "manual_status_not_seed_safe": 94,
+      "measured_high_cut_exposure": 34,
+      "miracle_or_finisher_core": 24,
+      "missing_cut_safety_row": 77,
+      "never_cut_lane": 29,
+      "never_cut_or_mana_base": 29,
+      "prior_rejected_cut": 37,
+      "prior_rejected_cut_slot": 24,
+      "prior_rejected_signature": 4,
+      "protected_cut": 22,
+      "protection_shell": 14,
+      "same_lane_only_requires_concrete_same_lane_add": 2,
+      "structural_dependency": 24
+    },
+    "champion_status": "current_champion_snapshot",
+    "cut_slot_count": 94,
+    "hard_blocked_count": 92,
+    "lane_counts": {
+      "big_spell_value": 2,
+      "commander": 1,
+      "contextual": 1,
+      "draw": 6,
+      "early_mana": 18,
+      "graveyard_recursion": 1,
+      "hand_filter": 1,
+      "mana_base": 28,
+      "misc": 2,
+      "protection": 13,
+      "removal": 10,
+      "spell_velocity": 5,
+      "wincon": 6
+    },
+    "micro_package_ready_count": 0,
+    "recommended_next_action": "no_cut_slot_to_expand_under_current_607_contract",
+    "reviewable_evidence_gap_count": 0,
+    "same_lane_hard_blocked_count": 2,
+    "seed_safe_ready_count": 0,
+    "top_near_miss_cut_cards": [
+      "Creative Technique",
+      "Bender's Waterskin",
+      "Generous Gift",
+      "Improvisation Capstone",
+      "Esper Sentinel",
+      "Path to Exile",
+      "Swords to Plowshares",
+      "Stroke of Midnight",
+      "Winds of Abandon",
+      "Monument to Endurance",
+      "Sensei's Divining Top",
+      "Smothering Tithe"
+    ],
+    "top_reviewable_cut_cards": [],
+    "top_same_lane_cut_cards": [
+      "Creative Technique",
+      "Bender's Waterskin"
+    ]
+  }
+}
