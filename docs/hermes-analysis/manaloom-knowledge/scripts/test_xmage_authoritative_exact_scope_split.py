@@ -191,6 +191,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_be_blocked_oracle_not_exact")
 
+    def test_static_cant_block_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            split.CANT_BLOCK_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CantBlockAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Goblin Raider",
+                type_line="Creature - Goblin Warrior",
+                oracle_text="This creature can't block.",
+            ),
+            source_text="""
+                import mage.abilities.keyword.CantBlockAbility;
+                this.addAbility(new CantBlockAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_CANT_BLOCK_CREATURE_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["cant_block"])
+        self.assertTrue(effect["cannot_block"])
+        self.assertTrue(effect["static_cant_block"])
+        self.assertEqual(effect["static_effect"], "self_cant_block")
+
+    def test_static_cant_block_creature_blocks_nonexact_source(self) -> None:
+        row = queue_row(
+            split.CANT_BLOCK_SOURCE_UNIT,
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["CantBlockAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Recursive Fixture",
+                type_line="Creature - Construct",
+                oracle_text="This creature can't block.",
+            ),
+            source_text="""
+                this.addAbility(new CantBlockAbility());
+                this.addAbility(new SimpleActivatedAbility(new ReturnSourceFromGraveyardToBattlefieldEffect()));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_cant_block_source_not_exact")
+
     def test_static_filtered_evasion_creature_maps_color_filter(self) -> None:
         row = queue_row(
             split.FILTERED_EVASION_UNIT,

@@ -197,6 +197,7 @@ STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
 )
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
+STATIC_CANT_BLOCK_CREATURE_SCOPE = "xmage_static_self_cant_block_creature_v1"
 STATIC_LANDWALK_CREATURE_SCOPE = "xmage_static_self_basic_landwalk_creature_v1"
 STATIC_FILTERED_EVASION_CREATURE_SCOPE = "xmage_static_filtered_evasion_creature_v1"
 STATIC_FLYING_CAN_BLOCK_ONLY_FLYING_CREATURE_SCOPE = (
@@ -477,6 +478,10 @@ FLASH_PERMISSION_FILTERS = {
 }
 CANT_BE_BLOCKED_SOURCE_UNIT = (
     "xmage_signature::no_effect_class::CantBeBlockedSourceAbility::"
+    "no_target_class::no_condition_class::no_signal"
+)
+CANT_BLOCK_SOURCE_UNIT = (
+    "xmage_signature::no_effect_class::CantBlockAbility::"
     "no_target_class::no_condition_class::no_signal"
 )
 FILTERED_EVASION_UNIT = (
@@ -4593,6 +4598,15 @@ def is_static_cant_be_blocked_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_static_cant_block_creature_unit(row: dict[str, Any]) -> bool:
+    return (
+        str(row.get("adapter_work_unit") or "") == CANT_BLOCK_SOURCE_UNIT
+        and not effect_classes(row)
+        and ability_classes(row) == {"CantBlockAbility"}
+        and not (row.get("xmage_signals") or [])
+    )
+
+
 def is_static_filtered_evasion_creature_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == FILTERED_EVASION_UNIT
@@ -5452,6 +5466,31 @@ def source_is_static_cant_be_blocked(source: str) -> bool:
         "CantBeBlockedSourceAbility" in text
         and "CantBeBlockedByCreaturesSourceEffect" not in text
         and "SimpleEvasionAbility" not in text
+    )
+
+
+def oracle_is_static_cant_block(metadata: dict[str, Any]) -> bool:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    if not text:
+        return False
+    text_without_period = text[:-1] if text.endswith(".") else text
+    source_name = re.sub(r"\s+", " ", str(metadata.get("name") or "").strip().lower())
+    if source_name and text_without_period == f"{source_name} can't block":
+        return True
+    return text_without_period in {
+        "can't block",
+        "this creature can't block",
+        "this card can't block",
+    }
+
+
+def source_is_static_cant_block(source: str) -> bool:
+    text = source or ""
+    return (
+        "CantBlockAbility" in text
+        and "SimpleActivatedAbility" not in text
+        and "ReturnSourceFromGraveyard" not in text
     )
 
 
@@ -11049,6 +11088,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "static cast-as-though-flash timing permission permanent"
     elif scope == STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE:
         scope_kind = "creature static self can't-be-blocked evasion"
+    elif scope == STATIC_CANT_BLOCK_CREATURE_SCOPE:
+        scope_kind = "creature static self can't-block restriction"
     elif scope == STATIC_LANDWALK_CREATURE_SCOPE:
         scope_kind = "creature static self basic landwalk evasion"
     elif scope == STATIC_FILTERED_EVASION_CREATURE_SCOPE:
@@ -11173,6 +11214,7 @@ def split_row(
     )
     static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
     static_cant_be_blocked_creature_unit = is_static_cant_be_blocked_creature_unit(row)
+    static_cant_block_creature_unit = is_static_cant_block_creature_unit(row)
     static_basic_landwalk_creature_unit = is_static_basic_landwalk_creature_unit(row)
     static_filtered_evasion_creature_unit = is_static_filtered_evasion_creature_unit(row)
     static_flying_can_block_only_flying_creature_unit = (
@@ -11256,6 +11298,7 @@ def split_row(
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
+        and not static_cant_block_creature_unit
         and not static_basic_landwalk_creature_unit
         and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
@@ -11317,6 +11360,7 @@ def split_row(
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
+        and not static_cant_block_creature_unit
         and not static_basic_landwalk_creature_unit
         and not static_filtered_evasion_creature_unit
         and not static_flying_can_block_only_flying_creature_unit
@@ -11466,6 +11510,32 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_cant_be_blocked_creature",
+        ), "selected_exact_scope"
+
+    if static_cant_block_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "static_cant_block_not_creature"
+        if not oracle_is_static_cant_block(metadata):
+            return None, "static_cant_block_oracle_not_exact"
+        if not source_is_static_cant_block(source_text):
+            return None, "static_cant_block_source_not_exact"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_CANT_BLOCK_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_cant_block",
+            "target": "self",
+            "target_controller": "self",
+            "cant_block": True,
+            "cannot_block": True,
+            "static_cant_block": True,
+            "xmage_ability_class": "CantBlockAbility",
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_cant_block_creature",
         ), "selected_exact_scope"
 
     if static_filtered_evasion_creature_unit:
@@ -16913,6 +16983,7 @@ def build_exact_split_report(
             and not is_static_protection_from_colors_creature_unit(row)
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
+            and not is_static_cant_block_creature_unit(row)
             and not is_static_basic_landwalk_creature_unit(row)
             and not is_static_filtered_evasion_creature_unit(row)
             and not is_static_flying_can_block_only_flying_creature_unit(row)

@@ -271,6 +271,43 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(assignments, [(attacker, [blocker])])
         self.assertTrue(blocker.get("blocking"))
 
+    def test_static_cant_block_creature_is_excluded_from_blockers(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        defender.life = 2
+        attacker = {
+            "name": "Attacking Bear",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        cant_blocker = {
+            "name": "Goblin Raider",
+            "type_line": "Creature - Goblin Warrior",
+            "power": 2,
+            "toughness": 2,
+            "cant_block": True,
+            "static_cant_block": True,
+            "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        }
+        legal_blocker = {
+            "name": "Grizzly Bears",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        defender.battlefield = [cant_blocker, legal_blocker]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [legal_blocker])])
+        self.assertNotIn("blocking", cant_blocker)
+        self.assertTrue(legal_blocker.get("blocking"))
+
     def test_static_filtered_evasion_rejects_matching_color_blocker(self) -> None:
         attacker = {
             "name": "Barrenton Cragtreads",

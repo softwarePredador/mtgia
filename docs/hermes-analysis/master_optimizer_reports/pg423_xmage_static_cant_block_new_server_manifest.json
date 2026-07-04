@@ -1,0 +1,783 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg423_xmage_static_cant_block_new_server_20260704_190640",
+  "deploy_id": "pg423",
+  "expected_rules": [
+    {
+      "card_name": "Ashenmoor Gouger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "ashenmoor gouger",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Craven Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "craven giant",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Craven Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "craven knight",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Raider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin raider",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Cyclops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking cyclops",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking goblin",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Ogre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking ogre",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Lion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "jungle lion",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre Taskmaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "ogre taskmaster",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scavenging Scarab",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "scavenging scarab",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spineless Thug",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "spineless thug",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yellow Scarves Troops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "yellow scarves troops",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Young Wei Recruits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "young wei recruits",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_cant_block_creature": 13
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg423_xmage_static_cant_block_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T19:06:40+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Ashenmoor Gouger"
+      },
+      "card_name": "Ashenmoor Gouger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "ashenmoor gouger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Craven Giant"
+      },
+      "card_name": "Craven Giant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "craven giant",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Craven Knight"
+      },
+      "card_name": "Craven Knight",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "craven knight",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Raider"
+      },
+      "card_name": "Goblin Raider",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "goblin raider",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Hulking Cyclops"
+      },
+      "card_name": "Hulking Cyclops",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "hulking cyclops",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Hulking Goblin"
+      },
+      "card_name": "Hulking Goblin",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "hulking goblin",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Hulking Ogre"
+      },
+      "card_name": "Hulking Ogre",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "hulking ogre",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Jungle Lion"
+      },
+      "card_name": "Jungle Lion",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "jungle lion",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Ogre Taskmaster"
+      },
+      "card_name": "Ogre Taskmaster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "ogre taskmaster",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Scavenging Scarab"
+      },
+      "card_name": "Scavenging Scarab",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "scavenging scarab",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Spineless Thug"
+      },
+      "card_name": "Spineless Thug",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "spineless thug",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Yellow Scarves Troops"
+      },
+      "card_name": "Yellow Scarves Troops",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "yellow scarves troops",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Young Wei Recruits"
+      },
+      "card_name": "Young Wei Recruits",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "normalized_name": "young wei recruits",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1",
+        "cannot_block": true,
+        "cant_block": true,
+        "effect": "creature",
+        "static_cant_block": true,
+        "static_effect": "self_cant_block",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "CantBlockAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Ashenmoor Gouger",
+    "Craven Giant",
+    "Craven Knight",
+    "Goblin Raider",
+    "Hulking Cyclops",
+    "Hulking Goblin",
+    "Hulking Ogre",
+    "Jungle Lion",
+    "Ogre Taskmaster",
+    "Scavenging Scarab",
+    "Spineless Thug",
+    "Yellow Scarves Troops",
+    "Young Wei Recruits"
+  ],
+  "selected_count": 13,
+  "slug": "xmage_static_cant_block_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Ashenmoor Gouger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "ashenmoor gouger",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Craven Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "craven giant",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Craven Knight",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "craven knight",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Raider",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin raider",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Cyclops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking cyclops",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Goblin",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking goblin",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hulking Ogre",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "hulking ogre",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jungle Lion",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "jungle lion",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Ogre Taskmaster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "ogre taskmaster",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Scavenging Scarab",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "scavenging scarab",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Spineless Thug",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "spineless thug",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Yellow Scarves Troops",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "yellow scarves troops",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Young Wei Recruits",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:6ee53f88921f55a8efb9dafc5a3b235b",
+      "min_rule_version": 2,
+      "normalized_name": "young wei recruits",
+      "oracle_hash": "8019586c29deff0d4a5543ee4d4f2726",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_cant_block_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

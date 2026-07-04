@@ -8530,6 +8530,42 @@ new server:
   exact split recheck produced `proposal_count=0`; the remaining `314`
   identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG423 Static Cant-Block Creature Closure
+
+- Closed the exact XMage no-effect/no-signal unit `CantBlockAbility` as
+  ManaLoom scope `xmage_static_self_cant_block_creature_v1`.
+- The mapper accepts only creature permanents with exact Oracle text
+  `This creature can't block.` and pure local XMage source containing
+  `new CantBlockAbility()` with no activated recursion or other companion
+  behavior. Composite cases remain blocked for their own scoped adapters.
+- Runtime behavior reuses the existing blocker surface:
+  `creatures_for_blocking()` excludes permanents where `creature_cannot_block`
+  is true, and focused tests now cover static cant-block mapper output plus
+  combat blocker exclusion.
+- The PostgreSQL package promoted `13` cards:
+  `Ashenmoor Gouger`, `Craven Giant`, `Craven Knight`, `Goblin Raider`,
+  `Hulking Cyclops`, `Hulking Goblin`, `Hulking Ogre`, `Jungle Lion`,
+  `Ogre Taskmaster`, `Scavenging Scarab`, `Spineless Thug`,
+  `Yellow Scarves Troops`, and `Young Wei Recruits`. Precheck found `13`
+  target rows, `0` existing rule rows, and `0` shadow rows; apply
+  inserted/updated `13`; postcheck verified `13/13` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `13` PG rules into SQLite. The canonical
+  fallback export increased to `5608` rows.
+- PG423 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `13` selected cards. Generic
+  battle scenario count remained `0`; combat blocker exclusion is covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26429` to `26416`, authoritative adapter-required count from `26115`
+  to `26102`, and the exact cant-block work unit to zero. The post-PG423 exact
+  split recheck produced `proposal_count=0`; the remaining `314` identities
+  are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
