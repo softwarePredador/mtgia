@@ -3128,6 +3128,30 @@
     "battle_rule_logical_key": "battle_rule_v1:96865d3297094468cd28c05e7369312e",
     "battle_rule_oracle_hash": "b7419854b72870c440a57ce3eed78317"
   },
+  "Angelic Curator": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b067ac2a5f8fe2f33fc1ea6586c92f68",
+    "battle_rule_oracle_hash": "c6da5f0c4b2d68f5ca57f71674898e63"
+  },
   "Angelic Edict": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
     "destination": "exile",
@@ -5756,6 +5780,30 @@
     "battle_rule_logical_key": "battle_rule_v1:441952312f2d6f7b3177d3ab66fe4240",
     "battle_rule_oracle_hash": "a4b4efd970d8d67cc9c13f1eaa34aaaf"
   },
+  "Azorius First-Wing": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from_card_types": [
+      "enchantment"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d1459b62eb8c5236cecc0803294e9c0a",
+    "battle_rule_oracle_hash": "0bed20a30ce1893bce2a5f3525a3586d"
+  },
   "Azorius Guildgate": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -7458,6 +7506,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b71629bffb38b34bffdfa811e6f631f0",
     "battle_rule_oracle_hash": "69e6798f55061e68bf84c06d15ec52aa"
+  },
+  "Beloved Chaplain": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "protection_from_card_types": [
+      "creature"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:219f2afb6ddef7cf8e3f05b9f56145b4",
+    "battle_rule_oracle_hash": "85465de2f7bb9355e2abee50bf175551"
   },
   "Benalish Heralds": {
     "ability_kind": "activated",
@@ -16003,6 +16070,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:62ec2df5de2fe17782f94df13896b536",
     "battle_rule_oracle_hash": "0b8938f4336c0cd09083c833785b944e"
+  },
+  "Commander Eesha": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from_card_types": [
+      "creature"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cb4ddef26b3af5c6fae84cbcc063bcbd",
+    "battle_rule_oracle_hash": "8c397f94332b7738a90dffa5e34c1766"
   },
   "Commander's Plate": {
     "battle_model_scope": "equipment_commander_plate_auto_attach_v1",
@@ -39316,6 +39407,30 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "405152fc32506cfb44e32746562af1e0"
   },
+  "Horizon Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "protection_from_card_types": [
+      "land"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8bad75f82fd0185f7d6515eae6a7ee75",
+    "battle_rule_oracle_hash": "483bc74a05388029147248b9fa3327e5"
+  },
   "Horizon of Progress": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -53076,6 +53191,25 @@
     "battle_rule_logical_key": "battle_rule_v1:8ba6c64cb704ad59909db0dff9e7ca1f",
     "battle_rule_oracle_hash": "978226458b33bce47981c36bbe3bd7b1"
   },
+  "Nacatl Savage": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+    "battle_rule_oracle_hash": "c326b8227109ed7986576e4fc2fd8738"
+  },
   "Naktamun Lorespinner // Wheel of Fortune": {
     "ability_kind": "prepare_spell",
     "battle_model_scope": "prepare_upkeep_any_player_one_or_fewer_hand_wheel_face_v1",
@@ -53718,6 +53852,30 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "e2c96921cf401d36b6b61b7afbecaf3d"
+  },
+  "Needlebug": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:813777fa7616859ba02a555d1232f605",
+    "battle_rule_oracle_hash": "e6aa03762d0c8998b46747f47b554641"
   },
   "Needlepeak Spider": {
     "_keywords_are_self": true,
@@ -82091,6 +82249,68 @@
     "battle_rule_logical_key": "battle_rule_v1:35ae547c02c12ce35e09945d4791f7ad",
     "battle_rule_oracle_hash": "7c2d3586e1633bcaf4f26d7b01a6c266"
   },
+  "Tel-Jilad Archers": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "keywords": [
+      "reach"
+    ],
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "reach": true,
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dc27d7f5f035d51b05a72775a1328276",
+    "battle_rule_oracle_hash": "12b0bc0b3cc904955ae10eba99c3c985"
+  },
+  "Tel-Jilad Chosen": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+    "battle_rule_oracle_hash": "c326b8227109ed7986576e4fc2fd8738"
+  },
+  "Tel-Jilad Outrider": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+    "battle_rule_oracle_hash": "c326b8227109ed7986576e4fc2fd8738"
+  },
   "Telim'Tor's Darts": {
     "_activated_rule_effects": [
       {
@@ -94506,6 +94726,25 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:d52aa5d893ee1876c825ea95a95b6333",
     "battle_rule_oracle_hash": "16b4d8fac0b34dbc4b9a65adee9aa171"
+  },
+  "Yavimaya Scion": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_protection_from_card_types_creature_v1",
+    "effect": "creature",
+    "protection_from_card_types": [
+      "artifact"
+    ],
+    "static_effect": "self_protection_from_card_types",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ProtectionAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:64d5ec144e33bf5008c6ec840889e03d",
+    "battle_rule_oracle_hash": "c326b8227109ed7986576e4fc2fd8738"
   },
   "Yavimaya Wurm": {
     "_keywords_are_self": true,

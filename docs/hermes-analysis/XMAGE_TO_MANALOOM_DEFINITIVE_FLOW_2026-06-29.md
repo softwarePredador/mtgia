@@ -9831,6 +9831,52 @@ new server:
   `xmage_fixed_damage_spell`, and `xmage_static_self_horsemanship_creature`
   with `10` cards each, and `xmage_fixed_draw_discard_spell` with `9` cards.
 
+## 2026-07-04 PG452 Static Protection Card Types Closure
+
+- Closed the exact XMage static self protection-from-card-type creature family
+  as ManaLoom scope
+  `xmage_static_self_protection_from_card_types_creature_v1`.
+- The selected package accepted local XMage creatures with exact static
+  `ProtectionAbility` source and Oracle/source agreement on protection from a
+  card type: artifact, enchantment, creature, or land.
+- The batch covers `11` cards: Angelic Curator, Azorius First-Wing, Beloved
+  Chaplain, Commander Eesha, Horizon Drake, Nacatl Savage, Needlebug,
+  Tel-Jilad Archers, Tel-Jilad Chosen, Tel-Jilad Outrider, and Yavimaya Scion.
+- Focused mapper/runtime tests covered exact card-type protection extraction
+  and target/combat legality for supported protection scopes; PG452 performed
+  no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `11` cards. Precheck found `11` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `11/11` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Direct PostgreSQL verification confirmed all `11` rows are
+  `verified`/`auto`/`curated`, have Oracle hashes, and preserve the exact
+  `protection_from_card_types` parameter for each card.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4373` PostgreSQL runtime rows, wrote `4365` SQLite runtime
+  rows, and exported `4340` canonical fallback rows.
+- PG452 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `11` selected cards. Generic
+  battle scenario count remained `0`; protection card-type behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26513`, `xmage_authoritative_source_count=26199`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26199`. This is an exact
+  reduction of `11` from the post-PG451 queue.
+- The post-PG452 exact split recheck reports `proposal_count=174` and
+  `safe_for_batch_pg_package_count=174`. The largest remaining exact families
+  are `xmage_creature_attack_target_keyword_until_eot`,
+  `xmage_fixed_damage_spell`, and `xmage_static_self_horsemanship_creature`
+  with `10` cards each, followed by `xmage_fixed_draw_discard_spell` and
+  `xmage_fixed_scry_draw_card_spell` with `9` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
