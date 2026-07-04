@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import random
 import sqlite3
 from contextlib import closing
@@ -1517,6 +1518,8 @@ def main() -> int:
     sqlite_db = Path(args.sqlite_db)
     snapshot = Path(args.snapshot)
     battle_path = Path(args.battle_path)
+    os.environ["MANALOOM_KNOWLEDGE_DB"] = str(sqlite_db.resolve())
+    os.environ["MANALOOM_CANONICAL_KNOWN_CARDS_JSON"] = str(snapshot.resolve())
     battle = load_battle(battle_path)
 
     pg_results = validate_postgres(expected_by_key)

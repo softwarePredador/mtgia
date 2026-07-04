@@ -8765,6 +8765,61 @@ new server:
   to `26036`, and the exact split recheck reports `proposal_count=0`.
   The remaining `314` identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG429 Hybrid Locket Mana/Draw Closure
+
+- Closed the hybrid-cost subpattern of
+  `xmage_simple_tap_mana_source_with_activated_draw_v1` for the ten Guild
+  Lockets: `Azorius Locket`, `Boros Locket`, `Dimir Locket`,
+  `Golgari Locket`, `Gruul Locket`, `Izzet Locket`, `Orzhov Locket`,
+  `Rakdos Locket`, `Selesnya Locket`, and `Simic Locket`.
+- The mapper now accepts Oracle activation costs with hybrid symbols such as
+  `{W/U}{W/U}{W/U}{W/U}`. The exact split intentionally selected only the
+  Locket mana-source/draw family for PG429; the five neighboring hybrid
+  activated destroy/self-boost proposals remain separate next-work candidates
+  until their own runtime tests/package cycle.
+- Runtime utility-artifact activation now records mana paid from the textual
+  activation cost, so hybrid and other non-generic costs produce correct
+  `mana_paid` and `resource_delta.mana` values. Focused tests cover an Azorius
+  Locket paying two white and two blue mana, sacrificing itself, and drawing
+  two cards; the existing Banner self-sacrifice draw path now also asserts
+  `mana_paid=3`.
+- The E2E validator now sets `MANALOOM_KNOWLEDGE_DB` and
+  `MANALOOM_CANONICAL_KNOWN_CARDS_JSON` from its CLI paths before importing the
+  battle runtime, preventing accidental validation against the stale sibling
+  `manaloom-knowledge/knowledge.db` instead of the operational
+  `manaloom-knowledge/scripts/knowledge.db`.
+- The PG -> SQLite sync cleanup contract is now explicit: partial selected-card
+  syncs preserve unrelated runtime rows, while global syncs remove stale local
+  mirror rows absent from the current PostgreSQL plus reviewed-runtime
+  snapshot. This fixed a post-PG429 parity failure where `692` stale SQLite
+  runtime keys were still shadowing PostgreSQL truth.
+- The PostgreSQL package promoted `10` cards. Precheck found `10` target rows,
+  `0` existing expected rows, and `2` shadow rows; apply inserted/updated `10`;
+  postcheck verified `10/10` promoted rows as `verified`/`auto` with Oracle
+  hashes and deprecated the `2` shadow rows.
+- Hermes metadata sync and PG -> SQLite sync were run against the operational
+  new-server target `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `3854` PostgreSQL runtime rows, wrote `3846` SQLite runtime
+  rows, and exported `3821` canonical fallback rows after stale mirror cleanup.
+- PG429 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `10` selected cards. Generic
+  battle scenario count remained `0`; the actual hybrid activation behavior is
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync readiness and queue rebuilds now surface the all-card/Commander
+  legal queue after stale-cache cleanup rather than comparing against the
+  pre-cleanup PG428 cache shape. Current Commander-legal authoritative queue:
+  `target_identity_count=27032`, `xmage_authoritative_source_count=26718`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26718`.
+- The post-PG429 exact split recheck reports `proposal_count=693` safe
+  candidates across already-supported exact scopes. Next work must select a
+  coherent family/subpattern from that recheck, not blindly promote all
+  proposals in one mixed package.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

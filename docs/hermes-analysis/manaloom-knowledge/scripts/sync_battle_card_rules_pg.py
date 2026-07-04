@@ -899,27 +899,69 @@ def merge_pg_rows_with_reviewed_runtime_rows(
 def cleanup_sqlite_rows_absent_from_runtime_rows(
     conn: sqlite3.Connection,
     rows: list[dict[str, Any]],
+    *,
+    global_cleanup: bool = False,
 ) -> int:
     """Drop stale local mirror rows for cards now governed by PG.
 
     The PG-to-SQLite path treats PostgreSQL plus the current reviewed runtime
-    layer as the cache source. Local mirror rows for the same normalized card
-    must match an active runtime logical key or they can shadow the canonical
-    rule during runtime selection.
+    layer as the cache source. Local mirror rows must match an active runtime
+    logical key or they can shadow the canonical rule during runtime selection.
     """
-    keys_by_name: dict[str, set[str]] = {}
+    runtime_keys: set[tuple[str, str]] = set()
     for row in rows:
         key = runtime_rule_key(row)
         if key is None:
             continue
-        normalized, logical_key = key
+        runtime_keys.add(key)
+
+    mirror_sources = ("curated", "generated", "imported", "heuristic")
+    source_placeholders = ",".join("?" for _ in mirror_sources)
+    if global_cleanup:
+        conn.execute("DROP TABLE IF EXISTS temp.current_runtime_rule_keys")
+        conn.execute(
+            """
+            CREATE TEMP TABLE current_runtime_rule_keys (
+                normalized_name TEXT NOT NULL,
+                logical_rule_key TEXT NOT NULL,
+                PRIMARY KEY (normalized_name, logical_rule_key)
+            )
+            """
+        )
+        conn.executemany(
+            """
+            INSERT OR IGNORE INTO current_runtime_rule_keys
+                (normalized_name, logical_rule_key)
+            VALUES (?, ?)
+            """,
+            sorted(runtime_keys),
+        )
+        cursor = conn.execute(
+            f"""
+            DELETE FROM battle_card_rules
+            WHERE source IN ({source_placeholders})
+              AND review_status IN ('verified', 'active', 'needs_review', 'deprecated')
+              AND execution_status != 'disabled'
+              AND NOT EXISTS (
+                SELECT 1
+                FROM current_runtime_rule_keys current_keys
+                WHERE current_keys.normalized_name = battle_card_rules.normalized_name
+                  AND current_keys.logical_rule_key = battle_card_rules.logical_rule_key
+              )
+            """,
+            mirror_sources,
+        )
+        changed = max(0, cursor.rowcount)
+        conn.execute("DROP TABLE IF EXISTS temp.current_runtime_rule_keys")
+        return changed
+
+    keys_by_name: dict[str, set[str]] = {}
+    for normalized, logical_key in runtime_keys:
         keys_by_name.setdefault(normalized, set()).add(logical_key)
 
     changed = 0
-    mirror_sources = ("curated", "generated", "imported", "heuristic")
     for normalized, logical_keys in keys_by_name.items():
         key_placeholders = ",".join("?" for _ in logical_keys)
-        source_placeholders = ",".join("?" for _ in mirror_sources)
         cursor = conn.execute(
             f"""
             DELETE FROM battle_card_rules
@@ -945,6 +987,7 @@ def mirror_pg_rules_to_sqlite(
     rows: list[dict[str, Any]],
     *,
     reviewed_rows: list[dict[str, Any]] | None = None,
+    global_cleanup: bool = False,
 ) -> int:
     changed = 0
     filtered_rows = filter_rows_for_current_reviewed_curated(
@@ -959,7 +1002,11 @@ def mirror_pg_rules_to_sqlite(
         battle_rule_registry.ensure_battle_card_rules(conn)
         cleanup_obsolete_manual_rows(conn)
         cleanup_stale_reviewed_rows(conn, reviewed_rows or [])
-        changed += cleanup_sqlite_rows_absent_from_runtime_rows(conn, runtime_rows)
+        changed += cleanup_sqlite_rows_absent_from_runtime_rows(
+            conn,
+            runtime_rows,
+            global_cleanup=global_cleanup,
+        )
         for row in runtime_rows:
             effect_json = json_obj(row.get("effect_json"))
             deck_role_json = row.get("deck_role_json")
@@ -1062,6 +1109,7 @@ def main() -> int:
             args.sqlite_db,
             rows,
             reviewed_rows=seed_rows,
+            global_cleanup=not bool(selected_card_names),
         )
         report["canonical_snapshot_rows_exported"] = export_canonical_snapshot(
             load_active_snapshot_rows(args.sqlite_db),

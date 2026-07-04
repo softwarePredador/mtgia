@@ -7369,7 +7369,70 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
                 and data.get("card") == "Fixture Banner"
                 and data.get("activation_kind") == "self_sacrifice_draw"
                 and data.get("activation_cost") == "{W}{B}{G}"
+                and data.get("mana_paid") == 3
                 and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_mana_source_with_hybrid_self_sacrifice_draw_pays_hybrid_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.library.extend(
+            [
+                {"name": "Fresh Card", "type_line": "Instant"},
+                {"name": "Backup Card", "type_line": "Sorcery"},
+                {"name": "Third Card", "type_line": "Sorcery"},
+            ]
+        )
+        locket = {
+            "name": "Azorius Locket",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WU",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+            "activated_draw": True,
+            "activated_draw_count": 2,
+            "activated_self_sacrifice_draw": True,
+            "activated_draw_on_self_sacrifice": True,
+            "draw_on_self_sacrifice": 2,
+            "activation_cost_mana": "{W/U}{W/U}{W/U}{W/U}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["W/U", "W/U", "W/U", "W/U"],
+            "activation_requires_sacrifice": True,
+            "_rule_logical_key": "battle_rule_v1:azorius_locket",
+        }
+        active.battlefield.append(locket)
+        active.mana_pool.add("white", 2)
+        active.mana_pool.add("blue", 2)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=8,
+            rng=random.Random(62),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(locket, active.battlefield)
+        self.assertIn(locket, active.graveyard)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card", "Backup Card"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("card") == "Azorius Locket"
+                and data.get("activation_kind") == "self_sacrifice_draw"
+                and data.get("activation_cost") == "{W/U}{W/U}{W/U}{W/U}"
+                and data.get("mana_paid") == 4
+                and data.get("cards_drawn") == 2
                 for event, data in self.events
             )
         )

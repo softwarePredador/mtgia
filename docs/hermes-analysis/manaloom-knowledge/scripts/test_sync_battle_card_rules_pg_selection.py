@@ -360,6 +360,116 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         self.assertEqual(len(merged), 1)
         self.assertEqual(merged[0]["logical_rule_key"], "pg-new")
 
+    def test_partial_sqlite_cleanup_preserves_unselected_card_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            conn = sqlite3.connect(sqlite_path)
+            try:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Selected Card",
+                    {"effect": "draw_cards"},
+                    normalized_name_value="selected card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="selected-new",
+                )
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Other Card",
+                    {"effect": "ramp_permanent"},
+                    normalized_name_value="other card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="other-current",
+                )
+                conn.commit()
+
+                changed = sync_pg.cleanup_sqlite_rows_absent_from_runtime_rows(
+                    conn,
+                    [
+                        {
+                            "card_name": "Selected Card",
+                            "normalized_name": "selected card",
+                            "logical_rule_key": "selected-new",
+                            "effect_json": {"effect": "draw_cards"},
+                        }
+                    ],
+                    global_cleanup=False,
+                )
+                conn.commit()
+                remaining = {
+                    row[0]
+                    for row in conn.execute(
+                        "SELECT logical_rule_key FROM battle_card_rules"
+                    )
+                }
+            finally:
+                conn.close()
+
+        self.assertEqual(changed, 0)
+        self.assertEqual(remaining, {"selected-new", "other-current"})
+
+    def test_global_sqlite_cleanup_removes_runtime_rows_absent_from_pg_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            sqlite_path = Path(tmpdir) / "knowledge.db"
+            conn = sqlite3.connect(sqlite_path)
+            try:
+                sync_pg.battle_rule_registry.ensure_battle_card_rules(conn)
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Selected Card",
+                    {"effect": "draw_cards"},
+                    normalized_name_value="selected card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="selected-new",
+                )
+                sync_pg.upsert_battle_card_rule(
+                    conn,
+                    "Stale Card",
+                    {"effect": "creature"},
+                    normalized_name_value="stale card",
+                    source="curated",
+                    confidence=0.9,
+                    review_status="verified",
+                    execution_status="auto",
+                    logical_rule_key_value="stale-old",
+                )
+                conn.commit()
+
+                changed = sync_pg.cleanup_sqlite_rows_absent_from_runtime_rows(
+                    conn,
+                    [
+                        {
+                            "card_name": "Selected Card",
+                            "normalized_name": "selected card",
+                            "logical_rule_key": "selected-new",
+                            "effect_json": {"effect": "draw_cards"},
+                        }
+                    ],
+                    global_cleanup=True,
+                )
+                conn.commit()
+                remaining = {
+                    row[0]
+                    for row in conn.execute(
+                        "SELECT logical_rule_key FROM battle_card_rules"
+                    )
+                }
+            finally:
+                conn.close()
+
+        self.assertEqual(changed, 1)
+        self.assertEqual(remaining, {"selected-new"})
+
     def test_merge_pg_rows_uses_pg_normalized_name_to_block_split_card_stale_reviewed_row(self) -> None:
         rows = [
             {

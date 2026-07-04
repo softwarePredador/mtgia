@@ -7243,6 +7243,8 @@ def parse_mana_cost_text(cost_text: str) -> tuple[int, list[str]] | None:
             generic += int(normalized)
         elif normalized in {"W", "U", "B", "R", "G"}:
             colors.append(normalized)
+        elif re.fullmatch(r"[WUBRG](?:/[WUBRG])+", normalized):
+            colors.append(normalized)
         else:
             return None
     return generic, colors
@@ -7538,7 +7540,6 @@ def activation_cost_from_oracle_prefix(
         text = re.sub(sacrifice_pattern, ",", text).strip(" ,")
         requires_sacrifice = True
     risky_tokens = [
-        "/",
         "{q}",
         "discard",
         "pay ",
@@ -7555,7 +7556,7 @@ def activation_cost_from_oracle_prefix(
     mana_text = re.sub(r"\s*,?\s*\{t\}\s*,?\s*", "", text).strip()
     if mana_text in {"", ","}:
         mana_text = "{0}"
-    if not re.fullmatch(r"(?:\{[0-9wubrg]\})+", mana_text):
+    if not re.fullmatch(r"(?:\{[0-9wubrg/]+\})+", mana_text):
         return "activated_self_boost_oracle_cost_not_supported"
     canonical = re.sub(
         r"\{([^}]+)\}",

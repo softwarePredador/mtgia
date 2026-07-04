@@ -6079,7 +6079,7 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "mana_source_auxiliary_ability_not_supported")
 
-    def test_simple_mana_source_with_hybrid_activated_draw_cost_stays_blocked(self) -> None:
+    def test_simple_mana_source_with_hybrid_activated_draw_cost_maps(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,
             effect_classes=["DrawCardSourceControllerEffect"],
@@ -6107,8 +6107,21 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             ),
         )
 
-        self.assertIsNone(proposal)
-        self.assertEqual(reason, "mana_source_activated_draw_oracle_cost_not_supported")
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ACTIVATED_DRAW_SCOPE)
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["produces"], "WU")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["activated_draw_count"], 2)
+        self.assertEqual(effect["draw_on_self_sacrifice"], 2)
+        self.assertEqual(effect["activation_cost_mana"], "{W/U}{W/U}{W/U}{W/U}")
+        self.assertEqual(effect["activation_cost_generic"], 0)
+        self.assertEqual(effect["activation_cost_colors"], ["W/U", "W/U", "W/U", "W/U"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertTrue(effect["activated_self_sacrifice_draw"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["activation_cost_mana"], "{W/U}{W/U}{W/U}{W/U}")
 
     def test_simple_mana_source_with_unsupported_auxiliary_stays_blocked(self) -> None:
         row = queue_row(

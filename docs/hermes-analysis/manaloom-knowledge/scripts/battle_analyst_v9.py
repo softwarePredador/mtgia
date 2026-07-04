@@ -24953,6 +24953,20 @@ def _activation_cost_text(generic_cost, activation_colors=None):
     return "".join(parts) or "{0}"
 
 
+def _mana_cost_text_value(cost_text):
+    parsed = parse_mana_cost(cost_text, 0)
+    value = int(parsed.get("generic", 0) or 0)
+    value += sum(int(amount or 0) for amount in parsed.get("colored", {}).values())
+    value += len(parsed.get("hybrid", []) or [])
+    value += len(parsed.get("phyrexian", []) or [])
+    value += len(parsed.get("phyrexian_hybrid", []) or [])
+    value += sum(
+        int(option.get("generic", 2) or 2)
+        for option in parsed.get("monocolored_hybrid", []) or []
+    )
+    return value
+
+
 def _land_matches_untap_engine_target(land, effect_data):
     if not isinstance(land, dict) or not is_effective_land(land):
         return False
@@ -31308,6 +31322,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 activation_cost,
                 permanent.get("activation_cost_colors") or [],
             )
+            activation_mana_paid = _mana_cost_text_value(activation_cost_text)
             life_cost = max(0, int(permanent.get("activation_life_cost") or 0))
             draw_count = max(1, int(permanent.get("activated_draw_count") or permanent.get("draw_count") or 1))
             discard_count = max(1, int(permanent.get("activated_discard_count") or permanent.get("discard_count") or 1))
@@ -31502,7 +31517,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 heuristic_version=DECISION_STRATEGY_VERSION,
                 resource_delta={
                     "cards": len(drawn) - len(discarded),
-                    "mana": -activation_cost,
+                    "mana": -activation_mana_paid,
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
                     "life": -life_cost,
                     "permanents": -1 if sacrificed_name else 0,
@@ -31525,7 +31540,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 player=player.name,
                 card=permanent.get("name", "?"),
                 activation_kind="simple_activated_draw_discard",
-                mana_paid=activation_cost,
+                mana_paid=activation_mana_paid,
                 activation_cost=activation_cost_text,
                 cards_drawn=len(drawn),
                 cards_discarded=len(discarded),
@@ -31570,6 +31585,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 activation_cost,
                 permanent.get("activation_cost_colors") or [],
             )
+            activation_mana_paid = _mana_cost_text_value(activation_cost_text)
             life_cost = max(0, int(permanent.get("activation_life_cost") or 0))
             sacrifice_target_type = str(permanent.get("activation_sacrifice_target") or "").strip()
             activation_discard_count = max(0, int(permanent.get("activation_discard_count") or 0))
@@ -31781,7 +31797,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 heuristic_version=DECISION_STRATEGY_VERSION,
                 resource_delta={
                     "cards": len(drawn) - len(discard_cards),
-                    "mana": -activation_cost,
+                    "mana": -activation_mana_paid,
                     "tapped": 1 if permanent.get("activation_requires_tap") else 0,
                     "life": -life_cost,
                     "permanents": -1 if sacrificed_name else 0,
@@ -31808,7 +31824,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
                 player=player.name,
                 card=permanent.get("name", "?"),
                 activation_kind="simple_activated_draw",
-                mana_paid=activation_cost,
+                mana_paid=activation_mana_paid,
                 activation_cost=activation_cost_text,
                 cards_drawn=len(drawn),
                 hand_before=hand_size,
@@ -31852,6 +31868,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             activation_cost,
             permanent.get("activation_cost_colors") or [],
         )
+        activation_mana_paid = _mana_cost_text_value(activation_cost_text)
         if permanent.get("activation_requires_tap") and permanent.get("tapped"):
             _utility_artifact_skip_event(
                 player,
@@ -31957,7 +31974,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             heuristic_version=DECISION_STRATEGY_VERSION,
             resource_delta={
                 "cards": len(drawn),
-                "mana": -activation_cost,
+                "mana": -activation_mana_paid,
                 "artifacts": -1,
                 "graveyard": 1,
             },
@@ -31968,7 +31985,7 @@ def activate_utility_artifacts(player, opponents, all_players, turn, rng, *, pha
             player=player.name,
             card=permanent.get("name", "?"),
             activation_kind="self_sacrifice_draw",
-            mana_paid=activation_cost,
+            mana_paid=activation_mana_paid,
             activation_cost=activation_cost_text,
             cards_drawn=len(drawn),
             hand_before=hand_size,
