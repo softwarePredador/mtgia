@@ -1,0 +1,130 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T11:41:40.421445+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg403_dynamic_graveyard_count_boost_new_server_package_manifest.json",
+  "package_id": "pg403_dynamic_graveyard_count_boost_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Festive Funeral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+          "oracle_hash": "6e9fbabe708f04c9ed322448d4f409db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Ghoul's Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+          "oracle_hash": "661b340dc8c9f7d884d1d203edb060b2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 2
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Festive Funeral",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+          "oracle_hash": "6e9fbabe708f04c9ed322448d4f409db",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Ghoul's Feast",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+          "oracle_hash": "661b340dc8c9f7d884d1d203edb060b2",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Festive Funeral",
+          "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Ghoul's Feast",
+          "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 2
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Festive Funeral",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Ghoul's Feast",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

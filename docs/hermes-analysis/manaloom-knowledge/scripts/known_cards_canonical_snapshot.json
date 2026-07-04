@@ -29764,6 +29764,37 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2bc63499be5ce5a2ee79709be4b4617f"
   },
+  "Festive Funeral": {
+    "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "graveyard_count_card_types": [
+      "card"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "graveyard_card_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+    "battle_rule_oracle_hash": "6e9fbabe708f04c9ed322448d4f409db"
+  },
   "Fetching Garden": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -35026,6 +35057,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:965f297f186ba18c8d3079ab1fad4d30",
     "battle_rule_oracle_hash": "849ed6da2ac0bcd4988b2207d297bc42"
+  },
+  "Ghoul's Feast": {
+    "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "graveyard_count_card_types": [
+      "creature"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "graveyard_card_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+    "battle_rule_oracle_hash": "661b340dc8c9f7d884d1d203edb060b2"
   },
   "Ghoulcaller's Bell": {
     "ability_kind": "activated",

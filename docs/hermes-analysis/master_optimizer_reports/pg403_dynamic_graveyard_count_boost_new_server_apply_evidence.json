@@ -1,0 +1,79 @@
+{
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "pg403",
+  "generated_at": "2026-07-04T11:41:09.569943+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg403_dynamic_graveyard_count_boost_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg403_dynamic_graveyard_count_boost_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Festive Funeral",
+      "Ghoul's Feast"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 2,
+    "promoted_rule_rows": 2,
+    "promoted_verified_auto_rows": 2,
+    "row_count": 2
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Festive Funeral",
+      "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+      "normalized_name": "festive funeral",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Ghoul's Feast",
+      "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+      "normalized_name": "ghoul's feast",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Festive Funeral",
+      "Ghoul's Feast"
+    ],
+    "existing_expected_rows_before": 0,
+    "missing_targets": [],
+    "row_count": 2,
+    "total_target_card_rows": 2,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "51b53b0a-9df3-4fff-9179-76c47fec0ccc",
+      "card_name": "Festive Funeral",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:3e4f67f3eb47bd397f83c59fd964d38c",
+      "normalized_name": "festive funeral",
+      "oracle_hash": "6e9fbabe708f04c9ed322448d4f409db",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4e21cdef-0673-4b84-a366-5c6023040fe9",
+      "card_name": "Ghoul's Feast",
+      "existing_rule_rows": 0,
+      "expected_rule_rows_before": 0,
+      "logical_rule_key": "battle_rule_v1:b7cb7a49d1c68ef3a1d9889ac4853f8d",
+      "normalized_name": "ghoul's feast",
+      "oracle_hash": "661b340dc8c9f7d884d1d203edb060b2",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "dynamic_graveyard_count_boost_new_server"
+}

@@ -7860,6 +7860,85 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_target_source_not_single_fixed")
 
+    def test_dynamic_graveyard_count_boost_maps_festive_funeral(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Festive Funeral",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets -X/-X until end of turn, where X is the number of cards in your graveyard."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue cardsInGraveyard = new CardsInControllerGraveyardCount(
+                    StaticFilters.FILTER_CARD_CARDS, null
+                );
+                private static final DynamicValue xValue = new SignInversionDynamicValue(cardsInGraveyard);
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE)
+        self.assertEqual(effect["stat_modifier_amount_source"], "graveyard_card_count")
+        self.assertEqual(effect["graveyard_count_card_types"], ["card"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], -1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], -1)
+
+    def test_dynamic_graveyard_count_boost_maps_ghouls_feast(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Ghoul's Feast",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets +X/+0 until end of turn, where X is the number of creature cards in your graveyard."
+                ),
+            ),
+            source_text="""
+                private static final DynamicValue xValue = new CardsInControllerGraveyardCount(
+                    StaticFilters.FILTER_CARD_CREATURES, null
+                );
+                this.getSpellAbility().addEffect(new BoostTargetEffect(
+                    xValue, StaticValue.get(0), Duration.EndOfTurn
+                ));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["graveyard_count_card_types"], ["creature"])
+        self.assertEqual(effect["power_delta_per_graveyard_count"], 1)
+        self.assertEqual(effect["toughness_delta_per_graveyard_count"], 0)
+
+    def test_dynamic_graveyard_count_boost_blocks_growth_cycle_composite(self) -> None:
+        row = queue_row(split.RECURSION_UNIT, effect_classes=["BoostTargetEffect"], xmage_signals=["targeting"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Growth Cycle",
+                type_line="Instant",
+                oracle_text=(
+                    "Target creature gets +3/+3 until end of turn. It gets an additional +2/+2 until end of turn "
+                    "for each card named Growth Cycle in your graveyard."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addEffect(new BoostTargetEffect(3, 3, Duration.EndOfTurn));
+                this.getSpellAbility().addEffect(new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_count_boost_source_not_single")
+
     def test_fixed_boost_controlled_creatures_spell_maps_to_controlled_stat_modifier(self) -> None:
         row = queue_row(split.BOOST_CONTROLLED_SPELL_UNIT, effect_classes=["BoostControlledEffect"])
         proposal, reason = split.split_row(

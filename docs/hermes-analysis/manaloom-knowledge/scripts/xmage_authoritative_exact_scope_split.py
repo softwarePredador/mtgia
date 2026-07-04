@@ -153,6 +153,9 @@ BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
 BOOST_TARGET_SCOPE = "xmage_fixed_boost_target_creature_until_eot_spell_v1"
+DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE = (
+    "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1"
+)
 BOOST_CONTROLLED_SPELL_SCOPE = "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1"
 BOOST_KEYWORD_SCOPE = "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1"
 SELF_BOOST_ACTIVATED_SCOPE = "xmage_permanent_simple_activated_self_boost_until_eot_v1"
@@ -3226,6 +3229,81 @@ def fixed_boost_target_from_source(source: str) -> tuple[int, int] | None:
     if "TargetPointer" in (source or "") or ".setTargetPointer" in (source or ""):
         return None
     return int(matches[0][0]), int(matches[0][1])
+
+
+def graveyard_count_boost_target_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str | None:
+    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    match = re.match(
+        r"^target creature gets (?P<power>[+-])x/(?P<toughness>[+-])(?P<toughness_value>x|0) "
+        r"until end of turn, where x is the number of (?P<filter>cards|creature cards) "
+        r"in your graveyard\.?$",
+        text,
+    )
+    if not match:
+        return None
+    power_per = -1 if match.group("power") == "-" else 1
+    toughness_token = match.group("toughness_value")
+    toughness_per = 0 if toughness_token == "0" else (-1 if match.group("toughness") == "-" else 1)
+    filter_text = match.group("filter")
+    card_types = ["creature"] if filter_text == "creature cards" else ["card"]
+    return {
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_card_types": card_types,
+        "power_base_delta": 0,
+        "toughness_base_delta": 0,
+        "power_delta_per_graveyard_count": power_per,
+        "toughness_delta_per_graveyard_count": toughness_per,
+    }
+
+
+def graveyard_count_boost_target_from_source(source: str) -> dict[str, Any] | str | None:
+    text = source or ""
+    if "getSpellAbility().addCost" in text or "addCost(" in text:
+        return "graveyard_count_boost_additional_cost_not_supported"
+    boost_matches = re.findall(r"new\s+BoostTargetEffect\s*\((.*?)\)", text, re.S)
+    if len(boost_matches) != 1:
+        return "graveyard_count_boost_source_not_single"
+    if len(re.findall(r"new\s+TargetCreaturePermanent\s*\(", text)) != 1:
+        return "graveyard_count_boost_target_not_supported"
+    if not re.search(r"new\s+TargetCreaturePermanent\s*\(\s*\)", text):
+        return "graveyard_count_boost_target_not_supported"
+    filter_match = re.search(
+        r"CardsInControllerGraveyardCount\s*\(\s*StaticFilters\.(FILTER_CARD_CARDS|FILTER_CARD_CREATURES)\s*,",
+        text,
+    )
+    if not filter_match:
+        return "graveyard_count_boost_source_filter_not_supported"
+    card_types = ["creature"] if filter_match.group(1) == "FILTER_CARD_CREATURES" else ["card"]
+    match = re.search(
+        r"new\s+BoostTargetEffect\s*\(\s*(?P<power>[^,]+?)\s*,\s*(?P<toughness>.+?)\s*,\s*Duration\.EndOfTurn\s*\)",
+        text,
+        re.S,
+    )
+    if not match:
+        return "graveyard_count_boost_source_not_single"
+
+    def per_count(expr: str) -> int | str:
+        expr = re.sub(r"\s+", " ", expr).strip()
+        if re.fullmatch(r"StaticValue\.get\s*\(\s*0\s*\)", expr):
+            return 0
+        if "xValue" in expr:
+            return -1 if "xValue = new SignInversionDynamicValue" in text else 1
+        return "graveyard_count_boost_source_delta_not_supported"
+
+    power_per = per_count(match.group("power"))
+    toughness_per = per_count(match.group("toughness"))
+    if isinstance(power_per, str):
+        return power_per
+    if isinstance(toughness_per, str):
+        return toughness_per
+    return {
+        "graveyard_count_scope": "controller_graveyard",
+        "graveyard_count_card_types": card_types,
+        "power_base_delta": 0,
+        "toughness_base_delta": 0,
+        "power_delta_per_graveyard_count": power_per,
+        "toughness_delta_per_graveyard_count": toughness_per,
+    }
 
 
 def fixed_boost_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, int] | None:
@@ -12020,6 +12098,37 @@ def split_row(
         return build_proposal(row, metadata, effect_json, family_id="xmage_return_target_to_hand_spell"), "selected_exact_scope"
 
     if unit == RECURSION_UNIT:
+        if classes == {"BoostTargetEffect"}:
+            if ability_classes(row):
+                return None, "graveyard_count_boost_ability_class_not_simple"
+            source_boost = graveyard_count_boost_target_from_source(source_text)
+            if isinstance(source_boost, str):
+                return None, source_boost
+            oracle_boost = graveyard_count_boost_target_from_oracle(metadata)
+            if isinstance(oracle_boost, str):
+                return None, oracle_boost
+            if oracle_boost is None:
+                return None, "graveyard_count_boost_oracle_not_exact"
+            if source_boost != oracle_boost:
+                return None, "graveyard_count_boost_source_oracle_mismatch"
+            effect_json = {
+                "effect": "stat_modifier_until_eot",
+                "battle_model_scope": DYNAMIC_GRAVEYARD_COUNT_BOOST_TARGET_SCOPE,
+                "target": "creature",
+                "target_constraints": {"card_types": ["creature"]},
+                "target_controller": "any",
+                "stat_modifier_amount_source": "graveyard_card_count",
+                "duration": "until_end_of_turn",
+                "xmage_effect_class": "BoostTargetEffect",
+                **source_boost,
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell",
+            ), "selected_exact_scope"
         if classes == {"PlayFromGraveyardControllerEffect"}:
             if ability_classes(row) != {"SimpleStaticAbility"}:
                 return None, "play_lands_from_graveyard_ability_class_not_simple_static"

@@ -8801,6 +8801,123 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_graveyard_count_stat_modifier_can_kill_opponent_creature(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Spent Spell", "type_line": "Instant", "cmc": 1},
+                {"name": "Fallen Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Used Land", "type_line": "Land", "cmc": 0},
+            ]
+        )
+        target = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 3, "toughness": 3}
+        own = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        active.battlefield.append(own)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["card"],
+            "power_delta_per_graveyard_count": -1,
+            "toughness_delta_per_graveyard_count": -1,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Festive Funeral",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Target creature gets -X/-X until end of turn, where X is the number of cards in your graveyard."
+                ),
+            },
+            turn=13,
+            rng=random.Random(13),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Enemy Bear"])
+        self.assertEqual([card["name"] for card in active.graveyard][-1], "Fixture Festive Funeral")
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Festive Funeral"
+                and data.get("target") == "Enemy Bear"
+                and data.get("graveyard_stat_modifier_count") == 3
+                and data.get("power_delta") == -3
+                and data.get("toughness_delta") == -3
+                and data.get("result") == "creature_put_into_graveyard_zero_toughness"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_graveyard_count_stat_modifier_buffs_from_creature_cards_only(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.graveyard.extend(
+            [
+                {"name": "Spent Spell", "type_line": "Instant", "cmc": 1},
+                {"name": "Fallen Bear", "type_line": "Creature - Bear", "cmc": 2},
+                {"name": "Fallen Elf", "type_line": "Creature - Elf", "cmc": 2},
+            ]
+        )
+        target = {"name": "Own Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        enemy = {"name": "Enemy Bear", "type_line": "Creature - Bear", "power": 4, "toughness": 4}
+        active.battlefield.append(target)
+        opponent.battlefield.append(enemy)
+        effect = {
+            "effect": "stat_modifier_until_eot",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_boost_target_creature_until_eot_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "target_controller": "any",
+            "stat_modifier_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["creature"],
+            "power_delta_per_graveyard_count": 1,
+            "toughness_delta_per_graveyard_count": 0,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Ghoul's Feast",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Target creature gets +X/+0 until end of turn, where X is the number of creature cards in your graveyard."
+                ),
+            },
+            turn=14,
+            rng=random.Random(14),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(target["power"], 4)
+        self.assertEqual(target["toughness"], 2)
+        self.assertEqual(enemy["power"], 4)
+        self.assertTrue(
+            any(
+                event == "stat_modifier_until_eot_resolved"
+                and data.get("card") == "Fixture Ghoul's Feast"
+                and data.get("target") == "Own Bear"
+                and data.get("graveyard_stat_modifier_count") == 2
+                and data.get("power_delta") == 2
+                and data.get("toughness_delta") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_controlled_stat_modifier_until_eot_spell_buffs_only_own_creatures_and_cleans_up(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
