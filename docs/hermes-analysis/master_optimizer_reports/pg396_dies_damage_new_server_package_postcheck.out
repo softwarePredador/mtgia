@@ -1,0 +1,11 @@
+       card_name       |    normalized_name    |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+-----------------------+-----------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Bogardan Firefiend    | bogardan firefiend    | battle_rule_v1:9c97a0bb3f8d95c6861678f7a210a696 |                  1 |                           1 |                         1 |           0
+ Careless Celebrant    | careless celebrant    | battle_rule_v1:47dd9df12e72454256312ff74c57a219 |                  1 |                           1 |                         1 |           0
+ Footlight Fiend       | footlight fiend       | battle_rule_v1:e674fea2b801e52066c06b5504a1a242 |                  1 |                           1 |                         1 |           0
+ Goblin Arsonist       | goblin arsonist       | battle_rule_v1:0f26849f10bf9e0357f6a7a23f392f75 |                  1 |                           1 |                         1 |           0
+ Mudbutton Torchrunner | mudbutton torchrunner | battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9 |                  1 |                           1 |                         1 |           0
+ Perilous Myr          | perilous myr          | battle_rule_v1:0cad1f375dbce251b5d86ecd298660a1 |                  1 |                           1 |                         1 |           0
+ Pitchburn Devils      | pitchburn devils      | battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9 |                  1 |                           1 |                         1 |           0
+ Pyre Spawn            | pyre spawn            | battle_rule_v1:5b89a7a55f519dfc8a4f39120ddda3a9 |                  1 |                           1 |                         1 |           0
+(8 rows)

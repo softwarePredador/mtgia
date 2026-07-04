@@ -17860,6 +17860,82 @@ def resolve_permanent_dies_life_gain(owner, permanent, *, destination=None, reas
     return gained
 
 
+def resolve_permanent_dies_damage(
+    owner,
+    permanent,
+    *,
+    destination=None,
+    reason=None,
+    source=None,
+    opponents=None,
+    all_players=None,
+):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return 0
+    amount = max(
+        0,
+        int(permanent.get("dies_damage_amount") or permanent.get("damage_when_this_dies") or 0),
+    )
+    if amount <= 0:
+        return 0
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = list(opponents or [player for player in participants if player is not owner])
+    resolved_opponents = [player for player in resolved_opponents if player is not None]
+    if not resolved_opponents:
+        return 0
+    effect_data = dict(permanent)
+    target = permanent.get("dies_damage_target") or permanent.get("target") or "any_target"
+    target_constraints = permanent.get("target_constraints")
+    if not isinstance(target_constraints, dict) or not target_constraints:
+        if target == "any_target":
+            target_constraints = {"scope": "any_target"}
+        elif target == "creature":
+            target_constraints = {"card_types": ["creature"]}
+        elif target == "creature_or_planeswalker":
+            target_constraints = {"card_types": ["creature", "planeswalker"]}
+        elif target == "player_or_planeswalker":
+            target_constraints = {"scope": "player_or_planeswalker"}
+        elif target in {"player", "opponent"}:
+            target_constraints = {"scope": target}
+        else:
+            target_constraints = {"target": target}
+    effect_data.update(
+        {
+            "effect": "direct_damage",
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "amount": amount,
+            "damage": amount,
+            "target": target,
+            "target_constraints": target_constraints,
+        }
+    )
+    apply_direct_damage(
+        owner,
+        resolved_opponents,
+        permanent,
+        effect_data,
+        CURRENT_REPLAY_TURN,
+        random.Random(CURRENT_REPLAY_TURN or 0),
+        finish_spell=False,
+        phase="dies_trigger",
+    )
+    emit_replay_event(
+        "dies_damage_trigger_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        damage=amount,
+        target=target,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return amount
+
+
 def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reason=None, source=None):
     if destination != "graveyard" or not isinstance(permanent, dict):
         return []
@@ -18001,6 +18077,14 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         reason=reason,
         source=source,
     )
+    resolve_permanent_dies_damage(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
+    )
     resolve_permanent_dies_recursion(
         owner,
         creature,
@@ -18078,6 +18162,14 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         destination=destination,
         reason=reason,
         source=source,
+    )
+    resolve_permanent_dies_damage(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
     )
     resolve_permanent_dies_recursion(
         owner,
@@ -39730,6 +39822,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                         target,
                         reason="damage",
                         source=card,
+                        all_players=[player, *list(opponents)],
                     )
                     result = "creature_destroyed"
             elif target_kind == "planeswalker":
@@ -39742,6 +39835,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                         target,
                         reason="damage",
                         source=card,
+                        all_players=[player, *list(opponents)],
                     )
                     result = "planeswalker_destroyed"
                 else:

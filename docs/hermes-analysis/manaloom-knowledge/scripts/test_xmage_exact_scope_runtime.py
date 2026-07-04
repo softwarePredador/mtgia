@@ -7342,6 +7342,91 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_damage_trigger_damages_target_when_moved_to_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Piker",
+            "type_line": "Creature - Goblin Warrior",
+            "power": 2,
+            "toughness": 2,
+        }
+        opponent.battlefield.append(target)
+        permanent = {
+            "name": "Fixture Myr",
+            "type_line": "Artifact Creature - Myr",
+            "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+            "dies_damage_amount": 2,
+            "dies_damage_target": "creature",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_damage",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Myr"])
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Piker"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Myr"
+                and data.get("target") == "Target Piker"
+                and data.get("amount") == 2
+                and data.get("result") == "creature_destroyed"
+                and data.get("phase") == "dies_trigger"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_damage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "dies_damage_trigger_resolved"
+                and data.get("card") == "Fixture Myr"
+                and data.get("damage") == 2
+                and data.get("source") == "Fixture Removal"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_creature_dies_damage_trigger_does_not_fire_when_exiled(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        permanent = {
+            "name": "Fixture Myr",
+            "type_line": "Artifact Creature - Myr",
+            "battle_model_scope": "xmage_creature_dies_fixed_damage_target_v1",
+            "dies_damage_amount": 2,
+            "dies_damage_target": "any_target",
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_damage",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_permanent_from_battlefield_to_exile(
+            active,
+            permanent,
+            reason="test_exile",
+            source={"name": "Fixture Exile"},
+            turn=3,
+        )
+
+        self.assertEqual(destination, "exile")
+        self.assertEqual(opponent.life, 20)
+        self.assertFalse(any(event == "damage_resolved" for event, _ in self.events))
+
     def test_creature_dies_create_tokens_triggers_when_moved_to_graveyard(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

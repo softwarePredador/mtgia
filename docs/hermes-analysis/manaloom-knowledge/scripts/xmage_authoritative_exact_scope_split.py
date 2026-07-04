@@ -173,6 +173,7 @@ ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
+DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
@@ -3939,6 +3940,16 @@ def is_creature_dies_life_gain_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_dies_damage_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DAMAGE_UNIT:
+        return False
+    return (
+        effect_classes(row) == {"DamageTargetEffect"}
+        and ability_classes(row) == {"DiesSourceTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_permanent_activated_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -7340,6 +7351,71 @@ def etb_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] |
     return None
 
 
+def dies_damage_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, str, bool] | None:
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    subject = r"(?:this creature|this card|[^,.]+?)"
+    target_patterns: list[tuple[str, str]] = [
+        (r"any target", "any_target"),
+        (r"target creature or planeswalker an opponent controls", "creature_or_planeswalker"),
+        (r"target creature or planeswalker", "creature_or_planeswalker"),
+        (r"target creature an opponent controls", "creature"),
+        (r"target creature", "creature"),
+        (r"target player or planeswalker", "player_or_planeswalker"),
+        (r"target player", "player"),
+        (r"target opponent", "opponent"),
+    ]
+    for target_phrase, target in target_patterns:
+        patterns = [
+            rf"^(?:when|whenever) {subject} dies, "
+            rf"(it|this creature|{subject}) deals (\d+) damage to {target_phrase}\.?$",
+            rf"^(?:when|whenever) {subject} dies, "
+            rf"you may have (it|this creature|{subject}) deal (\d+) damage to {target_phrase}\.?$",
+        ]
+        for index, pattern in enumerate(patterns):
+            match = re.match(pattern, text)
+            if not match:
+                continue
+            amount = int(match.group(2))
+            if amount <= 0:
+                return None
+            return amount, target, index == 1
+    return None
+
+
+def damage_target_from_source(source: str) -> str | None:
+    text = source or ""
+    restricted = restricted_battlefield_target_from_source(text)
+    if restricted is not None:
+        return restricted
+    if re.search(r"new\s+TargetAnyTarget\s*\(", text):
+        return "any_target"
+    if re.search(r"new\s+TargetPlayerOrPlaneswalker\s*\(", text):
+        return "player_or_planeswalker"
+    if re.search(r"new\s+TargetOpponent\s*\(", text):
+        return "opponent"
+    if re.search(r"new\s+TargetPlayer\s*\(", text):
+        return "player"
+    if re.search(r"new\s+TargetCreatureOrPlaneswalker\w*\s*\(", text):
+        return "creature_or_planeswalker"
+    if "TargetPermanent" in text and "creature or planeswalker" in text:
+        return "creature_or_planeswalker"
+    if (
+        re.search(r"new\s+TargetCreaturePermanent\s*\(", text)
+        or "FilterCreaturePermanent" in text
+        or "FILTER_PERMANENT_CREATURE" in text
+        or "FILTER_CREATURE" in text
+    ):
+        return "creature"
+    return None
+
+
+def dies_source_trigger_is_optional(source: str) -> bool:
+    match = re.search(r"DiesSourceTriggeredAbility\s*\((?P<body>[\s\S]{0,500}?)\)\s*;", source or "")
+    if not match:
+        return False
+    return bool(re.search(r",\s*true\b", match.group("body")))
+
+
 def etb_destroy_target_from_oracle(metadata: dict[str, Any]) -> tuple[str, str] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip()
     patterns: list[tuple[str, tuple[str, str]]] = [
@@ -8054,6 +8130,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "creature enter-the-battlefield triggered ability"
     elif scope == DIES_LIFE_GAIN_CREATURE_SCOPE:
         scope_kind = "creature dies triggered fixed life-gain ability"
+    elif scope == DIES_DAMAGE_CREATURE_SCOPE:
+        scope_kind = "creature dies triggered fixed damage ability"
     elif scope == DIES_TOKEN_CREATURE_SCOPE:
         scope_kind = "creature dies triggered fixed creature-token ability"
     elif scope == DIES_RECURSION_CREATURE_SCOPE:
@@ -8150,6 +8228,7 @@ def split_row(
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
     etb_draw_lose_life_creature_unit = is_creature_etb_draw_lose_life_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
+    dies_damage_creature_unit = is_creature_dies_damage_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
     dies_recursion_creature_unit = is_creature_dies_recursion_unit(row)
@@ -8202,6 +8281,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
+        and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
@@ -8247,6 +8327,7 @@ def split_row(
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
+        and not dies_damage_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
         and not dies_recursion_creature_unit
@@ -10018,6 +10099,47 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_dies_gain_life",
+        ), "selected_exact_scope"
+
+    if dies_damage_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_damage_not_creature"
+        parsed = dies_damage_target_from_oracle(metadata)
+        if parsed is None:
+            dies_text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+            if re.search(r"\b(?:when|whenever)\b.+\bdies,\s+.+\bdeals? x damage\b", dies_text):
+                return None, "dies_damage_amount_not_fixed"
+            return None, "dies_damage_target_not_supported"
+        amount, target, optional = parsed
+        constructor_amount = java_constructor_int(source_text, "DamageTargetEffect")
+        if constructor_amount is None or constructor_amount <= 0:
+            return None, "dies_damage_amount_source_not_fixed"
+        if constructor_amount != amount:
+            return None, "dies_damage_source_oracle_mismatch"
+        source_target = damage_target_from_source(source_text)
+        if source_target != target:
+            return None, "dies_damage_target_source_oracle_mismatch"
+        if optional != dies_source_trigger_is_optional(source_text):
+            return None, "dies_damage_optional_source_oracle_mismatch"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_DAMAGE_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "dies_damage_amount": amount,
+            "dies_damage_target": target,
+            "target": target,
+            "target_constraints": target_constraints_for(target),
+            "xmage_effect_class": "DamageTargetEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+        }
+        if optional:
+            effect_json["dies_damage_optional"] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_fixed_damage_target",
         ), "selected_exact_scope"
 
     if etb_draw_creature_unit:
@@ -12588,6 +12710,7 @@ def build_exact_split_report(
             and not is_creature_etb_draw_unit(row)
             and not is_creature_etb_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
+            and not is_creature_dies_damage_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
             and not is_creature_etb_damage_unit(row)
@@ -12658,6 +12781,7 @@ def build_exact_split_report(
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
+                "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",

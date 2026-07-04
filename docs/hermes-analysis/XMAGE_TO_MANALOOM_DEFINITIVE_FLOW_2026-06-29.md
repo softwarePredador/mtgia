@@ -221,21 +221,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg394_dies_create_tokens_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg395_dies_life_gain_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg395_dies_life_gain_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg396_dies_damage_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg396_dies_damage_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26812`
-- XMage authoritative source resolved: `26498`
+- target all-card battle-gap identities: `26804`
+- XMage authoritative source resolved: `26490`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26498`
+- XMage authoritative adapter required: `26490`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26498` identities, card semantics are accepted from XMage; work is now
+- For `26490` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -254,10 +256,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG395 Exact Adapter Waves
+## PG283-PG396 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG395 all-card exact adapter waves are applied and
-synced. PG375-PG395 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG396 all-card exact adapter waves are applied and
+synced. PG375-PG396 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -6578,6 +6580,52 @@ PG395 measured result:
   life-gain dies neighbors are explicitly blocked by
   `dies_life_gain_amount_not_fixed=3`.
 
+PG396 measured result:
+
+- PG396 promoted `8` creature dies fixed damage rules on the new server:
+  `Bogardan Firefiend`, `Careless Celebrant`, `Footlight Fiend`,
+  `Goblin Arsonist`, `Mudbutton Torchrunner`, `Perilous Myr`,
+  `Pitchburn Devils`, and `Pyre Spawn`.
+- The splitter now maps fixed
+  `DamageTargetEffect + DiesSourceTriggeredAbility` source rows to
+  `xmage_creature_dies_fixed_damage_target_v1` only when XMage has one fixed
+  damage amount, Oracle exactly says this creature/card name dies and deals
+  that amount of damage, and the XMage target class/filter matches the Oracle
+  target. It supports `any target`, `target creature`, and target creature or
+  planeswalker. Dynamic/complex neighbors remain blocked, including
+  `Blazing Effigy` and `Ember-Fist Zubera`.
+- Runtime coverage adds a dies-damage hook to the same
+  battlefield-to-graveyard path used by dies-draw, dies-life-gain,
+  dies-recursion, and dies-token. Bounce/exile/replacement moves do not trigger
+  it. The hook reuses `apply_direct_damage` and emits
+  `dies_damage_trigger_resolved` plus the normal `damage_resolved` provenance.
+- Full exact splitter tests passed `362/362`, full exact runtime tests passed
+  `206/206`, package-builder tests passed, and `py_compile` passed for the
+  changed scripts.
+- PostgreSQL precheck matched `8/8` target card rows on the new server; apply
+  upserted `8` rows and deprecated `0` shadows; postcheck verified `8/8`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `7737` PostgreSQL rows from
+  `database_target=127.0.0.1:15432/halder`, updated `7532` SQLite rows, and
+  exported `5239` canonical snapshot rows. Full metadata sync used the same
+  new-server target, matched `6238` PostgreSQL cards from `6047` unique
+  requested names, backfilled `2699/2699` deck-card cache rows, and left one
+  unrelated unresolved alias.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, runtime
+  `get_card_effect`, and no-override battle checks for all `8` cards against
+  `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global all-card authoritative queue after PG396:
+  `target_identity_count=26804`, `xmage_authoritative_source_count=26490`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26490`.
+- Running the exact splitter after PG396 on supported units returned
+  `proposal_count=0` over `7644` considered supported rows. Remaining
+  dies-damage neighbors are explicitly blocked by
+  `dies_damage_amount_not_fixed=1` and `dies_damage_target_not_supported=1`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7208,13 +7256,13 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG395 queue on the new server, the next exact runtime-backed work should
+post-PG396 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `876`
+4. `direct_damage::targeted_damage_variant_v1` - `868`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `728`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`

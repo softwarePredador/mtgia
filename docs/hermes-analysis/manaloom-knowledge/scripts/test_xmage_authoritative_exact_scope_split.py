@@ -3891,6 +3891,158 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_damage_target_not_supported")
 
+    def test_creature_dies_damage_maps_any_target_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Myr",
+                type_line="Artifact Creature - Myr",
+                oracle_text="When Fixture Myr dies, it deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(new DamageTargetEffect(2, "it"), false);
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DIES_DAMAGE_CREATURE_SCOPE)
+        self.assertEqual(effect["dies_damage_amount"], 2)
+        self.assertEqual(effect["dies_damage_target"], "any_target")
+        self.assertEqual(effect["target_constraints"], {"scope": "any_target"})
+
+    def test_creature_dies_damage_maps_creature_or_planeswalker_filter_scope(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Careless Fixture",
+                type_line="Creature - Satyr Shaman",
+                oracle_text=(
+                    "When Careless Fixture dies, it deals 2 damage to target creature "
+                    "or planeswalker an opponent controls."
+                ),
+            ),
+            source_text="""
+                private static final FilterPermanent filter
+                        = new FilterPermanent("creature or planeswalker an opponent controls");
+                static {
+                    filter.add(TargetController.OPPONENT.getControllerPredicate());
+                    filter.add(Predicates.or(
+                            CardType.CREATURE.getPredicate(),
+                            CardType.PLANESWALKER.getPredicate()
+                    ));
+                }
+                Ability ability = new DiesSourceTriggeredAbility(new DamageTargetEffect(2, "it"));
+                ability.addTarget(new TargetPermanent(filter));
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["dies_damage_target"], "creature_or_planeswalker")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature", "planeswalker"]})
+
+    def test_creature_dies_damage_preserves_optional_trigger(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Arsonist",
+                type_line="Creature - Goblin Shaman",
+                oracle_text="When Fixture Arsonist dies, you may have it deal 1 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(
+                    new DamageTargetEffect(1).setText("it deal 1 damage to any target"),
+                    true
+                );
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        self.assertTrue(proposal["effect_json"]["dies_damage_optional"])
+
+    def test_creature_dies_damage_blocks_variable_amount(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Blazing Fixture",
+                type_line="Creature - Elemental",
+                oracle_text=(
+                    "When Blazing Fixture dies, it deals X damage to target creature, "
+                    "where X is 3 plus the amount of damage dealt to it this turn."
+                ),
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(
+                    new DamageTargetEffect(BlazingFixtureCount.instance),
+                    false
+                );
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_damage_amount_not_fixed")
+
+    def test_creature_dies_damage_blocks_source_oracle_target_mismatch(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Firefiend",
+                type_line="Creature - Spirit",
+                oracle_text="When Fixture Firefiend dies, it deals 2 damage to any target.",
+            ),
+            source_text="""
+                Ability ability = new DiesSourceTriggeredAbility(new DamageTargetEffect(2), false);
+                ability.addTarget(new TargetCreaturePermanent());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_damage_target_source_oracle_mismatch")
+
     def test_destroy_target_creature_maps_to_remove_creature_runtime(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(
