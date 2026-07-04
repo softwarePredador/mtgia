@@ -41,7 +41,7 @@ class ApiClient {
     defaultValue: false,
   );
   static const String _serverFallbackUrl =
-      'https://evolution-cartinhas.8ktevp.easypanel.host';
+      'https://evolution-cartinhas.2ta7qx.easypanel.host';
 
   // ──────────────────────────────────────────
   // Cache do token em memória (evita SharedPreferences a cada request)
