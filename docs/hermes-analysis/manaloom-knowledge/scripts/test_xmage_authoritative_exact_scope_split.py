@@ -2332,6 +2332,141 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "scry_draw_oracle_not_exact_fixed")
 
+    def test_fixed_damage_scry_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Magma Jet deals 2 damage to any target. Scry 2. "
+                    "(Look at the top two cards of your library, then put any number of them on the bottom "
+                    "and the rest on top in any order.)"
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(2));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new ScryEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCRY_SCOPE)
+        self.assertEqual(effect["amount"], 2)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["scry_count"], 2)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["direct_damage", "scry"],
+        )
+
+    def test_fixed_damage_scry_spell_blocks_triggered_source(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect", "ScryEffect"],
+            ability_kind="triggered",
+            ability_classes=["CastSecondSpellTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Iron-Fist Pulverizer",
+                type_line="Creature - Goblin Artificer",
+                oracle_text="Whenever you cast your second spell each turn, Iron-Fist Pulverizer deals 2 damage to target opponent. Scry 1.",
+            ),
+            source_text=(
+                "Ability ability = new CastSecondSpellTriggeredAbility(new DamageTargetEffect(2));"
+                "ability.addEffect(new ScryEffect(1));"
+                "ability.addTarget(new TargetOpponent());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
+    def test_fixed_destroy_scry_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target artifact or enchantment. Scry 2."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                "this.getSpellAbility().addEffect(new ScryEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(effect["destination"], "graveyard")
+        self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
+        self.assertEqual(effect["_composite_rule_components"][1]["effect"], "scry")
+
+    def test_fixed_destroy_scry_spell_maps_power_three_restricted_target(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Destroy target creature with power 3 or greater. Scry 1."),
+            source_text=(
+                "filter.add(new PowerPredicate(ComparisonType.MORE_THAN, 2));"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(filter));"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "power_min": 3})
+
+    def test_fixed_exile_scry_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.EXILE_UNIT, effect_classes=["ExileTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Exile target artifact or enchantment. Scry 1."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ExileTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetPermanent(StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_ENCHANTMENT));"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.EXILE_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "artifact_or_enchantment")
+        self.assertEqual(effect["destination"], "exile")
+        self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_permanent")
+        self.assertEqual(effect["_composite_rule_components"][1]["effect"], "scry")
+
+    def test_fixed_bounce_scry_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(split.BOUNCE_UNIT, effect_classes=["ReturnToHandTargetEffect", "ScryEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Return target tapped creature to its owner's hand. Scry 1."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ReturnToHandTargetEffect());"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent(filter));"
+                "filter.add(TappedPredicate.TAPPED);"
+                "this.getSpellAbility().addEffect(new ScryEffect(1));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.BOUNCE_SCRY_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["target_constraints"], {"card_types": ["creature"], "tapped_state": "tapped"})
+        self.assertEqual(effect["destination"], "hand")
+        self.assertEqual(effect["_composite_rule_components"][0]["effect"], "remove_creature")
+        self.assertEqual(effect["_composite_rule_components"][1]["effect"], "scry")
+
     def test_fixed_damage_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

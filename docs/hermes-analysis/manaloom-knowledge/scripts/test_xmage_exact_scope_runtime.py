@@ -3221,6 +3221,92 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_destroy_scry_spell_removes_target_then_scries(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Low Priority Land", "type_line": "Land", "cmc": 0},
+                {"name": "Approach of the Second Sun", "type_line": "Sorcery", "cmc": 7},
+                {"name": "Library Remainder", "type_line": "Instant", "cmc": 2},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Relic",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 2,
+        }
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_destroy_target_and_scry_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "remove_permanent",
+                    "battle_model_scope": "xmage_destroy_target_spell_v1",
+                    "target": "artifact",
+                    "target_constraints": {"card_types": ["artifact"]},
+                    "destination": "graveyard",
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 2,
+                    "scry_count": 2,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Sorrow",
+            "type_line": "Instant",
+            "oracle_text": "Destroy target artifact. Scry 2.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(53),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Relic"])
+        self.assertEqual(active.library[0]["name"], "Approach of the Second Sun")
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Sorrow"])
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Sorrow"
+                and data.get("target") == "Target Relic"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "scry_resolved"
+                and data.get("card") == "Fixture Sorrow"
+                and data.get("component_index") == 1
+                and data.get("scry_count") == 2
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Sorrow"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

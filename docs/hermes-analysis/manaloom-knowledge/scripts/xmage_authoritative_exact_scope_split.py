@@ -106,6 +106,10 @@ LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
 SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
 SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
+DAMAGE_SCRY_SCOPE = "xmage_fixed_damage_target_and_scry_spell_v1"
+DESTROY_SCRY_SCOPE = "xmage_destroy_target_and_scry_spell_v1"
+EXILE_SCRY_SCOPE = "xmage_exile_target_and_scry_spell_v1"
+BOUNCE_SCRY_SCOPE = "xmage_return_target_to_hand_and_scry_spell_v1"
 DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
@@ -880,6 +884,140 @@ def fixed_scry_draw_from_source(source: str) -> tuple[int, int, str] | None:
         return None
     order = "scry_then_draw" if scry_matches[0].start() < draw_matches[0].start() else "draw_then_scry"
     return int(scry_matches[0].group(1)), draw_count, order
+
+
+def fixed_scry_count_match_from_source(source: str) -> tuple[int, int] | None:
+    matches = list(
+        re.finditer(r"new\s+ScryEffect\s*\(\s*(\d+)\s*(?:,\s*false\s*)?\)", source or "", re.S)
+    )
+    if len(matches) != 1:
+        return None
+    return int(matches[0].group(1)), matches[0].start()
+
+
+def fixed_damage_scry_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(?P<damage>.+ deals (?P<amount>\d+) damage to .+?)\. scry (?P<scry>\d+)\.?$", text)
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group('damage')}."
+    target = damage_target_from_oracle(simple_metadata)
+    if target is None:
+        return None
+    return int(match.group("amount")), int(match.group("scry")), target
+
+
+def fixed_damage_scry_from_source(source: str) -> tuple[int, int] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    damage_matches = list(re.finditer(r"new\s+DamageTargetEffect\s*\(\s*(\d+)\s*(?:,[^)]*)?\)", text, re.S))
+    scry_match = fixed_scry_count_match_from_source(text)
+    if len(damage_matches) != 1 or scry_match is None:
+        return None
+    scry_count, scry_index = scry_match
+    if damage_matches[0].start() > scry_index:
+        return None
+    return int(damage_matches[0].group(1)), scry_count
+
+
+def fixed_destroy_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(destroy target .+?)(\. it can't be regenerated)?\. scry (?P<scry>\d+)\.?$", text)
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}{match.group(2) or ''}."
+    parsed = destroy_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, int(match.group("scry"))
+
+
+def fixed_destroy_scry_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    destroy_matches = list(re.finditer(r"new\s+DestroyTargetEffect\s*\(\s*\)", text, re.S))
+    scry_match = fixed_scry_count_match_from_source(text)
+    if len(destroy_matches) != 1 or scry_match is None:
+        return None
+    scry_count, scry_index = scry_match
+    if destroy_matches[0].start() > scry_index:
+        return None
+    return scry_count
+
+
+def fixed_exile_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(exile target .+?)\. scry (?P<scry>\d+)\.?$", text)
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = exile_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, int(match.group("scry"))
+
+
+def fixed_exile_scry_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    exile_matches = list(re.finditer(r"new\s+ExileTargetEffect\s*\(\s*\)", text, re.S))
+    scry_match = fixed_scry_count_match_from_source(text)
+    if len(exile_matches) != 1 or scry_match is None:
+        return None
+    scry_count, scry_index = scry_match
+    if exile_matches[0].start() > scry_index:
+        return None
+    return scry_count
+
+
+def fixed_bounce_scry_from_oracle(metadata: dict[str, Any]) -> tuple[str, str, int] | None:
+    text = strip_parenthetical_reminders(oracle_text(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    match = re.match(r"^(return target .+? to its owner's hand)\. scry (?P<scry>\d+)\.?$", text)
+    if not match:
+        return None
+    simple_metadata = dict(metadata)
+    simple_metadata["oracle_text"] = f"{match.group(1)}."
+    parsed = bounce_target_from_oracle(simple_metadata)
+    if parsed is None:
+        return None
+    effect, target = parsed
+    return effect, target, int(match.group("scry"))
+
+
+def fixed_bounce_scry_from_source(source: str) -> int | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    if "TargetAdjuster" in text or ".setTargetAdjuster" in text:
+        return None
+    bounce_matches = list(re.finditer(r"new\s+ReturnToHandTargetEffect\s*\(\s*\)", text, re.S))
+    scry_match = fixed_scry_count_match_from_source(text)
+    if len(bounce_matches) != 1 or scry_match is None:
+        return None
+    scry_count, scry_index = scry_match
+    if bounce_matches[0].start() > scry_index:
+        return None
+    return scry_count
 
 
 def fixed_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
@@ -4027,6 +4165,7 @@ def restricted_target_base(target: str) -> str:
         "legendary_creature",
         "monocolored_creature",
         "blue_or_black_flying_creature",
+        "creature_power_3_or_greater",
         "creature_power_4_or_greater",
         "creature_mana_value_3_or_greater",
     }:
@@ -4070,6 +4209,7 @@ def restricted_battlefield_target_from_oracle(metadata: dict[str, Any], action: 
         (r"target blue or black creature with flying", "blue_or_black_flying_creature"),
         (r"target black or red permanent", "black_or_red_permanent"),
         (r"target nonwhite permanent", "nonwhite_permanent"),
+        (r"target creature with power 3 or greater", "creature_power_3_or_greater"),
         (r"target creature with power 4 or greater", "creature_power_4_or_greater"),
         (r"target creature with (?:mana value|converted mana cost) 3 or greater", "creature_mana_value_3_or_greater"),
     ]
@@ -4132,6 +4272,8 @@ def restricted_battlefield_target_from_source(source: str) -> str | None:
         return "black_or_red_permanent"
     if 'FilterPermanent("nonwhite permanent")' in text or "nonwhite permanent" in text:
         return "nonwhite_permanent"
+    if "PowerPredicate(ComparisonType.MORE_THAN, 2)" in text:
+        return "creature_power_3_or_greater"
     if "PowerPredicate(ComparisonType.MORE_THAN, 3)" in text:
         return "creature_power_4_or_greater"
     if "ManaValuePredicate(ComparisonType.MORE_THAN, 2)" in text:
@@ -7185,6 +7327,8 @@ def target_constraints_for(target: str) -> dict[str, Any]:
         return {"card_types": ["artifact"], "exclude_card_types": ["creature"]}
     if target == "creature_power_4_or_greater":
         return {"card_types": ["creature"], "power_min": 4}
+    if target == "creature_power_3_or_greater":
+        return {"card_types": ["creature"], "power_min": 3}
     if target == "creature_mana_value_3_or_greater":
         return {"card_types": ["creature"], "mana_value_min": 3}
     if target == "creature":
@@ -9571,6 +9715,216 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_permanent_simple_activated_damage",
+        ), "selected_exact_scope"
+
+    if unit == DAMAGE_UNIT and classes == {"DamageTargetEffect", "ScryEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "damage_scry_ability_class_not_simple"
+        oracle_damage_scry = fixed_damage_scry_from_oracle(metadata)
+        if oracle_damage_scry is None:
+            return None, "damage_scry_oracle_not_exact_fixed"
+        source_damage_scry = fixed_damage_scry_from_source(source_text)
+        if source_damage_scry is None:
+            return None, "damage_scry_source_not_fixed"
+        amount, scry_count, target = oracle_damage_scry
+        if source_damage_scry != (amount, scry_count):
+            return None, "damage_scry_source_oracle_mismatch"
+        if not source_matches_target_constraint(source_text, target):
+            return None, "damage_scry_target_source_mismatch"
+        target_base = restricted_target_base(target)
+        damage_component = {
+            "effect": "direct_damage",
+            "battle_model_scope": DAMAGE_SCOPE,
+            "amount": amount,
+            "damage": amount,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target),
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DamageTargetEffect",
+        }
+        scry_component = {
+            "effect": "scry",
+            "battle_model_scope": SCRY_SCOPE,
+            "count": scry_count,
+            "scry_count": scry_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ScryEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": DAMAGE_SCRY_SCOPE,
+            "amount": amount,
+            "damage": amount,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target),
+            "scry_count": scry_count,
+            "resolution_order": "damage_then_scry",
+            "_composite_rule_components": [damage_component, scry_component],
+            "xmage_effect_classes": ["DamageTargetEffect", "ScryEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_fixed_damage_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == DESTROY_UNIT and classes == {"DestroyTargetEffect", "ScryEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "destroy_scry_ability_class_not_simple"
+        oracle_destroy_scry = fixed_destroy_scry_from_oracle(metadata)
+        if oracle_destroy_scry is None:
+            return None, "destroy_scry_oracle_not_exact_fixed"
+        source_scry_count = fixed_destroy_scry_from_source(source_text)
+        if source_scry_count is None:
+            return None, "destroy_scry_source_not_fixed"
+        effect, target_type, scry_count = oracle_destroy_scry
+        if source_scry_count != scry_count:
+            return None, "destroy_scry_source_oracle_mismatch"
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "destroy_scry_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        destroy_component = {
+            "effect": effect,
+            "battle_model_scope": DESTROY_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "DestroyTargetEffect",
+        }
+        scry_component = {
+            "effect": "scry",
+            "battle_model_scope": SCRY_SCOPE,
+            "count": scry_count,
+            "scry_count": scry_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ScryEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": DESTROY_SCRY_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "graveyard",
+            "scry_count": scry_count,
+            "resolution_order": "destroy_then_scry",
+            "_composite_rule_components": [destroy_component, scry_component],
+            "xmage_effect_classes": ["DestroyTargetEffect", "ScryEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_destroy_target_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == EXILE_UNIT and classes == {"ExileTargetEffect", "ScryEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "exile_scry_ability_class_not_simple"
+        oracle_exile_scry = fixed_exile_scry_from_oracle(metadata)
+        if oracle_exile_scry is None:
+            return None, "exile_scry_oracle_not_exact_fixed"
+        source_scry_count = fixed_exile_scry_from_source(source_text)
+        if source_scry_count is None:
+            return None, "exile_scry_source_not_fixed"
+        effect, target_type, scry_count = oracle_exile_scry
+        if source_scry_count != scry_count:
+            return None, "exile_scry_source_oracle_mismatch"
+        if not source_matches_target_constraint(source_text, target_type):
+            return None, "exile_scry_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        exile_component = {
+            "effect": effect,
+            "battle_model_scope": EXILE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ExileTargetEffect",
+        }
+        scry_component = {
+            "effect": "scry",
+            "battle_model_scope": SCRY_SCOPE,
+            "count": scry_count,
+            "scry_count": scry_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ScryEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": EXILE_SCRY_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "exile",
+            "scry_count": scry_count,
+            "resolution_order": "exile_then_scry",
+            "_composite_rule_components": [exile_component, scry_component],
+            "xmage_effect_classes": ["ExileTargetEffect", "ScryEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_exile_target_scry_spell",
+        ), "selected_exact_scope"
+
+    if unit == BOUNCE_UNIT and classes == {"ReturnToHandTargetEffect", "ScryEffect"}:
+        unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+        if unsupported_abilities:
+            return None, "bounce_scry_ability_class_not_simple"
+        oracle_bounce_scry = fixed_bounce_scry_from_oracle(metadata)
+        if oracle_bounce_scry is None:
+            return None, "bounce_scry_oracle_not_exact_fixed"
+        source_scry_count = fixed_bounce_scry_from_source(source_text)
+        if source_scry_count is None:
+            return None, "bounce_scry_source_not_fixed"
+        effect, target_type, scry_count = oracle_bounce_scry
+        if source_scry_count != scry_count:
+            return None, "bounce_scry_source_oracle_mismatch"
+        if not source_matches_bounce_target(source_text, target_type):
+            return None, "bounce_scry_target_source_mismatch"
+        target_base = restricted_target_base(target_type)
+        bounce_component = {
+            "effect": effect,
+            "battle_model_scope": BOUNCE_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "hand",
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ReturnToHandTargetEffect",
+        }
+        scry_component = {
+            "effect": "scry",
+            "battle_model_scope": SCRY_SCOPE,
+            "count": scry_count,
+            "scry_count": scry_count,
+            "compose_on_resolution": True,
+            "xmage_effect_class": "ScryEffect",
+        }
+        effect_json = {
+            "effect": "composite_resolution",
+            "battle_model_scope": BOUNCE_SCRY_SCOPE,
+            "target": target_base,
+            "target_constraints": target_constraints_for(target_type),
+            "destination": "hand",
+            "scry_count": scry_count,
+            "resolution_order": "bounce_then_scry",
+            "_composite_rule_components": [bounce_component, scry_component],
+            "xmage_effect_classes": ["ReturnToHandTargetEffect", "ScryEffect"],
+            **flags,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_bounce_scry_spell",
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
