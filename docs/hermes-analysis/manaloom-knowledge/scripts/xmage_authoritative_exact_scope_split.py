@@ -3480,6 +3480,11 @@ def strip_leading_parenthetical_reminders(text: str) -> str:
         cleaned = cleaned[match.end() :].strip()
 
 
+def strip_parenthetical_reminders(text: str) -> str:
+    cleaned = strip_leading_parenthetical_reminders(text)
+    return re.sub(r"\s*\([^)]*\)", "", cleaned).strip()
+
+
 def signed_int_from_oracle(value: str) -> int | None:
     token = str(value or "").strip()
     if not re.fullmatch(r"[+-]?\d+", token):
@@ -3541,7 +3546,7 @@ def fixed_boost_controlled_from_source(source: str) -> tuple[int, int] | str | N
 
 
 def fixed_boost_keyword_target_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str, str] | None:
-    text = strip_leading_parenthetical_reminders(oracle_text(metadata))
+    text = strip_parenthetical_reminders(oracle_text(metadata))
     keyword_words = "|".join(re.escape(word) for word in sorted(TARGET_GRANT_KEYWORD_ORACLE_WORDS, key=len, reverse=True))
     match = re.match(
         rf"^target creature( you control)? gets ([+-]?\d+)/([+-]?\d+) and gains ({keyword_words}) until end of turn\.?$",
@@ -5005,7 +5010,10 @@ def activated_target_boost_from_source(source: str) -> dict[str, Any] | str:
 
 
 def activated_target_keyword_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip().lower()
+    text = strip_parenthetical_reminders(
+        oracle_text_after_leading_static_keywords(metadata)
+    )
+    text = re.sub(r"\s+", " ", text).strip().lower()
     if text.count(":") != 1:
         return "activated_target_keyword_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]

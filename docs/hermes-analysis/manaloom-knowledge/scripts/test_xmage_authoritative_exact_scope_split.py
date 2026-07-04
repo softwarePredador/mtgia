@@ -6150,6 +6150,35 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_keyword_source_oracle_target_mismatch")
 
+    def test_fixed_boost_keyword_allows_trailing_reminder_text(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["BoostTargetEffect", "GainAbilityTargetEffect"],
+            ability_classes=["TrampleAbility"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Target creature gets +3/+1 and gains trample until end of turn. "
+                    "(It can deal excess combat damage to the player or planeswalker it's attacking.)"
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new BoostTargetEffect(3, 1, Duration.EndOfTurn));"
+                "this.getSpellAbility().addEffect(new GainAbilityTargetEffect("
+                "TrampleAbility.getInstance(), Duration.EndOfTurn));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["power_delta"], 3)
+        self.assertEqual(effect["toughness_delta"], 1)
+        self.assertEqual(effect["granted_keywords_until_eot"], ["trample"])
+
     def test_static_combat_keyword_creature_maps_to_creature_with_keywords(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::FlyingAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
@@ -6589,6 +6618,35 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
 
         self.assertIsNone(proposal)
         self.assertEqual(reason, "activated_target_keyword_oracle_cost_not_supported")
+
+    def test_activated_target_keyword_allows_trailing_reminder_text(self) -> None:
+        row = queue_row(
+            split.BOOST_KEYWORD_UNIT,
+            effect_classes=["GainAbilityTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["HasteAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Inciter",
+                type_line="Creature - Human Warrior",
+                oracle_text="{T}: Target creature gains haste until end of turn. (It can attack and {T} this turn.)",
+            ),
+            source_text=(
+                "Ability ability = new SimpleActivatedAbility("
+                "new GainAbilityTargetEffect(HasteAbility.getInstance(), Duration.EndOfTurn), "
+                "new TapSourceCost());"
+                "ability.addTarget(new TargetCreaturePermanent());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["target_controller"], "any")
+        self.assertEqual(effect["granted_keywords_until_eot"], ["haste"])
+        self.assertTrue(effect["activation_requires_tap"])
 
     def test_static_keyword_creature_allows_multiline_keyword_oracle(self) -> None:
         row = queue_row(

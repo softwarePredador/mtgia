@@ -1,0 +1,35 @@
+        card_name         |     normalized_name      |                logical_rule_key                 | promoted_rule_rows | promoted_verified_auto_rows | promoted_oracle_hash_rows | backup_rows
+--------------------------+--------------------------+-------------------------------------------------+--------------------+-----------------------------+---------------------------+-------------
+ Adamant Will             | adamant will             | battle_rule_v1:90cc100ccda9438c7ac48cc560cb6f3a |                  1 |                           1 |                         1 |           0
+ Alabaster Mage           | alabaster mage           | battle_rule_v1:1d4f0780d5dd542aa811296cb7294b1d |                  1 |                           1 |                         1 |           0
+ Angelic Blessing         | angelic blessing         | battle_rule_v1:96865d3297094468cd28c05e7369312e |                  1 |                           1 |                         1 |           0
+ Axgard Cavalry           | axgard cavalry           | battle_rule_v1:390389de6d07280cec26bbd1d23eea79 |                  1 |                           1 |                         1 |           0
+ Beaming Defiance         | beaming defiance         | battle_rule_v1:f66305ab0cad38968db20f6d777544e8 |                  1 |                           1 |                         1 |           0
+ Bloodlust Inciter        | bloodlust inciter        | battle_rule_v1:390389de6d07280cec26bbd1d23eea79 |                  1 |                           1 |                         1 |           0
+ Blossoming Defense       | blossoming defense       | battle_rule_v1:f66305ab0cad38968db20f6d777544e8 |                  1 |                           1 |                         1 |           0
+ Brute Strength           | brute strength           | battle_rule_v1:cd628c49a7057e7865a282297ac4a5a9 |                  1 |                           1 |                         1 |           0
+ Chase Inspiration        | chase inspiration        | battle_rule_v1:1700e1e7565591c3def06b8342aceb24 |                  1 |                           1 |                         1 |           0
+ Coat with Venom          | coat with venom          | battle_rule_v1:373f8b2f0e05d487a3e49be1fda3fff4 |                  1 |                           1 |                         1 |           0
+ Confidence from Strength | confidence from strength | battle_rule_v1:18775898a3dc6af0bee9c3d53d1040ab |                  1 |                           1 |                         1 |           0
+ Crimson Mage             | crimson mage             | battle_rule_v1:265eb45d5b7c049042f3bfbdee9ad6f0 |                  1 |                           1 |                         1 |           0
+ Dive Down                | dive down                | battle_rule_v1:1700e1e7565591c3def06b8342aceb24 |                  1 |                           1 |                         1 |           0
+ Glint                    | glint                    | battle_rule_v1:1700e1e7565591c3def06b8342aceb24 |                  1 |                           1 |                         1 |           0
+ Goblin Motivator         | goblin motivator         | battle_rule_v1:390389de6d07280cec26bbd1d23eea79 |                  1 |                           1 |                         1 |           0
+ Grotesque Mutation       | grotesque mutation       | battle_rule_v1:83dd3e1b1938ed4752b2b6e08fe6beb4 |                  1 |                           1 |                         1 |           0
+ Kindled Fury             | kindled fury             | battle_rule_v1:0e2b7ef68567218c1936dba6a26881be |                  1 |                           1 |                         1 |           0
+ Moment of Heroism        | moment of heroism        | battle_rule_v1:921d62d7b77a16a68193a4dd2907e79a |                  1 |                           1 |                         1 |           0
+ Mortal's Ardor           | mortal's ardor           | battle_rule_v1:31e038f7ecd2a61e13d549f3001fd75b |                  1 |                           1 |                         1 |           0
+ Mortal's Resolve         | mortal's resolve         | battle_rule_v1:b52d5b62cc5eee528c2b0cb2ce318255 |                  1 |                           1 |                         1 |           0
+ Onyx Mage                | onyx mage                | battle_rule_v1:0584c17ed05ff1b9825059d1ab3ac656 |                  1 |                           1 |                         1 |           0
+ Predator's Strike        | predator's strike        | battle_rule_v1:9163dea3a4511d5276a90376e477b12a |                  1 |                           1 |                         1 |           0
+ Ranger's Guile           | ranger's guile           | battle_rule_v1:b33c78569c174f355afe393d210bb9ea |                  1 |                           1 |                         1 |           0
+ Shape the Sands          | shape the sands          | battle_rule_v1:985e756dd133e5a0fc85fa37b023c38a |                  1 |                           1 |                         1 |           0
+ Silk Net                 | silk net                 | battle_rule_v1:43f83ebf7dc3ef39da79f8fa8273d2b0 |                  1 |                           1 |                         1 |           0
+ Slaughter Cry            | slaughter cry            | battle_rule_v1:d0d3e82d35510640d9e051cdd229c095 |                  1 |                           1 |                         1 |           0
+ Snare the Skies          | snare the skies          | battle_rule_v1:43f83ebf7dc3ef39da79f8fa8273d2b0 |                  1 |                           1 |                         1 |           0
+ Sure Strike              | sure strike              | battle_rule_v1:d0d3e82d35510640d9e051cdd229c095 |                  1 |                           1 |                         1 |           0
+ Thunder Strike           | thunder strike           | battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd |                  1 |                           1 |                         1 |           0
+ Unlikely Aid             | unlikely aid             | battle_rule_v1:be13b522beca6444b5ac33444a6e94c6 |                  1 |                           1 |                         1 |           0
+ Whip Sergeant            | whip sergeant            | battle_rule_v1:225e955ff817043977cbe3fcb909b9d2 |                  1 |                           1 |                         1 |           0
+ Woodcutter's Grit        | woodcutter's grit        | battle_rule_v1:92d7ba96a27fe0f89a6e0b05c54d98f0 |                  1 |                           1 |                         1 |           0
+(32 rows)

@@ -179,21 +179,25 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg374_bounce_draw_spell_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg375_counter_draw_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg375_counter_draw_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg376_scry_damage_draw_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg376_scry_damage_draw_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg377_keyword_reminder_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg377_keyword_reminder_new_server_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27039`
-- XMage authoritative source resolved: `26725`
+- target all-card battle-gap identities: `26995`
+- XMage authoritative source resolved: `26681`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26725`
+- XMage authoritative adapter required: `26681`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26725` identities, card semantics are accepted from XMage; work is now
+- For `26681` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -212,11 +216,12 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG375 Exact Adapter Waves
+## PG283-PG377 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG375 all-card exact adapter waves are applied and
-synced. PG375 was applied against the new EasyPanel PostgreSQL target via the
-new-server tunnel and validated with `database_target=127.0.0.1:15432/halder`.
+As of 2026-07-04, the PG283-PG377 all-card exact adapter waves are applied and
+synced. PG375-PG377 were applied against the new EasyPanel PostgreSQL target
+via the new-server tunnel and validated with
+`database_target=127.0.0.1:15432/halder`.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py`
@@ -5732,6 +5737,57 @@ PG375 measured result:
   `DB_*`/`PG*` variables over any convenience `.env` loaded from the workspace,
   preventing ignored old-server env files from overriding new-server commands.
 
+PG376 measured result:
+
+- PG376 promoted `12` composite draw spells on the new server:
+  `9` fixed scry/draw spells and `3` fixed damage/draw spells.
+- Runtime support was extended for `scry` and `direct_damage` components inside
+  `composite_resolution`, with focused tests proving ordered component
+  resolution without double-moving the source spell.
+- Focused splitter tests passed with `294` tests; focused exact runtime tests
+  passed with `175` tests.
+- PostgreSQL precheck matched `12/12` target card rows on the new server; apply
+  upserted `12` rows and deprecated `8` shadows; postcheck verified `12/12`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `12` PostgreSQL rows from the new target,
+  inserted/updated `20` SQLite rows including deprecated shadows, and exported
+  `5031` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `12/12` cards.
+- Global all-card authoritative queue after PG376:
+  `target_identity_count=27027`, `xmage_authoritative_source_count=26713`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26713`.
+- Running the exact splitter after PG376 on supported units returned
+  `proposal_count=0` over `7784` considered supported rows.
+
+PG377 measured result:
+
+- PG377 promoted `32` keyword-until-EOT rules on the new server:
+  `25` fixed target-creature boost plus keyword spells and `7` simple
+  activated target-creature keyword permanents.
+- The splitter now strips Oracle reminder text in parenthetical clauses for
+  the keyword-until-EOT exact mapper path, fixing false blockers such as
+  `Bloodlust Inciter`, `Axgard Cavalry`, `Brute Strength`, and
+  `Beaming Defiance` without promoting broad generic protection behavior.
+- Focused splitter tests passed with `296` tests; focused exact runtime tests
+  passed with `175` tests. No new runtime executor was needed because both
+  scopes already had focused runtime coverage.
+- PostgreSQL precheck matched `32/32` target card rows on the new server; apply
+  upserted `32` rows and deprecated `0` shadows; postcheck verified `32/32`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `32` PostgreSQL rows from the new target,
+  updated `32` SQLite rows, and exported `5063` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `32/32` cards.
+- Global all-card authoritative queue after PG377:
+  `target_identity_count=26995`, `xmage_authoritative_source_count=26681`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26681`.
+- Running the exact splitter after PG377 on supported units returned
+  `proposal_count=0` over `7752` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6362,12 +6418,12 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG376 queue on the new server, the next exact runtime-backed work should be selected from
-these largest reusable work units, not from deck intuition:
+post-PG377 queue on the new server, the next exact runtime-backed work should
+be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1634`
-3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1162`
+3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1130`
 4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`

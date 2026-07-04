@@ -212,10 +212,42 @@ Post-PG376 update:
   returned `proposal_count=0` over `7784` considered supported rows.
 - delta since post-PG375: `12` identities promoted.
 
+Post-PG377 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg377_keyword_reminder_new_server_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg377_keyword_reminder_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg377_keyword_reminder_new_server_supported_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg377_xmage_keyword_reminder_wave_package_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg377_keyword_reminder_new_server_e2e.md`
+- promoted families:
+  - `xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1` for
+    `25` fixed target-creature boost plus keyword-until-EOT spells.
+  - `xmage_permanent_simple_activated_target_keyword_until_eot_v1` for `7`
+    permanents with simple activated target-creature keyword-until-EOT
+    abilities.
+- implementation change:
+  - the exact-scope splitter now strips Oracle reminder text in parenthetical
+    clauses for the keyword-until-EOT mapper path. This fixed false blockers
+    such as `Bloodlust Inciter`, `Axgard Cavalry`, `Brute Strength`, and
+    `Beaming Defiance` without broadening the executable runtime scope.
+- target battle-gap identities in authoritative queue: `26995`
+- XMage authoritative source resolved: `26681`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26681`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `status=pass`, `49 pass`, `1 warn`
+  (`deck_id_607_has_no_pg_deck_id_note`, unrelated to PG377)
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg377_keyword_reminder_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7752` considered supported rows.
+- delta since post-PG376: `32` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG376 queue above.
+historical only. The active execution baseline is the post-PG377 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -223,13 +255,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG376 control numbers:
+Current post-PG377 control numbers:
 
-- target battle-gap identities: `27027`
-- XMage-resolved authoritative source identities: `26713`
+- target battle-gap identities: `26995`
+- XMage-resolved authoritative source identities: `26681`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26713`
+- XMage authoritative adapter required: `26681`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -249,8 +281,8 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg376_scry_damage_draw_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG376, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg377_keyword_reminder_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG377, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
@@ -330,8 +362,36 @@ PG376 completion and PG377 starting hypothesis:
    (`492`), `mana_source_effect_class_not_simple` (`303`), and
    `not_instant_or_sorcery_spell` (`3946`) split by reusable XMage signatures.
 
+PG377 completion and PG378 starting hypothesis:
+
+1. PG377 promoted `32` keyword-until-EOT rules on the new server:
+   `25` fixed target-creature boost plus keyword spells and `7` simple
+   activated target-creature keyword permanents.
+2. PG377 did not add a new runtime executor. It corrected the exact-scope
+   Oracle parser so reminder text in parentheses no longer blocks otherwise
+   exact XMage/source/runtime agreement.
+3. Tests passed: splitter `296`, exact runtime `175`, E2E package validation
+   `status=pass`, and PG/Hermes/SQLite contract audit `status=pass`.
+4. The post-PG377 supported splitter returns `0` batch-safe proposals, so PG378
+   must implement another narrow subpattern before PostgreSQL package
+   generation.
+5. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1822`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1634`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1130`), `direct_damage::targeted_damage_variant_v1` (`906`), and
+   `add_counters::source_add_counters_variant_v1` (`795`).
+
 Fresh alignment evidence:
 
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg377_keyword_reminder_new_server.md`
+  passed with `49` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg377_keyword_reminder_new_server_docs_after_update.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg377_keyword_reminder_new_server_docs_after_update.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg377_keyword_reminder_new_server_docs_after_update.md`
+  passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg376_scry_damage_draw_new_server.md`
   passed with `49` pass and `1` inherited warning.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
@@ -972,7 +1032,14 @@ Immediate checkpoint after PG361:
 71. The final post-PG372 supported splitter recheck returned
     `proposal_count=0` over `7814` considered supported rows. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260702_post_pg372_supported_recheck.md`.
-72. Continue from the fresh post-PG372 queue. Since the exact splitter is now
+72. PG373-PG376 subsequently promoted the destroy/draw, bounce/draw,
+    counter/draw, scry/draw, and damage/draw composite spell waves. Those
+    historical queues are no longer the execution baseline.
+73. PG377 promoted `32` keyword-until-EOT rows after fixing the exact Oracle
+    parser to ignore reminder text in parenthetical clauses for already
+    runtime-backed keyword scopes. Current evidence:
+    `docs/hermes-analysis/master_optimizer_reports/pg377_keyword_reminder_new_server_e2e.md`.
+74. Continue from the fresh post-PG377 queue. Since the exact splitter is now
     empty, the next cycle must implement a new mapper/runtime subpattern before
     any PostgreSQL package can be generated.
 
