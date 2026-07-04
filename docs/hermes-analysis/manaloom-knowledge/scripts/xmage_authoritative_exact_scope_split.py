@@ -65,6 +65,10 @@ ETB_TOKEN_CREATURE_UNIT = (
     "token_maker::xmage_signature::CreateTokenEffect::EntersBattlefieldTriggeredAbility::"
     "no_target_class::no_condition_class::token,triggered_ability"
 )
+DIES_TOKEN_CREATURE_UNIT = (
+    "token_maker::xmage_signature::CreateTokenEffect::DiesSourceTriggeredAbility::"
+    "no_target_class::no_condition_class::token,triggered_ability"
+)
 SUPPORTED_UNITS = {
     DRAW_UNIT,
     DAMAGE_UNIT,
@@ -171,6 +175,7 @@ DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_RECURSION_CREATURE_SCOPE = "xmage_creature_dies_return_graveyard_card_to_hand_v1"
 TOKEN_SPELL_SCOPE = "xmage_fixed_create_creature_tokens_spell_v1"
 ETB_TOKEN_CREATURE_SCOPE = "xmage_creature_etb_create_tokens_v1"
+DIES_TOKEN_CREATURE_SCOPE = "xmage_creature_dies_create_tokens_v1"
 ETB_ADD_COUNTERS_CREATURE_SCOPE = "xmage_creature_etb_add_counters_target_creature_v1"
 
 SPELL_UNITS = {
@@ -627,6 +632,59 @@ def parse_simple_token_class(token_source: str, token_class: str) -> tuple[dict[
     if artifact:
         token_data["artifact_tokens"] = True
     return token_data, None
+
+
+def normalized_token_oracle_phrase(value: str) -> str:
+    text = re.sub(r"\([^)]*\)", "", str(value or "").lower())
+    text = re.sub(r"\s+", " ", text).strip()
+    return text.rstrip(".")
+
+
+def plural_token_description(description: str) -> str:
+    phrase = normalized_token_oracle_phrase(description)
+    if phrase.endswith(" token"):
+        return phrase[:-6] + " tokens"
+    return phrase + "s"
+
+
+def count_word_for_oracle(count: int) -> str:
+    for word, value in NUMBER_WORDS.items():
+        if value == count:
+            return word
+    return str(count)
+
+
+def dies_create_token_oracle_blocker(
+    metadata: dict[str, Any],
+    token_data: dict[str, Any],
+    token_count: int,
+) -> str | None:
+    text = normalized_token_oracle_phrase(oracle_text_after_leading_static_keywords(metadata))
+    match = re.match(
+        r"^(?:when|whenever) (?:this creature|[^,.]+) dies, create (?P<phrase>.+)$",
+        text,
+    )
+    if not match:
+        return "dies_token_oracle_not_simple"
+    phrase = match.group("phrase").strip()
+    if any(marker in text for marker in (" if ", " for each ", " unless ", " instead ")):
+        return "dies_token_oracle_not_simple"
+    token_description = normalized_token_oracle_phrase(token_data.get("token_description"))
+    if token_count == 1:
+        expected = {
+            f"a {token_description}",
+            f"an {token_description}",
+            f"one {token_description}",
+        }
+    else:
+        plural_description = plural_token_description(token_description)
+        expected = {
+            f"{token_count} {plural_description}",
+            f"{count_word_for_oracle(token_count)} {plural_description}",
+        }
+    if phrase not in expected:
+        return "dies_token_oracle_not_simple"
+    return None
 
 
 def is_spell(metadata: dict[str, Any]) -> bool:
@@ -4180,6 +4238,20 @@ def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
         str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
         and effect_classes(row) == {"CreateTokenEffect"}
         and ability_classes(row) == {"EntersBattlefieldTriggeredAbility"}
+        and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
+    )
+
+
+def is_creature_dies_token_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"DiesSourceTriggeredAbility"}
+    return (
+        str(row.get("adapter_work_unit") or "").startswith(
+            "token_maker::xmage_signature::CreateTokenEffect::"
+        )
+        and effect_classes(row) == {"CreateTokenEffect"}
+        and "DiesSourceTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"token", "triggered_ability"}
     )
 
@@ -7953,6 +8025,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
         scope_kind = "creature enter-the-battlefield triggered ability"
+    elif scope == DIES_TOKEN_CREATURE_SCOPE:
+        scope_kind = "creature dies triggered fixed creature-token ability"
     elif scope == DIES_RECURSION_CREATURE_SCOPE:
         scope_kind = "creature dies triggered graveyard-to-hand ability"
     elif scope == CREATURE_TAP_DAMAGE_SCOPE:
@@ -8057,6 +8131,7 @@ def split_row(
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
+    dies_token_creature_unit = is_creature_dies_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
     permanent_activated_draw_unit = is_permanent_activated_draw_unit(row)
@@ -8107,6 +8182,7 @@ def split_row(
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
         and not etb_token_creature_unit
+        and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
@@ -8150,6 +8226,7 @@ def split_row(
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
         and not etb_token_creature_unit
+        and not dies_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
         and not permanent_activated_draw_unit
@@ -9549,6 +9626,61 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_create_tokens",
+        ), "selected_exact_scope"
+
+    if dies_token_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "dies_token_not_creature"
+        parsed_effect = fixed_create_token_effect_from_source(source_text)
+        if isinstance(parsed_effect, str):
+            return None, parsed_effect
+        token_class, token_count = parsed_effect
+        token_data, token_reason = parse_simple_token_class(
+            token_class_source(row, source_text, token_class),
+            token_class,
+        )
+        if token_reason:
+            return None, token_reason
+        oracle_blocker = dies_create_token_oracle_blocker(metadata, token_data, token_count)
+        if oracle_blocker:
+            return None, oracle_blocker
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": DIES_TOKEN_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "dies",
+            "dies_trigger_effect": "token_maker",
+            "dies_token_count": token_count,
+            "xmage_effect_class": "CreateTokenEffect",
+            "xmage_ability_class": "DiesSourceTriggeredAbility",
+            "xmage_token_class": token_data["xmage_token_class"],
+            "token_description": token_data["token_description"],
+            "dies_token_name": token_data["token_name"],
+            "dies_token_power": token_data["token_power"],
+            "dies_token_toughness": token_data["token_toughness"],
+        }
+        optional_token_fields = {
+            "token_subtype": "dies_token_subtype",
+            "token_colors": "dies_token_colors",
+            "token_keywords": "dies_token_keywords",
+            "token_flying": "dies_token_flying",
+            "token_haste": "dies_token_haste",
+            "artifact_tokens": "dies_artifact_tokens",
+        }
+        for source_key, target_key in optional_token_fields.items():
+            if source_key in token_data:
+                effect_json[target_key] = token_data[source_key]
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_dies_create_tokens",
         ), "selected_exact_scope"
 
     if etb_add_counters_creature_unit:
@@ -12397,6 +12529,7 @@ def build_exact_split_report(
             and not is_creature_etb_library_pick_unit(row)
             and not is_creature_tap_damage_unit(row)
             and not is_creature_etb_token_unit(row)
+            and not is_creature_dies_token_unit(row)
             and not is_creature_etb_add_counters_unit(row)
             and not is_permanent_activated_draw_unit(row)
             and not is_permanent_activated_damage_unit(row)
@@ -12487,6 +12620,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
                 "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
+                "token_maker CreateTokenEffect rows with DiesSourceTriggeredAbility, a fixed token count, literal safe creature token class, and exact non-conditional dies Oracle text",
                 "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text",
             ],
             "blocked_generic_review_scopes_from_pg": True,

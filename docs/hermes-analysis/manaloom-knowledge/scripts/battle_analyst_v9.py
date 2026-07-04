@@ -17866,6 +17866,69 @@ def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reas
     return recovered
 
 
+def resolve_permanent_dies_token_maker(
+    owner,
+    permanent,
+    *,
+    destination=None,
+    reason=None,
+    source=None,
+    opponents=None,
+    all_players=None,
+):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return 0
+    if permanent.get("dies_trigger_effect") != "token_maker" and not permanent.get("dies_token_count"):
+        return 0
+    token_count = max(0, int(permanent.get("dies_token_count") or permanent.get("token_count") or 0))
+    if token_count <= 0:
+        return 0
+    effect_data = dict(permanent)
+    dies_field_map = {
+        "dies_token_name": "token_name",
+        "dies_token_power": "token_power",
+        "dies_token_toughness": "token_toughness",
+        "dies_token_subtype": "token_subtype",
+        "dies_token_colors": "token_colors",
+        "dies_token_keywords": "token_keywords",
+        "dies_token_flying": "token_flying",
+        "dies_token_haste": "token_haste",
+        "dies_artifact_tokens": "artifact_tokens",
+    }
+    for dies_key, token_key in dies_field_map.items():
+        if dies_key in permanent:
+            effect_data[token_key] = permanent[dies_key]
+    participants = list(all_players or [])
+    if not participants:
+        participants = [owner] + list(opponents or [])
+    resolved_opponents = list(opponents or [player for player in participants if player is not owner])
+    created = create_creature_tokens_from_effect(
+        owner,
+        effect_data,
+        count=token_count,
+        opponents=resolved_opponents,
+        turn=CURRENT_REPLAY_TURN,
+        source_event="dies_token_created",
+        active_player=owner,
+        all_players=participants,
+    )
+    emit_replay_event(
+        "dies_token_maker_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        token_count=created,
+        token_name=effect_data.get("token_name", "Token"),
+        token_power=effect_data.get("token_power"),
+        token_toughness=effect_data.get("token_toughness"),
+        token_subtype=effect_data.get("token_subtype"),
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return created
+
+
 def move_creature_from_battlefield(owner, creature, reason=None, source=None, all_players=None):
     destination = _move_creature_from_battlefield(
         owner,
@@ -17904,6 +17967,14 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         destination=destination,
         reason=reason,
         source=source,
+    )
+    resolve_permanent_dies_token_maker(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
     )
     resolve_leave_battlefield_treasure_trigger(
         owner,
@@ -17967,6 +18038,14 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
         destination=destination,
         reason=reason,
         source=source,
+    )
+    resolve_permanent_dies_token_maker(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+        all_players=all_players,
     )
     resolve_leave_battlefield_treasure_trigger(
         owner,

@@ -1148,6 +1148,146 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["etb_token_name"], "Merfolk Token")
         self.assertEqual(effect["etb_token_keywords"], ["hexproof"])
 
+    def test_creature_dies_create_tokens_is_package_safe(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Beskir Shieldmate",
+                type_line="Creature - Human Warrior",
+                oracle_text="When Beskir Shieldmate dies, create a 1/1 white Human Warrior creature token.",
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new HumanWarriorToken())));
+                class HumanWarriorToken extends TokenImpl {
+                    public HumanWarriorToken() {
+                        super("Human Warrior Token", "1/1 white Human Warrior creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.HUMAN);
+                        subtype.add(SubType.WARRIOR);
+                        color.setWhite(true);
+                        power = new MageInt(1);
+                        toughness = new MageInt(1);
+                    }
+                }
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.DIES_TOKEN_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["dies_trigger_effect"], "token_maker")
+        self.assertEqual(effect["dies_token_count"], 1)
+        self.assertEqual(effect["dies_token_name"], "Human Warrior Token")
+        self.assertEqual(effect["dies_token_subtype"], "Human Warrior")
+        self.assertEqual(effect["dies_token_power"], 1)
+        self.assertEqual(effect["dies_token_toughness"], 1)
+        self.assertEqual(effect["dies_token_colors"], ["W"])
+
+    def test_creature_dies_create_tokens_blocks_non_creature_token(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Hoarder",
+                type_line="Creature - Human Pirate",
+                oracle_text="When Fixture Hoarder dies, create a Treasure token.",
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new TreasureToken())));
+                class TreasureToken extends TokenImpl {
+                    public TreasureToken() {
+                        super("Treasure Token", "colorless Treasure artifact token");
+                        cardType.add(CardType.ARTIFACT);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_description_not_creature_token")
+
+    def test_creature_dies_create_tokens_blocks_conditional_oracle(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Deathknell Berserker",
+                type_line="Creature - Elf Berserker",
+                oracle_text=(
+                    "When Deathknell Berserker dies, if its power was 3 or greater, "
+                    "create a 2/2 black Zombie Berserker creature token."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new DiesSourceTriggeredAbility(
+                    new CreateTokenEffect(new ZombieBerserkerToken())));
+                class ZombieBerserkerToken extends TokenImpl {
+                    public ZombieBerserkerToken() {
+                        super("Zombie Berserker Token", "2/2 black Zombie Berserker creature token");
+                        cardType.add(CardType.CREATURE);
+                        subtype.add(SubType.ZOMBIE);
+                        subtype.add(SubType.BERSERKER);
+                        color.setBlack(true);
+                        power = new MageInt(2);
+                        toughness = new MageInt(2);
+                    }
+                }
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_token_oracle_not_simple")
+
+    def test_creature_dies_create_tokens_blocks_dynamic_count(self) -> None:
+        row = queue_row(
+            split.DIES_TOKEN_CREATURE_UNIT,
+            effect_classes=["CreateTokenEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["token", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Dripping-Tongue Zubera",
+                type_line="Creature - Zubera Spirit",
+                oracle_text=(
+                    "When Dripping-Tongue Zubera dies, create a 1/1 colorless Spirit "
+                    "creature token for each Zubera that died this turn."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new DiesSourceTriggeredAbility("
+                "new CreateTokenEffect(new SpiritToken(), ZuberasDiedDynamicValue.instance)));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "token_source_create_token_not_fixed")
+
     def test_fixed_source_controller_draw_spell_is_package_safe(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(

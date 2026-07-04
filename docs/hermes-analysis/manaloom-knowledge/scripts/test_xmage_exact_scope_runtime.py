@@ -7306,6 +7306,53 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_create_tokens_triggers_when_moved_to_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        permanent = {
+            "name": "Fixture Shieldmate",
+            "type_line": "Creature - Human Warrior",
+            "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+            "dies_trigger_effect": "token_maker",
+            "dies_token_count": 1,
+            "dies_token_name": "Human Warrior Token",
+            "dies_token_subtype": "Human Warrior",
+            "dies_token_power": 1,
+            "dies_token_toughness": 1,
+            "dies_token_colors": ["W"],
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_token",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+            all_players=[active, opponent],
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Shieldmate"])
+        tokens = [card for card in active.battlefield if card.get("name") == "Human Warrior Token"]
+        self.assertEqual(len(tokens), 1)
+        token = tokens[0]
+        self.assertEqual(token.get("type_line"), "Creature Token — Human Warrior")
+        self.assertEqual(token.get("power"), 1)
+        self.assertEqual(token.get("toughness"), 1)
+        self.assertEqual(token.get("colors"), ["W"])
+        self.assertTrue(
+            any(
+                event == "dies_token_maker_resolved"
+                and data.get("card") == "Fixture Shieldmate"
+                and data.get("token_count") == 1
+                and data.get("token_name") == "Human Warrior Token"
+                and data.get("source") == "Fixture Removal"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_token"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_graveyard_recursion_returns_matching_card_only(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

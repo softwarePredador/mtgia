@@ -217,21 +217,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg393_simple_mana_auxiliary_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg393_simple_mana_auxiliary_new_server_after_hash_cleanup_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg393_simple_mana_auxiliary_new_server_after_hash_cleanup.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg394_dies_create_tokens_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg394_dies_create_tokens_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26843`
-- XMage authoritative source resolved: `26529`
+- target all-card battle-gap identities: `26819`
+- XMage authoritative source resolved: `26505`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26529`
-- ManaLoom adapter work-unit keys: `11429`
+- XMage authoritative adapter required: `26505`
+- ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26529` identities, card semantics are accepted from XMage; work is now
+- For `26505` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -250,10 +252,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG393 Exact Adapter Waves
+## PG283-PG394 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG393 all-card exact adapter waves are applied and
-synced. PG375-PG393 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG394 all-card exact adapter waves are applied and
+synced. PG375-PG394 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -694,6 +696,12 @@ patterns:
   `first_strike`, `flying`, `haste`, `hexproof`, `indestructible`, `lifelink`,
   `menace`, `reach`, `trample`, `vigilance`) ->
   `xmage_creature_etb_create_tokens_v1`
+- `token_maker::xmage_signature::CreateTokenEffect::DiesSourceTriggeredAbility::*` with
+  one fixed dies-triggered `CreateTokenEffect`, a literal safe creature token
+  class, exact non-conditional "dies, create..." Oracle text, no dynamic count,
+  no non-creature token, no additional token fanout, no custom effect text, and
+  token keywords limited to static runtime-supported keywords ->
+  `xmage_creature_dies_create_tokens_v1`
 
 PG283 evidence:
 
@@ -6467,6 +6475,59 @@ PG393 measured result:
   `mana_source_effect_class_not_simple=24`, and
   `mana_source_oracle_not_simple=21`.
 
+PG394 measured result:
+
+- PG394 promoted `24` creature dies token-maker rules on the new server:
+  `Beskir Shieldmate`, `Brindle Shoat`, `Brood Weaver`,
+  `Conscripted Infantry`, `Deathbloom Thallid`, `Discordant Piper`,
+  `Doomed Dissenter`, `Doomed Traveler`, `Dwarven Castle Guard`,
+  `Elgaud Inquisitor`, `Filigree Crawler`, `Garrison Cat`,
+  `Hunted Witness`, `Infestation Sage`, `Maalfeld Twins`, `Martyr of Dusk`,
+  `Myr Sire`, `Penumbra Bobcat`, `Penumbra Kavu`, `Penumbra Spider`,
+  `Penumbra Wurm`, `Pretending Poxbearers`, `Tukatongue Thallid`, and
+  `Wriggling Grub`.
+- The splitter now maps fixed
+  `CreateTokenEffect + DiesSourceTriggeredAbility` source rows to
+  `xmage_creature_dies_create_tokens_v1` only when XMage has one fixed token
+  class/count and Oracle exactly says the creature dies and creates that token.
+  It blocks conditional dies text, dynamic counts, non-creature tokens,
+  additional token fanout, custom effect text, and unsupported token abilities.
+- Runtime coverage adds a dies-token hook to the same battlefield-to-graveyard
+  path used by dies-draw and dies-recursion, so bounce/exile/replacement moves
+  do not create tokens. The hook emits `dies_token_maker_resolved` and reuses
+  the existing token factory for colors, subtypes, artifact creature tokens,
+  power/toughness, and safe token keywords.
+- Full exact splitter tests passed `354/354`, full exact runtime tests passed
+  `203/203`, package-builder tests passed, and `py_compile` passed for the
+  changed scripts.
+- PostgreSQL precheck matched `24/24` target card rows on the new server; apply
+  upserted `24` rows and deprecated `0` shadows; postcheck verified `24/24`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `7722` PostgreSQL rows from
+  `database_target=127.0.0.1:15432/halder`, updated `7517` SQLite rows, and
+  exported `5224` canonical snapshot rows. Full metadata sync used the same
+  new-server target, matched `6200` PostgreSQL cards from `6009` unique
+  requested names, backfilled `2699/2699` deck-card cache rows, and left one
+  unrelated unresolved alias.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, runtime
+  `get_card_effect`, and no-override battle checks for all `24` cards against
+  `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global all-card authoritative queue after PG394:
+  `target_identity_count=26819`, `xmage_authoritative_source_count=26505`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26505`.
+- Running the exact splitter after PG394 on supported units returned
+  `proposal_count=0` over `7659` considered supported rows. Remaining
+  token-maker neighbors are explicitly blocked, including
+  `dies_token_oracle_not_simple=4`, `token_description_not_creature_token=20`,
+  `token_source_create_token_not_fixed=28`,
+  `token_source_additional_tokens_not_supported=8`,
+  `token_source_custom_text_not_supported=9`, and
+  `token_literal_description_missing=29`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7097,7 +7158,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG393 queue on the new server, the next exact runtime-backed work should
+post-PG394 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`

@@ -1,0 +1,878 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T08:38:29.307982+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg394_dies_create_tokens_new_server_package_manifest.json",
+  "package_id": "pg394_dies_create_tokens_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Beskir Shieldmate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a5c752ef27017f2e75ce0f55ed0f24a",
+          "oracle_hash": "89fb793e3d183e1a3d352d759288d9d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Brindle Shoat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:04e8494c0691cf7dd230789adf7bc286",
+          "oracle_hash": "62901a84db69b8edda50cd7f1a733533",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Brood Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2dcd84e152f45572a05f9f8d43a2aae0",
+          "oracle_hash": "51e227a65f407ba62455d94b3a0695cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Conscripted Infantry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2cce2e20c521add80e6cad078072c035",
+          "oracle_hash": "25e183b1dacc1be7f9da2f31818aa028",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Deathbloom Thallid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+          "oracle_hash": "6e0b562f99e80aa42fc539f44f400447",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Discordant Piper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6",
+          "oracle_hash": "dd733152b1ce5fa027f45c97120115b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Doomed Dissenter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:edebf7fc3cc9646f30387c314dcde94e",
+          "oracle_hash": "2ab448518057ad9b18d4e2a6a0341143",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Doomed Traveler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac86a2a29ae7c0cfdcf73ec9a713d3cb",
+          "oracle_hash": "de756341b6369b2f370f2cede1c9b5ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Dwarven Castle Guard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08b5f23d0ba3ececd41afd1c0b27e545",
+          "oracle_hash": "1d7cc43aa46a86937f63de92f8833319",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Elgaud Inquisitor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b27ac08efcdb59f9e5f79a2018068ab4",
+          "oracle_hash": "354b612167a8079d089953876e641763",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Filigree Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a096cd3aed03009497106c2db9f209bc",
+          "oracle_hash": "d59c39b39c79d4b53dabc2ab154fa89f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Garrison Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3",
+          "oracle_hash": "29f1b4320917ca21c9997126f08eade8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Hunted Witness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c01cfdd1141dc6552ff0253d15340f04",
+          "oracle_hash": "e255a06c0665c973118fe5b75e6d7502",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Infestation Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:063aea50108acb3ff8ff2d1642fa9de8",
+          "oracle_hash": "76d8a8b36d4d294e0bcf4fbf766cefb3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Maalfeld Twins",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d3fde7fc16ae1aecd6c8b1c81a1c72d8",
+          "oracle_hash": "b93594a92bd90f13d7b557059a8d83b7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Martyr of Dusk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:81a506711ed7bd57ddb4ab35d7f4a66c",
+          "oracle_hash": "22d93e92247d062d2373f43624d519f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Myr Sire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25584d7c86ac16ca719c188f2d571b31",
+          "oracle_hash": "b642f47076f215b5303fe8c37969d9c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Bobcat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8773318eae9506eddbd72a0e453d6e4",
+          "oracle_hash": "bad2cbbacc9a7b4b1d2f00fef9d6e08e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f00bc2b1fc8cd4077131be5988136ed",
+          "oracle_hash": "914070971bf87a5967ce2081f0e373df",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Spider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:047d03e7a2c6714e3247741e81a41ff1",
+          "oracle_hash": "aafdabd85a3aa45ea3fdce5bae24b377",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c94157fd5bd2044ab43ba5e594a03bd5",
+          "oracle_hash": "7393d00a98736c334e374426d1f3a5d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Pretending Poxbearers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dc87a61782aeec3e2b8dd1c0cf62ef59",
+          "oracle_hash": "83f29f4346f7420740944ed35b1e463c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Tukatongue Thallid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+          "oracle_hash": "6e0b562f99e80aa42fc539f44f400447",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Wriggling Grub",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a989e9845f2222d86457d14990e48107",
+          "oracle_hash": "13d8c9254983dfaf4e6eb2e00dfec731",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 24
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Beskir Shieldmate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7a5c752ef27017f2e75ce0f55ed0f24a",
+          "oracle_hash": "89fb793e3d183e1a3d352d759288d9d5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Brindle Shoat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:04e8494c0691cf7dd230789adf7bc286",
+          "oracle_hash": "62901a84db69b8edda50cd7f1a733533",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Brood Weaver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2dcd84e152f45572a05f9f8d43a2aae0",
+          "oracle_hash": "51e227a65f407ba62455d94b3a0695cc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Conscripted Infantry",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2cce2e20c521add80e6cad078072c035",
+          "oracle_hash": "25e183b1dacc1be7f9da2f31818aa028",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Deathbloom Thallid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+          "oracle_hash": "6e0b562f99e80aa42fc539f44f400447",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Discordant Piper",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6",
+          "oracle_hash": "dd733152b1ce5fa027f45c97120115b1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Doomed Dissenter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:edebf7fc3cc9646f30387c314dcde94e",
+          "oracle_hash": "2ab448518057ad9b18d4e2a6a0341143",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Doomed Traveler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:ac86a2a29ae7c0cfdcf73ec9a713d3cb",
+          "oracle_hash": "de756341b6369b2f370f2cede1c9b5ed",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Dwarven Castle Guard",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:08b5f23d0ba3ececd41afd1c0b27e545",
+          "oracle_hash": "1d7cc43aa46a86937f63de92f8833319",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Elgaud Inquisitor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b27ac08efcdb59f9e5f79a2018068ab4",
+          "oracle_hash": "354b612167a8079d089953876e641763",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Filigree Crawler",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a096cd3aed03009497106c2db9f209bc",
+          "oracle_hash": "d59c39b39c79d4b53dabc2ab154fa89f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Garrison Cat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3",
+          "oracle_hash": "29f1b4320917ca21c9997126f08eade8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Hunted Witness",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c01cfdd1141dc6552ff0253d15340f04",
+          "oracle_hash": "e255a06c0665c973118fe5b75e6d7502",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Infestation Sage",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:063aea50108acb3ff8ff2d1642fa9de8",
+          "oracle_hash": "76d8a8b36d4d294e0bcf4fbf766cefb3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Maalfeld Twins",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d3fde7fc16ae1aecd6c8b1c81a1c72d8",
+          "oracle_hash": "b93594a92bd90f13d7b557059a8d83b7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Martyr of Dusk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:81a506711ed7bd57ddb4ab35d7f4a66c",
+          "oracle_hash": "22d93e92247d062d2373f43624d519f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Myr Sire",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25584d7c86ac16ca719c188f2d571b31",
+          "oracle_hash": "b642f47076f215b5303fe8c37969d9c7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Bobcat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c8773318eae9506eddbd72a0e453d6e4",
+          "oracle_hash": "bad2cbbacc9a7b4b1d2f00fef9d6e08e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Kavu",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:7f00bc2b1fc8cd4077131be5988136ed",
+          "oracle_hash": "914070971bf87a5967ce2081f0e373df",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Spider",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:047d03e7a2c6714e3247741e81a41ff1",
+          "oracle_hash": "aafdabd85a3aa45ea3fdce5bae24b377",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Penumbra Wurm",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c94157fd5bd2044ab43ba5e594a03bd5",
+          "oracle_hash": "7393d00a98736c334e374426d1f3a5d3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Pretending Poxbearers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:dc87a61782aeec3e2b8dd1c0cf62ef59",
+          "oracle_hash": "83f29f4346f7420740944ed35b1e463c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Tukatongue Thallid",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b",
+          "oracle_hash": "6e0b562f99e80aa42fc539f44f400447",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "card_name": "Wriggling Grub",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:a989e9845f2222d86457d14990e48107",
+          "oracle_hash": "13d8c9254983dfaf4e6eb2e00dfec731",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Beskir Shieldmate",
+          "logical_rule_key": "battle_rule_v1:7a5c752ef27017f2e75ce0f55ed0f24a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brindle Shoat",
+          "logical_rule_key": "battle_rule_v1:04e8494c0691cf7dd230789adf7bc286"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Brood Weaver",
+          "logical_rule_key": "battle_rule_v1:2dcd84e152f45572a05f9f8d43a2aae0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Conscripted Infantry",
+          "logical_rule_key": "battle_rule_v1:2cce2e20c521add80e6cad078072c035"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Deathbloom Thallid",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Discordant Piper",
+          "logical_rule_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Doomed Dissenter",
+          "logical_rule_key": "battle_rule_v1:edebf7fc3cc9646f30387c314dcde94e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Doomed Traveler",
+          "logical_rule_key": "battle_rule_v1:ac86a2a29ae7c0cfdcf73ec9a713d3cb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dwarven Castle Guard",
+          "logical_rule_key": "battle_rule_v1:08b5f23d0ba3ececd41afd1c0b27e545"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elgaud Inquisitor",
+          "logical_rule_key": "battle_rule_v1:b27ac08efcdb59f9e5f79a2018068ab4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Filigree Crawler",
+          "logical_rule_key": "battle_rule_v1:a096cd3aed03009497106c2db9f209bc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Garrison Cat",
+          "logical_rule_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hunted Witness",
+          "logical_rule_key": "battle_rule_v1:c01cfdd1141dc6552ff0253d15340f04"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Infestation Sage",
+          "logical_rule_key": "battle_rule_v1:063aea50108acb3ff8ff2d1642fa9de8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Maalfeld Twins",
+          "logical_rule_key": "battle_rule_v1:d3fde7fc16ae1aecd6c8b1c81a1c72d8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Martyr of Dusk",
+          "logical_rule_key": "battle_rule_v1:81a506711ed7bd57ddb4ab35d7f4a66c"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Myr Sire",
+          "logical_rule_key": "battle_rule_v1:25584d7c86ac16ca719c188f2d571b31"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Penumbra Bobcat",
+          "logical_rule_key": "battle_rule_v1:c8773318eae9506eddbd72a0e453d6e4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Penumbra Kavu",
+          "logical_rule_key": "battle_rule_v1:7f00bc2b1fc8cd4077131be5988136ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Penumbra Spider",
+          "logical_rule_key": "battle_rule_v1:047d03e7a2c6714e3247741e81a41ff1"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Penumbra Wurm",
+          "logical_rule_key": "battle_rule_v1:c94157fd5bd2044ab43ba5e594a03bd5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pretending Poxbearers",
+          "logical_rule_key": "battle_rule_v1:dc87a61782aeec3e2b8dd1c0cf62ef59"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tukatongue Thallid",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wriggling Grub",
+          "logical_rule_key": "battle_rule_v1:a989e9845f2222d86457d14990e48107"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 24
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Beskir Shieldmate",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7a5c752ef27017f2e75ce0f55ed0f24a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brindle Shoat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:04e8494c0691cf7dd230789adf7bc286"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Brood Weaver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2dcd84e152f45572a05f9f8d43a2aae0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Conscripted Infantry",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2cce2e20c521add80e6cad078072c035"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Deathbloom Thallid",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Discordant Piper",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ad0e12aa20654aba517d10e9f36ba5b6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Doomed Dissenter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:edebf7fc3cc9646f30387c314dcde94e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Doomed Traveler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:ac86a2a29ae7c0cfdcf73ec9a713d3cb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dwarven Castle Guard",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:08b5f23d0ba3ececd41afd1c0b27e545"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elgaud Inquisitor",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:b27ac08efcdb59f9e5f79a2018068ab4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Filigree Crawler",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a096cd3aed03009497106c2db9f209bc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Garrison Cat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4eb7dcd745a142cb45c4077db59687d3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hunted Witness",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c01cfdd1141dc6552ff0253d15340f04"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Infestation Sage",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:063aea50108acb3ff8ff2d1642fa9de8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Maalfeld Twins",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d3fde7fc16ae1aecd6c8b1c81a1c72d8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Martyr of Dusk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:81a506711ed7bd57ddb4ab35d7f4a66c"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Myr Sire",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:25584d7c86ac16ca719c188f2d571b31"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Penumbra Bobcat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c8773318eae9506eddbd72a0e453d6e4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Penumbra Kavu",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:7f00bc2b1fc8cd4077131be5988136ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Penumbra Spider",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:047d03e7a2c6714e3247741e81a41ff1"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Penumbra Wurm",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c94157fd5bd2044ab43ba5e594a03bd5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pretending Poxbearers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:dc87a61782aeec3e2b8dd1c0cf62ef59"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tukatongue Thallid",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:508465079bb84a8a1e6be6b72cabd67b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wriggling Grub",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:a989e9845f2222d86457d14990e48107"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
