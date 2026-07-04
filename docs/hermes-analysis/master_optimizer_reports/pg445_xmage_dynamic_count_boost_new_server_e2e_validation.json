@@ -1,0 +1,538 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T22:56:14.089972+00:00",
+  "manifest": "../../master_optimizer_reports/pg445_xmage_dynamic_count_boost_new_server_manifest.json",
+  "package_id": "pg445_xmage_dynamic_count_boost_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Defile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed",
+          "oracle_hash": "ca60f5e3d71a02fd888b0f2ebdce61d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Desert's Due",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb",
+          "oracle_hash": "49adb7c8e3d3bb853d9326f0af9aaeb9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Drag Down",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea",
+          "oracle_hash": "a3975b258df864690a219dcc1f4f95a7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Feeding Frenzy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec",
+          "oracle_hash": "ea2ff3ba1587cba08d9262aaa88fcd32",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Gaea's Might",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+          "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Hunger of the Nim",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd",
+          "oracle_hash": "008a2e6c710c73f5a0972b451b66f7a7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Inner Calm, Outer Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88",
+          "oracle_hash": "18d68ccf2f96f30acec5bb7f5093aaf3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Irradiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a",
+          "oracle_hash": "3d4ec2868f66f9af1e0d63902702f7f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of Alara",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+          "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of the Masses",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3",
+          "oracle_hash": "265c407a7e7418e03ac6df0c6f7673dc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Nightmarish End",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd",
+          "oracle_hash": "436d4fb570ffb05e0cdfbee2118b0981",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Strength of Cedars",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384",
+          "oracle_hash": "6b950817f1f7afbec1f02f7e369ed926",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Warped Physique",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a",
+          "oracle_hash": "e59c03451b6154627e2115c632e45d87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wirewood Pride",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c",
+          "oracle_hash": "725d775135c01097c9ed49d586ec9ad0",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Defile",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed",
+          "oracle_hash": "ca60f5e3d71a02fd888b0f2ebdce61d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Desert's Due",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb",
+          "oracle_hash": "49adb7c8e3d3bb853d9326f0af9aaeb9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Drag Down",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea",
+          "oracle_hash": "a3975b258df864690a219dcc1f4f95a7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Feeding Frenzy",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec",
+          "oracle_hash": "ea2ff3ba1587cba08d9262aaa88fcd32",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Gaea's Might",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+          "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Hunger of the Nim",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd",
+          "oracle_hash": "008a2e6c710c73f5a0972b451b66f7a7",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Inner Calm, Outer Strength",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88",
+          "oracle_hash": "18d68ccf2f96f30acec5bb7f5093aaf3",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Irradiate",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a",
+          "oracle_hash": "3d4ec2868f66f9af1e0d63902702f7f2",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of Alara",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+          "oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Might of the Masses",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3",
+          "oracle_hash": "265c407a7e7418e03ac6df0c6f7673dc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Nightmarish End",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd",
+          "oracle_hash": "436d4fb570ffb05e0cdfbee2118b0981",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Strength of Cedars",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384",
+          "oracle_hash": "6b950817f1f7afbec1f02f7e369ed926",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Warped Physique",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a",
+          "oracle_hash": "e59c03451b6154627e2115c632e45d87",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "card_name": "Wirewood Pride",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c",
+          "oracle_hash": "725d775135c01097c9ed49d586ec9ad0",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Defile",
+          "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Desert's Due",
+          "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Drag Down",
+          "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Feeding Frenzy",
+          "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Gaea's Might",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hunger of the Nim",
+          "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Inner Calm, Outer Strength",
+          "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Irradiate",
+          "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Might of Alara",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Might of the Masses",
+          "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Nightmarish End",
+          "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Strength of Cedars",
+          "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warped Physique",
+          "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wirewood Pride",
+          "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Defile",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Desert's Due",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Drag Down",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Feeding Frenzy",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Gaea's Might",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hunger of the Nim",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Inner Calm, Outer Strength",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Irradiate",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Might of Alara",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Might of the Masses",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Nightmarish End",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Strength of Cedars",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warped Physique",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wirewood Pride",
+          "component_keys": [],
+          "effect": "stat_modifier_until_eot",
+          "logical_rule_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

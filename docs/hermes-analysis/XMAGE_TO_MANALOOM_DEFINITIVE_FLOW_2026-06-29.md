@@ -9508,6 +9508,55 @@ new server:
   `xmage_static_self_cant_block_creature` with `13` cards each, and
   `xmage_fixed_draw_spell` with `12` cards.
 
+## 2026-07-04 PG445 Dynamic Count Boost Closure
+
+- Closed the exact XMage dynamic target-creature boost family as ManaLoom
+  scope `xmage_dynamic_count_boost_target_creature_until_eot_spell_v1`.
+- The selected package accepted local XMage `BoostTargetEffect` spells where a
+  target creature gets a dynamic stat modifier until end of turn and the amount
+  is calculated from a runtime-supported count source: controller battlefield
+  permanents, controller hand size, domain basic land types, or all-battlefield
+  subtype counts. Unsupported filters, compound targets, mixed count sources,
+  or extra costs remain blocked by the splitter instead of becoming executable
+  rows.
+- The batch covers `14` cards: Defile, Desert's Due, Drag Down, Feeding Frenzy,
+  Gaea's Might, Hunger of the Nim, Inner Calm, Outer Strength, Irradiate, Might
+  of Alara, Might of the Masses, Nightmarish End, Strength of Cedars, Warped
+  Physique, and Wirewood Pride.
+- Focused mapper/runtime tests covered the exact-scope split and runtime
+  support for battlefield-count, hand-count, domain, subtype-count, negative,
+  positive, and mixed-stat dynamic boosts; PG445 performed no code mutation.
+  The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `14` cards. Precheck found `14` target rows,
+  `0` missing targets, `0` existing expected rows, and `2` shadow rows to
+  deprecate; apply/postcheck verified `14/14` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `2` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4287` PostgreSQL runtime rows, wrote `4279` SQLite runtime
+  rows, and exported `4254` canonical fallback rows.
+- PG445 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `14` selected cards. Generic
+  battle scenario count remained `0`; dynamic boost behavior remains covered by
+  focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26599`, `xmage_authoritative_source_count=26285`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26285`. This is an exact
+  reduction of `14` from the post-PG444 queue.
+- The post-PG445 exact split recheck reports `proposal_count=260` and
+  `safe_for_batch_pg_package_count=260`. The largest remaining exact family is
+  `xmage_library_search_spell` with `14` cards, followed by
+  `xmage_self_sacrifice_mana_source_permanent` and
+  `xmage_static_self_cant_block_creature` with `13` cards each, and
+  `xmage_fixed_damage_exile_if_dies_spell` and `xmage_fixed_draw_spell` with
+  `12` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

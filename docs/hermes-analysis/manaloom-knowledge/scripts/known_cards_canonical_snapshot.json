@@ -19422,6 +19422,40 @@
     "battle_rule_logical_key": "battle_rule_v1:8b75e08deb84e2d0e42ca28533f68bea",
     "battle_rule_oracle_hash": "32b8aad46992cb58b5cfae49735140ca"
   },
+  "Defile": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "swamp"
+    ],
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1100b16aa567a4166c89925fa02116ed",
+    "battle_rule_oracle_hash": "ca60f5e3d71a02fd888b0f2ebdce61d9"
+  },
   "Deflecting Palm": {
     "ability_kind": "one_shot",
     "battle_model_scope": "prevent_next_damage_from_chosen_source_to_you_reflect_to_controller_v1",
@@ -19935,6 +19969,40 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9b7e997dd751cbd96446201f24fb2ae2",
     "battle_rule_oracle_hash": "5d6d0af87e16292279a08a492e047713"
+  },
+  "Desert's Due": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "battlefield_count_subtypes": [
+      "desert"
+    ],
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": -2,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": -2,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c47f8cfa7cc6a286de6d8e56a0b350eb",
+    "battle_rule_oracle_hash": "49adb7c8e3d3bb853d9326f0af9aaeb9"
   },
   "Deserted Beach": {
     "effect": "land",
@@ -21700,6 +21768,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:cc6472595f2f60ee860c1ff9bee7a766",
     "battle_rule_oracle_hash": "14c3b256b0931e55d61cbff122cfcf8b"
+  },
+  "Drag Down": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "domain_basic_land_types",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:210c9f43c60a296a79af941511abf2ea",
+    "battle_rule_oracle_hash": "a3975b258df864690a219dcc1f4f95a7"
   },
   "Drag Under": {
     "_composite_rule_components": [
@@ -27176,6 +27271,37 @@
     "battle_rule_logical_key": "battle_rule_v1:9049794ec49e44015b321eae01df5473",
     "battle_rule_oracle_hash": "542fa4c4a0d5b78f7c0034105eb313cc"
   },
+  "Feeding Frenzy": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_scope": "all_battlefields",
+    "battlefield_count_subtypes": [
+      "zombie"
+    ],
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:00c7f63a7cceb61b5f8561db237f81ec",
+    "battle_rule_oracle_hash": "ea2ff3ba1587cba08d9262aaa88fcd32"
+  },
   "Feiyi Snake": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -31328,6 +31454,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "6d1aeff2f1a2c28c74054cde37cea58f"
+  },
+  "Gaea's Might": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "domain_basic_land_types",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+    "battle_rule_oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1"
   },
   "Gaea's Skyfolk": {
     "_keywords_are_self": true,
@@ -38888,6 +39041,37 @@
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
   },
+  "Hunger of the Nim": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "artifact"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": false,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": true,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 0,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9044a82a7faa7ba39758bbd225595fcd",
+    "battle_rule_oracle_hash": "008a2e6c710c73f5a0972b451b66f7a7"
+  },
   "Hunted Witness": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_dies_create_tokens_v1",
@@ -40092,6 +40276,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "dc28e08c2063aa2ea8687090f4c4697b"
   },
+  "Inner Calm, Outer Strength": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "controller_hand_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9f6efe319b4033f156aad274dd198d88",
+    "battle_rule_oracle_hash": "18d68ccf2f96f30acec5bb7f5093aaf3"
+  },
   "Insatiable Harpy": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -40891,6 +41102,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1fd9f658e128ca955f7acc4e117b9132",
     "battle_rule_oracle_hash": "c112c51f55b3d1cd548152e1391fed2b"
+  },
+  "Irradiate": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "artifact"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b73631198cb3e8cbfdce3b5800531f1a",
+    "battle_rule_oracle_hash": "3d4ec2868f66f9af1e0d63902702f7f2"
   },
   "Irrigated Farmland": {
     "effect": "land",
@@ -48752,6 +48994,33 @@
     "battle_rule_logical_key": "battle_rule_v1:7dffe8b5cecf5b2f3aff365597acf24f",
     "battle_rule_oracle_hash": "45d4b3a1a10b11a7f27e2e3614427281"
   },
+  "Might of Alara": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "domain_basic_land_types",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f6a6dd8a95547608ac7f79c6465088c0",
+    "battle_rule_oracle_hash": "be2ac80e1e9a2af2e3d54ad8ceb686c1"
+  },
   "Might of Oaks": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -48777,6 +49046,37 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:becd594232fab16acadf37c69169ee51",
     "battle_rule_oracle_hash": "662716716731e5e185b77e89756dbc08"
+  },
+  "Might of the Masses": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "creature"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6bd781adebd1fd040b548b5ca68d66a3",
+    "battle_rule_oracle_hash": "265c407a7e7418e03ac6df0c6f7673dc"
   },
   "Might of the Meek": {
     "count": 1,
@@ -52777,6 +53077,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:5058869fd7dd59a368bfb8f30e2d2d21",
     "battle_rule_oracle_hash": "5eff2c7ab7ebff88a6d4c864e4a9255d"
+  },
+  "Nightmarish End": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": -1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "controller_hand_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:68c94b97da910dce93cc269180b7f0fd",
+    "battle_rule_oracle_hash": "436d4fb570ffb05e0cdfbee2118b0981"
   },
   "Nightveil Predator": {
     "_keywords_are_self": true,
@@ -77286,6 +77613,37 @@
     "battle_rule_logical_key": "battle_rule_v1:8ead478fb37e561206c410fdf144df3a",
     "battle_rule_oracle_hash": "56186be506e23ca8577f2631a950f7ca"
   },
+  "Strength of Cedars": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_card_types": [
+      "land"
+    ],
+    "battlefield_count_scope": "controller_battlefield",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3ca636350943972a180f4f2535a9c384",
+    "battle_rule_oracle_hash": "6b950817f1f7afbec1f02f7e369ed926"
+  },
   "Stridehangar Automaton": {
     "artifact_token_replacement": true,
     "effect": "creature",
@@ -89671,6 +90029,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "235f16da99d4dd034d1cd18f847cf26a"
   },
+  "Warped Physique": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "controller_hand_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": -1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d1e30e5fc99f7122f4debeb26047597a",
+    "battle_rule_oracle_hash": "e59c03451b6154627e2115c632e45d87"
+  },
   "Warrior's Charge": {
     "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
     "effect": "controlled_stat_modifier_until_eot",
@@ -91559,6 +91944,37 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "ddee07c2498bebea2fb841fd0f59c964"
+  },
+  "Wirewood Pride": {
+    "battle_model_scope": "xmage_dynamic_count_boost_target_creature_until_eot_spell_v1",
+    "battlefield_count_scope": "all_battlefields",
+    "battlefield_count_subtypes": [
+      "elf"
+    ],
+    "duration": "until_end_of_turn",
+    "effect": "stat_modifier_until_eot",
+    "instant": true,
+    "power_base_delta": 0,
+    "power_delta_per_graveyard_count": 1,
+    "sorcery": false,
+    "stat_modifier_amount_source": "battlefield_permanent_count",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "target_controller": "any",
+    "toughness_base_delta": 0,
+    "toughness_delta_per_graveyard_count": 1,
+    "xmage_effect_class": "BoostTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c2abb3e20f0ac836039dbdb9cd080e2c",
+    "battle_rule_oracle_hash": "725d775135c01097c9ed49d586ec9ad0"
   },
   "Wishclaw Talisman": {
     "activated_tutor_target": "any",
