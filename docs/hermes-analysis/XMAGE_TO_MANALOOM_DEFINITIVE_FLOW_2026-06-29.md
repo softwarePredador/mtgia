@@ -9365,6 +9365,54 @@ new server:
   `xmage_dynamic_count_boost_target_creature_until_eot_spell` with `14` cards,
   and `xmage_library_search_spell` with `14` cards.
 
+## 2026-07-04 PG442 Flying Can Block Only Flying Closure
+
+- Closed the exact XMage static flying/can-block-only-flying creature family as
+  ManaLoom scope `xmage_static_flying_can_block_only_flying_creature_v1`.
+- The selected package accepted creatures whose local XMage class exposes the
+  narrow no-effect-class static keyword signature with flying plus the block
+  restriction that the creature can block only creatures with flying. The scope
+  excludes noncreatures, broader evasion restrictions, protection mixtures, and
+  any card whose Oracle/XMage text does not match this exact static combat
+  restriction.
+- The batch covers `18` cards: Belbe's Percher, Cloud Djinn, Cloud Dragon,
+  Cloud Elemental, Cloud Pirates, Cloud Spirit, Cloud Sprite, Hoverguard
+  Observer, Long-Finned Skywhale, Rishadan Airship, Scrapskin Drake, Skywinder
+  Drake, Stratozeppelid, Stronghold Zeppelin, Tattered Haunter, Vaporkin,
+  Wanderlight Spirit, and Welkin Tern.
+- Focused mapper/runtime tests covered the exact-scope split and static combat
+  restriction support already present for this family; PG442 performed no code
+  mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `18` cards. Precheck found `18` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `18/18` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4241` PostgreSQL runtime rows, wrote `4233` SQLite runtime
+  rows, and exported `4208` canonical fallback rows.
+- PG442 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `18` selected cards. Generic
+  battle scenario count remained `0`; actual combat restriction behavior
+  remains covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26645`, `xmage_authoritative_source_count=26331`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26331`. This is an exact
+  reduction of `18` from the post-PG441 queue.
+- The post-PG442 exact split recheck reports `proposal_count=306` and
+  `safe_for_batch_pg_package_count=306`. The largest remaining exact family is
+  `xmage_simple_mana_source_with_activated_draw` with `17` cards, followed by
+  `xmage_permanent_simple_activated_draw_discard` with `15` cards,
+  `xmage_dynamic_count_boost_target_creature_until_eot_spell` with `14` cards,
+  `xmage_library_search_spell` with `14` cards, and
+  `xmage_self_sacrifice_mana_source_permanent` with `13` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

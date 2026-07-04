@@ -7158,6 +7158,32 @@
     "battle_rule_logical_key": "battle_rule_v1:990d3d8901fc9239d0089e0ac86bef62",
     "battle_rule_oracle_hash": "22d23fc917885e5b22cb7b60c483756c"
   },
+  "Belbe's Percher": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Bellows Lizard": {
     "_activated_rule_effects": [
       {
@@ -14571,6 +14597,84 @@
     "battle_rule_logical_key": "battle_rule_v1:f3f6244f8cb13ac8ff7a8ca42456a9f3",
     "battle_rule_oracle_hash": "93d16df1ee55f8155677016e4ce03b99"
   },
+  "Cloud Djinn": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
+  "Cloud Dragon": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
+  "Cloud Elemental": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Cloud Key": {
     "ability_kind": "static",
     "applies_to_controller": "source_controller",
@@ -14637,6 +14741,84 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:22800c898eb8acf79b50adda432c928d",
     "battle_rule_oracle_hash": "7e06ce7c0f9bf5b2516e5c433440c291"
+  },
+  "Cloud Pirates": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
+  "Cloud Spirit": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
+  "Cloud Sprite": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "6cf637966fcb5f58376d337be2db96a6"
   },
   "Cloudcrest Lake": {
     "effect": "land",
@@ -37792,6 +37974,32 @@
     "battle_rule_logical_key": "battle_rule_v1:d4c58f370731929c49c163e747995ae7",
     "battle_rule_oracle_hash": "c7ff85be1555f3ee2e9ba9851f9966a4"
   },
+  "Hoverguard Observer": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Hovermyr": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -44886,6 +45094,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:233369e4b0fa1fc23cff1f00216d0b34",
     "battle_rule_oracle_hash": "fb34a02d26a0b45d4683fff7ad4d2347"
+  },
+  "Long-Finned Skywhale": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
   },
   "Longbow Archer": {
     "_keywords_are_self": true,
@@ -62911,6 +63145,32 @@
     "battle_rule_logical_key": "battle_rule_v1:ea3402c83a775c8f219f253347e038e2",
     "battle_rule_oracle_hash": "bfd583dfcfc9007d5900720e29e4499e"
   },
+  "Rishadan Airship": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Rishadan Port": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -66600,6 +66860,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b2bcbf2dbafe43780992bc75976967fe",
     "battle_rule_oracle_hash": "cec4c3f81a746a934176bc31381355b8"
+  },
+  "Scrapskin Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "6cf637966fcb5f58376d337be2db96a6"
   },
   "Screaming Fury": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
@@ -71279,6 +71565,32 @@
     "battle_rule_logical_key": "battle_rule_v1:73c998d8f94edccb0e59cb97eea6267c",
     "battle_rule_oracle_hash": "0ac25ffabfd8c18e6ec16015241d5477"
   },
+  "Skywinder Drake": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Slag Fiend": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_source_power_toughness_equal_graveyard_count_v1",
@@ -75549,6 +75861,32 @@
     "battle_rule_logical_key": "battle_rule_v1:76d702a9ba9cabd76ab84bc5dc15158f",
     "battle_rule_oracle_hash": "c5ef5760409d5c5315e84d96621eebd2"
   },
+  "Stratozeppelid": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Stream of Acid": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -75701,6 +76039,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f46d50601f25d4153e9c7fa2c460ebcd",
     "battle_rule_oracle_hash": "b14be76cbbac1d5a404dda8205132377"
+  },
+  "Stronghold Zeppelin": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
   },
   "Study": {
     "effect": "land",
@@ -78120,6 +78484,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:78e8097d6f3437e339ab729d87e5099a",
     "battle_rule_oracle_hash": "313b5afad418df592c6011b08c80d972"
+  },
+  "Tattered Haunter": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
   },
   "Taunt from the Rampart": {
     "ability_kind": "one_shot",
@@ -84694,6 +85084,32 @@
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "867bf2beccb79b310789f7cbdc7b2f4c"
   },
+  "Vaporkin": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Vassal Soul": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -87301,6 +87717,32 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "19d770749046c234285dd702a7e9cee8"
   },
+  "Wanderlight Spirit": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "ed0499a5deb12978780e059f84a5380f"
+  },
   "Wanderwine Hub": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -88268,6 +88710,32 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:ce38e61e0d1e1e4800bf27643822100d",
     "battle_rule_oracle_hash": "544ae9cd16365fa6f76f9356eae62e30"
+  },
+  "Welkin Tern": {
+    "_keywords_are_self": true,
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_flying_can_block_only_flying_creature_v1",
+    "block_restriction": "creatures_with_flying_only",
+    "can_block_only_flying": true,
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "static_effect": "self_flying_can_block_only_flying",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_classes": [
+      "CanBlockOnlyFlyingAbility",
+      "FlyingAbility"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:589e1344f2d78874998e014b0e0fba74",
+    "battle_rule_oracle_hash": "6cf637966fcb5f58376d337be2db96a6"
   },
   "Westvale Abbey // Ormendahl, Profane Prince": {
     "effect": "land",
