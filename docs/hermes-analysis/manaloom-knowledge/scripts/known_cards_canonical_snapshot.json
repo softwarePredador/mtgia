@@ -3299,6 +3299,22 @@
     "battle_rule_logical_key": "battle_rule_v1:b802630c68c32a86a5ac07d841e984ef",
     "battle_rule_oracle_hash": "e0b49a2eb44d5186ab12e8a7e2c3cfaa"
   },
+  "Anodet Lurker": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 3,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+    "battle_rule_oracle_hash": "a9c6230631d347882abbe6d015bb06e0"
+  },
   "Anointed Procession // Anointed Procession": {
     "cmc": 4.0,
     "effect": "token_maker",
@@ -25795,6 +25811,22 @@
     "battle_rule_logical_key": "battle_rule_v1:b96420fca6958c946ae146ed605148d3",
     "battle_rule_oracle_hash": "828db4694db59485c689a28ba4c12f47"
   },
+  "Enatu Golem": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 4,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a89277d577326cb47ef270db2344cb8",
+    "battle_rule_oracle_hash": "8f49e15bfa18c75f0217bc16c17aa6df"
+  },
   "Enchanted Prairie": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -36638,6 +36670,27 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "29d716915e355764ef634b807b968366"
   },
+  "Grasping Longneck": {
+    "_keywords_are_self": true,
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 2,
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e7ed4957301a134d003ea8a3c1bc1183",
+    "battle_rule_oracle_hash": "705e45d3be0759b8eaebd4e9f73680fd"
+  },
   "Grasslands": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -37698,6 +37751,22 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:b53caf6e1ec35c80ef4ef3df05ed35ec"
+  },
+  "Guardian Automaton": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 3,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:758847ca30fb454036cec72854246bb0",
+    "battle_rule_oracle_hash": "a9c6230631d347882abbe6d015bb06e0"
   },
   "Guardian Lions": {
     "_keywords_are_self": true,
@@ -39883,6 +39952,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "0aedf22e3f8eca01b988abc4646ae872"
+  },
+  "Highland Game": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 2,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+    "battle_rule_oracle_hash": "796b7be4baaa8b00e7d04b453b468634"
   },
   "Highland Lake": {
     "effect": "land",
@@ -57124,6 +57209,22 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:7e2f7553ad4cc925e1b740e7188691b0",
     "battle_rule_oracle_hash": "adc092650cd1bd8d2da9a76f3110e329"
+  },
+  "Onulet": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 2,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:90ada3943874c40067c8cde4d7e49fdc",
+    "battle_rule_oracle_hash": "796b7be4baaa8b00e7d04b453b468634"
   },
   "Onyx Mage": {
     "_activated_rule_effects": [
@@ -83493,6 +83594,22 @@
     "battle_rule_version": 3,
     "battle_rule_logical_key": "battle_rule_v1:d5663032352408a845b7602f9cb5adf9",
     "battle_rule_oracle_hash": "d8bdb24e586e16274f0bd42e40e2dc58"
+  },
+  "Tarpan": {
+    "ability_kind": "triggered",
+    "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+    "effect": "creature",
+    "gain_life_when_this_dies": 1,
+    "trigger": "dies",
+    "xmage_ability_class": "DiesSourceTriggeredAbility",
+    "xmage_effect_class": "GainLifeEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f97a1e681aa1afb50c4e774cb9808bd",
+    "battle_rule_oracle_hash": "1fd6a1149d32fb6b4f9ce8e236c1bbc6"
   },
   "Tarrian's Soulcleaver": {
     "cmc": 1.0,

@@ -219,21 +219,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg393_simple_mana_auxiliary_new_server_after_hash_cleanup.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg394_dies_create_tokens_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg394_dies_create_tokens_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg395_dies_life_gain_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg395_dies_life_gain_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26819`
-- XMage authoritative source resolved: `26505`
+- target all-card battle-gap identities: `26812`
+- XMage authoritative source resolved: `26498`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26505`
+- XMage authoritative adapter required: `26498`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26505` identities, card semantics are accepted from XMage; work is now
+- For `26498` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -252,10 +254,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG394 Exact Adapter Waves
+## PG283-PG395 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG394 all-card exact adapter waves are applied and
-synced. PG375-PG394 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG395 all-card exact adapter waves are applied and
+synced. PG375-PG395 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -332,6 +334,11 @@ patterns:
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
   `xmage_creature_etb_gain_life_v1`
+- `life_gain::xmage_life_gain_variant_review_v1` with
+  `GainLifeEffect + DiesSourceTriggeredAbility` on creatures, optional static
+  self keywords only, exact fixed "when this creature/name dies, you gain N
+  life" Oracle/source amount, and the battlefield-to-graveyard runtime hook ->
+  `xmage_creature_dies_gain_life_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + SimpleActivatedAbility` on battlefield permanents, exact
   fixed activated life-gain Oracle/source text, mana/tap/source self-sacrifice
@@ -6528,6 +6535,49 @@ PG394 measured result:
   `token_source_custom_text_not_supported=9`, and
   `token_literal_description_missing=29`.
 
+PG395 measured result:
+
+- PG395 promoted `7` creature dies fixed life-gain rules on the new server:
+  `Anodet Lurker`, `Enatu Golem`, `Grasping Longneck`, `Guardian Automaton`,
+  `Highland Game`, `Onulet`, and `Tarpan`.
+- The splitter now maps fixed
+  `GainLifeEffect + DiesSourceTriggeredAbility` source rows to
+  `xmage_creature_dies_gain_life_v1` only when XMage has one fixed life-gain
+  amount and Oracle exactly says this creature/card name dies and you gain that
+  amount of life. It blocks dynamic/conditional neighbors such as
+  `Bottle Golems`, `Centaur Safeguard`, and `Silent-Chant Zubera`.
+- Runtime coverage adds a dies-life-gain hook to the same
+  battlefield-to-graveyard path used by dies-draw, dies-recursion, and
+  dies-token. Bounce/exile/replacement moves do not trigger it. The hook emits
+  `dies_life_gain_resolved` with requested/gained life, before/after controller
+  life, source, and rule provenance.
+- Full exact splitter tests passed `357/357`, full exact runtime tests passed
+  `204/204`, package-builder tests passed, and `py_compile` passed for the
+  changed scripts.
+- PostgreSQL precheck matched `7/7` target card rows on the new server; apply
+  upserted `7` rows and deprecated `0` shadows; postcheck verified `7/7`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `7729` PostgreSQL rows from
+  `database_target=127.0.0.1:15432/halder`, updated `7524` SQLite rows, and
+  exported `5231` canonical snapshot rows. Full metadata sync used the same
+  new-server target, matched `6230` PostgreSQL cards from `6039` unique
+  requested names, backfilled `2699/2699` deck-card cache rows, and left one
+  unrelated unresolved alias.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, runtime
+  `get_card_effect`, and no-override battle checks for all `7` cards against
+  `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global all-card authoritative queue after PG395:
+  `target_identity_count=26812`, `xmage_authoritative_source_count=26498`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26498`.
+- Running the exact splitter after PG395 on supported units returned
+  `proposal_count=0` over `7652` considered supported rows. Remaining
+  life-gain dies neighbors are explicitly blocked by
+  `dies_life_gain_amount_not_fixed=3`.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7158,7 +7208,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG394 queue on the new server, the next exact runtime-backed work should
+post-PG395 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
@@ -7166,7 +7216,7 @@ be selected from these largest reusable work units, not from deck intuition:
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `876`
 5. `add_counters::source_add_counters_variant_v1` - `795`
-6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
+6. `life_gain::xmage_life_gain_variant_review_v1` - `728`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`
 8. `draw_cards::xmage_draw_card_variant_review_v1` - `605`
 9. `tutor::xmage_library_search_variant_review_v1` - `605`

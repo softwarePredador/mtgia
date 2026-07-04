@@ -7306,6 +7306,42 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_dies_gain_life_trigger_gains_when_moved_to_graveyard(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        active.life = 20
+        permanent = {
+            "name": "Fixture Lurker",
+            "type_line": "Creature - Construct",
+            "battle_model_scope": "xmage_creature_dies_gain_life_v1",
+            "gain_life_when_this_dies": 3,
+            "_rule_logical_key": "battle_rule_v1:fixture_dies_life_gain",
+        }
+        active.battlefield.append(permanent)
+
+        destination = self.battle.move_creature_from_battlefield(
+            active,
+            permanent,
+            reason="test_destroy",
+            source={"name": "Fixture Removal"},
+        )
+
+        self.assertEqual(destination, "graveyard")
+        self.assertEqual(active.life, 23)
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Lurker"])
+        self.assertTrue(
+            any(
+                event == "dies_life_gain_resolved"
+                and data.get("card") == "Fixture Lurker"
+                and data.get("life_gain_requested") == 3
+                and data.get("life_gained") == 3
+                and data.get("controller_life_before") == 20
+                and data.get("controller_life_after") == 23
+                and data.get("source") == "Fixture Removal"
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_dies_life_gain"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_dies_create_tokens_triggers_when_moved_to_graveyard(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

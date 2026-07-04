@@ -17827,6 +17827,39 @@ def resolve_permanent_dies_draw(owner, permanent, *, destination=None, reason=No
     return drawn
 
 
+def resolve_permanent_dies_life_gain(owner, permanent, *, destination=None, reason=None, source=None):
+    if destination != "graveyard" or not isinstance(permanent, dict):
+        return 0
+    amount = max(
+        0,
+        int(
+            permanent.get("gain_life_when_this_dies")
+            or permanent.get("dies_life_gain_amount")
+            or 0
+        ),
+    )
+    if amount <= 0:
+        return 0
+    life_before = int(getattr(owner, "life", 0) or 0)
+    gain_life(owner, amount, cap=999)
+    life_after = int(getattr(owner, "life", life_before) or 0)
+    gained = max(0, life_after - life_before)
+    emit_replay_event(
+        "dies_life_gain_resolved",
+        player=getattr(owner, "name", "?"),
+        card=permanent.get("name", "?"),
+        life_gain_requested=amount,
+        life_gained=gained,
+        controller_life_before=life_before,
+        controller_life_after=life_after,
+        reason=reason,
+        source=source.get("name", "?") if isinstance(source, dict) else source,
+        turn=CURRENT_REPLAY_TURN,
+        **replay_rule_fields(permanent),
+    )
+    return gained
+
+
 def resolve_permanent_dies_recursion(owner, permanent, *, destination=None, reason=None, source=None):
     if destination != "graveyard" or not isinstance(permanent, dict):
         return []
@@ -17961,6 +17994,13 @@ def move_creature_from_battlefield(owner, creature, reason=None, source=None, al
         reason=reason,
         source=source,
     )
+    resolve_permanent_dies_life_gain(
+        owner,
+        creature,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
     resolve_permanent_dies_recursion(
         owner,
         creature,
@@ -18026,6 +18066,13 @@ def move_permanent_from_battlefield(owner, permanent, reason=None, source=None, 
             turn=CURRENT_REPLAY_TURN,
         )
     resolve_permanent_dies_draw(
+        owner,
+        permanent,
+        destination=destination,
+        reason=reason,
+        source=source,
+    )
+    resolve_permanent_dies_life_gain(
         owner,
         permanent,
         destination=destination,

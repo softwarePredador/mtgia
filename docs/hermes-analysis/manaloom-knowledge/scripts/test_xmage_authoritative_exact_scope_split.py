@@ -8206,6 +8206,80 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_life_gain_amount_not_fixed")
 
+    def test_creature_dies_gain_life_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Lurker",
+                type_line="Creature - Construct",
+                oracle_text="When Fixture Lurker dies, you gain 3 life.",
+            ),
+            source_text="this.addAbility(new DiesSourceTriggeredAbility(new GainLifeEffect(3)));",
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.DIES_LIFE_GAIN_CREATURE_SCOPE)
+        self.assertEqual(effect["trigger"], "dies")
+        self.assertEqual(effect["gain_life_when_this_dies"], 3)
+
+    def test_creature_dies_gain_life_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility", "ReachAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Longneck",
+                type_line="Creature - Dinosaur",
+                oracle_text="Reach\nWhen this creature dies, you gain four life.",
+            ),
+            source_text=(
+                "this.addAbility(ReachAbility.getInstance());"
+                "this.addAbility(new DiesSourceTriggeredAbility(new GainLifeEffect(4)));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["keywords"], ["reach"])
+        self.assertTrue(effect["reach"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertEqual(effect["gain_life_when_this_dies"], 4)
+
+    def test_creature_dies_gain_life_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.LIFE_UNIT,
+            effect_classes=["GainLifeEffect"],
+            ability_kind="triggered",
+            ability_classes=["DiesSourceTriggeredAbility"],
+            xmage_signals=["triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Zubera",
+                type_line="Creature - Zubera Spirit",
+                oracle_text="When Fixture Zubera dies, you gain 2 life for each Zubera that died this turn.",
+            ),
+            source_text="this.addAbility(new DiesSourceTriggeredAbility(new GainLifeEffect(new ZuberaValue())));",
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "dies_life_gain_amount_not_fixed")
+
     def test_creature_etb_draw_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,
