@@ -113,6 +113,26 @@ class LoreholdPromotionGateDecisionAuditTests(unittest.TestCase):
         self.assertIn("candidate_custom", report["decision"]["promoted_deck_keys"])
         self.assertTrue(report["decision"]["ready_for_real_deck_change"])
 
+    def test_blocks_explicit_candidate_that_loses_head_to_head_against_607(self) -> None:
+        payload = gate(1, {"deck_607": 0, "candidate_custom": 1})
+        payload["opponents"].append("Fixed Lorehold deck 607")
+        candidate = next(row for row in payload["results"] if row["deck_key"] == "candidate_custom")
+        candidate["opponents"].append(
+            {
+                "opponent": "Fixed Lorehold deck 607",
+                "wins": 0,
+                "losses": 1,
+                "stalls": 0,
+            }
+        )
+
+        report = self.build_report([payload], candidate_keys=["candidate_custom"])
+
+        assessment = report["candidate_assessments"][0]
+        self.assertEqual(report["decision"]["promoted_deck_keys"], [])
+        self.assertFalse(report["decision"]["ready_for_real_deck_change"])
+        self.assertIn("head-to-head vs protected 607 not won (0/1, losses=1)", assessment["blockers"])
+
     def test_card_use_metrics_are_aggregated_from_game_card_event_counts(self) -> None:
         payload = gate(1, {"deck_607": 1, "candidate_custom": 2})
         candidate = next(row for row in payload["results"] if row["deck_key"] == "candidate_custom")

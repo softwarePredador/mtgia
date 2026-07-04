@@ -638,6 +638,136 @@ CHALLENGER_PLANS: dict[str, dict[str, Any]] = {
         "min_basics": 8,
         "mountain_bias": 0.58,
     },
+    "spell_pressure_mana_conversion_deoverfill": {
+        "mode": "from_scratch",
+        "candidate_key": "challenger_lorehold_spell_pressure_mana_conversion_deoverfill_v1",
+        "candidate_name": "Lorehold From-Scratch Spell Pressure Mana Conversion Deoverfill v1",
+        "candidate_archetype": "from-scratch-spell-pressure-mana-conversion-deoverfill",
+        "intent": (
+            "Repair the mana-conversion pressure shell before any larger gate: "
+            "exclude the unused Apex of Power overfill source, keep Guttersnipe "
+            "plus Storm-Kiln Artist, restore Pearl Medallion as low-noise 607-backed "
+            "early mana, and preserve the protected miracle/topdeck engine."
+        ),
+        "required_cards": [
+            "Approach of the Second Sun",
+            "Arcane Signet",
+            "Bender's Waterskin",
+            "Boros Charm",
+            "Boros Signet",
+            "Brass's Bounty",
+            "Call Forth the Tempest",
+            "Creative Technique",
+            "Dawn's Truce",
+            "Deflecting Palm",
+            "Deflecting Swat",
+            "Esper Sentinel",
+            "Everything Comes to Dust",
+            "Faithless Looting",
+            "Farewell",
+            "Fellwar Stone",
+            "Flawless Maneuver",
+            "Generous Gift",
+            "Giver of Runes",
+            "Guttersnipe",
+            "Hexing Squelcher",
+            "High Noon",
+            "Hit the Mother Lode",
+            "Jeska's Will",
+            "Land Tax",
+            "Library of Leng",
+            "Lightning Greaves",
+            "Mana Geyser",
+            "Mizzix's Mastery",
+            "Molecule Man",
+            "Monument to Endurance",
+            "Mother of Runes",
+            "Path to Exile",
+            "Pearl Medallion",
+            "Penance",
+            "Promise of Loyalty",
+            "Reforge the Soul",
+            "Scroll Rack",
+            "Sensei's Divining Top",
+            "Silence",
+            "Smothering Tithe",
+            "Sol Ring",
+            "Starfall Invocation",
+            "Storm-Kiln Artist",
+            "Stroke of Midnight",
+            "Swords to Plowshares",
+            "Talisman of Conviction",
+            "Teferi's Protection",
+            "The Mind Stone",
+            "The Scarlet Witch",
+            "Tibalt's Trickery",
+            "Unexpected Windfall",
+            "Victory Chimes",
+            "Wheel of Fortune",
+            "Winds of Abandon",
+        ],
+        "excluded_cards": [
+            "Aetherflux Reservoir",
+            "Apex of Power",
+            "Dance with Calamity",
+            "Monastery Mentor",
+            "Ruby Medallion",
+            "Soulfire Eruption",
+            "Young Pyromancer",
+        ],
+        "land_priority": [
+            "Ancient Tomb",
+            "Arid Mesa",
+            "Battlefield Forge",
+            "Bloodstained Mire",
+            "Command Beacon",
+            "Command Tower",
+            "Eiganjo, Seat of the Empire",
+            "Elegant Parlor",
+            "Exotic Orchard",
+            "Flooded Strand",
+            "Glittering Massif",
+            "Marsh Flats",
+            "Plaza of Heroes",
+            "Prismatic Vista",
+            "Radiant Summit",
+            "Reliquary Tower",
+            "Sacred Foundry",
+            "Scalding Tarn",
+            "Spectator Seating",
+            "Sunbaked Canyon",
+            "Sunbillow Verge",
+            "Turbulent Steppe",
+            "Urza's Saga",
+            "War Room",
+            "Windswept Heath",
+            "Wooded Foothills",
+        ],
+        "package_weights": {
+            "spell_chain_conversion": 11.0,
+            "topdeck_miracle_setup": 10.0,
+            "pressure_absorber": 9.0,
+            "protection_window": 9.0,
+            "deterministic_finisher": 8.0,
+            "hand_filter": 8.0,
+            "early_plan": 7.0,
+            "graveyard_recursion": 5.0,
+        },
+        "role_targets": {
+            "land": 34,
+            "ramp": 18,
+            "draw": 15,
+            "removal": 10,
+            "protection": 13,
+            "board_wipe": 4,
+            "tutor": 3,
+            "wincon": 9,
+            "recursion": 4,
+        },
+        "land_target": 34,
+        "min_basics": 8,
+        "mountain_bias": 0.58,
+    },
     "access_density_control": {
         "mode": "from_scratch",
         "candidate_key": "challenger_lorehold_access_density_control_v1",
@@ -992,6 +1122,7 @@ def build_nonlands(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     selected: dict[str, dict[str, Any]] = {}
     missing: list[str] = []
+    excluded = {normalize_name(name) for name in plan.get("excluded_cards") or []}
     for card_name in plan.get("required_cards") or []:
         add_named_card(selected, pool, str(card_name), missing=missing)
 
@@ -1002,6 +1133,7 @@ def build_nonlands(
             entry["representative"]
             for key, entry in pool.items()
             if key not in selected
+            and key not in excluded
             and not bool(entry["representative"].get("is_commander"))
             and "land" not in card_roles(entry["representative"])
         ]
@@ -1087,6 +1219,7 @@ def summarize_rows(rows: list[Mapping[str, Any]], plan: Mapping[str, Any]) -> di
         "commander_intent_alignment": commander_intent_alignment(final_deck),
         "final_deck": final_deck,
         "required_cards": list(plan.get("required_cards") or []),
+        "excluded_cards": list(plan.get("excluded_cards") or []),
     }
 
 

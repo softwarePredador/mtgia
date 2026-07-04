@@ -23,6 +23,7 @@ REPORT_DIR = REPO_ROOT / "docs" / "hermes-analysis" / "master_optimizer_reports"
 BASELINE_KEY = "deck_607"
 CHALLENGER_KEYS = ("deck_614", "deck_615")
 PRESSURE_OPPONENTS = {"Winota, Joiner of Forces #39 (real)"}
+BASELINE_OPPONENT_NAMES = {"Fixed Lorehold deck 607"}
 
 DEFAULT_GATE_PATHS = [
     REPORT_DIR / "lorehold_promotion_gate_607_614_615_20260629_seed42_real8_games3.json",
@@ -293,6 +294,23 @@ def candidate_assessment(candidate: Mapping[str, Any], baseline: Mapping[str, An
         reasons.extend(pressure_failures)
     else:
         passes.append("no_pressure_matchup_regression")
+
+    baseline_rows = [
+        row
+        for name, row in (candidate.get("opponents") or {}).items()
+        if str(name) in BASELINE_OPPONENT_NAMES
+    ]
+    if baseline_rows:
+        head_to_head_wins = sum(as_int(row.get("wins")) for row in baseline_rows)
+        head_to_head_losses = sum(as_int(row.get("losses")) for row in baseline_rows)
+        head_to_head_games = sum(as_int(row.get("games")) for row in baseline_rows)
+        if head_to_head_wins > head_to_head_losses:
+            passes.append("head_to_head_vs_protected_607_won")
+        else:
+            reasons.append(
+                "head-to-head vs protected 607 not won "
+                f"({head_to_head_wins}/{head_to_head_games}, losses={head_to_head_losses})"
+            )
 
     strategic = candidate.get("strategic_game_counts") or {}
     if as_int(strategic.get("lorehold_spell_cast")) and as_int(strategic.get("miracle_cast")):
