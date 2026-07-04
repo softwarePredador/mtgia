@@ -22,6 +22,19 @@ from battle_rule_registry import deck_role_from_effect, logical_rule_key
 
 REPORT_DIR = Path(__file__).resolve().parent.parent.parent / "master_optimizer_reports"
 
+
+def as_list(value: Any) -> list[Any]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple):
+        return list(value)
+    if isinstance(value, set):
+        return list(value)
+    return [value]
+
+
 DRAW_UNIT = "draw_cards::xmage_draw_card_variant_review_v1"
 DRAW_ENGINE_UNIT = "draw_engine::xmage_draw_card_variant_review_v1"
 DAMAGE_UNIT = "direct_damage::targeted_damage_variant_v1"
@@ -7512,7 +7525,124 @@ def attack_target_keyword_from_source(source: str, keyword_ability_class: str) -
     }
 
 
-def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | None:
+def normalized_activation_sacrifice_cost(cost: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(cost, dict):
+        return None
+    constraints = dict(cost.get("constraints") or {})
+    for key in ("card_types", "exclude_card_types", "target_subtypes", "required_subtypes"):
+        if key in constraints:
+            constraints[key] = sorted(
+                {
+                    str(value or "").strip().lower()
+                    for value in as_list(constraints.get(key))
+                    if str(value or "").strip()
+                }
+            )
+    return {
+        "count": int(cost.get("count") or 1),
+        "target_controller": str(cost.get("target_controller") or "self"),
+        "constraints": constraints,
+    }
+
+
+def activation_sacrifice_cost_from_phrase(phrase: str) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    text = re.sub(r"^(?:a|an)\s+", "", text).strip()
+    exclude_source = False
+    if text.startswith("another "):
+        exclude_source = True
+        text = text[len("another ") :].strip()
+    constraints: dict[str, Any] = {}
+    if text in {"creature", "creatures"}:
+        constraints["card_types"] = ["creature"]
+    elif text in {"artifact", "artifacts"}:
+        constraints["card_types"] = ["artifact"]
+    elif text in {"land", "lands"}:
+        constraints["card_types"] = ["land"]
+    elif text in {"nonland permanent", "nonland permanents"}:
+        constraints["card_types"] = ["permanent"]
+        constraints["exclude_card_types"] = ["land"]
+    elif text in {"goblin", "goblins"}:
+        constraints["target_subtypes"] = ["goblin"]
+    elif text in {"goblin creature", "goblin creatures"}:
+        constraints["card_types"] = ["creature"]
+        constraints["target_subtypes"] = ["goblin"]
+    elif text in {"forest", "forests"}:
+        constraints["target_subtypes"] = ["forest"]
+    elif text in {"creature or enchantment", "creature or an enchantment"}:
+        constraints["card_types"] = ["creature", "enchantment"]
+    elif text in {"creature or artifact", "creature or an artifact", "artifact or creature"}:
+        constraints["card_types"] = ["artifact", "creature"]
+    else:
+        return "activated_damage_sacrifice_cost_not_supported"
+    if exclude_source:
+        constraints["exclude_source"] = True
+    return normalized_activation_sacrifice_cost(
+        {"count": 1, "target_controller": "self", "constraints": constraints}
+    )
+
+
+def activation_sacrifice_cost_from_oracle(text: str) -> dict[str, Any] | str | None:
+    match = re.search(
+        r"sacrifice\s+(?P<object>another\s+[^.:]+|(?:a|an)\s+[^.:]+):",
+        str(text or "").lower(),
+    )
+    if not match:
+        return None
+    return activation_sacrifice_cost_from_phrase(match.group("object"))
+
+
+def activation_sacrifice_cost_from_source(text: str, window: str) -> dict[str, Any] | str | None:
+    cost_matches = re.findall(r"new\s+SacrificeTargetCost\s*\((.*?)\)", window or "", re.S)
+    if not cost_matches:
+        return None
+    if len(cost_matches) != 1:
+        return "activated_damage_source_sacrifice_cost_not_supported"
+    cost_arg = re.sub(r"\s+", " ", cost_matches[0]).strip()
+    if re.match(r"\d+\s*,", cost_arg):
+        return "activated_damage_source_sacrifice_cost_not_supported"
+    constraints: dict[str, Any] = {}
+    if "FILTER_PERMANENT_CREATURE_OR_ENCHANTMENT" in cost_arg:
+        constraints["card_types"] = ["creature", "enchantment"]
+    elif "FILTER_CONTROLLED_ARTIFACT_OR_OTHER_CREATURE" in cost_arg:
+        constraints["card_types"] = ["artifact", "creature"]
+        constraints["exclude_source"] = True
+    elif "FILTER_CONTROLLED_ANOTHER_CREATURE" in cost_arg or "FILTER_PERMANENT_ANOTHER_CREATURE" in cost_arg:
+        constraints["card_types"] = ["creature"]
+        constraints["exclude_source"] = True
+    elif "FILTER_PERMANENT_CREATURE" in cost_arg:
+        constraints["card_types"] = ["creature"]
+    elif "FILTER_CONTROLLED_PERMANENT_ARTIFACT" in cost_arg or "FILTER_PERMANENT_ARTIFACT" in cost_arg:
+        constraints["card_types"] = ["artifact"]
+    elif "filter" in cost_arg:
+        filter_match = re.search(
+            r"FilterControlledPermanent\s+filter\s*=\s*new\s+FilterControlledPermanent\s*\((.*?)\)\s*;",
+            text or "",
+            re.S,
+        )
+        filter_body = filter_match.group(1) if filter_match else ""
+        filter_window = ""
+        if filter_match:
+            filter_window = (text or "")[filter_match.start() : filter_match.start() + 700]
+        if "SubType.GOBLIN" in filter_body or "SubType.GOBLIN" in filter_window:
+            constraints["target_subtypes"] = ["goblin"]
+        elif "SubType.FOREST" in filter_body or "SubType.FOREST" in filter_window:
+            constraints["target_subtypes"] = ["forest"]
+        elif "CardType.ARTIFACT" in filter_window:
+            constraints["card_types"] = ["artifact"]
+        elif "Predicates.not(CardType.LAND.getPredicate())" in filter_window:
+            constraints["card_types"] = ["permanent"]
+            constraints["exclude_card_types"] = ["land"]
+        else:
+            return "activated_damage_source_sacrifice_cost_not_supported"
+    else:
+        return "activated_damage_source_sacrifice_cost_not_supported"
+    return normalized_activation_sacrifice_cost(
+        {"count": 1, "target_controller": "self", "constraints": constraints}
+    )
+
+
+def activated_damage_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
         return None
@@ -7523,7 +7653,16 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | 
             r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to ",
             effect_text,
         )
-        return (int(match.group(1)), restricted) if match else None
+        if not match:
+            return None
+        sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+        if isinstance(sacrifice_cost, str):
+            return None
+        return {
+            "amount": int(match.group(1)),
+            "target": restricted,
+            "activation_sacrifice_cost": sacrifice_cost,
+        }
     match = re.match(
         r"^(?:it|this (?:artifact|creature|enchantment)|[^.]+?) deals (\d+) damage to "
         r"(any target|target creature|target player or planeswalker)\.?$",
@@ -7536,7 +7675,14 @@ def activated_damage_from_oracle(metadata: dict[str, Any]) -> tuple[int, str] | 
         "target creature": "creature",
         "target player or planeswalker": "player_or_planeswalker",
     }
-    return int(match.group(1)), target_map[match.group(2)]
+    sacrifice_cost = activation_sacrifice_cost_from_oracle(text)
+    if isinstance(sacrifice_cost, str):
+        return None
+    return {
+        "amount": int(match.group(1)),
+        "target": target_map[match.group(2)],
+        "activation_sacrifice_cost": sacrifice_cost,
+    }
 
 
 def activated_damage_from_source(source: str) -> dict[str, Any] | str:
@@ -7552,14 +7698,10 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "RemoveCounterCost",
         "ReturnToHandSourceCost",
         "RevealTargetFromHandCost",
-        "SacrificeTargetCost",
         "TapTargetCost",
     }
     if "Zone.GRAVEYARD" in text:
         return "activated_damage_source_not_battlefield"
-    present_risky = sorted(cost for cost in risky_cost_classes if cost in text)
-    if present_risky:
-        return "activated_damage_source_cost_not_supported"
     damage_matches = re.findall(r"DamageTargetEffect\s*\(\s*(\d*)\s*(?:,|\))", text)
     if len(damage_matches) != 1:
         return "activated_damage_source_count_not_fixed"
@@ -7581,13 +7723,22 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
     window = text[max(0, damage_index - 300) : damage_index + 1600]
     if "SimpleActivatedAbility" not in window:
         return "activated_damage_source_not_simple_activated"
+    present_risky = sorted(cost for cost in risky_cost_classes if cost in window)
+    if present_risky:
+        return "activated_damage_source_cost_not_supported"
+    sacrifice_cost = activation_sacrifice_cost_from_source(text, window)
+    if isinstance(sacrifice_cost, str):
+        return sacrifice_cost
     cost_text = "{0}"
     mana_match = re.search(r'ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)', window)
     generic_match = re.search(r"GenericManaCost\s*\(\s*(\d+)\s*\)", window)
+    colored_match = re.search(r"ColoredManaCost\s*\(\s*ColoredManaSymbol\.([WUBRG])\s*\)", window)
     if mana_match:
         cost_text = mana_match.group(1)
     elif generic_match:
         cost_text = "{" + generic_match.group(1) + "}"
+    elif colored_match:
+        cost_text = "{" + colored_match.group(1) + "}"
     parsed_cost = parse_mana_cost_text(cost_text)
     if parsed_cost is None:
         return "activated_damage_source_mana_cost_not_supported"
@@ -7603,6 +7754,7 @@ def activated_damage_from_source(source: str) -> dict[str, Any] | str:
         "activation_cost_colors": activation_cost_colors,
         "activation_requires_tap": requires_tap,
         "activation_requires_sacrifice": requires_sacrifice,
+        "activation_sacrifice_cost": sacrifice_cost,
     }
 
 
@@ -13141,11 +13293,20 @@ def split_row(
         parsed_activation = activated_damage_from_source(source_text)
         if isinstance(parsed_activation, str):
             return None, parsed_activation
-        oracle_amount, oracle_target = oracle_damage
+        oracle_amount = int(oracle_damage["amount"])
+        oracle_target = str(oracle_damage["target"])
         if int(parsed_activation["amount"]) != int(oracle_amount):
             return None, "activated_damage_source_oracle_amount_mismatch"
         if str(parsed_activation["target"]) != str(oracle_target):
             return None, "activated_damage_source_oracle_target_mismatch"
+        oracle_sacrifice_cost = normalized_activation_sacrifice_cost(
+            oracle_damage.get("activation_sacrifice_cost")
+        )
+        source_sacrifice_cost = normalized_activation_sacrifice_cost(
+            parsed_activation.get("activation_sacrifice_cost")
+        )
+        if source_sacrifice_cost != oracle_sacrifice_cost:
+            return None, "activated_damage_source_oracle_sacrifice_cost_mismatch"
         type_line = str(metadata.get("type_line") or "").lower()
         permanent_effect = (
             "creature"
@@ -13189,6 +13350,11 @@ def split_row(
                 )
             },
         }
+        if source_sacrifice_cost:
+            effect_json["activation_sacrifice_cost"] = source_sacrifice_cost
+            effect_json["activation_requires_sacrifice_target"] = True
+            activated_effect["activation_sacrifice_cost"] = source_sacrifice_cost
+            activated_effect["activation_requires_sacrifice_target"] = True
         if parsed_activation.get("activation_requires_sacrifice"):
             effect_json["activated_self_sacrifice_damage"] = True
             activated_effect["activated_self_sacrifice_damage"] = True

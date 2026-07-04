@@ -5112,6 +5112,124 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_damage_sacrifices_matching_cost_target_and_damages_player(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        active.mana_pool.add_generic(1)
+        permanent = {
+            "name": "Barrage Ogre",
+            "type_line": "Creature - Ogre Warrior",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {"card_types": ["artifact"]},
+            },
+            "_rule_logical_key": "battle_rule_v1:barrage_ogre",
+        }
+        spare_artifact = {"name": "Spare Gear", "type_line": "Artifact"}
+        spare_creature = {"name": "Spare Cadet", "type_line": "Creature - Soldier", "power": 1, "toughness": 1}
+        active.battlefield.extend([permanent, spare_artifact, spare_creature])
+
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(59),
+            phase="precombat_main",
+        )
+
+        self.assertTrue(activated)
+        self.assertIn(permanent, active.battlefield)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertNotIn(spare_artifact, active.battlefield)
+        self.assertIn(spare_artifact, active.graveyard)
+        self.assertIn(spare_creature, active.battlefield)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "activated_ability"
+                and data.get("card") == "Barrage Ogre"
+                and data.get("activation_kind") == "simple_activated_damage"
+                and data.get("sacrificed_source") is False
+                and data.get("sacrificed_cost_target") == "Spare Gear"
+                and data.get("sacrifice_cost_available_targets") == 1
+                and data.get("mana_paid") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_simple_activated_damage_blocks_activation_without_sacrifice_cost_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        active.mana_pool.add_generic(1)
+        permanent = {
+            "name": "Barrage Ogre",
+            "type_line": "Creature - Ogre Warrior",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 2,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "activation_cost_mana": "{1}",
+            "activation_cost_generic": 1,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": False,
+            "activation_requires_sacrifice_target": True,
+            "activation_sacrifice_cost": {
+                "count": 1,
+                "target_controller": "self",
+                "constraints": {"card_types": ["artifact"]},
+            },
+        }
+        active.battlefield.extend(
+            [
+                permanent,
+                {"name": "Spare Cadet", "type_line": "Creature - Soldier", "power": 1, "toughness": 1},
+            ]
+        )
+
+        self.assertFalse(
+            self.battle.can_activate_generic_tap_damage_permanent(
+                active,
+                permanent,
+                [opponent],
+            )
+        )
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(60),
+            phase="precombat_main",
+        )
+
+        self.assertFalse(activated)
+        self.assertIn(permanent, active.battlefield)
+        self.assertFalse(permanent.get("tapped", False))
+        self.assertEqual(active.available_mana(), 1)
+        self.assertEqual(opponent.life, 6)
+
     def test_simple_activated_damage_creature_preserves_self_keyword_and_activates(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

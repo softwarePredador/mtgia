@@ -40722,6 +40722,8 @@ def _activated_rule_effects_for_permanent(permanent):
             "ability_kind": "activated",
             "activation_requires_tap": bool(permanent.get("activation_requires_tap")),
             "activation_requires_sacrifice": bool(permanent.get("activation_requires_sacrifice")),
+            "activation_requires_sacrifice_target": bool(permanent.get("activation_requires_sacrifice_target")),
+            "activation_sacrifice_cost": permanent.get("activation_sacrifice_cost"),
             "activation_cost_mana": permanent.get("activation_cost_mana"),
             "activation_cost_generic": permanent.get("activation_cost_generic"),
             "activation_cost_colors": permanent.get("activation_cost_colors"),
@@ -41032,6 +41034,80 @@ def generic_tap_damage_effect_for_permanent(permanent):
     return None
 
 
+def _activation_sacrifice_cost(effect_data):
+    cost = (effect_data or {}).get("activation_sacrifice_cost")
+    if not isinstance(cost, dict):
+        return None
+    constraints = dict(cost.get("constraints") or {})
+    return {
+        "count": int(cost.get("count") or 1),
+        "target_controller": str(cost.get("target_controller") or "self"),
+        "constraints": constraints,
+    }
+
+
+def _sacrifice_cost_candidate_matches(candidate, source, constraints):
+    if not isinstance(candidate, dict):
+        return False
+    constraints = dict(constraints or {})
+    if constraints.get("exclude_source") and candidate is source:
+        return False
+    card_types = [
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("card_types"))
+        if str(value or "").strip()
+    ]
+    if card_types:
+        if "permanent" not in card_types and not any(target_matches_type(candidate, card_type) for card_type in card_types):
+            return False
+    excluded_card_types = [
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("exclude_card_types"))
+        if str(value or "").strip()
+    ]
+    if excluded_card_types and any(target_matches_type(candidate, card_type) for card_type in excluded_card_types):
+        return False
+    subtypes = [
+        str(value or "").strip().lower()
+        for value in _as_list(constraints.get("target_subtypes") or constraints.get("required_subtypes"))
+        if str(value or "").strip()
+    ]
+    if subtypes and not any(permanent_has_subtype(candidate, subtype) for subtype in subtypes):
+        return False
+    return True
+
+
+def _activation_sacrifice_cost_candidates(player, source, effect_data):
+    cost = _activation_sacrifice_cost(effect_data)
+    if not cost:
+        return []
+    if int(cost.get("count") or 1) != 1:
+        return []
+    if str(cost.get("target_controller") or "self") not in {"self", "you", "controller"}:
+        return []
+    constraints = dict(cost.get("constraints") or {})
+    return [
+        candidate
+        for candidate in list(getattr(player, "battlefield", []) or [])
+        if _sacrifice_cost_candidate_matches(candidate, source, constraints)
+    ]
+
+
+def _choose_activation_sacrifice_cost_candidate(player, source, effect_data):
+    candidates = _activation_sacrifice_cost_candidates(player, source, effect_data)
+    if not candidates:
+        return None, []
+    chosen = min(
+        candidates,
+        key=lambda candidate: (
+            1 if candidate is source else 0,
+            target_priority(candidate),
+            str(candidate.get("name") or ""),
+        ),
+    )
+    return chosen, candidates
+
+
 def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, effect_data=None):
     effect_data = effect_data or generic_tap_damage_effect_for_permanent(permanent)
     if effect_data is None:
@@ -41055,6 +41131,14 @@ def can_activate_generic_tap_damage_permanent(player, permanent, opponents, *, e
         )
     if not player.can_pay(activation_cost):
         return False
+    if _activation_sacrifice_cost(effect_data):
+        sacrifice_candidate, _sacrifice_options = _choose_activation_sacrifice_cost_candidate(
+            player,
+            permanent,
+            effect_data,
+        )
+        if sacrifice_candidate is None:
+            return False
     if direct_damage_targets_player(effect_data):
         if any(opponent.is_alive() for opponent in opponents or []):
             return True
@@ -41094,6 +41178,20 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         player.graveyard.append(permanent)
         player.record_permanent_sacrificed(permanent, turn)
         sacrificed_source = True
+    sacrificed_cost_target = None
+    sacrifice_cost_options = []
+    if _activation_sacrifice_cost(effect_data):
+        sacrificed_cost_target, sacrifice_cost_options = _choose_activation_sacrifice_cost_candidate(
+            player,
+            permanent,
+            effect_data,
+        )
+        if sacrificed_cost_target is None:
+            return False
+        if sacrificed_cost_target in player.battlefield:
+            player.battlefield.remove(sacrificed_cost_target)
+        player.graveyard.append(sacrificed_cost_target)
+        player.record_permanent_sacrificed(sacrificed_cost_target, turn)
     fields = replay_rule_fields(effect_data)
     damage = int(effect_data.get("amount") or effect_data.get("damage") or 0)
     requires_tap = bool(effect_data.get("activation_requires_tap"))
@@ -41123,6 +41221,7 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "activation_cost": activation_cost,
             "requires_tap": 1 if requires_tap else 0,
             "requires_sacrifice": 1 if sacrificed_source else 0,
+            "sacrifice_cost_target": (sacrificed_cost_target or {}).get("name"),
         },
         rule_source=fields.get("rule_source", "battle_rule"),
         rule_status=fields.get("rule_review_status", "verified"),
@@ -41135,13 +41234,16 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
             "damage": damage,
             "mana": -mana_paid,
             "tapped": 1 if requires_tap else 0,
-            "permanents": -1 if sacrificed_source else 0,
+            "permanents": -(
+                (1 if sacrificed_source else 0) + (1 if sacrificed_cost_target is not None else 0)
+            ),
         },
         risk_flags=[
             flag
             for flag, active in {
                 "tap_ability": requires_tap,
                 "sacrifice_source": sacrificed_source,
+                "sacrifice_cost_target": sacrificed_cost_target is not None,
                 "simplified_target_choice": True,
             }.items()
             if active
@@ -41156,6 +41258,8 @@ def activate_generic_tap_damage_permanent(player, opponents, permanent, turn, rn
         activation_cost="tap" if old_tap_damage_scope and activation_cost == "{0}" else activation_cost,
         tapped=bool(permanent.get("tapped")),
         sacrificed_source=sacrificed_source,
+        sacrificed_cost_target=(sacrificed_cost_target or {}).get("name"),
+        sacrifice_cost_available_targets=len(sacrifice_cost_options),
         mana_paid=mana_paid,
         turn=turn,
         phase=phase,

@@ -1,0 +1,355 @@
+{
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "PG416",
+  "generated_at": "2026-07-04T17:06:50.268886+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg416_xmage_activated_damage_sacrifice_cost_new_server_package_manifest.json",
+  "mutations_performed": [
+    "postgres_apply_pg416_xmage_activated_damage_sacrifice_cost_new_server"
+  ],
+  "postcheck": {
+    "backup_rows": 0,
+    "cards": [
+      "Arms Dealer",
+      "Barrage Ogre",
+      "Blazing Hellhound",
+      "Fodder Cannon",
+      "Heartwood Giant",
+      "Hurler Cyclops",
+      "Magmaw",
+      "Orcish Bloodpainter",
+      "Orcish Mechanics",
+      "Orcish Vandal",
+      "Scorched Rusalka",
+      "Skirsdag Cultist",
+      "Skull Catapult",
+      "Tar Pitcher"
+    ],
+    "failed_cards": [],
+    "promoted_oracle_hash_rows": 14,
+    "promoted_rule_rows": 14,
+    "promoted_verified_auto_rows": 14,
+    "row_count": 14
+  },
+  "postcheck_rows": [
+    {
+      "backup_rows": 0,
+      "card_name": "Arms Dealer",
+      "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07",
+      "normalized_name": "arms dealer",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Barrage Ogre",
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "barrage ogre",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Blazing Hellhound",
+      "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+      "normalized_name": "blazing hellhound",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Fodder Cannon",
+      "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8",
+      "normalized_name": "fodder cannon",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Heartwood Giant",
+      "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698",
+      "normalized_name": "heartwood giant",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Hurler Cyclops",
+      "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+      "normalized_name": "hurler cyclops",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Magmaw",
+      "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613",
+      "normalized_name": "magmaw",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Orcish Bloodpainter",
+      "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063",
+      "normalized_name": "orcish bloodpainter",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Orcish Mechanics",
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "orcish mechanics",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Orcish Vandal",
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "orcish vandal",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Scorched Rusalka",
+      "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
+      "normalized_name": "scorched rusalka",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Skirsdag Cultist",
+      "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a",
+      "normalized_name": "skirsdag cultist",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Skull Catapult",
+      "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8",
+      "normalized_name": "skull catapult",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    },
+    {
+      "backup_rows": 0,
+      "card_name": "Tar Pitcher",
+      "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c",
+      "normalized_name": "tar pitcher",
+      "promoted_oracle_hash_rows": 1,
+      "promoted_rule_rows": 1,
+      "promoted_verified_auto_rows": 1
+    }
+  ],
+  "precheck": {
+    "cards": [
+      "Arms Dealer",
+      "Barrage Ogre",
+      "Blazing Hellhound",
+      "Fodder Cannon",
+      "Heartwood Giant",
+      "Hurler Cyclops",
+      "Magmaw",
+      "Orcish Bloodpainter",
+      "Orcish Mechanics",
+      "Orcish Vandal",
+      "Scorched Rusalka",
+      "Skirsdag Cultist",
+      "Skull Catapult",
+      "Tar Pitcher"
+    ],
+    "existing_expected_rows_before": 14,
+    "missing_targets": [],
+    "row_count": 14,
+    "total_target_card_rows": 14,
+    "would_deprecate_shadow_rows": 0
+  },
+  "precheck_rows": [
+    {
+      "canonical_card_id": "f53494dc-2c12-4711-b10d-bf11c40434b5",
+      "card_name": "Arms Dealer",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07",
+      "normalized_name": "arms dealer",
+      "oracle_hash": "7c113f7892e680c8189a3902ca9c1550",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "10e6024e-a53e-4226-8050-e3fdde5730b6",
+      "card_name": "Barrage Ogre",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "barrage ogre",
+      "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "116fc4c7-e4f9-4882-8d32-6f1c4eff9d86",
+      "card_name": "Blazing Hellhound",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+      "normalized_name": "blazing hellhound",
+      "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "51b7865a-aebe-49b7-8dea-d10ceeb7b4ec",
+      "card_name": "Fodder Cannon",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8",
+      "normalized_name": "fodder cannon",
+      "oracle_hash": "7623cd0a94a2a02bc06fb55d9b6da1e9",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "1e285787-7d8c-43ac-94d7-564e501cf167",
+      "card_name": "Heartwood Giant",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698",
+      "normalized_name": "heartwood giant",
+      "oracle_hash": "e89bc4628ed49ee6da5311b61f044034",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e911b465-d181-44ce-8309-0de2a3d5d7db",
+      "card_name": "Hurler Cyclops",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+      "normalized_name": "hurler cyclops",
+      "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e41f347f-a427-4aae-86f1-c510272df161",
+      "card_name": "Magmaw",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613",
+      "normalized_name": "magmaw",
+      "oracle_hash": "01e19cb03dba72d5a6a21f313c2d3b45",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "3ec23e5b-651f-4c8a-ab5b-531f699a5579",
+      "card_name": "Orcish Bloodpainter",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063",
+      "normalized_name": "orcish bloodpainter",
+      "oracle_hash": "a010ea1cdd4c79b244cb7cc149453cf5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4c008114-b75c-4e0c-b4dc-521e67dbe452",
+      "card_name": "Orcish Mechanics",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "orcish mechanics",
+      "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "b8e381ea-e075-4ac0-a78f-e8278118d8c6",
+      "card_name": "Orcish Vandal",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+      "normalized_name": "orcish vandal",
+      "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "84498140-8de9-4584-a438-6ab49b18158e",
+      "card_name": "Scorched Rusalka",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
+      "normalized_name": "scorched rusalka",
+      "oracle_hash": "abbd038551095cf4c7ea527274d87eda",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "2ece49f3-50e3-4ad0-af21-51d46962cd15",
+      "card_name": "Skirsdag Cultist",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a",
+      "normalized_name": "skirsdag cultist",
+      "oracle_hash": "cbafdddcdc87835d0160526c1455c4aa",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "4bce2184-3094-4a9f-b866-942d9a077fad",
+      "card_name": "Skull Catapult",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8",
+      "normalized_name": "skull catapult",
+      "oracle_hash": "4a877141cb1b927295d691566c40aab8",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    },
+    {
+      "canonical_card_id": "e7ff2069-6e5a-422d-b018-b467ea16c2c6",
+      "card_name": "Tar Pitcher",
+      "existing_rule_rows": 1,
+      "expected_rule_rows_before": 1,
+      "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c",
+      "normalized_name": "tar pitcher",
+      "oracle_hash": "a573e339df3d274035c7a38f41496487",
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "target_card_rows": 1,
+      "would_deprecate_shadow_rows": 0
+    }
+  ],
+  "slug": "xmage_activated_damage_sacrifice_cost_new_server"
+}

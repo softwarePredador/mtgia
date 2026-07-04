@@ -1,0 +1,538 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T17:04:09.843113+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg416_xmage_activated_damage_sacrifice_cost_new_server_package_manifest.json",
+  "package_id": "pg416_xmage_activated_damage_sacrifice_cost_new_server_package_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Arms Dealer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07",
+          "oracle_hash": "7c113f7892e680c8189a3902ca9c1550",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Barrage Ogre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Blazing Hellhound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+          "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fodder Cannon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8",
+          "oracle_hash": "7623cd0a94a2a02bc06fb55d9b6da1e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Heartwood Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698",
+          "oracle_hash": "e89bc4628ed49ee6da5311b61f044034",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Hurler Cyclops",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+          "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Magmaw",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613",
+          "oracle_hash": "01e19cb03dba72d5a6a21f313c2d3b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Bloodpainter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063",
+          "oracle_hash": "a010ea1cdd4c79b244cb7cc149453cf5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Mechanics",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Vandal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scorched Rusalka",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
+          "oracle_hash": "abbd038551095cf4c7ea527274d87eda",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skirsdag Cultist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a",
+          "oracle_hash": "cbafdddcdc87835d0160526c1455c4aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skull Catapult",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8",
+          "oracle_hash": "4a877141cb1b927295d691566c40aab8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Tar Pitcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c",
+          "oracle_hash": "a573e339df3d274035c7a38f41496487",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 14
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Arms Dealer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07",
+          "oracle_hash": "7c113f7892e680c8189a3902ca9c1550",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Barrage Ogre",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Blazing Hellhound",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+          "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Fodder Cannon",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8",
+          "oracle_hash": "7623cd0a94a2a02bc06fb55d9b6da1e9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Heartwood Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698",
+          "oracle_hash": "e89bc4628ed49ee6da5311b61f044034",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Hurler Cyclops",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+          "oracle_hash": "2d4d4592ecd33c272778933166b35f18",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Magmaw",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613",
+          "oracle_hash": "01e19cb03dba72d5a6a21f313c2d3b45",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Bloodpainter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063",
+          "oracle_hash": "a010ea1cdd4c79b244cb7cc149453cf5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Mechanics",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Orcish Vandal",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+          "oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Scorched Rusalka",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
+          "oracle_hash": "abbd038551095cf4c7ea527274d87eda",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skirsdag Cultist",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a",
+          "oracle_hash": "cbafdddcdc87835d0160526c1455c4aa",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Skull Catapult",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8",
+          "oracle_hash": "4a877141cb1b927295d691566c40aab8",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "card_name": "Tar Pitcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c",
+          "oracle_hash": "a573e339df3d274035c7a38f41496487",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Arms Dealer",
+          "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Barrage Ogre",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Blazing Hellhound",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Fodder Cannon",
+          "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heartwood Giant",
+          "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hurler Cyclops",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Magmaw",
+          "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orcish Bloodpainter",
+          "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orcish Mechanics",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Orcish Vandal",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Scorched Rusalka",
+          "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skirsdag Cultist",
+          "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Skull Catapult",
+          "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+          "battle_rule_version": 2,
+          "card_name": "Tar Pitcher",
+          "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 14
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Arms Dealer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Barrage Ogre",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Blazing Hellhound",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Fodder Cannon",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heartwood Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hurler Cyclops",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Magmaw",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orcish Bloodpainter",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orcish Mechanics",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Orcish Vandal",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Scorched Rusalka",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skirsdag Cultist",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:caed5a430d19931da153ce154474738a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Skull Catapult",
+          "component_keys": [],
+          "effect": "artifact",
+          "logical_rule_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Tar Pitcher",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

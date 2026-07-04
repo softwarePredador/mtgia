@@ -8218,6 +8218,53 @@ server:
   `1103`. The post-PG415 exact split recheck produced `proposal_count=0`; the
   remaining `314` identities are still explicit missing-source exceptions.
 
+PG416 closed the exact permanent activated damage with sacrifice-target cost
+subpattern on the new server:
+
+- Split support now maps XMage `DamageTargetEffect` permanent activated
+  abilities with a fixed damage amount plus simple `SacrificeTargetCost` into
+  `xmage_permanent_simple_activated_damage_v1` when Oracle and local Java
+  source agree on mana cost, tap requirement, target scope, and sacrifice-cost
+  constraints. Supported sacrifice targets in this wave are controlled
+  creature, artifact, Goblin, Forest, nonland permanent, and `another`
+  creature variants. Dynamic-damage and custom-cost neighbors stay blocked.
+- Runtime support now requires a legal sacrifice-cost target before activation,
+  chooses a matching controlled permanent, pays mana/tap/source-sacrifice
+  costs, moves the sacrificed cost target to graveyard, emits decision/replay
+  evidence, and resolves the direct damage.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`424` tests) and
+  `test_xmage_exact_scope_runtime.py` (`244` tests).
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg416_activated_damage_sacrifice_cost_new_server`
+  produced `14` safe candidates: `Arms Dealer`, `Barrage Ogre`,
+  `Blazing Hellhound`, `Fodder Cannon`, `Heartwood Giant`, `Hurler Cyclops`,
+  `Magmaw`, `Orcish Bloodpainter`, `Orcish Mechanics`, `Orcish Vandal`,
+  `Scorched Rusalka`, `Skirsdag Cultist`, `Skull Catapult`, and
+  `Tar Pitcher`.
+- PostgreSQL package `PG416` was applied on the new server:
+  precheck found `14` target card rows; apply upserted `14` rows and deprecated
+  `0` shadow rows; postcheck verified `14/14` `verified`/`auto` rows with
+  Oracle hashes. The idempotent apply-evidence runner later confirmed
+  `promoted_rule_rows=14`, `promoted_verified_auto_rows=14`, and
+  `promoted_oracle_hash_rows=14` against `127.0.0.1:15432/halder`.
+- PG -> Hermes/SQLite sync loaded `14` PostgreSQL rows, updated `14` SQLite
+  rows, and exported `5457` canonical snapshot rows. The metadata sync in the
+  same cycle matched `6443` PostgreSQL card rows, left `1` unresolved alias,
+  and kept `deck_cards` backfill at `2699/2699` matched rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `14` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26582` to `26568`, authoritative adapter-required count from `26268`
+  to `26254`, and the direct-damage work unit from `827` to `813`. The
+  post-PG416 exact split recheck produced `proposal_count=0`; the remaining
+  `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
