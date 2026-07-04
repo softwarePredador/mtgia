@@ -10125,6 +10125,128 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
             {"zone": "graveyard", "controller": "self", "card_types": ["land"]},
         )
 
+    def test_creature_combat_damage_recursion_maps_arcane_target(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=[
+                "DealsCombatDamageToAPlayerTriggeredAbility",
+                "FlyingAbility",
+                "TrampleAbility",
+            ],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="The Unspeakable",
+                type_line="Legendary Creature - Spirit",
+                oracle_text=(
+                    "Flying, trample\n"
+                    "Whenever The Unspeakable deals combat damage to a player, "
+                    "you may return target Arcane card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(FlyingAbility.getInstance());"
+                "this.addAbility(TrampleAbility.getInstance());"
+                "Ability ability = new DealsCombatDamageToAPlayerTriggeredAbility("
+                "new ReturnFromGraveyardToHandTargetEffect(), true);"
+                "ability.addTarget(new TargetCardInYourGraveyard(filter));"
+                "filter.add(SubType.ARCANE.getPredicate());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_RECURSION_CREATURE_SCOPE)
+        self.assertTrue(effect["combat_damage_player_graveyard_recursion"])
+        self.assertEqual(effect["combat_damage_recursion_target"], "arcane_card")
+        self.assertEqual(effect["combat_damage_recursion_destination"], "hand")
+        self.assertEqual(effect["keywords"], ["flying", "trample"])
+
+    def test_permanent_attack_recursion_maps_trigger_cost(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="triggered",
+            ability_classes=[
+                "AttacksTriggeredAbility",
+                "EntersBattlefieldTappedAbility",
+            ],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Eternal Taskmaster",
+                type_line="Creature - Zombie",
+                oracle_text=(
+                    "This creature enters tapped.\n"
+                    "Whenever this creature attacks, you may pay {2}{B}. If you do, "
+                    "return target creature card from your graveyard to your hand."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new EntersBattlefieldTappedAbility());"
+                "Ability ability = new AttacksTriggeredAbility(new DoIfCostPaid("
+                "new ReturnFromGraveyardToHandTargetEffect(), new ManaCostsImpl<>(\"{2}{B}\")), false);"
+                "ability.addTarget(new TargetCardInYourGraveyard("
+                "StaticFilters.FILTER_CARD_CREATURE_YOUR_GRAVEYARD));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.ATTACK_RECURSION_PERMANENT_SCOPE)
+        self.assertTrue(effect["attack_trigger_graveyard_recursion"])
+        self.assertEqual(effect["attack_recursion_target"], "creature")
+        self.assertEqual(effect["attack_recursion_trigger_cost_mana"], "{2}{B}")
+        self.assertEqual(effect["attack_recursion_trigger_cost_generic"], 2)
+        self.assertEqual(effect["attack_recursion_trigger_cost_colors"], ["B"])
+        self.assertTrue(effect["enters_tapped"])
+
+    def test_activated_recursion_to_hand_accepts_activate_as_sorcery(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["ReturnFromGraveyardToHandTargetEffect"],
+            ability_kind="activated",
+            ability_classes=["ActivateAsSorceryActivatedAbility", "ReachAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Pillardrop Warden",
+                type_line="Creature - Spirit Dwarf",
+                oracle_text=(
+                    "Reach\n"
+                    "{2}, {T}, Sacrifice this creature: Return target instant or sorcery card "
+                    "from your graveyard to your hand. Activate only as a sorcery."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(ReachAbility.getInstance());"
+                "Ability ability = new ActivateAsSorceryActivatedAbility("
+                "new ReturnFromGraveyardToHandTargetEffect(), new GenericManaCost(2));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "ability.addTarget(new TargetCardInYourGraveyard("
+                "new FilterInstantOrSorceryCard(\"instant or sorcery card from your graveyard\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_RECURSION_TO_HAND_SCOPE)
+        self.assertEqual(effect["graveyard_to_hand_target"], "instant_or_sorcery")
+        self.assertEqual(effect["activation_timing"], "sorcery")
+        self.assertEqual(effect["xmage_ability_class"], "ActivateAsSorceryActivatedAbility")
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["keywords"], ["reach"])
+
     def test_creature_etb_recursion_to_battlefield_maps_land_target(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

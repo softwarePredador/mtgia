@@ -1,0 +1,164 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "127.0.0.1:15432/halder",
+  "generated_at_utc": "2026-07-04T15:21:04.523977+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg411_triggered_recursion_to_hand_new_server_package_manifest.json",
+  "package_id": "pg411_triggered_recursion_to_hand_new_server_package_manifest",
+  "snapshot": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_attack_return_graveyard_card_to_hand_v1",
+          "card_name": "Eternal Taskmaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0",
+          "oracle_hash": "2d79b92556e0ed8ab221480fa5fd873d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Pillardrop Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a",
+          "oracle_hash": "c32f8c92a5a3cd47b3cd510867bbf5c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "card_name": "The Unspeakable",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063",
+          "oracle_hash": "b1b6b05b9d4aea8f3ac0379433f54829",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 3
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_attack_return_graveyard_card_to_hand_v1",
+          "card_name": "Eternal Taskmaster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0",
+          "oracle_hash": "2d79b92556e0ed8ab221480fa5fd873d",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "card_name": "Pillardrop Warden",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a",
+          "oracle_hash": "c32f8c92a5a3cd47b3cd510867bbf5c5",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "card_name": "The Unspeakable",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063",
+          "oracle_hash": "b1b6b05b9d4aea8f3ac0379433f54829",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_attack_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Eternal Taskmaster",
+          "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_graveyard_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pillardrop Warden",
+          "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+          "battle_rule_version": 2,
+          "card_name": "The Unspeakable",
+          "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 3
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Eternal Taskmaster",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4022dff702a96dc4ab9837e68a1f30e0"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pillardrop Warden",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:decee249f26e77cc845acd6db9ba629a"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "The Unspeakable",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2725808803ad0a91360ce43429ab4063"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

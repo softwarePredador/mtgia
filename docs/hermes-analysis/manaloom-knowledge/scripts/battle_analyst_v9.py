@@ -37944,6 +37944,14 @@ def graveyard_card_matches_recursion_target(card, target_type, *, mana_value_max
         return "artifact" in type_line or "enchantment" in type_line
     if target in ("artifact_or_creature", "artifact_creature_choice", "artifact_or_creature_card"):
         return "artifact" in type_line or is_creature_card(card)
+    if target in (
+        "artifact_or_creature_or_enchantment",
+        "artifact_creature_enchantment",
+        "artifact_or_creature_or_enchantment_card",
+    ):
+        return "artifact" in type_line or is_creature_card(card) or "enchantment" in type_line
+    if target in ("creature_or_vehicle", "creature_vehicle", "creature_or_vehicle_card"):
+        return is_creature_card(card) or "vehicle" in type_tokens
     if target in ("creature_or_enchantment", "creature_enchantment", "creature_or_enchantment_card"):
         return is_creature_card(card) or "enchantment" in type_line
     if target in ("creature_or_food", "creature_food", "creature_or_food_card"):
@@ -39109,6 +39117,7 @@ def resolve_attack_graveyard_recursion_triggers(player, attackers, turn, *, phas
             "attack_recursion_mana_value_max",
             "etb_recursion_mana_value_max",
         )
+        trigger_cost = permanent.get("attack_recursion_trigger_cost_mana")
         candidates = [
             grave_card
             for grave_card in list(getattr(player, "graveyard", []) or [])
@@ -39118,6 +39127,20 @@ def resolve_attack_graveyard_recursion_triggers(player, attackers, turn, *, phas
                 mana_value_max=mana_value_max,
             )
         ]
+        if trigger_cost and candidates:
+            if not player.can_pay(trigger_cost) or not player.spend_mana(trigger_cost):
+                emit_replay_event(
+                    "attack_recursion_trigger_skipped",
+                    player=player.name,
+                    card=permanent.get("name", "?"),
+                    reason="unable_to_pay_trigger_cost",
+                    trigger_cost=trigger_cost,
+                    target_type=target_type,
+                    turn=turn,
+                    phase=phase,
+                    **replay_rule_fields(permanent),
+                )
+                continue
         recovered = []
         for recovered_card in remove_cards_from_graveyard(
             player,
@@ -39143,6 +39166,71 @@ def resolve_attack_graveyard_recursion_triggers(player, attackers, turn, *, phas
             "player": player.name,
             "card": permanent.get("name", "?"),
             "trigger": "attack",
+            "target_type": target_type,
+            "destination": destination,
+            "mana_value_max": mana_value_max,
+            "trigger_cost": trigger_cost,
+            "recovered": [recovered_card.get("name", "?") for recovered_card in recovered],
+            "recovered_count": len(recovered),
+            "turn": turn,
+            "phase": phase,
+            **replay_rule_fields(permanent),
+        }
+        emit_replay_event("recursion_resolved", **payload)
+        trigger_events.append(payload)
+    return trigger_events
+
+
+def resolve_combat_damage_graveyard_recursion_triggers(
+    player,
+    damaging_creatures,
+    damaged_player,
+    turn,
+    *,
+    phase="combat_damage",
+):
+    trigger_events = []
+    for permanent in list(damaging_creatures or []):
+        if not isinstance(permanent, dict):
+            continue
+        if not (
+            permanent.get("combat_damage_player_graveyard_recursion")
+            or permanent.get("combat_damage_recursion_count")
+        ):
+            continue
+        if permanent not in getattr(player, "battlefield", []):
+            continue
+        count = max(1, int(permanent.get("combat_damage_recursion_count") or 1))
+        target_type = permanent.get("combat_damage_recursion_target") or permanent.get("target") or "nonland"
+        destination = permanent.get("combat_damage_recursion_destination") or "hand"
+        mana_value_max = recursion_mana_value_max(
+            permanent,
+            "combat_damage_recursion_mana_value_max",
+            "graveyard_to_hand_mana_value_max",
+        )
+        candidates = [
+            grave_card
+            for grave_card in list(getattr(player, "graveyard", []) or [])
+            if graveyard_card_matches_recursion_target(
+                grave_card,
+                target_type,
+                mana_value_max=mana_value_max,
+            )
+        ]
+        recovered = []
+        for recovered_card in remove_cards_from_graveyard(
+            player,
+            candidates[:count],
+            turn=turn,
+            source_event="combat_damage_recursion",
+        ):
+            recovered.append(recovered_card)
+            player.hand.append(recovered_card)
+        payload = {
+            "player": player.name,
+            "card": permanent.get("name", "?"),
+            "damaged_player": getattr(damaged_player, "name", None),
+            "trigger": "combat_damage_to_player",
             "target_type": target_type,
             "destination": destination,
             "mana_value_max": mana_value_max,
@@ -55480,6 +55568,13 @@ def combat_damage_steps(attacker, opponents, target, attackers, block_assignment
                 stack=stack,
                 phase="first_strike_damage" if first_strike_phase else "combat_damage",
                 rng=rng,
+            )
+            resolve_combat_damage_graveyard_recursion_triggers(
+                attacker,
+                damaging_creatures_to_player,
+                target,
+                turn,
+                phase="first_strike_damage" if first_strike_phase else "combat_damage",
             )
         destroy_lethal_creatures()
 

@@ -190,6 +190,8 @@ ETB_RECURSION_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_
 ETB_MILL_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_mill_then_return_graveyard_card_to_hand_v1"
 ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE = "xmage_creature_etb_put_graveyard_card_on_library_v1"
 ETB_LIBRARY_PICK_CREATURE_SCOPE = "xmage_creature_etb_look_library_pick_to_hand_rest_graveyard_v1"
+DAMAGE_RECURSION_CREATURE_SCOPE = "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1"
+ATTACK_RECURSION_PERMANENT_SCOPE = "xmage_permanent_attack_return_graveyard_card_to_hand_v1"
 DIES_DRAW_CREATURE_SCOPE = "xmage_creature_dies_draw_cards_v1"
 DIES_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_dies_gain_life_v1"
 DIES_DAMAGE_CREATURE_SCOPE = "xmage_creature_dies_fixed_damage_target_v1"
@@ -1392,10 +1394,17 @@ def recursion_target_constraints_for(
         constraints["card_types"] = ["artifact", "enchantment"]
     elif target == "artifact_or_creature":
         constraints["card_types"] = ["artifact", "creature"]
+    elif target == "artifact_or_creature_or_enchantment":
+        constraints["card_types"] = ["artifact", "creature", "enchantment"]
     elif target == "artifact_or_enchantment_or_planeswalker":
         constraints["card_types"] = ["artifact", "enchantment", "planeswalker"]
     elif target == "creature_or_land":
         constraints["card_types"] = ["creature", "land"]
+    elif target == "creature_or_vehicle":
+        constraints["any_of"] = [
+            {"card_types": ["creature"]},
+            {"subtypes": ["vehicle"]},
+        ]
     elif target == "creature_or_enchantment":
         constraints["card_types"] = ["creature", "enchantment"]
     elif target == "creature_or_food":
@@ -1835,6 +1844,150 @@ def recursion_to_hand_from_text(text: str) -> tuple[str, int, bool] | None:
 
 def recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     return recursion_to_hand_from_text(oracle_text(metadata))
+
+
+def attack_damage_recursion_target_from_phrase(phrase: str) -> dict[str, Any] | None:
+    normalized = re.sub(r"\s+", " ", str(phrase or "").strip().lower())
+    normalized = normalized.replace("multicoloured", "multicolored")
+    patterns: list[tuple[str, dict[str, Any]]] = [
+        (r"^card$", {"target": "any_card"}),
+        (r"^creature card$", {"target": "creature"}),
+        (r"^permanent card$", {"target": "permanent"}),
+        (r"^arcane card$", {"target": "arcane_card"}),
+        (
+            r"^artifact, creature, or enchantment card$",
+            {"target": "artifact_or_creature_or_enchantment"},
+        ),
+        (
+            r"^creature or vehicle card with mana value (?P<mv>\d+) or less$",
+            {"target": "creature_or_vehicle", "mana_value_max_group": "mv"},
+        ),
+    ]
+    for pattern, spec in patterns:
+        match = re.match(pattern, normalized)
+        if not match:
+            continue
+        result = {"target": spec["target"], "count": 1, "destination": "hand"}
+        if spec.get("mana_value_max_group"):
+            result["mana_value_max"] = int(match.group(str(spec["mana_value_max_group"])))
+        return result
+    return None
+
+
+def triggered_graveyard_to_hand_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text_after_leading_static_keywords(metadata)
+    if "deals damage to an opponent" in text:
+        return "triggered_recursion_damage_to_opponent_not_supported"
+    trigger = None
+    match = re.search(
+        r"whenever (?:this creature|this vehicle|[^,]+?) attacks, (?P<body>.+)$",
+        text,
+    )
+    if match:
+        trigger = "attack"
+    else:
+        match = re.search(
+            r"whenever (?:this creature|[^,]+?) deals combat damage to a player, (?P<body>.+)$",
+            text,
+        )
+        if match:
+            trigger = "combat_damage_to_player"
+    if not match or trigger is None:
+        return "triggered_recursion_oracle_trigger_not_supported"
+    body = match.group("body").strip()
+    activation_cost_mana = None
+    cost_match = re.match(
+        r"you may pay (?P<cost>(?:\{[0-9wubrgc]+\})+)\. if you do, (?P<body>.+)$",
+        body,
+    )
+    if cost_match:
+        activation_cost_mana = cost_match.group("cost").upper()
+        body = cost_match.group("body").strip()
+    body = body.removeprefix("you may ").strip()
+    target_match = re.match(
+        r"return target (?P<phrase>.+?) from your graveyard to your hand\.?$",
+        body,
+    )
+    if not target_match:
+        return "triggered_recursion_oracle_target_not_supported"
+    target = attack_damage_recursion_target_from_phrase(target_match.group("phrase"))
+    if target is None:
+        return "triggered_recursion_oracle_target_not_supported"
+    result = {"trigger": trigger, **target}
+    if activation_cost_mana:
+        parsed = parse_mana_cost_text(activation_cost_mana)
+        if parsed is None:
+            return "triggered_recursion_oracle_cost_not_supported"
+        result["trigger_cost_mana"] = activation_cost_mana
+        result["trigger_cost_generic"] = parsed[0]
+        result["trigger_cost_colors"] = parsed[1]
+    return result
+
+
+def triggered_graveyard_to_hand_target_from_source(source_text: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    lowered = text.lower()
+    if "creature or Vehicle card with mana value 2 or less".lower() in lowered:
+        target = "creature_or_vehicle"
+        mana_value_max = 2
+    elif "artifact, creature, or enchantment card" in lowered:
+        target = "artifact_or_creature_or_enchantment"
+        mana_value_max = None
+    elif "FilterPermanentCard" in text or "permanent card from your graveyard" in lowered:
+        target = "permanent"
+        mana_value_max = None
+    elif "SubType.ARCANE.getPredicate" in text or "arcane card from your graveyard" in lowered:
+        target = "arcane_card"
+        mana_value_max = None
+    elif (
+        "FILTER_CARD_CREATURE_YOUR_GRAVEYARD" in text
+        or "FilterCreatureCard" in text
+        or "creature card from your graveyard" in lowered
+    ):
+        target = "creature"
+        mana_value_max = None
+    elif "new TargetCardInYourGraveyard()" in text:
+        target = "any_card"
+        mana_value_max = None
+    else:
+        return "triggered_recursion_source_target_not_supported"
+    result = {"target": target, "count": 1, "destination": "hand"}
+    if mana_value_max is not None:
+        result["mana_value_max"] = mana_value_max
+    return result
+
+
+def triggered_graveyard_to_hand_from_source(source_text: str, expected_trigger: str) -> dict[str, Any] | str:
+    text = str(source_text or "")
+    if len(re.findall(r"ReturnFromGraveyardToHandTargetEffect\s*\(", text)) != 1:
+        return "triggered_recursion_source_effect_count_not_supported"
+    if len(re.findall(r"TargetCardInYourGraveyard\s*\(", text)) != 1:
+        return "triggered_recursion_source_target_count_not_supported"
+    if expected_trigger == "attack":
+        if "AttacksTriggeredAbility" not in text:
+            return "triggered_recursion_source_trigger_mismatch"
+    elif expected_trigger == "combat_damage_to_player":
+        if "DealsCombatDamageToAPlayerTriggeredAbility" not in text:
+            return "triggered_recursion_source_trigger_mismatch"
+    else:
+        return "triggered_recursion_source_trigger_mismatch"
+    target = triggered_graveyard_to_hand_target_from_source(text)
+    if isinstance(target, str):
+        return target
+    cost_match = re.search(
+        r'DoIfCostPaid\s*\(.*?ReturnFromGraveyardToHandTargetEffect\s*\(\s*\).*?ManaCostsImpl<[^>]*>\s*\(\s*"([^"]+)"\s*\)',
+        text,
+        re.S,
+    )
+    if cost_match:
+        cost_text = cost_match.group(1)
+        parsed = parse_mana_cost_text(cost_text)
+        if parsed is None:
+            return "triggered_recursion_source_cost_not_supported"
+        target["trigger_cost_mana"] = cost_text
+        target["trigger_cost_generic"] = parsed[0]
+        target["trigger_cost_colors"] = parsed[1]
+    return target
 
 
 def recursion_to_hand_x_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | None:
@@ -4508,9 +4661,13 @@ def is_static_graveyard_count_boost_unit(row: dict[str, Any]) -> bool:
 def is_permanent_activated_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
         return False
+    abilities = ability_classes(row)
+    activated = {"SimpleActivatedAbility", "ActivateAsSorceryActivatedAbility"} & abilities
+    remaining = abilities - activated
     return (
         effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
-        and ability_classes(row) == {"SimpleActivatedAbility"}
+        and len(activated) == 1
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and "activated_ability" in set(row.get("xmage_signals") or [])
     )
 
@@ -4616,6 +4773,36 @@ def is_creature_etb_recursion_unit(row: dict[str, Any]) -> bool:
     return (
         effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
         and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_permanent_attack_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"AttacksTriggeredAbility", "EntersBattlefieldTappedAbility"}
+    return (
+        effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and "AttacksTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
+def is_creature_combat_damage_recursion_to_hand_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != RECURSION_UNIT:
+        return False
+    abilities = ability_classes(row)
+    combat_triggers = {
+        "DealsCombatDamageToAPlayerTriggeredAbility",
+    }
+    present_triggers = abilities & combat_triggers
+    remaining = abilities - present_triggers
+    return (
+        effect_classes(row) == {"ReturnFromGraveyardToHandTargetEffect"}
+        and len(present_triggers) == 1
         and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
         and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
     )
@@ -5962,18 +6149,43 @@ def source_supports_self_cost_reduction_condition(source_text: str, condition_fi
     return False
 
 
+def activated_ability_line_from_oracle(metadata: dict[str, Any]) -> str:
+    raw_text = str(metadata.get("oracle_text") or "").strip()
+    colon_lines = [
+        re.sub(r"\s+", " ", line).strip().lower()
+        for line in raw_text.splitlines()
+        if ":" in line
+    ]
+    if len(colon_lines) == 1:
+        return colon_lines[0]
+    stripped = oracle_text_after_leading_static_keywords(metadata)
+    if stripped and stripped.count(":") == 1:
+        return stripped
+    return oracle_text(metadata)
+
+
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = activated_ability_line_from_oracle(metadata)
     if text.count(":") != 1:
         return None
     return recursion_to_hand_from_text(text.rsplit(":", 1)[1].strip())
 
 
 def activated_recursion_to_hand_activation_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
-    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    text = activated_ability_line_from_oracle(metadata)
     if text.count(":") != 1:
         return "activated_recursion_oracle_not_simple"
     cost_text, effect_text = [part.strip() for part in text.split(":", 1)]
+    activation_timing = None
+    timing_suffix = re.search(
+        r"\s*activate (?:only )?as a sorcery\.?$",
+        effect_text,
+    )
+    if timing_suffix:
+        activation_timing = "sorcery"
+        effect_text = effect_text[: timing_suffix.start()].strip()
+        if not effect_text.endswith("."):
+            effect_text += "."
     target = recursion_to_hand_from_text(effect_text)
     if target is None:
         return "activated_recursion_oracle_not_simple"
@@ -6039,6 +6251,8 @@ def activated_recursion_to_hand_activation_from_oracle(metadata: dict[str, Any])
     if sacrifice_target:
         result["activation_sacrifice_target"] = sacrifice_target
         result["activation_requires_sacrifice_target"] = True
+    if activation_timing:
+        result["activation_timing"] = activation_timing
     return result
 
 
@@ -7868,8 +8082,10 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
         return "activated_recursion_source_count_not_fixed"
     effect_index = text.find("ReturnFromGraveyardToHandTargetEffect")
     window = text[max(0, effect_index - 500) : effect_index + 1800]
-    if "SimpleActivatedAbility" not in window:
+    ability_match = re.search(r"\b(SimpleActivatedAbility|ActivateAsSorceryActivatedAbility)\b", window)
+    if not ability_match:
         return "activated_recursion_source_not_simple_activated"
+    activation_timing = "sorcery" if ability_match.group(1) == "ActivateAsSorceryActivatedAbility" else None
     parsed_target = activated_recursion_to_hand_target_from_source(text)
     if isinstance(parsed_target, str):
         return parsed_target
@@ -7919,10 +8135,11 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
             return "activated_recursion_source_cost_not_supported"
     if requires_sacrifice and sacrifice_target:
         return "activated_recursion_source_cost_not_supported"
-    return {
+    result = {
         "target": target,
         "count": count,
         "up_to": up_to,
+        "xmage_ability_class": ability_match.group(1),
         "activation_cost_mana": cost_text,
         "activation_cost_generic": activation_cost_generic,
         "activation_cost_colors": activation_cost_colors,
@@ -7940,6 +8157,9 @@ def activated_recursion_to_hand_from_source(source: str) -> dict[str, Any] | str
             else {}
         ),
     }
+    if activation_timing:
+        result["activation_timing"] = activation_timing
+    return result
 
 
 def activated_recursion_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -9820,6 +10040,8 @@ def split_row(
     etb_recursion_creature_unit = is_creature_etb_recursion_unit(row)
     etb_recursion_battlefield_creature_unit = is_creature_etb_recursion_battlefield_unit(row)
     etb_mill_recursion_creature_unit = is_creature_etb_mill_then_return_unit(row)
+    attack_recursion_permanent_unit = is_permanent_attack_recursion_to_hand_unit(row)
+    combat_damage_recursion_creature_unit = is_creature_combat_damage_recursion_to_hand_unit(row)
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
     etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
@@ -9890,6 +10112,8 @@ def split_row(
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
+        and not attack_recursion_permanent_unit
+        and not combat_damage_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
@@ -9939,6 +10163,8 @@ def split_row(
         and not etb_recursion_creature_unit
         and not etb_recursion_battlefield_creature_unit
         and not etb_mill_recursion_creature_unit
+        and not attack_recursion_permanent_unit
+        and not combat_damage_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
         and not etb_tutor_battlefield_creature_unit
@@ -10249,6 +10475,11 @@ def split_row(
             if "enchantment" in type_line
             else "permanent"
         )
+        xmage_ability_class = (
+            "ActivateAsSorceryActivatedAbility"
+            if parsed_activation.get("activation_timing") == "sorcery"
+            else "SimpleActivatedAbility"
+        )
         activated_effect = {
             "effect": "life_gain",
             "battle_model_scope": PERMANENT_ACTIVATED_LIFE_GAIN_SCOPE,
@@ -10259,7 +10490,7 @@ def split_row(
             "life_gain_amount": oracle_life_gain["life_gain_amount"],
             "activated_life_gain_amount": oracle_life_gain["life_gain_amount"],
             "xmage_effect_class": "GainLifeEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": xmage_ability_class,
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
@@ -10279,7 +10510,7 @@ def split_row(
             "permanent_type": permanent_effect,
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "GainLifeEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": xmage_ability_class,
             "activation_cost_mana": parsed_activation["activation_cost_mana"],
             "activation_cost_generic": parsed_activation["activation_cost_generic"],
             "activation_cost_colors": parsed_activation["activation_cost_colors"],
@@ -10593,6 +10824,7 @@ def split_row(
             "activation_life_cost",
             "activation_sacrifice_target",
             "activation_requires_sacrifice_target",
+            "activation_timing",
         ):
             if parsed_activation.get(key) != oracle_target.get(key):
                 return None, f"activated_recursion_source_oracle_{key}_mismatch"
@@ -10620,7 +10852,7 @@ def split_row(
             "graveyard_to_hand_target_count": oracle_count,
             "graveyard_to_hand_destination": "hand",
             "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": parsed_activation.get("xmage_ability_class", "SimpleActivatedAbility"),
             **{
                 key: parsed_activation[key]
                 for key in (
@@ -10634,6 +10866,7 @@ def split_row(
                     "activation_life_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_timing",
                 )
                 if key in parsed_activation
             },
@@ -10652,7 +10885,7 @@ def split_row(
             "target_controller": "self",
             "_activated_rule_effects": [activated_effect],
             "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
-            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_ability_class": parsed_activation.get("xmage_ability_class", "SimpleActivatedAbility"),
             **{
                 key: parsed_activation[key]
                 for key in (
@@ -10666,6 +10899,7 @@ def split_row(
                     "activation_life_cost",
                     "activation_sacrifice_target",
                     "activation_requires_sacrifice_target",
+                    "activation_timing",
                 )
                 if key in parsed_activation
             },
@@ -10677,6 +10911,16 @@ def split_row(
             "graveyard_to_hand_activation_discard_count": parsed_activation["activation_discard_count"],
             "graveyard_to_hand_activation_discard_target": parsed_activation["activation_discard_target"],
         }
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        if parsed_activation.get("activation_timing"):
+            activated_effect["activation_timing"] = parsed_activation["activation_timing"]
+            effect_json["activation_timing"] = parsed_activation["activation_timing"]
+            effect_json["graveyard_to_hand_activation_timing"] = parsed_activation["activation_timing"]
         if parsed_activation.get("activation_life_cost"):
             activated_effect["activation_life_cost"] = parsed_activation["activation_life_cost"]
             effect_json["activation_life_cost"] = parsed_activation["activation_life_cost"]
@@ -12096,6 +12340,109 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_mill_then_return_graveyard_to_hand",
+        ), "selected_exact_scope"
+
+    if attack_recursion_permanent_unit or combat_damage_recursion_creature_unit:
+        if not is_permanent_metadata(metadata) or is_spell(metadata):
+            return None, "triggered_recursion_not_permanent"
+        if combat_damage_recursion_creature_unit and not is_creature_metadata(metadata):
+            return None, "combat_damage_recursion_not_creature"
+        oracle_trigger = triggered_graveyard_to_hand_from_oracle(metadata)
+        if isinstance(oracle_trigger, str):
+            return None, oracle_trigger
+        expected_trigger = (
+            "combat_damage_to_player"
+            if combat_damage_recursion_creature_unit
+            else "attack"
+        )
+        if str(oracle_trigger.get("trigger")) != expected_trigger:
+            return None, "triggered_recursion_oracle_trigger_mismatch"
+        source_trigger = triggered_graveyard_to_hand_from_source(source_text, expected_trigger)
+        if isinstance(source_trigger, str):
+            return None, source_trigger
+        for key in (
+            "target",
+            "count",
+            "destination",
+            "mana_value_max",
+            "trigger_cost_mana",
+            "trigger_cost_generic",
+            "trigger_cost_colors",
+        ):
+            if source_trigger.get(key) != oracle_trigger.get(key):
+                return None, f"triggered_recursion_source_oracle_{key}_mismatch"
+        target_type = str(oracle_trigger["target"])
+        count = int(oracle_trigger["count"])
+        mana_value_max = oracle_trigger.get("mana_value_max")
+        type_line = str(metadata.get("type_line") or "").lower()
+        permanent_effect = (
+            "creature"
+            if "creature" in type_line
+            else "artifact"
+            if "artifact" in type_line
+            else "permanent"
+        )
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        if expected_trigger == "combat_damage_to_player":
+            effect_json = {
+                "effect": "creature",
+                "battle_model_scope": DAMAGE_RECURSION_CREATURE_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "combat_damage_to_player",
+                "combat_damage_player_graveyard_recursion": True,
+                "combat_damage_recursion_target": target_type,
+                "combat_damage_recursion_count": count,
+                "combat_damage_recursion_destination": "hand",
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    mana_value_max=mana_value_max,
+                ),
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                "xmage_ability_class": "DealsCombatDamageToAPlayerTriggeredAbility",
+                **flags,
+            }
+            if mana_value_max is not None:
+                effect_json["combat_damage_recursion_mana_value_max"] = mana_value_max
+        else:
+            effect_json = {
+                "effect": permanent_effect,
+                "battle_model_scope": ATTACK_RECURSION_PERMANENT_SCOPE,
+                "ability_kind": "triggered",
+                "trigger": "attack",
+                "attack_trigger_graveyard_recursion": True,
+                "attack_recursion_target": target_type,
+                "attack_recursion_count": count,
+                "attack_recursion_destination": "hand",
+                "target_constraints": recursion_target_constraints_for(
+                    target_type,
+                    mana_value_max=mana_value_max,
+                ),
+                "xmage_effect_class": "ReturnFromGraveyardToHandTargetEffect",
+                "xmage_ability_class": "AttacksTriggeredAbility",
+                **flags,
+            }
+            if mana_value_max is not None:
+                effect_json["attack_recursion_mana_value_max"] = mana_value_max
+            if oracle_trigger.get("trigger_cost_mana"):
+                effect_json["attack_recursion_trigger_cost_mana"] = oracle_trigger["trigger_cost_mana"]
+                effect_json["attack_recursion_trigger_cost_generic"] = oracle_trigger["trigger_cost_generic"]
+                effect_json["attack_recursion_trigger_cost_colors"] = list(oracle_trigger["trigger_cost_colors"])
+        if "EntersBattlefieldTappedAbility" in ability_classes(row):
+            effect_json["enters_tapped"] = True
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id=(
+                "xmage_creature_combat_damage_graveyard_to_hand"
+                if expected_trigger == "combat_damage_to_player"
+                else "xmage_permanent_attack_graveyard_to_hand"
+            ),
         ), "selected_exact_scope"
 
     if etb_graveyard_to_library_creature_unit:
@@ -14945,6 +15292,8 @@ def build_exact_split_report(
             and not is_permanent_activated_recursion_to_hand_unit(row)
             and not is_permanent_activated_recursion_to_battlefield_unit(row)
             and not is_permanent_activated_graveyard_exile_unit(row)
+            and not is_permanent_attack_recursion_to_hand_unit(row)
+            and not is_creature_combat_damage_recursion_to_hand_unit(row)
             and not is_boost_keyword_spell_unit(row)
             and not (
                 str(row.get("adapter_work_unit") or "") == RECURSION_UNIT
@@ -15011,6 +15360,8 @@ def build_exact_split_report(
                 "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, AttacksTriggeredAbility, exact attack graveyard-to-hand Oracle/source agreement, optional trigger mana cost, and only static self keywords or ETB tapped metadata",
+                "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, DealsCombatDamageToAPlayerTriggeredAbility, exact combat-damage graveyard-to-hand Oracle/source agreement, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, exact mill-then-return Oracle/source agreement, and no additional ability class",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, EntersBattlefieldTriggeredAbility, exact ETB mill-then-return Oracle/source agreement, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ExileTargetEffect, SimpleActivatedAbility, exact activated graveyard-exile Oracle text, and mana/tap/self-sacrifice source costs only",

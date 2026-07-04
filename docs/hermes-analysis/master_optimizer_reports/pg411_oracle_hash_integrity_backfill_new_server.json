@@ -1,0 +1,31 @@
+{
+  "apply": {
+    "backup_rows": 44,
+    "backup_table": "manaloom_deploy_audit.pg411_oracle_hash_integrity_backfill_new_server_20260704_152449",
+    "mutation": "filled card_battle_rules.oracle_hash from md5(coalesce(cards.oracle_text, '')) through primary rule key and card_id -> cards.id",
+    "updated_rows": 44
+  },
+  "database_target": "127.0.0.1:15432/halder",
+  "deploy_id": "PG411-oracle-hash-integrity-backfill",
+  "generated_at": "2026-07-04T15:26:40Z",
+  "postcheck": {
+    "backup_rows": 44,
+    "restored_hash_matches": 44,
+    "trusted_executable_rules_missing_oracle_hash_after": 0
+  },
+  "precheck": {
+    "distinct_affected_cards": 44,
+    "duplicate_pk_rows": 0,
+    "safely_resolved_rows": 44,
+    "trusted_executable_rules_missing_oracle_hash_before": 44,
+    "unresolved_rows": 0
+  },
+  "sync": {
+    "canonical_snapshot_rows_exported": 5377,
+    "pg_rows_loaded": 4243,
+    "report": "docs/hermes-analysis/master_optimizer_reports/pg411_oracle_hash_integrity_backfill_new_server_pg_to_sqlite_sync.json",
+    "selected_card_count": 0,
+    "sqlite_inserted_or_updated": 4238,
+    "sync_mode": "full_pg_to_sqlite_refresh"
+  }
+}

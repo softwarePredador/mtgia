@@ -7876,10 +7876,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG410 queue on the new server, the next exact runtime-backed work should
+post-PG411 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1806`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1803`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `827`
@@ -8027,6 +8027,50 @@ new server:
   to `26337`, creature mana-source work from `343` to `337`, and artifact
   mana-source work from `274` to `267`; the remaining `314` identities are
   still explicit missing-source exceptions.
+
+PG411 closed three exact recursion-to-hand subpatterns on the new server:
+
+- Split support now maps XMage `ReturnFromGraveyardToHandTargetEffect` with
+  `AttacksTriggeredAbility` into
+  `xmage_permanent_attack_return_graveyard_card_to_hand_v1`, including the
+  optional trigger mana cost used by `Eternal Taskmaster`.
+- Split/runtime support now handles
+  `DealsCombatDamageToAPlayerTriggeredAbility` recursion into
+  `xmage_creature_combat_damage_return_graveyard_card_to_hand_v1`, with a
+  separate combat-damage resolver instead of reusing attack-declaration logic.
+- Activated graveyard-to-hand recursion now accepts
+  `ActivateAsSorceryActivatedAbility`, preserves `activation_timing=sorcery`,
+  and carries static self keywords such as `reach` on the parent permanent.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`414` tests) and
+  `test_xmage_exact_scope_runtime.py` (`238` tests). The runtime tests cover
+  combat-damage Arcane recursion and attack-trigger recursion paying `{2}{B}`.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg411_triggered_recursion_to_hand_new_server`
+  produced `3` safe candidates: `Eternal Taskmaster`, `Pillardrop Warden`,
+  and `The Unspeakable`.
+- PostgreSQL package `PG411` was applied on the new server:
+  `3` upserted rows, `0` deprecated shadow rows, and postcheck `3/3`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `3` PostgreSQL rows, updated `3`
+  SQLite rows, and exported `5377` canonical snapshot rows.
+- E2E package validation passed across PostgreSQL, SQLite, canonical snapshot,
+  and runtime `get_card_effect` for all `3` selected cards. The generic E2E
+  battle scenario count was `0`; card behavior execution is covered by the
+  focused runtime tests above.
+- Contract cleanup in the same closeout backfilled missing `oracle_hash` for
+  `44` older trusted executable PostgreSQL rows on
+  `127.0.0.1:15432/halder`; postcheck left `0` trusted executable rows without
+  `oracle_hash`. Full PG -> SQLite sync then loaded `4243` PostgreSQL rows,
+  updated `4238` SQLite rows, and exported `5377` canonical snapshot rows.
+- Final governance audits passed after the hash cleanup:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26651` to `26648`, authoritative adapter-required count from `26337`
+  to `26334`, and the top recursion work unit from `1806` to `1803`. The
+  post-PG411 exact split recheck produced `proposal_count=0`; the remaining
+  `314` identities are still explicit missing-source exceptions.
 
 ## Required Artifacts Per Cycle
 

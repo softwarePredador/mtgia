@@ -8597,6 +8597,93 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_combat_damage_graveyard_recursion_returns_arcane_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        non_target = {"name": "Target Spirit", "type_line": "Creature - Spirit", "cmc": 2}
+        target = {"name": "Target Arcane", "type_line": "Instant - Arcane", "cmc": 3}
+        active.graveyard.extend([non_target, target])
+        permanent = {
+            "name": "The Unspeakable",
+            "type_line": "Legendary Creature - Spirit",
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_combat_damage_return_graveyard_card_to_hand_v1",
+            "combat_damage_player_graveyard_recursion": True,
+            "combat_damage_recursion_target": "arcane_card",
+            "combat_damage_recursion_count": 1,
+            "combat_damage_recursion_destination": "hand",
+            "_rule_logical_key": "battle_rule_v1:fixture_unspeakable",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_combat_damage_graveyard_recursion_triggers(
+            active,
+            [permanent],
+            opponent,
+            turn=12,
+            phase="combat_damage",
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual([card["name"] for card in active.hand], ["Target Arcane"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Spirit"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "The Unspeakable"
+                and data.get("trigger") == "combat_damage_to_player"
+                and data.get("target_type") == "arcane_card"
+                and data.get("recovered") == ["Target Arcane"]
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_unspeakable"
+                for event, data in self.events
+            )
+        )
+
+    def test_attack_graveyard_recursion_pays_trigger_cost_before_returning_card(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        non_target = {"name": "Target Bolt", "type_line": "Instant", "cmc": 1}
+        target = {"name": "Target Zombie", "type_line": "Creature - Zombie", "cmc": 2}
+        active.graveyard.extend([non_target, target])
+        active.mana_pool.add_generic(2)
+        active.mana_pool.add("black", 1)
+        permanent = {
+            "name": "Eternal Taskmaster",
+            "type_line": "Creature - Zombie",
+            "effect": "creature",
+            "battle_model_scope": "xmage_permanent_attack_return_graveyard_card_to_hand_v1",
+            "attack_trigger_graveyard_recursion": True,
+            "attack_recursion_target": "creature",
+            "attack_recursion_count": 1,
+            "attack_recursion_destination": "hand",
+            "attack_recursion_trigger_cost_mana": "{2}{B}",
+            "_rule_logical_key": "battle_rule_v1:fixture_eternal_taskmaster",
+        }
+        active.battlefield.append(permanent)
+
+        resolved = self.battle.resolve_attack_graveyard_recursion_triggers(
+            active,
+            [permanent],
+            turn=12,
+            phase="declare_attackers",
+        )
+
+        self.assertEqual(len(resolved), 1)
+        self.assertEqual(active.available_mana(), 0)
+        self.assertEqual([card["name"] for card in active.hand], ["Target Zombie"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Target Bolt"])
+        self.assertTrue(
+            any(
+                event == "recursion_resolved"
+                and data.get("card") == "Eternal Taskmaster"
+                and data.get("trigger") == "attack"
+                and data.get("target_type") == "creature"
+                and data.get("trigger_cost") == "{2}{B}"
+                and data.get("recovered") == ["Target Zombie"]
+                and data.get("rule_logical_key") == "battle_rule_v1:fixture_eternal_taskmaster"
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_mill_then_return_can_return_freshly_milled_land(self) -> None:
         active = self.battle.Player(
             "Active",
