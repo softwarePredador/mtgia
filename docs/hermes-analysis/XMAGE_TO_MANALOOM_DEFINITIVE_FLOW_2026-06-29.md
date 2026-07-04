@@ -9218,6 +9218,54 @@ new server:
   cards each, followed by `xmage_creature_etb_library_search_to_hand` with
   `19` cards.
 
+## 2026-07-04 PG439 Dynamic Count Damage Closure
+
+- Closed the exact XMage dynamic-count direct-damage spell family as ManaLoom
+  scope `xmage_dynamic_count_damage_spell_v1`.
+- The selected package accepted only instant/sorcery one-shot
+  `DamageTargetEffect` cards where Oracle and XMage agree on target scope,
+  target constraints, and the dynamic amount source. Supported amount sources
+  include battlefield permanent counts, domain basic land type count, and
+  controller hand count, with fixed base-plus-count variants where present.
+  Composite counts, X-cost variants, unsupported filters, unsupported targets,
+  additional costs, and source/Oracle mismatches remain blockers.
+- The batch covers `21` cards, including count-by-controlled artifacts,
+  Equipment, creatures, attacking creatures, lands, Mountains, Goblins,
+  domain, hand size, and fixed base plus count variants.
+- Focused mapper/runtime tests covered dynamic battlefield count damage,
+  attacking-creature count, domain damage, controller hand-count damage,
+  target constraints, blocker lanes for composite/X-cost variants, and
+  source/Oracle reconciliation. PG439 reused existing mapper/runtime support
+  and performed no code mutation. The focused test lane passed `718` tests.
+- The PostgreSQL package promoted `21` cards. Precheck found `21` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `21/21` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4183` PostgreSQL runtime rows, wrote `4175` SQLite runtime
+  rows, and exported `4150` canonical fallback rows.
+- PG439 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `21` selected cards. Generic
+  battle scenario count remained `0`; actual dynamic damage behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26703`, `xmage_authoritative_source_count=26389`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26389`. This is an exact
+  reduction of `21` from the post-PG438 queue.
+- The post-PG439 exact split recheck reports `proposal_count=364` and
+  `safe_for_batch_pg_package_count=364`. The largest remaining exact family is
+  `xmage_permanent_simple_activated_library_search_to_battlefield` with `21`
+  cards, followed by `xmage_creature_etb_library_search_to_hand` with `19`
+  cards and `xmage_static_flying_can_block_only_flying_creature` with `18`
+  cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
