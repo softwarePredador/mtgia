@@ -2369,6 +2369,109 @@
     "battle_rule_logical_key": "battle_rule_v1:86fe64ae174fad58c83c7a16343c90a4",
     "battle_rule_oracle_hash": "911aec072fe708e55839fe763df20c7b"
   },
+  "Amrou Scout": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 3,
+          "target_subtypes": [
+            "rebel"
+          ]
+        },
+        "target_mana_value_max": 3,
+        "target_subtypes": [
+          "rebel"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 4,
+    "activation_cost_mana": "{4}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 3,
+      "target_subtypes": [
+        "rebel"
+      ]
+    },
+    "target_mana_value_max": 3,
+    "target_subtypes": [
+      "rebel"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2b86f9c5742e15922f5eb19d3e22ee95",
+    "battle_rule_oracle_hash": "8a7dfe7033444987117893d31196e233"
+  },
   "Amrou Seekers": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_filtered_evasion_creature_v1",
@@ -8925,6 +9028,77 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "7893d091d986786110bf554afb33d973"
   },
+  "Bogbrew Witch": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_constraints": {
+          "target_names": [
+            "festering newt",
+            "bubbling cauldron"
+          ]
+        },
+        "target_names": [
+          "festering newt",
+          "bubbling cauldron"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_constraints": {
+      "target_names": [
+        "festering newt",
+        "bubbling cauldron"
+      ]
+    },
+    "target_names": [
+      "festering newt",
+      "bubbling cauldron"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:3eb1bddf6c52d048e8f756dab978aeb8",
+    "battle_rule_oracle_hash": "1c1a7ed45e8f9df662118ac04071d0b5"
+  },
   "Boggart Birth Rite": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -11017,6 +11191,65 @@
     "battle_rule_logical_key": "battle_rule_v1:b3128b312ccc7e86984dd94bbd9debab",
     "battle_rule_oracle_hash": "20d8edecf04d7027170b6a52954d370c"
   },
+  "Burnished Hart": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 2,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 2,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "tutor_up_to_count": true,
+        "up_to_count": true,
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 2,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 2,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "tutor_up_to_count": true,
+    "up_to_count": true,
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9a4693e78783dc8bfa7412fa053aec40",
+    "battle_rule_oracle_hash": "c0c3089365968ec2e972956c74c4a921"
+  },
   "Burnt Offering": {
     "ability_kind": "one_shot",
     "battle_model_scope": "sacrifice_creature_add_black_or_red_equal_sacrificed_mana_value_v1",
@@ -12202,6 +12435,315 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
     "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
+  "Cateran Brute": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 2,
+          "target_subtypes": [
+            "mercenary"
+          ]
+        },
+        "target_mana_value_max": 2,
+        "target_subtypes": [
+          "mercenary"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 2,
+      "target_subtypes": [
+        "mercenary"
+      ]
+    },
+    "target_mana_value_max": 2,
+    "target_subtypes": [
+      "mercenary"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dc30800adf89edce4850b72ea72d5ea6",
+    "battle_rule_oracle_hash": "d60fdf934e08faf33883ed4d0c0e58cd"
+  },
+  "Cateran Kidnappers": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 3,
+          "target_subtypes": [
+            "mercenary"
+          ]
+        },
+        "target_mana_value_max": 3,
+        "target_subtypes": [
+          "mercenary"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 3,
+      "target_subtypes": [
+        "mercenary"
+      ]
+    },
+    "target_mana_value_max": 3,
+    "target_subtypes": [
+      "mercenary"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0f829458ac28f72e9d78492d21d4676b",
+    "battle_rule_oracle_hash": "c8a9354def96d8715184ccc6f6932482"
+  },
+  "Cateran Persuader": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 1,
+          "target_subtypes": [
+            "mercenary"
+          ]
+        },
+        "target_mana_value_max": 1,
+        "target_subtypes": [
+          "mercenary"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 1,
+      "target_subtypes": [
+        "mercenary"
+      ]
+    },
+    "target_mana_value_max": 1,
+    "target_subtypes": [
+      "mercenary"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e5814832444189cd9aafc32f08f0e129",
+    "battle_rule_oracle_hash": "b95100c6362fee271724db44162ba7ab"
   },
   "Cathartic Reunion": {
     "ability_kind": "one_shot",
@@ -17422,6 +17964,65 @@
     "battle_rule_logical_key": "battle_rule_v1:a9cc2682c31543ce7b7bbd8e850ec869",
     "battle_rule_oracle_hash": "5d557f45692ae19657cdec6ba5053d52"
   },
+  "Dawntreader Elk": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:969c06bbb604a6d284011a49dbc650e9",
+    "battle_rule_oracle_hash": "06a76055212d2544c6c1926628d2a494"
+  },
   "Day of Destiny": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_controlled_power_toughness_boost_v1",
@@ -19219,6 +19820,65 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "5554bbd7453c41cd866554fee61d0f9b"
+  },
+  "Diligent Farmhand": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:54bcee120536de82b4d91c7247c3f1d3",
+    "battle_rule_oracle_hash": "3ae25933983583d72dfd32b713caedee"
   },
   "Dimension X": {
     "effect": "land",
@@ -23359,6 +24019,65 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:3055ac5244f9cfd8c3575366729be15e",
     "battle_rule_oracle_hash": "5a94850681adebf4628b748abeebd7d7"
+  },
+  "Embodiment of Spring": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:dde1f5b5a6017f290892772bcc68190f",
+    "battle_rule_oracle_hash": "e0d2998cf969049a225fddc062c22150"
   },
   "Emerald Charm": {
     "effect": "remove_creature",
@@ -28461,6 +29180,65 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d980185d667ae1ae13c6280f6fda118d"
   },
+  "Font of Fertility": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "enchantment",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:354a3adc044a1d5cd46b44ed9f3c5cbc",
+    "battle_rule_oracle_hash": "4f4145038da70ccff56d87ce8740a4b1"
+  },
   "Font of Fortunes": {
     "ability_kind": "activated",
     "activated_draw": true,
@@ -29339,6 +30117,63 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "556f2dcc25a19c70367a3dea438fba5d"
+  },
+  "Frontier Guide": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}{G}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1e0a8a61e531e3eded3189d6456590a3",
+    "battle_rule_oracle_hash": "4f303b1f7931364de010698db8f719a2"
   },
   "Frost Marsh": {
     "effect": "land",
@@ -47477,6 +48312,105 @@
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "e22716d8ff83c9a0ac3c3d94d4e24f95"
   },
+  "Moggcatcher": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_subtypes": [
+            "goblin"
+          ]
+        },
+        "target_subtypes": [
+          "goblin"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_subtypes": [
+        "goblin"
+      ]
+    },
+    "target_subtypes": [
+      "goblin"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c657e47b71363359f4b25aeeaee97bca",
+    "battle_rule_oracle_hash": "d3484672bb0ea5f035d3eb2018bc8df4"
+  },
   "Moldering Karok": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -50174,6 +51108,75 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "87a3deae567354bb77198b24bc4c05d4"
   },
+  "Neverwinter Dryad": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "required_supertypes": [
+          "basic"
+        ],
+        "target": "forest_to_battlefield",
+        "target_constraints": {
+          "required_supertypes": [
+            "basic"
+          ]
+        },
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "forest_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "required_supertypes": [
+      "basic"
+    ],
+    "target": "forest_to_battlefield",
+    "target_constraints": {
+      "required_supertypes": [
+        "basic"
+      ]
+    },
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "forest_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:edf4c1bd7312ba4b49b8b96178ba7e85",
+    "battle_rule_oracle_hash": "6a382c0a253251839816a627b63b9089"
+  },
   "New Benalia": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -50857,6 +51860,65 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2f7fff9653de5bc686e74cd31cc3ca4e"
+  },
+  "Oashra Cultivator": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activated_self_sacrifice_tutor_to_battlefield": true,
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "basic_land_to_battlefield",
+        "target_constraints": {},
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "basic_land_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activated_self_sacrifice_tutor_to_battlefield": true,
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{G}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "basic_land_to_battlefield",
+    "target_constraints": {},
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "basic_land_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8c2631a30c5ec93ea50b6025a1a8acdb",
+    "battle_rule_oracle_hash": "4fcbc8598190163114de5f0f0a84efd3"
   },
   "Oasis": {
     "effect": "land",
@@ -54382,6 +55444,93 @@
     "battle_rule_logical_key": "battle_rule_v1:f7fde69c51ea340cdfeda1544dea220b",
     "battle_rule_oracle_hash": "0159e87a7fe9f2edbdb9408db4e6cba8"
   },
+  "Planar Bridge": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 8,
+        "activation_cost_mana": "{8}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ]
+        },
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 8,
+    "activation_cost_mana": "{8}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "artifact",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ]
+    },
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a82e2bf6ca59f9247148c065bb31b395",
+    "battle_rule_oracle_hash": "a497375e85a074094a5fe76c1eed1819"
+  },
   "Planar Nexus": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -57536,6 +58685,212 @@
     "battle_rule_logical_key": "battle_rule_v1:779a759d97f1541f6a77b53572194327",
     "battle_rule_oracle_hash": "3595fe627f1b6adb32bafe5c4a236316"
   },
+  "Ramosian Commander": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 6,
+        "activation_cost_mana": "{6}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 5,
+          "target_subtypes": [
+            "rebel"
+          ]
+        },
+        "target_mana_value_max": 5,
+        "target_subtypes": [
+          "rebel"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 6,
+    "activation_cost_mana": "{6}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 5,
+      "target_subtypes": [
+        "rebel"
+      ]
+    },
+    "target_mana_value_max": 5,
+    "target_subtypes": [
+      "rebel"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1ba497f052681135426a75ae7efe3adf",
+    "battle_rule_oracle_hash": "0fd86c3a0b8a89228e4c4bda2ad799e5"
+  },
+  "Ramosian Lieutenant": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 3,
+          "target_subtypes": [
+            "rebel"
+          ]
+        },
+        "target_mana_value_max": 3,
+        "target_subtypes": [
+          "rebel"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 4,
+    "activation_cost_mana": "{4}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 3,
+      "target_subtypes": [
+        "rebel"
+      ]
+    },
+    "target_mana_value_max": 3,
+    "target_subtypes": [
+      "rebel"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2b86f9c5742e15922f5eb19d3e22ee95",
+    "battle_rule_oracle_hash": "8a7dfe7033444987117893d31196e233"
+  },
   "Ramosian Revivalist": {
     "_activated_rule_effects": [
       {
@@ -57632,6 +58987,109 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:80246cb1bf856d9fbb94d600bd79b278",
     "battle_rule_oracle_hash": "ee63e43e30e9c420b425349ed602e643"
+  },
+  "Ramosian Sergeant": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_mana_value_max": 2,
+          "target_subtypes": [
+            "rebel"
+          ]
+        },
+        "target_mana_value_max": 2,
+        "target_subtypes": [
+          "rebel"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_mana_value_max": 2,
+      "target_subtypes": [
+        "rebel"
+      ]
+    },
+    "target_mana_value_max": 2,
+    "target_subtypes": [
+      "rebel"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:e8bfeb8ce87efbf187100b05e35d85e7",
+    "battle_rule_oracle_hash": "31d5d6dec9eb4b1aeca26bf20272a699"
   },
   "Rampaging War Mammoth": {
     "effect": "creature",
@@ -65195,6 +66653,105 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b7829240bed4f799bfe4f83d9daa8142"
   },
+  "Seahunter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_subtypes": [
+            "merfolk"
+          ]
+        },
+        "target_subtypes": [
+          "merfolk"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_subtypes": [
+        "merfolk"
+      ]
+    },
+    "target_subtypes": [
+      "merfolk"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d6d79687dcea3c444f63bc5d74ae6d1e",
+    "battle_rule_oracle_hash": "2f4c29088a66ac6f0ed28d8643fe6396"
+  },
   "Seal of Fire": {
     "_activated_rule_effects": [
       {
@@ -69111,6 +70668,105 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "f85c1179ce217b4ffc36b1b8b359fbc9"
+  },
+  "Skyshroud Poacher": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_card_types": [
+          "artifact",
+          "creature",
+          "enchantment",
+          "planeswalker",
+          "land",
+          "battle"
+        ],
+        "target_constraints": {
+          "target_card_types": [
+            "artifact",
+            "creature",
+            "enchantment",
+            "planeswalker",
+            "land",
+            "battle"
+          ],
+          "target_subtypes": [
+            "elf"
+          ]
+        },
+        "target_subtypes": [
+          "elf"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": false,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_card_types": [
+      "artifact",
+      "creature",
+      "enchantment",
+      "planeswalker",
+      "land",
+      "battle"
+    ],
+    "target_constraints": {
+      "target_card_types": [
+        "artifact",
+        "creature",
+        "enchantment",
+        "planeswalker",
+        "land",
+        "battle"
+      ],
+      "target_subtypes": [
+        "elf"
+      ]
+    },
+    "target_subtypes": [
+      "elf"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": false,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:44f01a912dffb7f835fdb639040db038",
+    "battle_rule_oracle_hash": "6f9b98a89e0f3f04dce23331c1f0d41f"
   },
   "Skyshroud Troopers": {
     "activation_requires_tap": true,
@@ -86354,6 +88010,77 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:0a5df57593d441fead5b647bead37c3b",
     "battle_rule_oracle_hash": "8d1b3def6e90f817443397013093da3a"
+  },
+  "Whisper Squad": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "activated_effect": "tutor",
+        "activation_cost_colors": [
+          "B"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{B}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+        "count": 1,
+        "destination": "battlefield",
+        "effect": "tutor",
+        "target": "any_to_battlefield",
+        "target_constraints": {
+          "target_names": [
+            "whisper squad"
+          ]
+        },
+        "target_names": [
+          "whisper squad"
+        ],
+        "tutor_count": 1,
+        "tutor_destination": "battlefield",
+        "tutor_enters_tapped": true,
+        "tutor_target": "any_to_battlefield",
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "SearchLibraryPutInPlayEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "activated_effect": "tutor",
+    "activation_cost_colors": [
+      "B"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{B}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_library_search_to_battlefield_v1",
+    "count": 1,
+    "destination": "battlefield",
+    "effect": "creature",
+    "target": "any_to_battlefield",
+    "target_constraints": {
+      "target_names": [
+        "whisper squad"
+      ]
+    },
+    "target_names": [
+      "whisper squad"
+    ],
+    "tutor_count": 1,
+    "tutor_destination": "battlefield",
+    "tutor_enters_tapped": true,
+    "tutor_target": "any_to_battlefield",
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:ba93105d2a1510b60cf1a7eb8f4ad07a",
+    "battle_rule_oracle_hash": "df5a88379a24779040ebabd7d1d39a2c"
   },
   "Whispers of the Muse": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",

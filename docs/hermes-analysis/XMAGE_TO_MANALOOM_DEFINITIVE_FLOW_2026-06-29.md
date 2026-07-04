@@ -9266,6 +9266,54 @@ new server:
   cards and `xmage_static_flying_can_block_only_flying_creature` with `18`
   cards.
 
+## 2026-07-04 PG440 Activated Tutor To Battlefield Closure
+
+- Closed the exact XMage permanent simple activated library-search-to-battlefield
+  family as ManaLoom scope
+  `xmage_permanent_simple_activated_library_search_to_battlefield_v1`.
+- The selected package accepted only permanents with `SimpleActivatedAbility`
+  plus `SearchLibraryPutInPlayEffect`, fixed activation cost, supported
+  tap/sacrifice requirements, battlefield destination, and Oracle/XMage
+  agreement on target, count, enter-tapped flag, and constraints. Supported
+  constraints include basic land, Forest, target names, subtype, card type, and
+  mana-value ceiling. Non-simple Oracle text, unsupported activation costs,
+  ambiguous targets, and source/Oracle mismatches remain blockers.
+- The batch covers `21` cards, including Rebel/Mercenary chain tutors, Goblin,
+  Merfolk and Elf creature tutors, named-card tutors, basic land ramp,
+  Forest-only ramp, count-two land ramp, and any-permanent battlefield tutor.
+- Focused mapper/runtime tests covered activated tutor extraction, mana/tap
+  payment, summoning-sick tap refusal, sacrifice-source handling, enters-tapped
+  handling, subtype and mana-value constraints, count-two land movement, and
+  event/logical-key emission. PG440 reused existing mapper/runtime support and
+  performed no code mutation. The focused test lane passed `718` tests.
+- The PostgreSQL package promoted `21` cards. Precheck found `21` target rows,
+  `0` missing targets, `0` existing expected rows, and `2` shadow rows to
+  deprecate; apply/postcheck verified `21/21` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `2` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4204` PostgreSQL runtime rows, wrote `4196` SQLite runtime
+  rows, and exported `4171` canonical fallback rows.
+- PG440 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `21` selected cards. Generic
+  battle scenario count remained `0`; actual activated tutor behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26682`, `xmage_authoritative_source_count=26368`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26368`. This is an exact
+  reduction of `21` from the post-PG439 queue.
+- The post-PG440 exact split recheck reports `proposal_count=343` and
+  `safe_for_batch_pg_package_count=343`. The largest remaining exact family is
+  `xmage_creature_etb_library_search_to_hand` with `19` cards, followed by
+  `xmage_static_flying_can_block_only_flying_creature` with `18` cards and
+  `xmage_simple_mana_source_with_activated_draw` with `17` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:
