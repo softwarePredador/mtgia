@@ -9461,6 +9461,53 @@ new server:
   `xmage_self_sacrifice_mana_source_permanent` with `13` cards, and
   `xmage_static_self_cant_block_creature` with `13` cards.
 
+## 2026-07-04 PG444 Activated Draw Discard Closure
+
+- Closed the exact XMage permanent activated draw/discard family as ManaLoom
+  scope `xmage_permanent_simple_activated_draw_discard_v1`.
+- The selected package accepted local XMage
+  `DrawDiscardControllerEffect + SimpleActivatedAbility` permanents whose
+  Oracle text is a supported activated draw/discard pattern. Unsupported costs,
+  non-simple activation shapes, or compound draw/discard text remain blocked by
+  the splitter instead of becoming executable rows.
+- The batch covers `15` cards: Bloodfire Mentor, Captain of Umbar, Dragonborn
+  Looter, Emmessi Tome, Erratic Visionary, Facet Reader, Hapless Researcher,
+  Jalum Tome, Magus of the Bazaar, Merfolk Looter, Research Assistant,
+  Soothsayer Adept, Teferi's Protege, Thought Courier, and Unfulfilled
+  Desires.
+- Focused mapper/runtime tests covered the exact-scope split and runtime
+  support already present for permanent activated draw/discard; PG444 performed
+  no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `15` cards. Precheck found `15` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `15/15` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4273` PostgreSQL runtime rows, wrote `4265` SQLite runtime
+  rows, and exported `4240` canonical fallback rows.
+- PG444 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `15` selected cards. Generic
+  battle scenario count remained `0`; activated draw/discard behavior remains
+  covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26613`, `xmage_authoritative_source_count=26299`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26299`. This is an exact
+  reduction of `15` from the post-PG443 queue.
+- The post-PG444 exact split recheck reports `proposal_count=274` and
+  `safe_for_batch_pg_package_count=274`. The largest remaining exact families
+  are `xmage_dynamic_count_boost_target_creature_until_eot_spell` and
+  `xmage_library_search_spell` with `14` cards each, followed by
+  `xmage_self_sacrifice_mana_source_permanent` and
+  `xmage_static_self_cant_block_creature` with `13` cards each, and
+  `xmage_fixed_draw_spell` with `12` cards.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

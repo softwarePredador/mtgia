@@ -1,0 +1,572 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T22:43:28.949045+00:00",
+  "manifest": "../../master_optimizer_reports/pg444_xmage_activated_draw_discard_new_server_manifest.json",
+  "package_id": "pg444_xmage_activated_draw_discard_new_server_manifest",
+  "snapshot": "known_cards_canonical_snapshot.json",
+  "sqlite_db": "knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Bloodfire Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:386c2cdd805d7b299daa3f677f8f05da",
+          "oracle_hash": "52c1391b8d5b543b614490b2bb8b5eca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Captain of Umbar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Dragonborn Looter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Emmessi Tome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e7bb5e584c5c59ba3e4dbd79875a3c8",
+          "oracle_hash": "a5b2bd76828ed59e58f85ac4dd8a768c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Erratic Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Facet Reader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Hapless Researcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:197a3ff8611b8450cf1b513d5356ecc7",
+          "oracle_hash": "db617e99e45b7aa3d3c94a1fa9b0792f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Jalum Tome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:28b510a259034241632f6d97ee2cebb5",
+          "oracle_hash": "5026254cfa5f9f7930b3e3e5a2f20162",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Magus of the Bazaar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e29c82c5485bf8bd6c2d4c3bad3027a4",
+          "oracle_hash": "b105858cc9c25c34d35f203e35f9d9f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Merfolk Looter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc",
+          "oracle_hash": "65db688d78557781a70ee032119eba95",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Research Assistant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58c3bb02483fd8e55efd331e8381101d",
+          "oracle_hash": "2a888c4f5f1259d40304ed8bfb36c45e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Soothsayer Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Teferi's Protege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Thought Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc",
+          "oracle_hash": "65db688d78557781a70ee032119eba95",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Unfulfilled Desires",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:294f597adb66903de99c220b32ad0541",
+          "oracle_hash": "892ef322ce5c761ae412a879f691c03b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 15
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Bloodfire Mentor",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:386c2cdd805d7b299daa3f677f8f05da",
+          "oracle_hash": "52c1391b8d5b543b614490b2bb8b5eca",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Captain of Umbar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Dragonborn Looter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Emmessi Tome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2e7bb5e584c5c59ba3e4dbd79875a3c8",
+          "oracle_hash": "a5b2bd76828ed59e58f85ac4dd8a768c",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Erratic Visionary",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Facet Reader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e",
+          "oracle_hash": "b57707f2ba5eaf0bede6489576b06255",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Hapless Researcher",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:197a3ff8611b8450cf1b513d5356ecc7",
+          "oracle_hash": "db617e99e45b7aa3d3c94a1fa9b0792f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Jalum Tome",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:28b510a259034241632f6d97ee2cebb5",
+          "oracle_hash": "5026254cfa5f9f7930b3e3e5a2f20162",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Magus of the Bazaar",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:e29c82c5485bf8bd6c2d4c3bad3027a4",
+          "oracle_hash": "b105858cc9c25c34d35f203e35f9d9f4",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Merfolk Looter",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc",
+          "oracle_hash": "65db688d78557781a70ee032119eba95",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Research Assistant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:58c3bb02483fd8e55efd331e8381101d",
+          "oracle_hash": "2a888c4f5f1259d40304ed8bfb36c45e",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Soothsayer Adept",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Teferi's Protege",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548",
+          "oracle_hash": "4634a8f75f66568ffb3eb3881633e15f",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Thought Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc",
+          "oracle_hash": "65db688d78557781a70ee032119eba95",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "card_name": "Unfulfilled Desires",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:294f597adb66903de99c220b32ad0541",
+          "oracle_hash": "892ef322ce5c761ae412a879f691c03b",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bloodfire Mentor",
+          "logical_rule_key": "battle_rule_v1:386c2cdd805d7b299daa3f677f8f05da"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Captain of Umbar",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dragonborn Looter",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Emmessi Tome",
+          "logical_rule_key": "battle_rule_v1:2e7bb5e584c5c59ba3e4dbd79875a3c8"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Erratic Visionary",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Facet Reader",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hapless Researcher",
+          "logical_rule_key": "battle_rule_v1:197a3ff8611b8450cf1b513d5356ecc7"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jalum Tome",
+          "logical_rule_key": "battle_rule_v1:28b510a259034241632f6d97ee2cebb5"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Magus of the Bazaar",
+          "logical_rule_key": "battle_rule_v1:e29c82c5485bf8bd6c2d4c3bad3027a4"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Merfolk Looter",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Research Assistant",
+          "logical_rule_key": "battle_rule_v1:58c3bb02483fd8e55efd331e8381101d"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Soothsayer Adept",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Teferi's Protege",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Thought Courier",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_permanent_simple_activated_draw_discard_v1",
+          "battle_rule_version": 2,
+          "card_name": "Unfulfilled Desires",
+          "logical_rule_key": "battle_rule_v1:294f597adb66903de99c220b32ad0541"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 15
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Bloodfire Mentor",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:386c2cdd805d7b299daa3f677f8f05da"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Captain of Umbar",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dragonborn Looter",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Emmessi Tome",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:2e7bb5e584c5c59ba3e4dbd79875a3c8"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Erratic Visionary",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Facet Reader",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:f6ff18994b68459bd072a6f2f4fdce8e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hapless Researcher",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:197a3ff8611b8450cf1b513d5356ecc7"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jalum Tome",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:28b510a259034241632f6d97ee2cebb5"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Magus of the Bazaar",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:e29c82c5485bf8bd6c2d4c3bad3027a4"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Merfolk Looter",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Research Assistant",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:58c3bb02483fd8e55efd331e8381101d"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Soothsayer Adept",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Teferi's Protege",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:16916cb87debd17a10a893669e718548"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Thought Courier",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:5ee41032f595e624edf7841a7b6f80cc"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Unfulfilled Desires",
+          "component_keys": [],
+          "effect": "draw_engine",
+          "logical_rule_key": "battle_rule_v1:294f597adb66903de99c220b32ad0541"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}
