@@ -6362,7 +6362,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG374 queue, the next exact runtime-backed work should be selected from
+post-PG376 queue on the new server, the next exact runtime-backed work should be selected from
 these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1822`
@@ -6371,7 +6371,7 @@ these largest reusable work units, not from deck intuition:
 4. `direct_damage::targeted_damage_variant_v1` - `906`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `654`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `636`
 8. `removal_destroy::targeted_destroy_variant_v1` - `624`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`

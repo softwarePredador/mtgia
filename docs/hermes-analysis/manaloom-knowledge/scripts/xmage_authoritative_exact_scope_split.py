@@ -104,6 +104,9 @@ GRAVEYARD_SELF_RETURN_TO_BATTLEFIELD_SCOPE = (
 DESTROY_SCOPE = "xmage_destroy_target_spell_v1"
 LIFE_SCOPE = "xmage_fixed_controller_gain_life_spell_v1"
 LIFE_GAIN_DRAW_SCOPE = "xmage_fixed_controller_gain_life_draw_card_spell_v1"
+SCRY_SCOPE = "xmage_fixed_scry_spell_v1"
+SCRY_DRAW_SCOPE = "xmage_fixed_scry_and_draw_cards_spell_v1"
+DAMAGE_DRAW_SCOPE = "xmage_fixed_damage_target_and_draw_card_spell_v1"
 BOOST_DRAW_SCOPE = "xmage_fixed_boost_target_creature_until_eot_draw_card_spell_v1"
 DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
@@ -200,6 +203,11 @@ SPELL_COMPLEXITY_TOKENS = {
 AUXILIARY_RECURSION_SPELL_ABILITY_CLASSES = {
     "FlashbackAbility",
     "CyclingAbility",
+}
+
+ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES = {
+    "FlashbackAbility",
+    "ForetellAbility",
 }
 
 NUMBER_WORDS = {
@@ -820,6 +828,99 @@ def fixed_bounce_draw_from_source(source: str) -> int | None:
     if bounce_matches[0].start() > draw_matches[0].start():
         return None
     return draw_count
+
+
+def word_or_int(value: str) -> int:
+    token = str(value or "").strip().lower()
+    if token == "a":
+        return 1
+    if token.isdigit():
+        return int(token)
+    return NUMBER_WORDS[token]
+
+
+def fixed_scry_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = oracle_text(metadata)
+    text_without_reminder = re.sub(r"\([^)]*\)", "", text)
+    text_without_reminder = re.sub(r"\s+", " ", text_without_reminder).strip()
+    scry_first = re.match(
+        r"^scry (\d+)(?:, then|\.) draw (a|\d+|one|two|three|four|five) cards?\.?"
+        r"(?: (?:flashback|foretell) .*)?$",
+        text_without_reminder,
+    )
+    if scry_first:
+        return int(scry_first.group(1)), word_or_int(scry_first.group(2)), "scry_then_draw"
+    draw_first = re.match(
+        r"^draw (a|\d+|one|two|three|four|five) cards?\. scry (\d+)\.?"
+        r"(?: (?:flashback|foretell) .*)?$",
+        text_without_reminder,
+    )
+    if draw_first:
+        return int(draw_first.group(2)), word_or_int(draw_first.group(1)), "draw_then_scry"
+    return None
+
+
+def fixed_scry_draw_from_source(source: str) -> tuple[int, int, str] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    scry_matches = list(
+        re.finditer(r"new\s+ScryEffect\s*\(\s*(\d+)\s*(?:,\s*false\s*)?\)", text, re.S)
+    )
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(scry_matches) != 1 or len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return None
+    order = "scry_then_draw" if scry_matches[0].start() < draw_matches[0].start() else "draw_then_scry"
+    return int(scry_matches[0].group(1)), draw_count, order
+
+
+def fixed_damage_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, int, str] | None:
+    text = oracle_text(metadata)
+    match = re.match(
+        r"^.+ deals (\d+) damage to "
+        r"(any target|target opponent|target player|target creature or planeswalker|target creature)"
+        r"\. draw a card\.?$",
+        text,
+    )
+    if not match:
+        return None
+    target_map = {
+        "any target": "any_target",
+        "target opponent": "opponent",
+        "target player": "player",
+        "target creature": "creature",
+        "target creature or planeswalker": "creature_or_planeswalker",
+    }
+    return int(match.group(1)), 1, target_map[match.group(2)]
+
+
+def fixed_damage_draw_from_source(source: str) -> tuple[int, int] | None:
+    text = source or ""
+    if has_additional_cost(text):
+        return None
+    if "TargetPointer" in text or ".setTargetPointer" in text:
+        return None
+    damage_matches = list(re.finditer(r"new\s+DamageTargetEffect\s*\(\s*(\d+)\s*\)", text, re.S))
+    draw_matches = list(re.finditer(r"new\s+DrawCardSourceControllerEffect\s*\(", text))
+    if len(damage_matches) != 1 or len(draw_matches) != 1:
+        return None
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardSourceControllerEffect",
+        noarg_default=1,
+    )
+    if draw_count != 1:
+        return None
+    if damage_matches[0].start() > draw_matches[0].start():
+        return None
+    return int(damage_matches[0].group(1)), draw_count
 
 
 def source_matches_bounce_target(source: str, target: str) -> bool:
@@ -8944,6 +9045,109 @@ def split_row(
         ), "selected_exact_scope"
 
     if unit == DRAW_UNIT:
+        if classes == {"ScryEffect", "DrawCardSourceControllerEffect"}:
+            unsupported_abilities = ability_classes(row) - ALLOWED_AUXILIARY_RESOLUTION_ABILITY_CLASSES
+            if unsupported_abilities:
+                return None, "scry_draw_ability_class_not_simple"
+            oracle_scry_draw = fixed_scry_draw_from_oracle(metadata)
+            if oracle_scry_draw is None:
+                return None, "scry_draw_oracle_not_exact_fixed"
+            source_scry_draw = fixed_scry_draw_from_source(source_text)
+            if source_scry_draw is None:
+                return None, "scry_draw_source_not_fixed"
+            if source_scry_draw != oracle_scry_draw:
+                return None, "scry_draw_source_oracle_mismatch"
+            scry_count, draw_count, order = oracle_scry_draw
+            scry_component = {
+                "effect": "scry",
+                "battle_model_scope": SCRY_SCOPE,
+                "count": scry_count,
+                "scry_count": scry_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "ScryEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            components = (
+                [scry_component, draw_component]
+                if order == "scry_then_draw"
+                else [draw_component, scry_component]
+            )
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": SCRY_DRAW_SCOPE,
+                "scry_count": scry_count,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "resolution_order": order,
+                "_composite_rule_components": components,
+                "xmage_effect_classes": ["ScryEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_scry_draw_card_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DamageTargetEffect", "DrawCardSourceControllerEffect"}:
+            if ability_classes(row):
+                return None, "damage_draw_ability_class_not_simple"
+            oracle_damage_draw = fixed_damage_draw_from_oracle(metadata)
+            if oracle_damage_draw is None:
+                return None, "damage_draw_oracle_not_exact_fixed"
+            source_damage_draw = fixed_damage_draw_from_source(source_text)
+            if source_damage_draw is None:
+                return None, "damage_draw_source_not_fixed"
+            amount, draw_count, target = oracle_damage_draw
+            if source_damage_draw != (amount, draw_count):
+                return None, "damage_draw_source_oracle_mismatch"
+            if not source_matches_target_constraint(source_text, target):
+                return None, "damage_draw_target_source_mismatch"
+            target_base = restricted_target_base(target)
+            damage_component = {
+                "effect": "direct_damage",
+                "battle_model_scope": DAMAGE_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DamageTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "composite_resolution",
+                "battle_model_scope": DAMAGE_DRAW_SCOPE,
+                "amount": amount,
+                "damage": amount,
+                "target": target_base,
+                "target_constraints": target_constraints_for(target),
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [damage_component, draw_component],
+                "xmage_effect_classes": ["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_damage_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes == {"BoostTargetEffect", "DrawCardSourceControllerEffect"}:
             if ability_classes(row):
                 return None, "boost_draw_ability_class_not_simple"

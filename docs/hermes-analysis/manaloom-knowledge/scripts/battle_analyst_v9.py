@@ -48644,6 +48644,56 @@ def resolve_composite_resolution_effect(player, opponents, card, effect_data, tu
                         permanent["tapped"] = False
             outcome = "extra_combat_scheduled"
             applied.append({"effect": component_effect, "extra_combats": combats})
+        elif component_effect == "scry":
+            count = int(component.get("count") or component.get("scry_count") or 1)
+            scry_result = scry_library_for_controller(player, count)
+            outcome = "scry_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "count": count,
+                    "looked_at": scry_result["looked_at"],
+                    "kept_on_top": scry_result["kept_on_top"],
+                    "bottomed": scry_result["bottomed"],
+                    "top_after": scry_result["top_after"],
+                }
+            )
+            emit_replay_event(
+                "scry_resolved",
+                player=player.name,
+                card=card.get("name", "?"),
+                scry_count=count,
+                looked_at=scry_result["looked_at"],
+                kept_on_top=scry_result["kept_on_top"],
+                bottomed=scry_result["bottomed"],
+                top_after=scry_result["top_after"],
+                component_index=index,
+                turn=turn,
+                phase=phase,
+                **component_fields,
+            )
+        elif component_effect == "direct_damage":
+            component_payload = dict(component)
+            component_payload["_composite_component_index"] = index
+            apply_direct_damage(
+                player,
+                opponents,
+                card,
+                component_payload,
+                turn,
+                rng,
+                finish_spell=False,
+                phase=phase,
+            )
+            amount = int(component.get("amount") or component.get("damage") or 0)
+            outcome = "direct_damage_resolved"
+            applied.append(
+                {
+                    "effect": component_effect,
+                    "amount": amount,
+                    "target": component.get("target"),
+                }
+            )
         elif component_effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
             removed = False
             if resolve_multi_target_removal(player, opponents, card, component, turn, rng):

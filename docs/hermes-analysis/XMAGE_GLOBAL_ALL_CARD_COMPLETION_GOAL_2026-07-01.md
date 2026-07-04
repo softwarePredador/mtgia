@@ -184,10 +184,38 @@ Post-PG375 update:
   (`deck_id_607_has_no_pg_deck_id_note`, unrelated to PG375)
 - delta since post-PG374: `6` identities promoted
 
+Post-PG376 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg376_scry_damage_draw_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg376_scry_damage_draw_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg376_scry_damage_draw_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg376_scry_damage_draw_new_server_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg376_scry_damage_draw_new_server_e2e.md`
+- promoted families:
+  - `xmage_fixed_scry_and_draw_cards_spell_v1` for `9` fixed scry/draw spells:
+    `Behold the Multiverse`, `Deliberate`, `Foresee`, `Introduction to Prophecy`,
+    `Opt`, `Preordain`, `Scour All Possibilities`, `Serum Visions`, and
+    `Tamiyo's Epiphany`.
+  - `xmage_fixed_damage_target_and_draw_card_spell_v1` for `3` fixed damage/draw
+    spells: `Ember Shot`, `Playful Shove`, and `Zap`.
+- target battle-gap identities in authoritative queue: `27027`
+- XMage authoritative source resolved: `26713`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26713`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `status=pass`, `49 pass`, `1 warn`
+  (`deck_id_607_has_no_pg_deck_id_note`, unrelated to PG376)
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg376_scry_damage_draw_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7784` considered supported rows.
+- delta since post-PG375: `12` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG375 queue above.
+historical only. The active execution baseline is the post-PG376 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -195,13 +223,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG375 control numbers:
+Current post-PG376 control numbers:
 
-- target battle-gap identities: `27039`
-- XMage-resolved authoritative source identities: `26725`
+- target battle-gap identities: `27027`
+- XMage-resolved authoritative source identities: `26713`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26725`
+- XMage authoritative adapter required: `26713`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -221,12 +249,12 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg375_counter_draw_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG375, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg376_scry_damage_draw_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG376, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
-   `draw_effect_class_not_pure` composite draw spells (`511` blockers),
+   `draw_effect_class_not_pure` composite draw spells (`492` blockers),
    `mana_source_effect_class_not_simple` artifact/creature mana permanents
    (`303` blockers), and then non-spell/triggered permanent families currently
    blocked by `not_instant_or_sorcery_spell`.
@@ -285,8 +313,33 @@ PG375 completion and PG376 starting hypothesis:
    (`511` blockers) unless a measured lane with higher safe reuse appears in
    the refreshed queue.
 
+PG376 completion and PG377 starting hypothesis:
+
+1. PG376 promoted `12` composite draw spell rules on the new server:
+   `9` fixed scry/draw spells and `3` fixed damage/draw spells.
+2. PG376 added runtime support for `scry` and `direct_damage` components inside
+   `composite_resolution`, with focused runtime tests proving ordered scry/draw
+   and damage/draw resolution without double-moving the source spell.
+3. Dynamic or conditional neighbors remain blocked: `Ugin's Insight` by dynamic
+   `Scry X`; `Incinerating Blast`, `Needle Drop`, `Tweeze`,
+   `Invoke the Firemind`, `Master the Way`, and `Stensia Banquet` by optional,
+   conditional, modal, or dynamic damage/draw behavior.
+4. The post-PG376 supported splitter returns `0` batch-safe proposals, so PG377
+   must implement another narrow subpattern before any PostgreSQL package.
+5. The next highest measured blockers remain `draw_effect_class_not_pure`
+   (`492`), `mana_source_effect_class_not_simple` (`303`), and
+   `not_instant_or_sorcery_spell` (`3946`) split by reusable XMage signatures.
+
 Fresh alignment evidence:
 
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg376_scry_damage_draw_new_server.md`
+  passed with `49` pass and `1` inherited warning.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg376_scry_damage_draw_new_server_docs_final.md`
+  passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260702_post_pg374_bounce_draw_spell_wave_final.md`
   passed with `49/49` checks.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260702_post_pg374_bounce_draw_spell_wave_docs_after_update.md`

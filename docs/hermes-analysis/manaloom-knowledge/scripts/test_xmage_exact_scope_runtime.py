@@ -2735,6 +2735,135 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_composite_scry_draw_spell_reorders_library_then_draws_once(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Low Priority Land", "type_line": "Land", "cmc": 0},
+                {"name": "Approach of the Second Sun", "type_line": "Sorcery", "cmc": 7},
+                {"name": "Library Remainder", "type_line": "Instant", "cmc": 2},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_scry_and_draw_cards_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "scry",
+                    "battle_model_scope": "xmage_fixed_scry_spell_v1",
+                    "count": 2,
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Deliberate",
+            "type_line": "Instant",
+            "oracle_text": "Scry 2, then draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(51),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Approach of the Second Sun"])
+        self.assertEqual([card["name"] for card in active.library], ["Low Priority Land", "Library Remainder"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Deliberate"])
+        self.assertTrue(
+            any(
+                event == "scry_resolved"
+                and data.get("card") == "Fixture Deliberate"
+                and data.get("component_index") == 0
+                and data.get("scry_count") == 2
+                and "Approach of the Second Sun" in data.get("kept_on_top", [])
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Deliberate"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
+    def test_composite_damage_draw_spell_damages_player_then_draws_once(self) -> None:
+        active = self.battle.Player("Active", None, [{"name": "Fresh Draw"}])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 20
+        effect = {
+            "effect": "composite_resolution",
+            "battle_model_scope": "xmage_fixed_damage_target_and_draw_card_spell_v1",
+            "_composite_rule_components": [
+                {
+                    "effect": "direct_damage",
+                    "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+                    "amount": 3,
+                    "damage": 3,
+                    "target": "any_target",
+                    "target_constraints": {"card_types": ["any"]},
+                    "compose_on_resolution": True,
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+        }
+        card = {
+            "name": "Fixture Ember Shot",
+            "type_line": "Instant",
+            "oracle_text": "Fixture Ember Shot deals 3 damage to any target. Draw a card.",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            card,
+            turn=5,
+            rng=random.Random(52),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 17)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Draw"])
+        self.assertEqual([card["name"] for card in active.graveyard], ["Fixture Ember Shot"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Fixture Ember Shot"
+                and data.get("amount") == 3
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "composite_rule_resolved"
+                and data.get("card") == "Fixture Ember Shot"
+                and data.get("components_applied") == 2
+                and data.get("components_skipped") == 0
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_gain_life_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

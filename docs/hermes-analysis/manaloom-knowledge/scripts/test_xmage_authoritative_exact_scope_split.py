@@ -1986,6 +1986,155 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "boost_draw_source_oracle_mismatch")
 
+    def test_fixed_scry_draw_spell_maps_scry_first_order_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ScryEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Scry 2, then draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ScryEffect(2));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.SCRY_DRAW_SCOPE)
+        self.assertEqual(effect["scry_count"], 2)
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(effect["resolution_order"], "scry_then_draw")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["scry", "draw_cards"],
+        )
+
+    def test_fixed_scry_draw_spell_maps_draw_first_order_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ScryEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Draw a card. Scry 2."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+                "this.getSpellAbility().addEffect(new ScryEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["resolution_order"], "draw_then_scry")
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["draw_cards", "scry"],
+        )
+
+    def test_fixed_scry_draw_spell_accepts_fixed_two_arg_scry_and_auxiliary_casting_ability(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ScryEffect", "DrawCardSourceControllerEffect"],
+            ability_classes=["ForetellAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Scry 2, then draw two cards.\n"
+                    "Foretell {1}{U} (During your turn, you may pay {2} and exile this card "
+                    "from your hand face down. Cast it on a later turn for its foretell cost.)"
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ScryEffect(2, false));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2).concatBy(\", then\"));"
+                "this.addAbility(new ForetellAbility(this, new ManaCostsImpl<>(\"{1}{U}\")));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["scry_count"], 2)
+        self.assertEqual(effect["draw_count"], 2)
+        self.assertEqual(effect["resolution_order"], "scry_then_draw")
+
+    def test_fixed_scry_draw_spell_blocks_dynamic_scry(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["ScryEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Scry X, where X is the greatest mana value among permanents you control, "
+                    "then draw three cards."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new ScryEffect(GreatestAmongPermanentsValue.instance));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(3));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "scry_draw_oracle_not_exact_fixed")
+
+    def test_fixed_damage_draw_spell_maps_to_composite_runtime(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Zap deals 1 damage to any target. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(1));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "composite_resolution")
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_DRAW_SCOPE)
+        self.assertEqual(effect["amount"], 1)
+        self.assertEqual(effect["target"], "any_target")
+        self.assertEqual(effect["draw_count"], 1)
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["direct_damage", "draw_cards"],
+        )
+
+    def test_fixed_damage_draw_spell_blocks_conditional_draw(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DamageTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Tweeze deals 3 damage to any target. You may discard a card. "
+                    "If you do, draw a card."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(3));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DoIfCostPaid(new DrawCardSourceControllerEffect(), "
+                "new DiscardCardCost()));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "damage_draw_oracle_not_exact_fixed")
+
     def test_fixed_destroy_draw_spell_maps_to_composite_runtime(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,
