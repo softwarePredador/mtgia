@@ -10897,6 +10897,57 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_static_protection_from_subtype_creature_blocks_matching_source_subtype(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Baneslayer Angel",
+            "type_line": "Creature - Angel",
+            "oracle_text": "Flying, first strike, lifelink, protection from Demons and from Dragons",
+            "controller": "Active",
+            "power": 5,
+            "toughness": 5,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_subtypes_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_protection_from_subtypes",
+            "protection_from_subtypes": ["demon", "dragon"],
+        }
+        permanent = self.battle.enrich_card({**creature, **effect})
+        active.battlefield.append(permanent)
+
+        dragon_source = {
+            "name": "Fixture Dragon Source",
+            "type_line": "Creature - Dragon",
+            "colors": ["R"],
+            "oracle_text": "Fixture Dragon Source deals 3 damage to target creature.",
+        }
+        angel_source = {
+            "name": "Fixture Angel Source",
+            "type_line": "Creature - Angel",
+            "colors": ["W"],
+            "oracle_text": "Fixture Angel Source deals 3 damage to target creature.",
+        }
+
+        self.assertFalse(
+            self.battle.is_legal_target(
+                dragon_source,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+        self.assertTrue(
+            self.battle.is_legal_target(
+                angel_source,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
+
     def test_static_protection_from_color_creature_blocks_matching_colored_targeting(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

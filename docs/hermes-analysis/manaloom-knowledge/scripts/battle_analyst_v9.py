@@ -11286,6 +11286,13 @@ def is_legal_target(spell, target, controller, all_players=None, target_type=Non
     }
     if protected_card_types and any(target_matches_type(spell, card_type) for card_type in protected_card_types):
         return False
+    protected_subtypes = {
+        str(subtype or "").strip().lower()
+        for subtype in _as_list(target.get("protection_from_subtypes"))
+        if str(subtype or "").strip()
+    }
+    if protected_subtypes and any(permanent_has_subtype(spell, subtype) for subtype in protected_subtypes):
+        return False
     allowed_types = _constraint_card_types(spell)
     if allowed_types and "permanent" not in allowed_types:
         if not any(target_matches_type(target, allowed_type) for allowed_type in allowed_types):

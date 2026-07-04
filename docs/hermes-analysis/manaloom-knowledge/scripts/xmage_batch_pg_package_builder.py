@@ -170,6 +170,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "xmage_auxiliary_ability_classes",
     "static_effect",
     "protection_from_card_types",
+    "protection_from_subtypes",
     "cast_spells_as_flash",
     "cast_nonland_spells_as_flash",
     "flash_permission_filter",

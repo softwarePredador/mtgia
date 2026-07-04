@@ -198,6 +198,9 @@ STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
 STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE = (
     "xmage_static_self_protection_from_card_types_creature_v1"
 )
+STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE = (
+    "xmage_static_self_protection_from_subtypes_creature_v1"
+)
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
 STATIC_CANT_BLOCK_CREATURE_SCOPE = "xmage_static_self_cant_block_creature_v1"
@@ -482,6 +485,24 @@ PROTECTION_CARD_TYPE_WORDS = {
     "land": "land",
 }
 PROTECTION_CARD_TYPE_ORDER = ["artifact", "enchantment", "creature", "land"]
+PROTECTION_SUBTYPE_WORDS = {
+    "arcane": "arcane",
+    "demons": "demon",
+    "demon": "demon",
+    "dragons": "dragon",
+    "dragon": "dragon",
+    "elves": "elf",
+    "elf": "elf",
+    "kavu": "kavu",
+    "spirits": "spirit",
+    "spirit": "spirit",
+    "vampires": "vampire",
+    "vampire": "vampire",
+    "werewolves": "werewolf",
+    "werewolf": "werewolf",
+    "zombies": "zombie",
+    "zombie": "zombie",
+}
 
 FLASH_PERMISSION_UNIT = "passive::static_cast_as_flash_permission_variant_review_v1"
 FLASH_PERMISSION_FILTERS = {
@@ -5219,6 +5240,15 @@ def ordered_protection_card_types(card_types: set[str] | list[str]) -> list[str]
     return [card_type for card_type in PROTECTION_CARD_TYPE_ORDER if card_type in present]
 
 
+def ordered_protection_subtypes(subtypes: set[str] | list[str]) -> list[str]:
+    present = {
+        str(subtype or "").strip().lower()
+        for subtype in subtypes
+        if str(subtype or "").strip()
+    }
+    return sorted(present)
+
+
 def protection_from_colors_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
     raw = str(metadata.get("oracle_text") or "").strip()
     if not raw:
@@ -5269,16 +5299,49 @@ def protection_from_card_types_from_oracle(metadata: dict[str, Any]) -> list[str
     return ordered_protection_card_types([PROTECTION_CARD_TYPE_WORDS[part] for part in parts])
 
 
+def protection_from_subtypes_from_oracle(metadata: dict[str, Any]) -> list[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    text = re.sub(r"\([^)]*\)", "", raw)
+    text = re.sub(r"\s+", " ", text.replace("\n", ", ")).strip().rstrip(".").lower()
+    text = oracle_protection_clause(text) or text
+    match = re.fullmatch(r"protection from (.+)", text)
+    if not match:
+        return None
+    body = re.sub(r"\bfrom\s+", "", match.group(1))
+    body = re.sub(r"\s*,\s*and\s+", ", ", body)
+    parts = [
+        part.strip()
+        for part in re.split(r"\s*,\s*|\s+and\s+", body)
+        if part.strip()
+    ]
+    if not parts:
+        return None
+    if any(part not in PROTECTION_SUBTYPE_WORDS for part in parts):
+        return None
+    return ordered_protection_subtypes([PROTECTION_SUBTYPE_WORDS[part] for part in parts])
+
+
 def oracle_protection_clause(text: str) -> str | None:
     parts = [
         part.strip()
         for part in re.split(r"\s*[,;]\s*", str(text or "").strip())
         if part.strip()
     ]
+    clauses: list[str] = []
+    capturing = False
     for index, part in enumerate(parts):
         if part.startswith("protection from "):
-            return ", ".join(parts[index:])
-    return None
+            clauses.append(part)
+            capturing = True
+            continue
+        if capturing and (part.startswith("from ") or part.startswith("and from ")):
+            clauses.append(part)
+            continue
+        if capturing:
+            break
+    return ", ".join(clauses) if clauses else None
 
 
 def static_keywords_before_protection_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -5358,6 +5421,33 @@ def protection_from_card_types_from_source(source: str) -> list[str] | str:
     if len(card_types) != 1:
         return "static_protection_source_not_card_type_exact"
     return ordered_protection_card_types(card_types)
+
+
+def protection_subtype_from_enum(value: str) -> str:
+    return str(value or "").strip().lower().replace("_", " ")
+
+
+def protection_from_subtypes_from_source(source: str) -> list[str] | str:
+    text = source or ""
+    if not re.search(r"\bProtectionAbility\b", text):
+        return "static_protection_source_missing_protection_ability"
+    ability_constructors = re.findall(
+        r"(?:ProtectionAbility\.from|new\s+ProtectionAbility)\s*\(",
+        text,
+    )
+    if len(ability_constructors) != 1:
+        return "static_protection_source_multiple_protection_abilities"
+    subtypes = {
+        protection_subtype_from_enum(match)
+        for match in re.findall(r"\bSubType\.([A-Z0-9_]+)\.getPredicate\s*\(", text)
+    }
+    subtypes.update(
+        protection_subtype_from_enum(match)
+        for match in re.findall(r"\bnew\s+Filter(?:Permanent|Card|CreaturePermanent)?\s*\(\s*SubType\.([A-Z0-9_]+)", text)
+    )
+    if not subtypes:
+        return "static_protection_source_not_subtype_exact"
+    return ordered_protection_subtypes(subtypes)
 
 
 def static_keywords_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
@@ -13592,6 +13682,7 @@ def split_row(
             return None, "static_protection_not_creature"
         oracle_colors = protection_from_colors_from_oracle(metadata)
         oracle_card_types: list[str] | None = None
+        oracle_subtypes: list[str] | None = None
         if oracle_colors is not None:
             source_colors = protection_from_colors_from_source(source_text)
             if isinstance(source_colors, str):
@@ -13606,23 +13697,36 @@ def split_row(
             }
         else:
             oracle_card_types = protection_from_card_types_from_oracle(metadata)
-            if oracle_card_types is None:
-                return None, "static_protection_oracle_not_color_or_card_type_exact"
-            source_card_types = protection_from_card_types_from_source(source_text)
-            if isinstance(source_card_types, str):
-                return None, source_card_types
-            if source_card_types != oracle_card_types:
-                return None, "static_protection_source_oracle_mismatch"
-            protection_scope = STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE
-            static_effect = "self_protection_from_card_types"
-            protection_fields = {
-                "protection_from_card_types": oracle_card_types,
-            }
+            if oracle_card_types is not None:
+                source_card_types = protection_from_card_types_from_source(source_text)
+                if isinstance(source_card_types, str):
+                    return None, source_card_types
+                if source_card_types != oracle_card_types:
+                    return None, "static_protection_source_oracle_mismatch"
+                protection_scope = STATIC_PROTECTION_FROM_CARD_TYPES_CREATURE_SCOPE
+                static_effect = "self_protection_from_card_types"
+                protection_fields = {
+                    "protection_from_card_types": oracle_card_types,
+                }
+            else:
+                oracle_subtypes = protection_from_subtypes_from_oracle(metadata)
+                if oracle_subtypes is None:
+                    return None, "static_protection_oracle_not_color_or_card_type_or_subtype_exact"
+                source_subtypes = protection_from_subtypes_from_source(source_text)
+                if isinstance(source_subtypes, str):
+                    return None, source_subtypes
+                if source_subtypes != oracle_subtypes:
+                    return None, "static_protection_source_oracle_mismatch"
+                protection_scope = STATIC_PROTECTION_FROM_SUBTYPES_CREATURE_SCOPE
+                static_effect = "self_protection_from_subtypes"
+                protection_fields = {
+                    "protection_from_subtypes": oracle_subtypes,
+                }
         keywords = keywords_from_ability_classes(row)
         oracle_keywords = static_keywords_before_protection_from_oracle(metadata)
         if oracle_keywords is None:
             return None, "static_protection_oracle_keyword_not_exact"
-        if keywords != oracle_keywords:
+        if not oracle_keywords.issubset(keywords):
             return None, "static_protection_oracle_keyword_mismatch"
         keyword_list = ordered_keywords(keywords)
         effect_json = {
@@ -13647,7 +13751,11 @@ def split_row(
             family_id=(
                 "xmage_static_self_protection_from_colors_creature"
                 if oracle_colors is not None
-                else "xmage_static_self_protection_from_card_types_creature"
+                else (
+                    "xmage_static_self_protection_from_card_types_creature"
+                    if oracle_card_types is not None
+                    else "xmage_static_self_protection_from_subtypes_creature"
+                )
             ),
         ), "selected_exact_scope"
 
