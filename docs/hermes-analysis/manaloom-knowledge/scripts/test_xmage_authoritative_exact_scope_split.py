@@ -191,6 +191,58 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "static_cant_be_blocked_oracle_not_exact")
 
+    def test_static_basic_landwalk_creature_maps_to_runtime(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::SwampwalkAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["SwampwalkAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Anaconda",
+                type_line="Creature - Snake",
+                oracle_text="Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)",
+            ),
+            source_text="""
+                import mage.abilities.keyword.SwampwalkAbility;
+                this.addAbility(new SwampwalkAbility());
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_LANDWALK_CREATURE_SCOPE)
+        self.assertEqual(effect["effect"], "creature")
+        self.assertTrue(effect["landwalk"])
+        self.assertEqual(effect["landwalk_keyword"], "swampwalk")
+        self.assertEqual(effect["landwalk_land_type"], "swamp")
+        self.assertEqual(effect["landwalk_land_types"], ["swamp"])
+
+    def test_static_basic_landwalk_creature_blocks_nonbasic_landwalk_text(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::ForestwalkAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["ForestwalkAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Snow Dryad",
+                type_line="Creature - Dryad",
+                oracle_text="Snow forestwalk",
+            ),
+            source_text="""
+                import mage.abilities.keyword.ForestwalkAbility;
+                this.addAbility(new ForestwalkAbility());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "static_landwalk_oracle_not_basic_exact")
+
     def test_static_play_lands_from_graveyard_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

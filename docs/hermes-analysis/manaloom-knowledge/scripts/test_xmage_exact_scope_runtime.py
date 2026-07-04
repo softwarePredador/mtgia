@@ -142,6 +142,74 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertEqual(assignments, [(attacker, [])])
         self.assertNotIn("blocking", blocker)
 
+    def test_static_basic_landwalk_skips_blocker_when_defender_controls_matching_land(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        attacker = {
+            "name": "Anaconda",
+            "type_line": "Creature - Snake",
+            "power": 3,
+            "toughness": 3,
+            "effect": "creature",
+            "landwalk": True,
+            "landwalk_land_type": "swamp",
+            "landwalk_land_types": ["swamp"],
+            "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        }
+        blocker = {
+            "name": "Grizzly Bears",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        defender.battlefield = [
+            {"name": "Swamp", "type_line": "Basic Land - Swamp", "effect": "land"},
+            blocker,
+        ]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [])])
+        self.assertNotIn("blocking", blocker)
+
+    def test_static_basic_landwalk_allows_blocker_without_matching_land(self) -> None:
+        defender = self.battle.Player("Defender", None, [])
+        attacker = {
+            "name": "Anaconda",
+            "type_line": "Creature - Snake",
+            "power": 1,
+            "toughness": 1,
+            "effect": "creature",
+            "landwalk": True,
+            "landwalk_land_type": "swamp",
+            "landwalk_land_types": ["swamp"],
+            "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        }
+        blocker = {
+            "name": "Grizzly Bears",
+            "type_line": "Creature - Bear",
+            "power": 2,
+            "toughness": 2,
+        }
+        defender.battlefield = [
+            {"name": "Forest", "type_line": "Basic Land - Forest", "effect": "land"},
+            blocker,
+        ]
+
+        assignments = self.battle.declare_blockers_step(
+            defender,
+            [attacker],
+            turn=4,
+            rng=random.Random(1),
+        )
+
+        self.assertEqual(assignments, [(attacker, [blocker])])
+        self.assertTrue(blocker.get("blocking"))
+
     def test_static_play_lands_from_graveyard_uses_graveyard_land_when_no_hand_or_topdeck(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -197,6 +197,7 @@ STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE = (
 )
 STATIC_CAST_AS_FLASH_PERMISSION_SCOPE = "xmage_static_cast_spells_as_flash_permission_v1"
 STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE = "xmage_static_self_cant_be_blocked_creature_v1"
+STATIC_LANDWALK_CREATURE_SCOPE = "xmage_static_self_basic_landwalk_creature_v1"
 STATIC_CONTROLLED_PT_SCOPE = "xmage_static_controlled_power_toughness_boost_v1"
 STATIC_GRAVEYARD_COUNT_PT_SCOPE = "xmage_static_source_power_toughness_equal_graveyard_count_v1"
 STATIC_GRAVEYARD_THRESHOLD_BOOST_SCOPE = "xmage_static_source_boost_if_graveyard_threshold_v1"
@@ -474,6 +475,13 @@ CANT_BE_BLOCKED_SOURCE_UNIT = (
     "xmage_signature::no_effect_class::CantBeBlockedSourceAbility::"
     "no_target_class::no_condition_class::no_signal"
 )
+BASIC_LANDWALK_ABILITY_TO_TYPE = {
+    "PlainswalkAbility": "plains",
+    "IslandwalkAbility": "island",
+    "SwampwalkAbility": "swamp",
+    "MountainwalkAbility": "mountain",
+    "ForestwalkAbility": "forest",
+}
 
 
 def utc_now() -> str:
@@ -4573,6 +4581,29 @@ def is_static_cant_be_blocked_creature_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def basic_landwalk_type_for_row(row: dict[str, Any]) -> str | None:
+    abilities = ability_classes(row)
+    if len(abilities) != 1:
+        return None
+    ability = next(iter(abilities))
+    land_type = BASIC_LANDWALK_ABILITY_TO_TYPE.get(ability)
+    if not land_type:
+        return None
+    expected_unit = (
+        f"xmage_signature::no_effect_class::{ability}::"
+        "no_target_class::no_condition_class::no_signal"
+    )
+    if str(row.get("adapter_work_unit") or "") != expected_unit:
+        return None
+    if effect_classes(row) or (row.get("xmage_signals") or []):
+        return None
+    return land_type
+
+
+def is_static_basic_landwalk_creature_unit(row: dict[str, Any]) -> bool:
+    return basic_landwalk_type_for_row(row) is not None
+
+
 def is_creature_etb_life_gain_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != LIFE_UNIT:
         return False
@@ -5390,6 +5421,27 @@ def source_is_static_cant_be_blocked(source: str) -> bool:
     return (
         "CantBeBlockedSourceAbility" in text
         and "CantBeBlockedByCreaturesSourceEffect" not in text
+        and "SimpleEvasionAbility" not in text
+    )
+
+
+def oracle_is_static_basic_landwalk(metadata: dict[str, Any], land_type: str) -> bool:
+    text = strip_parenthetical_reminders(str(metadata.get("oracle_text") or ""))
+    text = re.sub(r"\s+", " ", text).strip().lower().rstrip(".")
+    return text == f"{land_type}walk"
+
+
+def source_is_static_basic_landwalk(source: str, land_type: str) -> bool:
+    ability_class = {
+        value: key for key, value in BASIC_LANDWALK_ABILITY_TO_TYPE.items()
+    }.get(land_type)
+    if not ability_class:
+        return False
+    text = source or ""
+    return (
+        ability_class in text
+        and "LandwalkAbility" not in text
+        and "GainAbility" not in text
         and "SimpleEvasionAbility" not in text
     )
 
@@ -10760,6 +10812,8 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         scope_kind = "static cast-as-though-flash timing permission permanent"
     elif scope == STATIC_CANT_BE_BLOCKED_CREATURE_SCOPE:
         scope_kind = "creature static self can't-be-blocked evasion"
+    elif scope == STATIC_LANDWALK_CREATURE_SCOPE:
+        scope_kind = "creature static self basic landwalk evasion"
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
@@ -10878,6 +10932,7 @@ def split_row(
     )
     static_cast_as_flash_permission_unit = is_static_cast_as_flash_permission_unit(row)
     static_cant_be_blocked_creature_unit = is_static_cant_be_blocked_creature_unit(row)
+    static_basic_landwalk_creature_unit = is_static_basic_landwalk_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     dies_life_gain_creature_unit = is_creature_dies_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
@@ -10956,6 +11011,7 @@ def split_row(
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
+        and not static_basic_landwalk_creature_unit
         and not etb_life_gain_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
@@ -11014,6 +11070,7 @@ def split_row(
         and not static_protection_from_colors_creature_unit
         and not static_cast_as_flash_permission_unit
         and not static_cant_be_blocked_creature_unit
+        and not static_basic_landwalk_creature_unit
         and not dies_life_gain_creature_unit
         and not etb_draw_creature_unit
         and not etb_draw_lose_life_creature_unit
@@ -11160,6 +11217,41 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_static_self_cant_be_blocked_creature",
+        ), "selected_exact_scope"
+
+    if static_basic_landwalk_creature_unit:
+        land_type = basic_landwalk_type_for_row(row)
+        if not land_type:
+            return None, "static_landwalk_not_basic_unit"
+        if not is_creature_metadata(metadata):
+            return None, "static_landwalk_not_creature"
+        if not oracle_is_static_basic_landwalk(metadata, land_type):
+            return None, "static_landwalk_oracle_not_basic_exact"
+        if not source_is_static_basic_landwalk(source_text, land_type):
+            return None, "static_landwalk_source_not_basic_exact"
+        ability_class = {
+            value: key for key, value in BASIC_LANDWALK_ABILITY_TO_TYPE.items()
+        }[land_type]
+        keyword = f"{land_type}walk"
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": STATIC_LANDWALK_CREATURE_SCOPE,
+            "ability_kind": "static",
+            "static_effect": "self_basic_landwalk",
+            "target": "self",
+            "target_controller": "self",
+            "landwalk": True,
+            "landwalk_keyword": keyword,
+            "landwalk_land_type": land_type,
+            "landwalk_land_types": [land_type],
+            keyword: True,
+            "xmage_ability_class": ability_class,
+        }
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_static_self_basic_landwalk_creature",
         ), "selected_exact_scope"
 
     if permanent_activated_tutor_battlefield_unit:
@@ -16512,6 +16604,7 @@ def build_exact_split_report(
             and not is_static_protection_from_colors_creature_unit(row)
             and not is_static_cast_as_flash_permission_unit(row)
             and not is_static_cant_be_blocked_creature_unit(row)
+            and not is_static_basic_landwalk_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_dies_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
@@ -16587,6 +16680,7 @@ def build_exact_split_report(
                 "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
                 "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
                 "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
+                "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

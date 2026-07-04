@@ -54547,12 +54547,44 @@ def creature_cannot_block(creature):
     )
 
 
-def attacker_cannot_be_blocked(creature):
-    return bool(
+def _landwalk_land_types(creature):
+    if not isinstance(creature, dict):
+        return []
+    values = creature.get("landwalk_land_types") or creature.get("landwalk_land_type") or []
+    if isinstance(values, str):
+        values = [values]
+    normalized = []
+    for value in values:
+        land_type = str(value or "").strip().lower()
+        if land_type in {"plains", "island", "swamp", "mountain", "forest"}:
+            normalized.append(land_type)
+    return normalized
+
+
+def _player_controls_landwalk_land(player, land_type):
+    if player is None or not land_type:
+        return False
+    for permanent in getattr(player, "battlefield", []) or []:
+        if not isinstance(permanent, dict) or not is_effective_land(permanent):
+            continue
+        if permanent_has_subtype(permanent, land_type):
+            return True
+    return False
+
+
+def attacker_cannot_be_blocked(creature, defending_player=None):
+    if bool(
         creature.get("unblockable")
         or creature.get("cant_be_blocked")
         or creature.get("cannot_be_blocked")
         or creature.get("can't_be_blocked")
+    ):
+        return True
+    if defending_player is None:
+        return False
+    return any(
+        _player_controls_landwalk_land(defending_player, land_type)
+        for land_type in _landwalk_land_types(creature)
     )
 
 
@@ -55691,7 +55723,7 @@ def declare_blockers_step(target, attackers, turn, rng):
     block_assignments = []
     assigned_blockers = []
     for a in sorted(attackers, key=lambda creature: creature.get("power", 2), reverse=True):
-        if attacker_cannot_be_blocked(a):
+        if attacker_cannot_be_blocked(a, target):
             block_assignments.append((a, []))
             continue
         available = [

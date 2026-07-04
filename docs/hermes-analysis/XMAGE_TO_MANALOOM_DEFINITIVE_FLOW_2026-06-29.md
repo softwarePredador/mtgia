@@ -8405,6 +8405,48 @@ new server:
   exact split recheck produced `proposal_count=0`; the remaining `314`
   identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG420 Static Basic Landwalk Creature Closure
+
+- Closed the exact XMage basic-landwalk no-effect/no-signal units as ManaLoom
+  scope `xmage_static_self_basic_landwalk_creature_v1`.
+- The mapper accepts only pure `PlainswalkAbility`, `IslandwalkAbility`,
+  `SwampwalkAbility`, `MountainwalkAbility`, or `ForestwalkAbility`, with exact
+  Oracle text after reminder removal (`plainswalk`, `islandwalk`, `swampwalk`,
+  `mountainwalk`, or `forestwalk`) and matching local XMage source. Generic
+  `LandwalkAbility` cases such as nonbasic, legendary, or snow landwalk remain
+  intentionally excluded for separate scoped adapters.
+- Runtime behavior now passes the defending player into
+  `attacker_cannot_be_blocked`; absolute unblockable still works without a
+  defender, while landwalk only suppresses blockers when the defending player
+  controls a land with the matching basic land subtype. Focused tests cover the
+  mapper, nonbasic/snow text rejection, matching-land unblockability, and
+  nonmatching-land blockability.
+- The PostgreSQL package promoted `61` cards:
+  `21` swampwalk, `17` forestwalk, `12` mountainwalk, `9` islandwalk, and `2`
+  plainswalk identities. Precheck found `61` target rows, `0` existing rule
+  rows, and `0` shadow rows; apply inserted/updated `61`; postcheck verified
+  `61/61` promoted rows as `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `61` PG rules into SQLite. The canonical
+  fallback export increased to `5556` rows.
+- PG420 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `61` selected cards. Generic
+  battle scenario count remained `0`; conditional combat behavior is covered by
+  focused runtime tests.
+- PG420b fixed a contract drift discovered by the final PG/Hermes/SQLite audit:
+  `44` older trusted executable PostgreSQL rules lacked `oracle_hash`. The
+  backfill used `cards.id = card_battle_rules.card_id`, updated `44`, preserved
+  rule behavior, synced the affected `44` cards to SQLite, and reduced trusted
+  executable missing-hash rows to `0`.
+- Final governance audits passed after PG420b:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26529` to `26468`, authoritative adapter-required count from `26215`
+  to `26154`, and the basic landwalk exact units to zero. The post-PG420 exact
+  split recheck produced `proposal_count=0`; the remaining `314` identities are
+  still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

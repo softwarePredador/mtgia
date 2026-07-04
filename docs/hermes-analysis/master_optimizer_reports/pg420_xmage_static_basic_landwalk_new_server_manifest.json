@@ -1,0 +1,3933 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg420_xmage_static_basic_landwalk_new_server_20260704_18",
+  "deploy_id": "pg420",
+  "expected_rules": [
+    {
+      "card_name": "Anaconda",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "anaconda",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anurid Murkdiver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "anurid murkdiver",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Benthic Behemoth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "benthic behemoth",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Raiders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog raiders",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Smugglers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog smugglers",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Tatters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog tatters",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Wraith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog wraith",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bull Hippo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "bull hippo",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Canyon Wildcat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "canyon wildcat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cat Warriors",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "cat warriors",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cliff Threader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "cliff threader",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Devouring Deep",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "devouring deep",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dwarven Grunt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "dwarven grunt",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Cat Warrior",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "elite cat warrior",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emerald Oryx",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "emerald oryx",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Farbog Explorer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "farbog explorer",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glissa's Courier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "glissa's courier",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Mountaineer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin mountaineer",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Spelunkers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin spelunkers",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grayscaled Gharial",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "grayscaled gharial",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heartwood Treefolk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "heartwood treefolk",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hillcomber Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "hillcomber giant",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jukai Messenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "jukai messenger",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Koth's Courier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "koth's courier",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaf Dancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "leaf dancer",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost Soul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "lost soul",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lynx",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "lynx",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Boa",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh boa",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Goblins",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh goblins",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Threader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh threader",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moor Fiend",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "moor fiend",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mountain Goat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "mountain goat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pale Bears",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "pale bears",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Plague Beetle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "plague beetle",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pygmy Allosaurus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "pygmy allosaurus",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raiding Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "raiding nightstalker",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Righteous Avengers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "min_rule_version": 2,
+      "normalized_name": "righteous avengers",
+      "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "plainswalk",
+        "landwalk_land_type": "plains",
+        "landwalk_land_types": [
+          "plains"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "PlainswalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "River Bear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "river bear",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rock Badger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "rock badger",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rootwater Commando",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "rootwater commando",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rushwood Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "rushwood dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Segovian Leviathan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "segovian leviathan",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shanodin Dryads",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "shanodin dryads",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slinking Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "slinking serpent",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sokenzan Bruiser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "sokenzan bruiser",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Somberwald Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "somberwald dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warthog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "warthog",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "wild ox",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Willow Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "willow dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zendikar Farguide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zendikar farguide",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Dog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac dog",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Goat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac goat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Horse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac horse",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Monkey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac monkey",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac ox",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Pig",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac pig",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rabbit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rabbit",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rat",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rooster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rooster",
+      "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "plainswalk",
+        "landwalk_land_type": "plains",
+        "landwalk_land_types": [
+          "plains"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "PlainswalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Snake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac snake",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac tiger",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_static_self_basic_landwalk_creature": 61
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg420_xmage_static_basic_landwalk_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T18:22:08+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Anaconda"
+      },
+      "card_name": "Anaconda",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "anaconda",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Anurid Murkdiver"
+      },
+      "card_name": "Anurid Murkdiver",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "anurid murkdiver",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Benthic Behemoth"
+      },
+      "card_name": "Benthic Behemoth",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "benthic behemoth",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Raiders"
+      },
+      "card_name": "Bog Raiders",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "bog raiders",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Smugglers"
+      },
+      "card_name": "Bog Smugglers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "bog smugglers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Tatters"
+      },
+      "card_name": "Bog Tatters",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "bog tatters",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bog Wraith"
+      },
+      "card_name": "Bog Wraith",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "bog wraith",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Bull Hippo"
+      },
+      "card_name": "Bull Hippo",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "bull hippo",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Canyon Wildcat"
+      },
+      "card_name": "Canyon Wildcat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "canyon wildcat",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Cat Warriors"
+      },
+      "card_name": "Cat Warriors",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "cat warriors",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Cliff Threader"
+      },
+      "card_name": "Cliff Threader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "cliff threader",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Devouring Deep"
+      },
+      "card_name": "Devouring Deep",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "devouring deep",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Dwarven Grunt"
+      },
+      "card_name": "Dwarven Grunt",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "dwarven grunt",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Elite Cat Warrior"
+      },
+      "card_name": "Elite Cat Warrior",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "elite cat warrior",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Emerald Oryx"
+      },
+      "card_name": "Emerald Oryx",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "emerald oryx",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Farbog Explorer"
+      },
+      "card_name": "Farbog Explorer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "farbog explorer",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Glissa's Courier"
+      },
+      "card_name": "Glissa's Courier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "glissa's courier",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Mountaineer"
+      },
+      "card_name": "Goblin Mountaineer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "goblin mountaineer",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Goblin Spelunkers"
+      },
+      "card_name": "Goblin Spelunkers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "goblin spelunkers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Grayscaled Gharial"
+      },
+      "card_name": "Grayscaled Gharial",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "grayscaled gharial",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Heartwood Treefolk"
+      },
+      "card_name": "Heartwood Treefolk",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "heartwood treefolk",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Hillcomber Giant"
+      },
+      "card_name": "Hillcomber Giant",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "hillcomber giant",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Jukai Messenger"
+      },
+      "card_name": "Jukai Messenger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "jukai messenger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Koth's Courier"
+      },
+      "card_name": "Koth's Courier",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "koth's courier",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Leaf Dancer"
+      },
+      "card_name": "Leaf Dancer",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "leaf dancer",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Lost Soul"
+      },
+      "card_name": "Lost Soul",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "lost soul",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Lynx"
+      },
+      "card_name": "Lynx",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "lynx",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Marsh Boa"
+      },
+      "card_name": "Marsh Boa",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "marsh boa",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Marsh Goblins"
+      },
+      "card_name": "Marsh Goblins",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "marsh goblins",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Marsh Threader"
+      },
+      "card_name": "Marsh Threader",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "marsh threader",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Moor Fiend"
+      },
+      "card_name": "Moor Fiend",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "moor fiend",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Mountain Goat"
+      },
+      "card_name": "Mountain Goat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "mountain goat",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Pale Bears"
+      },
+      "card_name": "Pale Bears",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "pale bears",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Plague Beetle"
+      },
+      "card_name": "Plague Beetle",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "plague beetle",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Pygmy Allosaurus"
+      },
+      "card_name": "Pygmy Allosaurus",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "pygmy allosaurus",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Raiding Nightstalker"
+      },
+      "card_name": "Raiding Nightstalker",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "raiding nightstalker",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Righteous Avengers"
+      },
+      "card_name": "Righteous Avengers",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "normalized_name": "righteous avengers",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "plainswalk",
+        "landwalk_land_type": "plains",
+        "landwalk_land_types": [
+          "plains"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "PlainswalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "River Bear"
+      },
+      "card_name": "River Bear",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "river bear",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Rock Badger"
+      },
+      "card_name": "Rock Badger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "rock badger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Rootwater Commando"
+      },
+      "card_name": "Rootwater Commando",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "rootwater commando",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Rushwood Dryad"
+      },
+      "card_name": "Rushwood Dryad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "rushwood dryad",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Segovian Leviathan"
+      },
+      "card_name": "Segovian Leviathan",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "segovian leviathan",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Shanodin Dryads"
+      },
+      "card_name": "Shanodin Dryads",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "shanodin dryads",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Slinking Serpent"
+      },
+      "card_name": "Slinking Serpent",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "slinking serpent",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Sokenzan Bruiser"
+      },
+      "card_name": "Sokenzan Bruiser",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "sokenzan bruiser",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Somberwald Dryad"
+      },
+      "card_name": "Somberwald Dryad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "somberwald dryad",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Warthog"
+      },
+      "card_name": "Warthog",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "warthog",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Wild Ox"
+      },
+      "card_name": "Wild Ox",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "wild ox",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Willow Dryad"
+      },
+      "card_name": "Willow Dryad",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "willow dryad",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zendikar Farguide"
+      },
+      "card_name": "Zendikar Farguide",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "zendikar farguide",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Dog"
+      },
+      "card_name": "Zodiac Dog",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "zodiac dog",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Goat"
+      },
+      "card_name": "Zodiac Goat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "normalized_name": "zodiac goat",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "mountainwalk",
+        "landwalk_land_type": "mountain",
+        "landwalk_land_types": [
+          "mountain"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "MountainwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Horse"
+      },
+      "card_name": "Zodiac Horse",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "normalized_name": "zodiac horse",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "islandwalk",
+        "landwalk_land_type": "island",
+        "landwalk_land_types": [
+          "island"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "IslandwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Monkey"
+      },
+      "card_name": "Zodiac Monkey",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "zodiac monkey",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Ox"
+      },
+      "card_name": "Zodiac Ox",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "zodiac ox",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Pig"
+      },
+      "card_name": "Zodiac Pig",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "zodiac pig",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Rabbit"
+      },
+      "card_name": "Zodiac Rabbit",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "zodiac rabbit",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Rat"
+      },
+      "card_name": "Zodiac Rat",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "zodiac rat",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Rooster"
+      },
+      "card_name": "Zodiac Rooster",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "normalized_name": "zodiac rooster",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "plainswalk",
+        "landwalk_land_type": "plains",
+        "landwalk_land_types": [
+          "plains"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "PlainswalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Snake"
+      },
+      "card_name": "Zodiac Snake",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "normalized_name": "zodiac snake",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "swampwalk",
+        "landwalk_land_type": "swamp",
+        "landwalk_land_types": [
+          "swamp"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "SwampwalkAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Zodiac Tiger"
+      },
+      "card_name": "Zodiac Tiger",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "normalized_name": "zodiac tiger",
+      "required_effect_fields": {
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+        "effect": "creature",
+        "landwalk": true,
+        "landwalk_keyword": "forestwalk",
+        "landwalk_land_type": "forest",
+        "landwalk_land_types": [
+          "forest"
+        ],
+        "static_effect": "self_basic_landwalk",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ForestwalkAbility"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Anaconda",
+    "Anurid Murkdiver",
+    "Benthic Behemoth",
+    "Bog Raiders",
+    "Bog Smugglers",
+    "Bog Tatters",
+    "Bog Wraith",
+    "Bull Hippo",
+    "Canyon Wildcat",
+    "Cat Warriors",
+    "Cliff Threader",
+    "Devouring Deep",
+    "Dwarven Grunt",
+    "Elite Cat Warrior",
+    "Emerald Oryx",
+    "Farbog Explorer",
+    "Glissa's Courier",
+    "Goblin Mountaineer",
+    "Goblin Spelunkers",
+    "Grayscaled Gharial",
+    "Heartwood Treefolk",
+    "Hillcomber Giant",
+    "Jukai Messenger",
+    "Koth's Courier",
+    "Leaf Dancer",
+    "Lost Soul",
+    "Lynx",
+    "Marsh Boa",
+    "Marsh Goblins",
+    "Marsh Threader",
+    "Moor Fiend",
+    "Mountain Goat",
+    "Pale Bears",
+    "Plague Beetle",
+    "Pygmy Allosaurus",
+    "Raiding Nightstalker",
+    "Righteous Avengers",
+    "River Bear",
+    "Rock Badger",
+    "Rootwater Commando",
+    "Rushwood Dryad",
+    "Segovian Leviathan",
+    "Shanodin Dryads",
+    "Slinking Serpent",
+    "Sokenzan Bruiser",
+    "Somberwald Dryad",
+    "Warthog",
+    "Wild Ox",
+    "Willow Dryad",
+    "Zendikar Farguide",
+    "Zodiac Dog",
+    "Zodiac Goat",
+    "Zodiac Horse",
+    "Zodiac Monkey",
+    "Zodiac Ox",
+    "Zodiac Pig",
+    "Zodiac Rabbit",
+    "Zodiac Rat",
+    "Zodiac Rooster",
+    "Zodiac Snake",
+    "Zodiac Tiger"
+  ],
+  "selected_count": 61,
+  "slug": "xmage_static_basic_landwalk_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Anaconda",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "anaconda",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Anurid Murkdiver",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "anurid murkdiver",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Benthic Behemoth",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "benthic behemoth",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Raiders",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog raiders",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Smugglers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog smugglers",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Tatters",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog tatters",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bog Wraith",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "bog wraith",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Bull Hippo",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "bull hippo",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Canyon Wildcat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "canyon wildcat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cat Warriors",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "cat warriors",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Cliff Threader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "cliff threader",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Devouring Deep",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "devouring deep",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Dwarven Grunt",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "dwarven grunt",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Elite Cat Warrior",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "elite cat warrior",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Emerald Oryx",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "emerald oryx",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Farbog Explorer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "farbog explorer",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Glissa's Courier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "glissa's courier",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Mountaineer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin mountaineer",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Goblin Spelunkers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "goblin spelunkers",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Grayscaled Gharial",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "grayscaled gharial",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Heartwood Treefolk",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "heartwood treefolk",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Hillcomber Giant",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "hillcomber giant",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Jukai Messenger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "jukai messenger",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Koth's Courier",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "koth's courier",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Leaf Dancer",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "leaf dancer",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lost Soul",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "lost soul",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Lynx",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "lynx",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Boa",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh boa",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Goblins",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh goblins",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Marsh Threader",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "marsh threader",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Moor Fiend",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "moor fiend",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Mountain Goat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "mountain goat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pale Bears",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "pale bears",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Plague Beetle",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "plague beetle",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Pygmy Allosaurus",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "pygmy allosaurus",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Raiding Nightstalker",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "raiding nightstalker",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Righteous Avengers",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "min_rule_version": 2,
+      "normalized_name": "righteous avengers",
+      "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "River Bear",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "river bear",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rock Badger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "rock badger",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rootwater Commando",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "rootwater commando",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Rushwood Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "rushwood dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Segovian Leviathan",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "segovian leviathan",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Shanodin Dryads",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "shanodin dryads",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Slinking Serpent",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "slinking serpent",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Sokenzan Bruiser",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "sokenzan bruiser",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Somberwald Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "somberwald dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Warthog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "warthog",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Wild Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "wild ox",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Willow Dryad",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "willow dryad",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zendikar Farguide",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zendikar farguide",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Dog",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac dog",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Goat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac goat",
+      "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Horse",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac horse",
+      "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Monkey",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac monkey",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Ox",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac ox",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Pig",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac pig",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rabbit",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rabbit",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rat",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rat",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Rooster",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac rooster",
+      "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Snake",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac snake",
+      "oracle_hash": "d892699f363998ce8914957a67c601d9",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Zodiac Tiger",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+      "min_rule_version": 2,
+      "normalized_name": "zodiac tiger",
+      "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}
