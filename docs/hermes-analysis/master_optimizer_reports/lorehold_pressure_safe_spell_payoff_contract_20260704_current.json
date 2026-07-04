@@ -1,0 +1,256 @@
+{
+  "artifact_type": "lorehold_pressure_safe_spell_payoff_contract",
+  "battle_gate_contract": [
+    "Create a legal decklist copy; deck 607 itself remains unchanged.",
+    "Run structure matrix first; reject variants that regress lands, ramp, miracle/topdeck, or pressure-survival floors.",
+    "Only after the matrix passes, run an equal opponent and seed gate against 607.",
+    "Promotion requires tying or beating 607 overall and no Winota/fast-pressure regression.",
+    "Card-level claims require direct draw/cast/trigger/use events for each included pressure payoff."
+  ],
+  "contract_key": "pressure_safe_spell_payoff_micro_shell",
+  "current_champion": "deck_607",
+  "cut_plan_validation": {
+    "named_cut_count": 0,
+    "required_cut_count": 4,
+    "safe": false,
+    "violations": [
+      {
+        "card_name": "",
+        "protected_anchor": "",
+        "violation": "cut_count_must_match_add_count_before_legal_deck_generation"
+      }
+    ]
+  },
+  "cut_policy": [
+    "No protected 607 anchor can be used as a generic cut.",
+    "Do not cut below the current 607 land floor before a full-shell matrix proves curve safety.",
+    "Do not cut core ramp, topdeck/miracle setup, or protection to add pressure unless the cut is same-lane and trace-supported.",
+    "The first legal variant needs exactly four named cuts for the four-card primary pressure package.",
+    "A cut is not safe because a replacement is famous; it is safe only after role, source, and battle trace evidence align."
+  ],
+  "deck_607_current_role_counts": {
+    "board_wipe": 8,
+    "creature": 2,
+    "draw": 9,
+    "engine": 3,
+    "land": 34,
+    "protection": 12,
+    "ramp": 15,
+    "removal": 7,
+    "tutor": 1,
+    "wincon": 9
+  },
+  "deck_607_mutated": false,
+  "diagnostic_planner": "docs/hermes-analysis/master_optimizer_reports/lorehold_diagnostic_contract_planner_20260704_current.json",
+  "external_pressure_sources": [
+    {
+      "learning": "Public Lorehold pressure advice specifically calls out token and damage spell payoffs such as Monastery Mentor, Young Pyromancer, Guttersnipe, and Storm-Kiln Artist.",
+      "source_key": "gametyrant_lorehold_deck_tech_pressure_payoffs",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "learning": "The public core page frames Lorehold in Topdeck, Spellslinger, Discard, and Reanimator lanes, which matches the internal role gates.",
+      "source_key": "edhrec_core_lorehold_spellslinger",
+      "url": "https://edhrec.com/commanders/lorehold-the-historian/core/spellslinger"
+    },
+    {
+      "learning": "Recent public analysis reinforces Lorehold's flying, haste, miracle, rummage, and possible token-swarm pressure identity.",
+      "source_key": "coolstuffinc_lorehold_2026",
+      "url": "https://www.coolstuffinc.com/a/stephenjohnson-04202026-lorehold-the-historian-commander"
+    },
+    {
+      "learning": "The commander identity remains miracle timing plus rummage; pressure cards must not dilute the topdeck/miracle floor.",
+      "source_key": "edhrec_miracles_every_turn",
+      "url": "https://edhrec.com/articles/miracles-every-turn-with-lorehold-the-historian-in-commander"
+    }
+  ],
+  "generated_at": "2026-07-04T22:00:00Z",
+  "knowledge_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "method_notes": [
+    "This contract reads SQLite and existing reports only; it does not write PostgreSQL, SQLite, deck rows, or decklists.",
+    "The local card preflight passing does not mean the deck should change; it only means the cut-pool resolver is the next real blocker.",
+    "The One Ring and Mana Vault remain outside this contract because prior internal testing did not prove seed-safe cuts for the protected 607 shell."
+  ],
+  "postgres_writes": false,
+  "primary_package_preflight": [
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Monastery Mentor",
+      "cmc": 3.0,
+      "color_identity_json": "[\"W\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Monastery Mentor",
+      "preflight_status": "pass",
+      "role": "token_pressure_spell_payoff",
+      "type_line": "Creature \u2014 Human Monk",
+      "value_test": "Converts noncreature spell density into board pressure and blockers; valuable only if the shell keeps enough cheap spell velocity.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Young Pyromancer",
+      "cmc": 2.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Young Pyromancer",
+      "preflight_status": "pass",
+      "role": "low_curve_token_pressure_payoff",
+      "type_line": "Creature \u2014 Human Shaman",
+      "value_test": "Adds low-cost pressure absorption and chip pressure from instants and sorceries without asking the deck to become creature-heavy.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Guttersnipe",
+      "cmc": 3.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Guttersnipe",
+      "preflight_status": "pass",
+      "role": "noncombat_spell_pressure_payoff",
+      "type_line": "Creature \u2014 Goblin Shaman",
+      "value_test": "Turns spell chaining into direct table pressure, but must be measured against protection and closing-window timing.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Storm-Kiln Artist",
+      "cmc": 4.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Storm-Kiln Artist",
+      "preflight_status": "pass",
+      "role": "spell_payoff_mana_extension",
+      "type_line": "Creature \u2014 Dwarf Shaman",
+      "value_test": "Extends spell-chain turns through treasure production; prior internal evidence forbids treating it as a generic Arcane Signet replacement.",
+      "verified_auto_battle_rule_count": 1
+    }
+  ],
+  "primary_package_preflight_summary": {
+    "all_primary_preflight_pass": true,
+    "already_in_607_count": 0,
+    "commander_legal_count": 4,
+    "oracle_cache_present_count": 4,
+    "primary_package_size": 4,
+    "verified_auto_battle_rule_count": 4
+  },
+  "protected_607_anchors": [
+    "Bender's Waterskin",
+    "Victory Chimes",
+    "Molecule Man",
+    "The Scarlet Witch",
+    "The Mind Stone",
+    "Insurrection",
+    "Storm Herd",
+    "Creative Technique",
+    "Sensei's Divining Top",
+    "Scroll Rack",
+    "Land Tax",
+    "Approach of the Second Sun"
+  ],
+  "secondary_research_queue_preflight": [
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Goldspan Dragon",
+      "cmc": 5.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Goldspan Dragon",
+      "preflight_status": "pass",
+      "role": "research_queue",
+      "type_line": "Creature \u2014 Dragon",
+      "value_test": "Higher-curve treasure pressure candidate; not part of the first compact package.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Dragon's Rage Channeler",
+      "cmc": 1.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Dragon's Rage Channeler",
+      "preflight_status": "pass",
+      "role": "research_queue",
+      "type_line": "Creature \u2014 Human Shaman",
+      "value_test": "Cheap selection/pressure candidate; requires delirium and topdeck-risk review.",
+      "verified_auto_battle_rule_count": 1
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 0,
+      "blockers": [
+        "missing_verified_auto_battle_rule"
+      ],
+      "card_name": "Burning Prophet",
+      "cmc": 2.0,
+      "color_identity_json": "[\"R\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Burning Prophet",
+      "preflight_status": "blocked",
+      "role": "research_queue",
+      "type_line": "Creature \u2014 Human Wizard",
+      "value_test": "Low-curve spell-scry pressure candidate; likely diagnostic only until proven.",
+      "verified_auto_battle_rule_count": 0
+    },
+    {
+      "already_in_607": false,
+      "battle_rule_count": 1,
+      "blockers": [],
+      "card_name": "Velomachus Lorehold",
+      "cmc": 7.0,
+      "color_identity_json": "[\"R\", \"W\"]",
+      "commander_legal_status": "legal",
+      "oracle_cache_status": "present",
+      "oracle_name": "Velomachus Lorehold",
+      "preflight_status": "pass",
+      "role": "research_queue",
+      "type_line": "Legendary Creature \u2014 Elder Dragon",
+      "value_test": "High-curve spell access threat; likely too slow unless a separate shell proves it.",
+      "verified_auto_battle_rule_count": 1
+    }
+  ],
+  "source_db_mutated": false,
+  "source_diagnostic": {
+    "diagnostic_key": "pressure_safe_spell_payoff_micro_shell",
+    "predeclared_requirements": [
+      "Preserve the 607 mana, topdeck, miracle, protection, and pressure anchors.",
+      "Add only a compact spell-payoff pressure package before expanding the shell.",
+      "Require structure matrix alignment before any smoke battle.",
+      "Promote only if equal gate ties or beats 607 and Winota does not regress.",
+      "Require direct card events for the pressure package before card-level claims."
+    ],
+    "priority_score": 12,
+    "readiness": "design_next",
+    "why": "Targets the known pressure/closing-window weakness without asking for a generic one-for-one cut."
+  },
+  "summary": {
+    "decision_status": "preflight_pass_cut_pool_required",
+    "legal_variant_generation_allowed_now": false,
+    "natural_battle_gate_allowed_now": false,
+    "primary_package_size": 4,
+    "protected_607_anchor_count": 12,
+    "ready_deck_change_count": 0,
+    "ready_for_cut_pool_resolver": true,
+    "recommended_next_action": "build_pressure_safe_cut_pool_resolver_before_variant_battle",
+    "required_cut_count_before_legal_variant": 4
+  }
+}
