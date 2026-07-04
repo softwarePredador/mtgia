@@ -9695,6 +9695,52 @@ new server:
   `xmage_static_self_protection_from_card_types_creature` with `11` cards each,
   and `xmage_creature_attack_target_keyword_until_eot` with `10` cards.
 
+## 2026-07-04 PG449 Damage Exile If Dies Closure
+
+- Closed the exact XMage fixed damage plus exile-if-dies spell family as
+  ManaLoom scope `xmage_fixed_damage_target_exile_if_dies_spell_v1`.
+- The selected package accepted local XMage spells whose source combines
+  `DamageTargetEffect` with `ExileTargetIfDiesEffect`, with Oracle/source
+  agreement on fixed damage, supported target class, and exile-if-dies
+  replacement behavior.
+- The batch covers `12` cards: Bot Bashing Time, Elspeth's Smite, Fanged
+  Flames, Feed the Flames, Flame-Blessed Bolt, Lava Coil, Magma Spray,
+  Obliterating Bolt, Puncturing Blow, Reduce to Ashes, Scorching Dragonfire,
+  and Scorchmark.
+- Focused mapper/runtime tests covered exact damage plus exile-if-dies source
+  selection, creature-or-planeswalker target support, additional-cost blocking,
+  activated-permanent blocking, and lethal-damage exile behavior; PG449
+  performed no code mutation. The focused test lane passed `718` checks.
+- The PostgreSQL package promoted `12` cards. Precheck found `12` target rows,
+  `0` missing targets, `0` existing expected rows, and `0` shadow rows to
+  deprecate; apply/postcheck verified `12/12` promoted rows as
+  `verified`/`auto` with Oracle hashes. The apply backup captured `0` rows;
+  `failed_cards=[]`.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `4339` PostgreSQL runtime rows, wrote `4331` SQLite runtime
+  rows, and exported `4306` canonical fallback rows.
+- PG449 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `12` selected cards. Generic
+  battle scenario count remained `0`; damage plus exile-if-dies behavior
+  remains covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface (`39/39`), legacy contamination
+  (`32/32`), and PG/Hermes/SQLite contract (`51/51`).
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26547`, `xmage_authoritative_source_count=26233`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26233`. This is an exact
+  reduction of `12` from the post-PG448 queue.
+- The post-PG449 exact split recheck reports `proposal_count=208` and
+  `safe_for_batch_pg_package_count=208`. The largest remaining exact families
+  are `xmage_fixed_draw_spell` with `12` cards,
+  `xmage_static_self_cant_be_blocked_creature` and
+  `xmage_static_self_protection_from_card_types_creature` with `11` cards each,
+  followed by `xmage_creature_attack_target_keyword_until_eot` and
+  `xmage_fixed_damage_spell` with `10` cards each.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

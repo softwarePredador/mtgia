@@ -10217,6 +10217,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d9692140b06619e1fb472205c995224b"
   },
+  "Bot Bashing Time": {
+    "amount": 6,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 6,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a7da533e49853cbf8e4a5b43631bf2fc",
+    "battle_rule_oracle_hash": "67e437e3a8187ee229930b0ab1612a84"
+  },
   "Botanical Plaza": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -24689,6 +24716,34 @@
     "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
     "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
+  "Elspeth's Smite": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:6a9e2c540e2ef67377d637edfb05cee1",
+    "battle_rule_oracle_hash": "34755e1be497b61da78f77e5861b6822"
+  },
   "Elven Cache": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -27326,6 +27381,34 @@
     "battle_rule_logical_key": "battle_rule_v1:2850ce96f84583b510eac2c0ad840fa3",
     "battle_rule_oracle_hash": "13cecae816b64406aa3f621ad48976b3"
   },
+  "Fanged Flames": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature_or_planeswalker",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0b23905863b021edd3a97ba78bfb32ca",
+    "battle_rule_oracle_hash": "cbdcc5f559e76ddb1fba7a8c49b95588"
+  },
   "Fangren Hunter": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -27640,6 +27723,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8783617a8d44c4f2e0242d17976f8828",
     "battle_rule_oracle_hash": "9d3f44ba9a777ab7510132842a854475"
+  },
+  "Feed the Flames": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4f3ea4eabca25c95c2525886a0c65a9c",
+    "battle_rule_oracle_hash": "71bae3916a02f627931b86fbc2bc7c26"
   },
   "Feed the Serpent": {
     "battle_model_scope": "xmage_exile_target_spell_v1",
@@ -29222,6 +29332,34 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:7a932c36df79f966f5f144a3b3a87d84",
     "battle_rule_oracle_hash": "db2deb4a84e2c517c85ae1d933ed708d"
+  },
+  "Flame-Blessed Bolt": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 2,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature_or_planeswalker",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0260a8c11989a2b8375c4717dc6b3361",
+    "battle_rule_oracle_hash": "8c29d5792a7c71d3debe5d3f9e06bbde"
   },
   "Flamecast Wheel": {
     "_activated_rule_effects": [
@@ -45404,6 +45542,33 @@
     "battle_rule_logical_key": "battle_rule_v1:88f0e11e2132483b7dd719057fa15e81",
     "battle_rule_oracle_hash": "63af38a612bc914f551896f7dffa9101"
   },
+  "Lava Coil": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:00f072b0c13f2f6710f402ff7cf15fc8",
+    "battle_rule_oracle_hash": "b5658f51fc5b9f2a86c0302c7665a0c4"
+  },
   "Lava Dart": {
     "amount": 1,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -47467,6 +47632,33 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:c3edfce465174a85507af4db418b2afb",
     "battle_rule_oracle_hash": "809522892bd5bb1abae8e9c80e1f7d34"
+  },
+  "Magma Spray": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 2,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:001df6fe0862f863a88aa1fc27841a74",
+    "battle_rule_oracle_hash": "76241ca8f5ff7d8bad5c0771650321d3"
   },
   "Magmakin Artillerist": {
     "ability_kind": "triggered",
@@ -54504,6 +54696,34 @@
     "battle_rule_logical_key": "battle_rule_v1:a2f35d6b036f3a370dad1e4324e6bea9",
     "battle_rule_oracle_hash": "435ababd4f473e2e72b617af4bae2927"
   },
+  "Obliterating Bolt": {
+    "amount": 4,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 4,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature_or_planeswalker",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:0b23905863b021edd3a97ba78bfb32ca",
+    "battle_rule_oracle_hash": "52fbf2ba566570f29f83416740b783f9"
+  },
   "Oboro Breezecaller": {
     "ability_kind": "activated",
     "activated_untap_lands_for_mana_unlock": true,
@@ -59603,6 +59823,33 @@
     "battle_rule_logical_key": "battle_rule_v1:0179c6cc3d20112655e43b1269bf2290",
     "battle_rule_oracle_hash": "47b957743aff1829adc112fbe08e0e01"
   },
+  "Puncturing Blow": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:591bd8909ef06dcc4127e24b0d952e7d",
+    "battle_rule_oracle_hash": "dbf801bc943efd39819ea09ff4897a36"
+  },
   "Purge": {
     "battle_model_scope": "xmage_destroy_target_spell_v1",
     "destination": "graveyard",
@@ -62954,6 +63201,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e78fc833fc5528c9fff3788f2d82d5d0",
     "battle_rule_oracle_hash": "43b0f9e8d3e2fc829b55e89d812750cd"
+  },
+  "Reduce to Ashes": {
+    "amount": 5,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 5,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": false,
+    "sorcery": true,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:591bd8909ef06dcc4127e24b0d952e7d",
+    "battle_rule_oracle_hash": "53e679871c65ac7ce23f480a6cc58fe4"
   },
   "Reef Roads": {
     "effect": "land",
@@ -68940,6 +69214,34 @@
     "battle_rule_logical_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
     "battle_rule_oracle_hash": "abbd038551095cf4c7ea527274d87eda"
   },
+  "Scorching Dragonfire": {
+    "amount": 3,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 3,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature_or_planeswalker",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature_or_planeswalker",
+    "target_constraints": {
+      "card_types": [
+        "creature",
+        "planeswalker"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d8158e4630695dfb123c559adf5c6669",
+    "battle_rule_oracle_hash": "eb4b58cb260c7ed83fb61f407f095f88"
+  },
   "Scorching Missile": {
     "amount": 4,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -69001,6 +69303,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e1e2f2f2c340bd000faf9ec8501492fe",
     "battle_rule_oracle_hash": "821d054bc2827d9d2311ea1213be9311"
+  },
+  "Scorchmark": {
+    "amount": 2,
+    "battle_model_scope": "xmage_fixed_damage_target_exile_if_dies_spell_v1",
+    "damage": 2,
+    "effect": "direct_damage",
+    "exile_if_dies_from_damage": true,
+    "exile_if_dies_target": "creature",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_classes": [
+      "DamageTargetEffect",
+      "ExileTargetIfDiesEffect"
+    ],
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:001df6fe0862f863a88aa1fc27841a74",
+    "battle_rule_oracle_hash": "4e2b75865e1ef6c6a3a22a3e70cc4342"
   },
   "Scorpion's Sting": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
