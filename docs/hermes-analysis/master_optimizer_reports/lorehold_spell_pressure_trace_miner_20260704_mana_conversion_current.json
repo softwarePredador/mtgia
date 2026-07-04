@@ -1,0 +1,208 @@
+{
+  "artifact_type": "lorehold_spell_pressure_trace_miner",
+  "candidate_games": [
+    {
+      "core_card_event_counts": {
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Sensei's Divining Top": 1,
+        "spell_cast:Bender's Waterskin": 1,
+        "spell_cast:Sensei's Divining Top": 1,
+        "spell_resolved:Sensei's Divining Top": 1
+      },
+      "core_event_total": 10,
+      "core_strategic_event_counts": {
+        "lorehold_spell_cast": 5
+      },
+      "game_id": "challenger_lorehold_spell_pressure_mana_conversion_v1:Fixed Lorehold deck 607:0",
+      "observed_pressure_cards": [],
+      "opponent": "Fixed Lorehold deck 607",
+      "pressure_card_event_counts": {},
+      "pressure_conversion_event_counts": {},
+      "pressure_conversion_event_total": 0,
+      "pressure_event_total": 0,
+      "reason": "life_zero|found=False|countered=0",
+      "result": "loss",
+      "turns": 6
+    },
+    {
+      "core_card_event_counts": {
+        "cost_paid:Bender's Waterskin": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "spell_cast:Bender's Waterskin": 1
+      },
+      "core_event_total": 18,
+      "core_strategic_event_counts": {
+        "lorehold_spell_cast": 11,
+        "miracle_cast": 4
+      },
+      "game_id": "challenger_lorehold_spell_pressure_mana_conversion_v1:Vivi Ornitier #99 (real):0",
+      "observed_pressure_cards": [
+        "Storm-Kiln Artist"
+      ],
+      "opponent": "Vivi Ornitier #99 (real)",
+      "pressure_card_event_counts": {
+        "cost_paid:Storm-Kiln Artist": 1
+      },
+      "pressure_conversion_event_counts": {},
+      "pressure_conversion_event_total": 0,
+      "pressure_event_total": 1,
+      "reason": "elimination",
+      "result": "win",
+      "turns": 13
+    },
+    {
+      "core_card_event_counts": {
+        "cost_paid:Library of Leng": 1,
+        "cost_paid:Lorehold, the Historian": 1,
+        "spell_cast:Library of Leng": 1,
+        "spell_resolved:Library of Leng": 1,
+        "topdeck_manipulation_activated:Sensei's Divining Top": 2
+      },
+      "core_event_total": 23,
+      "core_strategic_event_counts": {
+        "lorehold_spell_cast": 6,
+        "lorehold_upkeep_rummage": 7,
+        "miracle_cast": 2,
+        "topdeck_manipulation_activated": 2
+      },
+      "game_id": "challenger_lorehold_spell_pressure_mana_conversion_v1:Sisay, Weatherlight Captain #61 (real):0",
+      "observed_pressure_cards": [],
+      "opponent": "Sisay, Weatherlight Captain #61 (real)",
+      "pressure_card_event_counts": {},
+      "pressure_conversion_event_counts": {},
+      "pressure_conversion_event_total": 0,
+      "pressure_event_total": 0,
+      "reason": "life_zero|found=False|countered=0",
+      "result": "loss",
+      "turns": 7
+    },
+    {
+      "core_card_event_counts": {
+        "cost_paid:Lorehold, the Historian": 1,
+        "cost_paid:Scroll Rack": 1,
+        "spell_cast:Scroll Rack": 1,
+        "spell_resolved:Scroll Rack": 1
+      },
+      "core_event_total": 14,
+      "core_strategic_event_counts": {
+        "lorehold_spell_cast": 4,
+        "miracle_cast": 2,
+        "topdeck_manipulation_activated": 4
+      },
+      "game_id": "challenger_lorehold_spell_pressure_mana_conversion_v1:Winota, Joiner of Forces #39 (real):0",
+      "observed_pressure_cards": [],
+      "opponent": "Winota, Joiner of Forces #39 (real)",
+      "pressure_card_event_counts": {},
+      "pressure_conversion_event_counts": {},
+      "pressure_conversion_event_total": 0,
+      "pressure_event_total": 0,
+      "reason": "elimination",
+      "result": "win",
+      "turns": 11
+    }
+  ],
+  "decision": {
+    "confirmation_allowed": false,
+    "keep_607_as_protected_baseline": true,
+    "next_actions": [
+      "do_not_confirm_current_spell_pressure_mana_conversion_shell",
+      "treat_storm_kiln_cost_paid_as_exposure_not_conversion_proof",
+      "repair_structural_overfill_before_larger_seed_window",
+      "keep_607_protected_until_head_to_head_and_conversion_trace_pass"
+    ],
+    "promotion_allowed": false
+  },
+  "deck_607_mutated": false,
+  "deckbuilding_priority_update": {
+    "demote_until_proven": [
+      "Young Pyromancer",
+      "Monastery Mentor"
+    ],
+    "next_pressure_priority": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "protect_607_baseline": true,
+    "protect_engine_cards": [
+      "Bender's Waterskin",
+      "Library of Leng",
+      "Scroll Rack",
+      "Sensei's Divining Top",
+      "The Mind Stone",
+      "The Scarlet Witch",
+      "Victory Chimes"
+    ],
+    "reason": "Pressure cards are only useful when they execute their role inside the protected Lorehold topdeck/miracle engine. A mere cost-paid or cast event is exposure, not proof of conversion; require a trigger, damage, mana-conversion, or spell-resolution signal before treating the pressure package as learned value."
+  },
+  "external_learning": [
+    {
+      "learning": "The current optimized average shows Topdeck and Spellslinger together, and includes Guttersnipe, Storm-Kiln Artist, Scroll Rack, Sensei's Divining Top, Bender's Waterskin, and Victory Chimes as one coherent shell.",
+      "source": "EDHREC average optimized spellslinger",
+      "url": "https://edhrec.com/average-decks/lorehold-the-historian/optimized/spellslinger"
+    },
+    {
+      "learning": "Lorehold wants a high instant/sorcery density to avoid miracle duds; Bender's Waterskin is specifically useful because it untaps on opposing turns for miracle costs.",
+      "source": "EDHREC Boros Miracles budget article",
+      "url": "https://edhrec.com/articles/lorehold-the-historian-boros-miracles-on-a-budget"
+    },
+    {
+      "learning": "Pressure cards are valid only as support for the topdeck/miracle plan: Monastery Mentor and Young Pyromancer create bodies, while Guttersnipe converts spell chains into damage.",
+      "source": "GameTyrant Lorehold deck tech",
+      "url": "https://gametyrant.com/news/how-to-build-a-lorehold-the-historian-commander-deck-deck-tech"
+    },
+    {
+      "learning": "Lorehold is a cost-reducing, miracle-making rummage commander, so engine timing and resource conversion outrank generic creature pressure.",
+      "source": "Card Kingdom Lorehold synergy article",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    }
+  ],
+  "generated_at": "2026-07-04T23:04:17Z",
+  "postgres_writes": false,
+  "sisay_win_trace": {},
+  "source_db_mutated": false,
+  "source_reports": {
+    "battle_gate": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_fixed607_gate.json",
+    "matrix": "docs/hermes-analysis/master_optimizer_reports/lorehold_from_scratch_challengers_20260704_spell_pressure_mana_conversion_matrix.json"
+  },
+  "status": "pressure_trace_partial_presence_not_conversion_proof",
+  "summary": {
+    "baseline_key": "deck_607",
+    "baseline_rank": 1,
+    "baseline_record": {
+      "games": 4,
+      "losses": 4,
+      "stalls": 0,
+      "wins": 0
+    },
+    "candidate_key": "challenger_lorehold_spell_pressure_mana_conversion_v1",
+    "candidate_loss_count": 2,
+    "candidate_rank": 2,
+    "candidate_record": {
+      "games": 4,
+      "losses": 2,
+      "stalls": 0,
+      "wins": 2
+    },
+    "candidate_win_count": 2,
+    "confirmation_allowed": false,
+    "failure_modes": [
+      "head_to_head_lost_to_607",
+      "pressure_seen_without_conversion_events",
+      "still_structurally_below_607"
+    ],
+    "losses_with_pressure_card_events": 0,
+    "losses_with_pressure_conversion_events": 0,
+    "pressure_cards_by_result": {
+      "win": [
+        "Storm-Kiln Artist"
+      ]
+    },
+    "promotion_allowed": false,
+    "tested_pressure_cards": [
+      "Guttersnipe",
+      "Storm-Kiln Artist"
+    ],
+    "wins_with_pressure_card_events": 1,
+    "wins_with_pressure_conversion_events": 0
+  }
+}

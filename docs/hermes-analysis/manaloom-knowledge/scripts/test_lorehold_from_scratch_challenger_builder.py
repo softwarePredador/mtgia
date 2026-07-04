@@ -14,6 +14,7 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
                 "miracle_pressure_conversion",
                 "miracle_topdeck_control",
                 "spellchain_big_sorcery",
+                "spell_pressure_mana_conversion",
                 "spell_pressure_topdeck",
                 "recursion_discard_engine",
                 "recursion_discard_pressure_repair",
@@ -109,6 +110,42 @@ class LoreholdFromScratchChallengerBuilderTest(unittest.TestCase):
             "The Scarlet Witch",
         ):
             self.assertIn(card_name, names)
+        self.assertEqual(candidate["quantity_total"], 100)
+        self.assertEqual(candidate["land_quantity"], 34)
+        self.assertEqual(candidate["missing_required_cards"], [])
+
+    def test_spell_pressure_mana_conversion_prioritizes_storm_kiln_over_token_pressure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            report = builder.build_all(
+                source_db=builder.DEFAULT_SOURCE_DB,
+                plan_keys=["spell_pressure_mana_conversion"],
+                corpus_deck_ids=list(builder.DEFAULT_CORPUS_DECK_IDS),
+                out_dir=Path(tmp),
+                stem="unit_from_scratch_spell_mana_conversion",
+                opponent_limit=3,
+                games=1,
+                game_timeout_seconds=5.0,
+            )
+
+        candidate = report["candidates"][0]
+        names = {card["card_name"] for card in candidate["final_deck"]}
+        for card_name in (
+            "Guttersnipe",
+            "Storm-Kiln Artist",
+            "Sensei's Divining Top",
+            "Scroll Rack",
+            "Library of Leng",
+            "Bender's Waterskin",
+            "Victory Chimes",
+            "Molecule Man",
+            "The Scarlet Witch",
+            "Jeska's Will",
+        ):
+            self.assertIn(card_name, names)
+        required = set(candidate["required_cards"])
+        self.assertNotIn("Young Pyromancer", required)
+        self.assertNotIn("Monastery Mentor", required)
+        self.assertEqual(candidate["candidate_key"], "challenger_lorehold_spell_pressure_mana_conversion_v1")
         self.assertEqual(candidate["quantity_total"], 100)
         self.assertEqual(candidate["land_quantity"], 34)
         self.assertEqual(candidate["missing_required_cards"], [])
