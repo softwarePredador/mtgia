@@ -4489,6 +4489,79 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             [],
         )
 
+    def test_counter_draw_scope_is_stack_response_and_draws_on_counter(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        responder = self.battle.Player(
+            "Responder",
+            None,
+            [{"name": "Fresh Draw", "type_line": "Instant", "cmc": 1}],
+        )
+        responder.mana_pool.add_generic(2)
+        responder.mana_pool.add("blue", 1)
+        counter = {
+            "name": "Fixture Exclude",
+            "type_line": "Instant",
+            "mana_cost": "{2}{U}",
+            "cmc": 3,
+            "effect": "counter",
+            "battle_model_scope": "xmage_counter_target_and_draw_card_spell_v1",
+            "target": "creature_spell",
+            "target_constraints": {"zone": "stack", "stack_object": "spell", "card_types": ["creature"]},
+            "draw_on_counter": 1,
+            "_composite_rule_components": [
+                {
+                    "effect": "counter",
+                    "battle_model_scope": "xmage_counter_target_spell_v1",
+                    "target": "creature_spell",
+                    "target_constraints": {
+                        "zone": "stack",
+                        "stack_object": "spell",
+                        "card_types": ["creature"],
+                    },
+                },
+                {
+                    "effect": "draw_cards",
+                    "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
+                    "count": 1,
+                    "compose_on_resolution": True,
+                },
+            ],
+            "instant": True,
+        }
+        responder.hand.append(counter)
+        target_spell = {
+            "name": "Target Finisher",
+            "type_line": "Creature - Dragon",
+            "cmc": 7,
+            "effect": "finisher",
+        }
+        stack = self.battle.Stack()
+        stack.push(target_spell, active, {"effect": "finisher"})
+
+        self.assertTrue(
+            self.battle.priority_round(
+                active,
+                [active, responder],
+                stack,
+                turn=8,
+                rng=random.Random(8),
+                phase="precombat_main",
+            )
+        )
+
+        self.assertTrue(stack.items[-1].countered)
+        self.assertEqual([card["name"] for card in responder.hand], ["Fresh Draw"])
+        self.assertEqual([card["name"] for card in responder.graveyard], ["Fixture Exclude"])
+        self.assertTrue(
+            any(
+                event == "spell_countered"
+                and data.get("counter") == "Fixture Exclude"
+                and data.get("target") == "Target Finisher"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_return_target_creature_to_owner_hand_moves_from_battlefield_to_hand(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

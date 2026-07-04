@@ -3217,6 +3217,57 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["target_constraints"]["spell_colors"], ["U"])
         self.assertTrue(effect["requires_blue_target"])
 
+    def test_counter_draw_spell_maps_to_counter_runtime_with_draw_on_counter(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Counter target creature spell. Draw a card."),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "counter")
+        self.assertEqual(effect["battle_model_scope"], split.COUNTER_DRAW_SCOPE)
+        self.assertEqual(effect["target"], "creature_spell")
+        self.assertEqual(effect["draw_on_counter"], 1)
+        self.assertEqual(
+            effect["target_constraints"],
+            {"zone": "stack", "stack_object": "spell", "card_types": ["creature"]},
+        )
+        self.assertEqual(
+            [component["effect"] for component in effect["_composite_rule_components"]],
+            ["counter", "draw_cards"],
+        )
+
+    def test_counter_draw_spell_with_activated_ability_target_stays_blocked(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "Counter target activated ability. "
+                    "(Mana abilities can't be targeted.) Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addEffect(new CounterTargetEffect());"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect());"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "counter_draw_target_not_supported")
+
     def test_counter_spell_with_unless_clause_stays_blocked(self) -> None:
         row = queue_row(split.COUNTER_UNIT, effect_classes=["CounterTargetEffect"])
         proposal, reason = split.split_row(

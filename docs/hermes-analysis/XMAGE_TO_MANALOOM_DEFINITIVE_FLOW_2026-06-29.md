@@ -177,21 +177,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg369_activated_recursion_costs_wave_recheck.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg374_bounce_draw_spell_wave_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260702_post_pg374_bounce_draw_spell_wave_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg375_counter_draw_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg375_counter_draw_new_server_recheck.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `27045`
-- XMage authoritative source resolved: `26731`
+- target all-card battle-gap identities: `27039`
+- XMage authoritative source resolved: `26725`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26731`
+- XMage authoritative adapter required: `26725`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9884`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26731` identities, card semantics are accepted from XMage; work is now
+- For `26725` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -210,10 +212,11 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG374 Exact Adapter Waves
+## PG283-PG375 Exact Adapter Waves
 
-As of 2026-07-02, the PG283-PG374 all-card exact adapter waves are applied and
-synced.
+As of 2026-07-04, the PG283-PG375 all-card exact adapter waves are applied and
+synced. PG375 was applied against the new EasyPanel PostgreSQL target via the
+new-server tunnel and validated with `database_target=127.0.0.1:15432/halder`.
 
 Use
 `docs/hermes-analysis/manaloom-knowledge/scripts/xmage_authoritative_exact_scope_split.py`
@@ -261,6 +264,12 @@ patterns:
   resolution using the removal destination helper so the target moves to hand
   rather than graveyard ->
   `xmage_return_target_to_hand_and_draw_card_spell_v1`
+- `draw_cards::xmage_draw_card_variant_review_v1` with
+  `CounterTargetEffect + DrawCardSourceControllerEffect`, exact supported
+  "Counter target ... spell. Draw a card." Oracle/source text, stack-target
+  constraints already supported by the counter runtime, and draw-on-counter
+  metadata exercised by focused stack-response tests ->
+  `xmage_counter_target_and_draw_card_spell_v1`
 - `life_gain::xmage_life_gain_variant_review_v1` with
   `GainLifeEffect + EntersBattlefieldTriggeredAbility` on creatures and fixed
   Oracle/source amount ->
@@ -5692,6 +5701,36 @@ PG373-PG374 measured result:
 - Running the exact splitter after PG374 on supported units returns
   `proposal_count=0` over `7802` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
+
+PG375 measured result:
+
+- PG375 promoted `6` fixed counter-target plus draw-card spells into
+  `xmage_counter_target_and_draw_card_spell_v1`: `Bone to Ash`, `Contradict`,
+  `Dismiss`, `Exclude`, `Halt Order`, and `Scatter Arc`.
+- Unsupported neighbors remain deliberately blocked: activated-ability
+  counters (`Bind`, `Squelch`), spell-targeting restriction variants
+  (`Confound`, `Hindering Light`, `Keep Safe`), graveyard-cast restriction
+  (`Laquatus's Disdain`), and modal text (`School Daze`).
+- Focused splitter tests passed with `288` tests; focused exact runtime tests
+  passed with `173` tests; the runtime stack-response test proves
+  `draw_on_counter=1` draws a card while countering a legal creature spell.
+- PostgreSQL precheck matched `6/6` target card rows on the new server; apply
+  upserted `6` rows and deprecated `0` shadows; postcheck verified `6/6`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `6` PostgreSQL rows from the new target,
+  updated `6` SQLite rows, and exported `5023` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `6/6` cards.
+- Global all-card authoritative queue after PG375:
+  `target_identity_count=27039`, `xmage_authoritative_source_count=26725`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26725`.
+- Running the exact splitter after PG375 on supported units returns
+  `proposal_count=0` over `7796` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+- `db_helper.py` now prefers explicit process `DATABASE_URL` or complete
+  `DB_*`/`PG*` variables over any convenience `.env` loaded from the workspace,
+  preventing ignored old-server env files from overriding new-server commands.
 
 ## Why This Is The Best Current Flow
 

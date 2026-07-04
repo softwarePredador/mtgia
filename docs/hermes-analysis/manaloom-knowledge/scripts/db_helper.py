@@ -51,6 +51,24 @@ def load_dotenv_once() -> None:
 
 
 def get_database_url():
+    explicit_database_url = os.environ.get("DATABASE_URL")
+    explicit_host = os.environ.get("DB_HOST") or os.environ.get("PGHOST")
+    explicit_port = os.environ.get("DB_PORT") or os.environ.get("PGPORT") or "5432"
+    explicit_db_name = os.environ.get("DB_NAME") or os.environ.get("PGDATABASE")
+    explicit_user = os.environ.get("DB_USER") or os.environ.get("PGUSER")
+    explicit_password = os.environ.get("DB_PASS") or os.environ.get("PGPASSWORD")
+
+    if explicit_database_url:
+        return explicit_database_url
+    if all([explicit_host, explicit_db_name, explicit_user, explicit_password]):
+        return _database_url_from_parts(
+            host=explicit_host,
+            port=explicit_port,
+            db_name=explicit_db_name,
+            user=explicit_user,
+            password=explicit_password,
+        )
+
     load_dotenv_once()
 
     database_url = os.environ.get("DATABASE_URL")
@@ -76,6 +94,16 @@ def get_database_url():
             + ", ".join(missing)
         )
 
+    return _database_url_from_parts(
+        host=host,
+        port=port,
+        db_name=db_name,
+        user=user,
+        password=password,
+    )
+
+
+def _database_url_from_parts(*, host, port, db_name, user, password):
     dbname_safe = quote(str(db_name), safe="")
     user_safe = quote(str(user), safe="")
     password_safe = quote(str(password), safe="")

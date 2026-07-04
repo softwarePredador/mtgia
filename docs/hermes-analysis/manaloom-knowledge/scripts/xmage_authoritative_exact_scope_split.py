@@ -110,6 +110,7 @@ BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
+COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
 RECURSION_SCOPE = "xmage_return_target_graveyard_card_to_hand_spell_v1"
 RECURSION_MILL_RETURN_SCOPE = "xmage_mill_then_return_graveyard_card_to_hand_spell_v1"
@@ -917,6 +918,13 @@ def counter_target_from_oracle(metadata: dict[str, Any]) -> str | None:
         if re.match(pattern, text):
             return target
     return None
+
+
+def counter_draw_target_from_oracle(metadata: dict[str, Any]) -> str | None:
+    text = oracle_text(metadata)
+    if not text.endswith(" draw a card."):
+        return None
+    return counter_target_from_oracle({"oracle_text": text.removesuffix(" draw a card.").strip()})
 
 
 def counter_target_constraints_for(target: str) -> dict[str, Any]:
@@ -9093,6 +9101,52 @@ def split_row(
                 family_id="xmage_bounce_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes == {"CounterTargetEffect", "DrawCardSourceControllerEffect"}:
+            if ability_classes(row):
+                return None, "counter_draw_ability_class_not_simple"
+            if has_oracle_complexity(metadata):
+                return None, "counter_draw_oracle_not_simple"
+            target = counter_draw_target_from_oracle(metadata)
+            if target is None:
+                return None, "counter_draw_target_not_supported"
+            draw_count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
+            if draw_count != 1:
+                return None, "counter_draw_count_not_fixed"
+            counter_component = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "xmage_effect_class": "CounterTargetEffect",
+            }
+            draw_component = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_SCOPE,
+                "count": draw_count,
+                "compose_on_resolution": True,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+            }
+            effect_json = {
+                "effect": "counter",
+                "battle_model_scope": COUNTER_DRAW_SCOPE,
+                "target": target,
+                "target_constraints": counter_target_constraints_for(target),
+                "draw_on_counter": draw_count,
+                "draw_count": draw_count,
+                "count": draw_count,
+                "_composite_rule_components": [counter_component, draw_component],
+                "xmage_effect_classes": ["CounterTargetEffect", "DrawCardSourceControllerEffect"],
+                **flags,
+            }
+            if target == "blue_spell":
+                effect_json["requires_blue_target"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_counter_target_draw_card_spell",
+            ), "selected_exact_scope"
+
         if classes != {"DrawCardSourceControllerEffect"}:
             return None, "draw_effect_class_not_pure"
         count = java_constructor_int(source_text, "DrawCardSourceControllerEffect", default=1)
@@ -10478,6 +10532,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterTargetEffect + DrawCardSourceControllerEffect, exact supported counter-target spell Oracle text, and draw-on-counter runtime metadata",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

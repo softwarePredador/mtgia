@@ -167,10 +167,27 @@ Post-PG374 update:
 - final PG-Hermes-SQLite contract audit: `49/49` pass
 - delta since post-PG373: `5` identities promoted
 
+Post-PG375 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg375_counter_draw_new_server_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg375_counter_draw_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg375_counter_draw_new_server_supported_recheck.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg375_xmage_counter_draw_spell_wave_package.md`
+- target battle-gap identities in authoritative queue: `27039`
+- XMage authoritative source resolved: `26725`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26725`
+- adapter work-unit keys: `11429`
+- final PG-Hermes-SQLite contract audit: `status=pass`, `49 pass`, `1 warn`
+  (`deck_id_607_has_no_pg_deck_id_note`, unrelated to PG375)
+- delta since post-PG374: `6` identities promoted
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG374 queue above.
+historical only. The active execution baseline is the post-PG375 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -178,13 +195,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG374 control numbers:
+Current post-PG375 control numbers:
 
-- target battle-gap identities: `27045`
-- XMage-resolved authoritative source identities: `26731`
+- target battle-gap identities: `27039`
+- XMage-resolved authoritative source identities: `26725`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26731`
+- XMage authoritative adapter required: `26725`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -204,12 +221,12 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260702_post_pg374_bounce_draw_spell_wave_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG374, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg375_counter_draw_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG375, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
-   `draw_effect_class_not_pure` composite draw spells (`522` blockers),
+   `draw_effect_class_not_pure` composite draw spells (`511` blockers),
    `mana_source_effect_class_not_simple` artifact/creature mana permanents
    (`303` blockers), and then non-spell/triggered permanent families currently
    blocked by `not_instant_or_sorcery_spell`.
@@ -253,6 +270,20 @@ PG374 completion and PG375 starting hypothesis:
    added with a focused runtime test in the same cycle. If that fails, preserve
    blocker evidence and try the next measured subpattern; do not hand-write
    individual card rules.
+
+PG375 completion and PG376 starting hypothesis:
+
+1. PG375 promoted the exact
+   `CounterTargetEffect + DrawCardSourceControllerEffect` subset as
+   `xmage_counter_target_and_draw_card_spell_v1`, covering `6` fixed
+   counter-target spell plus draw-card spells: `Bone to Ash`, `Contradict`,
+   `Dismiss`, `Exclude`, `Halt Order`, and `Scatter Arc`.
+2. `Bind`, `Squelch`, `Confound`, `Hindering Light`, `Keep Safe`,
+   `Laquatus's Disdain`, and `School Daze` remain blocked by unsupported
+   target type/restriction or modal text, not by missing XMage source.
+3. The next cycle should continue splitting `draw_effect_class_not_pure`
+   (`511` blockers) unless a measured lane with higher safe reuse appears in
+   the refreshed queue.
 
 Fresh alignment evidence:
 
