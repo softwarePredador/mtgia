@@ -1,0 +1,622 @@
+{
+  "artifact_type": "lorehold_diagnostic_contract_planner",
+  "card_value_framework": [
+    {
+      "anti_pattern": "Cut lands or source quality to fit more famous spells before proving curve safety.",
+      "axis": "lands_and_mana_base",
+      "current_607_rule": "Preserve the 34-land floor unless a full-shell matrix proves a new curve.",
+      "value_test": "Color reliability, commander turn target, untapped sources, and spell-window support beat raw land power."
+    },
+    {
+      "anti_pattern": "Treat Mana Vault, Cloud Key, or another artifact as automatically better than Bender's Waterskin or Arcane Signet.",
+      "axis": "ramp_and_artifacts",
+      "current_607_rule": "Separate structural floor ramp from burst/high-power ramp.",
+      "value_test": "Ramp must improve Lorehold timing without reducing miracle cadence or pressure survival."
+    },
+    {
+      "anti_pattern": "Force The One Ring or another game changer into 607 after tested cuts already lost.",
+      "axis": "staples",
+      "current_607_rule": "A staple is a role-floor signal, not deck truth.",
+      "value_test": "Global power must survive commander-specific role fit, cut safety, direct use, and equal gate evidence."
+    },
+    {
+      "anti_pattern": "Add Approach/Lapse, Breach, Aetherflux, or token payoffs without a protection/pressure contract.",
+      "axis": "synergy_and_combo",
+      "current_607_rule": "Synergy must support topdeck/miracle setup, rummage, spell-chain conversion, protection, or pressure repair.",
+      "value_test": "A combo line is valuable only if the shell can access it, protect it, and still survive fast pressure."
+    },
+    {
+      "anti_pattern": "Use Creative Technique, Bender's Waterskin, Molecule Man, or other protected anchors as generic cuts.",
+      "axis": "cuts",
+      "current_607_rule": "No current seed-safe one-for-one cuts are available under the protected 607 contract.",
+      "value_test": "Each add needs a same-lane cut or a declared separate shell contract before battle promotion."
+    }
+  ],
+  "current_champion": "deck_607",
+  "external_reconciliation": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_evidence_reconciler_20260704_current.json",
+  "external_refresh_sources": [
+    {
+      "learning": "Approach lines are concrete but telegraphed; the second Approach must resolve, so protection/permission is part of the test contract.",
+      "source_key": "draftsim_approach_lapse_risk_refresh",
+      "url": "https://draftsim.com/lorehold-approach-combo/"
+    },
+    {
+      "learning": "Lorehold combo evidence clusters around Approach, spell-copy, Storm-Kiln, Birgi, Breach, token/damage payoff, and topdeck packages.",
+      "source_key": "edhrec_lorehold_combo_refresh",
+      "url": "https://edhrec.com/combos/lorehold-the-historian"
+    },
+    {
+      "learning": "Lorehold synergy must either reward discard/rummage or set up miracle timing; generic value is lower priority.",
+      "source_key": "draftsim_lorehold_synergy_refresh",
+      "url": "https://draftsim.com/lorehold-the-historian-edh-deck/"
+    },
+    {
+      "learning": "The commander identity is cost reduction, miracle timing, and rummage; candidate value must be measured against that identity.",
+      "source_key": "cardkingdom_lorehold_identity_refresh",
+      "url": "https://blog.cardkingdom.com/10-crazy-synergy-cards-for-lorehold-the-historian-secrets-of-strixhaven/"
+    }
+  ],
+  "generated_at": "2026-07-04T21:52:10Z",
+  "method_notes": [
+    "This planner is read-only and does not mutate PostgreSQL, SQLite, or deck rows.",
+    "Priority score ranks learning value, not permission to change deck 607.",
+    "Any natural battle gate still requires a named contract, structure matrix, equal opponent/seed window, and direct card-use evidence.",
+    "Forced-access diagnostics remain learning-only unless later natural confirmation passes the Lorehold promotion gate."
+  ],
+  "postgres_writes": false,
+  "ranked_diagnostics": [
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.25,
+          "matched_cards": [
+            "Storm-Kiln Artist"
+          ],
+          "missing_cards": [
+            "Guttersnipe",
+            "Monastery Mentor",
+            "Young Pyromancer"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "blockers": [
+        "not_a_current_one_for_one_cut",
+        "prior_internal_reject"
+      ],
+      "cards_checked": [
+        "Monastery Mentor",
+        "Young Pyromancer",
+        "Guttersnipe",
+        "Storm-Kiln Artist"
+      ],
+      "contract_type": "separate_micro_shell",
+      "diagnostic_key": "pressure_safe_spell_payoff_micro_shell",
+      "external_strength": "medium",
+      "known_internal_decisions": [
+        "Storm-Kiln Artist showed real strategic signal after runtime correction but regressed Winota when tested over Arcane Signet."
+      ],
+      "lane": "pressure_absorber",
+      "predeclared_requirements": [
+        "Preserve the 607 mana, topdeck, miracle, protection, and pressure anchors.",
+        "Add only a compact spell-payoff pressure package before expanding the shell.",
+        "Require structure matrix alignment before any smoke battle.",
+        "Promote only if equal gate ties or beats 607 and Winota does not regress.",
+        "Require direct card events for the pressure package before card-level claims."
+      ],
+      "priority_score": 12,
+      "readiness": "design_next",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "score_components": {
+        "external_strength": 3,
+        "mission_fit": 5,
+        "risk_penalty": 3,
+        "synthesis_openness": 4,
+        "testability": 3
+      },
+      "signal_key": "external_spell_pressure_creature_package",
+      "synthesis_status": "partial_or_uncovered_full_shell",
+      "tier": "primary_next_contract",
+      "why": "Targets the known pressure/closing-window weakness without asking for a generic one-for-one cut."
+    },
+    {
+      "best_coverages": [],
+      "blockers": [
+        "not_a_current_one_for_one_cut"
+      ],
+      "cards_checked": [
+        "Storm of Souls",
+        "Late to Dinner",
+        "Karmic Guide"
+      ],
+      "contract_type": "new_intent_profile",
+      "diagnostic_key": "discard_reanimator_alt_intent_profile",
+      "external_strength": "medium",
+      "known_internal_decisions": [],
+      "lane": "graveyard_recursion",
+      "predeclared_requirements": [
+        "Create a separate intent profile before any deck generation.",
+        "Do not compare as a 607 replacement until the archetype has its own matrix.",
+        "Require recursion payoff telemetry, not only graveyard-card density."
+      ],
+      "priority_score": 11,
+      "readiness": "design_next",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "score_components": {
+        "external_strength": 3,
+        "mission_fit": 1,
+        "risk_penalty": 0,
+        "synthesis_openness": 4,
+        "testability": 3
+      },
+      "signal_key": "external_discard_reanimator_alt_shell",
+      "synthesis_status": "partial_or_uncovered_full_shell",
+      "tier": "alternate_archetype_research",
+      "why": "This is likely a different Lorehold archetype, not an improvement to the protected 607 miracle shell."
+    },
+    {
+      "best_coverages": [],
+      "blockers": [
+        "no_named_cut_card"
+      ],
+      "cards_checked": [
+        "Lapse of Certainty"
+      ],
+      "contract_type": "forced_or_trace_diagnostic",
+      "diagnostic_key": "approach_lapse_permission_diagnostic",
+      "external_strength": "medium",
+      "known_internal_decisions": [],
+      "lane": "deterministic_finisher",
+      "predeclared_requirements": [
+        "Do not mutate deck 607.",
+        "First verify runtime/card-rule support and card access traces.",
+        "Treat forced-access results as learning only, not promotion.",
+        "Name a seed-safe same-lane cut before natural battle confirmation."
+      ],
+      "priority_score": 10,
+      "readiness": "research_or_diagnostic_only",
+      "recommended_action": "name_cut_or_model_as_diagnostic_only",
+      "score_components": {
+        "external_strength": 3,
+        "mission_fit": 4,
+        "risk_penalty": 2,
+        "synthesis_openness": 3,
+        "testability": 2
+      },
+      "signal_key": "external_approach_lapse_deterministic_line",
+      "synthesis_status": "blocked_no_named_cut",
+      "tier": "diagnostic_only_until_cut_exists",
+      "why": "Approach is already a 607 finisher; Lapse tests whether protection of the second Approach is worth a future slot, but no seed-safe cut exists."
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.167,
+          "matched_cards": [
+            "Mana Vault"
+          ],
+          "missing_cards": [
+            "Chrome Mox",
+            "Grim Monolith",
+            "Lion's Eye Diamond",
+            "Lotus Petal",
+            "Mox Diamond"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "blockers": [
+        "not_a_current_one_for_one_cut",
+        "prior_internal_reject"
+      ],
+      "cards_checked": [
+        "Chrome Mox",
+        "Mana Vault",
+        "Grim Monolith",
+        "Mox Diamond",
+        "Lion's Eye Diamond",
+        "Lotus Petal"
+      ],
+      "contract_type": "power_bracket_shell",
+      "diagnostic_key": "declared_high_power_fast_mana_shell",
+      "external_strength": "high",
+      "known_internal_decisions": [
+        "Mana Vault over Bender's Waterskin lost the confirmed 607 gate.",
+        "Fast-mana variants must not cut the 607 miracle-timing floor without pressure-safe proof."
+      ],
+      "lane": "early_plan",
+      "predeclared_requirements": [
+        "Declare bracket/power target before card selection.",
+        "Do not cut Bender's Waterskin as generic ramp.",
+        "Preserve pressure-survival and miracle cadence targets.",
+        "Require a full structure matrix and equal gate before promotion claims."
+      ],
+      "priority_score": 8,
+      "readiness": "research_or_diagnostic_only",
+      "recommended_action": "define_smaller_named_shell_contract_before_battle",
+      "score_components": {
+        "external_strength": 4,
+        "mission_fit": 2,
+        "risk_penalty": 5,
+        "synthesis_openness": 4,
+        "testability": 3
+      },
+      "signal_key": "external_cedh_fast_mana_engine",
+      "synthesis_status": "partial_or_uncovered_full_shell",
+      "tier": "later_full_shell_contract",
+      "why": "Fast mana is externally strong, but Mana Vault over Bender's Waterskin already lost, so this must be a declared high-power shell instead of a 607 one-card repair."
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_access_density_control_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "access_density_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+          "candidate_rank": 2,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_pressure_conversion"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_pressure_repair"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [],
+          "missing_cards": [],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "blockers": [],
+      "cards_checked": [],
+      "contract_type": "support_existing_607",
+      "diagnostic_key": "external_topdeck_miracle_anchor_floor_diagnostic",
+      "external_strength": "high",
+      "known_internal_decisions": [],
+      "lane": "topdeck_miracle_setup",
+      "predeclared_requirements": [],
+      "priority_score": 6,
+      "readiness": "support_current_607_no_new_test",
+      "recommended_action": "keep_current_anchor",
+      "score_components": {
+        "external_strength": 4,
+        "mission_fit": 1,
+        "risk_penalty": 0,
+        "synthesis_openness": 0,
+        "testability": 1
+      },
+      "signal_key": "external_topdeck_miracle_anchor_floor",
+      "synthesis_status": "supports_current_607",
+      "tier": "support_current_607_no_new_test",
+      "why": "Multiple external sources independently reinforce the current 607 topdeck/miracle floor rather than replacing it."
+    },
+    {
+      "best_coverages": [
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_access_density_control_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "access_density_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_pressure_conversion_v1",
+          "candidate_rank": 2,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_pressure_conversion"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_engine_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_engine"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_recursion_discard_pressure_repair_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 1.0,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Underworld Breach",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "recursion_discard_pressure_repair"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_miracle_topdeck_control_v1",
+          "candidate_rank": 3,
+          "coverage_ratio": 0.75,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [
+            "Underworld Breach"
+          ],
+          "shell_decision": "not_promotable_structure_below_607",
+          "shell_slug": "miracle_topdeck_control"
+        },
+        {
+          "baseline_rank": 1,
+          "candidate_key": "challenger_lorehold_spellchain_big_sorcery_v1",
+          "candidate_rank": 4,
+          "coverage_ratio": 0.75,
+          "matched_cards": [
+            "Aetherflux Reservoir",
+            "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+            "Wheel of Fortune"
+          ],
+          "missing_cards": [
+            "Underworld Breach"
+          ],
+          "shell_decision": "reject_confirmed_lost_to_607",
+          "shell_slug": "spellchain_big_sorcery"
+        }
+      ],
+      "blockers": [
+        "not_a_current_one_for_one_cut"
+      ],
+      "cards_checked": [
+        "Underworld Breach",
+        "Wheel of Fortune",
+        "Aetherflux Reservoir",
+        "Birgi, God of Storytelling // Harnfel, Horn of Bounty"
+      ],
+      "contract_type": "full_shell",
+      "diagnostic_key": "external_breach_wheel_aetherflux_conversion_shell_diagnostic",
+      "external_strength": "high",
+      "known_internal_decisions": [
+        "Prior miracle-pressure-conversion and recursion-discard shells produced useful telemetry but did not beat 607."
+      ],
+      "lane": "spell_chain_conversion",
+      "predeclared_requirements": [],
+      "priority_score": 2,
+      "readiness": "defer",
+      "recommended_action": "do_not_repeat_full_shell_without_new_contract_change",
+      "score_components": {
+        "external_strength": 4,
+        "mission_fit": 2,
+        "risk_penalty": 5,
+        "synthesis_openness": 0,
+        "testability": 1
+      },
+      "signal_key": "external_breach_wheel_aetherflux_conversion_shell",
+      "synthesis_status": "covered_by_existing_nonpromotable_shell",
+      "tier": "defer",
+      "why": "External data supports a compact high-power conversion shell, but prior broad shells failed and this needs a smaller named contract."
+    },
+    {
+      "best_coverages": [],
+      "blockers": [
+        "prior_internal_inconclusive_low_exposure",
+        "prior_internal_reject",
+        "proposed_cut_not_seed_safe"
+      ],
+      "cards_checked": [
+        "Brainstone",
+        "Planetarium of Wan Shi Tong"
+      ],
+      "contract_type": "same_lane_package",
+      "diagnostic_key": "external_brainstone_planetarium_topdeck_extension_diagnostic",
+      "external_strength": "medium",
+      "known_internal_decisions": [
+        "Brainstone deck-6 path was invalid for protected deck 607 in the current contract.",
+        "Planetarium of Wan Shi Tong over Creative Technique lost a natural gate and did not override 607."
+      ],
+      "lane": "topdeck_miracle_setup",
+      "predeclared_requirements": [],
+      "priority_score": -2,
+      "readiness": "blocked_until_cut_safety_changes",
+      "recommended_action": "do_not_gate_until_cut_safety_changes",
+      "score_components": {
+        "external_strength": 3,
+        "mission_fit": 1,
+        "risk_penalty": 7,
+        "synthesis_openness": 1,
+        "testability": 0
+      },
+      "signal_key": "external_brainstone_planetarium_topdeck_extension",
+      "synthesis_status": "blocked_by_cut_safety",
+      "tier": "blocked_until_cut_safety_changes",
+      "why": "External sources support these as topdeck tools, but the only named 607 cut is protected or previously rejected."
+    },
+    {
+      "best_coverages": [],
+      "blockers": [
+        "proposed_cut_not_seed_safe"
+      ],
+      "cards_checked": [
+        "The One Ring"
+      ],
+      "contract_type": "same_lane_package",
+      "diagnostic_key": "external_one_ring_value_engine_diagnostic",
+      "external_strength": "high_global_low_context",
+      "known_internal_decisions": [
+        "The One Ring was accessed and used in current 607 tests, but tested cuts lost to 607."
+      ],
+      "lane": "card_draw_selection",
+      "predeclared_requirements": [],
+      "priority_score": -4,
+      "readiness": "blocked_until_cut_safety_changes",
+      "recommended_action": "do_not_gate_until_cut_safety_changes",
+      "score_components": {
+        "external_strength": 2,
+        "mission_fit": 1,
+        "risk_penalty": 8,
+        "synthesis_openness": 1,
+        "testability": 0
+      },
+      "signal_key": "external_one_ring_value_engine",
+      "synthesis_status": "blocked_by_cut_safety",
+      "tier": "blocked_until_cut_safety_changes",
+      "why": "The One Ring is legal and a game changer, but current internal battle proof rejects the tested 607 cuts."
+    }
+  ],
+  "shell_synthesis": "docs/hermes-analysis/master_optimizer_reports/lorehold_external_shell_gate_synthesis_20260704_current.json",
+  "source_db_mutated": false,
+  "summary": {
+    "actionable_learning_count": 4,
+    "diagnostic_count": 8,
+    "keep_607_protected": true,
+    "readiness_counts": {
+      "blocked_until_cut_safety_changes": 2,
+      "defer": 1,
+      "design_next": 2,
+      "research_or_diagnostic_only": 2,
+      "support_current_607_no_new_test": 1
+    },
+    "ready_deck_change_count": 0,
+    "recommended_next_action": "build_pressure_safe_spell_payoff_micro_shell_contract",
+    "top_diagnostic_key": "pressure_safe_spell_payoff_micro_shell"
+  }
+}
