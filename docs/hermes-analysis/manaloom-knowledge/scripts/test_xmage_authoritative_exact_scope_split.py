@@ -122,6 +122,163 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "play_lands_from_graveyard_oracle_not_exact")
 
+    def test_dynamic_graveyard_count_damage_spells_map_to_runtime(self) -> None:
+        fixtures = [
+            {
+                "name": "Galvanic Bombardment",
+                "type_line": "Instant",
+                "oracle": (
+                    "Galvanic Bombardment deals X damage to target creature, where X is 2 plus "
+                    "the number of cards named Galvanic Bombardment in your graveyard."
+                ),
+                "source": """
+                    filter.add(new NamePredicate("Galvanic Bombardment"));
+                    Effect effect = new DamageTargetEffect(
+                        new GalvanicBombardmentCardsInControllerGraveyardCount(filter));
+                    this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+                """,
+                "target": "creature",
+                "scope": "controller_graveyard",
+                "card_names": ["Galvanic Bombardment"],
+                "base": 2,
+            },
+            {
+                "name": "Ire of Kaminari",
+                "type_line": "Instant - Arcane",
+                "oracle": (
+                    "Ire of Kaminari deals damage to any target equal to the number of Arcane cards "
+                    "in your graveyard."
+                ),
+                "source": """
+                    filter.add(SubType.ARCANE.getPredicate());
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(
+                        new CardsInControllerGraveyardCount(filter)));
+                    this.getSpellAbility().addTarget(new TargetAnyTarget());
+                """,
+                "target": "any_target",
+                "scope": "controller_graveyard",
+                "subtypes": ["arcane"],
+                "base": 0,
+            },
+            {
+                "name": "Kindle",
+                "type_line": "Instant",
+                "oracle": (
+                    "Kindle deals X damage to any target, where X is 2 plus the number of cards "
+                    "named Kindle in all graveyards."
+                ),
+                "source": """
+                    filter.add(new NamePredicate("Kindle"));
+                    Effect effect = new DamageTargetEffect(new KindleCardsInAllGraveyardsCount(filter));
+                    this.getSpellAbility().addTarget(new TargetAnyTarget());
+                """,
+                "target": "any_target",
+                "scope": "all_graveyards",
+                "card_names": ["Kindle"],
+                "base": 2,
+            },
+            {
+                "name": "Scrapyard Salvo",
+                "type_line": "Sorcery",
+                "oracle": (
+                    "Scrapyard Salvo deals damage to target player or planeswalker equal to the "
+                    "number of artifact cards in your graveyard."
+                ),
+                "source": """
+                    this.getSpellAbility().addTarget(new TargetPlayerOrPlaneswalker());
+                    this.getSpellAbility().addEffect(new DamageTargetEffect(
+                        new CardsInControllerGraveyardCount(new FilterArtifactCard())));
+                """,
+                "target": "player_or_planeswalker",
+                "scope": "controller_graveyard",
+                "card_types": ["artifact"],
+                "base": 0,
+            },
+        ]
+
+        for fixture in fixtures:
+            with self.subTest(card=fixture["name"]):
+                row = queue_row(
+                    split.RECURSION_UNIT,
+                    effect_classes=["DamageTargetEffect"],
+                    card_id=fixture["name"],
+                    xmage_signals=["targeting"],
+                )
+                proposal, reason = split.split_row(
+                    row,
+                    metadata(
+                        name=fixture["name"],
+                        type_line=fixture["type_line"],
+                        oracle_text=fixture["oracle"],
+                    ),
+                    source_text=fixture["source"],
+                )
+
+                self.assertEqual(reason, "selected_exact_scope")
+                effect = proposal["effect_json"]
+                self.assertEqual(effect["battle_model_scope"], split.GRAVEYARD_COUNT_DAMAGE_SCOPE)
+                self.assertEqual(effect["damage_amount_source"], "graveyard_card_count")
+                self.assertEqual(effect["target"], fixture["target"])
+                self.assertEqual(effect["graveyard_count_scope"], fixture["scope"])
+                self.assertEqual(effect["damage_base_amount"], fixture["base"])
+                if "card_names" in fixture:
+                    self.assertEqual(effect["graveyard_count_card_names"], fixture["card_names"])
+                if "subtypes" in fixture:
+                    self.assertEqual(effect["graveyard_count_subtypes"], fixture["subtypes"])
+                if "card_types" in fixture:
+                    self.assertEqual(effect["graveyard_count_card_types"], fixture["card_types"])
+
+    def test_dynamic_graveyard_count_damage_blocks_unsupported_neighbors(self) -> None:
+        row = queue_row(
+            split.RECURSION_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            xmage_signals=["targeting"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Frantic Firebolt",
+                type_line="Instant",
+                oracle_text=(
+                    "Frantic Firebolt deals X damage to target creature, where X is 2 plus the "
+                    "number of cards in your graveyard that are instant cards, sorcery cards, "
+                    "and/or have an Adventure."
+                ),
+            ),
+            source_text="""
+                filter.add(Predicates.or(
+                    CardType.INSTANT.getPredicate(),
+                    CardType.SORCERY.getPredicate(),
+                    AdventurePredicate.instance));
+                this.getSpellAbility().addEffect(new DamageTargetEffect(xValue));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_count_damage_adventure_filter_not_supported")
+
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Harvest Pyre",
+                type_line="Instant",
+                oracle_text=(
+                    "As an additional cost to cast this spell, exile X cards from your graveyard. "
+                    "Harvest Pyre deals X damage to target creature."
+                ),
+            ),
+            source_text="""
+                this.getSpellAbility().addCost(new ExileXFromYourGraveCost(
+                    StaticFilters.FILTER_CARDS_FROM_YOUR_GRAVEYARD));
+                this.getSpellAbility().addEffect(new DamageTargetEffect(GetXValue.instance));
+                this.getSpellAbility().addTarget(new TargetCreaturePermanent());
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "graveyard_count_damage_exile_x_graveyard_cost_not_supported")
+
     def test_return_all_graveyard_enchantments_to_battlefield_spell_maps_to_runtime(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

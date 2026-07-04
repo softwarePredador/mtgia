@@ -3,8 +3,9 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG389
-baseline and the stop criteria below.
+thread goal remains active, but execution must use the current post-PG401
+baseline in `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md` and the stop
+criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
 PG waves are implementation cycles inside this goal; they are not separate
@@ -118,6 +119,20 @@ Post-PG370 counts:
 - parser gaps after XMage source resolution: `0`
 - XMage authoritative adapter required: `26758`
 - adapter work-unit keys: `11429`
+
+Latest checkpoint:
+
+- As of PG401 on 2026-07-04, the new-server global authoritative queue is:
+  `target_identity_count=26756`,
+  `xmage_authoritative_source_count=26442`,
+  `xmage_missing_source_exception_count=314`,
+  `xmage_authoritative_parser_gap_count=0`, and
+  `xmage_authoritative_adapter_required_count=26442`.
+- Latest source artifacts:
+  `xmage_authoritative_adaptation_queue_20260704_post_pg401_dynamic_graveyard_damage_new_server_commander_legal.md`,
+  `global_card_oracle_battle_readiness_20260704_post_pg401_dynamic_graveyard_damage_new_server.md`,
+  and the PG401 package/evidence files listed in
+  `XMAGE_TO_MANALOOM_DEFINITIVE_FLOW_2026-06-29.md`.
 
 Post-PG372 update:
 

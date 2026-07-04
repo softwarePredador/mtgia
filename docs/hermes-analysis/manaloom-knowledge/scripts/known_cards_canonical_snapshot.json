@@ -33989,6 +33989,35 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ffcb16d3b969504cbd13c8b736552a3f"
   },
+  "Galvanic Bombardment": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 2,
+    "damage_per_graveyard_count": 1,
+    "effect": "direct_damage",
+    "graveyard_count_card_names": [
+      "Galvanic Bombardment"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": true,
+    "sorcery": false,
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:01661b56bea5a3130cd2584b41e60ad2",
+    "battle_rule_oracle_hash": "a63030de85a8efbe5d5cfb5812aacad0"
+  },
   "Galvanoth": {
     "ability_kind": "triggered",
     "battle_model_scope": "controller_upkeep_look_top_instant_or_sorcery_may_cast_without_paying_mana_v1",
@@ -43869,6 +43898,33 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "44ff1c77519cb7c55d2bd71bddcaf5da"
   },
+  "Ire of Kaminari": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "direct_damage",
+    "graveyard_count_scope": "controller_graveyard",
+    "graveyard_count_subtypes": [
+      "arcane"
+    ],
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:14bbef0a7472d0051f179a1f39198391",
+    "battle_rule_oracle_hash": "7a164fc97eec2cf77b86d03b602ac26c"
+  },
   "Irenicus's Vile Duplication": {
     "cmc": 4.0,
     "effect": "token_maker",
@@ -46666,6 +46722,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f4cebed22cdccdda520867221610197a",
     "battle_rule_oracle_hash": "5fcc8ba3e411e0240b7a0de584dc899b"
+  },
+  "Kindle": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 2,
+    "damage_per_graveyard_count": 1,
+    "effect": "direct_damage",
+    "graveyard_count_card_names": [
+      "Kindle"
+    ],
+    "graveyard_count_scope": "all_graveyards",
+    "instant": true,
+    "sorcery": false,
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a9db350295df3f3a11a1a18a541cd671",
+    "battle_rule_oracle_hash": "daa81fd00aeae9e0b48d50f284a4f46f"
   },
   "Kindle the Inner Flame": {
     "ability_kind": "triggered",
@@ -73744,6 +73827,33 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b2bcbf2dbafe43780992bc75976967fe",
     "battle_rule_oracle_hash": "cec4c3f81a746a934176bc31381355b8"
+  },
+  "Scrapyard Salvo": {
+    "amount": 0,
+    "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+    "damage": 0,
+    "damage_amount_source": "graveyard_card_count",
+    "damage_base_amount": 0,
+    "damage_per_graveyard_count": 1,
+    "effect": "direct_damage",
+    "graveyard_count_card_types": [
+      "artifact"
+    ],
+    "graveyard_count_scope": "controller_graveyard",
+    "instant": false,
+    "sorcery": true,
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:75b7f7990c05194d68d794d77aade7d6",
+    "battle_rule_oracle_hash": "65339ed7621226246a5b84a9f684b333"
   },
   "Scrawling Crawler": {
     "cmc": 3.0,

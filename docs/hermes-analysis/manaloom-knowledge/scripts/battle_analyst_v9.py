@@ -11056,6 +11056,10 @@ def target_matches_type(target, target_type):
     target_type = str(target_type or "").lower()
     if not target_type:
         return True
+    if target_type in ("player", "opponent"):
+        return False
+    if target_type == "player_or_planeswalker":
+        return is_planeswalker_permanent(target)
     if target_type == "any_target":
         return (
             is_battlefield_creature(target)
@@ -39806,11 +39810,15 @@ def trigger_white_instant_sorcery_lifegain_damage(
 
 
 def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, finish_spell=True, phase="resolution"):
-    raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
-    if raw_amount == "x_available":
-        amount = max(1, int(card.get("cmc") or 0), player.available_mana())
+    dynamic_amount, dynamic_amount_fields = dynamic_graveyard_damage_amount(player, opponents, effect_data)
+    if dynamic_amount is not None:
+        amount = dynamic_amount
     else:
-        amount = int(raw_amount)
+        raw_amount = effect_data.get("amount") or effect_data.get("damage") or 3
+        if raw_amount == "x_available":
+            amount = max(1, int(card.get("cmc") or 0), player.available_mana())
+        else:
+            amount = int(raw_amount)
     amount = apply_controller_noncombat_damage_modifiers(
         player,
         amount,
@@ -40003,6 +40011,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
                 controller_life_after=controller_life_after,
                 turn=turn,
                 phase=phase,
+                **dynamic_amount_fields,
                 **replay_rule_fields(effect_data),
             )
             trigger_white_instant_sorcery_lifegain_damage(
@@ -40026,6 +40035,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             result="no_legal_creature_target",
             turn=turn,
             phase=phase,
+            **dynamic_amount_fields,
             **replay_rule_fields(effect_data),
         )
         if finish_spell:
@@ -40065,6 +40075,7 @@ def apply_direct_damage(player, opponents, card, effect_data, turn, rng, *, fini
             controller_life_after=controller_life_after,
             turn=turn,
             phase=phase,
+            **dynamic_amount_fields,
             **replay_rule_fields(effect_data),
         )
         trigger_white_instant_sorcery_lifegain_damage(
@@ -41776,6 +41787,72 @@ def damage_amount_from_x_context(effect_data, default=0):
         return int(float(cast_context.get("x_value") or effect_data.get("x_value") or default or 0))
     except Exception:
         return int(default or 0)
+
+
+def _graveyard_damage_card_matches(card, effect_data):
+    if not isinstance(card, dict):
+        return False
+    allowed_types = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("graveyard_count_card_types"))
+        if str(value).strip()
+    ]
+    if allowed_types and not _card_type_matches(card, allowed_types):
+        return False
+    allowed_subtypes = [
+        str(value).strip().lower()
+        for value in _as_list(effect_data.get("graveyard_count_subtypes"))
+        if str(value).strip()
+    ]
+    if allowed_subtypes and not any(permanent_has_subtype(card, subtype) for subtype in allowed_subtypes):
+        return False
+    allowed_names = {
+        normalize_card_name(value)
+        for value in _as_list(effect_data.get("graveyard_count_card_names"))
+        if str(value).strip()
+    }
+    if allowed_names and normalize_card_name(card.get("name") or card.get("card_name") or "") not in allowed_names:
+        return False
+    return bool(allowed_types or allowed_subtypes or allowed_names)
+
+
+def dynamic_graveyard_damage_amount(player, opponents, effect_data):
+    if str(effect_data.get("damage_amount_source") or "").lower() != "graveyard_card_count":
+        return None, {}
+    scope = str(effect_data.get("graveyard_count_scope") or "controller_graveyard").lower()
+    if scope == "controller_graveyard":
+        graveyard_players = [player]
+    elif scope == "all_graveyards":
+        graveyard_players = [player] + list(opponents or [])
+    elif scope == "opponents_graveyards":
+        graveyard_players = list(opponents or [])
+    else:
+        return None, {
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": scope,
+            "graveyard_count_status": "unsupported_scope",
+        }
+    count = 0
+    for participant in graveyard_players:
+        for graveyard_card in getattr(participant, "graveyard", []) or []:
+            if _graveyard_damage_card_matches(graveyard_card, effect_data):
+                count += 1
+    try:
+        base_amount = int(float(effect_data.get("damage_base_amount") or 0))
+    except Exception:
+        base_amount = 0
+    try:
+        per_card = int(float(effect_data.get("damage_per_graveyard_count") or 1))
+    except Exception:
+        per_card = 1
+    amount = max(0, base_amount + (count * per_card))
+    return amount, {
+        "damage_amount_source": "graveyard_card_count",
+        "graveyard_count_scope": scope,
+        "graveyard_damage_count": count,
+        "damage_base_amount": base_amount,
+        "damage_per_graveyard_count": per_card,
+    }
 
 
 CONTROLLED_SOURCE_DAMAGE_DOUBLED_SCOPE = (

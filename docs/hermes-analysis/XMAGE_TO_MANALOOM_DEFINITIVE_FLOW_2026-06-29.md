@@ -242,21 +242,34 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg400_play_lands_from_graveyard_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg401_dynamic_graveyard_damage_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg401_dynamic_graveyard_damage_new_server_package_package.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg401_dynamic_graveyard_damage_new_server_apply_evidence.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg401_dynamic_graveyard_damage_new_server_pg_to_sqlite_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg401_dynamic_graveyard_damage_new_server_metadata_sync.json`
+- `docs/hermes-analysis/master_optimizer_reports/pg401_dynamic_graveyard_damage_new_server_e2e_validation.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg401_dynamic_graveyard_damage_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg401_dynamic_graveyard_damage_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg401_dynamic_graveyard_damage_new_server_recheck.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg401_dynamic_graveyard_damage_new_server_final.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26760`
-- XMage authoritative source resolved: `26446`
+- target all-card battle-gap identities: `26756`
+- XMage authoritative source resolved: `26442`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26446`
+- XMage authoritative adapter required: `26442`
 - ManaLoom adapter work-unit keys: `11427`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26446` identities, card semantics are accepted from XMage; work is now
+- For `26442` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -275,10 +288,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG400 Exact Adapter And Integrity Waves
+## PG283-PG401 Exact Adapter And Integrity Waves
 
-As of 2026-07-04, the PG283-PG400 all-card exact adapter waves are applied and
-synced. PG375-PG400 and the PG399b/PG399c integrity backfills were applied
+As of 2026-07-04, the PG283-PG401 all-card exact adapter waves are applied and
+synced. PG375-PG401 and the PG399b/PG399c integrity backfills were applied
 against the new EasyPanel PostgreSQL target via the new-server tunnel and
 validated with `database_target=127.0.0.1:15432/halder`.
 
@@ -6868,6 +6881,58 @@ PG400 measured result:
   graveyard land-play subpattern is therefore closed for currently safe exact
   scopes.
 
+PG401 measured result:
+
+- PG401 promoted `4` exact dynamic graveyard-count damage rules on the new
+  server: `Galvanic Bombardment`, `Ire of Kaminari`, `Kindle`, and
+  `Scrapyard Salvo`.
+- All rows use `xmage_dynamic_graveyard_count_damage_spell_v1`, sourced from
+  local XMage `DamageTargetEffect` with a supported dynamic value:
+  controller graveyard named-card count plus `2`, all-graveyards named-card
+  count plus `2`, controller graveyard subtype count, or controller graveyard
+  artifact-card count.
+- The splitter deliberately left unsupported neighbors blocked:
+  `Frantic Firebolt` remains
+  `graveyard_count_damage_adventure_filter_not_supported`; `Harvest Pyre` and
+  `Haunting Misery` remain
+  `graveyard_count_damage_exile_x_graveyard_cost_not_supported` until a
+  separate X-cost/graveyard-exile payment model exists.
+- Runtime now computes direct damage with
+  `damage_amount_source=graveyard_card_count`, supports
+  `controller_graveyard`, `all_graveyards`, and `opponents_graveyards`
+  counting scopes, filters by card type, subtype, or name, and emits
+  `graveyard_damage_count`, `graveyard_count_scope`, `damage_base_amount`, and
+  `damage_per_graveyard_count` in replay events. The target matcher now treats
+  `player`/`opponent` as non-permanent target types and restricts
+  `player_or_planeswalker` permanent candidates to planeswalkers.
+- Full exact splitter tests passed `373/373`, exact runtime tests passed
+  `217/217`, and `py_compile` passed for the changed splitter, runtime, and
+  test files.
+- PostgreSQL precheck matched `1` Oracle-hash-backed target row for each card
+  on the new server. Apply backed up `0` existing rows, deprecated `0` shadow
+  rows, and upserted `4` verified/auto rules. Postcheck verified `4/4`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync used `database_target=127.0.0.1:15432/halder`,
+  loaded `4135` PostgreSQL rows, updated `4130` SQLite rows, and exported
+  `5277` canonical snapshot rows. Metadata sync used the same new-server
+  target, matched `6282` PostgreSQL cards from `6087` unique requested names,
+  wrote `6209` SQLite alias rows, and backfilled `2699/2699` deck-card cache
+  rows with `108` local `card_id` updates.
+- E2E validation passed PostgreSQL source-of-truth, SQLite/Hermes cache,
+  canonical snapshot fallback, runtime `get_card_effect`, and no-override
+  stages for all four cards against `database_target=127.0.0.1:15432/halder`.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `51/51`.
+- Global all-card authoritative queue after PG401:
+  `target_identity_count=26756`, `xmage_authoritative_source_count=26442`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26442`.
+- Running the exact splitter after PG401 on supported units returned
+  `proposal_count=0` over `7596` considered supported rows. The dynamic
+  graveyard-count damage subpattern is therefore closed for currently safe
+  exact scopes.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -7498,10 +7563,10 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG400 queue on the new server, the next exact runtime-backed work should
+post-PG401 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
-1. `recursion::xmage_graveyard_return_variant_review_v1` - `1816`
+1. `recursion::xmage_graveyard_return_variant_review_v1` - `1812`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1610`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `851`

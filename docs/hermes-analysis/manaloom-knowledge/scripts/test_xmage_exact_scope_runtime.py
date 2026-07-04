@@ -2844,6 +2844,219 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_dynamic_graveyard_count_damage_counts_named_cards_in_all_graveyards(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 9
+        active.graveyard = [
+            {"name": "Kindle", "type_line": "Instant"},
+            {"name": "Other Spell", "type_line": "Instant"},
+        ]
+        opponent.graveyard = [
+            {"name": "Kindle", "type_line": "Instant"},
+            {"name": "Kindle", "type_line": "Instant"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "all_graveyards",
+            "graveyard_count_card_names": ["Kindle"],
+            "damage_base_amount": 2,
+            "damage_per_graveyard_count": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Kindle",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Kindle deals X damage to any target, where X is 2 plus the "
+                    "number of cards named Kindle in all graveyards."
+                ),
+            },
+            turn=2,
+            rng=random.Random(26),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Kindle"
+                and data.get("amount") == 5
+                and data.get("graveyard_damage_count") == 3
+                and data.get("graveyard_count_scope") == "all_graveyards"
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_graveyard_count_damage_counts_named_cards_for_creature_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {
+            "name": "Target Beast",
+            "type_line": "Creature - Beast",
+            "power": 3,
+            "toughness": 3,
+        }
+        opponent.battlefield.append(target)
+        active.graveyard = [
+            {"name": "Galvanic Bombardment", "type_line": "Instant"},
+            {"name": "Other Spell", "type_line": "Instant"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_names": ["Galvanic Bombardment"],
+            "damage_base_amount": 2,
+            "damage_per_graveyard_count": 1,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Galvanic Bombardment",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "Galvanic Bombardment deals X damage to target creature, where X is 2 plus "
+                    "the number of cards named Galvanic Bombardment in your graveyard."
+                ),
+            },
+            turn=2,
+            rng=random.Random(29),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [])
+        self.assertEqual([card["name"] for card in opponent.graveyard], ["Target Beast"])
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Galvanic Bombardment"
+                and data.get("amount") == 3
+                and data.get("graveyard_damage_count") == 1
+                and data.get("result") == "creature_destroyed"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_graveyard_count_damage_counts_controller_subtype(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 7
+        active.graveyard = [
+            {"name": "Peer Through Depths", "type_line": "Instant - Arcane"},
+            {"name": "Glacial Ray", "type_line": "Instant — Arcane"},
+            {"name": "Lightning Bolt", "type_line": "Instant"},
+        ]
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_subtypes": ["arcane"],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Ire of Kaminari",
+                "type_line": "Instant - Arcane",
+                "oracle_text": (
+                    "Ire of Kaminari deals damage to any target equal to the number "
+                    "of Arcane cards in your graveyard."
+                ),
+            },
+            turn=2,
+            rng=random.Random(27),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.life, 5)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Ire of Kaminari"
+                and data.get("amount") == 2
+                and data.get("graveyard_damage_count") == 2
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
+    def test_dynamic_graveyard_count_damage_player_or_planeswalker_ignores_artifact_target(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        opponent.life = 6
+        active.graveyard = [
+            {"name": "Spare Relic", "type_line": "Artifact"},
+            {"name": "Junk Token", "type_line": "Artifact Creature - Servo"},
+            {"name": "Mountain", "type_line": "Basic Land - Mountain"},
+        ]
+        artifact = {"name": "Target Relic", "type_line": "Artifact", "cmc": 2}
+        opponent.battlefield.append(artifact)
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_dynamic_graveyard_count_damage_spell_v1",
+            "damage_amount_source": "graveyard_card_count",
+            "graveyard_count_scope": "controller_graveyard",
+            "graveyard_count_card_types": ["artifact"],
+            "damage_base_amount": 0,
+            "damage_per_graveyard_count": 1,
+            "target": "player_or_planeswalker",
+            "target_constraints": {"scope": "player_or_planeswalker"},
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Scrapyard Salvo",
+                "type_line": "Sorcery",
+                "oracle_text": (
+                    "Scrapyard Salvo deals damage to target player or planeswalker "
+                    "equal to the number of artifact cards in your graveyard."
+                ),
+            },
+            turn=2,
+            rng=random.Random(28),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(opponent.battlefield, [artifact])
+        self.assertEqual(opponent.life, 4)
+        self.assertTrue(
+            any(
+                event == "damage_resolved"
+                and data.get("card") == "Scrapyard Salvo"
+                and data.get("amount") == 2
+                and data.get("graveyard_damage_count") == 2
+                and data.get("result") == "player_damage"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_pays_creature_sacrifice_cost_before_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
