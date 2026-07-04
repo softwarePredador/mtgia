@@ -846,6 +846,64 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_library_tutor_to_battlefield_resolves_tapped(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Mountain", "type_line": "Basic Land - Mountain", "cmc": 0},
+                {"name": "Island", "type_line": "Basic Land - Island", "cmc": 0},
+                {"name": "Forest", "type_line": "Basic Land - Forest", "cmc": 0},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_library_search_to_battlefield_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_tutor_target": "basic_forest_or_island_to_battlefield",
+            "etb_tutor_count": 1,
+            "target": "basic_forest_or_island_to_battlefield",
+            "count": 1,
+            "destination": "battlefield",
+            "tutor_enters_tapped": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_tutor",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Cultivator",
+                "type_line": "Creature - Turtle Druid",
+                "oracle_text": (
+                    "When Fixture Cultivator enters the battlefield, you may search your library for a "
+                    "basic Forest or Island card, put it onto the battlefield, then shuffle."
+                ),
+                "power": 2,
+                "toughness": 4,
+            },
+            turn=3,
+            rng=random.Random(23),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Cultivator", "Forest"])
+        self.assertTrue(active.battlefield[1].get("tapped"))
+        self.assertEqual([card["name"] for card in active.library], ["Mountain", "Island"])
+        self.assertTrue(
+            any(
+                event == "tutor_resolved"
+                and data.get("card") == "Fixture Cultivator"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("target_type") == "basic_forest_or_island_to_battlefield"
+                and data.get("destination") == "battlefield"
+                and data.get("found") == "Forest"
+                for event, data in self.events
+            )
+        )
+
     def test_graveyard_to_library_top_recursion_moves_card_from_graveyard(self) -> None:
         active = self.battle.Player(
             "Active",

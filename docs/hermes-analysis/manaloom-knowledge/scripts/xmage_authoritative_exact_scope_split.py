@@ -137,6 +137,7 @@ PERMANENT_ACTIVATED_GRAVEYARD_TO_LIBRARY_SCOPE = (
 )
 TUTOR_BATTLEFIELD_SCOPE = "xmage_library_search_to_battlefield_spell_v1"
 TUTOR_TOP_SCOPE = "xmage_library_search_to_library_top_spell_v1"
+ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE = "xmage_creature_etb_library_search_to_battlefield_v1"
 BOARD_WIPE_SCOPE = "xmage_destroy_all_matching_permanents_spell_v1"
 DAMAGE_WIPE_SCOPE = "xmage_fixed_damage_all_matching_permanents_spell_v1"
 ADD_COUNTERS_TARGET_SCOPE = "xmage_fixed_add_counters_target_creature_spell_v1"
@@ -4028,6 +4029,19 @@ def is_creature_etb_library_pick_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_tutor_to_battlefield_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != TUTOR_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"SearchLibraryPutInPlayEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []) == {"targeting", "triggered_ability"}
+    )
+
+
 def is_creature_etb_token_unit(row: dict[str, Any]) -> bool:
     return (
         str(row.get("adapter_work_unit") or "") == ETB_TOKEN_CREATURE_UNIT
@@ -7420,6 +7434,10 @@ def library_tutor_target_from_phrase(phrase: str) -> str | None:
         "basic land cards and/or town cards with different names": "basic_land_or_town",
         "forest card": "forest",
         "forest cards": "forest",
+        "plains card": "plains",
+        "plains cards": "plains",
+        "basic forest or island card": "basic_forest_or_island",
+        "basic forest or island cards": "basic_forest_or_island",
         "land cards": "land",
         "snow land card": "snow_land",
         "plains, island, swamp, or mountain card": "plains_island_swamp_or_mountain",
@@ -7483,12 +7501,40 @@ def library_tutor_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
     return "library_tutor_oracle_not_simple"
 
 
+def etb_library_tutor_to_battlefield_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = strip_parenthetical_reminders(oracle_text_after_leading_static_keywords(metadata))
+    text = re.sub(r"\s+", " ", text).strip()
+    if " if " in f" {text} " or " additional cost " in f" {text} ":
+        return "etb_library_tutor_oracle_not_simple"
+    match = re.fullmatch(
+        r"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+"
+        r"(?:you may )?search your library for (?P<query>.+?)(?:,| and) put "
+        r"(?:it|that card|them|those cards) onto the battlefield(?P<tapped> tapped)?, "
+        r"then shuffle(?: your library)?\.?",
+        text,
+    )
+    if not match:
+        return "etb_library_tutor_oracle_not_simple"
+    parsed = parse_library_tutor_query(match.group("query"))
+    if parsed is None:
+        return "etb_library_tutor_oracle_target_not_supported"
+    if int(parsed["count"]) != 1 or bool(parsed.get("up_to_count")):
+        return "etb_library_tutor_oracle_count_not_supported"
+    parsed["destination"] = "battlefield"
+    parsed["enters_tapped"] = bool(match.group("tapped"))
+    return parsed
+
+
 def library_tutor_target_from_source(source: str) -> str | None:
     text = source or ""
     if "FILTER_CARD_BASIC_LAND" in text:
         return "basic_land"
     if "FILTER_CARD_LANDS" in text:
         return "land"
+    if "SubType.PLAINS" in text:
+        return "plains"
+    if "SuperType.BASIC" in text and "SubType.FOREST" in text and "SubType.ISLAND" in text:
+        return "basic_forest_or_island"
     filter_match = re.search(r'new\s+Filter(?:Land)?Card\s*\(\s*"([^"]+)"\s*\)', text)
     if filter_match:
         return library_tutor_target_from_phrase(filter_match.group(1))
@@ -7656,6 +7702,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
         ETB_MILL_RECURSION_CREATURE_SCOPE,
         ETB_GRAVEYARD_TO_LIBRARY_CREATURE_SCOPE,
         ETB_LIBRARY_PICK_CREATURE_SCOPE,
+        ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE,
         ETB_TOKEN_CREATURE_SCOPE,
         ETB_ADD_COUNTERS_CREATURE_SCOPE,
     }:
@@ -7762,6 +7809,7 @@ def split_row(
     etb_mill_recursion_creature_unit = is_creature_etb_mill_then_return_unit(row)
     etb_graveyard_to_library_creature_unit = is_creature_etb_graveyard_to_library_unit(row)
     etb_library_pick_creature_unit = is_creature_etb_library_pick_unit(row)
+    etb_tutor_battlefield_creature_unit = is_creature_etb_tutor_to_battlefield_unit(row)
     etb_token_creature_unit = is_creature_etb_token_unit(row)
     etb_add_counters_creature_unit = is_creature_etb_add_counters_unit(row)
     creature_tap_damage_unit = is_creature_tap_damage_unit(row)
@@ -7811,6 +7859,7 @@ def split_row(
         and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
+        and not etb_tutor_battlefield_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -7853,6 +7902,7 @@ def split_row(
         and not etb_mill_recursion_creature_unit
         and not etb_graveyard_to_library_creature_unit
         and not etb_library_pick_creature_unit
+        and not etb_tutor_battlefield_creature_unit
         and not etb_token_creature_unit
         and not etb_add_counters_creature_unit
         and not creature_tap_damage_unit
@@ -9911,6 +9961,46 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_look_library_pick_to_hand_rest_graveyard",
+        ), "selected_exact_scope"
+
+    if etb_tutor_battlefield_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_library_tutor_not_creature"
+        oracle_tutor = etb_library_tutor_to_battlefield_from_oracle(metadata)
+        if isinstance(oracle_tutor, str):
+            return None, oracle_tutor
+        source_tutor = library_tutor_from_source(source_text, "SearchLibraryPutInPlayEffect")
+        if isinstance(source_tutor, str):
+            return None, source_tutor.replace("library_tutor", "etb_library_tutor")
+        for key in ("target", "count", "up_to_count", "destination", "enters_tapped"):
+            if source_tutor.get(key) != oracle_tutor.get(key):
+                return None, f"etb_library_tutor_source_oracle_{key}_mismatch"
+        target = f"{oracle_tutor['target']}_to_battlefield"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_tutor_target": target,
+            "etb_tutor_count": int(oracle_tutor["count"]),
+            "target": target,
+            "count": int(oracle_tutor["count"]),
+            "destination": "battlefield",
+            "tutor_enters_tapped": bool(oracle_tutor.get("enters_tapped")),
+            "xmage_effect_class": "SearchLibraryPutInPlayEffect",
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_library_search_to_battlefield",
         ), "selected_exact_scope"
 
     if creature_tap_damage_unit and is_creature_metadata(metadata):
@@ -12012,6 +12102,7 @@ def build_exact_split_report(
                 "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
+                "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
                 "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
                 "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",

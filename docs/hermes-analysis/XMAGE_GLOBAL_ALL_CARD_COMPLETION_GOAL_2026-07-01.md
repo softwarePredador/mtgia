@@ -3,7 +3,7 @@
 Status: `active_operational_goal`.
 
 This goal supersedes stale numeric baselines inside thread-level goal text. The
-thread goal remains active, but execution must use the current post-PG372
+thread goal remains active, but execution must use the current post-PG388
 baseline and the stop criteria below.
 
 This is the global control plane for the remaining card-rule work. Individual
@@ -572,8 +572,8 @@ Post-PG384 update:
 
 ## Latest Goal Recheck - 2026-07-02
 
-Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG387 queue below.
+Current thread goal text still mentions older baselines. That is historical
+only. The active execution baseline is the post-PG388 queue below.
 
 ## General Goal Contract - 2026-07-02
 
@@ -581,13 +581,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG387 control numbers:
+Current post-PG388 control numbers:
 
-- target battle-gap identities: `26897`
-- XMage-resolved authoritative source identities: `26583`
+- target battle-gap identities: `26889`
+- XMage-resolved authoritative source identities: `26575`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26583`
+- XMage authoritative adapter required: `26575`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -607,8 +607,8 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg387_etb_draw_lose_life_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG387, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg388_etb_tutor_battlefield_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG388, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
@@ -618,9 +618,9 @@ Next executable cycle:
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`), and
    `add_counters::source_add_counters_variant_v1` (`795`), followed by
    `life_gain::xmage_life_gain_variant_review_v1` (`735`),
-   `tutor::xmage_library_search_variant_review_v1` (`613`),
-   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
-   `draw_cards::xmage_draw_card_variant_review_v1` (`607`).
+   `removal_destroy::targeted_destroy_variant_v1` (`612`),
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`), and
+   `tutor::xmage_library_search_variant_review_v1` (`605`).
 4. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
 5. If a proposed lane cannot prove Oracle/source/runtime agreement, record the
@@ -1269,9 +1269,46 @@ PG387 completion and PG388 starting hypothesis:
    `removal_destroy::targeted_destroy_variant_v1` (`612`), and
    `draw_cards::xmage_draw_card_variant_review_v1` (`607`).
 
+PG388 completion and PG389 starting hypothesis:
+
+1. PG388 promoted `8` exact creature ETB library tutor-to-battlefield rules on
+   the new server: `Farhaven Elf`, `Kor Cartographer`, `Ondu Giant`,
+   `Quandrix Cultivator`, `Quirion Trailblazer`, `Silverglade Elemental`,
+   `Wild Wanderer`, and `Wood Elves`.
+2. The implementation added exact
+   `xmage_creature_etb_library_search_to_battlefield_v1` mapping for
+   `SearchLibraryPutInPlayEffect + EntersBattlefieldTriggeredAbility` with
+   Oracle/source agreement on one-card land tutor targets and tapped-entry
+   state. Supported targets are `basic_land`, `plains`, `forest`, and
+   `basic_forest_or_island`.
+3. Runtime uses the existing ETB tutor movement path and now supports
+   `basic_forest_or_island` candidate selection.
+4. Tests passed: exact splitter `336`, exact runtime `195`, builder/sync `23`,
+   py_compile, and E2E package validation `status=pass`.
+5. PostgreSQL on the new server applied `8` upserts and deprecated `2` stale
+   Farhaven Elf review-only shadows; postcheck verified `8/8`; Hermes/SQLite
+   sync loaded `8` PG rows, updated `10` SQLite rows, and exported `5154`
+   canonical snapshot rows.
+6. Final alignment audits passed on the new server: strategy consistency
+   `26/26`, operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50`.
+7. The post-PG388 supported splitter returns `0` batch-safe proposals over
+   `7667` considered supported rows, so PG389 must implement another narrow
+   subpattern before PostgreSQL package generation.
+8. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1615`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`),
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`), and
+   `tutor::xmage_library_search_variant_review_v1` (`605`).
+
 ## Current Priority Order
 
-Use the post-PG387 authoritative queue unless a newer queue exists:
+Use the post-PG388 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
@@ -1279,9 +1316,9 @@ Use the post-PG387 authoritative queue unless a newer queue exists:
 4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `tutor::xmage_library_search_variant_review_v1` - `613`
-8. `removal_destroy::targeted_destroy_variant_v1` - `612`
-9. `draw_cards::xmage_draw_card_variant_review_v1` - `607`
+7. `removal_destroy::targeted_destroy_variant_v1` - `612`
+8. `draw_cards::xmage_draw_card_variant_review_v1` - `607`
+9. `tutor::xmage_library_search_variant_review_v1` - `605`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 
 Immediate checkpoint after PG361:
@@ -1676,6 +1713,12 @@ Immediate checkpoint after PG361:
     server and the post-PG387 supported splitter recheck returned
     `proposal_count=0` over `7675` considered supported rows. Continue from
     the fresh post-PG387 queue. Since the exact splitter is now empty again,
+    the next cycle must implement a new mapper/runtime subpattern before any
+    PostgreSQL package can be generated.
+77. PG388 promoted `8` exact creature ETB library tutor-to-battlefield rows on
+    the new server and the post-PG388 supported splitter recheck returned
+    `proposal_count=0` over `7667` considered supported rows. Continue from
+    the fresh post-PG388 queue. Since the exact splitter is now empty again,
     the next cycle must implement a new mapper/runtime subpattern before any
     PostgreSQL package can be generated.
 

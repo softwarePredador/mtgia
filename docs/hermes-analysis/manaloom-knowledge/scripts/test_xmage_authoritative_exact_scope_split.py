@@ -8429,6 +8429,107 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_library_pick_oracle_not_simple")
 
+    def test_creature_etb_library_tutor_to_battlefield_maps_land_scope(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Cultivator",
+                type_line="Creature - Turtle Druid",
+                oracle_text=(
+                    "When Fixture Cultivator enters the battlefield, you may search your library for a "
+                    "basic Forest or Island card, put it onto the battlefield, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard("a basic Forest or Island card");
+                static {
+                    filter.add(SuperType.BASIC.getPredicate());
+                    filter.add(Predicates.or(SubType.FOREST.getPredicate(), SubType.ISLAND.getPredicate()));
+                }
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), false), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_TUTOR_BATTLEFIELD_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_tutor_target"], "basic_forest_or_island_to_battlefield")
+        self.assertEqual(effect["etb_tutor_count"], 1)
+        self.assertEqual(effect["destination"], "battlefield")
+        self.assertFalse(effect["tutor_enters_tapped"])
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_library_tutor_to_battlefield_preserves_static_keywords(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility", "FlyingAbility"],
+            xmage_signals=["targeting", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Hawk",
+                type_line="Creature - Bird",
+                oracle_text=(
+                    "Flying\n"
+                    "When Fixture Hawk enters the battlefield, you may search your library for a Plains card, "
+                    "put it onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                private static final FilterCard filter = new FilterCard(SubType.PLAINS);
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(filter), true), true));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["etb_tutor_target"], "plains_to_battlefield")
+        self.assertTrue(effect["tutor_enters_tapped"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
+    def test_creature_etb_library_tutor_to_battlefield_blocks_condition(self) -> None:
+        row = queue_row(
+            split.TUTOR_UNIT,
+            effect_classes=["SearchLibraryPutInPlayEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["targeting", "condition", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Hawk",
+                type_line="Creature - Bird",
+                oracle_text=(
+                    "When Fixture Hawk enters the battlefield, if an opponent controls more lands than you, "
+                    "search your library for a basic Plains card, put it onto the battlefield tapped, then shuffle."
+                ),
+            ),
+            source_text="""
+                this.addAbility(new EntersBattlefieldTriggeredAbility(
+                    new SearchLibraryPutInPlayEffect(new TargetCardInLibrary(StaticFilters.FILTER_CARD_BASIC_LAND), true),
+                    false, condition));
+            """,
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "not_instant_or_sorcery_spell")
+
     def test_creature_etb_graveyard_to_library_maps_artifact_or_creature_top(self) -> None:
         row = queue_row(
             split.RECURSION_UNIT,

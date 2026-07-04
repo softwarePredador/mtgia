@@ -33497,6 +33497,13 @@ def library_tutor_candidates(player, target_type):
                 for land_type in ("plains", "island", "swamp", "mountain", "forest")
             ):
                 candidates.append(candidate)
+        elif target_type == "basic_forest_or_island":
+            if (
+                is_effective_land(candidate)
+                and "basic" in type_line
+                and ("forest" in type_line or "island" in type_line)
+            ):
+                candidates.append(candidate)
         elif target_type == "plains_island_swamp_or_mountain":
             if is_effective_land(candidate) and any(
                 land_type in type_line
