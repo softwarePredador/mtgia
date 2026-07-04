@@ -8820,6 +8820,53 @@ new server:
   coherent family/subpattern from that recheck, not blindly promote all
   proposals in one mixed package.
 
+## 2026-07-04 PG430 Static Basic Landwalk New-Server Reconciliation
+
+- Reconciled the PG420 exact basic-landwalk family against the operational
+  new-server target `143.198.230.247:5433/halder`. This is not a second
+  semantic model: it replays the validated
+  `xmage_static_self_basic_landwalk_creature_v1` scope after the PostgreSQL
+  target and SQLite cleanup contract changed in PG429.
+- The selected package contains the same pure XMage basic-landwalk shape:
+  `PlainswalkAbility`, `IslandwalkAbility`, `SwampwalkAbility`,
+  `MountainwalkAbility`, or `ForestwalkAbility`, exact Oracle text after
+  reminder removal, and matching local XMage source. Nonbasic, legendary, snow,
+  or other generic `LandwalkAbility` variants remain outside this scope.
+- Runtime behavior was already covered by the focused PG420 tests:
+  `attacker_cannot_be_blocked` receives the defending player, landwalk only
+  suppresses blockers when the defender controls the matching basic land
+  subtype, and absolute unblockable still works without a defender. PG430
+  reused those mapper/runtime tests and performed no code mutation.
+- The PostgreSQL package promoted `61` cards:
+  `21` swampwalk, `17` forestwalk, `12` mountainwalk, `9` islandwalk, and `2`
+  plainswalk identities. Precheck found `61` target rows, `0` existing expected
+  rows, and `0` shadow rows; apply inserted/updated `61`; postcheck verified
+  `61/61` promoted rows as `verified`/`auto` with Oracle hashes.
+- Hermes metadata sync and full PG -> SQLite sync were run against
+  `143.198.230.247:5433/halder` and
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`. The final
+  full sync loaded `3915` PostgreSQL runtime rows, wrote `3907` SQLite runtime
+  rows, and exported `3882` canonical fallback rows.
+- PG430 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `61` selected cards. Generic
+  battle scenario count remained `0`; conditional combat behavior remains
+  covered by the focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`). The local stale sibling
+  `docs/hermes-analysis/manaloom-knowledge/knowledge.db` was removed after the
+  audit warning; the operational SQLite cache remains
+  `docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db`.
+- Post-sync Commander-legal queue is now:
+  `target_identity_count=26971`, `xmage_authoritative_source_count=26657`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26657`. This is an exact
+  reduction of `61` from the post-PG429 queue.
+- The post-PG430 exact split recheck reports `proposal_count=632` and
+  `safe_for_batch_pg_package_count=632`. Next work should choose one coherent
+  family/subpattern from that set, starting with highest leverage where runtime
+  behavior is already focused-test covered.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

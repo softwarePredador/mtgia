@@ -1,0 +1,2136 @@
+{
+  "battle_execution": {
+    "event_count": 0,
+    "results": [],
+    "scenario_count": 0
+  },
+  "battle_path": "docs/hermes-analysis/manaloom-knowledge/scripts/battle_analyst_v9.py",
+  "database_target": "143.198.230.247:5433/halder",
+  "generated_at_utc": "2026-07-04T20:51:13.294514+00:00",
+  "manifest": "docs/hermes-analysis/master_optimizer_reports/pg430_xmage_static_basic_landwalk_new_server_manifest.json",
+  "package_id": "pg430_xmage_static_basic_landwalk_new_server_manifest",
+  "snapshot": "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_canonical_snapshot.json",
+  "sqlite_db": "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db",
+  "stages": [
+    {
+      "evidence": {
+        "validated_rows": 61
+      },
+      "name": "postgres_source_of_truth",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Anaconda",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Anurid Murkdiver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Benthic Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Raiders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Smugglers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Tatters",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Wraith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bull Hippo",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Canyon Wildcat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Cat Warriors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Cliff Threader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Devouring Deep",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Dwarven Grunt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Elite Cat Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Emerald Oryx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Farbog Explorer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Glissa's Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Goblin Mountaineer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Goblin Spelunkers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Grayscaled Gharial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Heartwood Treefolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Hillcomber Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Jukai Messenger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Koth's Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Leaf Dancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Lost Soul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Lynx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Boa",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Goblins",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Threader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Moor Fiend",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Mountain Goat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Pale Bears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Plague Beetle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Pygmy Allosaurus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Raiding Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Righteous Avengers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+          "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "River Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rock Badger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rootwater Commando",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rushwood Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Segovian Leviathan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Shanodin Dryads",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Slinking Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Sokenzan Bruiser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Somberwald Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Warthog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Wild Ox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Willow Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zendikar Farguide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Dog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Goat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Horse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Monkey",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Ox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Pig",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rabbit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rooster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+          "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Snake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_rows": 61
+      },
+      "name": "sqlite_hermes_cache",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Anaconda",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Anurid Murkdiver",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Benthic Behemoth",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Raiders",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Smugglers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Tatters",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bog Wraith",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Bull Hippo",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Canyon Wildcat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Cat Warriors",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Cliff Threader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Devouring Deep",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Dwarven Grunt",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Elite Cat Warrior",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Emerald Oryx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Farbog Explorer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Glissa's Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Goblin Mountaineer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Goblin Spelunkers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Grayscaled Gharial",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Heartwood Treefolk",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Hillcomber Giant",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Jukai Messenger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Koth's Courier",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Leaf Dancer",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Lost Soul",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Lynx",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Boa",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Goblins",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Marsh Threader",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Moor Fiend",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Mountain Goat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Pale Bears",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Plague Beetle",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Pygmy Allosaurus",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Raiding Nightstalker",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Righteous Avengers",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+          "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "River Bear",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rock Badger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rootwater Commando",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Rushwood Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Segovian Leviathan",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Shanodin Dryads",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Slinking Serpent",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Sokenzan Bruiser",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Somberwald Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Warthog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Wild Ox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Willow Dryad",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zendikar Farguide",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Dog",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Goat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+          "oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Horse",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+          "oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Monkey",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Ox",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Pig",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rabbit",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rat",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Rooster",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+          "oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Snake",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+          "oracle_hash": "d892699f363998ce8914957a67c601d9",
+          "review_status": "verified",
+          "rule_version": 2
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "card_name": "Zodiac Tiger",
+          "execution_status": "auto",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+          "oracle_hash": "5585e6019dbd5d733ee03c96f3edb106",
+          "review_status": "verified",
+          "rule_version": 2
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 61
+      },
+      "name": "canonical_snapshot_fallback",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anaconda",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Anurid Murkdiver",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Benthic Behemoth",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Raiders",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Smugglers",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Tatters",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bog Wraith",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Bull Hippo",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Canyon Wildcat",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cat Warriors",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Cliff Threader",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Devouring Deep",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Dwarven Grunt",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Elite Cat Warrior",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Emerald Oryx",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Farbog Explorer",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Glissa's Courier",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Mountaineer",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Goblin Spelunkers",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Grayscaled Gharial",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Heartwood Treefolk",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Hillcomber Giant",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Jukai Messenger",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Koth's Courier",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Leaf Dancer",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lost Soul",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Lynx",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marsh Boa",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marsh Goblins",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Marsh Threader",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Moor Fiend",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Mountain Goat",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pale Bears",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Plague Beetle",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Pygmy Allosaurus",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Raiding Nightstalker",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Righteous Avengers",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "River Bear",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rock Badger",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rootwater Commando",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Rushwood Dryad",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Segovian Leviathan",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Shanodin Dryads",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Slinking Serpent",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Sokenzan Bruiser",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Somberwald Dryad",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Warthog",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Wild Ox",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Willow Dryad",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zendikar Farguide",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Dog",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Goat",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Horse",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Monkey",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Ox",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Pig",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Rabbit",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Rat",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Rooster",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Snake",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+          "battle_rule_version": 2,
+          "card_name": "Zodiac Tiger",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "validated_cards": 61
+      },
+      "name": "runtime_get_card_effect",
+      "rows": [
+        {
+          "annotation_fields": [],
+          "card_name": "Anaconda",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Anurid Murkdiver",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Benthic Behemoth",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Raiders",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Smugglers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Tatters",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bog Wraith",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Bull Hippo",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Canyon Wildcat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cat Warriors",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Cliff Threader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Devouring Deep",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Dwarven Grunt",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Elite Cat Warrior",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Emerald Oryx",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Farbog Explorer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Glissa's Courier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Mountaineer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Goblin Spelunkers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Grayscaled Gharial",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Heartwood Treefolk",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Hillcomber Giant",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Jukai Messenger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Koth's Courier",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Leaf Dancer",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lost Soul",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Lynx",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marsh Boa",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marsh Goblins",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Marsh Threader",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Moor Fiend",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Mountain Goat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pale Bears",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Plague Beetle",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Pygmy Allosaurus",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Raiding Nightstalker",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Righteous Avengers",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "River Bear",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rock Badger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rootwater Commando",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Rushwood Dryad",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Segovian Leviathan",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Shanodin Dryads",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Slinking Serpent",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Sokenzan Bruiser",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Somberwald Dryad",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Warthog",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Wild Ox",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Willow Dryad",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zendikar Farguide",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Dog",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Goat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Horse",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Monkey",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Ox",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Pig",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Rabbit",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Rat",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Rooster",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Snake",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e"
+        },
+        {
+          "annotation_fields": [],
+          "card_name": "Zodiac Tiger",
+          "component_keys": [],
+          "effect": "creature",
+          "logical_rule_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "evidence": {
+        "events": 0,
+        "scenarios": 0
+      },
+      "name": "battle_execution_no_override",
+      "status": "pass"
+    }
+  ],
+  "status": "pass",
+  "title": "Battle Package End-to-End Validation"
+}

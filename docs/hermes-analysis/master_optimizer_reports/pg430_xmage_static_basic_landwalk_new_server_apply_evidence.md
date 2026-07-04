@@ -1,0 +1,13 @@
+# pg430 PostgreSQL Apply Evidence
+
+- Generated at: `2026-07-04T20:53:00+00:00`
+- Database: `143.198.230.247:5433/halder`
+- Mutations performed: `["postgres_apply_pg430_xmage_static_basic_landwalk_new_server"]`
+
+## Precheck
+
+`{"cards": ["Anaconda", "Anurid Murkdiver", "Benthic Behemoth", "Bog Raiders", "Bog Smugglers", "Bog Tatters", "Bog Wraith", "Bull Hippo", "Canyon Wildcat", "Cat Warriors", "Cliff Threader", "Devouring Deep", "Dwarven Grunt", "Elite Cat Warrior", "Emerald Oryx", "Farbog Explorer", "Glissa's Courier", "Goblin Mountaineer", "Goblin Spelunkers", "Grayscaled Gharial", "Heartwood Treefolk", "Hillcomber Giant", "Jukai Messenger", "Koth's Courier", "Leaf Dancer", "Lost Soul", "Lynx", "Marsh Boa", "Marsh Goblins", "Marsh Threader", "Moor Fiend", "Mountain Goat", "Pale Bears", "Plague Beetle", "Pygmy Allosaurus", "Raiding Nightstalker", "Righteous Avengers", "River Bear", "Rock Badger", "Rootwater Commando", "Rushwood Dryad", "Segovian Leviathan", "Shanodin Dryads", "Slinking Serpent", "Sokenzan Bruiser", "Somberwald Dryad", "Warthog", "Wild Ox", "Willow Dryad", "Zendikar Farguide", "Zodiac Dog", "Zodiac Goat", "Zodiac Horse", "Zodiac Monkey", "Zodiac Ox", "Zodiac Pig", "Zodiac Rabbit", "Zodiac Rat", "Zodiac Rooster", "Zodiac Snake", "Zodiac Tiger"], "existing_expected_rows_before": 0, "missing_targets": [], "row_count": 61, "total_target_card_rows": 61, "would_deprecate_shadow_rows": 0}`
+
+## Postcheck
+
+`{"backup_rows": 0, "cards": ["Anaconda", "Anurid Murkdiver", "Benthic Behemoth", "Bog Raiders", "Bog Smugglers", "Bog Tatters", "Bog Wraith", "Bull Hippo", "Canyon Wildcat", "Cat Warriors", "Cliff Threader", "Devouring Deep", "Dwarven Grunt", "Elite Cat Warrior", "Emerald Oryx", "Farbog Explorer", "Glissa's Courier", "Goblin Mountaineer", "Goblin Spelunkers", "Grayscaled Gharial", "Heartwood Treefolk", "Hillcomber Giant", "Jukai Messenger", "Koth's Courier", "Leaf Dancer", "Lost Soul", "Lynx", "Marsh Boa", "Marsh Goblins", "Marsh Threader", "Moor Fiend", "Mountain Goat", "Pale Bears", "Plague Beetle", "Pygmy Allosaurus", "Raiding Nightstalker", "Righteous Avengers", "River Bear", "Rock Badger", "Rootwater Commando", "Rushwood Dryad", "Segovian Leviathan", "Shanodin Dryads", "Slinking Serpent", "Sokenzan Bruiser", "Somberwald Dryad", "Warthog", "Wild Ox", "Willow Dryad", "Zendikar Farguide", "Zodiac Dog", "Zodiac Goat", "Zodiac Horse", "Zodiac Monkey", "Zodiac Ox", "Zodiac Pig", "Zodiac Rabbit", "Zodiac Rat", "Zodiac Rooster", "Zodiac Snake", "Zodiac Tiger"], "failed_cards": [], "promoted_oracle_hash_rows": 61, "promoted_rule_rows": 61, "promoted_verified_auto_rows": 61, "row_count": 61}`

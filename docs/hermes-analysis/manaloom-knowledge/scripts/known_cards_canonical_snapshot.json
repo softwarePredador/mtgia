@@ -2084,6 +2084,29 @@
     "battle_rule_logical_key": "battle_rule_v1:0e83ee59b1ea7d74910425548323ec4c",
     "battle_rule_oracle_hash": "d2ded326358a59b57a910e672ed5b437"
   },
+  "Anaconda": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Analyze the Pollen": {
     "effect": "tutor",
     "target": "land",
@@ -2661,6 +2684,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:b4b407a7f3e66517c0718ce885fd8445",
     "battle_rule_oracle_hash": "203e9afaf95da481ac996e23ca4d2d7e"
+  },
+  "Anurid Murkdiver": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
   "Anvilwrought Raptor": {
     "_keywords_are_self": true,
@@ -6090,6 +6136,29 @@
     "battle_rule_logical_key": "battle_rule_v1:cf94f06a51a48080913a6c01290c7be2",
     "battle_rule_oracle_hash": "1bd371e1f09ed8b48837c3fc5cd2a2ff"
   },
+  "Benthic Behemoth": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "Benthic Giant": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -7310,6 +7379,98 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "d7f00fbbdd23e665a72acc7fcc074462"
+  },
+  "Bog Raiders": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Bog Smugglers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Bog Tatters": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Bog Wraith": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
   "Bog Wreckage": {
     "effect": "land",
@@ -9125,6 +9286,29 @@
     "battle_rule_logical_key": "battle_rule_v1:003e73a39c607e95c1b79431f0e6c126",
     "battle_rule_oracle_hash": "1e4094f05d8962ea4b3335786f533c17"
   },
+  "Bull Hippo": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "Bull Rush": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -9832,6 +10016,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "eee50bee70388bb11dcc8d2e3d38b727"
   },
+  "Canyon Wildcat": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
   "Capashen Templar": {
     "_activated_rule_effects": [
       {
@@ -10414,6 +10621,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:96c08a0582c9ddf638096214e8d1b198",
     "battle_rule_oracle_hash": "0cf160ba6fdfde6b8675a3fe54985b8d"
+  },
+  "Cat Warriors": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Cathartic Reunion": {
     "ability_kind": "one_shot",
@@ -11950,6 +12180,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:743bc58026f68050c6ef7c902ce85cde",
     "battle_rule_oracle_hash": "b5a888ad1107dbe2b4d9be83113e83bb"
+  },
+  "Cliff Threader": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
   "Cliffgate": {
     "effect": "land",
@@ -16648,6 +16901,29 @@
     "battle_rule_logical_key": "battle_rule_v1:6db322969025d520a58b064fc82fb34d",
     "battle_rule_oracle_hash": "e483875cdde6c3db6d7b418ae16dfee5"
   },
+  "Devouring Deep": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "Devout Monk": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_creature_etb_gain_life_v1",
@@ -18703,6 +18979,29 @@
     "battle_rule_logical_key": "battle_rule_v1:038c5d2096ae7ffffaded58f0289ae35",
     "battle_rule_oracle_hash": "bcbcbb61fb3ab82bd47fbd7be4c29933"
   },
+  "Dwarven Grunt": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
   "Dwarven Hold": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -19809,6 +20108,29 @@
     "battle_rule_logical_key": "battle_rule_v1:5bcd5d422cc0b0569f056df6e45c3b8e",
     "battle_rule_oracle_hash": "99130e293359f234f88b17d926c3bb8e"
   },
+  "Elite Cat Warrior": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Elven Cache": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
     "count": 1,
@@ -20313,6 +20635,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ca4daad70b395a70e9cb84616624a687",
     "battle_rule_oracle_hash": "ba85fb88d32b1a965d43a484b52d7e7c"
+  },
+  "Emerald Oryx": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Emergence Zone": {
     "effect": "land",
@@ -22209,6 +22554,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
     "battle_rule_oracle_hash": "f659790c4b426feec068a2741201e1b4"
+  },
+  "Farbog Explorer": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
   "Farewell": {
     "battle_model_scope": "modal_exile_wipe_creature_runtime_baseline_v1",
@@ -28023,6 +28391,29 @@
     "battle_rule_logical_key": "battle_rule_v1:ebffa5caeecaa96b52e0d4b5307874fe",
     "battle_rule_oracle_hash": "8b64e70b97f5871e2203d6cabed377b4"
   },
+  "Glissa's Courier": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
   "Glittering Massif": {
     "basic_land_subtype_colors": [
       "red",
@@ -28453,6 +28844,29 @@
     "battle_rule_logical_key": "battle_rule_v1:f219cc0dec2abc3b2eb97b15854285df",
     "battle_rule_oracle_hash": "dd5eab544bcdd29cd5f1297eb5d7e2bc"
   },
+  "Goblin Mountaineer": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
   "Goblin Rally": {
     "ability_kind": "one_shot",
     "battle_model_scope": "xmage_fixed_create_creature_tokens_spell_v1",
@@ -28517,6 +28931,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "d7f00fbbdd23e665a72acc7fcc074462"
+  },
+  "Goblin Spelunkers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
   "Goblin Striker": {
     "_keywords_are_self": true,
@@ -29502,6 +29939,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "e0cff4ef6bae4baf28d9c34a3386c363"
+  },
+  "Grayscaled Gharial": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
   },
   "Grazing Whiptail": {
     "_keywords_are_self": true,
@@ -31474,6 +31934,29 @@
     "battle_rule_logical_key": "battle_rule_v1:f2dfdefefd0aa9032366a0aa11d84742",
     "battle_rule_oracle_hash": "240bb15b470790a2b0d763d9fd1f0130"
   },
+  "Heartwood Treefolk": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Heat Shimmer": {
     "battle_model_scope": "target_creature_copy_haste_exile_eot_v1",
     "cmc": 3.0,
@@ -32090,6 +32573,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:49ba8443dd1ae75b4c67441e1d96cead",
     "battle_rule_oracle_hash": "6a4d99398409198cb3eeb6d3aae0b03c"
+  },
+  "Hillcomber Giant": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
   "Hinterland Harbor": {
     "effect": "land",
@@ -35340,6 +35846,29 @@
     "battle_rule_logical_key": "battle_rule_v1:16faca08fbda6c20c43df1e9c36712d4",
     "battle_rule_oracle_hash": "4956741e28adf6e2c08aaac6551ecc07"
   },
+  "Jukai Messenger": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Jund Panorama": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -36716,6 +37245,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "dcd0c94db5d14da8d0e974cf14c0dd93"
   },
+  "Koth's Courier": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Kozilek's Channeler": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -37905,6 +38457,29 @@
     "battle_rule_logical_key": "battle_rule_v1:cf9e9715bb8136fe37e29b8b124cbde3",
     "battle_rule_oracle_hash": "738155a967c949d253c1704e80034b2f"
   },
+  "Leaf Dancer": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Leaf Gilder": {
     "activation_requires_tap": true,
     "battle_model_scope": "xmage_simple_tap_mana_source_permanent_v1",
@@ -39012,6 +39587,29 @@
     "battle_rule_logical_key": "battle_rule_v1:06d892f8ad75831f785aef6dcedc82b4",
     "battle_rule_oracle_hash": "f1b6d4f38a533e56f0efb5a3f1547214"
   },
+  "Lost Soul": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Lotho, Corrupt Shirriff": {
     "ability_kind": "triggered",
     "battle_model_scope": "opponent_second_spell_each_turn_create_treasure_life_loss_v1",
@@ -39247,6 +39845,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "8ac32ff8cb9ae337814079acc213e81a"
+  },
+  "Lynx": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "L\u00f3rien Revealed": {
     "battle_model_scope": "xmage_fixed_source_controller_draw_spell_v1",
@@ -40270,6 +40891,29 @@
     "battle_rule_logical_key": "battle_rule_v1:aa0c64421c6ae4bf06b653dea512f935",
     "battle_rule_oracle_hash": "49b4ed3350f7cb5ffce32eff082cc5ba"
   },
+  "Marsh Boa": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Marsh Flats": {
     "battle_model_scope": "fetchland_land_play_with_direct_activation_v1",
     "effect": "land",
@@ -40297,6 +40941,52 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "1e88f8d7987276fdac2c3311b238eaab"
+  },
+  "Marsh Goblins": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Marsh Threader": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
   "Maskwood Nexus": {
     "cmc": 4.0,
@@ -42545,6 +43235,29 @@
     "battle_rule_logical_key": "battle_rule_v1:867f951a27c7284910fe5e6dd23fbc57",
     "battle_rule_oracle_hash": "7a8aa86fec6e5cbd6e1f9002d6e2c647"
   },
+  "Moor Fiend": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Moorish Cavalry": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -42871,6 +43584,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:33e1dd27537361327415a737afccc230",
     "battle_rule_oracle_hash": "f4f7253661dc3bf12544fc82fdcf4efb"
+  },
+  "Mountain Goat": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
   "Mountain Stronghold": {
     "effect": "land",
@@ -46014,6 +46750,29 @@
     "battle_rule_logical_key": "battle_rule_v1:26179de4259137dba13dc5d473b1fe72",
     "battle_rule_oracle_hash": "a85ec353e0a18e783ae88be2f64536ec"
   },
+  "Pale Bears": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "Paliano, the High City": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -47661,6 +48420,29 @@
     "battle_rule_logical_key": "battle_rule_v1:92da53168ad3c7175c351d4bf984fa6c",
     "battle_rule_oracle_hash": "d81188656267840c4a9d890bf8f1b62c"
   },
+  "Plague Beetle": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Plague Myr": {
     "effect": "creature",
     "is_creature_permanent": true,
@@ -49157,6 +49939,29 @@
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "3385678f59a6cd1a07e1a21a3100d2ae"
   },
+  "Pygmy Allosaurus": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Pygmy Razorback": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -50027,6 +50832,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:f2dfdefefd0aa9032366a0aa11d84742",
     "battle_rule_oracle_hash": "eeb3140ef74b5f3036c4d4bc6ca38684"
+  },
+  "Raiding Nightstalker": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
   },
   "Rain of Filth": {
     "effect": "ramp_ritual",
@@ -53550,6 +54378,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "314d01be4b95000b0ceb411fc9b77d9c"
   },
+  "Righteous Avengers": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "plainswalk",
+    "landwalk_land_type": "plains",
+    "landwalk_land_types": [
+      "plains"
+    ],
+    "plainswalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "PlainswalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+    "battle_rule_oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc"
+  },
   "Righteous Blow": {
     "amount": 2,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -54141,6 +54992,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "20fed7e6d58014a5c3c0078536461476"
   },
+  "River Bear": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "River Delta": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -54290,6 +55164,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Rock Badger": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
   },
   "Rockface Village": {
     "effect": "land",
@@ -54602,6 +55499,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:121490d1b858123d81f5f899d4e7c87f",
     "battle_rule_oracle_hash": "f1bc61c589787def6b90b04df0a5dba2"
+  },
+  "Rootwater Commando": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
   },
   "Rootwater Depths": {
     "effect": "land",
@@ -55218,6 +56138,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:1dc787546713b8ba46fd75acf55c2668",
     "battle_rule_oracle_hash": "3dbffe0635a45cf2210251895c33b6f7"
+  },
+  "Rushwood Dryad": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Rushwood Grove": {
     "effect": "land",
@@ -58015,6 +58958,29 @@
     "battle_rule_logical_key": "battle_rule_v1:2e2525d647793b5aa2d31045a508dca1",
     "battle_rule_oracle_hash": "e1528476f4465cfb54a103159363cabe"
   },
+  "Segovian Leviathan": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
   "Seize the Initiative": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -58748,6 +59714,29 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "edec80987fc94f7400d663a1549df754"
+  },
+  "Shanodin Dryads": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Shantotto, Tactician Magician": {
     "battle_model_scope": "noncreature_cmc4_draw_trigger_power_annotation_v1",
@@ -61107,6 +62096,29 @@
     "battle_rule_logical_key": "battle_rule_v1:9fd2ff72170533330fc8ba9165bd99b4",
     "battle_rule_oracle_hash": "24ce626e7e7957d8e01f615ea00d9d08"
   },
+  "Slinking Serpent": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Slippery Bogle": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -61655,6 +62667,29 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "4b1ba3129da5f3ed94fe5224745b46fe"
   },
+  "Sokenzan Bruiser": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
   "Sokenzan, Crucible of Defiance": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -61831,6 +62866,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:7cf3d68b56f34ef24c6766142072ecd1",
     "battle_rule_oracle_hash": "26e18e44356c6f9c61fd592dca42a2d1"
+  },
+  "Somberwald Dryad": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Sorin's Thirst": {
     "amount": 2,
@@ -75539,6 +76597,29 @@
     "battle_rule_logical_key": "battle_rule_v1:824ba0de681326e26cd769c161748b0e",
     "battle_rule_oracle_hash": "1f548fec2889bc73409f43f067ec3367"
   },
+  "Warthog": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Wary Okapi": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -76326,6 +77407,29 @@
     "battle_rule_logical_key": "battle_rule_v1:039c03e68a2849bba78f03d804c2a91a",
     "battle_rule_oracle_hash": "f2d1cd6e36c0e9fdedd8273fb312c020"
   },
+  "Wild Ox": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
   "Wild Ricochet": {
     "ability_kind": "one_shot",
     "battle_model_scope": "copy_target_instant_or_sorcery_stack_spell_change_original_and_copy_targets_annotation_v1",
@@ -76451,6 +77555,29 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:68abeb7ac55d0de86280cc7cbfdae17f",
     "battle_rule_oracle_hash": "e37d143305cf0b027585c7ece4c1d380"
+  },
+  "Willow Dryad": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Willow Faerie": {
     "_keywords_are_self": true,
@@ -78031,6 +79158,29 @@
     "battle_rule_logical_key": "battle_rule_v1:f8936911ecf7e7f49df5548c254c8cdd",
     "battle_rule_oracle_hash": "48587a2f80ce949a40d73619aa4022bf"
   },
+  "Zendikar Farguide": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
   "Zephid": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -78285,6 +79435,259 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:45c3e1db1be4f2f97a3337ce3de8f767",
     "battle_rule_oracle_hash": "23860bc4072cc27137ba346b82b9f548"
+  },
+  "Zodiac Dog": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
+  "Zodiac Goat": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "mountainwalk",
+    "landwalk_land_type": "mountain",
+    "landwalk_land_types": [
+      "mountain"
+    ],
+    "mountainwalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "MountainwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2df6ec67eb4ec29ca96fd42e5769037b",
+    "battle_rule_oracle_hash": "7e9f180d53d93a0587df4a6ad1e03eaf"
+  },
+  "Zodiac Horse": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "islandwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "islandwalk",
+    "landwalk_land_type": "island",
+    "landwalk_land_types": [
+      "island"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "IslandwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:643656d3a9ea8ff8fed517d60384be08",
+    "battle_rule_oracle_hash": "cf410cd07eb194e98cfbbb994b9258fe"
+  },
+  "Zodiac Monkey": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
+  "Zodiac Ox": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Zodiac Pig": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Zodiac Rabbit": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
+  },
+  "Zodiac Rat": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Zodiac Rooster": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "plainswalk",
+    "landwalk_land_type": "plains",
+    "landwalk_land_types": [
+      "plains"
+    ],
+    "plainswalk": true,
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "PlainswalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:2c1db0dcb37a50f52a15efb05f61a8f6",
+    "battle_rule_oracle_hash": "165a58e6d831e37b07a37de1d84a2bdc"
+  },
+  "Zodiac Snake": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "landwalk": true,
+    "landwalk_keyword": "swampwalk",
+    "landwalk_land_type": "swamp",
+    "landwalk_land_types": [
+      "swamp"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "swampwalk": true,
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "SwampwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:c463b85a35ad06f3a22b4fb4bd5ccf2e",
+    "battle_rule_oracle_hash": "d892699f363998ce8914957a67c601d9"
+  },
+  "Zodiac Tiger": {
+    "ability_kind": "static",
+    "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
+    "effect": "creature",
+    "forestwalk": true,
+    "landwalk": true,
+    "landwalk_keyword": "forestwalk",
+    "landwalk_land_type": "forest",
+    "landwalk_land_types": [
+      "forest"
+    ],
+    "static_effect": "self_basic_landwalk",
+    "target": "self",
+    "target_controller": "self",
+    "xmage_ability_class": "ForestwalkAbility",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4a71cb0deecb806b7af4da2279564aa3",
+    "battle_rule_oracle_hash": "5585e6019dbd5d733ee03c96f3edb106"
   },
   "Zoetic Cavern": {
     "effect": "land",
