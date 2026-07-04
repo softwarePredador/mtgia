@@ -3803,6 +3803,81 @@
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
   },
+  "Arms Dealer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "target_subtypes": [
+              "goblin"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 4,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 4,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{R}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "target_subtypes": [
+          "goblin"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:838f908f83f59febc86141e6ce6a5a07",
+    "battle_rule_oracle_hash": "7c113f7892e680c8189a3902ca9c1550"
+  },
   "Arrogant Vampire": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -4460,6 +4535,73 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:2dc2965ea9c97ebdb62c2b351bf29bf5",
     "battle_rule_oracle_hash": "21a711291b98f2e66a6d94a6c806945d"
+  },
+  "Aven Archer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "W"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{W}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "W"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{W}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "attacking_or_blocking_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d77bb59dda62df156274f0290f432d70",
+    "battle_rule_oracle_hash": "ff0959005adcc5916ebbfbc68019084a"
   },
   "Aven Battle Priest": {
     "_keywords_are_self": true,
@@ -5431,6 +5573,73 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2129968841d660b2dead4012318431d2"
   },
+  "Barrage Ogre": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "artifact"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+    "battle_rule_oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5"
+  },
   "Barren Moor": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -5861,6 +6070,69 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:655c7da1b9d381d24b94b64487226598",
     "battle_rule_oracle_hash": "642c17cb019f4299d5af9954f812f8a6"
+  },
+  "Bear Trap": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 3,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 3,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "artifact",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f42916e2503558c6d07d0e4248ecfaa4",
+    "battle_rule_oracle_hash": "96f5bf52ac3ff60d49307eda68e9bbb0"
   },
   "Bear's Companion": {
     "ability_kind": "triggered",
@@ -6883,6 +7155,75 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "3e5eb8bf94f5b51f7d47be67d913a8c6"
+  },
+  "Blazing Hellhound": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ],
+            "exclude_source": true
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_source": true
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+    "battle_rule_oracle_hash": "2d4d4592ecd33c272778933166b35f18"
   },
   "Blazing Volley": {
     "amount": 1,
@@ -14307,6 +14648,73 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2e48c2c7feaa259cde5e62ccdd0cd5f1"
   },
+  "Crimson Manticore": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{R}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "attacking_or_blocking_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8a21ec2ff77d73796b1347c55874eae1",
+    "battle_rule_oracle_hash": "c60843c06379a65cda17b11d8722038b"
+  },
   "Crimson Wisps": {
     "count": 1,
     "effect": "draw_cards",
@@ -14769,6 +15177,63 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:46ba2b759b0c9a870fc137d59e42ecd5",
     "battle_rule_oracle_hash": "09a1156f3a8acaf46d1eae1b4b937e85"
+  },
+  "Cunning Sparkmage": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5d90d47d181d1f7ef6757a857adcfba6",
+    "battle_rule_oracle_hash": "f715d6258f6601d0484e65b349490531"
   },
   "Curator's Ward": {
     "aura": true,
@@ -17854,6 +18319,136 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:8827478db4c81a315abdcbecd194a052",
     "battle_rule_oracle_hash": "e58ab45fafef354ecc2a21276ec922f3"
+  },
+  "Dive Bomber": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "attacking_or_blocking_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1d7c5675d355c265d9298428b3490b62",
+    "battle_rule_oracle_hash": "b145a239769c3f9dda021b8278e18bf0"
+  },
+  "Divebomber Griffin": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 3,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "attacking_or_blocking_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "combat_state": "attacking_or_blocking"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 3,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "attacking_or_blocking_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "combat_state": "attacking_or_blocking"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:45f510b6391eb447b286b11bdcd5be1d",
+    "battle_rule_oracle_hash": "aad57b7ada0732ea25b1b7532381024c"
   },
   "Divergent Equation": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_hand_spell_v1",
@@ -22950,6 +23545,65 @@
     "battle_rule_logical_key": "battle_rule_v1:4f49c32ccf671ac5a1e6c342d8300fe5",
     "battle_rule_oracle_hash": "65d3b1da504d83abf67171b2f703614c"
   },
+  "Fanatical Firebrand": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:f4ea6bf78abe77995aa5241a655c1160",
+    "battle_rule_oracle_hash": "d38a860ef72dda97a39593feb215174e"
+  },
   "Fanatical Strength": {
     "battle_model_scope": "xmage_fixed_boost_and_keyword_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -25855,6 +26509,77 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Fodder Cannon": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 4,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 4,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 4,
+    "activation_cost_mana": "{4}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "artifact",
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:61a9eac995ea571ee4f576f61b14f5a8",
+    "battle_rule_oracle_hash": "7623cd0a94a2a02bc06fb55d9b6da1e9"
   },
   "Fog": {
     "effect": "unknown",
@@ -32587,6 +33312,73 @@
     "battle_rule_logical_key": "battle_rule_v1:f2dfdefefd0aa9032366a0aa11d84742",
     "battle_rule_oracle_hash": "240bb15b470790a2b0d763d9fd1f0130"
   },
+  "Heartwood Giant": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "target_subtypes": [
+              "forest"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "target_subtypes": [
+          "forest"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5f948488a69e83b0b470a31d8894d698",
+    "battle_rule_oracle_hash": "e89bc4628ed49ee6da5311b61f044034"
+  },
   "Heartwood Treefolk": {
     "ability_kind": "static",
     "battle_model_scope": "xmage_static_self_basic_landwalk_creature_v1",
@@ -33981,6 +34773,75 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
+  },
+  "Hurler Cyclops": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ],
+            "exclude_source": true
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ],
+        "exclude_source": true
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:8da7adf1a02721f55e3737400b25a5e2",
+    "battle_rule_oracle_hash": "2d4d4592ecd33c272778933166b35f18"
   },
   "Hushwood Verge": {
     "effect": "land",
@@ -36331,6 +37192,66 @@
     "battle_rule_logical_key": "battle_rule_v1:c8621a807cc65adc820a8b8189979f70",
     "battle_rule_oracle_hash": "e323893e6c38ee2d618b4f9c737fadee"
   },
+  "Jeska, Warrior Adept": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "first_strike": true,
+    "haste": true,
+    "keywords": [
+      "first_strike",
+      "haste"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FirstStrikeAbility",
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:46504c5f3e2c002f2ad5723f301aeb6e",
+    "battle_rule_oracle_hash": "2e5f88dd30b01f820f05e7a5e5f5cc42"
+  },
   "Jetmir's Garden": {
     "effect": "land",
     "battle_rule_source": "curated",
@@ -36903,6 +37824,63 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:9ce558d63d813002f9dab2736c32fb31",
     "battle_rule_oracle_hash": "eaf65e452e9126ddfbc8e1c8b63d100f"
+  },
+  "Kamahl, Pit Fighter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 3,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 3,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:1f6a08a24ecf2eee6382ffedd987d0de",
+    "battle_rule_oracle_hash": "8d8b4512f4c5a8aa733e5eeb9a5d2083"
   },
   "Kami of Ancient Law": {
     "_activated_rule_effects": [
@@ -40952,6 +41930,79 @@
     "battle_rule_logical_key": "battle_rule_v1:dbaec042896051bca0cd57988077ca14",
     "battle_rule_oracle_hash": "63325c1b3f34983f089eef2030b640bb"
   },
+  "Magmaw": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "permanent"
+            ],
+            "exclude_card_types": [
+              "land"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "permanent"
+        ],
+        "exclude_card_types": [
+          "land"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:17d7baa49d693263cc5584a3754d0613",
+    "battle_rule_oracle_hash": "01e19cb03dba72d5a6a21f313c2d3b45"
+  },
   "Magnigoth Sentry": {
     "_keywords_are_self": true,
     "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
@@ -42010,6 +43061,63 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:30ecba357ba66148eab77d3cd4e5e9a6",
     "battle_rule_oracle_hash": "af7b53f165c85d1baa6e0670e600763d"
+  },
+  "Mawcor": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bab917078edf5017fb81d3e514d5a1df",
+    "battle_rule_oracle_hash": "56ce2fe4091f1171025effc171272525"
   },
   "Maze of Ith": {
     "effect": "land",
@@ -47332,6 +48440,73 @@
     "battle_rule_logical_key": "battle_rule_v1:2663d6337e3437c6dfefe18bcce533a5",
     "battle_rule_oracle_hash": "ed5b07f2f74081eea332ffbf640d290c"
   },
+  "Orcish Bloodpainter": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5238e3db54b9c2d828a10683bc423063",
+    "battle_rule_oracle_hash": "a010ea1cdd4c79b244cb7cc149453cf5"
+  },
   "Orcish Bowmasters": {
     "ability_kind": "triggered",
     "amass_orcs": 1,
@@ -47366,6 +48541,73 @@
     "battle_rule_logical_key": "battle_rule_v1:3928f623fa6bea3e5c2fac2983d8df26",
     "battle_rule_oracle_hash": "b63a428ffc3dff109028c603c0f54923"
   },
+  "Orcish Mechanics": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "artifact"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+    "battle_rule_oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5"
+  },
   "Orcish Spy": {
     "ability_kind": "activated",
     "activation_requires_tap": true,
@@ -47387,6 +48629,73 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:fb3a5267bf97f7634af6f31db2316382",
     "battle_rule_oracle_hash": "3db8959a9384e0c35d17fe89ad50d2da"
+  },
+  "Orcish Vandal": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "artifact"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "artifact"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:541bcd87ed6902e049fae61b02fe40e8",
+    "battle_rule_oracle_hash": "e6b51f3136d4f23dd04bb0e216deabc5"
   },
   "Organ Hoarder": {
     "ability_kind": "triggered",
@@ -58526,6 +59835,73 @@
     "battle_rule_logical_key": "battle_rule_v1:c82a87930ce3e98fa9de892c49d73b83",
     "battle_rule_oracle_hash": "de517c804272d32243aff46171907675"
   },
+  "Sarpadian Simulacrum": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": null,
+        "amount": 4,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 4,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 4,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 3,
+    "activation_cost_mana": "{3}{R}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:67101afe5016b8fb2e61cb3b855c3e0a",
+    "battle_rule_oracle_hash": "77dde89d00fd54b395c81e156fd224ed"
+  },
   "Satyr Enchanter": {
     "ability_kind": "triggered",
     "battle_model_scope": "xmage_spell_cast_draw_engine_v1",
@@ -58842,6 +60218,69 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "2f8da37c0e286b9d2ab7b9caed62a8c2"
+  },
+  "Scaldkin": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{R}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": null,
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{R}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:9a932851814ea2de91b4c41640e6f0e7",
+    "battle_rule_oracle_hash": "5a52e3fd978ee7083641b5b52d8c0645"
   },
   "Scalebane's Elite": {
     "ability_kind": "static",
@@ -59302,6 +60741,77 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "d1ae06c613443357269466c621469e7b"
+  },
+  "Scorched Rusalka": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "player_or_planeswalker",
+        "target_constraints": {
+          "scope": "player_or_planeswalker"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{R}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": false,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "player_or_planeswalker",
+    "target_constraints": {
+      "scope": "player_or_planeswalker"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:25394e24bd62caa0dcaf160d1cdd8406",
+    "battle_rule_oracle_hash": "abbd038551095cf4c7ea527274d87eda"
   },
   "Scorching Missile": {
     "amount": 4,
@@ -61763,6 +63273,67 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "69d3cf5552d5e2ca434547b062d0d15b"
   },
+  "Shivan Hellkite": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}{R}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32e5b17e6c39e40c7c1b758278fdccd8",
+    "battle_rule_oracle_hash": "37573976ed48c984160657762532e910"
+  },
   "Shivan Meteor": {
     "amount": 13,
     "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
@@ -62931,6 +64502,77 @@
     "battle_rule_logical_key": "battle_rule_v1:ae0a22fdcefad6ba6316b28f7f3210dd",
     "battle_rule_oracle_hash": "262b967f9e07cb229f7af108b99ce784"
   },
+  "Skirsdag Cultist": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "R"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{R}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "R"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{R}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:caed5a430d19931da153ce154474738a",
+    "battle_rule_oracle_hash": "cbafdddcdc87835d0160526c1455c4aa"
+  },
   "Skrelv, Defector Mite": {
     "cmc": 1.0,
     "duration": 1,
@@ -62942,6 +64584,73 @@
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:ffda876b2bf9dd73b654d1f15d865f61",
     "battle_rule_oracle_hash": "79a11c8939b4c4c4949947dcb2e5457f"
+  },
+  "Skull Catapult": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 1,
+        "activation_cost_mana": "{1}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "card_types": [
+              "creature"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 1,
+    "activation_cost_mana": "{1}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "card_types": [
+          "creature"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "artifact",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:32246bddb0296b9bb722c0f9a93e70a8",
+    "battle_rule_oracle_hash": "4a877141cb1b927295d691566c40aab8"
   },
   "Skull of Orm": {
     "_activated_rule_effects": [
@@ -63475,6 +65184,77 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:c0af1080edad34ea6a4fc4d5deba65cb",
     "battle_rule_oracle_hash": "444733081a578880ba8a563d3c59d22d"
+  },
+  "Skyway Sniper": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "G"
+        ],
+        "activation_cost_generic": 2,
+        "activation_cost_mana": "{2}{G}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": false,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "flying_creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ],
+          "required_keywords": [
+            "flying"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "G"
+    ],
+    "activation_cost_generic": 2,
+    "activation_cost_mana": "{2}{G}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": false,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "keywords": [
+      "reach"
+    ],
+    "reach": true,
+    "target": "flying_creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ],
+      "required_keywords": [
+        "flying"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "ReachAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:73c998d8f94edccb0e59cb97eea6267c",
+    "battle_rule_oracle_hash": "0ac25ffabfd8c18e6ec16015241d5477"
   },
   "Slag Fiend": {
     "ability_kind": "static",
@@ -65519,6 +67299,65 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "b1515297e5031b21bb137ec5682475ac"
   },
+  "Springjaw Trap": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 3,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 3,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 3,
+    "activated_effect": "direct_damage",
+    "activated_self_sacrifice_damage": true,
+    "activation_cost_colors": [],
+    "activation_cost_generic": 4,
+    "activation_cost_mana": "{4}",
+    "activation_requires_sacrifice": true,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "artifact",
+    "flash": true,
+    "keywords": [
+      "flash"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlashAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:4af262b74796a9830c2e46d341bcc49b",
+    "battle_rule_oracle_hash": "0cfb147f3137086ad77e1697c480b0c3"
+  },
   "Springleaf Drum": {
     "ability_kind": "activated",
     "battle_model_scope": "creature_support_any_color_mana_rock_v1",
@@ -66388,6 +68227,67 @@
     "battle_rule_logical_key": "battle_rule_v1:eadf67fc1cb7f3af1815c990dcc877ef",
     "battle_rule_oracle_hash": "66bd94130c3b840b17efe71562caaa52"
   },
+  "Stinging Barrier": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [
+          "U"
+        ],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{U}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [
+      "U"
+    ],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{U}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "defender": true,
+    "effect": "creature",
+    "keywords": [
+      "defender"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "DefenderAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:b1e0a8a3bdeacf3c06b6154cd467513e",
+    "battle_rule_oracle_hash": "41590c21871cd0bd64a11bab406c595b"
+  },
   "Stir the Grave": {
     "battle_model_scope": "xmage_return_target_graveyard_card_to_battlefield_spell_v1",
     "battlefield_controller": "self",
@@ -66861,6 +68761,67 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:225f4ec8ae4e0f595467b867ced4ec4a",
     "battle_rule_oracle_hash": "290bd0cc4068a9ee94ca2c00f0ae9ce5"
+  },
+  "Storm Spirit": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "creature",
+    "target_constraints": {
+      "card_types": [
+        "creature"
+      ]
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:a48e7d80dbc71a414f1d9e6a982d3d0b",
+    "battle_rule_oracle_hash": "bb0c8293a45260ecd482ae046012b37c"
   },
   "Storm's Wrath": {
     "amount": 4,
@@ -69381,6 +71342,73 @@
     "battle_rule_logical_key": "battle_rule_v1:67682574cd83c50c417bda73cb54c69b",
     "battle_rule_oracle_hash": "91702377ce6d69cc19357882d3ac24de"
   },
+  "Tar Pitcher": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_sacrifice_target": true,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": {
+          "constraints": {
+            "target_subtypes": [
+              "goblin"
+            ]
+          },
+          "count": 1,
+          "target_controller": "self"
+        },
+        "amount": 2,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 2,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 2,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_sacrifice_target": true,
+    "activation_requires_tap": true,
+    "activation_sacrifice_cost": {
+      "constraints": {
+        "target_subtypes": [
+          "goblin"
+        ]
+      },
+      "count": 1,
+      "target_controller": "self"
+    },
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:d5ec217ecebff1f256812fb52cfbbb4c",
+    "battle_rule_oracle_hash": "a573e339df3d274035c7a38f41496487"
+  },
   "Tar Snare": {
     "battle_model_scope": "xmage_fixed_boost_target_creature_until_eot_spell_v1",
     "duration": "until_end_of_turn",
@@ -71230,6 +73258,63 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:e9c4161aae1c553789ca345fa2989c1b",
     "battle_rule_oracle_hash": "a506dddb02e366c9956b2707bbc7a61e"
+  },
+  "Thornwind Faeries": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "flying": true,
+    "keywords": [
+      "flying"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "FlyingAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:bab917078edf5017fb81d3e514d5a1df",
+    "battle_rule_oracle_hash": "56ce2fe4091f1171025effc171272525"
   },
   "Thornwood Falls": {
     "effect": "land",
@@ -77739,6 +79824,63 @@
     "battle_rule_version": 2,
     "battle_rule_logical_key": "battle_rule_v1:99365c102acc02481cb6ab18c2d131a6",
     "battle_rule_oracle_hash": "7ec4a9423850acce187f343f1b70c8a3"
+  },
+  "Vulshok Sorcerer": {
+    "_activated_rule_effects": [
+      {
+        "ability_kind": "activated",
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 0,
+        "activation_cost_mana": "{0}",
+        "activation_requires_sacrifice": false,
+        "activation_requires_tap": true,
+        "activation_sacrifice_cost": null,
+        "amount": 1,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "damage": 1,
+        "effect": "direct_damage",
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    ],
+    "_keywords_are_self": true,
+    "ability_kind": "static_and_activated",
+    "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "activated_damage_amount": 1,
+    "activated_effect": "direct_damage",
+    "activation_cost_colors": [],
+    "activation_cost_generic": 0,
+    "activation_cost_mana": "{0}",
+    "activation_requires_sacrifice": false,
+    "activation_requires_tap": true,
+    "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+    "effect": "creature",
+    "haste": true,
+    "keywords": [
+      "haste"
+    ],
+    "target": "any_target",
+    "target_constraints": {
+      "scope": "any_target"
+    },
+    "xmage_ability_class": "SimpleActivatedAbility",
+    "xmage_ability_classes": [
+      "HasteAbility",
+      "SimpleActivatedAbility"
+    ],
+    "xmage_effect_class": "DamageTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:5d90d47d181d1f7ef6757a857adcfba6",
+    "battle_rule_oracle_hash": "f715d6258f6601d0484e65b349490531"
   },
   "Wake the Past": {
     "ability_kind": "one_shot",
