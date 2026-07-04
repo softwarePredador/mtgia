@@ -115,6 +115,7 @@ E2E_REQUIRED_EFFECT_FIELDS = (
     "counter_grants_keywords",
     "keywords",
     "_keywords_are_self",
+    "flash",
     "is_mana_source",
     "mana_produced",
     "produces",

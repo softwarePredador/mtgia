@@ -380,6 +380,7 @@ STATIC_SELF_KEYWORD_ABILITY_CLASSES = {
     "DefenderAbility": "defender",
     "DoubleStrikeAbility": "double_strike",
     "FirstStrikeAbility": "first_strike",
+    "FlashAbility": "flash",
     "FlyingAbility": "flying",
     "HasteAbility": "haste",
     "HexproofAbility": "hexproof",
@@ -398,6 +399,7 @@ SAFE_MANA_AUXILIARY_ABILITY_CLASSES = {
 }
 
 STATIC_SELF_KEYWORD_ORDER = [
+    "flash",
     "flying",
     "first_strike",
     "double_strike",
@@ -417,7 +419,7 @@ FLASH_PERMISSION_AUXILIARY_ABILITY_CLASSES = {
     **STATIC_SELF_KEYWORD_ABILITY_CLASSES,
     "FlashAbility": "flash",
 }
-FLASH_PERMISSION_KEYWORD_ORDER = ["flash", *STATIC_SELF_KEYWORD_ORDER]
+FLASH_PERMISSION_KEYWORD_ORDER = list(dict.fromkeys(["flash", *STATIC_SELF_KEYWORD_ORDER]))
 TARGET_GRANT_KEYWORD_ABILITY_CLASSES = {
     key: value
     for key, value in STATIC_SELF_KEYWORD_ABILITY_CLASSES.items()

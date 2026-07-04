@@ -10674,6 +10674,43 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         self.assertTrue(permanent["haste"])
         self.assertFalse(permanent["summoning_sick"])
 
+    def test_static_flash_keyword_creature_can_be_cast_outside_main_phase(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        flash_creature = {
+            "name": "Aven Reedstalker",
+            "type_line": "Creature - Bird Soldier",
+            "oracle_text": "Flash\nFlying",
+            "keywords": ["flash", "flying"],
+            "_keywords_are_self": True,
+            "flash": True,
+            "flying": True,
+        }
+        ordinary_creature = {
+            "name": "Wind Drake",
+            "type_line": "Creature - Drake",
+            "oracle_text": "Flying",
+            "keywords": ["flying"],
+            "_keywords_are_self": True,
+            "flying": True,
+        }
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(
+                flash_creature,
+                {"effect": "creature", "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"},
+                "combat",
+                controller=active,
+            )
+        )
+        self.assertFalse(
+            self.battle.can_cast_in_phase(
+                ordinary_creature,
+                {"effect": "creature", "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1"},
+                "combat",
+                controller=active,
+            )
+        )
+
     def test_static_self_keyword_creature_runtime_enforces_hexproof_shroud_indestructible(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

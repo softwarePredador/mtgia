@@ -1,0 +1,3361 @@
+{
+  "blocked_samples": {
+    "activated_damage_oracle_not_simple": [
+      "Airdrop Condor",
+      "Ballista Squad",
+      "Ben-Ben, Akki Hermit",
+      "Bloodshot Cyclops",
+      "Bosh, Iron Golem",
+      "Brion Stoutarm",
+      "Cinder Elemental",
+      "Coalborn Entity",
+      "Crimson Hellkite",
+      "Cuombajj Witches",
+      "Deadeye Duelist",
+      "Elite Headhunter"
+    ],
+    "activated_damage_source_cost_not_supported": [
+      "Arc-Slogger",
+      "Bolrac-Clan Crusher",
+      "Catapult Squad",
+      "Fodder Tosser",
+      "Ghirapur Aether Grid",
+      "Ion Storm",
+      "Kris Mage",
+      "Kyren Negotiations",
+      "Mage il-Vec",
+      "Meteor Storm",
+      "Molten Vortex",
+      "Ogre Shaman"
+    ],
+    "activated_destroy_oracle_not_simple": [
+      "Blaster Mage",
+      "Boom Box",
+      "Devout Harpist",
+      "Dwarven Demolition Team",
+      "Dwarven Miner",
+      "Eastern Paladin",
+      "Fulminator Mage",
+      "Goblin Digging Team",
+      "Gorilla Shaman",
+      "Haazda Exonerator",
+      "King Suleiman",
+      "Miracle Worker"
+    ],
+    "activated_destroy_source_cost_not_supported": [
+      "Army Ants",
+      "Attrition",
+      "Aura Fracture",
+      "Devout Witness",
+      "Earthblighter",
+      "Elvish Skysweeper",
+      "Hand of Justice",
+      "Keldon Arsonist",
+      "Krark-Clan Engineers",
+      "Murderous Betrayal",
+      "Notorious Assassin",
+      "Nullmage Shepherd"
+    ],
+    "activated_destroy_source_mana_cost_not_supported": [
+      "Elvish Hexhunter"
+    ],
+    "activated_destroy_source_not_simple_destroy_effect": [
+      "Despotic Scepter",
+      "Seal of Doom"
+    ],
+    "activated_destroy_source_target_not_supported": [
+      "Chandler",
+      "Deepfire Elemental",
+      "Dogged Hunter",
+      "Goblin Replica",
+      "Hearth Kami",
+      "Intrepid Hero",
+      "Knight of Dusk",
+      "Ogre Siegebreaker",
+      "Rats of Rath",
+      "Witch's Mist"
+    ],
+    "activated_draw_discard_oracle_cost_not_supported": [
+      "Maestros Initiate"
+    ],
+    "activated_draw_oracle_cost_not_supported": [
+      "Azami, Lady of Scrolls",
+      "Cobbled Lancer",
+      "Illuminated Folio",
+      "Jandor's Ring",
+      "O'aka, Traveling Merchant",
+      "Selhoff Entomber",
+      "Soul Diviner",
+      "Thraxodemon"
+    ],
+    "activated_draw_oracle_not_simple": [
+      "Compulsion",
+      "Gristle Glutton",
+      "Riptide Director",
+      "Sea Gate Loremaster",
+      "Slate of Ancestry"
+    ],
+    "activated_draw_source_cost_not_supported": [
+      "Sage of Lat-Nam"
+    ],
+    "activated_graveyard_exile_oracle_not_simple": [
+      "Martyr of Bones",
+      "Mortiphobia",
+      "Steamclaw"
+    ],
+    "activated_graveyard_to_library_oracle_not_simple": [
+      "Keeper of the Cadence"
+    ],
+    "activated_library_tutor_oracle_cost_not_supported": [
+      "Angel's Herald",
+      "Behemoth's Herald",
+      "Demon's Herald",
+      "Dragon's Herald",
+      "Dreamscape Artist",
+      "Everbark Shaman",
+      "Kuldotha Forgemaster",
+      "Lifespinner",
+      "Magus of the Order",
+      "Perilous Forays",
+      "Silverglade Pathfinder",
+      "Sphinx's Herald"
+    ],
+    "activated_life_gain_oracle_cost_not_supported": [
+      "Ancestor's Prophet",
+      "Claws of Gix",
+      "Dark Heart of the Wood",
+      "Dune Diviner",
+      "Gutless Ghoul",
+      "Overgrown Estate",
+      "Peace of Mind",
+      "Ravenous Baloth",
+      "Royal Herbalist",
+      "Soul Shepherd",
+      "Starved Rusalka"
+    ],
+    "activated_life_gain_oracle_not_simple": [
+      "Children of Korlis",
+      "Elvish Eulogist",
+      "Faith Healer",
+      "Keeper of the Light",
+      "Martyr of Sands",
+      "Oracle of Nectars",
+      "Skullmead Cauldron",
+      "Sophic Centaur",
+      "Tainted Sigil",
+      "Wellwisher"
+    ],
+    "activated_recursion_battlefield_oracle_cost_not_supported": [
+      "Gravespawn Sovereign",
+      "Order of Whiteclay",
+      "Sidisi, Regent of the Mire",
+      "Whisper, Blood Liturgist"
+    ],
+    "activated_recursion_oracle_cost_not_supported": [
+      "Bonebind Orator",
+      "Cabal Surgeon",
+      "Skeleton Shard"
+    ],
+    "activated_recursion_oracle_not_simple": [
+      "Restoration Specialist",
+      "Salvager of Ruin",
+      "Soul of Innistrad"
+    ],
+    "activated_self_boost_oracle_cost_not_supported": [
+      "Carrion Howler",
+      "Fleshgrafter",
+      "Foxfire Oak",
+      "Frenetic Ogre",
+      "Frostburn Weird",
+      "Llanowar Behemoth",
+      "Loch Korrigan",
+      "Parapet Watchers",
+      "Pardic Swordsmith",
+      "Ravenous Bloodseeker",
+      "Simian Brawler",
+      "Topan Ascetic"
+    ],
+    "activated_self_boost_oracle_not_simple": [
+      "Feral Animist",
+      "Immolating Souleater",
+      "Kitsune Loreweaver",
+      "Reckless Amplimancer",
+      "Safehold Sentry",
+      "Stone Kavu",
+      "Volrath the Fallen",
+      "Wandering Goblins",
+      "Water Servant",
+      "Yew Spirit"
+    ],
+    "activated_target_boost_oracle_cost_not_supported": [
+      "Coral Helm",
+      "Deepwood Drummer",
+      "Goblin Sledder",
+      "Plague Witch"
+    ],
+    "activated_target_boost_oracle_not_simple": [
+      "Armorer Guildmage",
+      "Auriok Bladewarden",
+      "Belbe's Armor",
+      "Cackling Witch",
+      "Dega Disciple",
+      "Disciple of Tevesh Szat",
+      "Elder of Laurels",
+      "Lys Alana Scarblade",
+      "Merrow Grimeblotter",
+      "Narcissism",
+      "Power Armor",
+      "Silvergill Douser"
+    ],
+    "activated_target_keyword_oracle_cost_not_supported": [
+      "Balloon Peddler",
+      "Heartwood Shard",
+      "Need for Speed",
+      "Ohran Yeti",
+      "Selfless Savior",
+      "Slobad, Goblin Tinkerer",
+      "Spurred Wolverine",
+      "Stonerise Spirit",
+      "Torch Courier",
+      "Vial of Poison"
+    ],
+    "activated_target_keyword_source_target_not_supported": [
+      "Veteran Cathar"
+    ],
+    "add_counters_ability_class_not_simple": [
+      "Earthen Arms",
+      "Nature's Panoply",
+      "Stinging Shot",
+      "Travel Preparations"
+    ],
+    "add_counters_counter_not_fixed": [
+      "Common Bond",
+      "Gird for Battle",
+      "Incremental Blight",
+      "Incremental Growth",
+      "Reap What Is Sown",
+      "River Heralds' Boon",
+      "Stand Together",
+      "Strength of Solidarity"
+    ],
+    "add_counters_effect_class_not_pure": [
+      "Aggressive Negotiations",
+      "Ajani's Influence",
+      "Ancient Animus",
+      "Awakening of Vitu-Ghazi",
+      "Azula Always Lies",
+      "Biogenic Upgrade",
+      "Blur of Blades",
+      "Boon of Safety",
+      "Clash of the Eikons",
+      "Clockspinning",
+      "Courage in Crisis",
+      "Domri's Ambush"
+    ],
+    "add_counters_oracle_not_simple": [
+      "Protection Magic"
+    ],
+    "add_counters_target_not_supported": [
+      "Thrive",
+      "Unexpected Fangs"
+    ],
+    "additional_cost_detected": [
+      "Abjure",
+      "Aether Tide",
+      "Anchor to Reality",
+      "Angelic Purge",
+      "Betrayer's Bargain",
+      "Blood for Bones",
+      "Bogslither's Embrace",
+      "Caught in the Crossfire",
+      "Caustic Exhale",
+      "Chill Haunting",
+      "Cinder Strike",
+      "Cloud's Limit Break"
+    ],
+    "attack_target_keyword_oracle_static_keyword_not_exact": [
+      "Ogre Errant"
+    ],
+    "attack_target_keyword_source_keyword_not_supported": [
+      "Appa, Aang's Companion",
+      "Flesh Burrower",
+      "Malamet Brawler",
+      "Phyrexian Pegasus",
+      "Poison-Blade Mentor"
+    ],
+    "attack_target_keyword_source_oracle_mismatch": [
+      "Mirkwood Spider"
+    ],
+    "board_wipe_ability_class_not_simple": [
+      "Akroma's Vengeance",
+      "Artistic Process",
+      "Blasphemous Edict",
+      "Boiling Earth",
+      "Burn Down the House",
+      "Cinderclasm",
+      "Claws of Wirewood",
+      "Crush the Weak",
+      "Deafening Clarion",
+      "Devastating Mastery",
+      "Doomskar",
+      "Dusk // Dawn"
+    ],
+    "board_wipe_damage_amount_not_fixed": [
+      "Calamitous Cave-In",
+      "Chain Reaction",
+      "Corrosive Gale",
+      "Gates Ablaze",
+      "Immolating Gyre",
+      "Radiant Flames",
+      "Savage Twister",
+      "Skyreaping",
+      "Windstorm"
+    ],
+    "board_wipe_damage_scope_not_supported": [
+      "Breath Weapon",
+      "Evaporate",
+      "Fiery Cannonade",
+      "Gale Force",
+      "Incandescent Aria",
+      "Inflame",
+      "Kaervek's Hex",
+      "Marrow Shards",
+      "Rain of Blades",
+      "Sandstorm",
+      "Squall",
+      "Warpath"
+    ],
+    "board_wipe_destroy_scope_not_supported": [
+      "Acid Rain",
+      "Anarchy",
+      "Boil",
+      "Boiling Seas",
+      "Citywide Bust",
+      "Consume the Meek",
+      "Culling Sun",
+      "Damning Verdict",
+      "Extinguish All Hope",
+      "Fight to the Death",
+      "Flashfires",
+      "Forced March"
+    ],
+    "board_wipe_effect_class_not_supported": [
+      "Balancing Act",
+      "Barter in Blood",
+      "Bend or Break",
+      "Blood Money",
+      "Bontu's Last Reckoning",
+      "Burning of Xinye",
+      "By Invitation Only",
+      "Call to the Void",
+      "Cataclysm",
+      "Catastrophe",
+      "Ceaseless Conflict",
+      "Celestial Judgment"
+    ],
+    "board_wipe_oracle_not_simple": [
+      "Anger of the Gods",
+      "Barrage of Boulders",
+      "Blood on the Snow",
+      "Breaking Point",
+      "Brotherhood's End",
+      "Calming Verse",
+      "Cleansing Meditation",
+      "Cleansing Nova",
+      "Crisis of Conscience",
+      "Crux of Fate",
+      "Fated Retribution",
+      "Final Act"
+    ],
+    "boost_controlled_source_filter_not_supported": [
+      "Guardians' Pledge"
+    ],
+    "boost_controlled_source_not_single_fixed": [
+      "Battle Frenzy",
+      "Fortify",
+      "In Oketra's Name",
+      "Klothys's Design"
+    ],
+    "boost_draw_oracle_not_exact_fixed": [
+      "Aang's Defense",
+      "Gallantry"
+    ],
+    "boost_keyword_oracle_not_simple": [
+      "Fight as One",
+      "Invigorated Rampage"
+    ],
+    "boost_keyword_source_not_single_fixed": [
+      "Arm the Cathars",
+      "Armor of Shadows",
+      "Blitzball Shot",
+      "Chorus of Might",
+      "Coordinated Assault",
+      "Cutthroat Maneuver",
+      "Get a Leg Up",
+      "Massive Might",
+      "Masterful Flourish",
+      "Pedal to the Metal",
+      "Press the Advantage",
+      "Run Amok"
+    ],
+    "boost_target_source_not_single_fixed": [
+      "Accelerated Mutation",
+      "Agony Warp",
+      "Allied Assault",
+      "Bloodcurdling Scream",
+      "Bounty of Might",
+      "Dauntless Onslaught",
+      "Death Wind",
+      "Enrage",
+      "Hearts on Fire",
+      "Howl from Beyond",
+      "Martial Glory",
+      "Might of the Nephilim"
+    ],
+    "bounce_ability_class_not_simple": [
+      "Alchemist's Retrieval",
+      "Capsize",
+      "Champion's Victory",
+      "Clutch of Currents",
+      "Command of Unsummoning",
+      "Consuming Vortex",
+      "Dematerialize",
+      "Deny Reality",
+      "Depart the Realm",
+      "Essence Fracture",
+      "Floodwaters",
+      "Into Thin Air"
+    ],
+    "bounce_draw_ability_class_not_simple": [
+      "Eject",
+      "Escape Detection",
+      "Lunar Rejection"
+    ],
+    "bounce_draw_oracle_not_exact_fixed": [
+      "Repeal"
+    ],
+    "bounce_draw_oracle_not_simple": [
+      "Read the Tides"
+    ],
+    "bounce_effect_class_not_pure": [
+      "Absorb Identity",
+      "Alley Evasion",
+      "Applied Biomancy",
+      "Banishing Betrayal",
+      "Baral's Expertise",
+      "Barrin's Unmaking",
+      "Boing!",
+      "Brutal Expulsion",
+      "Callous Dismissal",
+      "Clutch of the Undercity",
+      "Consign // Oblivion",
+      "Dead // Gone"
+    ],
+    "bounce_scry_oracle_not_exact_fixed": [
+      "Sea God's Revenge"
+    ],
+    "bounce_target_not_supported": [
+      "Aether Gale",
+      "Aether Tradewinds",
+      "Bounce Off",
+      "Captivating Gyre",
+      "Churning Eddy",
+      "Counterintelligence",
+      "Cut the Earthly Bond",
+      "Distorting Wake",
+      "Hoodwink",
+      "Into the Void",
+      "Peel from Reality",
+      "Quicksilver Geyser"
+    ],
+    "counter_ability_class_not_simple": [
+      "Admiral's Order",
+      "Broken Concentration",
+      "Consign to Memory",
+      "Controvert",
+      "Fervent Denial",
+      "Forbid",
+      "Forceful Denial",
+      "Last Word",
+      "Long River's Pull",
+      "Muddle the Mixture",
+      "Neutralize",
+      "Out of Bounds"
+    ],
+    "counter_draw_oracle_not_simple": [
+      "School Daze"
+    ],
+    "counter_draw_target_not_supported": [
+      "Confound",
+      "Hindering Light",
+      "Keep Safe",
+      "Laquatus's Disdain"
+    ],
+    "counter_effect_class_not_pure": [
+      "Amazing Acrobatics",
+      "Bar the Gate",
+      "Bring the Ending",
+      "Confirm Suspicions",
+      "Countersquall",
+      "Dawn Charm",
+      "Deny the Witch",
+      "Didn't Say Please",
+      "Discombobulate",
+      "Dissolve",
+      "Ertai's Trickery",
+      "Essence Capture"
+    ],
+    "counter_oracle_not_simple": [
+      "Change the Equation",
+      "Spell Blast"
+    ],
+    "counter_target_not_supported": [
+      "Avoid Fate",
+      "Ceremonious Rejection",
+      "Disallow",
+      "Disdainful Stroke",
+      "Double Negative",
+      "Flashfreeze",
+      "Frazzle",
+      "Guttural Response",
+      "Hisoka's Defiance",
+      "Intervene",
+      "Minor Misstep",
+      "Mystic Denial"
+    ],
+    "damage_additional_cost_not_supported": [
+      "Close Encounter",
+      "Devour in Flames",
+      "Final Flare",
+      "Goblin Grenade",
+      "Heartfire",
+      "Lightning Axe",
+      "Monstrous Emergence",
+      "Nahiri's Wrath",
+      "Pumpkin Bombardment",
+      "Shrapnel Blast"
+    ],
+    "damage_amount_not_fixed": [
+      "Clan Defiance",
+      "Devil's Play",
+      "Electrostatic Bolt",
+      "Fall of the Titans",
+      "Final Strike",
+      "Fling",
+      "Jaya's Immolating Inferno",
+      "Practiced Tactics",
+      "Street Spasm",
+      "Thud",
+      "Torrent of Fire",
+      "Triumphant Chomp"
+    ],
+    "damage_draw_oracle_not_exact_fixed": [
+      "Incinerating Blast",
+      "Invoke the Firemind",
+      "Master the Way",
+      "Needle Drop",
+      "Stensia Banquet",
+      "Tweeze"
+    ],
+    "damage_effect_class_not_pure": [
+      "Aggressive Sabotage",
+      "Arc Blade",
+      "Arrow Storm",
+      "Barrel Down Sokenzan",
+      "Beacon of Destruction",
+      "Bedeck // Bedazzle",
+      "Blastfire Bolt",
+      "Blightning",
+      "Blooming Blast",
+      "Brimstone Volley",
+      "Bring Low",
+      "Burning Cloak"
+    ],
+    "damage_life_gain_oracle_not_simple": [
+      "Covenant of Blood",
+      "Lantern Flare",
+      "Morbid Hunger",
+      "Parasitic Grasp",
+      "Sacred Fire",
+      "Smiting Helix",
+      "Zenith Flare"
+    ],
+    "damage_life_gain_source_not_fixed": [
+      "Consuming Corruption",
+      "Deadly Riposte",
+      "Death Grasp",
+      "Feast of Flesh",
+      "Harsh Sustenance",
+      "Joust Through",
+      "Kiss of Death",
+      "Profane Prayers",
+      "Simulacrum",
+      "Sorin's Vengeance",
+      "Soul Shred",
+      "Soul Spike"
+    ],
+    "damage_target_not_supported": [
+      "Consuming Bonfire",
+      "Dual Shot",
+      "Furious Reprisal",
+      "Jagged Lightning",
+      "Meteor Blast",
+      "Pinnacle of Rage",
+      "Storm of Steel",
+      "Strafe",
+      "Sunlance",
+      "Swelter"
+    ],
+    "destroy_additional_cost_not_supported": [
+      "Annihilating Glare",
+      "Bitter Triumph",
+      "Bone Shards",
+      "Deadly Precision",
+      "Eliminate the Competition",
+      "Feed the Cycle",
+      "Final Payment",
+      "Flowstone Flood",
+      "Fumarole",
+      "Immoral Bargain",
+      "Lash of the Balrog",
+      "Lethal Sting"
+    ],
+    "destroy_draw_oracle_not_exact_fixed": [
+      "Deadly Embrace",
+      "Dregs of Sorrow",
+      "Execute",
+      "Slay"
+    ],
+    "destroy_draw_source_not_fixed": [
+      "Annihilate"
+    ],
+    "destroy_effect_class_not_pure": [
+      "Active Volcano",
+      "Afterlife",
+      "Aftershock",
+      "Agonizing Demise",
+      "Airbender's Reversal",
+      "Assassin's Strike",
+      "Atomize",
+      "Bant Charm",
+      "Beast Within",
+      "Blight Grenade",
+      "Blood Curdle",
+      "Blue Elemental Blast"
+    ],
+    "destroy_life_gain_ability_class_not_simple": [
+      "Aerial Assault",
+      "Feast of Blood"
+    ],
+    "destroy_life_gain_source_not_fixed": [
+      "Aerial Predation",
+      "Dark Offering",
+      "Divine Offering",
+      "Eriette's Lullaby",
+      "Lucky Offering",
+      "Molder",
+      "Noxious Grasp",
+      "Poison Arrow",
+      "Radiant Strike",
+      "Serene Offering",
+      "Silverstrike",
+      "Surge of Righteousness"
+    ],
+    "destroy_scry_ability_class_not_simple": [
+      "Shower of Arrows"
+    ],
+    "destroy_target_not_supported": [
+      "Assassin's Blade",
+      "Avalanche",
+      "By Force",
+      "Cast Down",
+      "Chill to the Bone",
+      "Consign to Dust",
+      "Cradle to Grave",
+      "Curtains' Call",
+      "Cut Short",
+      "Dark Withering",
+      "Death Rattle",
+      "Eightfold Maze"
+    ],
+    "dies_damage_amount_not_fixed": [
+      "Blazing Effigy"
+    ],
+    "dies_damage_target_not_supported": [
+      "Ember-Fist Zubera"
+    ],
+    "dies_draw_count_not_fixed": [
+      "Floating-Dream Zubera",
+      "Merfolk Seer"
+    ],
+    "dies_life_gain_amount_not_fixed": [
+      "Bottle Golems",
+      "Centaur Safeguard",
+      "Silent-Chant Zubera"
+    ],
+    "dies_recursion_optional_cost_not_supported": [
+      "Carrion Thrash"
+    ],
+    "dies_token_oracle_not_simple": [
+      "Conclave Cavalier",
+      "Deathknell Berserker",
+      "Mausoleum Guard",
+      "Tuktuk the Explorer"
+    ],
+    "draw_additional_cost_not_supported": [
+      "Bankrupt in Blood",
+      "Merciless Resolve",
+      "Necrologia",
+      "Scarscale Ritual",
+      "Shared Discovery"
+    ],
+    "draw_discard_spell_ability_class_not_simple": [
+      "Faithless Salvaging",
+      "Unexpected Assistance",
+      "Winternight Stories"
+    ],
+    "draw_discard_spell_oracle_not_exact_fixed": [
+      "Brilliant Spectrum",
+      "Control of the Court",
+      "Flow of Knowledge",
+      "Goblin Lore",
+      "Pull from Tomorrow"
+    ],
+    "draw_discard_spell_oracle_not_simple": [
+      "Mystic Meditation",
+      "Thirst for Discovery",
+      "Thirst for Identity",
+      "Thirst for Knowledge",
+      "Thirst for Meaning",
+      "Waterbending Lesson"
+    ],
+    "draw_effect_class_not_pure": [
+      "Abeyance",
+      "Abzan Charm",
+      "Accelerate",
+      "Adventure Awaits",
+      "Afterlife Insurance",
+      "Airbending Lesson",
+      "Amass the Components",
+      "Ambitious Assault",
+      "Ancestral Anger",
+      "Aphotic Wisps",
+      "Archmage's Charm",
+      "Argent Mutation"
+    ],
+    "draw_lose_life_spell_ability_class_not_simple": [
+      "Cut of the Profits",
+      "Decorum Dissertation",
+      "Ominous Harvest"
+    ],
+    "draw_lose_life_spell_oracle_not_exact_fixed": [
+      "Monumental Corruption",
+      "Painful Truths",
+      "Sanguimancy"
+    ],
+    "draw_self_cost_reduction_condition_not_supported": [
+      "Seize the Secrets"
+    ],
+    "draw_self_cost_reduction_oracle_not_exact_fixed": [
+      "Even the Score"
+    ],
+    "dynamic_count_damage_oracle_composite_count_not_supported": [
+      "Focus Fire",
+      "Hobbit's Sting",
+      "Slash of Light"
+    ],
+    "dynamic_count_damage_oracle_filter_not_supported": [
+      "Kaleidoscorch",
+      "Road Rage",
+      "Runeflare Trap",
+      "Storm Seeker",
+      "Sudden Impact",
+      "Thunder Salvo"
+    ],
+    "etb_add_counters_counter_not_fixed": [
+      "Aeronaut Cavalry",
+      "Angelic Quartermaster",
+      "Baleful Ammit",
+      "Basri's Acolyte",
+      "Crocodile of the Crossing",
+      "Earth Kingdom Soldier",
+      "Felidar Savior",
+      "Gavony Silversmith",
+      "Jade Bearer",
+      "Keen-Eyed Raven",
+      "Kujar Seedsculptor",
+      "Ornery Kudu"
+    ],
+    "etb_damage_target_not_supported": [
+      "Basalt Ravager",
+      "Explosive Prodigy",
+      "Firefist Adept",
+      "Geistcatcher's Rig",
+      "Goretusk Firebeast",
+      "Gruesome Scourger",
+      "Kessig Malcontents",
+      "Outrage Shaman",
+      "Thundering Sparkmage",
+      "Unsparing Boltcaster",
+      "Viashino Pyromancer",
+      "Volley Veteran"
+    ],
+    "etb_destroy_target_not_supported": [
+      "Bala Ged Scorpion",
+      "Dakmor Lancer",
+      "Fathom Fleet Cutthroat",
+      "Fleshpulper Giant",
+      "Marshdrinker Giant",
+      "Myconid Spore Tender",
+      "Ravenous Baboons",
+      "Rock Soldiers",
+      "Rustspore Ram",
+      "Serpent Assassin",
+      "Setessan Starbreaker",
+      "Slayer of the Wicked"
+    ],
+    "etb_draw_count_not_fixed": [
+      "Armorcraft Judge",
+      "Discerning Peddler",
+      "Earthshaker Dreadmaw",
+      "Fissure Wizard",
+      "Immersturm Raider",
+      "Keldon Raider",
+      "Liliana's Standard Bearer",
+      "Plundering Predator",
+      "Prophet of the Scarab",
+      "Regal Force",
+      "Shinestriker",
+      "Treetop Sentries"
+    ],
+    "etb_draw_lose_life_oracle_not_exact_fixed": [
+      "Champion of Dusk"
+    ],
+    "etb_library_pick_oracle_not_simple": [
+      "Gurmag Nightwatch",
+      "Sage of Days",
+      "Stirring Honormancer"
+    ],
+    "etb_library_tutor_oracle_not_simple": [
+      "Llanowar Sentinel"
+    ],
+    "etb_library_tutor_oracle_target_not_supported": [
+      "Scampering Surveyor"
+    ],
+    "etb_library_tutor_to_hand_oracle_target_not_supported": [
+      "Micromancer"
+    ],
+    "etb_library_tutor_to_hand_source_oracle_count_mismatch": [
+      "Battalion Foot Soldier",
+      "Gathering Throng",
+      "Legion Conquistador"
+    ],
+    "etb_library_tutor_to_hand_source_oracle_up_to_count_mismatch": [
+      "Thalia's Lancers"
+    ],
+    "etb_life_gain_amount_not_fixed": [
+      "Ancestor's Chosen",
+      "Angel of Renewal",
+      "Archway Angel",
+      "Aven Gagglemaster",
+      "Dwarven Priest",
+      "Flourishing Hunter",
+      "Goldnight Redeemer",
+      "Kraul Foragers",
+      "Luminollusk",
+      "Nylea's Disciple",
+      "Setessan Petitioner",
+      "Shepherd of Heroes"
+    ],
+    "etb_recursion_battlefield_target_not_supported": [
+      "Rot Hulk"
+    ],
+    "etb_recursion_target_not_supported": [
+      "Master Skald",
+      "Mausoleum Turnkey",
+      "Nucklavee"
+    ],
+    "exile_effect_class_not_pure": [
+      "Agate Assault",
+      "Aim for the Head",
+      "Angelic Ascension",
+      "Anguished Unmaking",
+      "Ashes to Ashes",
+      "Break Down the Door",
+      "Buy Your Silence",
+      "Cast into the Fire",
+      "Consuming Sinkhole",
+      "Crib Swap",
+      "Dispatch",
+      "Divine Gambit"
+    ],
+    "exile_oracle_not_simple": [
+      "Barrier Breach",
+      "Crush Contraband",
+      "Devouring Light",
+      "Forsake the Worldly",
+      "Repel the Vile",
+      "Tear Asunder",
+      "Topple",
+      "Wipe Clean"
+    ],
+    "exile_scry_oracle_not_exact_fixed": [
+      "Devout Decree",
+      "Ray of Ruin"
+    ],
+    "exile_target_not_supported": [
+      "Blazing Hope",
+      "Complete Disregard",
+      "Death in the Family",
+      "Despark",
+      "Dust to Dust",
+      "Exorcise",
+      "Glare of Heresy",
+      "Gravkill",
+      "Grip of Desolation",
+      "Grotesque Demise",
+      "Into the Core",
+      "Isolate"
+    ],
+    "graveyard_count_boost_source_not_single": [
+      "Growth Cycle"
+    ],
+    "graveyard_count_damage_adventure_filter_not_supported": [
+      "Frantic Firebolt"
+    ],
+    "graveyard_count_damage_exile_x_graveyard_cost_not_supported": [
+      "Harvest Pyre",
+      "Haunting Misery"
+    ],
+    "graveyard_exile_ability_class_not_supported": [
+      "Shred Memory"
+    ],
+    "graveyard_self_return_ability_class_not_simple": [
+      "Deathless Pilot",
+      "Eldrazi Ravager",
+      "Gilded Assault Cart",
+      "Salvage Titan"
+    ],
+    "graveyard_self_return_oracle_not_simple": [
+      "Deathless Ancient",
+      "Deathless Behemoth",
+      "Dutiful Griffin",
+      "Gangrenous Goliath"
+    ],
+    "library_pick_ability_class_not_simple": [
+      "Tracker's Instincts"
+    ],
+    "library_tutor_oracle_not_simple": [
+      "Beseech the Queen"
+    ],
+    "library_tutor_oracle_target_not_supported": [
+      "Conflux",
+      "Reach the Horizon"
+    ],
+    "library_tutor_source_distinct_names_not_supported": [
+      "Shared Summons",
+      "Three Dreams"
+    ],
+    "life_gain_amount_not_fixed": [
+      "Blessed Reversal",
+      "Bountiful Harvest",
+      "Festival of Trokin",
+      "Fruition",
+      "Gerrard's Wisdom",
+      "Invigorating Falls",
+      "Joyous Respite",
+      "Landbind Ritual",
+      "Nourishing Shoal",
+      "Peach Garden Oath",
+      "Predator's Rapport",
+      "Presence of the Wise"
+    ],
+    "life_gain_draw_ability_class_not_simple": [
+      "Lifestream's Blessing",
+      "Pursue the Past",
+      "Voyage Home"
+    ],
+    "life_gain_draw_oracle_not_exact_fixed": [
+      "Shamanic Revelation",
+      "Sphinx's Revelation",
+      "Union of the Third Path"
+    ],
+    "life_gain_draw_oracle_not_simple": [
+      "Thrilling Discovery"
+    ],
+    "life_gain_effect_class_not_pure": [
+      "Aang's Journey",
+      "Absorb",
+      "Abuna's Chant",
+      "Archangel's Light",
+      "Bargain",
+      "Basic Conjuration",
+      "Battle at the Bridge",
+      "Battlefield Promotion",
+      "Blossoming Calm",
+      "Blunt the Assault",
+      "Bond of Flourishing",
+      "Commune with Evil"
+    ],
+    "life_gain_oracle_not_simple": [
+      "Ancestral Tribute",
+      "Benediction of Moons",
+      "Captured Sunlight",
+      "Folk Medicine",
+      "Gnaw to the Bone",
+      "Meditation Puzzle",
+      "Reaping the Rewards",
+      "Rejuvenate",
+      "Sun's Bounty",
+      "Vital Surge",
+      "Weather the Storm"
+    ],
+    "mana_source_activated_draw_oracle_cost_not_supported": [
+      "Azorius Locket",
+      "Boros Locket",
+      "Dimir Locket",
+      "Golgari Locket",
+      "Gruul Locket",
+      "Izzet Locket",
+      "Orzhov Locket",
+      "Rakdos Locket",
+      "Selesnya Locket",
+      "Simic Locket"
+    ],
+    "mana_source_activated_draw_oracle_not_simple": [
+      "All-Fates Scroll",
+      "Intelligence Bobblehead"
+    ],
+    "mana_source_auxiliary_ability_not_supported": [
+      "Aetheric Amplifier",
+      "Agility Bobblehead",
+      "Altar of the Pantheon",
+      "Ancient Cornucopia",
+      "Arc Reactor",
+      "Arixmethes, Slumbering Isle",
+      "Armored Scrapgorger",
+      "Ashaya, Soul of the Wild",
+      "Astral Cornucopia",
+      "Astrolabe",
+      "Atarka Monument",
+      "Atzocan Seer"
+    ],
+    "mana_source_effect_class_not_simple": [
+      "Animal Attendant",
+      "Avid Reclaimer",
+      "Biophagus",
+      "Carnelian Orb of Dragonkind",
+      "Darkwater Egg",
+      "Doubling Cube // Doubling Cube",
+      "Generator Servant",
+      "Goblin Clearcutter",
+      "Heritage Druid",
+      "Ilysian Caryatid",
+      "Leafkin Druid",
+      "Mossfire Egg"
+    ],
+    "mana_source_oracle_not_simple": [
+      "Citanul Stalwart",
+      "Deranged Assistant",
+      "Gilded Lotus",
+      "Jaspera Sentinel",
+      "Loam Dryad",
+      "Mana Prism",
+      "Nightshade Dryad",
+      "Oasis Ritualist",
+      "Pili-Pala",
+      "Rootrider Faun",
+      "Saruli Caretaker",
+      "Sea Scryer"
+    ],
+    "mana_source_sacrifice_oracle_not_simple": [
+      "Overeager Apprentice"
+    ],
+    "mana_source_safe_ability_missing": [
+      "Abstract Paintmage",
+      "Aetherflux Conduit",
+      "Akki Rockspeaker",
+      "Alluring Suitor // Deadly Dancer",
+      "Ardent Electromancer",
+      "Arvinox, the Mind Flail",
+      "Azula, Cunning Usurper",
+      "Barbflare Gremlin",
+      "Benthic Explorers",
+      "Berta, Wise Extrapolator",
+      "Blazing Firesinger // Seething Song",
+      "Boommobile"
+    ],
+    "mana_source_simple_source_missing_tap_cost": [
+      "Skyshroud Elf"
+    ],
+    "mana_source_source_discard_cost_not_supported": [
+      "Bog Witch",
+      "Skirge Familiar"
+    ],
+    "mana_source_source_pay_life_cost_not_supported": [
+      "Blightsoil Druid",
+      "Blood Celebrant",
+      "Vesper Ghoul"
+    ],
+    "mana_source_source_sacrifice_cost_not_supported": [
+      "Eye of Ramos",
+      "Heart of Ramos",
+      "Horn of Ramos",
+      "Implements of Sacrifice",
+      "Kaleidostone",
+      "Skull of Ramos",
+      "Tooth of Ramos",
+      "Wild Cantor"
+    ],
+    "mana_source_source_sacrifice_target_cost_not_supported": [
+      "Krark-Clan Stoker",
+      "Skirk Prospector"
+    ],
+    "mana_source_spell_not_supported": [
+      "Esper Origins // Summon: Esper Maduin"
+    ],
+    "mana_source_unsafe_ability_class": [
+      "Abzan Devotee",
+      "Accomplished Alchemist",
+      "Adarkar Unicorn",
+      "Alena, Kessig Trapper",
+      "Altar of the Lost",
+      "Arbor Adherent",
+      "Automated Artificer",
+      "Axebane Guardian",
+      "Barrels of Blasting Jelly",
+      "Battery Bearer",
+      "Beastcaller Savant",
+      "Bighorner Rancher"
+    ],
+    "mill_return_ability_class_not_simple": [
+      "Dig Up the Body",
+      "Incarnation Technique"
+    ],
+    "not_instant_or_sorcery_spell": [
+      "Aang, A Lot to Learn",
+      "Abandoned Sarcophagus",
+      "Aberrant",
+      "Aberrant Mind Sorcerer",
+      "Abhorrent Oculus",
+      "Abiding Grace",
+      "Abigale, Poet Laureate // Heroic Stanza",
+      "Abomination",
+      "Absolver Thrull",
+      "Absolving Lammasu",
+      "Abu Ja'far",
+      "Abyssal Gatekeeper"
+    ],
+    "not_one_shot_spell_ability": [
+      "Ajani's Response",
+      "Aleatory",
+      "All Hallow's Eve",
+      "Anzrag's Rampage",
+      "Arm with Aether",
+      "Arwen's Gift",
+      "Astral Confrontation",
+      "Back for More",
+      "Balduvian Rage",
+      "Banish from Edoras",
+      "Benefactor's Draught",
+      "Bind"
+    ],
+    "play_lands_from_graveyard_ability_class_not_simple_static": [
+      "Perennial Behemoth"
+    ],
+    "recursion_ability_class_not_simple": [
+      "Blood Beckoning",
+      "Call to the Netherworld",
+      "Dead Revels",
+      "Disturbed Burial",
+      "Grim Harvest",
+      "Life from the Loam",
+      "Peerless Recycling",
+      "Soulless Revival",
+      "Unmake the Graves"
+    ],
+    "recursion_auxiliary_flashback_cost_not_supported": [
+      "Dread Return"
+    ],
+    "recursion_auxiliary_primary_oracle_not_simple": [
+      "Sacred Excavation"
+    ],
+    "recursion_battlefield_ability_class_not_simple": [
+      "Endless Obedience",
+      "Entreat the Dead",
+      "Leonardo's Technique",
+      "Proclamation of Rebirth",
+      "Restart Sequence",
+      "Return to the Ranks"
+    ],
+    "recursion_battlefield_all_ability_class_not_simple": [
+      "Primevals' Glorious Rebirth",
+      "Resurgent Belief"
+    ],
+    "recursion_battlefield_all_oracle_not_supported": [
+      "Replenish"
+    ],
+    "recursion_battlefield_counter_ability_class_not_simple": [
+      "Prison Break",
+      "Rite of the Moth"
+    ],
+    "recursion_effect_class_not_pure": [
+      "Abuelo's Awakening",
+      "Accumulate Wisdom",
+      "Aether Burst",
+      "Aether Helix",
+      "Afterlife from the Loam",
+      "Agonizing Remorse",
+      "All Suns' Dawn",
+      "Animal Magnetism",
+      "Animist's Awakening",
+      "Another Chance",
+      "Anticognition",
+      "Ascend from Avernus"
+    ],
+    "recursion_exile_self_ability_class_not_simple": [
+      "Seeds of Renewal"
+    ],
+    "recursion_exile_self_target_not_supported": [
+      "Uncle's Musings"
+    ],
+    "scry_draw_oracle_not_exact_fixed": [
+      "Ugin's Insight"
+    ],
+    "spell_cast_draw_oracle_filter_not_supported": [
+      "Dreamcatcher",
+      "Edgewall Innkeeper",
+      "Lunar Mystic"
+    ],
+    "spell_cast_draw_source_oracle_mismatch": [
+      "Emrakul's Influence"
+    ],
+    "static_controlled_pt_oracle_filter_not_supported": [
+      "A Tale for the Ages",
+      "Builder's Blessing",
+      "Castle",
+      "Dire Fleet Neckbreaker",
+      "Goblin Oriflamme",
+      "Honor of the Pure",
+      "Jacques le Vert",
+      "Kaysa",
+      "Orcish Oriflamme",
+      "War Horn"
+    ],
+    "static_controlled_pt_oracle_not_exact": [
+      "Commander's Insignia",
+      "Sporecrown Thallid"
+    ],
+    "static_controlled_pt_source_oracle_mismatch": [
+      "Glass of the Guildpact"
+    ],
+    "static_graveyard_count_boost_oracle_not_exact": [
+      "Moon-Vigil Adherents"
+    ],
+    "static_graveyard_count_pt_oracle_not_exact": [
+      "Abomination of Llanowar",
+      "Adamaro, First to Desire",
+      "Ancient Ooze",
+      "Awakened Amalgam",
+      "Aysen Crusader",
+      "Battle Squadron",
+      "Beast of Burden",
+      "Burrowguard Mentor",
+      "Crusader of Odric",
+      "Dakkon Blackblade",
+      "Drove of Elves",
+      "Dungrove Elder"
+    ],
+    "static_graveyard_threshold_boost_oracle_not_exact": [
+      "First-Time Flyer",
+      "Gnarlwood Dryad",
+      "Gorilla Titan",
+      "Jace's Phantasm",
+      "Moldgraf Scavenger",
+      "Murasa Behemoth",
+      "Syndicate Infiltrator"
+    ],
+    "static_keyword_not_creature": [
+      "Darksteel Relic"
+    ],
+    "static_protection_oracle_not_color_exact": [
+      "Angelic Curator",
+      "Azorius First-Wing",
+      "Baneslayer Angel",
+      "Beloved Chaplain",
+      "Commander Eesha",
+      "Dragonstalker",
+      "Elite Inquisitor",
+      "Enemy of the Guildpact",
+      "Grave Bramble",
+      "Guardian of the Guildpact",
+      "Horizon Drake",
+      "Kitsune Riftwalker"
+    ],
+    "target_player_draw_spell_ability_class_not_simple": [
+      "Ancestral Vision",
+      "Comparative Analysis",
+      "Huddle Up",
+      "Oona's Grace"
+    ],
+    "target_player_draw_spell_oracle_not_exact_fixed": [
+      "Allied Strategies",
+      "Braingeyser",
+      "Stroke of Genius"
+    ],
+    "token_description_keyword_not_supported": [
+      "Carrion Call",
+      "Errand of Duty",
+      "Goblin Scouts",
+      "Goblin Wizardry",
+      "Hobbling Zombie"
+    ],
+    "token_description_not_creature_token": [
+      "Beamsaw Prospector",
+      "Blood Servitor",
+      "Brazen Freebooter",
+      "Cartographer's Companion",
+      "Common Crook",
+      "Crustacean Commando",
+      "Dire Fleet Hoarder",
+      "Forecasting Fortune Teller",
+      "Galactic Wayfarer",
+      "Gleaming Barrier",
+      "Jewel-Eyed Cobra",
+      "Mintstrosity"
+    ],
+    "token_literal_description_missing": [
+      "Carrier Thrall",
+      "Dance with Devils",
+      "Deathpact Angel",
+      "Devils' Playground",
+      "Dragon Egg",
+      "Dread Drone",
+      "Emrakul's Hatcher",
+      "Harried Spearguard",
+      "Icingdeath, Frost Tyrant",
+      "Kozilek's Predator",
+      "Mage's Attendant",
+      "Mitotic Slime"
+    ],
+    "token_source_additional_tokens_not_supported": [
+      "Bestial Menace",
+      "Farmer Cotton",
+      "Forbidden Friendship",
+      "Mascot Exhibition",
+      "Triplicate Titan",
+      "Trostani's Summoner",
+      "Wurmcoil Engine",
+      "Wurmcoil Larva"
+    ],
+    "token_source_create_token_not_fixed": [
+      "Argothian Opportunist",
+      "Awaken the Woods",
+      "Crash the Party",
+      "Dripping-Tongue Zubera",
+      "Elven Ambush",
+      "Elvish Promenade",
+      "Flurry of Wings",
+      "Form a Posse",
+      "Fresh Meat",
+      "Fungal Sprouting",
+      "Goblin Gathering",
+      "Goblin Offensive"
+    ],
+    "token_source_custom_text_not_supported": [
+      "Deploy to the Front",
+      "Evangel of Heliod",
+      "Hallowed Spiritkeeper",
+      "Reverent Hoplite",
+      "Servo Exhibition",
+      "Springjack Shepherd",
+      "Sweep the Skies",
+      "Underworld Hermit",
+      "Unified Front"
+    ],
+    "token_source_not_single_create_token_effect": [
+      "Exhibition Magician"
+    ],
+    "tutor_ability_class_not_simple": [
+      "Beneath the Sands",
+      "Bitter Ordeal",
+      "Brave the Wilds",
+      "Cosmium Confluence",
+      "Crumble to Dust",
+      "Deep Reconnaissance",
+      "Dig Up",
+      "Dire-Strain Rampage",
+      "Dragonstorm",
+      "Edge of Autumn",
+      "Extirpate",
+      "Flare of Cultivation"
+    ],
+    "tutor_effect_class_not_supported": [
+      "Acquire",
+      "Ancient Vendetta",
+      "Angrath's Fury",
+      "Attune with Aether",
+      "Avengers Disassembled",
+      "Basri's Aegis",
+      "Begin the Invasion",
+      "Behold the Beyond",
+      "Bifurcate",
+      "Boundless Realms",
+      "Bribery",
+      "Bring to Light"
+    ],
+    "unsupported_adapter_work_unit": [
+      "Changeling Wayfinder",
+      "Tiamat",
+      "Yasharn, Implacable Earth"
+    ],
+    "x_damage_alternative_timing_not_supported": [
+      "Ghitu Fire"
+    ],
+    "x_damage_buyback_not_supported": [
+      "Fanning the Flames"
+    ]
+  },
+  "generated_at": "2026-07-04T19:40:33+00:00",
+  "method": {
+    "blocked_generic_review_scopes_from_pg": true,
+    "max_cards": 0,
+    "promotion_boundary": "exact runtime-backed spell/permanent scopes only",
+    "supported_adapter_work_units": [
+      "add_counters::targeted_add_counters_variant_v1",
+      "board_wipe::xmage_mass_removal_or_sacrifice_variant_review_v1",
+      "bounce::targeted_return_to_hand_variant_v1",
+      "counter_spell::counter_target_stack_object_variant_v1",
+      "creature::etb_tutor_to_hand_creature_variant_v1",
+      "direct_damage::targeted_damage_variant_v1",
+      "draw_cards::xmage_draw_card_variant_review_v1",
+      "life_gain::xmage_life_gain_variant_review_v1",
+      "ramp_permanent::xmage_artifact_mana_source_variant_review_v1",
+      "ramp_permanent::xmage_creature_mana_source_variant_review_v1",
+      "recursion::xmage_graveyard_return_variant_review_v1",
+      "removal_destroy::targeted_destroy_variant_v1",
+      "removal_exile::targeted_exile_variant_v1",
+      "token_maker::xmage_signature::CreateTokenEffect::no_ability_class::no_target_class::no_condition_class::token",
+      "tutor::any_tutor_to_hand_v1",
+      "tutor::xmage_library_search_variant_review_v1",
+      "xmage_signature::BoostControlledEffect::SimpleStaticAbility::no_target_class::no_condition_class::static_ability",
+      "xmage_signature::BoostControlledEffect::no_ability_class::no_target_class::no_condition_class::no_signal",
+      "xmage_signature::BoostTargetEffect::no_ability_class::TargetCreaturePermanent::no_condition_class::targeting"
+    ],
+    "supported_dynamic_adapter_work_units": [
+      "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
+      "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
+      "passive::static_cast_as_flash_permission_variant_review_v1 rows with CastAsThoughItHadFlashAllEffect, SimpleStaticAbility, only safe static keyword auxiliaries including FlashAbility, and exact Oracle/XMage timing-permission filters",
+      "no-effect/no-signal CantBeBlockedSourceAbility creature rows with exact Oracle/XMage self can't-be-blocked evasion",
+      "no-effect/no-signal basic landwalk creature rows with exact Oracle/XMage self landwalk evasion",
+      "no-effect/no-signal FlyingAbility plus CanBlockOnlyFlyingAbility creature rows with exact Oracle/XMage block-only-flying restriction",
+      "no-effect/no-signal HorsemanshipAbility creature rows with exact Oracle/XMage self horsemanship evasion",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
+      "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, EntersBattlefieldTriggeredAbility, and exact fixed ETB damage Oracle text",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, DiesSourceTriggeredAbility, exact fixed dies-damage Oracle/source agreement, and no auxiliary ability class",
+      "direct_damage::targeted_damage_variant_v1 rows with one-shot DamageTargetEffect whose amount is an exact supported battlefield/hand/domain count, optional fixed base amount, and supported target constraints",
+      "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, EntersBattlefieldTriggeredAbility, and exact unrestricted ETB destroy Oracle text",
+      "add_counters::targeted_add_counters_variant_v1 rows with AddCountersTargetEffect, EntersBattlefieldTriggeredAbility, exact one target creature Oracle text, and only static self keywords",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, EntersBattlefieldTriggeredAbility, exact self-graveyard top/bottom library Oracle text, and only static self keywords",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with LookLibraryAndPickControllerEffect, EntersBattlefieldTriggeredAbility, exact ETB look-library pick-one-to-hand Oracle/source agreement, and only static self keywords",
+      "tutor::xmage_library_search_variant_review_v1 rows with SearchLibraryPutInPlayEffect, EntersBattlefieldTriggeredAbility, exact ETB land tutor-to-battlefield Oracle/source agreement, and only static self keywords",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility, exact creature Oracle tap damage, and TapSourceCost only",
+      "direct_damage::targeted_damage_variant_v1 rows with DamageTargetEffect, SimpleActivatedAbility plus only static self keywords, fixed activated damage, mana/tap/self-sacrifice source costs only, and simple any-target or creature targets",
+      "removal_destroy::targeted_destroy_variant_v1 rows with DestroyTargetEffect, SimpleActivatedAbility, exact activated destroy-target Oracle text, and mana/tap/self-sacrifice source costs only",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect, SimpleActivatedAbility, exact fixed activated life-gain Oracle text, and mana/tap/source self-sacrifice costs only",
+      "xmage_signature BoostControlledEffect one-shot spell rows with exact fixed controlled-creature boost until EOT and no color/modal/dynamic filters",
+      "xmage_signature BoostSourceEffect + SimpleActivatedAbility rows with exact activated self boost until EOT and mana/tap source costs only",
+      "xmage_signature BoostTargetEffect + SimpleActivatedAbility + TargetCreaturePermanent rows with exact activated target-creature boost until EOT and mana/tap source costs only",
+      "xmage_signature BoostControlledEffect + SimpleStaticAbility rows with exact static controlled-creature power/toughness boosts and simple creature/artifact/subtype/legendary filters",
+      "SetBasePowerToughnessSourceEffect + SimpleStaticAbility creature rows whose source and Oracle both set source power/toughness to a direct controller/all-graveyards card-type count",
+      "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + SimpleActivatedAbility, exact activated target-creature keyword until EOT, and simple mana/tap source costs only",
+      "grant_protection_from_chosen_color rows with GainAbilityTargetEffect + AttacksTriggeredAbility, exact attack-trigger target-creature keyword until EOT, and Oracle/source target constraints agreement",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-hand Oracle text, and mana/tap/self-sacrifice/discard-a-card source costs only",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToBattlefieldTargetEffect, SimpleActivatedAbility, exact activated graveyard-to-battlefield Oracle text, and mana/tap/source self-sacrifice costs only",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, AttacksTriggeredAbility, exact attack graveyard-to-hand Oracle/source agreement, optional trigger mana cost, and only static self keywords or ETB tapped metadata",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, DealsCombatDamageToAPlayerTriggeredAbility, exact combat-damage graveyard-to-hand Oracle/source agreement, and only static self keywords",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, exact mill-then-return Oracle/source agreement, and no additional ability class",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with MillCardsControllerEffect + ReturnCardChosenFromGraveyardEffect, EntersBattlefieldTriggeredAbility, exact ETB mill-then-return Oracle/source agreement, and only static self keywords",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ExileTargetEffect, SimpleActivatedAbility, exact activated graveyard-exile Oracle text, and mana/tap/self-sacrifice source costs only",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect + ExileSpellEffect, no extra ability class, exact fixed graveyard-to-hand Oracle text, and trailing self-exile text",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
+      "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterTargetEffect + DrawCardSourceControllerEffect, exact supported counter-target spell Oracle text, and draw-on-counter runtime metadata",
+      "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
+      "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
+      "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",
+      "token_maker CreateTokenEffect rows with EntersBattlefieldTriggeredAbility, a fixed token count, and a literal safe creature token class",
+      "token_maker CreateTokenEffect rows with DiesSourceTriggeredAbility, a fixed token count, literal safe creature token class, and exact non-conditional dies Oracle text",
+      "grant_protection_from_chosen_color rows with BoostTargetEffect + GainAbilityTargetEffect, one fixed target creature, and exact until-EOT keyword Oracle text"
+    ],
+    "xmage_is_authoritative_for_resolved_sources": true
+  },
+  "mutations_performed": [],
+  "proposals": [
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ff29d7ce-2c48-4057-a61c-10c4960dd107",
+      "card_name": "Ambush Viper",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:0d334008fea61bb626110dc1db32b6d0",
+      "normalized_name": "ambush viper",
+      "notes": "XMage authoritative exact-scope split: local class AmbushViper translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "c8f16b33c4b28977abb1746f0387728e",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AmbushViper",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AmbushViper.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "db223707-2d31-4c4e-8557-a962c88d694e",
+      "card_name": "Ashcoat Bear",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "ashcoat bear",
+      "notes": "XMage authoritative exact-scope split: local class AshcoatBear translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "4a2c565e9fda686748cd261b1298b784",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AshcoatBear",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AshcoatBear.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "b962fe4c-39ce-4e14-8653-4c82b53998f6",
+      "card_name": "Aven Reedstalker",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "aven reedstalker",
+      "notes": "XMage authoritative exact-scope split: local class AvenReedstalker translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "3baebb06100722ec034bcfe15b534fb7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "AvenReedstalker",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/a/AvenReedstalker.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "a0e97e93-dc67-4a53-9a41-4452f6cb0e52",
+      "card_name": "Bear Trap",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "creature"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:f42916e2503558c6d07d0e4248ecfaa4",
+      "normalized_name": "bear trap",
+      "notes": "XMage authoritative exact-scope split: local class BearTrap translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "96f5bf52ac3ff60d49307eda68e9bbb0",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BearTrap",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BearTrap.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FirstStrikeAbility,FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "24219eb2-07b7-45d1-b075-f36d621775c8",
+      "card_name": "Benalish Knight",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "first_strike": true,
+        "flash": true,
+        "keywords": [
+          "flash",
+          "first_strike"
+        ],
+        "xmage_ability_classes": [
+          "FirstStrikeAbility",
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:e69be624f5717c9c450521ca938fde94",
+      "normalized_name": "benalish knight",
+      "notes": "XMage authoritative exact-scope split: local class BenalishKnight translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "fcb744ee0a138e1bb29c33212f14398c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BenalishKnight",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BenalishKnight.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1221a14b-a226-4506-a98d-c2b240134209",
+      "card_name": "Bounding Wolf",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+      "normalized_name": "bounding wolf",
+      "notes": "XMage authoritative exact-scope split: local class BoundingWolf translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "c6a597480f571cbfab0ea87ebc019b85",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "BoundingWolf",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/b/BoundingWolf.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "5db25e65-5474-4be5-8526-88e7f932bd52",
+      "card_name": "Cloaked Siren",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "cloaked siren",
+      "notes": "XMage authoritative exact-scope split: local class CloakedSiren translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "CloakedSiren",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/CloakedSiren.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "acaaa9b0-709f-494d-8c43-a9de265a8b8a",
+      "card_name": "Crystacean",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "crystacean",
+      "notes": "XMage authoritative exact-scope split: local class Crystacean translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "4a2c565e9fda686748cd261b1298b784",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Crystacean",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/c/Crystacean.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,IndestructibleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d200d2ad-5682-49a2-8f0c-7a0cd6c4458f",
+      "card_name": "Darksteel Sentinel",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "indestructible": true,
+        "keywords": [
+          "flash",
+          "vigilance",
+          "indestructible"
+        ],
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "IndestructibleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:69cf1a8a74e0b40c022ba0cefbac4f29",
+      "normalized_name": "darksteel sentinel",
+      "notes": "XMage authoritative exact-scope split: local class DarksteelSentinel translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "8ced2ff7a7a3af95d0f8198bd4dc3d2b",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DarksteelSentinel",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DarksteelSentinel.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "e939ce4e-938d-445b-8000-371083cbd396",
+      "card_name": "Dawn's Light Archer",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+      "normalized_name": "dawn's light archer",
+      "notes": "XMage authoritative exact-scope split: local class DawnsLightArcher translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "c6a597480f571cbfab0ea87ebc019b85",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DawnsLightArcher",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DawnsLightArcher.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+      "card_id": "73d62a9e-b2be-4867-bb14-8b0d9ce7f2da",
+      "card_name": "Defender of Chaos",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "self"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "protection_from": [
+          "white"
+        ],
+        "protection_from_colors": [
+          "white"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_protection_from_colors_creature",
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "normalized_name": "defender of chaos",
+      "notes": "XMage authoritative exact-scope split: local class DefenderOfChaos translated into ManaLoom runtime scope xmage_static_self_protection_from_colors_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DefenderOfChaos",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DefenderOfChaos.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+      "card_id": "d9d205c9-a105-4115-a141-41a1c5f35e0a",
+      "card_name": "Defender of Law",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature",
+        "target": "self"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "protection_from": [
+          "red"
+        ],
+        "protection_from_colors": [
+          "red"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_protection_from_colors_creature",
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "normalized_name": "defender of law",
+      "notes": "XMage authoritative exact-scope split: local class DefenderOfLaw translated into ManaLoom runtime scope xmage_static_self_protection_from_colors_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "DefenderOfLaw",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/d/DefenderOfLaw.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "2a8ab82c-fcac-45b7-9eff-418562d5ea56",
+      "card_name": "Faerie Invaders",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "faerie invaders",
+      "notes": "XMage authoritative exact-scope split: local class FaerieInvaders translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FaerieInvaders",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FaerieInvaders.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "0703fb20-39ea-4e66-87c5-b00609e6f26a",
+      "card_name": "Fire Nation Ambushers",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "fire nation ambushers",
+      "notes": "XMage authoritative exact-scope split: local class FireNationAmbushers translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "4a2c565e9fda686748cd261b1298b784",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "FireNationAmbushers",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/f/FireNationAmbushers.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ReachAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "c37768c5-c472-45e6-9514-6559276405a9",
+      "card_name": "Galewind Moose",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "reach",
+          "trample",
+          "vigilance"
+        ],
+        "reach": true,
+        "trample": true,
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ReachAbility",
+          "TrampleAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:3b9008f96c5d746ad6e1f5e17dd87e20",
+      "normalized_name": "galewind moose",
+      "notes": "XMage authoritative exact-scope split: local class GalewindMoose translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "46fdf1268a89e54af4894249c88fad6c",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "GalewindMoose",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/g/GalewindMoose.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,TrampleAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "f3670238-5367-479c-af1a-d8929f5162e8",
+      "card_name": "Havenwood Wurm",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "trample"
+        ],
+        "trample": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "TrampleAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:ef412605d53621e6df6854b57f9b352c",
+      "normalized_name": "havenwood wurm",
+      "notes": "XMage authoritative exact-scope split: local class HavenwoodWurm translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "0401904a9ced72875eddd7de1e5a55f4",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HavenwoodWurm",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HavenwoodWurm.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "bccf132a-ed17-454e-9436-88f8cd696db1",
+      "card_name": "Hired Blade",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "hired blade",
+      "notes": "XMage authoritative exact-scope split: local class HiredBlade translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "4a2c565e9fda686748cd261b1298b784",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HiredBlade",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HiredBlade.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "3566b87e-e75e-4a63-9bd4-dbaba08a870e",
+      "card_name": "Hussar Patrol",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "vigilance"
+        ],
+        "vigilance": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "VigilanceAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:0e7ff9ef8e5837f51587ddb7ba59851c",
+      "normalized_name": "hussar patrol",
+      "notes": "XMage authoritative exact-scope split: local class HussarPatrol translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "f9e4e3bae652f9e091908dc888e27dbe",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "HussarPatrol",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/h/HussarPatrol.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "fb7e9a7f-8322-49c4-8f8a-c9b12b9750f0",
+      "card_name": "King Cheetah",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "king cheetah",
+      "notes": "XMage authoritative exact-scope split: local class KingCheetah translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "KingCheetah",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/k/KingCheetah.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "2c116d1c-e96b-416b-93b6-045c574cc454",
+      "card_name": "Living Tempest",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "living tempest",
+      "notes": "XMage authoritative exact-scope split: local class LivingTempest translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "3baebb06100722ec034bcfe15b534fb7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "LivingTempest",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/l/LivingTempest.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "17a0695c-b2c5-4a80-b7b9-4e5836d1faeb",
+      "card_name": "Merfolk of the Depths",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "merfolk of the depths",
+      "notes": "XMage authoritative exact-scope split: local class MerfolkOfTheDepths translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "4a2c565e9fda686748cd261b1298b784",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "MerfolkOfTheDepths",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/m/MerfolkOfTheDepths.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "3c26a6c0-8888-4dda-8f0b-77d587c6859e",
+      "card_name": "Nephalia Seakite",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "nephalia seakite",
+      "notes": "XMage authoritative exact-scope split: local class NephaliaSeakite translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "NephaliaSeakite",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/n/NephaliaSeakite.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "ac019306-00d9-43a8-9ac6-5fb50c9bcd83",
+      "card_name": "Plumeveil",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:0d9e9efd643d383269e6284f7db3a9af",
+      "normalized_name": "plumeveil",
+      "notes": "XMage authoritative exact-scope split: local class Plumeveil translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "1635dbfc5c0c438f8c4162633c303ed3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "Plumeveil",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/Plumeveil.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "5cceabd8-a5f7-4b7b-be02-d8d6510a7577",
+      "card_name": "Pouncing Cheetah",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "pouncing cheetah",
+      "notes": "XMage authoritative exact-scope split: local class PouncingCheetah translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "PouncingCheetah",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/p/PouncingCheetah.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,HasteAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "5313441b-4fde-4285-8d92-58d705e4151c",
+      "card_name": "Raging Kavu",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "haste": true,
+        "keywords": [
+          "flash",
+          "haste"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "HasteAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:1d62ae53017137f3b6a850b6cd6a2606",
+      "normalized_name": "raging kavu",
+      "notes": "XMage authoritative exact-scope split: local class RagingKavu translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "ef26d540d93145fee85f76dbeb57fff9",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RagingKavu",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RagingKavu.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DefenderAbility,FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "64d48807-b27f-450c-be5c-c6bd5be00a8b",
+      "card_name": "Riptide Turtle",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "defender": true,
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "defender"
+        ],
+        "xmage_ability_classes": [
+          "DefenderAbility",
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:8a884a5f51973344420a302d0455f390",
+      "normalized_name": "riptide turtle",
+      "notes": "XMage authoritative exact-scope split: local class RiptideTurtle translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "08e19ac1e964423ace0df0845826d3a2",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "RiptideTurtle",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/r/RiptideTurtle.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "366fb9aa-3c58-4b45-a159-f44368bc476b",
+      "card_name": "Sentinels of Glen Elendra",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "sentinels of glen elendra",
+      "notes": "XMage authoritative exact-scope split: local class SentinelsOfGlenElendra translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "3baebb06100722ec034bcfe15b534fb7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SentinelsOfGlenElendra",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SentinelsOfGlenElendra.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "9ef35787-c93b-4264-8c70-780816aa7508",
+      "card_name": "Skyline Predator",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "skyline predator",
+      "notes": "XMage authoritative exact-scope split: local class SkylinePredator translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SkylinePredator",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SkylinePredator.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "67f21ed2-64c7-4ec0-a75d-1fbe1d15df1a",
+      "card_name": "Spire Monitor",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "spire monitor",
+      "notes": "XMage authoritative exact-scope split: local class SpireMonitor translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SpireMonitor",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SpireMonitor.java"
+    },
+    {
+      "adapter_work_unit": "direct_damage::targeted_damage_variant_v1",
+      "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+      "card_id": "8c35a820-b0c9-437c-ac25-7c061a111fa5",
+      "card_name": "Springjaw Trap",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "artifact",
+        "target": "any_target"
+      },
+      "effect": "artifact",
+      "effect_json": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activated_self_sacrifice_damage": true,
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_permanent_simple_activated_damage",
+      "logical_rule_key": "battle_rule_v1:4af262b74796a9830c2e46d341bcc49b",
+      "normalized_name": "springjaw trap",
+      "notes": "XMage authoritative exact-scope split: local class SpringjawTrap translated into ManaLoom runtime scope xmage_permanent_simple_activated_damage_v1. This row is package-ready only because the source signature is a narrow permanent with a simple activated damage ability with focused runtime coverage.",
+      "oracle_hash": "0cfb147f3137086ad77e1697c480b0c3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SpringjawTrap",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SpringjawTrap.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "1187cdd4-4763-4ccb-9713-f1566ca50dcc",
+      "card_name": "Stormrider Spirit",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "stormrider spirit",
+      "notes": "XMage authoritative exact-scope split: local class StormriderSpirit translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "3baebb06100722ec034bcfe15b534fb7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "StormriderSpirit",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/StormriderSpirit.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "983273ba-8c54-4ce2-8d02-51ab597abfe1",
+      "card_name": "Swift Spinner",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+      "normalized_name": "swift spinner",
+      "notes": "XMage authoritative exact-scope split: local class SwiftSpinner translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "5b68bdd096c620fd99f2fa2d5b655469",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "SwiftSpinner",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/s/SwiftSpinner.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,ReachAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "d6be9ee5-29c1-4527-a431-9a2258d1dae2",
+      "card_name": "Tangle Spider",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash",
+          "reach"
+        ],
+        "reach": true,
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "ReachAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:015f4c1e88bfb228ee80d796a1aef0d1",
+      "normalized_name": "tangle spider",
+      "notes": "XMage authoritative exact-scope split: local class TangleSpider translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "5b68bdd096c620fd99f2fa2d5b655469",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "TangleSpider",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/t/TangleSpider.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "3b4612ee-4976-45ad-b2f5-06e18f31e82e",
+      "card_name": "Vexing Gull",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "vexing gull",
+      "notes": "XMage authoritative exact-scope split: local class VexingGull translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "3baebb06100722ec034bcfe15b534fb7",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "VexingGull",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/v/VexingGull.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "83a2fb72-eaf0-47a1-b83b-b455db196a1b",
+      "card_name": "Wind Strider",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:41fb4ab488cdbfa783ec06bca9c79259",
+      "normalized_name": "wind strider",
+      "notes": "XMage authoritative exact-scope split: local class WindStrider translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "da6fdbbff5d93feaa47849886ae61ab3",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WindStrider",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WindStrider.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::DeathtouchAbility,FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "913f012a-61f0-4ff3-9188-9c8d50a5fe22",
+      "card_name": "Winged Coatl",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "deathtouch": true,
+        "effect": "creature",
+        "flash": true,
+        "flying": true,
+        "keywords": [
+          "flash",
+          "flying",
+          "deathtouch"
+        ],
+        "xmage_ability_classes": [
+          "DeathtouchAbility",
+          "FlashAbility",
+          "FlyingAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c269497a1b68cc205b2db22742d203ba",
+      "normalized_name": "winged coatl",
+      "notes": "XMage authoritative exact-scope split: local class WingedCoatl translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "c76841e62af8f16f47552bcce367e463",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "WingedCoatl",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/w/WingedCoatl.java"
+    },
+    {
+      "adapter_work_unit": "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal",
+      "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+      "card_id": "7d78a2c6-9aa6-4bce-b281-e9ab7bff74d3",
+      "card_name": "Zealous Guardian",
+      "confidence": 0.96,
+      "deck_role_json": {
+        "category": "unknown",
+        "effect": "creature"
+      },
+      "effect": "creature",
+      "effect_json": {
+        "_keywords_are_self": true,
+        "battle_model_scope": "xmage_static_self_combat_keyword_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "xmage_ability_classes": [
+          "FlashAbility"
+        ]
+      },
+      "execution_status": "auto",
+      "family_id": "xmage_static_self_combat_keyword_creature",
+      "logical_rule_key": "battle_rule_v1:c8861f554480ae68baa034a71de2fcae",
+      "normalized_name": "zealous guardian",
+      "notes": "XMage authoritative exact-scope split: local class ZealousGuardian translated into ManaLoom runtime scope xmage_static_self_combat_keyword_creature_v1. This row is package-ready only because the source signature is a narrow runtime-backed exact-scope adapter with focused runtime coverage.",
+      "oracle_hash": "bf2c44e6fc09515648b91b1bb4ec3f5f",
+      "oracle_hash_source": "postgres.cards.oracle_text_md5",
+      "promotion_lane": "batch_metadata_candidate_requires_pg_precheck",
+      "proposal_status": "batch_pg_candidate_after_precheck",
+      "review_status": "verified",
+      "safe_for_batch_pg_package": true,
+      "shadow_handling": "deprecate_nonmatching_rows",
+      "source": "curated",
+      "xmage_class": "ZealousGuardian",
+      "xmage_path": "/Users/desenvolvimentomobile/Downloads/mage-master/Mage.Sets/src/mage/cards/z/ZealousGuardian.java"
+    }
+  ],
+  "source": {
+    "input_queue_status": "action_required",
+    "queue_generated_at": "2026-07-04T19:25:41+00:00",
+    "queue_scope": "commander_legal_battle_gap"
+  },
+  "status": "ready",
+  "summary": {
+    "adapter_work_unit_counts": {
+      "direct_damage::targeted_damage_variant_v1": 2,
+      "xmage_signature::no_effect_class::DeathtouchAbility,FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DeathtouchAbility,FlashAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DefenderAbility,FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::DefenderAbility,FlashAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FirstStrikeAbility,FlashAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal": 11,
+      "xmage_signature::no_effect_class::FlashAbility,HasteAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility,IndestructibleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal": 2,
+      "xmage_signature::no_effect_class::FlashAbility,ReachAbility,TrampleAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility,ReachAbility::no_target_class::no_condition_class::no_signal": 4,
+      "xmage_signature::no_effect_class::FlashAbility,TrampleAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility,VigilanceAbility::no_target_class::no_condition_class::no_signal": 1,
+      "xmage_signature::no_effect_class::FlashAbility::no_target_class::no_condition_class::no_signal": 8
+    },
+    "blocked_reason_counts": {
+      "activated_damage_oracle_not_simple": 42,
+      "activated_damage_source_cost_not_supported": 15,
+      "activated_destroy_oracle_not_simple": 25,
+      "activated_destroy_source_cost_not_supported": 18,
+      "activated_destroy_source_mana_cost_not_supported": 1,
+      "activated_destroy_source_not_simple_destroy_effect": 2,
+      "activated_destroy_source_target_not_supported": 10,
+      "activated_draw_discard_oracle_cost_not_supported": 1,
+      "activated_draw_oracle_cost_not_supported": 8,
+      "activated_draw_oracle_not_simple": 5,
+      "activated_draw_source_cost_not_supported": 1,
+      "activated_graveyard_exile_oracle_not_simple": 3,
+      "activated_graveyard_to_library_oracle_not_simple": 1,
+      "activated_library_tutor_oracle_cost_not_supported": 12,
+      "activated_life_gain_oracle_cost_not_supported": 11,
+      "activated_life_gain_oracle_not_simple": 10,
+      "activated_recursion_battlefield_oracle_cost_not_supported": 4,
+      "activated_recursion_oracle_cost_not_supported": 3,
+      "activated_recursion_oracle_not_simple": 3,
+      "activated_self_boost_oracle_cost_not_supported": 13,
+      "activated_self_boost_oracle_not_simple": 10,
+      "activated_target_boost_oracle_cost_not_supported": 4,
+      "activated_target_boost_oracle_not_simple": 14,
+      "activated_target_keyword_oracle_cost_not_supported": 10,
+      "activated_target_keyword_source_target_not_supported": 1,
+      "add_counters_ability_class_not_simple": 4,
+      "add_counters_counter_not_fixed": 8,
+      "add_counters_effect_class_not_pure": 63,
+      "add_counters_oracle_not_simple": 1,
+      "add_counters_target_not_supported": 2,
+      "additional_cost_detected": 96,
+      "attack_target_keyword_oracle_static_keyword_not_exact": 1,
+      "attack_target_keyword_source_keyword_not_supported": 5,
+      "attack_target_keyword_source_oracle_mismatch": 1,
+      "board_wipe_ability_class_not_simple": 67,
+      "board_wipe_damage_amount_not_fixed": 9,
+      "board_wipe_damage_scope_not_supported": 13,
+      "board_wipe_destroy_scope_not_supported": 37,
+      "board_wipe_effect_class_not_supported": 81,
+      "board_wipe_oracle_not_simple": 37,
+      "boost_controlled_source_filter_not_supported": 1,
+      "boost_controlled_source_not_single_fixed": 4,
+      "boost_draw_oracle_not_exact_fixed": 2,
+      "boost_keyword_oracle_not_simple": 2,
+      "boost_keyword_source_not_single_fixed": 14,
+      "boost_target_source_not_single_fixed": 20,
+      "bounce_ability_class_not_simple": 28,
+      "bounce_draw_ability_class_not_simple": 3,
+      "bounce_draw_oracle_not_exact_fixed": 1,
+      "bounce_draw_oracle_not_simple": 1,
+      "bounce_effect_class_not_pure": 41,
+      "bounce_scry_oracle_not_exact_fixed": 1,
+      "bounce_target_not_supported": 20,
+      "counter_ability_class_not_simple": 19,
+      "counter_draw_oracle_not_simple": 1,
+      "counter_draw_target_not_supported": 4,
+      "counter_effect_class_not_pure": 35,
+      "counter_oracle_not_simple": 2,
+      "counter_target_not_supported": 23,
+      "damage_additional_cost_not_supported": 10,
+      "damage_amount_not_fixed": 12,
+      "damage_draw_oracle_not_exact_fixed": 6,
+      "damage_effect_class_not_pure": 103,
+      "damage_life_gain_oracle_not_simple": 7,
+      "damage_life_gain_source_not_fixed": 18,
+      "damage_target_not_supported": 10,
+      "destroy_additional_cost_not_supported": 15,
+      "destroy_draw_oracle_not_exact_fixed": 4,
+      "destroy_draw_source_not_fixed": 1,
+      "destroy_effect_class_not_pure": 129,
+      "destroy_life_gain_ability_class_not_simple": 2,
+      "destroy_life_gain_source_not_fixed": 14,
+      "destroy_scry_ability_class_not_simple": 1,
+      "destroy_target_not_supported": 47,
+      "dies_damage_amount_not_fixed": 1,
+      "dies_damage_target_not_supported": 1,
+      "dies_draw_count_not_fixed": 2,
+      "dies_life_gain_amount_not_fixed": 3,
+      "dies_recursion_optional_cost_not_supported": 1,
+      "dies_token_oracle_not_simple": 4,
+      "draw_additional_cost_not_supported": 5,
+      "draw_discard_spell_ability_class_not_simple": 3,
+      "draw_discard_spell_oracle_not_exact_fixed": 5,
+      "draw_discard_spell_oracle_not_simple": 6,
+      "draw_effect_class_not_pure": 445,
+      "draw_lose_life_spell_ability_class_not_simple": 3,
+      "draw_lose_life_spell_oracle_not_exact_fixed": 3,
+      "draw_self_cost_reduction_condition_not_supported": 1,
+      "draw_self_cost_reduction_oracle_not_exact_fixed": 1,
+      "dynamic_count_damage_oracle_composite_count_not_supported": 3,
+      "dynamic_count_damage_oracle_filter_not_supported": 6,
+      "etb_add_counters_counter_not_fixed": 20,
+      "etb_damage_target_not_supported": 13,
+      "etb_destroy_target_not_supported": 13,
+      "etb_draw_count_not_fixed": 14,
+      "etb_draw_lose_life_oracle_not_exact_fixed": 1,
+      "etb_library_pick_oracle_not_simple": 3,
+      "etb_library_tutor_oracle_not_simple": 1,
+      "etb_library_tutor_oracle_target_not_supported": 1,
+      "etb_library_tutor_to_hand_oracle_target_not_supported": 1,
+      "etb_library_tutor_to_hand_source_oracle_count_mismatch": 3,
+      "etb_library_tutor_to_hand_source_oracle_up_to_count_mismatch": 1,
+      "etb_life_gain_amount_not_fixed": 12,
+      "etb_recursion_battlefield_target_not_supported": 1,
+      "etb_recursion_target_not_supported": 3,
+      "exile_effect_class_not_pure": 40,
+      "exile_oracle_not_simple": 8,
+      "exile_scry_oracle_not_exact_fixed": 2,
+      "exile_target_not_supported": 23,
+      "graveyard_count_boost_source_not_single": 1,
+      "graveyard_count_damage_adventure_filter_not_supported": 1,
+      "graveyard_count_damage_exile_x_graveyard_cost_not_supported": 2,
+      "graveyard_exile_ability_class_not_supported": 1,
+      "graveyard_self_return_ability_class_not_simple": 4,
+      "graveyard_self_return_oracle_not_simple": 4,
+      "library_pick_ability_class_not_simple": 1,
+      "library_tutor_oracle_not_simple": 1,
+      "library_tutor_oracle_target_not_supported": 2,
+      "library_tutor_source_distinct_names_not_supported": 2,
+      "life_gain_amount_not_fixed": 19,
+      "life_gain_draw_ability_class_not_simple": 3,
+      "life_gain_draw_oracle_not_exact_fixed": 3,
+      "life_gain_draw_oracle_not_simple": 1,
+      "life_gain_effect_class_not_pure": 87,
+      "life_gain_oracle_not_simple": 11,
+      "mana_source_activated_draw_oracle_cost_not_supported": 10,
+      "mana_source_activated_draw_oracle_not_simple": 2,
+      "mana_source_auxiliary_ability_not_supported": 271,
+      "mana_source_effect_class_not_simple": 24,
+      "mana_source_oracle_not_simple": 14,
+      "mana_source_sacrifice_oracle_not_simple": 1,
+      "mana_source_safe_ability_missing": 132,
+      "mana_source_simple_source_missing_tap_cost": 1,
+      "mana_source_source_discard_cost_not_supported": 2,
+      "mana_source_source_pay_life_cost_not_supported": 3,
+      "mana_source_source_sacrifice_cost_not_supported": 8,
+      "mana_source_source_sacrifice_target_cost_not_supported": 2,
+      "mana_source_spell_not_supported": 1,
+      "mana_source_unsafe_ability_class": 133,
+      "mill_return_ability_class_not_simple": 2,
+      "not_instant_or_sorcery_spell": 3834,
+      "not_one_shot_spell_ability": 249,
+      "play_lands_from_graveyard_ability_class_not_simple_static": 1,
+      "recursion_ability_class_not_simple": 9,
+      "recursion_auxiliary_flashback_cost_not_supported": 1,
+      "recursion_auxiliary_primary_oracle_not_simple": 1,
+      "recursion_battlefield_ability_class_not_simple": 6,
+      "recursion_battlefield_all_ability_class_not_simple": 2,
+      "recursion_battlefield_all_oracle_not_supported": 1,
+      "recursion_battlefield_counter_ability_class_not_simple": 2,
+      "recursion_effect_class_not_pure": 374,
+      "recursion_exile_self_ability_class_not_simple": 1,
+      "recursion_exile_self_target_not_supported": 1,
+      "scry_draw_oracle_not_exact_fixed": 1,
+      "spell_cast_draw_oracle_filter_not_supported": 3,
+      "spell_cast_draw_source_oracle_mismatch": 1,
+      "static_controlled_pt_oracle_filter_not_supported": 10,
+      "static_controlled_pt_oracle_not_exact": 2,
+      "static_controlled_pt_source_oracle_mismatch": 1,
+      "static_graveyard_count_boost_oracle_not_exact": 1,
+      "static_graveyard_count_pt_oracle_not_exact": 35,
+      "static_graveyard_threshold_boost_oracle_not_exact": 7,
+      "static_keyword_not_creature": 1,
+      "static_protection_oracle_not_color_exact": 23,
+      "target_player_draw_spell_ability_class_not_simple": 4,
+      "target_player_draw_spell_oracle_not_exact_fixed": 3,
+      "token_description_keyword_not_supported": 5,
+      "token_description_not_creature_token": 20,
+      "token_literal_description_missing": 29,
+      "token_source_additional_tokens_not_supported": 8,
+      "token_source_create_token_not_fixed": 29,
+      "token_source_custom_text_not_supported": 9,
+      "token_source_not_single_create_token_effect": 1,
+      "tutor_ability_class_not_simple": 45,
+      "tutor_effect_class_not_supported": 145,
+      "unsupported_adapter_work_unit": 3,
+      "x_damage_alternative_timing_not_supported": 1,
+      "x_damage_buyback_not_supported": 1
+    },
+    "considered_supported_work_unit_rows": 7562,
+    "family_counts": {
+      "xmage_permanent_simple_activated_damage": 2,
+      "xmage_static_self_combat_keyword_creature": 33,
+      "xmage_static_self_protection_from_colors_creature": 2
+    },
+    "proposal_count": 37,
+    "proposal_status_counts": {
+      "batch_pg_candidate_after_precheck": 37
+    },
+    "safe_for_batch_pg_package_count": 37,
+    "scope_counts": {
+      "xmage_permanent_simple_activated_damage_v1": 2,
+      "xmage_static_self_combat_keyword_creature_v1": 33,
+      "xmage_static_self_protection_from_colors_creature_v1": 2
+    }
+  }
+}

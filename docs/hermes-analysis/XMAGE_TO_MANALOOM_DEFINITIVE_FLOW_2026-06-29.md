@@ -8609,6 +8609,49 @@ new server:
   exact split recheck produced `proposal_count=0`; the remaining `314`
   identities are still explicit missing-source exceptions.
 
+## 2026-07-04 PG425 Static Flash Creature Closure
+
+- Closed the exact XMage no-effect/no-signal units where `FlashAbility` appears
+  only as a self timing keyword on creature permanents, with any companion
+  static self keywords already supported by the ManaLoom runtime.
+- The mapper now translates `FlashAbility` to the self keyword `flash` and
+  preserves it in `effect_json.keywords`, `_keywords_are_self`, and the
+  boolean `flash=true` flag. Unsafe neighbors such as protection flash
+  creatures and flash permanents with activated damage stayed outside this
+  package and remain separate exact families.
+- Runtime behavior already gates spell timing through `card_has_keyword(card,
+  "flash")`; focused tests now prove that a flash creature can be cast outside
+  main phase while an equivalent ordinary creature cannot.
+- The PostgreSQL package promoted `33` cards:
+  `Ambush Viper`, `Ashcoat Bear`, `Aven Reedstalker`, `Benalish Knight`,
+  `Bounding Wolf`, `Cloaked Siren`, `Crystacean`, `Darksteel Sentinel`,
+  `Dawn's Light Archer`, `Faerie Invaders`, `Fire Nation Ambushers`,
+  `Galewind Moose`, `Havenwood Wurm`, `Hired Blade`, `Hussar Patrol`,
+  `King Cheetah`, `Living Tempest`, `Merfolk of the Depths`,
+  `Nephalia Seakite`, `Plumeveil`, `Pouncing Cheetah`, `Raging Kavu`,
+  `Riptide Turtle`, `Sentinels of Glen Elendra`, `Skyline Predator`,
+  `Spire Monitor`, `Stormrider Spirit`, `Swift Spinner`, `Tangle Spider`,
+  `Vexing Gull`, `Wind Strider`, `Winged Coatl`, and `Zealous Guardian`.
+  Precheck found `33` target rows, `0` existing rule rows, and `0` shadow rows;
+  apply inserted/updated `33`; postcheck verified `33/33` promoted rows as
+  `verified`/`auto` with Oracle hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `33` PG rules into SQLite. The canonical
+  fallback export increased to `5651` rows.
+- PG425 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `33` selected cards. Generic
+  battle scenario count remained `0`; flash timing is covered by focused
+  runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26406` to `26373`, authoritative adapter-required count from `26092`
+  to `26059`, and the exact static self combat keyword flash work unit to
+  zero. The post-PG425 exact split recheck produced `proposal_count=4` only for
+  separate next-work candidates: `Bear Trap`, `Springjaw Trap`,
+  `Defender of Chaos`, and `Defender of Law`.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

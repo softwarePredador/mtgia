@@ -9632,6 +9632,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["vigilance"])
         self.assertTrue(effect["_keywords_are_self"])
 
+    def test_static_keyword_creature_maps_flash_to_timing_keyword(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlashAbility,FlyingAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlashAbility", "FlyingAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Aven Reedstalker",
+                type_line="Creature - Bird Soldier",
+                oracle_text="Flash\nFlying",
+            ),
+            source_text=(
+                "this.addAbility(FlashAbility.getInstance());"
+                "this.addAbility(FlyingAbility.getInstance());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_KEYWORD_CREATURE_SCOPE)
+        self.assertEqual(effect["keywords"], ["flash", "flying"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flash"])
+        self.assertTrue(effect["flying"])
+
     def test_activated_self_boost_creature_maps_to_self_stat_modifier(self) -> None:
         row = queue_row(
             split.SELF_BOOST_ACTIVATED_UNIT,
