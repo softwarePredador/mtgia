@@ -2326,6 +2326,132 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_damage_spell_pays_artifact_or_creature_sacrifice_cost(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        artifact = {
+            "name": "Spare Bauble",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "cmc": 0,
+        }
+        creature = {
+            "name": "Larger Creature",
+            "type_line": "Creature - Beast",
+            "effect": "creature",
+            "power": 4,
+            "toughness": 4,
+        }
+        active.battlefield.extend([creature, artifact])
+        opponent.life = 8
+        effect = {
+            "effect": "direct_damage",
+            "battle_model_scope": "xmage_fixed_damage_target_spell_v1",
+            "amount": 5,
+            "damage": 5,
+            "target": "any_target",
+            "target_constraints": {"scope": "any_target"},
+            "requires_sacrifice_artifact_or_creature": True,
+            "additional_cost": "sacrifice_artifact_or_creature",
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Club",
+                "type_line": "Instant",
+                "oracle_text": (
+                    "As an additional cost to cast this spell, sacrifice an artifact or creature. "
+                    "Fixture Club deals 5 damage to any target."
+                ),
+            },
+            turn=4,
+            rng=random.Random(33),
+            effect_data_override=effect,
+        )
+
+        self.assertNotIn(artifact, active.battlefield)
+        self.assertIn(artifact, active.graveyard)
+        self.assertIn(creature, active.battlefield)
+        self.assertEqual(opponent.life, 3)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Club"
+                and data.get("cost") == "sacrifice_artifact_or_creature"
+                and data.get("sacrificed") == "Spare Bauble"
+                for event, data in self.events
+            )
+        )
+
+    def test_destroy_target_spell_pays_creature_sacrifice_cost_before_removal(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        sacrifice = {
+            "name": "Spare Cultist",
+            "type_line": "Creature - Human",
+            "effect": "creature",
+            "power": 1,
+            "toughness": 1,
+        }
+        target = {
+            "name": "Target Knight",
+            "type_line": "Creature - Knight",
+            "effect": "creature",
+            "power": 3,
+            "toughness": 3,
+        }
+        active.battlefield.append(sacrifice)
+        opponent.battlefield.append(target)
+        effect = {
+            "effect": "remove_creature",
+            "battle_model_scope": "xmage_destroy_target_spell_v1",
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "destination": "graveyard",
+            "requires_sacrifice_creature": True,
+            "additional_cost": "sacrifice_creature",
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Splinters",
+                "type_line": "Sorcery",
+                "oracle_text": "As an additional cost to cast this spell, sacrifice a creature. Destroy target creature.",
+            },
+            turn=4,
+            rng=random.Random(32),
+            effect_data_override=effect,
+        )
+
+        self.assertNotIn(sacrifice, active.battlefield)
+        self.assertIn(sacrifice, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(
+            any(
+                event == "additional_cost_paid"
+                and data.get("card") == "Fixture Splinters"
+                and data.get("cost") == "sacrifice_creature"
+                and data.get("sacrificed") == "Spare Cultist"
+                for event, data in self.events
+            )
+        )
+        self.assertTrue(
+            any(
+                event == "removal_resolved"
+                and data.get("card") == "Fixture Splinters"
+                and data.get("target") == "Target Knight"
+                and data.get("destination") == "graveyard"
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_damage_spell_without_required_sacrifice_land_does_not_damage(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])

@@ -518,10 +518,62 @@ Post-PG383 update:
     -> `status=pass`, `50/50` pass.
 - delta since post-PG382: `18` identities promoted.
 
+Post-PG384 update:
+
+- source artifacts:
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_pg384_destroy_additional_cost_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg384_additional_cost_spell_runtime_new_server_package_package.md`
+  - `docs/hermes-analysis/master_optimizer_reports/pg384_additional_cost_spell_runtime_new_server_e2e.md`
+  - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg384_additional_cost_spell_runtime_new_server.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg384_additional_cost_spell_runtime_new_server_commander_legal.md`
+  - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg384_additional_cost_spell_runtime_new_server_supported_recheck.md`
+- promoted families:
+  - `xmage_fixed_damage_target_spell_v1` for `5` exact fixed damage spells
+    with supported additional costs.
+  - `xmage_destroy_target_spell_v1` for `4` exact destroy-target spells with
+    supported additional costs.
+  - `xmage_fixed_source_controller_draw_spell_v1` for `3` exact fixed draw
+    spells with supported additional costs.
+- promoted cards: `Acceptable Losses`, `Artillerize`, `Bone Splinters`,
+  `Costly Plunder`, `Embrace Oblivion`, `Eviscerator's Insight`,
+  `Improvised Club`, `Morbid Curiosity`, `Powerstone Fracture`, `Raze`,
+  `Sonic Burst`, and `Sonic Seizure`.
+- implementation change:
+  - the exact-scope splitter now reuses one supported spell-additional-cost
+    mapper across fixed damage, fixed draw, and destroy-target spell scopes.
+  - supported costs for this mapper are discard a card, discard a land,
+    sacrifice a creature, sacrifice a land, and sacrifice an artifact or
+    creature when XMage source and Oracle text agree exactly.
+  - the battle runtime now pays `requires_sacrifice_artifact_or_creature` and
+    pays additional costs before resolving destroy/remove effects.
+- target battle-gap identities in authoritative queue: `26918`
+- XMage authoritative source resolved: `26604`
+- XMage missing-source exceptions: `314`
+- parser gaps after XMage source resolution: `0`
+- XMage authoritative adapter required: `26604`
+- adapter work-unit keys: `11429`
+- final supported splitter recheck:
+  `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_exact_scope_split_20260704_post_pg384_additional_cost_spell_runtime_new_server_supported_recheck.md`
+  returned `proposal_count=0` over `7691` considered supported rows.
+- final audits:
+  - strategy consistency:
+    `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_pg384_additional_cost_spell_runtime_new_server.md`
+    -> `status=pass`, `26/26` pass.
+  - operational surface alignment:
+    `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_pg384_additional_cost_spell_runtime_new_server.md`
+    -> `status=pass`.
+  - legacy contamination:
+    `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_pg384_additional_cost_spell_runtime_new_server.md`
+    -> `status=pass`.
+  - PG-Hermes-SQLite contract:
+    `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_pg384_additional_cost_spell_runtime_new_server.md`
+    -> `status=pass`, `50/50` pass.
+- delta since post-PG383: `12` identities promoted.
+
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG383 queue above.
+historical only. The active execution baseline is the post-PG384 queue above.
 
 ## General Goal Contract - 2026-07-02
 
@@ -529,13 +581,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG383 control numbers:
+Current post-PG384 control numbers:
 
-- target battle-gap identities: `26930`
-- XMage-resolved authoritative source identities: `26616`
+- target battle-gap identities: `26918`
+- XMage-resolved authoritative source identities: `26604`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26616`
+- XMage authoritative adapter required: `26604`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -555,15 +607,15 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg383_target_effect_scry_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG383, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg384_additional_cost_spell_runtime_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG384, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
    `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
-   (`1114`), `direct_damage::targeted_damage_variant_v1` (`893`), and
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`), and
    `add_counters::source_add_counters_variant_v1` (`795`).
 4. Promote only a narrow subpattern whose ManaLoom runtime behavior is already
    implemented or implemented in the same cycle.
@@ -785,6 +837,32 @@ PG383 completion and PG384 starting hypothesis:
    `life_gain::xmage_life_gain_variant_review_v1` (`735`),
    `draw_cards::xmage_draw_card_variant_review_v1` (`627`),
    `removal_destroy::targeted_destroy_variant_v1` (`616`), and
+   `tutor::xmage_library_search_variant_review_v1` (`613`).
+
+PG384 completion and PG385 starting hypothesis:
+
+1. PG384 promoted `12` additional-cost spells on the new server:
+   `5` fixed damage, `4` destroy-target, and `3` fixed draw cards.
+2. The implementation made spell additional-cost mapping reusable across these
+   exact scopes and added runtime payment for sacrifice artifact or creature
+   plus destroy/remove spell costs.
+3. Tests passed: splitter `323`, exact runtime `189`, package builder,
+   py_compile, and E2E package validation `status=pass`.
+4. Post-PG384 governance passed with strategy consistency `26/26`,
+   operational surface `pass`, legacy contamination `pass`, and
+   PG-Hermes-SQLite contract `50/50` pass against the new server.
+5. The post-PG384 supported splitter returns `0` batch-safe proposals over
+   `7691` considered supported rows, so PG385 must implement another narrow
+   subpattern before PostgreSQL package generation.
+6. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `draw_cards::xmage_draw_card_variant_review_v1` (`624`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
    `tutor::xmage_library_search_variant_review_v1` (`613`).
 
 Fresh alignment evidence:
@@ -1075,16 +1153,16 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG383 authoritative queue unless a newer queue exists:
+Use the post-PG384 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `893`
+4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `627`
-8. `removal_destroy::targeted_destroy_variant_v1` - `616`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `624`
+8. `removal_destroy::targeted_destroy_variant_v1` - `612`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 

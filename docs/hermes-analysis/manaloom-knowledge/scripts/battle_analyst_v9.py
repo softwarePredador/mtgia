@@ -18760,6 +18760,14 @@ def additional_card_costs_are_payable(player, card, effect_data, cost_context=No
         creature, _options, _reason = choose_creature_for_resource_cost(player)
         if creature is None:
             return False
+    if effect_data.get("requires_sacrifice_artifact_or_creature"):
+        permanent, _options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "artifact_or_creature",
+        )
+        if permanent is None:
+            return False
     if effect_data.get("requires_sacrifice_land"):
         battlefield_lands = [
             candidate
@@ -18787,6 +18795,7 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
         and not effect_data.get("requires_discard_land")
         and not effect_data.get("requires_sacrifice_creature")
         and not effect_data.get("requires_sacrifice_green_creature")
+        and not effect_data.get("requires_sacrifice_artifact_or_creature")
         and not effect_data.get("requires_sacrifice_land")
         and not planned_sacrifices
         and not planned_blight
@@ -19001,6 +19010,41 @@ def pay_additional_card_costs(player, card, effect_data, *, turn=None, cost_cont
             creature_options=creature_options,
             selection_reason=selection_reason,
             required_color=required_color,
+            turn=turn,
+        )
+    if effect_data.get("requires_sacrifice_artifact_or_creature"):
+        sacrifice, permanent_options = choose_activation_sacrifice_target(
+            player,
+            card,
+            "artifact_or_creature",
+        )
+        if not sacrifice:
+            emit_replay_event(
+                "additional_cost_failed",
+                player=player.name,
+                card=card.get("name", "?"),
+                cost="sacrifice_artifact_or_creature",
+                turn=turn,
+            )
+            return False
+        destination = move_permanent_from_battlefield(
+            player,
+            sacrifice,
+            reason="sacrifice_artifact_or_creature",
+            source=card,
+        )
+        emit_replay_event(
+            "additional_cost_paid",
+            player=player.name,
+            card=card.get("name", "?"),
+            cost="sacrifice_artifact_or_creature",
+            sacrificed=sacrifice.get("name", "?"),
+            destination=destination,
+            permanent_options=[
+                option.get("name", "?")
+                for option in permanent_options[:8]
+                if isinstance(option, dict)
+            ],
             turn=turn,
         )
     if planned_sacrifices:
@@ -50307,6 +50351,9 @@ def apply_effect_immediate(
         )
         finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
     elif effect in ("remove_creature", "remove_permanent", "remove_artifact_or_3dmg"):
+        if not pay_additional_card_costs(player, card, effect_data, turn=turn):
+            finish_resolved_spell(player, card, turn=turn, effect_data=effect_data)
+            return
         if not effect_data.get("declared_targets"):
             effect_data, _declared_replay = prepare_declared_removal_targets(
                 player,

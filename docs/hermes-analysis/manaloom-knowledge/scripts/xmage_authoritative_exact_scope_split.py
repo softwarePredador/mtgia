@@ -5944,9 +5944,10 @@ def activation_sacrifice_target_from_source(source: str, window: str) -> str | N
     return None
 
 
-def fixed_damage_spell_additional_cost_fields_from_source(
+def fixed_spell_additional_cost_fields_from_source(
     source: str,
     metadata: dict[str, Any],
+    unsupported_reason: str,
 ) -> tuple[dict[str, Any] | None, str | None]:
     text = source or ""
     has_cost = has_additional_cost(text) or "additional cost" in oracle_text(metadata).lower()
@@ -5954,38 +5955,9 @@ def fixed_damage_spell_additional_cost_fields_from_source(
         return {}, None
     cost_count = len(re.findall(r"\.addCost\s*\(", text))
     if cost_count != 1:
-        return None, "damage_additional_cost_not_supported"
-    if "SacrificeTargetCost" not in text:
-        return None, "damage_additional_cost_not_supported"
-    sacrifice_target = activation_sacrifice_target_from_source(text, text)
-    if sacrifice_target == "creature":
-        return {
-            "additional_cost": "sacrifice_creature",
-            "requires_sacrifice_creature": True,
-            "xmage_additional_cost_class": "SacrificeTargetCost",
-            "xmage_additional_cost_target": "creature",
-        }, None
-    if sacrifice_target == "land":
-        return {
-            "additional_cost": "sacrifice_land",
-            "requires_sacrifice_land": True,
-            "xmage_additional_cost_class": "SacrificeTargetCost",
-            "xmage_additional_cost_target": "land",
-        }, None
-    return None, "damage_additional_cost_not_supported"
-
-
-def fixed_draw_spell_additional_cost_fields_from_source(
-    source: str,
-    metadata: dict[str, Any],
-) -> tuple[dict[str, Any] | None, str | None]:
-    text = source or ""
-    has_cost = has_additional_cost(text) or "additional cost" in oracle_text(metadata).lower()
-    if not has_cost:
-        return {}, None
-    cost_count = len(re.findall(r"\.addCost\s*\(", text))
-    if cost_count != 1:
-        return None, "draw_additional_cost_not_supported"
+        return None, unsupported_reason
+    if "OrCost" in text or "GenericManaCost" in text or "PayLifeCost" in text:
+        return None, unsupported_reason
     lowered_oracle = oracle_text(metadata).lower()
     if "DiscardCardCost" in text and re.search(r"additional cost.*discard a card", lowered_oracle):
         return {
@@ -6006,18 +5978,74 @@ def fixed_draw_spell_additional_cost_fields_from_source(
             "xmage_additional_cost_target": "land",
         }, None
     if "SacrificeTargetCost" in text and re.search(
-        r"additional cost.*sacrifice a creature", lowered_oracle
+        r"additional cost.*sacrifice (?:a|one) creature", lowered_oracle
     ):
         if re.search(r"SacrificeTargetCost\s*\(\s*2\b", text):
-            return None, "draw_additional_cost_not_supported"
-        if "FILTER_PERMANENT_CREATURE" in text and "FILTER_PERMANENT_CREATURES" not in text:
+            return None, unsupported_reason
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "creature":
             return {
                 "additional_cost": "sacrifice_creature",
                 "requires_sacrifice_creature": True,
                 "xmage_additional_cost_class": "SacrificeTargetCost",
                 "xmage_additional_cost_target": "creature",
             }, None
-    return None, "draw_additional_cost_not_supported"
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:an?|one) artifact or creature", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "artifact_or_creature":
+            return {
+                "additional_cost": "sacrifice_artifact_or_creature",
+                "requires_sacrifice_artifact_or_creature": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "artifact_or_creature",
+            }, None
+    if "SacrificeTargetCost" in text and re.search(
+        r"additional cost.*sacrifice (?:a|one) land", lowered_oracle
+    ):
+        sacrifice_target = activation_sacrifice_target_from_source(text, text)
+        if sacrifice_target == "land":
+            return {
+                "additional_cost": "sacrifice_land",
+                "requires_sacrifice_land": True,
+                "xmage_additional_cost_class": "SacrificeTargetCost",
+                "xmage_additional_cost_target": "land",
+            }, None
+    return None, unsupported_reason
+
+
+def fixed_damage_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    return fixed_spell_additional_cost_fields_from_source(
+        source,
+        metadata,
+        "damage_additional_cost_not_supported",
+    )
+
+
+def fixed_draw_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    return fixed_spell_additional_cost_fields_from_source(
+        source,
+        metadata,
+        "draw_additional_cost_not_supported",
+    )
+
+
+def fixed_destroy_spell_additional_cost_fields_from_source(
+    source: str,
+    metadata: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    return fixed_spell_additional_cost_fields_from_source(
+        source,
+        metadata,
+        "destroy_additional_cost_not_supported",
+    )
 
 
 def spell_cast_draw_filter_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
@@ -7618,6 +7646,8 @@ def split_row(
             if unit == DAMAGE_UNIT and effect_classes(row) == {"DamageTargetEffect"}:
                 pass
             elif unit == DRAW_UNIT and effect_classes(row) == {"DrawCardSourceControllerEffect"}:
+                pass
+            elif unit == DESTROY_UNIT and effect_classes(row) == {"DestroyTargetEffect"}:
                 pass
             else:
                 return None, "additional_cost_detected"
@@ -10289,6 +10319,12 @@ def split_row(
     if unit == DESTROY_UNIT:
         if classes != {"DestroyTargetEffect"}:
             return None, "destroy_effect_class_not_pure"
+        additional_cost_fields, additional_cost_reason = fixed_destroy_spell_additional_cost_fields_from_source(
+            source_text,
+            metadata,
+        )
+        if additional_cost_reason is not None:
+            return None, additional_cost_reason
         target = destroy_target_from_oracle(metadata)
         if target is None:
             return None, "destroy_target_not_supported"
@@ -10304,6 +10340,7 @@ def split_row(
             "destination": "graveyard",
             "xmage_effect_class": "DestroyTargetEffect",
             **flags,
+            **(additional_cost_fields or {}),
         }
         return build_proposal(row, metadata, effect_json, family_id="xmage_destroy_target_spell"), "selected_exact_scope"
 

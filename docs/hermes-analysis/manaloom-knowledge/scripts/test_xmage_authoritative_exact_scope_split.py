@@ -1229,6 +1229,31 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["xmage_additional_cost_class"], "DiscardTargetCost")
         self.assertEqual(effect["xmage_additional_cost_target"], "land")
 
+    def test_fixed_source_controller_draw_spell_accepts_artifact_or_creature_sacrifice_cost(self) -> None:
+        row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Costly Plunder",
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice an artifact or creature.\n"
+                    "Draw two cards."
+                ),
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost("
+                "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));"
+                "this.getSpellAbility().addEffect(new DrawCardSourceControllerEffect(2));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["additional_cost"], "sacrifice_artifact_or_creature")
+        self.assertTrue(effect["requires_sacrifice_artifact_or_creature"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "artifact_or_creature")
+
     def test_fixed_source_controller_draw_spell_blocks_unsupported_additional_cost(self) -> None:
         row = queue_row(split.DRAW_UNIT, effect_classes=["DrawCardSourceControllerEffect"])
         proposal, reason = split.split_row(
@@ -2034,6 +2059,32 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["requires_sacrifice_land"])
         self.assertEqual(effect["additional_cost"], "sacrifice_land")
         self.assertEqual(effect["xmage_additional_cost_target"], "land")
+
+    def test_fixed_damage_spell_maps_artifact_or_creature_sacrifice_additional_cost(self) -> None:
+        row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice an artifact or creature. "
+                    "Fixture Blast deals 5 damage to any target."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new SacrificeTargetCost("
+                "StaticFilters.FILTER_PERMANENT_ARTIFACT_OR_CREATURE));"
+                "this.getSpellAbility().addTarget(new TargetAnyTarget());"
+                "this.getSpellAbility().addEffect(new DamageTargetEffect(5));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DAMAGE_SCOPE)
+        self.assertEqual(effect["amount"], 5)
+        self.assertEqual(effect["additional_cost"], "sacrifice_artifact_or_creature")
+        self.assertTrue(effect["requires_sacrifice_artifact_or_creature"])
+        self.assertEqual(effect["xmage_additional_cost_target"], "artifact_or_creature")
 
     def test_fixed_damage_spell_blocks_creature_or_enchantment_sacrifice_cost(self) -> None:
         row = queue_row(split.DAMAGE_UNIT, effect_classes=["DamageTargetEffect"])
@@ -3487,19 +3538,49 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "destroy_target_source_mismatch")
 
-    def test_additional_cost_blocks_first_wave_package_candidate(self) -> None:
+    def test_destroy_target_spell_accepts_creature_sacrifice_additional_cost(self) -> None:
         row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
         proposal, reason = split.split_row(
             row,
             metadata(oracle_text="As an additional cost to cast this spell, sacrifice a creature. Destroy target creature."),
             source_text=(
-                "this.getSpellAbility().addCost(new SacrificeTargetCost());"
+                "this.getSpellAbility().addCost(new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
+                "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.DESTROY_SCOPE)
+        self.assertEqual(effect["target"], "creature")
+        self.assertEqual(effect["additional_cost"], "sacrifice_creature")
+        self.assertTrue(effect["requires_sacrifice_creature"])
+        self.assertEqual(effect["xmage_additional_cost_class"], "SacrificeTargetCost")
+        self.assertEqual(effect["xmage_additional_cost_target"], "creature")
+
+    def test_destroy_target_spell_blocks_or_additional_cost(self) -> None:
+        row = queue_row(split.DESTROY_UNIT, effect_classes=["DestroyTargetEffect"])
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                oracle_text=(
+                    "As an additional cost to cast this spell, sacrifice a creature or discard a card. "
+                    "Destroy target creature."
+                )
+            ),
+            source_text=(
+                "this.getSpellAbility().addCost(new OrCost("
+                "\"sacrifice a creature or discard a card\", "
+                "new SacrificeTargetCost(StaticFilters.FILTER_PERMANENT_CREATURE), "
+                "new DiscardCardCost()));"
+                "this.getSpellAbility().addTarget(new TargetCreaturePermanent());"
                 "this.getSpellAbility().addEffect(new DestroyTargetEffect());"
             ),
         )
 
         self.assertIsNone(proposal)
-        self.assertEqual(reason, "additional_cost_detected")
+        self.assertEqual(reason, "destroy_additional_cost_not_supported")
 
     def test_fixed_life_gain_spell_maps_to_life_total_change_runtime(self) -> None:
         row = queue_row(split.LIFE_UNIT, effect_classes=["GainLifeEffect"])
