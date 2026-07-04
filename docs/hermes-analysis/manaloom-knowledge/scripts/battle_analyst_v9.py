@@ -17085,6 +17085,8 @@ def resolve_generic_permanent_etb(
         requested = int(effect_data.get("etb_draw_count") or 1)
         hand_before = len(player.hand)
         library_before = len(player.library)
+        life_loss = int(effect_data.get("etb_life_loss") or 0)
+        life_before = int(getattr(player, "life", 0))
         drawn = player.draw(requested, rng)
         if all_players is not None:
             process_player_draw_triggers(
@@ -17096,6 +17098,8 @@ def resolve_generic_permanent_etb(
                 stack=stack,
                 turn_player=player,
             )
+        if life_loss > 0:
+            change_life(player, -life_loss)
         emit_replay_event(
             "trigger_resolved",
             player=player.name,
@@ -17108,6 +17112,9 @@ def resolve_generic_permanent_etb(
             hand_after=len(player.hand),
             library_before=library_before,
             library_after=len(player.library),
+            life_lost=max(0, life_before - int(getattr(player, "life", life_before))),
+            life_before=life_before,
+            life_after=int(getattr(player, "life", life_before)),
             turn=turn,
             **replay_rule_fields(effect_data),
         )

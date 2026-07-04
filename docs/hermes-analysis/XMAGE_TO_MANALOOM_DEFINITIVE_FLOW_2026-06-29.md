@@ -201,21 +201,23 @@ to build this queue. Current evidence:
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg385_draw_discard_spell_runtime_new_server.md`
 - `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg386_draw_lose_life_spell_runtime_new_server_commander_legal.md`
 - `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg386_draw_lose_life_spell_runtime_new_server.md`
+- `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg387_etb_draw_lose_life_new_server_commander_legal.md`
+- `docs/hermes-analysis/master_optimizer_reports/global_card_oracle_battle_readiness_20260704_post_pg387_etb_draw_lose_life_new_server.md`
 
 Current measured queue:
 
-- target all-card battle-gap identities: `26901`
-- XMage authoritative source resolved: `26587`
+- target all-card battle-gap identities: `26897`
+- XMage authoritative source resolved: `26583`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26587`
+- XMage authoritative adapter required: `26583`
 - ManaLoom adapter work-unit keys: `11429`
 - authoritative source coverage ratio: `0.9883`
 
 Interpretation:
 
 - The old mental model, "review 28k cards manually", is wrong.
-- For `26587` identities, card semantics are accepted from XMage; work is now
+- For `26583` identities, card semantics are accepted from XMage; work is now
   adapter implementation and effect-family classification.
 - `314` identities remain residual exceptions because the local XMage checkout
   did not resolve a source class in the all-card scope. These are a separate
@@ -234,10 +236,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG386 Exact Adapter Waves
+## PG283-PG387 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG386 all-card exact adapter waves are applied and
-synced. PG375-PG386 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG387 all-card exact adapter waves are applied and
+synced. PG375-PG387 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -6158,6 +6160,40 @@ PG386 measured result:
   `proposal_count=0` over `7674` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG387 measured result:
+
+- PG387 promoted `4` fixed creature ETB draw plus life-loss rules on the new
+  server: `Dusk Legion Zealot`, `Phyrexian Gargantua`, `Phyrexian Rager`, and
+  `Tithebearer Giant`.
+- The splitter now maps exact fixed
+  `DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect` with
+  `EntersBattlefieldTriggeredAbility` into
+  `xmage_creature_etb_draw_lose_life_v1`, only when Oracle and XMage agree on
+  fixed draw count and fixed life loss. Conditional ETB, `X`/dynamic counts,
+  alternative triggers, and non-static auxiliary abilities remain blocked.
+- Runtime coverage resolves the ETB draw, processes draw triggers, then applies
+  controller life loss through `etb_life_loss` in the same triggered event.
+- Focused splitter/runtime tests passed; full exact splitter tests passed
+  `333/333`, full exact runtime tests passed `194/194`, and package
+  builder/sync tests passed `23/23`.
+- PostgreSQL precheck matched `4/4` target card rows on the new server; apply
+  upserted `4` rows and deprecated `0` stale shadows; postcheck verified `4/4`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `4` PostgreSQL rows, updated `4` SQLite
+  rows, and exported `5147` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `4/4` cards.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, legacy contamination `pass`, and
+  PG-Hermes-SQLite contract `50/50` pass.
+- Global all-card authoritative queue after PG387:
+  `target_identity_count=26897`, `xmage_authoritative_source_count=26583`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26583`.
+- Running the exact splitter after PG387 on supported units returned
+  `proposal_count=0` over `7675` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6788,11 +6824,11 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG386 queue on the new server, the next exact runtime-backed work should
+post-PG387 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`

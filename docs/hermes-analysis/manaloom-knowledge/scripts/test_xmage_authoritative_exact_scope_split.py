@@ -7749,6 +7749,94 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertIsNone(proposal)
         self.assertEqual(reason, "etb_draw_count_not_fixed")
 
+    def test_creature_etb_draw_lose_life_maps_to_triggered_creature_scope(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Rager",
+                type_line="Creature - Horror",
+                oracle_text="When Fixture Rager enters the battlefield, you draw a card and you lose 1 life.",
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new DrawCardSourceControllerEffect(1, true));"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(1).concatBy(\"and\"));"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "creature")
+        self.assertEqual(effect["battle_model_scope"], split.ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE)
+        self.assertEqual(effect["etb_draw_count"], 1)
+        self.assertEqual(effect["etb_life_loss"], 1)
+        self.assertEqual(effect["trigger"], "enters_battlefield")
+
+    def test_creature_etb_draw_lose_life_blocks_condition(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "condition", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Hexblade",
+                type_line="Creature - Human Assassin",
+                oracle_text=(
+                    "When Fixture Hexblade enters the battlefield, if mana from a Treasure was spent to cast it, "
+                    "you draw a card and you lose 1 life."
+                ),
+            ),
+            source_text=(
+                "Ability ability = new EntersBattlefieldTriggeredAbility(new DrawCardSourceControllerEffect(1, true))"
+                ".withInterveningIf(Condition.instance);"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(1).concatBy(\"and\"));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "unsupported_adapter_work_unit")
+
+    def test_creature_etb_draw_lose_life_blocks_dynamic_amount(self) -> None:
+        row = queue_row(
+            split.DRAW_ENGINE_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            ability_kind="triggered",
+            ability_classes=["EntersBattlefieldTriggeredAbility"],
+            xmage_signals=["draw", "triggered_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Fixture Champion",
+                type_line="Creature - Vampire Knight",
+                oracle_text=(
+                    "When Fixture Champion enters the battlefield, you draw X cards and you lose X life, "
+                    "where X is the number of Vampires you control."
+                ),
+            ),
+            source_text=(
+                "DynamicValue xCount = new PermanentsOnBattlefieldCount(filter);"
+                "Ability ability = new EntersBattlefieldTriggeredAbility("
+                "new DrawCardSourceControllerEffect(xCount).setText(\"you draw X cards\"));"
+                "ability.addEffect(new LoseLifeSourceControllerEffect(xCount));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "etb_draw_lose_life_oracle_not_exact_fixed")
+
     def test_creature_dies_draw_maps_to_triggered_creature_scope(self) -> None:
         row = queue_row(
             split.DRAW_ENGINE_UNIT,

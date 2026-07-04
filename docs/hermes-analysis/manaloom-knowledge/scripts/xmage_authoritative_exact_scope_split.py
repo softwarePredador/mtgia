@@ -156,6 +156,7 @@ PERMANENT_ACTIVATED_DRAW_DISCARD_SCOPE = "xmage_permanent_simple_activated_draw_
 SPELL_CAST_DRAW_ENGINE_SCOPE = "xmage_spell_cast_draw_engine_v1"
 ETB_LIFE_GAIN_CREATURE_SCOPE = "xmage_creature_etb_gain_life_v1"
 ETB_DRAW_CREATURE_SCOPE = "xmage_creature_etb_draw_cards_v1"
+ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE = "xmage_creature_etb_draw_lose_life_v1"
 ETB_DAMAGE_CREATURE_SCOPE = "xmage_creature_etb_fixed_damage_target_v1"
 ETB_DESTROY_CREATURE_SCOPE = "xmage_creature_etb_destroy_target_v1"
 ETB_RECURSION_CREATURE_SCOPE = "xmage_creature_etb_return_graveyard_card_to_hand_v1"
@@ -3755,6 +3756,19 @@ def is_creature_etb_draw_unit(row: dict[str, Any]) -> bool:
     )
 
 
+def is_creature_etb_draw_lose_life_unit(row: dict[str, Any]) -> bool:
+    if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
+        return False
+    abilities = ability_classes(row)
+    remaining = abilities - {"EntersBattlefieldTriggeredAbility"}
+    return (
+        effect_classes(row) == {"DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"}
+        and "EntersBattlefieldTriggeredAbility" in abilities
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
+        and set(row.get("xmage_signals") or []).issubset({"draw", "triggered_ability"})
+    )
+
+
 def is_permanent_activated_draw_unit(row: dict[str, Any]) -> bool:
     if str(row.get("adapter_work_unit") or "") != DRAW_ENGINE_UNIT:
         return False
@@ -6926,6 +6940,26 @@ def etb_draw_count_from_oracle(metadata: dict[str, Any]) -> int | None:
     return int(value)
 
 
+def etb_draw_lose_life_from_oracle(metadata: dict[str, Any]) -> dict[str, int] | str:
+    trigger_complexity_tokens = SPELL_COMPLEXITY_TOKENS - {"when ", "whenever "}
+    if has_oracle_complexity(metadata, tokens=trigger_complexity_tokens):
+        return "etb_draw_lose_life_oracle_not_simple"
+    text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    match = re.fullmatch(
+        rf"(?:when|whenever) [^.]* enters(?: the battlefield)?[, ]+you draw {number_pattern} cards? "
+        rf"and (?:you )?lose (?P<life>\d+) life\.?",
+        text,
+    )
+    if not match:
+        return "etb_draw_lose_life_oracle_not_exact_fixed"
+    draw_count = number_word_to_int(match.group(1))
+    life_loss = int(match.group("life"))
+    if draw_count <= 0 or life_loss <= 0:
+        return "etb_draw_lose_life_count_not_fixed"
+    return {"draw_count": draw_count, "life_loss": life_loss}
+
+
 def dies_draw_from_oracle(metadata: dict[str, Any]) -> tuple[int, bool] | None:
     text = re.sub(r"\s+", " ", oracle_text_after_leading_static_keywords(metadata)).strip()
     match = re.match(
@@ -7615,6 +7649,7 @@ def proposal_notes(row: dict[str, Any], scope: str) -> str:
     elif scope in {
         ETB_LIFE_GAIN_CREATURE_SCOPE,
         ETB_DRAW_CREATURE_SCOPE,
+        ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE,
         ETB_DAMAGE_CREATURE_SCOPE,
         ETB_DESTROY_CREATURE_SCOPE,
         ETB_RECURSION_CREATURE_SCOPE,
@@ -7716,6 +7751,7 @@ def split_row(
     keyword_creature_unit = is_static_keyword_creature_unit(row)
     etb_life_gain_creature_unit = is_creature_etb_life_gain_unit(row)
     etb_draw_creature_unit = is_creature_etb_draw_unit(row)
+    etb_draw_lose_life_creature_unit = is_creature_etb_draw_lose_life_unit(row)
     dies_draw_creature_unit = is_creature_dies_draw_unit(row)
     spell_cast_draw_engine_unit = is_spell_cast_draw_engine_unit(row)
     permanent_activated_draw_discard_unit = is_permanent_activated_draw_discard_unit(row)
@@ -7764,6 +7800,7 @@ def split_row(
         and not keyword_creature_unit
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
@@ -7805,6 +7842,7 @@ def split_row(
         (unit in SPELL_UNITS or boost_keyword_spell_unit)
         and not etb_life_gain_creature_unit
         and not etb_draw_creature_unit
+        and not etb_draw_lose_life_creature_unit
         and not dies_draw_creature_unit
         and not spell_cast_draw_engine_unit
         and not permanent_activated_draw_discard_unit
@@ -9521,6 +9559,45 @@ def split_row(
             metadata,
             effect_json,
             family_id="xmage_creature_etb_draw_cards",
+        ), "selected_exact_scope"
+
+    if etb_draw_lose_life_creature_unit:
+        if not is_creature_metadata(metadata):
+            return None, "etb_draw_lose_life_not_creature"
+        oracle_draw_life = etb_draw_lose_life_from_oracle(metadata)
+        if isinstance(oracle_draw_life, str):
+            return None, oracle_draw_life
+        source_draw_life = fixed_draw_lose_life_spell_from_source(source_text, classes)
+        if isinstance(source_draw_life, str):
+            return None, source_draw_life.replace("draw_lose_life_spell", "etb_draw_lose_life")
+        if source_draw_life.get("target_controller") != "self":
+            return None, "etb_draw_lose_life_target_not_controller"
+        if (
+            int(source_draw_life.get("draw_count") or 0) != int(oracle_draw_life["draw_count"])
+            or int(source_draw_life.get("life_loss") or 0) != int(oracle_draw_life["life_loss"])
+        ):
+            return None, "etb_draw_lose_life_source_oracle_mismatch"
+        keyword_list = ordered_keywords(keywords_from_ability_classes(row))
+        effect_json = {
+            "effect": "creature",
+            "battle_model_scope": ETB_DRAW_LOSE_LIFE_CREATURE_SCOPE,
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": int(oracle_draw_life["draw_count"]),
+            "etb_life_loss": int(oracle_draw_life["life_loss"]),
+            "xmage_effect_classes": ["DrawCardSourceControllerEffect", "LoseLifeSourceControllerEffect"],
+            "xmage_ability_class": "EntersBattlefieldTriggeredAbility",
+        }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
+        return build_proposal(
+            row,
+            metadata,
+            effect_json,
+            family_id="xmage_creature_etb_draw_lose_life",
         ), "selected_exact_scope"
 
     if dies_draw_creature_unit:
@@ -11861,6 +11938,7 @@ def build_exact_split_report(
             and not is_static_keyword_creature_unit(row)
             and not is_creature_etb_life_gain_unit(row)
             and not is_creature_etb_draw_unit(row)
+            and not is_creature_etb_draw_lose_life_unit(row)
             and not is_creature_dies_draw_unit(row)
             and not is_spell_cast_draw_engine_unit(row)
             and not is_permanent_activated_draw_discard_unit(row)
@@ -11925,6 +12003,7 @@ def build_exact_split_report(
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
+                "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect, EntersBattlefieldTriggeredAbility, exact fixed draw/life-loss Oracle/source agreement, and only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and SpellCastControllerTriggeredAbility, exact draw count, and supported spell filters",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect and SimpleActivatedAbility, exact draw-then-discard counts, and mana/tap/life/source self-sacrifice costs only",

@@ -573,7 +573,7 @@ Post-PG384 update:
 ## Latest Goal Recheck - 2026-07-02
 
 Current thread goal text still mentions the older post-PG284 baseline. That is
-historical only. The active execution baseline is the post-PG386 queue below.
+historical only. The active execution baseline is the post-PG387 queue below.
 
 ## General Goal Contract - 2026-07-02
 
@@ -581,13 +581,13 @@ Treat this file as the active stop contract for the all-card work. The Codex
 thread goal may contain older counts, but execution stops only when a freshly
 generated queue proves the terminal stop definition below.
 
-Current post-PG386 control numbers:
+Current post-PG387 control numbers:
 
-- target battle-gap identities: `26901`
-- XMage-resolved authoritative source identities: `26587`
+- target battle-gap identities: `26897`
+- XMage-resolved authoritative source identities: `26583`
 - local XMage missing-source exceptions: `314`
 - parser gaps after XMage source resolution: `0`
-- XMage authoritative adapter required: `26587`
+- XMage authoritative adapter required: `26583`
 - adapter work-unit keys: `11429`
 
 Operational goal:
@@ -607,13 +607,13 @@ Operational goal:
 Next executable cycle:
 
 1. Start from
-   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg386_draw_lose_life_spell_runtime_new_server_commander_legal.json`.
-2. The current exact splitter returns `0` batch-safe proposals after PG386, so
+   `docs/hermes-analysis/master_optimizer_reports/xmage_authoritative_adaptation_queue_20260704_post_pg387_etb_draw_lose_life_new_server_commander_legal.json`.
+2. The current exact splitter returns `0` batch-safe proposals after PG387, so
    the next cycle must add a new mapper/runtime subpattern before package
    generation.
 3. Preferred next analysis lanes, in order:
    `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
-   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1615`),
    `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
    (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`), and
    `add_counters::source_add_counters_variant_v1` (`795`), followed by
@@ -953,6 +953,14 @@ Fresh alignment evidence:
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_pg386_draw_lose_life_spell_runtime_new_server_docs_after_update.md`
   passed.
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_pg387_etb_draw_lose_life_new_server_final.md`
+  passed with `50/50`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_pg387_etb_draw_lose_life_new_server_final.md`
+  passed with `26/26` checks.
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_pg387_etb_draw_lose_life_new_server_final.md`
+  passed.
+- `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_pg387_etb_draw_lose_life_new_server_final.md`
+  passed.
 - `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
   passed with `49` pass and `1` inherited warning.
 - `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server.md`
@@ -1229,12 +1237,44 @@ and continue to the next highest reusable work unit in the same goal. Do not
 fall back to per-card implementation unless all reusable subpatterns for that
 family are exhausted and the residual card is explicitly classified as manual.
 
+PG387 completion and PG388 starting hypothesis:
+
+1. PG387 promoted `4` fixed creature ETB draw plus life-loss rules on the new
+   server: `Dusk Legion Zealot`, `Phyrexian Gargantua`, `Phyrexian Rager`, and
+   `Tithebearer Giant`.
+2. The implementation added exact
+   `xmage_creature_etb_draw_lose_life_v1` mapping for fixed
+   `DrawCardSourceControllerEffect + LoseLifeSourceControllerEffect` with
+   `EntersBattlefieldTriggeredAbility`, requiring Oracle/source agreement on
+   draw count and life loss while blocking conditional ETB, dynamic `X`, and
+   unsupported auxiliary abilities.
+3. Runtime now resolves ETB draw first, processes draw triggers, then applies
+   controller life loss through `etb_life_loss` in the triggered event.
+4. Tests passed: exact splitter `333`, exact runtime `194`, builder/sync `23`,
+   py_compile, and E2E package validation `status=pass`.
+5. PostgreSQL on the new server applied `4` upserts with `0` stale shadow rows
+   deprecated; postcheck verified `4/4`; Hermes/SQLite sync loaded `4` PG rows,
+   updated `4` SQLite rows, and exported `5147` canonical snapshot rows.
+6. The post-PG387 supported splitter returns `0` batch-safe proposals over
+   `7675` considered supported rows, so PG388 must implement another narrow
+   subpattern before PostgreSQL package generation.
+7. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1615`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `tutor::xmage_library_search_variant_review_v1` (`613`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
+   `draw_cards::xmage_draw_card_variant_review_v1` (`607`).
+
 ## Current Priority Order
 
-Use the post-PG386 authoritative queue unless a newer queue exists:
+Use the post-PG387 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
-2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
+2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
 4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`
@@ -1632,9 +1672,12 @@ Immediate checkpoint after PG361:
     adding supported creature/land sacrifice additional costs to the exact
     mapper and battle runtime. Current evidence:
     `docs/hermes-analysis/master_optimizer_reports/pg379_fixed_damage_sacrifice_cost_new_server_e2e.md`.
-76. Continue from the fresh post-PG386 queue. Since the exact splitter is now
-    empty again, the next cycle must implement a new mapper/runtime subpattern
-    before any PostgreSQL package can be generated.
+76. PG387 promoted `4` fixed creature ETB draw plus life-loss rows on the new
+    server and the post-PG387 supported splitter recheck returned
+    `proposal_count=0` over `7675` considered supported rows. Continue from
+    the fresh post-PG387 queue. Since the exact splitter is now empty again,
+    the next cycle must implement a new mapper/runtime subpattern before any
+    PostgreSQL package can be generated.
 
 ## Non-Goals
 

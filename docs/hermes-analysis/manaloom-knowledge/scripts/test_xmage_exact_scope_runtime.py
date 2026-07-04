@@ -3712,6 +3712,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_creature_etb_draw_lose_life_resolves_after_entering_battlefield(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Drawn A"}, {"name": "Drawn B"}],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.life = 20
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_creature_etb_draw_lose_life_v1",
+            "ability_kind": "triggered",
+            "trigger": "enters_battlefield",
+            "etb_draw_count": 2,
+            "etb_life_loss": 2,
+            "_rule_logical_key": "battle_rule_v1:fixture_etb_draw_lose_life",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Gargantua",
+                "type_line": "Creature - Horror",
+                "oracle_text": "When Fixture Gargantua enters the battlefield, you draw two cards and you lose 2 life.",
+                "power": 4,
+                "toughness": 4,
+            },
+            turn=4,
+            rng=random.Random(146),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.battlefield], ["Fixture Gargantua"])
+        self.assertEqual([card["name"] for card in active.hand], ["Drawn A", "Drawn B"])
+        self.assertEqual(active.life, 18)
+        self.assertTrue(
+            any(
+                event == "trigger_resolved"
+                and data.get("card") == "Fixture Gargantua"
+                and data.get("trigger") == "enters_battlefield"
+                and data.get("effect") == "draw_cards"
+                and data.get("cards_requested") == 2
+                and data.get("cards_drawn") == 2
+                and data.get("life_lost") == 2
+                and data.get("life_after") == 18
+                for event, data in self.events
+            )
+        )
+
     def test_creature_etb_destroy_resolves_after_entering_battlefield(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
