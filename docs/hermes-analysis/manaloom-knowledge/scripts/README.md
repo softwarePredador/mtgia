@@ -93,13 +93,17 @@ Only proposals marked `safe_for_batch_pg_package=true` may feed
 remain blocked until this split produces an exact `battle_model_scope` with
 focused runtime tests.
 
-Current applied checkpoint: PG425. PG420 closed exact basic landwalk, PG421
+Current applied checkpoint: PG426. PG420 closed exact basic landwalk, PG421
 closed flying block-only-flying, PG422 closed exact filtered-evasion, PG423
 closed static cant-block blocker legality, and PG424 closed static
 horsemanship blocker legality. PG424b backfilled `oracle_hash` for `44` older
 trusted PostgreSQL executable rules on the new server. PG425 closed static
 flash timing keywords for `33` creature permanents and left only the separate
 flash/protection and flash/activated-damage candidates for later adapters.
+PG426 closed those `4` flash auxiliary residuals and the current exact split
+recheck reports `proposal_count=0`; continue by selecting the next exact
+subpattern from the rebuilt authoritative queue instead of reusing old split
+artifacts.
 Earlier package trail:
 PG323. PG283
 promoted and synced 312 exact one-shot

@@ -1,0 +1,434 @@
+{
+  "apply_gate": "Do not run apply SQL without explicit approval for the exact command.",
+  "backup_table": "manaloom_deploy_audit.pg426_xmage_flash_auxiliary_residuals_new_server_2026070",
+  "deploy_id": "pg426",
+  "expected_rules": [
+    {
+      "card_name": "Bear Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f42916e2503558c6d07d0e4248ecfaa4",
+      "min_rule_version": 2,
+      "normalized_name": "bear trap",
+      "oracle_hash": "96f5bf52ac3ff60d49307eda68e9bbb0",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Chaos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of chaos",
+      "oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of law",
+      "oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Springjaw Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4af262b74796a9830c2e46d341bcc49b",
+      "min_rule_version": 2,
+      "normalized_name": "springjaw trap",
+      "oracle_hash": "0cfb147f3137086ad77e1697c480b0c3",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "family_counts": {
+    "xmage_permanent_simple_activated_damage": 2,
+    "xmage_static_self_protection_from_colors_creature": 2
+  },
+  "files": {
+    "apply": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_apply.sql",
+    "manifest": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_manifest.json",
+    "package": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_package.md",
+    "postcheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_postcheck.sql",
+    "precheck": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_precheck.sql",
+    "rollback": "/Users/desenvolvimentomobile/Documents/rafa/mtg/mtgia/docs/hermes-analysis/master_optimizer_reports/pg426_xmage_flash_auxiliary_residuals_new_server_rollback.sql"
+  },
+  "generated_at": "2026-07-04T19:46:49+00:00",
+  "mutations_performed": [],
+  "runtime_checks": [
+    {
+      "card": {
+        "name": "Bear Trap"
+      },
+      "card_name": "Bear Trap",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f42916e2503558c6d07d0e4248ecfaa4",
+      "normalized_name": "bear trap",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 3,
+            "activation_cost_mana": "{3}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "creature",
+            "target_constraints": {
+              "card_types": [
+                "creature"
+              ]
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 3,
+        "activation_cost_mana": "{3}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "creature",
+        "target_constraints": {
+          "card_types": [
+            "creature"
+          ]
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    },
+    {
+      "card": {
+        "name": "Defender of Chaos"
+      },
+      "card_name": "Defender of Chaos",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "normalized_name": "defender of chaos",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Defender of Law"
+      },
+      "card_name": "Defender of Law",
+      "effect": "creature",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "normalized_name": "defender of law",
+      "required_effect_fields": {
+        "_keywords_are_self": true,
+        "ability_kind": "static",
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+        "effect": "creature",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "static_effect": "self_protection_from_colors",
+        "target": "self",
+        "target_controller": "self",
+        "xmage_ability_class": "ProtectionAbility"
+      }
+    },
+    {
+      "card": {
+        "name": "Springjaw Trap"
+      },
+      "card_name": "Springjaw Trap",
+      "effect": "artifact",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4af262b74796a9830c2e46d341bcc49b",
+      "normalized_name": "springjaw trap",
+      "required_effect_fields": {
+        "_activated_rule_effects": [
+          {
+            "ability_kind": "activated",
+            "activated_effect": "direct_damage",
+            "activated_self_sacrifice_damage": true,
+            "activation_cost_colors": [],
+            "activation_cost_generic": 4,
+            "activation_cost_mana": "{4}",
+            "activation_requires_sacrifice": true,
+            "activation_requires_tap": true,
+            "activation_sacrifice_cost": null,
+            "amount": 3,
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "damage": 3,
+            "effect": "direct_damage",
+            "target": "any_target",
+            "target_constraints": {
+              "scope": "any_target"
+            },
+            "xmage_ability_class": "SimpleActivatedAbility",
+            "xmage_effect_class": "DamageTargetEffect"
+          }
+        ],
+        "_keywords_are_self": true,
+        "ability_kind": "static_and_activated",
+        "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "activated_damage_amount": 3,
+        "activated_effect": "direct_damage",
+        "activation_cost_colors": [],
+        "activation_cost_generic": 4,
+        "activation_cost_mana": "{4}",
+        "activation_requires_sacrifice": true,
+        "activation_requires_tap": true,
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+        "effect": "artifact",
+        "flash": true,
+        "keywords": [
+          "flash"
+        ],
+        "target": "any_target",
+        "target_constraints": {
+          "scope": "any_target"
+        },
+        "xmage_ability_class": "SimpleActivatedAbility",
+        "xmage_ability_classes": [
+          "FlashAbility",
+          "SimpleActivatedAbility"
+        ],
+        "xmage_effect_class": "DamageTargetEffect"
+      }
+    }
+  ],
+  "selected_card_names": [
+    "Bear Trap",
+    "Defender of Chaos",
+    "Defender of Law",
+    "Springjaw Trap"
+  ],
+  "selected_count": 4,
+  "slug": "xmage_flash_auxiliary_residuals_new_server",
+  "snapshot_checks": [
+    {
+      "card_name": "Bear Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:f42916e2503558c6d07d0e4248ecfaa4",
+      "min_rule_version": 2,
+      "normalized_name": "bear trap",
+      "oracle_hash": "96f5bf52ac3ff60d49307eda68e9bbb0",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Chaos",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:8a6d1d1f78df760eaa3d55060ed162c9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of chaos",
+      "oracle_hash": "0a5067d02cd8e46a4bcbcc67b9410e61",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Defender of Law",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:d63de8e51b839f8f151ea9dc27062ac9",
+      "min_rule_version": 2,
+      "normalized_name": "defender of law",
+      "oracle_hash": "fd4214bb098c9fa877e15d35d1a8f26f",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1"
+      },
+      "review_status": "verified"
+    },
+    {
+      "card_name": "Springjaw Trap",
+      "execution_status": "auto",
+      "forbid_annotation_only": true,
+      "logical_rule_key": "battle_rule_v1:4af262b74796a9830c2e46d341bcc49b",
+      "min_rule_version": 2,
+      "normalized_name": "springjaw trap",
+      "oracle_hash": "0cfb147f3137086ad77e1697c480b0c3",
+      "required_effect_fields": {
+        "battle_model_scope": "xmage_permanent_simple_activated_damage_v1"
+      },
+      "review_status": "verified"
+    }
+  ],
+  "status": "prepared_read_only_pending_apply_approval"
+}

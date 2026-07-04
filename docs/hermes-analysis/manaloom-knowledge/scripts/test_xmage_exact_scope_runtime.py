@@ -5632,6 +5632,60 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_simple_activated_damage_flash_artifact_can_be_cast_outside_main_and_activates(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        target = {"name": "Target Bear", "type_line": "Creature - Bear", "power": 2, "toughness": 2}
+        opponent.battlefield.append(target)
+        active.mana_pool.add_generic(3)
+        permanent = {
+            "name": "Bear Trap",
+            "type_line": "Artifact",
+            "effect": "artifact",
+            "battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "ability_kind": "static_and_activated",
+            "activated_effect": "direct_damage",
+            "activated_battle_model_scope": "xmage_permanent_simple_activated_damage_v1",
+            "activated_damage_amount": 3,
+            "target": "creature",
+            "target_constraints": {"card_types": ["creature"]},
+            "activation_cost_mana": "{3}",
+            "activation_cost_generic": 3,
+            "activation_cost_colors": [],
+            "activation_requires_tap": True,
+            "activation_requires_sacrifice": True,
+            "keywords": ["flash"],
+            "_keywords_are_self": True,
+            "flash": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_bear_trap",
+        }
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(
+                permanent,
+                permanent,
+                "combat",
+                controller=active,
+            )
+        )
+        active.battlefield.append(permanent)
+        activated = self.battle.activate_generic_tap_damage_permanent(
+            active,
+            [opponent],
+            permanent,
+            turn=7,
+            rng=random.Random(61),
+            phase="combat",
+        )
+
+        self.assertTrue(activated)
+        self.assertNotIn(permanent, active.battlefield)
+        self.assertIn(permanent, active.graveyard)
+        self.assertNotIn(target, opponent.battlefield)
+        self.assertIn(target, opponent.graveyard)
+        self.assertTrue(permanent.get("tapped"))
+        self.assertEqual(active.available_mana(), 0)
+
     def test_simple_activated_damage_creature_pays_colored_sacrifices_and_hits_creature(self) -> None:
         active = self.battle.Player("Active", None, [])
         opponent = self.battle.Player("Opponent", None, [])
@@ -10741,6 +10795,56 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
         permanent_without_shroud["shroud"] = False
         self.assertFalse(self.battle.is_legal_target({"name": "Enemy Spell"}, permanent_without_shroud, opponent))
         self.assertTrue(self.battle.is_legal_target({"name": "Own Spell"}, permanent_without_shroud, active))
+
+    def test_static_flash_protection_from_color_creature_has_timing_and_target_protection(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        creature = {
+            "name": "Defender of Law",
+            "type_line": "Creature - Human Knight",
+            "oracle_text": "Flash, protection from red",
+            "controller": "Active",
+            "power": 2,
+            "toughness": 1,
+        }
+        effect = {
+            "effect": "creature",
+            "battle_model_scope": "xmage_static_self_protection_from_colors_creature_v1",
+            "ability_kind": "static",
+            "static_effect": "self_protection_from_colors",
+            "protection_from": ["red"],
+            "protection_from_colors": ["red"],
+            "keywords": ["flash"],
+            "_keywords_are_self": True,
+            "flash": True,
+        }
+
+        self.assertTrue(
+            self.battle.can_cast_in_phase(
+                {**creature, **effect},
+                effect,
+                "combat",
+                controller=active,
+            )
+        )
+        permanent = self.battle.enrich_card({**creature, **effect})
+        active.battlefield.append(permanent)
+
+        red_spell = {
+            "name": "Fixture Red Burn",
+            "type_line": "Instant",
+            "colors": ["R"],
+            "mana_cost": "{R}",
+            "oracle_text": "Fixture Red Burn deals 3 damage to target creature.",
+        }
+        self.assertFalse(
+            self.battle.is_legal_target(
+                red_spell,
+                permanent,
+                opponent,
+                target_type="creature",
+            )
+        )
 
     def test_static_protection_from_color_creature_blocks_matching_colored_targeting(self) -> None:
         active = self.battle.Player("Active", None, [])

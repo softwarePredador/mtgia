@@ -8652,6 +8652,39 @@ new server:
   separate next-work candidates: `Bear Trap`, `Springjaw Trap`,
   `Defender of Chaos`, and `Defender of Law`.
 
+## 2026-07-04 PG426 Flash Auxiliary Residual Closure
+
+- Closed the four post-PG425 exact-scope residuals that used `flash` as an
+  auxiliary keyword outside the plain static self-keyword creature family:
+  `Bear Trap`, `Springjaw Trap`, `Defender of Chaos`, and `Defender of Law`.
+- No broad mapper was promoted. The package reused existing exact scopes:
+  `xmage_permanent_simple_activated_damage_v1` for flash artifacts with simple
+  tap/sacrifice damage activations, and
+  `xmage_static_self_protection_from_colors_creature_v1` for flash creatures
+  with exact protection from one color.
+- Focused tests now cover both combined cases: a flash damage artifact can be
+  cast outside main phase and still activate/tap/sacrifice/deal damage, and a
+  flash protection creature preserves combat-speed timing while blocking
+  illegal targeting from the protected color.
+- The PostgreSQL package promoted `4` cards. Precheck found `4` target rows,
+  `0` existing rule rows, and `0` shadow rows; apply inserted/updated `4`;
+  postcheck verified `4/4` promoted rows as `verified`/`auto` with Oracle
+  hashes.
+- Hermes sync refreshed PostgreSQL card metadata against
+  `127.0.0.1:15432/halder` and synced `4` PG rules into SQLite. The canonical
+  fallback export increased to `5655` rows.
+- PG426 E2E package validation passed across PostgreSQL, SQLite, canonical
+  snapshot, and runtime `get_card_effect` for all `4` selected cards. Generic
+  battle scenario count remained `0`; timing/protection/activation semantics
+  are covered by focused runtime tests.
+- Final governance audits passed:
+  XMage strategy (`26/26`), operational surface, legacy contamination, and
+  PG/Hermes/SQLite contract (`51/51`).
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26373` to `26369`, authoritative adapter-required count from `26059`
+  to `26055`, and the exact split recheck now reports `proposal_count=0`.
+  The remaining `314` identities are still explicit missing-source exceptions.
+
 ## Required Artifacts Per Cycle
 
 Every cycle must produce or refresh:

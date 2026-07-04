@@ -4817,6 +4817,44 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertTrue(effect["activation_requires_sacrifice"])
         self.assertTrue(effect["activated_self_sacrifice_damage"])
 
+    def test_permanent_activated_damage_maps_flash_artifact_tap_self_sacrifice(self) -> None:
+        row = queue_row(
+            split.DAMAGE_UNIT,
+            effect_classes=["DamageTargetEffect"],
+            ability_kind="static_and_activated",
+            ability_classes=["FlashAbility", "SimpleActivatedAbility"],
+            xmage_signals=["targeting", "activated_ability"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Springjaw Trap",
+                type_line="Artifact",
+                oracle_text="Flash\n{4}, {T}, Sacrifice Springjaw Trap: It deals 3 damage to any target.",
+            ),
+            source_text="""
+                this.addAbility(FlashAbility.getInstance());
+                Ability ability = new SimpleActivatedAbility(
+                    new DamageTargetEffect(3, "it"), new GenericManaCost(4)
+                );
+                ability.addCost(new TapSourceCost());
+                ability.addCost(new SacrificeSourceCost());
+                ability.addTarget(new TargetAnyTarget());
+                this.addAbility(ability);
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "artifact")
+        self.assertEqual(effect["battle_model_scope"], split.PERMANENT_ACTIVATED_DAMAGE_SCOPE)
+        self.assertEqual(effect["activated_damage_amount"], 3)
+        self.assertEqual(effect["activation_cost_mana"], "{4}")
+        self.assertTrue(effect["activated_self_sacrifice_damage"])
+        self.assertEqual(effect["keywords"], ["flash"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flash"])
+
     def test_permanent_activated_damage_maps_creature_self_sacrifice_target_creature(self) -> None:
         row = queue_row(
             split.DAMAGE_UNIT,
@@ -12844,6 +12882,34 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["protection_from"], ["red"])
         self.assertEqual(effect["keywords"], ["flying"])
         self.assertTrue(effect["flying"])
+
+    def test_static_protection_with_flash_creature_maps_timing_keyword_and_color(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlashAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlashAbility", "ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Defender of Law",
+                type_line="Creature - Human Knight",
+                oracle_text="Flash, protection from red",
+            ),
+            source_text="""
+                this.addAbility(FlashAbility.getInstance());
+                this.addAbility(ProtectionAbility.from(ObjectColor.RED));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_from"], ["red"])
+        self.assertEqual(effect["keywords"], ["flash"])
+        self.assertTrue(effect["_keywords_are_self"])
+        self.assertTrue(effect["flash"])
 
     def test_static_protection_with_flying_creature_maps_each_color(self) -> None:
         row = queue_row(
