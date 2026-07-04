@@ -1228,6 +1228,49 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["draw_count"], 2)
         self.assertEqual(effect["life_loss"], 2)
 
+    def test_fixed_target_player_draw_spell_maps(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player draws four cards."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(4));"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.TARGET_DRAW_SCOPE)
+        self.assertTrue(effect["target_player_draw"])
+        self.assertEqual(effect["target_controller"], "target_player")
+        self.assertEqual(effect["target"], "player")
+        self.assertEqual(effect["target_preference"], "self")
+        self.assertEqual(effect["draw_count"], 4)
+        self.assertEqual(effect["count"], 4)
+
+    def test_fixed_target_player_draw_spell_blocks_dynamic_source_count(self) -> None:
+        row = queue_row(
+            split.DRAW_UNIT,
+            effect_classes=["DrawCardTargetEffect"],
+            xmage_signals=["targeting", "draw"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(oracle_text="Target player draws X cards."),
+            source_text=(
+                "this.getSpellAbility().addTarget(new TargetPlayer());"
+                "this.getSpellAbility().addEffect(new DrawCardTargetEffect(GetXValue.instance));"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "target_player_draw_spell_oracle_not_exact_fixed")
+
     def test_fixed_draw_lose_life_spell_blocks_dynamic_source_count(self) -> None:
         row = queue_row(
             split.DRAW_UNIT,

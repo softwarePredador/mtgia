@@ -539,6 +539,105 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_fixed_target_player_draw_spell_defaults_to_self(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}, {"name": "Card C"}],
+        )
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [{"name": "Opponent Card"}],
+        )
+        effect = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "count": 2,
+            "draw_count": 2,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "target_player_draw": True,
+            "instant": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Inspiration",
+                "type_line": "Instant",
+                "oracle_text": "Target player draws two cards.",
+            },
+            turn=1,
+            rng=random.Random(1),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual([card["name"] for card in active.hand], ["Card A", "Card B"])
+        self.assertEqual([card["name"] for card in opponent.hand], [])
+        self.assertTrue(
+            any(
+                event == "draw_cards_resolved"
+                and data.get("card") == "Fixture Inspiration"
+                and data.get("target_player") == "Active"
+                and data.get("target_player_draw") is True
+                and data.get("cards_drawn") == 2
+                for event, data in self.events
+            )
+        )
+
+    def test_fixed_target_player_draw_spell_respects_declared_target(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [{"name": "Card A"}, {"name": "Card B"}],
+        )
+        opponent = self.battle.Player(
+            "Opponent",
+            None,
+            [{"name": "Opponent Card A"}, {"name": "Opponent Card B"}],
+        )
+        effect = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "count": 1,
+            "draw_count": 1,
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "target_player_draw": True,
+            "declared_targets": [{"target_player": "Opponent"}],
+            "sorcery": True,
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            {
+                "name": "Fixture Donate Draw",
+                "type_line": "Sorcery",
+                "oracle_text": "Target player draws a card.",
+            },
+            turn=2,
+            rng=random.Random(2),
+            effect_data_override=effect,
+        )
+
+        self.assertEqual(active.hand, [])
+        self.assertEqual([card["name"] for card in opponent.hand], ["Opponent Card A"])
+        self.assertTrue(
+            any(
+                event == "draw_cards_resolved"
+                and data.get("card") == "Fixture Donate Draw"
+                and data.get("target_player") == "Opponent"
+                and data.get("target_reason") == "declared_target"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_fixed_source_controller_draw_spell_pays_creature_sacrifice_cost(self) -> None:
         active = self.battle.Player(
             "Active",

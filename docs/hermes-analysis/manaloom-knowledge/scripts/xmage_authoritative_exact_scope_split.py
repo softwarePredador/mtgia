@@ -86,6 +86,7 @@ SUPPORTED_UNITS = {
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
+TARGET_DRAW_SCOPE = "xmage_fixed_target_player_draw_spell_v1"
 DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_controller_draw_lose_life_spell_v1"
 TARGET_DRAW_LOSE_LIFE_SPELL_SCOPE = "xmage_fixed_target_player_draw_lose_life_spell_v1"
@@ -4763,6 +4764,20 @@ def fixed_draw_lose_life_spell_from_oracle(metadata: dict[str, Any]) -> dict[str
     return "draw_lose_life_spell_oracle_not_exact_fixed"
 
 
+def fixed_target_player_draw_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if has_oracle_complexity(metadata):
+        return "target_player_draw_spell_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|six|seven|\d+)"
+    match = re.fullmatch(rf"target player draws {number_pattern} cards?\.?", text)
+    if not match:
+        return "target_player_draw_spell_oracle_not_exact_fixed"
+    draw_count = number_word_to_int(match.group(1))
+    if draw_count <= 0:
+        return "target_player_draw_spell_count_not_fixed"
+    return {"draw_count": draw_count}
+
+
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
@@ -6178,6 +6193,37 @@ def fixed_draw_lose_life_spell_from_source(source: str, classes: set[str]) -> di
         "life_loss": int(life_loss),
         "target_controller": target_controller,
         "xmage_effect_classes": effect_classes,
+    }
+
+
+def fixed_target_player_draw_spell_from_source(source: str) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "target_player_draw_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "target_player_draw_spell_source_not_simple"
+    if "TargetPlayer" not in text:
+        return "target_player_draw_spell_source_target_not_supported"
+    if len(re.findall(r"\bDrawCardTargetEffect\s*\(", text)) != 1:
+        return "target_player_draw_spell_source_not_simple"
+    draw_count = java_constructor_int_or_noarg_default(
+        text,
+        "DrawCardTargetEffect",
+        noarg_default=1,
+    )
+    if draw_count is None or draw_count <= 0:
+        return "target_player_draw_spell_source_count_not_fixed"
+    return {
+        "draw_count": int(draw_count),
+        "xmage_effect_class": "DrawCardTargetEffect",
     }
 
 
@@ -10800,6 +10846,38 @@ def split_row(
                 metadata,
                 effect_json,
                 family_id="xmage_fixed_draw_lose_life_spell",
+            ), "selected_exact_scope"
+
+        if classes == {"DrawCardTargetEffect"}:
+            if ability_classes(row):
+                return None, "target_player_draw_spell_ability_class_not_simple"
+            oracle_target_draw = fixed_target_player_draw_spell_from_oracle(metadata)
+            if isinstance(oracle_target_draw, str):
+                return None, oracle_target_draw
+            source_target_draw = fixed_target_player_draw_spell_from_source(source_text)
+            if isinstance(source_target_draw, str):
+                return None, source_target_draw
+            if oracle_target_draw["draw_count"] != source_target_draw["draw_count"]:
+                return None, "target_player_draw_spell_source_oracle_mismatch"
+            draw_count = int(oracle_target_draw["draw_count"])
+            effect_json = {
+                "effect": "draw_cards",
+                "battle_model_scope": TARGET_DRAW_SCOPE,
+                "count": draw_count,
+                "draw_count": draw_count,
+                "target": "player",
+                "target_controller": "target_player",
+                "target_constraints": {"players": ["any"]},
+                "target_preference": "self",
+                "target_player_draw": True,
+                "xmage_effect_class": "DrawCardTargetEffect",
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_target_player_draw_spell",
             ), "selected_exact_scope"
 
         if classes in (

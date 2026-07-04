@@ -41693,6 +41693,31 @@
     "battle_rule_logical_key": "battle_rule_v1:603c776839827f2f21cef8b62e22a1be",
     "battle_rule_oracle_hash": "88430d9feac4ab218c6b1a9000d35193"
   },
+  "Inspiration": {
+    "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+    "count": 2,
+    "draw_count": 2,
+    "effect": "draw_cards",
+    "instant": true,
+    "sorcery": false,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_player_draw": true,
+    "target_preference": "self",
+    "xmage_effect_class": "DrawCardTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:cad2616d7e332eef99280194f30a8898",
+    "battle_rule_oracle_hash": "4a531dfd5223b1e66a938ece9c70373b"
+  },
   "Inspired Charge": {
     "battle_model_scope": "xmage_fixed_boost_controlled_creatures_until_eot_spell_v1",
     "effect": "controlled_stat_modifier_until_eot",
@@ -56286,6 +56311,31 @@
     "battle_rule_confidence": 0.55,
     "battle_rule_version": 1,
     "battle_rule_logical_key": "battle_rule_v1:adf4845203520f2f668e196538e532f2"
+  },
+  "Opportunity": {
+    "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+    "count": 4,
+    "draw_count": 4,
+    "effect": "draw_cards",
+    "instant": true,
+    "sorcery": false,
+    "target": "player",
+    "target_constraints": {
+      "players": [
+        "any"
+      ]
+    },
+    "target_controller": "target_player",
+    "target_player_draw": true,
+    "target_preference": "self",
+    "xmage_effect_class": "DrawCardTargetEffect",
+    "battle_rule_source": "curated",
+    "battle_rule_review_status": "verified",
+    "battle_rule_execution_status": "auto",
+    "battle_rule_confidence": 0.96,
+    "battle_rule_version": 2,
+    "battle_rule_logical_key": "battle_rule_v1:40b41e58b350a82f29f7671634a144cf",
+    "battle_rule_oracle_hash": "04f6982cfff3d1ddc14ba9ed057a2812"
   },
   "Opt": {
     "_composite_rule_components": [

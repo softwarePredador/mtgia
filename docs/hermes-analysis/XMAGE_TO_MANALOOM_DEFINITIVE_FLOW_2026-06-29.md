@@ -240,10 +240,10 @@ Interpretation:
   and every `xmage_missing_source_exception` is classified into an explicit
   official/Forge/manual-model or product-exclusion lane with evidence.
 
-## PG283-PG389 Exact Adapter Waves
+## PG283-PG391 Exact Adapter Waves
 
-As of 2026-07-04, the PG283-PG389 all-card exact adapter waves are applied and
-synced. PG375-PG389 were applied against the new EasyPanel PostgreSQL target
+As of 2026-07-04, the PG283-PG391 all-card exact adapter waves are applied and
+synced. PG375-PG391 were applied against the new EasyPanel PostgreSQL target
 via the new-server tunnel and validated with
 `database_target=127.0.0.1:15432/halder`.
 
@@ -6295,6 +6295,63 @@ PG389 measured result:
   `proposal_count=0` over `7665` considered supported rows. The next cycle must
   implement another exact mapper/runtime subpattern before package generation.
 
+PG390 measured result:
+
+- PG390 promoted `12` fixed damage plus exile-if-dies spells on the new server
+  into `xmage_fixed_damage_target_exile_if_dies_spell_v1`.
+- The splitter now maps exact local XMage
+  `DamageTargetEffect + ExileTargetIfDiesEffect` only when the fixed damage
+  amount, supported target class, and Oracle "would die this turn, exile it
+  instead" clause agree. Dynamic damage, unsupported targets, and additional
+  costs remain blocked.
+- Runtime coverage applies damage with an exile-if-dies marker so the damaged
+  target is exiled rather than moved to graveyard when lethal damage resolves.
+- PostgreSQL postcheck verified `12/12` promoted rows as `verified`, `auto`,
+  and hash-backed on the new server.
+- PG -> Hermes/SQLite sync and E2E validation passed for PostgreSQL,
+  SQLite/Hermes, canonical snapshot, and runtime `get_card_effect`.
+- Global all-card authoritative queue after PG390:
+  `target_identity_count=26875`, `xmage_authoritative_source_count=26561`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26561`.
+- Running the exact splitter after PG390 on supported units returned
+  `proposal_count=0` over `7653` considered supported rows until the PG391
+  target-player draw mapper was implemented.
+
+PG391 measured result:
+
+- PG391 promoted `2` fixed target-player draw spells on the new server:
+  `Inspiration` and `Opportunity`.
+- The splitter now maps exact local XMage `DrawCardTargetEffect` plus
+  `TargetPlayer` into `xmage_fixed_target_player_draw_spell_v1`, only when
+  Oracle text is exactly "Target player draws N cards." and source/Oracle
+  fixed counts agree. X/dynamic counts, ability-class variants, and non-exact
+  Oracle text remain blocked.
+- Runtime coverage resolves `target_player_draw` by honoring a replay-declared
+  target first and otherwise choosing the controller for beneficial card draw.
+- Focused splitter tests passed `345/345`; focused exact runtime tests passed
+  `200/200`; package-builder tests passed `5/5`; and `py_compile` passed.
+- PostgreSQL precheck matched `2/2` target card rows on the new server; apply
+  upserted `2` rows and deprecated `0` shadows; postcheck verified `2/2`
+  promoted rows as `verified`, `auto`, and hash-backed.
+- PG -> Hermes/SQLite sync loaded `2` PostgreSQL rows from the new target,
+  updated `2` SQLite rows, and exported `5170` canonical snapshot rows.
+- E2E validation passed PostgreSQL, SQLite/Hermes, canonical snapshot, and
+  runtime `get_card_effect` checks for `2/2` cards.
+- Post-package governance passed on the new server: strategy consistency
+  `26/26`, operational surface `pass`, and PG-Hermes-SQLite contract `50/50`
+  pass.
+- Global readiness after PG391: `battle_and_oracle_ready=4034`,
+  `battle_family_mapper_required=29796`, and
+  `snapshot_has_verified_rule=3899`.
+- Global all-card authoritative queue after PG391:
+  `target_identity_count=26873`, `xmage_authoritative_source_count=26559`,
+  `xmage_missing_source_exception_count=314`, `parser_gap=0`, and
+  `xmage_authoritative_adapter_required_count=26559`.
+- Running the exact splitter after PG391 on supported units returned
+  `proposal_count=0` over `7651` considered supported rows. The next cycle must
+  implement another exact mapper/runtime subpattern before package generation.
+
 ## Why This Is The Best Current Flow
 
 The alternatives were rechecked on 2026-06-29.
@@ -6925,17 +6982,17 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG389 queue on the new server, the next exact runtime-backed work should
+post-PG391 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1818`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1615`
 3. `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1` - `1114`
-4. `direct_damage::targeted_damage_variant_v1` - `888`
+4. `direct_damage::targeted_damage_variant_v1` - `876`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
 7. `removal_destroy::targeted_destroy_variant_v1` - `612`
-8. `draw_cards::xmage_draw_card_variant_review_v1` - `607`
+8. `draw_cards::xmage_draw_card_variant_review_v1` - `605`
 9. `tutor::xmage_library_search_variant_review_v1` - `605`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
 

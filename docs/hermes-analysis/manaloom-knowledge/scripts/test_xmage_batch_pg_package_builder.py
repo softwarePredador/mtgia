@@ -202,6 +202,40 @@ def test_manifest_expected_rule_from_proposal_contains_e2e_fields() -> None:
     }
 
 
+def test_manifest_expected_rule_preserves_target_player_draw_fields() -> None:
+    proposal = {
+        "normalized_name": "inspiration",
+        "card_name": "Inspiration",
+        "oracle_hash": "hash-target-draw",
+        "logical_rule_key": "battle_rule_v1:hash-target-draw",
+        "effect_json": {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+            "target": "player",
+            "target_controller": "target_player",
+            "target_preference": "self",
+            "target_constraints": {"players": ["any"]},
+            "count": 2,
+            "draw_count": 2,
+            "target_player_draw": True,
+        },
+    }
+
+    expected = builder.expected_rule_from_proposal(proposal)
+
+    assert expected["required_effect_fields"] == {
+        "effect": "draw_cards",
+        "battle_model_scope": "xmage_fixed_target_player_draw_spell_v1",
+        "target": "player",
+        "target_controller": "target_player",
+        "target_constraints": {"players": ["any"]},
+        "target_preference": "self",
+        "count": 2,
+        "draw_count": 2,
+        "target_player_draw": True,
+    }
+
+
 def test_manifest_checks_from_expected_rule_split_snapshot_and_runtime_fields() -> None:
     rule = {
         "normalized_name": "verge rangers",
