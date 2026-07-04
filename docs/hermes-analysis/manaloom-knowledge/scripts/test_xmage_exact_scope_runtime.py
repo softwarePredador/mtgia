@@ -1693,6 +1693,101 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_draw_discard_spell_draws_then_discards(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [
+            {"name": "Low Value Land", "type_line": "Land", "cmc": 0},
+            {"name": "Keep Spell", "type_line": "Sorcery", "cmc": 5},
+        ]
+        spell = {"name": "Fixture Study", "type_line": "Sorcery", "cmc": 3}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 2,
+            "draw_count": 2,
+            "discard_count": 1,
+            "draw_discard_order": "draw_then_discard",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=4,
+            rng=random.Random(4),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 3)
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(any(card.get("name") == "Low Value Land" for card in active.graveyard))
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Study"
+                and data.get("order") == "draw_then_discard"
+                and data.get("cards_drawn") == 2
+                and data.get("cards_discarded") == 1
+                for event, data in self.events
+            )
+        )
+
+    def test_draw_discard_spell_discards_then_draws(self) -> None:
+        active = self.battle.Player(
+            "Active",
+            None,
+            [
+                {"name": "Fresh Card A", "cmc": 2},
+                {"name": "Fresh Card B", "cmc": 3},
+            ],
+        )
+        opponent = self.battle.Player("Opponent", None, [])
+        active.hand = [{"name": "Low Value Land", "type_line": "Land", "cmc": 0}]
+        spell = {"name": "Fixture Rendezvous", "type_line": "Sorcery", "cmc": 2}
+        effect_data = {
+            "effect": "draw_cards",
+            "battle_model_scope": "xmage_fixed_draw_discard_spell_v1",
+            "draw_discard_spell": True,
+            "count": 2,
+            "draw_count": 2,
+            "discard_count": 1,
+            "draw_discard_order": "discard_then_draw",
+        }
+
+        self.battle.apply_effect_immediate(
+            active,
+            [opponent],
+            spell,
+            turn=5,
+            rng=random.Random(5),
+            effect_data_override=effect_data,
+            phase="resolution",
+        )
+
+        self.assertEqual(len(active.hand), 2)
+        self.assertEqual(len(active.library), 0)
+        self.assertTrue(any(card.get("name") == "Low Value Land" for card in active.graveyard))
+        self.assertTrue(
+            any(
+                event == "draw_discard_spell_resolved"
+                and data.get("card") == "Fixture Rendezvous"
+                and data.get("order") == "discard_then_draw"
+                and data.get("cards_drawn") == 2
+                and data.get("cards_discarded") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_simple_activated_draw_discard_can_discard_drawn_card_with_empty_hand(self) -> None:
         active = self.battle.Player(
             "Active",

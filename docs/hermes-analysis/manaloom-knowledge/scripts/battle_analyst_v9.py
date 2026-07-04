@@ -49237,6 +49237,124 @@ def resolve_life_total_change(player, opponents, card, effect_data, turn, rng):
     return changed
 
 
+def _draw_discard_spell_selected_discards(player, discard_count, *, random_discard=False, rng=None):
+    discard_count = max(0, int(discard_count or 0))
+    if discard_count <= 0:
+        return []
+    candidates = [card for card in getattr(player, "hand", []) or [] if isinstance(card, dict)]
+    if not candidates:
+        return []
+    if random_discard:
+        chooser = rng or random
+        selected = list(chooser.sample(candidates, min(discard_count, len(candidates))))
+    else:
+        selected = []
+        for _ in range(discard_count):
+            discard_card = _choose_currency_converter_discard(player)
+            if discard_card is None:
+                break
+            selected.append(discard_card)
+            player.hand.remove(discard_card)
+        return selected
+    for discard_card in selected:
+        if discard_card in player.hand:
+            player.hand.remove(discard_card)
+    return selected
+
+
+def resolve_draw_discard_spell(
+    player,
+    opponents,
+    card,
+    effect_data,
+    turn,
+    rng,
+    *,
+    phase=None,
+    all_players=None,
+    stack=None,
+):
+    draw_count = max(0, int(effect_data.get("draw_count") or effect_data.get("count") or 0))
+    discard_count = max(0, int(effect_data.get("discard_count") or 0))
+    order = str(effect_data.get("draw_discard_order") or "draw_then_discard")
+    random_discard = bool(effect_data.get("discard_random"))
+    phase_name = phase or "resolution"
+    all_players_for_triggers = all_players or [player] + list(opponents or [])
+    drawn_cards = []
+    discarded_cards = []
+    discard_resolution = {
+        "to_top": [],
+        "to_graveyard": [],
+        "used_replacement": False,
+        "trigger_events": [],
+    }
+
+    def draw_step():
+        nonlocal drawn_cards
+        drawn_cards = player.draw(draw_count, rng)
+        process_player_draw_triggers(
+            player,
+            len(drawn_cards),
+            turn,
+            phase_name,
+            all_players_for_triggers,
+            stack=stack,
+            turn_player=player,
+        )
+
+    def discard_step():
+        nonlocal discarded_cards, discard_resolution
+        discarded_cards = _draw_discard_spell_selected_discards(
+            player,
+            discard_count,
+            random_discard=random_discard,
+            rng=rng,
+        )
+        if discarded_cards:
+            discard_resolution = resolve_effect_discard_cards(
+                player,
+                discarded_cards,
+                top_limit=0,
+                opponents=opponents,
+                turn=turn,
+                phase=phase_name,
+                rng=rng,
+            )
+
+    if order == "discard_then_draw":
+        discard_step()
+        draw_step()
+    else:
+        draw_step()
+        discard_step()
+
+    emit_replay_event(
+        "draw_discard_spell_resolved",
+        player=player.name,
+        card=card.get("name", "?"),
+        order=order,
+        cards_drawn=len(drawn_cards),
+        requested_draw_count=draw_count,
+        cards_discarded=len(discarded_cards),
+        requested_discard_count=discard_count,
+        discard_random=random_discard,
+        discarded_to_graveyard=[
+            entry.get("name", "?")
+            for entry in discard_resolution.get("to_graveyard", [])
+            if isinstance(entry, dict)
+        ],
+        discarded_to_library_top=[
+            entry.get("name", "?")
+            for entry in discard_resolution.get("to_top", [])
+            if isinstance(entry, dict)
+        ],
+        library_remaining=len(player.library),
+        hand_size=len(player.hand),
+        turn=turn,
+        **replay_rule_fields(effect_data),
+    )
+
+
 def apply_effect_immediate(
     player,
     opponents,
@@ -50085,6 +50203,20 @@ def apply_effect_immediate(
             finish_resolved_spell(player, card, turn=turn)
             return
         n = effect_data.get("count", 2)
+        if effect_data.get("draw_discard_spell"):
+            resolve_draw_discard_spell(
+                player,
+                opponents,
+                card,
+                effect_data,
+                turn,
+                rng,
+                phase=phase or "resolution",
+                all_players=all_players_for_entry,
+                stack=stack,
+            )
+            finish_resolved_spell(player, card, turn=turn)
+            return
         if is_wheel_like_card(card, effect_data):
             wheel_draw_count = wheel_like_draw_count(
                 card,

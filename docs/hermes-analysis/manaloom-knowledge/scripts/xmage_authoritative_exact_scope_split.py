@@ -86,6 +86,7 @@ SUPPORTED_UNITS = {
 }
 
 DRAW_SCOPE = "xmage_fixed_source_controller_draw_spell_v1"
+DRAW_DISCARD_SPELL_SCOPE = "xmage_fixed_draw_discard_spell_v1"
 DAMAGE_SCOPE = "xmage_fixed_damage_target_spell_v1"
 DAMAGE_GAIN_LIFE_SCOPE = "xmage_fixed_damage_target_and_controller_gain_life_spell_v1"
 DESTROY_GAIN_LIFE_SCOPE = "xmage_destroy_target_and_controller_gain_life_spell_v1"
@@ -4533,6 +4534,42 @@ def activated_draw_discard_from_oracle(metadata: dict[str, Any]) -> dict[str, An
     return activation
 
 
+def fixed_draw_discard_spell_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
+    if has_oracle_complexity(metadata):
+        return "draw_discard_spell_oracle_not_simple"
+    number_pattern = r"(a|one|two|three|four|five|\d+)"
+    draw_then_discard = re.fullmatch(
+        rf"draw {number_pattern} cards?, then discard {number_pattern} cards?\.?",
+        text,
+    )
+    if draw_then_discard:
+        draw_count = number_word_to_int(draw_then_discard.group(1))
+        discard_count = number_word_to_int(draw_then_discard.group(2))
+        if draw_count <= 0 or discard_count <= 0:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+        }
+    discard_then_draw = re.fullmatch(
+        rf"discard {number_pattern} cards?, then draw {number_pattern} cards?\.?",
+        text,
+    )
+    if discard_then_draw:
+        discard_count = number_word_to_int(discard_then_draw.group(1))
+        draw_count = number_word_to_int(discard_then_draw.group(2))
+        if draw_count <= 0 or discard_count <= 0:
+            return "draw_discard_spell_oracle_count_not_fixed"
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": "discard_then_draw",
+        }
+    return "draw_discard_spell_oracle_not_exact_fixed"
+
+
 def activated_recursion_to_hand_from_oracle(metadata: dict[str, Any]) -> tuple[str, int, bool] | None:
     text = re.sub(r"\s+", " ", oracle_text(metadata)).strip().lower()
     if text.count(":") != 1:
@@ -5828,6 +5865,81 @@ def draw_discard_counts_from_source(source: str) -> tuple[int, int] | str:
     if draw_count <= 0 or discard_count <= 0:
         return "activated_draw_discard_source_count_not_fixed"
     return draw_count, discard_count
+
+
+def discard_controller_spell_count_from_source(source: str) -> tuple[int, bool] | str:
+    matches = re.findall(r"DiscardControllerEffect\s*\(([^)]*)\)", source or "")
+    if len(matches) != 1:
+        return "draw_discard_spell_source_count_not_fixed"
+    raw_args = [part.strip() for part in matches[0].split(",") if part.strip()]
+    if not raw_args:
+        return 1, False
+    if not raw_args[0].isdigit():
+        return "draw_discard_spell_source_count_not_fixed"
+    discard_count = int(raw_args[0])
+    if discard_count <= 0:
+        return "draw_discard_spell_source_count_not_fixed"
+    random_discard = False
+    if len(raw_args) >= 2:
+        if raw_args[1].lower() not in {"true", "false"}:
+            return "draw_discard_spell_source_count_not_fixed"
+        random_discard = raw_args[1].lower() == "true"
+    if len(raw_args) > 2:
+        return "draw_discard_spell_source_count_not_fixed"
+    return discard_count, random_discard
+
+
+def fixed_draw_discard_spell_from_source(source: str, classes: set[str]) -> dict[str, Any] | str:
+    text = source or ""
+    if has_additional_cost(text):
+        return "draw_discard_spell_source_additional_cost_not_supported"
+    unsupported_markers = {
+        "ConditionalOneShotEffect",
+        "DoIfCostPaid",
+        "Mode",
+        "Modes",
+        "TargetPointer",
+        ".setTargetPointer",
+    }
+    if any(marker in text for marker in unsupported_markers):
+        return "draw_discard_spell_source_not_simple"
+    if classes == {"DrawDiscardControllerEffect"}:
+        counts = draw_discard_counts_from_source(text)
+        if isinstance(counts, str):
+            return counts.replace("activated_draw_discard", "draw_discard_spell")
+        draw_count, discard_count = counts
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": "draw_then_discard",
+            "discard_random": False,
+            "xmage_effect_classes": ["DrawDiscardControllerEffect"],
+        }
+    if classes == {"DrawCardSourceControllerEffect", "DiscardControllerEffect"}:
+        draw_count = java_constructor_int_or_noarg_default(
+            text,
+            "DrawCardSourceControllerEffect",
+            noarg_default=1,
+        )
+        if draw_count is None or draw_count <= 0:
+            return "draw_discard_spell_source_count_not_fixed"
+        discard_detail = discard_controller_spell_count_from_source(text)
+        if isinstance(discard_detail, str):
+            return discard_detail
+        discard_count, random_discard = discard_detail
+        draw_match = re.search(r"DrawCardSourceControllerEffect\s*\(", text)
+        discard_match = re.search(r"DiscardControllerEffect\s*\(", text)
+        if not draw_match or not discard_match:
+            return "draw_discard_spell_source_not_simple"
+        order = "draw_then_discard" if draw_match.start() < discard_match.start() else "discard_then_draw"
+        return {
+            "draw_count": draw_count,
+            "discard_count": discard_count,
+            "draw_discard_order": order,
+            "discard_random": random_discard,
+            "xmage_effect_classes": ["DrawCardSourceControllerEffect", "DiscardControllerEffect"],
+        }
+    return "draw_discard_spell_source_effect_class_not_supported"
 
 
 def activated_draw_discard_from_source(source: str) -> dict[str, Any] | str:
@@ -10264,6 +10376,43 @@ def split_row(
                 family_id="xmage_counter_target_draw_card_spell",
             ), "selected_exact_scope"
 
+        if classes in (
+            {"DrawDiscardControllerEffect"},
+            {"DrawCardSourceControllerEffect", "DiscardControllerEffect"},
+        ):
+            if ability_classes(row):
+                return None, "draw_discard_spell_ability_class_not_simple"
+            oracle_draw_discard = fixed_draw_discard_spell_from_oracle(metadata)
+            if isinstance(oracle_draw_discard, str):
+                return None, oracle_draw_discard
+            source_draw_discard = fixed_draw_discard_spell_from_source(source_text, classes)
+            if isinstance(source_draw_discard, str):
+                return None, source_draw_discard
+            comparison_keys = ("draw_count", "discard_count", "draw_discard_order")
+            if any(
+                oracle_draw_discard.get(key) != source_draw_discard.get(key)
+                for key in comparison_keys
+            ):
+                return None, "draw_discard_spell_source_oracle_mismatch"
+            effect_json = {
+                "effect": "draw_cards",
+                "battle_model_scope": DRAW_DISCARD_SPELL_SCOPE,
+                "count": int(oracle_draw_discard["draw_count"]),
+                "draw_count": int(oracle_draw_discard["draw_count"]),
+                "discard_count": int(oracle_draw_discard["discard_count"]),
+                "draw_discard_order": str(oracle_draw_discard["draw_discard_order"]),
+                "draw_discard_spell": True,
+                "discard_random": bool(source_draw_discard.get("discard_random")),
+                "xmage_effect_classes": list(source_draw_discard["xmage_effect_classes"]),
+                **flags,
+            }
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_fixed_draw_discard_spell",
+            ), "selected_exact_scope"
+
         if classes != {"DrawCardSourceControllerEffect"}:
             return None, "draw_effect_class_not_pure"
         additional_cost_fields, additional_cost_reason = fixed_draw_spell_additional_cost_fields_from_source(
@@ -11673,6 +11822,7 @@ def build_exact_split_report(
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one-or-both Oracle text, and two fixed graveyard-to-hand components",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with ReturnFromGraveyardToHandTargetEffect, no extra ability class, exact choose-one Oracle text, and two fixed alternative graveyard-to-hand components",
                 "draw_cards::xmage_draw_card_variant_review_v1 rows with CounterTargetEffect + DrawCardSourceControllerEffect, exact supported counter-target spell Oracle text, and draw-on-counter runtime metadata",
+                "draw_cards::xmage_draw_card_variant_review_v1 rows with DrawDiscardControllerEffect or fixed DrawCardSourceControllerEffect + DiscardControllerEffect, exact Oracle/source draw-discard order agreement, and optional random discard metadata",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with PutOnLibraryTargetEffect, no extra ability class, exact graveyard-to-library top/bottom Oracle text, and self-graveyard targets only",
                 "recursion::xmage_graveyard_return_variant_review_v1 rows with RevealLibraryPickControllerEffect, no extra ability class, exact reveal-top-library pick-to-hand Oracle/source agreement, and graveyard rest destination",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with DamageTargetEffect + GainLifeEffect and exact fixed damage/life-gain Oracle text",

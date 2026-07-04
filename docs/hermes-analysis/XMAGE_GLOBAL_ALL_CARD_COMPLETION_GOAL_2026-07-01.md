@@ -865,13 +865,48 @@ PG384 completion and PG385 starting hypothesis:
    `removal_destroy::targeted_destroy_variant_v1` (`612`), and
    `tutor::xmage_library_search_variant_review_v1` (`613`).
 
+PG385 completion and PG386 starting hypothesis:
+
+1. PG385 promoted `9` fixed draw/discard spells on the new server:
+   `Ancestral Reminiscence`, `Careful Study`, `Catalog`, `Enhanced Awareness`,
+   `Prying Eyes`, `Rain of Revelation`, `Romantic Rendezvous`, `Sift`, and
+   `Thoughtflare`.
+2. The implementation added exact `xmage_fixed_draw_discard_spell_v1` mapping
+   for fixed `DrawDiscardControllerEffect` and fixed
+   `DrawCardSourceControllerEffect + DiscardControllerEffect` spell pairs,
+   requiring Oracle/source agreement on draw count, discard count, and order.
+3. Runtime now resolves both `draw_then_discard` and `discard_then_draw`,
+   emits `draw_discard_spell_resolved`, and keeps random-discard metadata
+   available for XMage pair effects that require it.
+4. Tests passed: splitter `327`, exact runtime `191`, sync selection `19`,
+   py_compile, and E2E package validation `status=pass`.
+5. PostgreSQL on the new server applied `9` upserts with `0` shadow rows
+   deprecated; postcheck verified `9/9`; Hermes/SQLite sync loaded `9` PG rows,
+   updated `9` SQLite rows, and exported `5137` canonical snapshot rows.
+6. Post-PG385 governance passed with strategy consistency `26/26`,
+   operational surface `pass`, and PG-Hermes-SQLite contract `50/50` pass
+   against `127.0.0.1:15432/halder`.
+7. The post-PG385 supported splitter returns `0` batch-safe proposals over
+   `7682` considered supported rows, so PG386 must implement another narrow
+   subpattern before PostgreSQL package generation.
+8. The largest remaining work units are now:
+   `recursion::xmage_graveyard_return_variant_review_v1` (`1820`),
+   `draw_engine::xmage_draw_card_variant_review_v1` (`1619`),
+   `grant_protection_from_chosen_color::xmage_targeted_protection_variant_review_v1`
+   (`1114`), `direct_damage::targeted_damage_variant_v1` (`888`),
+   `add_counters::source_add_counters_variant_v1` (`795`),
+   `life_gain::xmage_life_gain_variant_review_v1` (`735`),
+   `draw_cards::xmage_draw_card_variant_review_v1` (`615`),
+   `removal_destroy::targeted_destroy_variant_v1` (`612`), and
+   `tutor::xmage_library_search_variant_review_v1` (`613`).
+
 Fresh alignment evidence:
 
-- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
-  passed with `49` pass and `1` inherited warning.
-- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/pg_hermes_sqlite_contract_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
+  passed with `50/50`.
+- `docs/hermes-analysis/master_optimizer_reports/xmage_strategy_consistency_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
   passed with `26/26` checks.
-- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
+- `docs/hermes-analysis/master_optimizer_reports/operational_surface_alignment_audit_20260704_pg385_draw_discard_spell_runtime_new_server_docs_after_update.md`
   passed.
 - `docs/hermes-analysis/master_optimizer_reports/legacy_contamination_audit_20260704_post_pg379_fixed_damage_sacrifice_cost_new_server_docs_after_update.md`
   passed.
@@ -1153,7 +1188,7 @@ family are exhausted and the residual card is explicitly classified as manual.
 
 ## Current Priority Order
 
-Use the post-PG384 authoritative queue unless a newer queue exists:
+Use the post-PG385 authoritative queue unless a newer queue exists:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1820`
 2. `draw_engine::xmage_draw_card_variant_review_v1` - `1619`
@@ -1161,7 +1196,7 @@ Use the post-PG384 authoritative queue unless a newer queue exists:
 4. `direct_damage::targeted_damage_variant_v1` - `888`
 5. `add_counters::source_add_counters_variant_v1` - `795`
 6. `life_gain::xmage_life_gain_variant_review_v1` - `735`
-7. `draw_cards::xmage_draw_card_variant_review_v1` - `624`
+7. `draw_cards::xmage_draw_card_variant_review_v1` - `615`
 8. `removal_destroy::targeted_destroy_variant_v1` - `612`
 9. `tutor::xmage_library_search_variant_review_v1` - `613`
 10. `add_counters::targeted_add_counters_variant_v1` - `459`
