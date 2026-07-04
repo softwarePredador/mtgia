@@ -120,6 +120,7 @@ void main() {
         containsAll([
           'commander_intent_and_archetype',
           'primary_and_backup_win_plan',
+          'staple_impact_and_role_policy',
           'lane_balanced_cuts_and_anchor_protection',
           'goldfish_battle_replay_iteration',
         ]),
@@ -144,6 +145,7 @@ void main() {
           'commander_plan_sentence',
           'primary_win_lines',
           'role_counts_vs_targets',
+          'staple_impact_by_role',
           'protected_anchors_and_cut_rules',
         ]),
       );

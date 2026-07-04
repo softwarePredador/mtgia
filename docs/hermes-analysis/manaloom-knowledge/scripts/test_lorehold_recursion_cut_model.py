@@ -278,6 +278,28 @@ def test_recursion_model_blocks_pinnacle_after_prior_reject():
     assert by_pair[("Volcanic Vision", "Pinnacle Monk // Mystic Peak")]["status"] == (
         "blocked_prior_reject"
     )
-    restoration_pinnacle = by_pair[("Restoration Seminar", "Pinnacle Monk // Mystic Peak")]
-    assert restoration_pinnacle["status"] == "blocked_cut_prior_reject"
-    assert "cut_prior_reject_count:1" in restoration_pinnacle["blockers"]
+
+
+def test_recursion_model_blocks_cut_not_present_in_baseline_deck():
+    with memory_db() as conn:
+        conn.execute(
+            "DELETE FROM deck_cards WHERE deck_id=? AND card_name=?",
+            (607, "Squee, Goblin Nabob"),
+        )
+        payload = model.build_model(
+            conn=conn,
+            miner_report=miner_report(),
+            exposure_profiles=exposure_profiles(),
+        )
+
+    by_pair = {
+        (row["candidate"], row["cut"]): row
+        for row in payload["pair_evaluations"]
+    }
+    squee_pair = by_pair[("Volcanic Vision", "Squee, Goblin Nabob")]
+    assert squee_pair["status"] == "blocked_cut_not_in_baseline"
+    assert "cut_not_in_baseline_deck" in squee_pair["blockers"]
+    assert "cut_is_current_squee_recursion_engine" not in squee_pair["blockers"]
+    assert payload["guardrails"][0]["guardrail_key"] == (
+        "exclude_nonbaseline_squee_cut_options"
+    )

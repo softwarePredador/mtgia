@@ -263,19 +263,27 @@ def classify_pair(
 ) -> dict[str, Any]:
     candidate_name = str(pairing.get("candidate") or "")
     cut_name = str(cut_option.get("card_name") or "")
+    cut_key = normalize_key(cut_name)
     prior_rejection = (rejected_pairs or {}).get(
-        (normalize_key(candidate_name), normalize_key(cut_name))
+        (normalize_key(candidate_name), cut_key)
     )
-    cut_reject_count = int((rejected_cut_counts or {}).get(normalize_key(cut_name), 0))
+    cut_reject_count = int((rejected_cut_counts or {}).get(cut_key, 0))
     candidate = profile_summary(candidate_name, exposures)
     cut_profile = profile_summary(cut_name, exposures)
-    cut = deck_cards.get(normalize_key(cut_name), {"card_name": cut_name})
+    cut_missing_from_baseline = cut_key not in deck_cards
+    cut = deck_cards.get(cut_key, {"card_name": cut_name})
     candidate_blockers, candidate_score = candidate_runtime_status(candidate)
-    cut_blockers, cut_score = cut_safety_status(cut, cut_profile)
+    if cut_missing_from_baseline:
+        cut_blockers, cut_score = [], 0
+    else:
+        cut_blockers, cut_score = cut_safety_status(cut, cut_profile)
     base_score = int(pairing.get("candidate_score") or 0)
     score = base_score + candidate_score + cut_score
     blockers = sorted(set(candidate_blockers + cut_blockers))
-    if prior_rejection:
+    if cut_missing_from_baseline:
+        blockers.append("cut_not_in_baseline_deck")
+        status = "blocked_cut_not_in_baseline"
+    elif prior_rejection:
         blockers.append("prior_exact_package_reject")
         status = "blocked_prior_reject"
     elif cut_reject_count >= 1:
@@ -324,6 +332,7 @@ def build_model(
     rejected_pairs = rejected_pair_lookup(prior_package_reports or [])
     rejected_cut_counts = Counter(cut for _candidate, cut in rejected_pairs)
     deck_cards = deck_card_lookup(conn, deck_id)
+    squee_in_baseline = normalize_key("Squee, Goblin Nabob") in deck_cards
     pair_rows: list[dict[str, Any]] = []
     for pairing in recursion_pairings(miner_report):
         for cut_option in pairing.get("cut_options") or []:
@@ -366,10 +375,17 @@ def build_model(
         "top_pair_evaluations": pair_rows[:25],
         "pair_evaluations": pair_rows,
         "guardrails": [
-            {
-                "guardrail_key": "preserve_squee_current_engine",
-                "reason": "Squee has measured graveyard-return exposure and should not be cut for Volcanic Vision or Restoration Seminar.",
-            },
+            (
+                {
+                    "guardrail_key": "preserve_squee_current_engine",
+                    "reason": "Squee has measured graveyard-return exposure in the loaded baseline and should not be cut for Volcanic Vision or Restoration Seminar.",
+                }
+                if squee_in_baseline
+                else {
+                    "guardrail_key": "exclude_nonbaseline_squee_cut_options",
+                    "reason": "Squee has measured exposure in older/variant traces, but it is not present in the loaded baseline deck and cannot be used as a 607 cut.",
+                }
+            ),
             {
                 "guardrail_key": "protect_wincon_and_wipe_slots",
                 "reason": "Farewell, Furygale Flocking, and Mizzix's Mastery carry core wipe/wincon roles and are not blind recursion cuts.",
