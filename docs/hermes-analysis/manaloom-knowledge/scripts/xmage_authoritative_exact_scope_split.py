@@ -4501,12 +4501,13 @@ def is_static_keyword_creature_unit(row: dict[str, Any]) -> bool:
 
 
 def is_static_protection_from_colors_creature_unit(row: dict[str, Any]) -> bool:
+    abilities = ability_classes(row)
+    remaining = abilities - {"ProtectionAbility"}
     return (
-        str(row.get("adapter_work_unit") or "")
-        == "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal"
+        "ProtectionAbility" in abilities
         and not effect_classes(row)
-        and ability_classes(row) == {"ProtectionAbility"}
         and not (row.get("xmage_signals") or [])
+        and remaining.issubset(STATIC_SELF_KEYWORD_ABILITY_CLASSES)
     )
 
 
@@ -5023,12 +5024,15 @@ def protection_from_colors_from_oracle(metadata: dict[str, Any]) -> list[str] | 
     if not raw:
         return None
     text = re.sub(r"\([^)]*\)", "", raw)
-    text = re.sub(r"\s+", " ", text).strip().rstrip(".").lower()
+    text = re.sub(r"\s+", " ", text.replace("\n", ", ")).strip().rstrip(".").lower()
+    text = oracle_protection_clause(text) or text
     match = re.fullmatch(r"protection from (.+)", text)
     if not match:
         return None
     body = re.sub(r"\bfrom\s+", "", match.group(1))
     body = re.sub(r"\s*,\s*and\s+", ", ", body)
+    if body in {"all colors", "each color"}:
+        return list(PROTECTION_COLOR_ORDER)
     parts = [
         part.strip()
         for part in re.split(r"\s*,\s*|\s+and\s+", body)
@@ -5039,6 +5043,43 @@ def protection_from_colors_from_oracle(metadata: dict[str, Any]) -> list[str] | 
     if any(part not in PROTECTION_COLOR_WORDS for part in parts):
         return None
     return ordered_protection_colors(parts)
+
+
+def oracle_protection_clause(text: str) -> str | None:
+    parts = [
+        part.strip()
+        for part in re.split(r"\s*[,;]\s*", str(text or "").strip())
+        if part.strip()
+    ]
+    for index, part in enumerate(parts):
+        if part.startswith("protection from "):
+            return ", ".join(parts[index:])
+    return None
+
+
+def static_keywords_before_protection_from_oracle(metadata: dict[str, Any]) -> set[str] | None:
+    raw = str(metadata.get("oracle_text") or "").strip()
+    if not raw:
+        return None
+    text = re.sub(r"\([^)]*\)", "", raw)
+    text = re.sub(r"\s+", " ", text.replace("\n", ", ")).strip().rstrip(".").lower()
+    parts = [
+        part.strip()
+        for part in re.split(r"\s*[,;]\s*", text)
+        if part.strip()
+    ]
+    if not parts:
+        return None
+    allowed = set(STATIC_SELF_KEYWORD_ABILITY_CLASSES.values())
+    keywords: set[str] = set()
+    for part in parts:
+        if part.startswith("protection from "):
+            return keywords
+        normalized = normalize_keyword_phrase(part)
+        if normalized not in allowed:
+            return None
+        keywords.add(normalized)
+    return None
 
 
 def protection_from_colors_from_source(source: str) -> list[str] | str:
@@ -12061,6 +12102,13 @@ def split_row(
             return None, source_colors
         if source_colors != oracle_colors:
             return None, "static_protection_source_oracle_mismatch"
+        keywords = keywords_from_ability_classes(row)
+        oracle_keywords = static_keywords_before_protection_from_oracle(metadata)
+        if oracle_keywords is None:
+            return None, "static_protection_oracle_keyword_not_exact"
+        if keywords != oracle_keywords:
+            return None, "static_protection_oracle_keyword_mismatch"
+        keyword_list = ordered_keywords(keywords)
         effect_json = {
             "effect": "creature",
             "battle_model_scope": STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE,
@@ -12072,6 +12120,11 @@ def split_row(
             "protection_from_colors": oracle_colors,
             "xmage_ability_class": "ProtectionAbility",
         }
+        if keyword_list:
+            effect_json["keywords"] = keyword_list
+            effect_json["_keywords_are_self"] = True
+            for keyword in keyword_list:
+                effect_json[keyword] = True
         return build_proposal(
             row,
             metadata,
@@ -15624,7 +15677,7 @@ def build_exact_split_report(
             "supported_adapter_work_units": sorted(SUPPORTED_UNITS),
             "supported_dynamic_adapter_work_units": [
                 "no-effect/no-signal static self keyword creature rows without ProtectionAbility or WardAbility",
-                "no-effect/no-signal ProtectionAbility creature rows with exact Oracle/XMage protection from color words only",
+                "no-effect/no-signal ProtectionAbility creature rows, optionally with static self keywords, with exact Oracle/XMage protection from color words only",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",
                 "life_gain::xmage_life_gain_variant_review_v1 rows with GainLifeEffect and DiesSourceTriggeredAbility plus only static self keywords",
                 "draw_engine::xmage_draw_card_variant_review_v1 rows with DrawCardSourceControllerEffect and EntersBattlefieldTriggeredAbility plus only static self keywords",

@@ -1,0 +1,42 @@
+{
+  "status": "pass",
+  "focused_tests": {
+    "test_xmage_authoritative_exact_scope_split.py": {
+      "passed": 419
+    },
+    "test_xmage_exact_scope_runtime.py": {
+      "passed": 241
+    },
+    "test_xmage_batch_pg_package_builder.py__test_sync_battle_card_rules_pg_selection.py__test_sync_battle_card_rules_manual_preserve.py": {
+      "passed": 27,
+      "notes": "Existing SQLite ResourceWarning messages appeared, but no failures."
+    }
+  },
+  "runtime_behavior_validated": [
+    "static keywords are preserved in the same creature effect_json as protection_from",
+    "protection_from field persists on the creature permanent",
+    "matching colored source is rejected by target legality",
+    "direct damage resolves as no_legal_creature_target when the only creature target is protected",
+    "nonmatching colored source remains legal"
+  ],
+  "audits": {
+    "xmage_strategy_consistency": {
+      "status": "pass",
+      "checks": 26
+    },
+    "operational_surface_alignment": {
+      "status": "pass"
+    },
+    "pg_hermes_sqlite_contract_after_hash_backfill": {
+      "status": "pass",
+      "checks": 51
+    },
+    "legacy_contamination": {
+      "status": "pass"
+    },
+    "global_card_oracle_battle_readiness": {
+      "status": "action_required",
+      "expected_reason": "all-card queue remains open after this 32-card package"
+    }
+  }
+}

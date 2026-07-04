@@ -7876,7 +7876,7 @@ Rules:
 ## Current Priority Order
 
 Use the fresh global authoritative queue after every package. As of the
-post-PG413 queue on the new server, the next exact runtime-backed work should
+post-PG414 queue on the new server, the next exact runtime-backed work should
 be selected from these largest reusable work units, not from deck intuition:
 
 1. `recursion::xmage_graveyard_return_variant_review_v1` - `1799`
@@ -8129,6 +8129,45 @@ new server:
 - Post-sync queue rebuild reduced the Commander-legal target identity queue
   from `26644` to `26625` and authoritative adapter-required count from
   `26330` to `26311`. The post-PG413 exact split recheck produced
+  `proposal_count=0`; the remaining `314` identities are still explicit
+  missing-source exceptions.
+
+PG414 extended the static protection-from-colors subpattern to creatures whose
+`ProtectionAbility` is combined with already-supported static self keywords on
+the new server:
+
+- Split support now accepts no-effect/no-signal `ProtectionAbility` rows with
+  static self keyword abilities such as flying, first strike, defender, double
+  strike, trample, vigilance, haste, and lifelink, as long as Oracle text and
+  local XMage source agree on exact color protection. `Protection from each
+  color` maps to the five colored source protections and still does not cover
+  colorless sources.
+- Focused tests passed:
+  `test_xmage_authoritative_exact_scope_split.py` (`419` tests) and
+  `test_xmage_exact_scope_runtime.py` (`241` tests). Split tests cover
+  `Flying, protection from red` and `Flying, protection from each color`;
+  runtime coverage is inherited from the focused protection target-legality
+  test and static keyword tests.
+- Exact split:
+  `xmage_authoritative_exact_scope_split_20260704_pg414_static_keyword_protection_colors_new_server`
+  produced `32` safe candidates. The split also left `22` non-color protection
+  rows blocked as `static_protection_oracle_not_color_exact`.
+- PostgreSQL package `PG414` was applied on the new server:
+  `32` upserted rows, `0` deprecated shadow rows, and postcheck `32/32`
+  `verified`/`auto` rows with Oracle hashes.
+- PG -> SQLite sync for the package loaded `32` PostgreSQL rows, updated `32`
+  SQLite rows, and exported `5432` canonical snapshot rows.
+- Contract cleanup in the same closeout backfilled missing `oracle_hash` for
+  `44` older trusted executable PostgreSQL rows on
+  `127.0.0.1:15432/halder`; full PG -> SQLite sync then loaded `4298`
+  PostgreSQL rows, updated `4293` SQLite rows, and exported `5432` canonical
+  snapshot rows.
+- Final governance audits passed after hash cleanup:
+  XMage strategy (`26/26`), operational surface, PG/Hermes/SQLite contract
+  (`51/51`), and legacy contamination.
+- Post-sync queue rebuild reduced the Commander-legal target identity queue
+  from `26625` to `26593` and authoritative adapter-required count from
+  `26311` to `26279`. The post-PG414 exact split recheck produced
   `proposal_count=0`; the remaining `314` identities are still explicit
   missing-source exceptions.
 

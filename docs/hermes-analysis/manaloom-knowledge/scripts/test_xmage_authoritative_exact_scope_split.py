@@ -12016,6 +12016,66 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         effect = proposal["effect_json"]
         self.assertEqual(effect["protection_from"], ["blue", "black", "red"])
 
+    def test_static_protection_with_flying_creature_maps_keyword_and_color(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Abbey Gargoyles",
+                type_line="Creature - Gargoyle",
+                oracle_text="Flying, protection from red",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                this.addAbility(ProtectionAbility.from(ObjectColor.RED));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["battle_model_scope"], split.STATIC_PROTECTION_FROM_COLORS_CREATURE_SCOPE)
+        self.assertEqual(effect["protection_from"], ["red"])
+        self.assertEqual(effect["keywords"], ["flying"])
+        self.assertTrue(effect["flying"])
+
+    def test_static_protection_with_flying_creature_maps_each_color(self) -> None:
+        row = queue_row(
+            "xmage_signature::no_effect_class::FlyingAbility,ProtectionAbility::no_target_class::no_condition_class::no_signal",
+            effect_classes=[],
+            ability_kind="static",
+            ability_classes=["FlyingAbility", "ProtectionAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Iridescent Angel",
+                type_line="Creature - Angel",
+                oracle_text="Flying, protection from each color",
+            ),
+            source_text="""
+                this.addAbility(FlyingAbility.getInstance());
+                private static final FilterCard filter = new FilterCard("each color");
+                static {
+                    filter.add(new ColorPredicate(ObjectColor.BLACK));
+                    filter.add(new ColorPredicate(ObjectColor.BLUE));
+                    filter.add(new ColorPredicate(ObjectColor.GREEN));
+                    filter.add(new ColorPredicate(ObjectColor.RED));
+                    filter.add(new ColorPredicate(ObjectColor.WHITE));
+                }
+                this.addAbility(new ProtectionAbility(filter));
+            """,
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["protection_from"], ["white", "blue", "black", "red", "green"])
+        self.assertEqual(effect["keywords"], ["flying"])
+
     def test_static_protection_creature_blocks_non_color_protection(self) -> None:
         row = queue_row(
             "xmage_signature::no_effect_class::ProtectionAbility::no_target_class::no_condition_class::no_signal",

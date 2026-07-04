@@ -1,0 +1,47 @@
+{
+  "status": "applied_postchecked_synced",
+  "deploy_id": "PG414",
+  "runtime_scope": "xmage_static_self_protection_from_colors_creature_v1",
+  "selected_count": 32,
+  "blocked_non_color_protection_count": 22,
+  "precheck": {
+    "oracle_hash_matched_cards": 32,
+    "existing_rule_rows": 0,
+    "would_deprecate_shadow_rows": 0
+  },
+  "apply": {
+    "upserted_rows": 32,
+    "deprecated_shadow_rows": 0
+  },
+  "postcheck": {
+    "promoted_rows": 32,
+    "verified_auto_rows": 32,
+    "oracle_hash_matched_rows": 32
+  },
+  "sync": {
+    "pg_rows_loaded": 32,
+    "sqlite_inserted_or_updated": 32,
+    "canonical_snapshot_rows_exported": 5432
+  },
+  "integrity_cleanup": {
+    "oracle_hash_backfilled_rows": 44,
+    "full_pg_rows_loaded_after_backfill": 4298,
+    "full_sqlite_inserted_or_updated_after_backfill": 4293,
+    "canonical_snapshot_rows_exported_after_backfill": 5432
+  },
+  "direct_validation": {
+    "pg_scope_rows_total": 51,
+    "pg_verified_auto_rows_total": 51,
+    "sqlite_scope_rows_total": 51,
+    "sqlite_verified_auto_rows_total": 51
+  },
+  "queue_delta": {
+    "adapter_required_before": 26311,
+    "adapter_required_after": 26279,
+    "target_identity_count_before": 26625,
+    "target_identity_count_after": 26593
+  },
+  "post_apply_recheck": {
+    "proposal_count": 0
+  }
+}
