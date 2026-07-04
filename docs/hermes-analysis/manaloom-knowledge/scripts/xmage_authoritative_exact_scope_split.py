@@ -125,6 +125,7 @@ DESTROY_DRAW_SCOPE = "xmage_destroy_target_and_draw_card_spell_v1"
 BOUNCE_DRAW_SCOPE = "xmage_return_target_to_hand_and_draw_card_spell_v1"
 EXILE_SCOPE = "xmage_exile_target_spell_v1"
 MANA_SCOPE = "xmage_simple_tap_mana_source_permanent_v1"
+MANA_WITH_ACTIVATED_DRAW_SCOPE = "xmage_simple_tap_mana_source_with_activated_draw_v1"
 COUNTER_SCOPE = "xmage_counter_target_spell_v1"
 COUNTER_DRAW_SCOPE = "xmage_counter_target_and_draw_card_spell_v1"
 BOUNCE_SCOPE = "xmage_return_target_to_hand_spell_v1"
@@ -4737,6 +4738,43 @@ def activated_draw_from_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str
     if sacrifice_target:
         activation["activation_sacrifice_target"] = sacrifice_target
         activation["activation_requires_sacrifice_target"] = True
+    return activation
+
+
+def activated_draw_from_mana_source_oracle(metadata: dict[str, Any]) -> dict[str, Any] | str:
+    text = oracle_text(metadata)
+    matches = list(
+        re.finditer(
+            r"(?:^|\.\s*)(?P<cost>[^.:]+):\s*draw (?P<count>a|one|two|three|four|five|\d+) cards?\.?",
+            text,
+        )
+    )
+    if len(matches) != 1:
+        return "mana_source_activated_draw_oracle_not_simple"
+    cost_text = matches[0].group("cost").strip()
+    count = number_word_to_int(matches[0].group("count"))
+    if count <= 0:
+        return "mana_source_activated_draw_oracle_not_simple"
+
+    type_line = str(metadata.get("type_line") or "").lower()
+    self_type = "artifact" if "artifact" in type_line else "creature" if "creature" in type_line else "permanent"
+    normalized_cost = cost_text
+    candidate_names = [str(metadata.get("name") or "").strip().lower()]
+    if "//" in candidate_names[0]:
+        candidate_names.extend(part.strip() for part in candidate_names[0].split("//"))
+    for candidate_name in sorted({name for name in candidate_names if name}, key=len, reverse=True):
+        normalized_cost = re.sub(
+            rf"\bsacrifice\s+{re.escape(candidate_name)}\b",
+            f"sacrifice this {self_type}",
+            normalized_cost,
+        )
+    activation = activation_cost_from_oracle_prefix(normalized_cost, allow_source_sacrifice=True)
+    if isinstance(activation, str):
+        return str(activation).replace(
+            "activated_self_boost",
+            "mana_source_activated_draw",
+        )
+    activation["count"] = count
     return activation
 
 
@@ -12652,6 +12690,105 @@ def split_row(
             return None, "mana_source_unsafe_ability_class"
         if not mana_ability_classes.intersection(SAFE_MANA_ABILITY_CLASSES):
             return None, "mana_source_safe_ability_missing"
+        mana_source_with_activated_draw = (
+            classes == {"DrawCardSourceControllerEffect"}
+            and "SimpleActivatedAbility" in mana_ability_classes
+            and not (
+                mana_ability_classes
+                - SAFE_MANA_ABILITY_CLASSES
+                - SAFE_MANA_AUXILIARY_ABILITY_CLASSES
+                - {"SimpleActivatedAbility"}
+            )
+        )
+        if mana_source_with_activated_draw:
+            mana_source_detail = simple_mana_source_detail_from_oracle(metadata)
+            if mana_source_detail is None:
+                return None, "mana_source_oracle_not_simple"
+            oracle_activation = activated_draw_from_mana_source_oracle(metadata)
+            if isinstance(oracle_activation, str):
+                return None, oracle_activation
+            parsed_activation = activated_draw_from_source(source_text)
+            if isinstance(parsed_activation, str):
+                return None, parsed_activation.replace("activated_draw", "mana_source_activated_draw")
+            for key in (
+                "count",
+                "activation_cost_mana",
+                "activation_cost_generic",
+                "activation_cost_colors",
+                "activation_requires_tap",
+                "activation_requires_sacrifice",
+            ):
+                if parsed_activation.get(key) != oracle_activation.get(key):
+                    return None, "mana_source_activated_draw_source_oracle_mismatch"
+            type_line = str(metadata.get("type_line") or "").lower()
+            permanent_type = (
+                "creature"
+                if "creature" in type_line
+                else "artifact"
+                if "artifact" in type_line
+                else "permanent"
+            )
+            oracle_count = int(oracle_activation["count"])
+            activated_effect = {
+                "effect": "draw_cards",
+                "battle_model_scope": PERMANENT_ACTIVATED_DRAW_SCOPE,
+                "ability_kind": "activated",
+                "activated_effect": "draw_cards",
+                "activated_draw": True,
+                "activated_draw_count": oracle_count,
+                "count": oracle_count,
+                "draw_count": oracle_count,
+                "xmage_effect_class": "DrawCardSourceControllerEffect",
+                "xmage_ability_class": "SimpleActivatedAbility",
+                **parsed_activation,
+            }
+            effect_json = {
+                "effect": "ramp_permanent",
+                "battle_model_scope": MANA_WITH_ACTIVATED_DRAW_SCOPE,
+                "is_mana_source": True,
+                "mana_produced": int(mana_source_detail["mana_produced"]),
+                "produces": str(mana_source_detail["produces"]),
+                "activation_requires_tap": bool(parsed_activation.get("activation_requires_tap")),
+                "mana_activation_requires_tap": True,
+                "permanent_type": permanent_type,
+                "ability_kind": "mana_and_activated",
+                "activated_effect": "draw_cards",
+                "activated_battle_model_scope": PERMANENT_ACTIVATED_DRAW_SCOPE,
+                "activated_draw": True,
+                "activated_draw_count": oracle_count,
+                "count": oracle_count,
+                "draw_count": oracle_count,
+                "activated_self_sacrifice_draw": bool(parsed_activation.get("activation_requires_sacrifice")),
+                "activated_draw_on_self_sacrifice": bool(parsed_activation.get("activation_requires_sacrifice")),
+                "draw_on_self_sacrifice": oracle_count
+                if parsed_activation.get("activation_requires_sacrifice")
+                else None,
+                "xmage_mana_ability_classes": sorted(
+                    mana_ability_classes - {"SimpleActivatedAbility"}
+                ),
+                "xmage_effect_classes": sorted(classes),
+                "xmage_ability_classes": sorted(mana_ability_classes),
+                "_activated_rule_effects": [activated_effect],
+                **parsed_activation,
+            }
+            if effect_json["draw_on_self_sacrifice"] is None:
+                effect_json.pop("draw_on_self_sacrifice", None)
+            if mana_source_detail.get("produced_mana_symbols"):
+                effect_json["produced_mana_symbols"] = list(mana_source_detail["produced_mana_symbols"])
+            static_keywords = ordered_keywords(
+                keywords_from_ability_classes({"xmage_ability_classes": list(mana_ability_classes)})
+            )
+            if static_keywords:
+                effect_json["keywords"] = static_keywords
+                effect_json["_keywords_are_self"] = True
+            if "EntersBattlefieldTappedAbility" in mana_ability_classes:
+                effect_json["enters_tapped"] = True
+            return build_proposal(
+                row,
+                metadata,
+                effect_json,
+                family_id="xmage_simple_mana_source_with_activated_draw",
+            ), "selected_exact_scope"
         auxiliary_abilities = mana_ability_classes - SAFE_MANA_ABILITY_CLASSES
         if auxiliary_abilities - SAFE_MANA_AUXILIARY_ABILITY_CLASSES:
             return None, "mana_source_auxiliary_ability_not_supported"

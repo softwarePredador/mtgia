@@ -4460,6 +4460,89 @@ class XMageAuthoritativeExactScopeSplitTest(unittest.TestCase):
         self.assertEqual(effect["produces"], "WUBRG")
         self.assertEqual(effect["keywords"], ["indestructible"])
 
+    def test_simple_mana_source_with_activated_self_sacrifice_draw_maps(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=[
+                "BlackManaAbility",
+                "GreenManaAbility",
+                "SimpleActivatedAbility",
+                "WhiteManaAbility",
+            ],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Abzan Banner",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {W}, {B}, or {G}.\n"
+                    "{W}{B}{G}, {T}, Sacrifice this artifact: Draw a card."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new WhiteManaAbility());"
+                "this.addAbility(new BlackManaAbility());"
+                "this.addAbility(new GreenManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new DrawCardSourceControllerEffect(1), new ManaCostsImpl<>(\"{W}{B}{G}\"));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertEqual(reason, "selected_exact_scope")
+        effect = proposal["effect_json"]
+        self.assertEqual(effect["effect"], "ramp_permanent")
+        self.assertEqual(effect["battle_model_scope"], split.MANA_WITH_ACTIVATED_DRAW_SCOPE)
+        self.assertTrue(effect["is_mana_source"])
+        self.assertEqual(effect["produces"], "WBG")
+        self.assertEqual(effect["mana_produced"], 1)
+        self.assertEqual(effect["ability_kind"], "mana_and_activated")
+        self.assertTrue(effect["activated_draw"])
+        self.assertEqual(effect["activated_draw_count"], 1)
+        self.assertEqual(effect["draw_on_self_sacrifice"], 1)
+        self.assertEqual(effect["activation_cost_mana"], "{W}{B}{G}")
+        self.assertEqual(effect["activation_cost_colors"], ["W", "B", "G"])
+        self.assertTrue(effect["activation_requires_tap"])
+        self.assertTrue(effect["activation_requires_sacrifice"])
+        self.assertEqual(effect["xmage_mana_ability_classes"], ["BlackManaAbility", "GreenManaAbility", "WhiteManaAbility"])
+        self.assertEqual(effect["_activated_rule_effects"][0]["battle_model_scope"], split.PERMANENT_ACTIVATED_DRAW_SCOPE)
+
+    def test_simple_mana_source_with_hybrid_activated_draw_cost_stays_blocked(self) -> None:
+        row = queue_row(
+            split.RAMP_ARTIFACT_UNIT,
+            effect_classes=["DrawCardSourceControllerEffect"],
+            ability_kind="activated",
+            ability_classes=["BlueManaAbility", "SimpleActivatedAbility", "WhiteManaAbility"],
+        )
+        proposal, reason = split.split_row(
+            row,
+            metadata(
+                name="Azorius Locket",
+                type_line="Artifact",
+                oracle_text=(
+                    "{T}: Add {W} or {U}.\n"
+                    "{W/U}{W/U}{W/U}{W/U}, {T}, Sacrifice this artifact: Draw two cards."
+                ),
+            ),
+            source_text=(
+                "this.addAbility(new WhiteManaAbility());"
+                "this.addAbility(new BlueManaAbility());"
+                "Ability ability = new SimpleActivatedAbility("
+                "new DrawCardSourceControllerEffect(2), new ManaCostsImpl<>(\"{W/U}{W/U}{W/U}{W/U}\"));"
+                "ability.addCost(new TapSourceCost());"
+                "ability.addCost(new SacrificeSourceCost());"
+                "this.addAbility(ability);"
+            ),
+        )
+
+        self.assertIsNone(proposal)
+        self.assertEqual(reason, "mana_source_activated_draw_oracle_cost_not_supported")
+
     def test_simple_mana_source_with_unsupported_auxiliary_stays_blocked(self) -> None:
         row = queue_row(
             split.RAMP_ARTIFACT_UNIT,

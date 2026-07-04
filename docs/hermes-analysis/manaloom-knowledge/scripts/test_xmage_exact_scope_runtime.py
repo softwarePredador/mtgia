@@ -5729,6 +5729,76 @@ class XMageExactScopeRuntimeTest(unittest.TestCase):
             )
         )
 
+    def test_mana_source_with_self_sacrifice_draw_refreshes_then_cashes_in(self) -> None:
+        active = self.battle.Player("Active", None, [])
+        opponent = self.battle.Player("Opponent", None, [])
+        active.library.extend(
+            [
+                {"name": "Fresh Card", "type_line": "Instant"},
+                {"name": "Backup Card", "type_line": "Sorcery"},
+            ]
+        )
+        banner = {
+            "name": "Fixture Banner",
+            "type_line": "Artifact",
+            "effect": "ramp_permanent",
+            "battle_model_scope": "xmage_simple_tap_mana_source_with_activated_draw_v1",
+            "is_mana_source": True,
+            "mana_produced": 1,
+            "produces": "WBG",
+            "activation_requires_tap": True,
+            "mana_activation_requires_tap": True,
+            "permanent_type": "artifact",
+            "activated_draw": True,
+            "activated_draw_count": 1,
+            "activated_self_sacrifice_draw": True,
+            "activated_draw_on_self_sacrifice": True,
+            "draw_on_self_sacrifice": 1,
+            "activation_cost_mana": "{W}{B}{G}",
+            "activation_cost_generic": 0,
+            "activation_cost_colors": ["W", "B", "G"],
+            "activation_requires_sacrifice": True,
+            "_rule_logical_key": "battle_rule_v1:fixture_banner",
+        }
+        active.battlefield.append(banner)
+
+        active.refresh_mana_sources(turn=7)
+
+        self.assertEqual(active.available_mana(), 1)
+        self.assertTrue(banner["tapped"])
+
+        banner["tapped"] = False
+        active.mana_pool.empty()
+        active.conditional_mana_sources = []
+        active.mana_pool.add("white", 1)
+        active.mana_pool.add("black", 1)
+        active.mana_pool.add("green", 1)
+
+        activated = self.battle.activate_utility_artifacts(
+            active,
+            [opponent],
+            [active, opponent],
+            turn=7,
+            rng=random.Random(61),
+            phase="postcombat_main",
+        )
+
+        self.assertEqual(activated, 1)
+        self.assertNotIn(banner, active.battlefield)
+        self.assertIn(banner, active.graveyard)
+        self.assertEqual([card["name"] for card in active.hand], ["Fresh Card"])
+        self.assertEqual(active.available_mana(), 0)
+        self.assertTrue(
+            any(
+                event == "utility_artifact_activated"
+                and data.get("card") == "Fixture Banner"
+                and data.get("activation_kind") == "self_sacrifice_draw"
+                and data.get("activation_cost") == "{W}{B}{G}"
+                and data.get("cards_drawn") == 1
+                for event, data in self.events
+            )
+        )
+
     def test_simple_mana_source_permanent_refreshes_fixed_distinct_symbols(self) -> None:
         active = self.battle.Player("Active", None, [])
         engineer = {
